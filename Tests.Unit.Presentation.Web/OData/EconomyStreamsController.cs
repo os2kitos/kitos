@@ -241,7 +241,7 @@ namespace Tests.Unit.Presentation.Web.OData
                         {
                             new OrganizationRight
                             {
-                                ObjectId = orgKey
+                                OrganizationId = orgKey
                             }
                         }
                 });

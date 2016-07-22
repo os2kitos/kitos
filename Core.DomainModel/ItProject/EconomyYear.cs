@@ -3,7 +3,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// Economy for an it project in a specific year.
     /// </summary>
-    public class EconomyYear : Entity, IContextAware
+    public class EconomyYear : Entity, IContextAware, IProjectModule
     {
         public int YearNumber { get; set; }
 

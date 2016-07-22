@@ -1,60 +1,66 @@
-﻿(function (ng, app) {
-    app.config([
-        '$stateProvider', function ($stateProvider) {
-            $stateProvider.state('global-admin.organizations.create', {
-                url: '/create',
-                authRoles: ['GlobalAdmin'],
-                onEnter: ['$state', '$stateParams', '$uibModal',
-                    function ($state, $stateParams, $modal) {
-                        $modal.open({
-                            templateUrl: 'app/components/global-admin/global-admin-organization-modal.view.html',
-                            // fade in instead of slide from top, fixes strange cursor placement in IE
-                            // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                            windowClass: 'modal fade in',
-                            controller: 'globalAdmin.createOrganizationCtrl',
-                        }).result.then(function () {
-                            // OK
-                            // GOTO parent state and reload
-                            $state.go('^', null, { reload: true });
-                        }, function () {
-                            // Cancel
-                            // GOTO parent state
-                            $state.go('^');
-                        });
-                    }
-                ]
-            });
-        }
-    ]);
+﻿module Kitos.GlobalAdmin.Organization {
+    "use strict";
 
-    app.controller('globalAdmin.createOrganizationCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', function ($rootScope, $scope, $http, notify) {
+    export class CreateOrganizationController {
+        public title: string;
+        public org;
+
+        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify'];
+
+        constructor(private $rootScope, private $scope, private $http, private notify) {
             $rootScope.page.title = 'Ny organisation';
-            $scope.title = 'Opret organisation';
-
-            function init() {
-                $scope.org = {};
-                $scope.org.accessModifier = 0;
-                $scope.org.type = 1; // set type to municipality by default
-            };
-
-            init();
-
-            $scope.dismiss = function () {
-                $scope.$dismiss();
-            };
-
-            $scope.submit = function () {
-                var payload = $scope.org;
-                $http.post('api/organization', payload)
-                    .success(function (result) {
-                        notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
-                        $scope.$close(true);
-                    })
-                    .error(function (result) {
-                        notify.addErrorMessage("Organisationen " + $scope.org.name + " kunne ikke oprettes!");
-                    });
-            };
+            this.title = 'Opret organisation';
+            this.org = {};
+            this.org.accessModifier = 0;
+            this.org.typeId = 1; // set type to municipality by default
         }
-    ]);
-})(angular, app);
+
+        public dismiss() {
+            this.$scope.$dismiss();
+        }
+
+        public submit() {
+            var payload = this.org;
+            this.$http.post('api/organization', payload)
+                .success((result) => {
+                    this.notify.addSuccessMessage("Organisationen " + result.response.name + " er blevet oprettet!");
+                    this.$scope.$close(true);
+                })
+                .error((result) => {
+                    this.notify.addErrorMessage("Organisationen " + this.org.name + " kunne ikke oprettes!");
+                });
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            '$stateProvider', ($stateProvider) => {
+                $stateProvider.state('global-admin.organizations.create', {
+                    url: '/create',
+                    authRoles: ['GlobalAdmin'],
+                    onEnter: ['$state', '$stateParams', '$uibModal',
+                        ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: ng.ui.bootstrap.IModalService) => {
+                            $modal.open({
+                                size: 'lg',
+                                templateUrl: 'app/components/global-admin/global-admin-organization-modal.view.html',
+                                // fade in instead of slide from top, fixes strange cursor placement in IE
+                                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                                windowClass: 'modal fade in',
+                                controller: CreateOrganizationController,
+                                controllerAs: "ctrl"
+                            }).result.then(() => {
+                                // OK
+                                // GOTO parent state and reload
+                                $state.go('^', null, { reload: true });
+                            }, function () {
+                                // Cancel
+                                // GOTO parent state
+                                $state.go('^');
+                            });
+                        }
+                    ]
+                });
+            }
+        ]);
+}

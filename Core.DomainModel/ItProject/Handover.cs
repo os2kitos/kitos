@@ -6,13 +6,13 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project handover data.
     /// </summary>
-    public class Handover : Entity, IContextAware
+    public class Handover : Entity, IContextAware, IProjectModule
     {
         public Handover()
         {
             this.Participants = new List<User>();
         }
-        
+
         public string Description { get; set; }
         public DateTime? MeetingDate { get; set; }
         public string Summary { get; set; }

@@ -12,12 +12,12 @@ namespace Presentation.Web.Controllers.API
     public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
         where TObject : HasRightsEntity<TObject, TRight, TRole>, IContextAware
         where TRight : Entity, IRight<TObject, TRight, TRole>
-        where TRole : IRoleEntity<TRight>
+        where TRole : IRoleEntity
     {
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
-        protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository )
+        protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;
@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API
             var obj = _objectRepository.GetByKey(objectId);
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess))
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
                 return true;
 
             return obj.HasUserWriteAccess(user);

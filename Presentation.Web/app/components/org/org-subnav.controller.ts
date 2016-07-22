@@ -7,16 +7,9 @@
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();
-                }],
-                organizationRoles: [
-                        '$http', function ($http) {
-                            return $http.get('api/OrganizationRole').then(function (result) {
-                                return result.data.response;
-                            });
-                        }
-                ],
+                }]
             },
-            controller: ['$rootScope', '$uibModal', '$state', 'user', 'organizationRoles', function ($rootScope, $modal, $state, user, organizationRoles: { id; name; }[]) {
+            controller: ['$rootScope', '$uibModal', '$state', 'user', function ($rootScope, $modal, $state, user) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -38,9 +31,6 @@
                     $state.go('.', null, { reload: true });
                 }
 
-                var orgUserRole = _.find(organizationRoles, function (role) { return role.name == 'Medarbejder'; });
-
-
                 function createUser() {
                     var modal = $modal.open({
                         // fade in instead of slide from top, fixes strange cursor placement in IE
@@ -48,7 +38,7 @@
                         windowClass: 'modal fade in',
                         templateUrl: 'app/components/org/user/org-user-modal-create.view.html',
                         controller: ['$scope', '$uibModalInstance', '$http', 'notify', 'autofocus', function ($modalScope, $modalInstance, $http, notify, autofocus) {
-                            if (!orgUserRole && !user.currentOrganizationId) {
+                            if (!user.currentOrganizationId) {
                                 notify.addErrorMessage("Fejl! Kunne ikke oprette bruger.", true);
                                 return;
                             }
@@ -80,7 +70,7 @@
 
                                     var data = {
                                         userId: userResult.id,
-                                        roleId: orgUserRole.id,
+                                        role: Kitos.API.Models.OrganizationRole.User,
                                     };
 
                                     $http.post("api/OrganizationRights/?rightByOrganizationRight&organizationId=" + oId + "&userId=" + user.id, data, { handleBusy: true }).success(function (result) {

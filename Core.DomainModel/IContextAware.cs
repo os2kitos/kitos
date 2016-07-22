@@ -13,5 +13,7 @@
         ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
         /// </returns>
         bool IsInContext(int organizationId);
+
+        //int GetOrganizationId();
     }
 }

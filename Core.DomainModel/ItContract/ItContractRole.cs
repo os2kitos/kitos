@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract role option.
     /// </summary>
-    public class ItContractRole : Entity, IRoleEntity<ItContractRight>
+    public class ItContractRole : Entity, IRoleEntity, IOptionEntity<ItContractRight>
     {
         public ItContractRole()
         {

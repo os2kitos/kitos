@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// Represents a milestone for a it project. (OIO entity: "Tilstand")
     /// </summary>
-    public class Milestone : ItProjectStatus
+    public class Milestone : ItProjectStatus, IProjectModule
     {
         /// <summary>
         /// Gets or sets the date for the milestone.

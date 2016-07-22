@@ -27,24 +27,25 @@ namespace Presentation.Web.Controllers.OData
             return base.Get();
         }
 
-        // GET /Organizations(1)/ItSystems
+        // GET /Organizations(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItProjects")]
-        public IHttpActionResult GetItSystems(int key)
+        public IHttpActionResult GetItProjects(int key)
         {
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
             return Ok(result);
         }
 
-        // GET /Organizations(1)/ItSystems(1)
+        // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
-        public IHttpActionResult GetItSystems(int orgKey, int projKey)
+        public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var result = Repository.AsQueryable().Where(m => m.Id == projKey && (m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public));
             return Ok(result);
         }
 
+        // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)

@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItContract
     /// It contract economy stream.
     /// </summary>
     /// TODO Refactor into a base class and extern & intern derived classes
-    public class EconomyStream : Entity, IContextAware
+    public class EconomyStream : Entity, IContextAware, IContractModule
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.

@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project goal status.
     /// </summary>
-    public class GoalStatus : Entity, IContextAware
+    public class GoalStatus : Entity, IContextAware, IProjectModule
     {
         public GoalStatus()
         {

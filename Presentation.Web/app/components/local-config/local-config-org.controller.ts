@@ -1,28 +1,41 @@
-﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('local-config.org', {
-            url: '/org',
-            templateUrl: 'app/components/local-config/local-config-org.view.html',
-            controller: 'local-config.EditOrgCtrl',
-            resolve: {
-                organization: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function(user) {
-                        return $http.get('api/organization/' + user.currentOrganizationId).then(function(result) {
-                            return result.data.response;
-                        });
-                    });
-                }]
-            }
-        });
-    }]);
+﻿module Kitos.LocalAdmin.Organization {
+    "use strict";
 
-    app.controller('local-config.EditOrgCtrl', ['$scope', '$http', 'notify', 'config', 'organization',
-            function ($scope, $http, notify, config, organization) {
-                $scope.orgName = organization.name;
-                $scope.orgCvr = organization.cvr;
-                $scope.orgType = organization.type;
-                $scope.orgAutosaveUrl = 'api/organization/' + organization.id;
+    export class OrganizationController {
+        public orgAutosaveUrl: string;
+        public typeName: string;
+        public static $inject: string[] = ['$scope', '$http', 'notify', 'organization'];
+
+        constructor(private $scope, private $http, private notify, public organization) {
+            switch (organization.typeId) {
+                case 1: this.typeName = 'Kommune'; break;
+                case 2: this.typeName = 'Interessefællesskab'; break;
+                case 3: this.typeName = 'Virksomhed'; break;
+                case 4: this.typeName = 'Anden offentlig myndighed'; break;
             }
-        ]
-    );
-})(angular, app);
+
+            this.orgAutosaveUrl = 'api/organization/' + organization.id;
+        }
+    }
+
+    angular
+        .module("app")
+        .config([
+            '$stateProvider', ($stateProvider: ng.ui.IStateProvider) => {
+                $stateProvider.state('local-config.org', {
+                    url: '/org',
+                    templateUrl: 'app/components/local-config/local-config-org.view.html',
+                    controller: OrganizationController,
+                    controllerAs: 'orgCtrl',
+                    resolve: {
+                        organization: ['$http', 'userService', ($http: ng.IHttpService, userService) => {
+                            return userService.getUser().then((user) => {
+                                return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organization/' + user.currentOrganizationId).then((result) => {
+                                    return result.data.response;
+                                });
+                            });
+                        }]
+                    }
+                });
+            }]);
+}

@@ -9,7 +9,7 @@ namespace Presentation.Web.Models
         public string Name { get; set; }
         public string Cvr { get; set; }
 
-        public OrganizationType Type { get; set; }
+        public int TypeId { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public ConfigDTO Config { get; set; }
 

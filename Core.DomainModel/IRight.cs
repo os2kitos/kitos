@@ -11,7 +11,7 @@
     public interface IRight<TObject, TRight, TRole>
         where TObject : HasRightsEntity<TObject, TRight, TRole>
         where TRight : IRight<TObject, TRight, TRole>
-        where TRole : IRoleEntity<TRight>
+        where TRole : IRoleEntity
     {
         int UserId { get; set; }
         User User { get; set; }

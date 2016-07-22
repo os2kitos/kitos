@@ -8,14 +8,14 @@
                 resolve: {
                     orgUnits: [
                         '$http', 'user', function ($http: ng.IHttpService, user) {
-                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationunit?organization=' + user.currentOrganizationId).then((result) => {
+                            return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationunit?organization=' + user.currentOrganizationId).then((result) => {
                                 return result.data.response;
                             });
                         }
                     ],
-                    orgRoles: [
+                    orgUnitRoles: [
                         '$http', function ($http: ng.IHttpService) {
-                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationRole/?nonsuggestions').then((result) => {
+                            return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnitRole/?nonsuggestions').then((result) => {
                                 return result.data.response;
                             });
                         }
@@ -31,8 +31,8 @@
     ]);
 
     app.controller('org.StructureCtrl', [
-        '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
+        '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgUnitRoles', 'user',
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgUnitRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -49,9 +49,9 @@
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = _.where(orgRoles, { isActive: true });
+            $scope.activeOrgRoles = _.where(orgUnitRoles, { isActive: true });
             $scope.orgRoles = {};
-            _.each(orgRoles, function(orgRole: { id }) {
+            _.each(orgUnitRoles, function(orgRole: { id }) {
                 $scope.orgRoles[orgRole.id] = orgRole;
             });
 
@@ -70,7 +70,7 @@
                 $scope.orgUnits[orgUnit.id] = orgUnit;
 
                 if (!inheritWriteAccess) {
-                    $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).then((result) => {
+                    $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnit/' + orgUnit.id + '?hasWriteAccess&organizationId=' + user.currentOrganizationId).then((result) => {
                         orgUnit.hasWriteAccess = result.data.response;
 
                         _.each(orgUnit.children, function(u) {
@@ -120,7 +120,7 @@
                         node.organization = orgs[node.organizationId];
                     } else {
                         //else get from server
-                        $http.get<Kitos.Models.IApiWrapper<any>>('api/organization/' + node.organizationId).then((result) => {
+                        $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organization/' + node.organizationId).then((result) => {
                             node.organization = result.data.response;
 
                             //save to cache
@@ -141,7 +141,7 @@
 
             function loadRights(node) {
                 //get org rights on the org unit and subtree
-                $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).then((result) => {
+                $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).then((result) => {
                     var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalRightsCount = paginationHeader.TotalCount;
                     node.orgRights = result.data.response;
@@ -181,7 +181,7 @@
                     "userId": uId
                 };
 
-                $http.post<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
                     notify.addSuccessMessage(result.data.response.user.fullName + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
@@ -206,7 +206,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }, (error) => {
@@ -234,13 +234,13 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post<Kitos.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                    $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
                         right.roleId = result.data.response.roleId;
                         right.user = result.data.response.user;
                         right.userId = result.data.response.userId;
@@ -359,11 +359,11 @@
 
                                 var id = unit.id;
 
-                                $http<Kitos.Models.IApiWrapper<any>>({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).then((result) => {
+                                $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: "api/organizationUnit/" + id + '?organizationId=' + user.currentOrganizationId, data: data }).then((result) => {
                                     notify.addSuccessMessage(name + " er ændret.");
 
                                     $modalInstance.close(result.data.response);
-                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.Models.IApiWrapper<any>>) => {
+                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
                                     $modalScope.submitting = false;
                                     if (error.data.msg.indexOf("Duplicate entry") > -1) {
                                         notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
@@ -395,11 +395,11 @@
 
                                 $modalScope.submitting = true;
 
-                                $http<Kitos.Models.IApiWrapper<any>>({ method: 'POST', url: "api/organizationUnit/", data: data }).then((result) => {
+                                $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'POST', url: "api/organizationUnit/", data: data }).then((result) => {
                                     notify.addSuccessMessage(name + " er gemt.");
 
                                     $modalInstance.close(result.data.response);
-                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.Models.IApiWrapper<any>>) => {
+                                }, (error: ng.IHttpPromiseCallbackArg<Kitos.API.Models.IApiWrapper<any>>) => {
                                     $modalScope.submitting = false;
                                     if (error.data.msg.indexOf("Duplicate entry") > -1) {
                                         notify.addErrorMessage("Fejl! Enhed ID er allerede brugt!");
@@ -426,7 +426,7 @@
 
                                 $modalScope.submitting = true;
 
-                                $http.delete<Kitos.Models.IApiWrapper<any>>("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).then((result) => {
+                                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnit/" + unit.id + '?organizationId=' + user.currentOrganizationId).then((result) => {
                                     $modalInstance.close();
                                     notify.addSuccessMessage(unit.name + " er slettet!");
                                 }, (error) => {
@@ -491,7 +491,7 @@
                     if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
                 }
 
-                $http.get<Kitos.Models.IApiWrapper<any>>(url).then((result) => {
+                $http.get<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
                     $scope.taskRefUsageList = result.data.response;
 
                     var paginationHeader = JSON.parse(result.headers('X-Pagination'));
@@ -513,7 +513,7 @@
                     orgUnitId: $scope.chosenOrgUnit.id
                 };
 
-                $http.post<Kitos.Models.IApiWrapper<any>>(url, payload).then((result) => {
+                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, payload).then((result) => {
                     refUsage.usage = result.data.response;
                     if (showMessage) msg.toSuccessMessage("Tilknytningen er oprettet");
                 }, (error) => {
@@ -526,7 +526,7 @@
 
                 var url = 'api/taskUsage/' + refUsage.usage.id + '?organizationId=' + user.currentOrganizationId;
 
-                $http.delete<Kitos.Models.IApiWrapper<any>>(url).then((result) => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then((result) => {
                     refUsage.usage = null;
                     if (showMessage) msg.toSuccessMessage("Tilknytningen er fjernet");
                 }, (error) => {
@@ -553,7 +553,7 @@
 
                         var url = 'api/taskUsage/' + refUsage.usage.id;
                         var msg = notify.addInfoMessage("Opdaterer...", false);
-                        $http<Kitos.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
+                        $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
                             refUsage.usage.starred = !refUsage.usage.starred;
                             msg.toSuccessMessage("Feltet er opdateret");
                         }, (error) => {
@@ -583,7 +583,7 @@
                 var url = 'api/taskusage?orgUnitId=' + $scope.chosenOrgUnit.id + '&taskId=' + $scope.selectedTaskGroup;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
-                $http.post<Kitos.Models.IApiWrapper<any>>(url, null).then((result) => {
+                $http.post<Kitos.API.Models.IApiWrapper<any>>(url, null).then((result) => {
                     msg.toSuccessMessage("Tilknytningen er oprettet");
                     reload();
                 }, (error) => {
@@ -595,7 +595,7 @@
                 var url = 'api/taskusage?orgUnitId=' + $scope.chosenOrgUnit.id + '&taskId=' + $scope.selectedTaskGroup;
 
                 var msg = notify.addInfoMessage("Fjerner tilknytning...", false);
-                $http.delete<Kitos.Models.IApiWrapper<any>>(url).then(() => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>(url).then(() => {
                     msg.toSuccessMessage("Tilknytningen er fjernet");
                     reload();
                 }, (error) => {

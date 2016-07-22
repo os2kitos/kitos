@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project role.
     /// </summary>
-    public class ItProjectRole : Entity, IRoleEntity<ItProjectRight>
+    public class ItProjectRole : Entity, IRoleEntity, IOptionEntity<ItProjectRight>
     {
         public ItProjectRole()
         {
