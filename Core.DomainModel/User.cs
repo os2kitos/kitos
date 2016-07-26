@@ -33,6 +33,16 @@ namespace Core.DomainModel
         public Guid? Uuid { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
+        public int DefaultOrganizationId { get; set; }
+        /// <summary>
+        /// The organization the user will be automatically logged into.
+        /// </summary>
+        /// <remarks>
+        /// WARN: this is currently abused to track what organization the user is logged into,
+        /// and will change in the future.
+        /// </remarks>
+        public virtual Organization DefaultOrganization { get; set; }
+
         /// <summary>
         /// The admin rights of the user
         /// </summary>

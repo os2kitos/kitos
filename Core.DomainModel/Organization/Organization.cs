@@ -20,11 +20,12 @@ namespace Core.DomainModel
             this.ItContracts = new List<ItContract.ItContract>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.Rights = new List<OrganizationRight>();
+            this.DefaultOrganizationForUsers = new List<User>();
         }
 
         public string Name { get; set; }
         public int TypeId { get; set; }
-        public OrganizationType Type { get; set; }
+        public virtual OrganizationType Type { get; set; }
         /// <summary>
         /// Cvr number
         /// </summary>
@@ -70,6 +71,8 @@ namespace Core.DomainModel
         public virtual Config Config { get; set; }
 
         public virtual ICollection<OrganizationRight> Rights { get; set; }
+
+        public virtual ICollection<User> DefaultOrganizationForUsers { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

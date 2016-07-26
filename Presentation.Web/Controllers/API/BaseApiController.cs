@@ -109,7 +109,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                return AuthenticationService.IsGlobalAdmin(KitosUser);
+                int userId;
+                int.TryParse(User.Identity.Name, out userId);
+
+                return AuthenticationService.IsGlobalAdmin(userId);
             }
             catch
             {

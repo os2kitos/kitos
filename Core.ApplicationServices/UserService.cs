@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int? orgId)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.UtcNow + " spices");
@@ -49,18 +49,19 @@ namespace Core.ApplicationServices
 #endif
 
             user.LastChanged = DateTime.UtcNow;
+            user.DefaultOrganizationId = orgId;
 
             _userRepository.Insert(user);
             _userRepository.Save();
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            if (sendMailOnCreation && orgId != null)
-                IssueAdvisMail(savedUser, false, (int)orgId);
+            if (sendMailOnCreation)
+                IssueAdvisMail(savedUser, false, orgId);
 
             return savedUser;
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int? orgId)
+        public void IssueAdvisMail(User user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException("user");
@@ -174,6 +175,12 @@ namespace Core.ApplicationServices
         private bool IsValidPassword(string password)
         {
             return password.Length >= 6;
+        }
+
+        public int GetCurrentOrganizationId(int userId)
+        {
+            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            return user.DefaultOrganizationId;
         }
     }
 }

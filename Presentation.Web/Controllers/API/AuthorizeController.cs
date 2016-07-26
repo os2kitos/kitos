@@ -118,7 +118,6 @@ namespace Presentation.Web.Controllers.API
                 User = userDto,
                 Organizations = orgsDto
             };
-
         }
     }
 }

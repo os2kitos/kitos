@@ -20,6 +20,5 @@ namespace Presentation.Web.Models
     {
         public UserDTO User { get; set; }
         public IEnumerable<OrganizationAndDefaultUnitDTO> Organizations { get; set; }
-        
     }
 }

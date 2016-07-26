@@ -92,13 +92,13 @@ namespace Presentation.Web.Controllers.API
                 // if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
-                    _userService.IssueAdvisMail(existingUser, true, orgId);
+                    _userService.IssueAdvisMail(existingUser, true, orgId.Value);
                     return Ok(Map(existingUser));
                 }
                 // if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
-                    _userService.IssueAdvisMail(existingUser, false, orgId);
+                    _userService.IssueAdvisMail(existingUser, false, orgId.Value);
                     return Ok(Map(existingUser));
                 }
 
@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                item = _userService.AddUser(item, sendMailOnCreation, orgId);
+                item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
