@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItProject
 {
@@ -73,7 +74,7 @@ namespace Core.DomainModel.ItProject
         /// <value>
         /// The organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         #endregion
 

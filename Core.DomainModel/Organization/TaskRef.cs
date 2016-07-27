@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents a task (such as KLE), which can be associated

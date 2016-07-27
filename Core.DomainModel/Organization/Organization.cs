@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).

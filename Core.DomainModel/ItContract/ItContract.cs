@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
 {
@@ -141,7 +142,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         /// <summary>
         /// Id of the organization marked as supplier for this contract.
@@ -156,7 +157,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The organization.
         /// </value>
-        public virtual Organization Supplier { get; set; }
+        public virtual Organization.Organization Supplier { get; set; }
         /// <summary>
         /// Gets or sets the chosen procurement strategy option identifier. (udbudsstrategi)
         /// </summary>

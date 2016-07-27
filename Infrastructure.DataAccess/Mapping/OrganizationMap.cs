@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Infrastructure.Annotations;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
 {

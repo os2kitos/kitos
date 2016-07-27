@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Web.Http.Results;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using NSubstitute;
 using Presentation.Web.Controllers.OData;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents a role that a user can have on an organization unit,

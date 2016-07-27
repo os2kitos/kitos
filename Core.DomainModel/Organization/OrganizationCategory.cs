@@ -1,4 +1,4 @@
-﻿namespace Core.DomainModel
+﻿namespace Core.DomainModel.Organization
 {
     public enum OrganizationCategory
     {

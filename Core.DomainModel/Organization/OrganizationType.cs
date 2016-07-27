@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     public class OrganizationType
     {

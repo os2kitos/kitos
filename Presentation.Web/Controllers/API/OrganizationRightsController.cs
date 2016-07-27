@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API
 {

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Transactions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices

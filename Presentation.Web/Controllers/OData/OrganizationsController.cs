@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData

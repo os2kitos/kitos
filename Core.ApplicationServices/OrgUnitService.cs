@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainServices;
 using System.Linq;
+using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices
 {

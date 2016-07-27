@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -95,7 +96,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// The responsible organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public int ItSystemId { get; set; }
         /// <summary>

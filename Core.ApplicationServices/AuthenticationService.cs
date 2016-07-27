@@ -4,6 +4,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
+using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices
 {

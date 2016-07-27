@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel;
 using System;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Models
 {

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystem
 {

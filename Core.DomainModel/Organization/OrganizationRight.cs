@@ -1,4 +1,4 @@
-﻿namespace Core.DomainModel
+﻿namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents that a user has an administrator role on an organization.

@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
 {

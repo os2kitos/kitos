@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel
 {
@@ -41,7 +42,7 @@ namespace Core.DomainModel
         /// WARN: this is currently abused to track what organization the user is logged into,
         /// and will change in the future.
         /// </remarks>
-        public virtual Organization DefaultOrganization { get; set; }
+        public virtual Organization.Organization DefaultOrganization { get; set; }
 
         /// <summary>
         /// The admin rights of the user

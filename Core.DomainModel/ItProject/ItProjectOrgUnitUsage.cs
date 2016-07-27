@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel.ItProject
+﻿using Core.DomainModel.Organization;
+
+namespace Core.DomainModel.ItProject
 {
     public class ItProjectOrgUnitUsage
     {

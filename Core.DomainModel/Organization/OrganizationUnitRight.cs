@@ -1,4 +1,4 @@
-﻿namespace Core.DomainModel
+﻿namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents a users rights on an Organization Unit

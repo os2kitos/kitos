@@ -17,7 +17,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public int? BelongsToId { get; set; }
         /// <summary>
@@ -29,7 +29,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// The organization the it system belongs to.
         /// </value>
-        public virtual Organization BelongsTo { get; set; }
+        public virtual Organization.Organization BelongsTo { get; set; }
 
         /// <summary>
         /// Determines whether this instance is within a given organizational context.

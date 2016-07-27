@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents that a<see><cref>TaskRef</cref></see> has been marked as important for an

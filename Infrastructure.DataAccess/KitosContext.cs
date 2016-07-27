@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
 using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess
 {

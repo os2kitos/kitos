@@ -1,5 +1,6 @@
 using Core.DomainModel;
 using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
 {

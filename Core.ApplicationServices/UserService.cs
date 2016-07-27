@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Web;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices

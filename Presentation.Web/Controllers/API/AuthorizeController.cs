@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 
