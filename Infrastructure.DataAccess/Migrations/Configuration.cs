@@ -674,8 +674,8 @@ Kontakt: info@kitos.dk",
                     Email = email,
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?) null,
-                    LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                    ObjectOwnerId = objectOwner?.Id,
+                    LastChangedByUserId = objectOwner?.Id
                 };
         }
 
@@ -686,15 +686,15 @@ Kontakt: info@kitos.dk",
                 Name = name,
                 Config = Config.Default(objectOwner),
                 Type = organizationType,
-                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
-                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                ObjectOwnerId = objectOwner?.Id,
+                LastChangedByUserId = objectOwner?.Id
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
-                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
-                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                ObjectOwnerId = objectOwner?.Id,
+                LastChangedByUserId = objectOwner?.Id
             });
 
             return org;

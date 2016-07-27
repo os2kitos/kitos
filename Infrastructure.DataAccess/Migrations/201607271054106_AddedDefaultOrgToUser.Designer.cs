@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201607250903202_AddedDefaultOrgToUser"; }
+            get { return "201607271054106_AddedDefaultOrgToUser"; }
         }
         
         string IMigrationMetadata.Source

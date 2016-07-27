@@ -119,7 +119,7 @@ namespace Core.ApplicationServices
         public bool HasWriteAccess(int userId, Entity entity)
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId;
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
             // check if global admin
             if (user.IsGlobalAdmin)

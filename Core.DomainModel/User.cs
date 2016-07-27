@@ -34,7 +34,7 @@ namespace Core.DomainModel
         public Guid? Uuid { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
-        public int DefaultOrganizationId { get; set; }
+        public int? DefaultOrganizationId { get; set; }
         /// <summary>
         /// The organization the user will be automatically logged into.
         /// </summary>

@@ -169,9 +169,9 @@
     <Compile Include="Migrations\201607220834424_AlterOrganizationRole.Designer.cs">
       <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201607250903202_AddedDefaultOrgToUser.cs" />
-    <Compile Include="Migrations\201607250903202_AddedDefaultOrgToUser.Designer.cs">
-      <DependentUpon>201607250903202_AddedDefaultOrgToUser.cs</DependentUpon>
+    <Compile Include="Migrations\201607271054106_AddedDefaultOrgToUser.cs" />
+    <Compile Include="Migrations\201607271054106_AddedDefaultOrgToUser.Designer.cs">
+      <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -212,8 +212,8 @@
     <EmbeddedResource Include="Migrations\201607220834424_AlterOrganizationRole.resx">
       <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201607250903202_AddedDefaultOrgToUser.resx">
-      <DependentUpon>201607250903202_AddedDefaultOrgToUser.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201607271054106_AddedDefaultOrgToUser.resx">
+      <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
