@@ -8,8 +8,8 @@
             var defaultOrgUnit = orgAndDefaultUnit.defaultOrgUnit;
             var defaultOrgUnitId = defaultOrgUnit == null ? null : defaultOrgUnit.id;
 
-            var isLocalAdmin = _.some(user.organizationRights, function (userRight: { roleName; organizationId; }) {
-                return userRight.roleName == "LocalAdmin" && userRight.organizationId == currOrg.id;
+            var isLocalAdmin = _.some(user.organizationRights, function (userRight: { role; organizationId; }) {
+                return userRight.role == Kitos.API.Models.OrganizationRole.LocalAdmin && userRight.organizationId == currOrg.id;
             });
 
             // the current org unit is the default org unit for this organization if the user has selected one
@@ -108,6 +108,9 @@
 
                     resolveOrganization2(orgsAndDefaultUnits).then(orgAndDefaultUnit => {
                         saveUser(user, orgAndDefaultUnit);
+
+                        setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
+
                         loadUserDeferred.resolve(_user);
                         loadUserDeferred = null;
                     }, () => {
@@ -122,6 +125,10 @@
             }
 
             return loadUserDeferred.promise;
+        }
+
+        function setDefaultOrganizationInBackend(organizationId) {
+            $http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`);
         }
 
         function login(email, password, rememberMe) {
@@ -280,6 +287,5 @@
             patchUser: patchUser,
             updateDefaultOrgUnit: updateDefaultOrgUnit
         };
-
     }]);
 })(angular, app);

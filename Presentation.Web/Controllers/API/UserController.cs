@@ -385,6 +385,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public HttpResponseMessage PostDefaultOrganization(bool? updateDefaultOrganization, int organizationId)
+        {
+            var userId = int.Parse(User.Identity.Name);
+            var user = Repository.Get(x => x.Id == userId).First();
+            user.DefaultOrganizationId = organizationId;
+            Repository.Save();
+            return Ok();
+        }
+
         protected override bool HasWriteAccess(User obj, User user, int organizationId)
         {
             var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
