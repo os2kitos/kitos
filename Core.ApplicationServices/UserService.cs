@@ -65,7 +65,7 @@ namespace Core.ApplicationServices
         public void IssueAdvisMail(User user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var org = _orgRepository.GetByKey(orgId);
 
@@ -93,7 +93,7 @@ namespace Core.ApplicationServices
         public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
         {
             if (user == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var mailContent = "";
             var reset = new PasswordResetRequest();
@@ -157,7 +157,7 @@ namespace Core.ApplicationServices
         public void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword)
         {
             if (passwordResetRequest == null)
-                throw new ArgumentNullException("passwordResetRequest");
+                throw new ArgumentNullException(nameof(passwordResetRequest));
 
             if (!IsValidPassword(newPassword))
                 throw new ArgumentException("New password is invalid");
