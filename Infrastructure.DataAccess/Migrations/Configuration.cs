@@ -516,7 +516,9 @@ namespace Infrastructure.DataAccess.Migrations
 
             context.SaveChanges();
 
-            var commonOrganization = CreateOrganization("Fælles Kommune", muniType, globalAdmin);
+            var orgType = context.OrganizationTypes.Single(x => x.Name == "Kommune");
+
+            var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
             //var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
             //var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
 
@@ -651,7 +653,7 @@ Kontakt: info@kitos.dk",
             }
             catch
             {
-	            // we don't really care about duplicates
+                // we don't really care about duplicates
                 // just do nothing
             }
         }

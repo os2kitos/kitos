@@ -162,10 +162,6 @@
     <Compile Include="Migrations\201607141106381_AlteredOrgType.Designer.cs">
       <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201607141111592_MigrateDataOrgType.cs" />
-    <Compile Include="Migrations\201607141111592_MigrateDataOrgType.Designer.cs">
-      <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201607220834424_AlterOrganizationRole.cs" />
     <Compile Include="Migrations\201607220834424_AlterOrganizationRole.Designer.cs">
       <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
@@ -206,9 +202,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607141106381_AlteredOrgType.resx">
       <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201607141111592_MigrateDataOrgType.resx">
-      <DependentUpon>201607141111592_MigrateDataOrgType.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201607220834424_AlterOrganizationRole.resx">
       <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
