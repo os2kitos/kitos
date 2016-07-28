@@ -8,10 +8,6 @@ namespace Infrastructure.DataAccess.Migrations
         public override void Up()
         {
             AddColumn("dbo.User", "DefaultOrganizationId", c => c.Int());
-
-            // set everyones default organization to "fælles kommune"
-            Sql("UPDATE [dbo].[User] Set DefaultOrganizationId=1");
-
             CreateIndex("dbo.User", "DefaultOrganizationId");
             AddForeignKey("dbo.User", "DefaultOrganizationId", "dbo.Organization", "Id");
         }
