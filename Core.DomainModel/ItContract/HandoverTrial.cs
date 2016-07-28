@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItContract
 {
-    public class HandoverTrial : Entity, IContextAware
+    public class HandoverTrial : Entity, IContextAware, IContractModule
     {
         public DateTime? Expected { get; set; }
         public DateTime? Approved { get; set; }

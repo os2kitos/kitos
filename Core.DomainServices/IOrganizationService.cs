@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainServices
 {

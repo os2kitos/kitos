@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel.ItSystemUsage
+﻿using Core.DomainModel.Organization;
+
+namespace Core.DomainModel.ItSystemUsage
 {
     public class ItSystemUsageOrgUnitUsage
     {

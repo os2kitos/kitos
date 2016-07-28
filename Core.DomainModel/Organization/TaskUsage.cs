@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.Organization
 {
     /// <summary>
     /// Represents that a<see><cref>TaskRef</cref></see> has been marked as important for an
-    /// <see><cref>OrganizationUnit</cref></see>.  
+    /// <see><cref>OrganizationUnit</cref></see>.
     /// Helper object which can hold comments and status property
     /// </summary>
     /// TODO this really should be a composite key entity
     /// TODO why is this a hierarchy?
-    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IContextAware
+    public class TaskUsage : Entity, IHierarchy<TaskUsage>, IContextAware, IOrganizationModule
     {
         public TaskUsage()
         {
@@ -38,7 +38,7 @@ namespace Core.DomainModel
         /// <summary>
         /// Child usages (see <see cref="Parent"/>)
         /// </summary>
-        public virtual ICollection<TaskUsage> Children { get; set; } 
+        public virtual ICollection<TaskUsage> Children { get; set; }
 
         /// <summary>
         /// Whether the TaskUsage can be found on the overview
@@ -59,7 +59,7 @@ namespace Core.DomainModel
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user)) 
+            if (OrgUnit != null && OrgUnit.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);

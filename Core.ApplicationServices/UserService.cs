@@ -4,6 +4,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Web;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -38,7 +39,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int? orgId)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.UtcNow + " spices");
@@ -49,21 +50,22 @@ namespace Core.ApplicationServices
 #endif
 
             user.LastChanged = DateTime.UtcNow;
+            user.DefaultOrganizationId = orgId;
 
             _userRepository.Insert(user);
             _userRepository.Save();
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            if (sendMailOnCreation && orgId != null)
-                IssueAdvisMail(savedUser, false, (int)orgId);
+            if (sendMailOnCreation)
+                IssueAdvisMail(savedUser, false, orgId);
 
             return savedUser;
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int? orgId)
+        public void IssueAdvisMail(User user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var org = _orgRepository.GetByKey(orgId);
 
@@ -91,7 +93,7 @@ namespace Core.ApplicationServices
         public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
         {
             if (user == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var mailContent = "";
             var reset = new PasswordResetRequest();
@@ -155,7 +157,7 @@ namespace Core.ApplicationServices
         public void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword)
         {
             if (passwordResetRequest == null)
-                throw new ArgumentNullException("passwordResetRequest");
+                throw new ArgumentNullException(nameof(passwordResetRequest));
 
             if (!IsValidPassword(newPassword))
                 throw new ArgumentException("New password is invalid");
@@ -174,6 +176,12 @@ namespace Core.ApplicationServices
         private bool IsValidPassword(string password)
         {
             return password.Length >= 6;
+        }
+
+        public int GetCurrentOrganizationId(int userId)
+        {
+            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            return user.DefaultOrganizationId.Value;
         }
     }
 }

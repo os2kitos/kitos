@@ -2,6 +2,12 @@
 using System.Web.OData;
 using System.Web.OData.Query;
 using Core.DomainServices;
+using Ninject;
+using Core.DomainModel;
+using System;
+using System.Linq;
+using System.Security;
+using System.Data.Entity;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -11,10 +17,24 @@ namespace Presentation.Web.Controllers.OData
         protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
 
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
         protected BaseController(IGenericRepository<T> repository)
         {
             ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
+        }
+
+        protected int UserId
+        {
+            get
+            {
+                int userId;
+                int.TryParse(User.Identity.Name, out userId);
+
+                return userId;
+            }
         }
 
         [EnableQuery]

@@ -17,7 +17,7 @@ namespace Core.DomainModel
         public bool ShowColumnTechnology { get; set; }
         public bool ShowColumnUsage { get; set; }
 
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public static Config Default(User objectOwner)
         {

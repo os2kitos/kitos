@@ -19,6 +19,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId);
 
+            this.HasOptional(t => t.DefaultOrganization)
+                .WithMany(t => t.DefaultOrganizationForUsers)
+                .HasForeignKey(d => d.DefaultOrganizationId)
+                .WillCascadeOnDelete(false);
+
             // Properties
             this.Property(t => t.Name)
                 .IsRequired();

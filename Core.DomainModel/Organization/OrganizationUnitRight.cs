@@ -1,7 +1,7 @@
-﻿namespace Core.DomainModel
+﻿namespace Core.DomainModel.Organization
 {
     /// <summary>
-    /// Represents organization rights on an Organization Unit
+    /// Represents a users rights on an Organization Unit
     /// </summary>
     public class OrganizationUnitRight : Entity, IRight<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
     {

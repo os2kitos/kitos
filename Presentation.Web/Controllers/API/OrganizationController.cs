@@ -4,7 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -146,7 +148,7 @@ namespace Presentation.Web.Controllers.API
                 var qry =
                     _useRepository.Get(
                         u =>
-                            u.OrganizationRights.Count(r => r.ObjectId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
+                            u.OrganizationRights.Count(r => r.OrganizationId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
@@ -160,6 +162,20 @@ namespace Presentation.Web.Controllers.API
         {
             _organizationService.SetupDefaultOrganization(item, KitosUser);
             return base.PostQuery(item);
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            if (!KitosUser.IsGlobalAdmin)
+            {
+	            if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
+                {
+                    // only global admin is allowed to change the type of an organization
+                    return Unauthorized();
+                }
+            }
+
+            return base.Patch(id, organizationId, obj);
         }
     }
 }

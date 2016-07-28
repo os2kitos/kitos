@@ -1,7 +1,7 @@
 ﻿module Kitos.Models {
-    export const enum OrganizationType {
-        Company,
-        Municipality,
-        CommunityOfInterests,
+    export interface OrganizationType {
+        Id: number;
+        Name: string;
+        Category: number;
     }
 }

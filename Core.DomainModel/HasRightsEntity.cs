@@ -13,7 +13,7 @@ namespace Core.DomainModel
     public abstract class HasRightsEntity<TModel, TRight, TRole> : Entity
         where TModel : HasRightsEntity<TModel, TRight, TRole>
         where TRight : IRight<TModel, TRight, TRole>
-        where TRole : IRoleEntity<TRight>
+        where TRole : IRoleEntity
     {
         protected HasRightsEntity()
         {

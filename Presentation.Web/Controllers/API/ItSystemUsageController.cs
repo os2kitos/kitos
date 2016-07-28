@@ -12,6 +12,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 

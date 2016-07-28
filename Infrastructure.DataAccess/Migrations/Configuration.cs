@@ -7,6 +7,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Migrations
 {
@@ -107,28 +108,6 @@ namespace Infrastructure.DataAccess.Migrations
 
             #endregion
 
-            #region ADMIN ROLES
-
-            var localAdmin = new OrganizationRole
-            {
-                Name = "LocalAdmin",
-                IsActive = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
-            };
-            var orgRole = new OrganizationRole
-            {
-                Name = "Medarbejder",
-                IsActive = true,
-                HasWriteAccess = false,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
-            };
-            context.OrganizationRoles.AddOrUpdate(x => x.Name, localAdmin, orgRole);
-            context.SaveChanges();
-
-            #endregion
-
             #region ORG ROLES
 
             var boss = new OrganizationUnitRole()
@@ -201,8 +180,16 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
-            context.SaveChanges();
+            try
+            {
+                context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
+                context.SaveChanges();
+            }
+            catch
+            {
+                // we don't really care about duplicates
+                // just do nothing
+            }
 
             #endregion
 
@@ -521,7 +508,15 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ORGANIZATIONS
 
-            var commonOrganization = CreateOrganization("Fælles Kommune", OrganizationType.Municipality, globalAdmin);
+            var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
+            var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
+            var company = new OrganizationType { Name = "Virksomhed", Category = OrganizationCategory.Other };
+            var other = new OrganizationType { Name = "Anden offentlig myndighed", Category = OrganizationCategory.Other };
+            context.OrganizationTypes.AddOrUpdate(x => x.Name, muniType, interestType, company, other);
+
+            context.SaveChanges();
+
+            var commonOrganization = CreateOrganization("Fælles Kommune", muniType, globalAdmin);
             //var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
             //var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
 
@@ -650,7 +645,15 @@ Kontakt: info@kitos.dk",
             where T : Entity, IOptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
-            dbSet.AddOrUpdate(x => x.Name, options);
+            try
+            {
+                dbSet.AddOrUpdate(x => x.Name, options);
+            }
+            catch
+            {
+	            // we don't really care about duplicates
+                // just do nothing
+            }
         }
 
         /// <summary>
@@ -671,8 +674,8 @@ Kontakt: info@kitos.dk",
                     Email = email,
                     Salt = salt,
                     Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?) null,
-                    LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                    ObjectOwnerId = objectOwner?.Id,
+                    LastChangedByUserId = objectOwner?.Id
                 };
         }
 
@@ -683,15 +686,15 @@ Kontakt: info@kitos.dk",
                 Name = name,
                 Config = Config.Default(objectOwner),
                 Type = organizationType,
-                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
-                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                ObjectOwnerId = objectOwner?.Id,
+                LastChangedByUserId = objectOwner?.Id
             };
 
             org.OrgUnits.Add(new OrganizationUnit()
             {
                 Name = org.Name,
-                ObjectOwnerId = objectOwner != null ? objectOwner.Id : (int?)null,
-                LastChangedByUserId = objectOwner != null ? objectOwner.Id : (int?)null
+                ObjectOwnerId = objectOwner?.Id,
+                LastChangedByUserId = objectOwner?.Id
             });
 
             return org;

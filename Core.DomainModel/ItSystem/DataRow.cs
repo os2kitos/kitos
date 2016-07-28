@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItSystem
     /// The interface will have a datarow for each piece of data that the
     /// interface exposes.
     /// </summary>
-    public class DataRow : Entity, IContextAware
+    public class DataRow : Entity, IContextAware, ISystemModule
     {
         public DataRow()
         {

@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule
     {
         public ItSystemUsage()
         {
@@ -95,7 +96,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// The responsible organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public int ItSystemId { get; set; }
         /// <summary>

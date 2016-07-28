@@ -6,6 +6,7 @@ using System.Linq;
 using System.Transactions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices
@@ -40,7 +41,7 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         public Stream ExportUsers(Stream stream, int organizationId, User kitosUSer)
         {
-            var users = _userRepository.Get(x => x.OrganizationRights.Count(r => r.ObjectId == organizationId) > 0);
+            var users = _userRepository.Get(x => x.OrganizationRights.Count(r => r.OrganizationId == organizationId) > 0);
 
             var set = new DataSet();
             set.Tables.Add(GetUserTable(users));
@@ -383,15 +384,15 @@ namespace Core.ApplicationServices
                     resolvedInThisPass.Add(userRow);
 
                     // if adminRight exists, no further action is needed
-                    if (_orgRightRepository.Get(x => x.User.Email == userEntity.Email && x.ObjectId == organizationId).Any())
+                    if (_orgRightRepository.Get(x => x.User.Email == userEntity.Email && x.OrganizationId == organizationId).Any())
                         continue;
 
                     // create the adminright within the organization
                     _orgRightRepository.Insert(new OrganizationRight
                     {
-                        ObjectId = organizationId,
+                        OrganizationId = organizationId,
                         UserId = userEntity.Id,
-                        RoleId = 2,
+                        Role = OrganizationRole.User,
                         LastChangedByUserId = kitosUser.Id,
                         LastChanged = DateTime.UtcNow,
                         ObjectOwnerId = kitosUser.Id

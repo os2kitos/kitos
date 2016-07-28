@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>, IContextAware
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule
     {
         public ItProject()
         {
@@ -73,7 +74,7 @@ namespace Core.DomainModel.ItProject
         /// <value>
         /// The organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         #endregion
 
