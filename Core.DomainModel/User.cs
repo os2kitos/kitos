@@ -91,5 +91,10 @@ namespace Core.DomainModel
 
             return base.HasUserWriteAccess(user);
         }
+
+        public override string ToString()
+        {
+            return $"{Id}:{Name} {LastName}";
+        }
     }
 }

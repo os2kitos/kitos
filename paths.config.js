@@ -1,3 +1,5 @@
+'use strict';
+
 var source = "Presentation.Web",
     sourceApp = source + "/app",
     sourceScript = source + "/Scripts",
@@ -42,6 +44,7 @@ var source = "Presentation.Web",
         itSystem: source + "/Tests/it-system/**/*e2e.spec.js",
         itContract: source + "/Tests/it-contract/**/*e2e.spec.js"
     },
+
     e2eReport = "results-protractor",
 
     // coverage

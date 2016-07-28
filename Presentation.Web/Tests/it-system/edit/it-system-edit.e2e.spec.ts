@@ -62,7 +62,7 @@ describe("system edit view", () => {
 
         it("should not delete when delete confirm popup is dismissed", () => {
             // arrange
-            pageObject.deleteSystemElement.first().click();
+            pageObject.deleteSystemElement.click();
 
             // act
             browserHelper.dismissAlert();
@@ -73,7 +73,7 @@ describe("system edit view", () => {
 
         it("should delete when delete confirm popup is accepted", () => {
             // arrange
-            pageObject.deleteSystemElement.first().click();
+            pageObject.deleteSystemElement.click();
 
             // act
             browserHelper.acceptAlert();

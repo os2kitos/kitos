@@ -2,7 +2,7 @@
   "rules": {
     "eofline": true,
     "indent": [ true, 4 ],
-    "interface-name": false,
+    "interface-name": [ true ],
     "no-consecutive-blank-lines": true,
     "no-trailing-comma": true,
     "no-trailing-whitespace": true,
@@ -10,7 +10,7 @@
     "no-unused-variable": true,
     "one-line": [ true, "check-else", "check-whitespace", "check-catch", "check-open-brace" ],
     "quotemark": [ true, "double" ],
-    "semicolon": true,
+    "semicolon": [ true ],
     "triple-equals": [ true ],
     "variable-name": true,
     "whitespace": [ true, "check-branch", "check-decl", "check-operator", "check-separator", "check-type" ]

@@ -3,6 +3,7 @@ import Select2Wrapper = require("../../../Tests/object-wrappers/Select2Wrapper")
 import Select2TagWrapper = require("../../../Tests/object-wrappers/Select2TagWrapper");
 
 class ItContractEditPo implements IPageObject {
+
     public getPage(): webdriver.promise.Promise<void> {
         return browser.get("https://localhost:44300/#/contract/edit/1/systems");
     }

@@ -1474,7 +1474,10 @@ declare module kendo.geometry {
         round(digits: number): kendo.geometry.Matrix;
         multiplyCopy(matrix: kendo.geometry.Matrix): kendo.geometry.Matrix;
         toArray(digits: number): any;
+
         toString(digits: number, separator: string): string;
+        toString(): string;
+        toString(digits?: number, separator?: string): string;
 
     }
 
@@ -1520,7 +1523,10 @@ declare module kendo.geometry {
         setX(value: number): kendo.geometry.Point;
         setY(value: number): kendo.geometry.Point;
         toArray(digits: number): any;
+
         toString(digits: number, separator: string): string;
+        toString(): string;
+        toString(digits?: number, separator?: string): string;
         transform(tansformation: kendo.geometry.Transformation): kendo.geometry.Point;
         transformCopy(tansformation: kendo.geometry.Transformation): kendo.geometry.Point;
         translate(dx: number, dy: number): kendo.geometry.Point;
@@ -8227,7 +8233,10 @@ declare module kendo.dataviz.geometry {
         round(digits: number): kendo.geometry.Matrix;
         multiplyCopy(matrix: kendo.geometry.Matrix): kendo.geometry.Matrix;
         toArray(digits: number): any;
+
         toString(digits: number, separator: string): string;
+        toString(): string;
+        toString(digits?: number, separator?: string): string;
 
     }
 
@@ -8273,7 +8282,10 @@ declare module kendo.dataviz.geometry {
         setX(value: number): kendo.geometry.Point;
         setY(value: number): kendo.geometry.Point;
         toArray(digits: number): any;
+
         toString(digits: number, separator: string): string;
+        toString(): string;
+        toString(digits?: number, separator?: string): string;
         transform(tansformation: kendo.geometry.Transformation): kendo.geometry.Point;
         transformCopy(tansformation: kendo.geometry.Transformation): kendo.geometry.Point;
         translate(dx: number, dy: number): kendo.geometry.Point;

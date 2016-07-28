@@ -19,7 +19,6 @@ namespace Tests.Unit.Presentation.Web.OData
         private readonly EconomyStreamsController _economyStreamsController;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
         private readonly IGenericRepository<User> _userRepository;
-        private readonly UserMock _userMock;
 
         public ODataEconomyStreamsController()
         {
@@ -27,9 +26,8 @@ namespace Tests.Unit.Presentation.Web.OData
             _userRepository = Substitute.For<IGenericRepository<User>>();
 
             _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _userRepository);
-            _userMock = new UserMock(_economyStreamsController, "12345678");
-
-            _userMock.LogOn();
+            var userMock = new UserMock(_economyStreamsController, "12345678");
+            userMock.LogOn();
         }
 
         [Fact]

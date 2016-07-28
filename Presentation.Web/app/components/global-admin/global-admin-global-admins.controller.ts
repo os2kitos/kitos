@@ -1,6 +1,6 @@
-﻿(function(ng, app) {
+﻿((ng, app) => {
     app.config([
-        '$stateProvider', function($stateProvider) {
+        '$stateProvider', $stateProvider => {
             $stateProvider.state('global-admin.global-users', {
                 url: '/global-admins',
                 templateUrl: 'app/components/global-admin/global-admin-global-admins.view.html',
@@ -11,7 +11,7 @@
     ]);
 
     app.controller('globalAdmin.globalAdminsCtrl', [
-        '$rootScope', '$scope', '$http', 'notify', function($rootScope, $scope, $http, notify) {
+        '$rootScope', '$scope', '$http', 'notify', ($rootScope, $scope, $http, notify) => {
             $rootScope.page.title = 'Globale administratorer';
 
             $scope.globalAdmins = [];
@@ -30,14 +30,14 @@
                 $scope.globalAdmins.push(admin);
             }
 
-            $http.get("api/globaladmin").success(function(result) {
+            $http.get("api/globaladmin").success(result => {
                 _.each(result.response, pushAdmin);
             });
 
             function newGlobalAdmin() {
                 if (!$scope.newUser) return;
 
-                var user = $scope.newUser;
+                let user = $scope.newUser;
                 var uId = user.id;
 
                 if (!uId) return;
@@ -48,13 +48,13 @@
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
-                $http.post("api/globaladmin", data, { handleBusy: true }).success(function(result) {
+                $http.post("api/globaladmin", data, { handleBusy: true }).success(result => {
                     msg.toSuccessMessage(user.text + " er blevet global administrator");
                     $scope.newUser = null;
 
                     pushAdmin(result.response);
 
-                }).error(function(result) {
+                }).error(result => {
                     msg.toErrorMessage("Kunne ikke gøre " + user.text + " til global administrator");
                 });
             }

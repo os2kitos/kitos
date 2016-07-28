@@ -22,9 +22,7 @@ describe("contract edit view", () => {
     beforeEach(() => {
         mockHelper = new Helper.Mock();
         browserHelper = new Helper.Browser(browser);
-
         pageObject = new ItContractEditPo();
-
         browser.driver.manage().window().maximize();
     });
 

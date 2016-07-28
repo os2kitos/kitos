@@ -615,7 +615,7 @@
                     excelTemplate: dataItem => {
                         var roles = "";
 
-                        if (! dataItem || dataItem.roles[role.Id] === undefined)
+                        if (!dataItem || dataItem.roles[role.Id] === undefined)
                             return roles;
 
                         return this.concatRoles(dataItem.roles[role.Id]);
@@ -813,7 +813,7 @@
                 }
             }
         };
-
+        
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";
 
@@ -833,29 +833,37 @@
 
     angular
         .module("app")
-        .config([
-            "$stateProvider", $stateProvider => {
-                $stateProvider.state("it-contract.overview", {
-                    url: "/overview",
-                    templateUrl: "app/components/it-contract/it-contract-overview.view.html",
-                    controller: OverviewController,
-                    controllerAs: "contractOverviewVm",
-                    resolve: {
-                        itContractRoles: [
-                            "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
-                        ],
-                        user: [
-                            "userService", userService => userService.getUser()
-                        ],
-                        orgUnits: [
-                            "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                        ],
-                        // TODO this isn't a sustainable solution - but a workaround for now...
-                        ecoStreamData: [
-                            "$http", "user", ($http, user) => $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`).then(result => result.data.value)
-                        ]
-                    }
-                });
+        .config(["$stateProvider", ($stateProvider) => {
+                $stateProvider.state("it-contract.overview",
+                    {
+                        url: "/overview",
+                        templateUrl: "app/components/it-contract/it-contract-overview.view.html",
+                        controller: OverviewController,
+                        controllerAs: "contractOverviewVm",
+                        resolve: {
+                            itContractRoles: [
+                                "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
+                            ],
+                            user: [
+                                "userService", userService => userService.getUser()
+                            ],
+                            orgUnits: [
+                                "$http", "user", "_",
+                                ($http, user, _) => $http
+                                    .get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
+                                    .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                            ],
+                            // TODO this isn't a sustainable solution - but a workaround for now...
+                            ecoStreamData: [
+                                "$http", "user", "notify", ($http, user, notify) =>
+                                    $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
+                                        .then(function successCallback(result) { result.data.value; },
+                                        function errorCallback(result) {
+                                            $stateProvider.transitionTo("home", { q: 'updated search term' });
+                                        })
+                            ]
+                        }
+                    });
             }
         ]);
 }

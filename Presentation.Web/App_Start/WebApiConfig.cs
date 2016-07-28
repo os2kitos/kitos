@@ -36,9 +36,6 @@ namespace Presentation.Web
 
             config.EnableEnumPrefixFree(true);
             config.EnableCaseInsensitive(true);
-
-            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
 
         public static IEdmModel GetModel()
