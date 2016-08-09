@@ -53,11 +53,24 @@ namespace Presentation.Web.Controllers.OData
             {
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
-            else
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            return Ok(result);
+        }
+
+        // GET /Organizations(1)/Supplier
+        [EnableQuery(MaxExpansionDepth = 3)]
+        [ODataRoute("Organizations({key})/Supplier")]
+        public IHttpActionResult GetSupplier(int key)
+        {
+            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                return Ok(result);
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
+
+            var result = Repository.AsQueryable().Where(m => m.SupplierId == key);
+            return Ok(result);
         }
 
         // GET /Organizations(1)/ItContracts(1)

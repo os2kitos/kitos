@@ -63,6 +63,31 @@ namespace Presentation.Web.Controllers.OData
             }
         }
 
+        // GET /Organizations(1)/BelongingSystems
+        [EnableQuery]
+        [ODataRoute("Organizations({key})/BelongingSystems")]
+        public IHttpActionResult GetBelongingSystems(int key)
+        {
+            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
+            if (!_authService.HasReadAccessOutsideContext(UserId))
+            {
+                if (loggedIntoOrgId != key)
+                {
+                    return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+                }
+                else
+                {
+                    var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
+                    return Ok(result);
+                }
+            }
+            else
+            {
+                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+                return Ok(result);
+            }
+        }
+
         // GET /Organizations(1)/ItSystems(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]

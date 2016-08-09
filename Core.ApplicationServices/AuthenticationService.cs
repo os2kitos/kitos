@@ -59,7 +59,12 @@ namespace Core.ApplicationServices
 
         public bool HasReadAccessOutsideContext(int userId)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                return false;
+            }
+
             if (user.IsGlobalAdmin)
             {
                 return true;

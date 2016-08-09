@@ -1,6 +1,8 @@
 ﻿using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
+using System.Web.OData.Formatter;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -17,6 +19,7 @@ namespace Presentation.Web
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
             var apiCfg = config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
@@ -36,6 +39,8 @@ namespace Presentation.Web
 
             config.EnableEnumPrefixFree(true);
             config.EnableCaseInsensitive(true);
+            //var formatters = ODataMediaTypeFormatters.Create();
+            //config.Formatters.InsertRange(0, formatters);
         }
 
         public static IEdmModel GetModel()
