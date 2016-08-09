@@ -73,7 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdminService.cs" />
+    <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
     <Compile Include="CryptoService.cs" />
     <Compile Include="IAuthenticationService.cs" />

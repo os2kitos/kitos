@@ -87,25 +87,17 @@ namespace Core.ApplicationServices
                 return true;
             }
 
-            if (entity is IContextAware) // TODO I don't like this impl
-            {
-                var awareEntity = entity as IContextAware;
+            var awareEntity = entity as IContextAware;
+            if (awareEntity == null)
+                return false;
 
-                // check if user is part of target organization (he's trying to access)
-                if (awareEntity.IsInContext(loggedIntoOrganizationId))
-                {
-                    // users part of an orgaization have read access to all entities inside the organization
-                    return true;
-                }
-                else // if not, check if organization, he's logged into, allows sharing
-                {
-                    if (user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality)
-                    {
-                        // organizations of type OrganizationCategory.Municipality have read access to other organizations
-                        return true;
-                    }
-                }
-            }
+            // check if user is part of target organization (he's trying to access)
+            if (awareEntity.IsInContext(loggedIntoOrganizationId))
+                // users part of an orgaization have read access to all entities inside the organization
+                return true;
+            if (user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality)
+                // organizations of type OrganizationCategory.Municipality have read access to other organizations
+                return true;
 
             return false;
         }
@@ -129,58 +121,53 @@ namespace Core.ApplicationServices
             }
 
             // check if user is in context
-            if (entity is IContextAware) // TODO I don't like this impl
+            var awareEntity = entity as IContextAware;
+            if (awareEntity == null)
+                return false;
+
+            // check if user is part of target organization (he's trying to access)
+            if (!awareEntity.IsInContext(loggedIntoOrganizationId))
+                return false;
+
+            // check if local admin in target organization
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
+                return true;
+
+            // check if module admin in target organization and target entity is of the correct type
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin)
+                && entity is IContractModule)
             {
-                var awareEntity = entity as IContextAware;
+                return true;
+            }
 
-                // check if user is part of target organization (he's trying to access)
-                if (!awareEntity.IsInContext(loggedIntoOrganizationId))
-                {
-                    return false;
-                }
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin)
+                && entity is IOrganizationModule)
+            {
+                return true;
+            }
 
-                // check if local admin in target organization
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
-                {
-                    return true;
-                }
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin)
+                && entity is IProjectModule)
+            {
+                return true;
+            }
 
-                // check if module admin in target organization and target entity is of the correct type
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin)
-                    && entity is IContractModule)
-                {
-                    return true;
-                }
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin)
+                && entity is ISystemModule)
+            {
+                return true;
+            }
 
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin)
-                    && entity is IOrganizationModule)
-                {
-                    return true;
-                }
+            // check if user has a write role on the target entity
+            if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
+            {
+                return true;
+            }
 
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin)
-                    && entity is IProjectModule)
-                {
-                    return true;
-                }
-
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin)
-                    && entity is ISystemModule)
-                {
-                    return true;
-                }
-
-                // check if user has a write role on the target entity
-                if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
-                {
-                    return true;
-                }
-
-                // check if user is object owner
-                if (entity.ObjectOwnerId == user.Id)
-                {
-                    return true;
-                }
+            // check if user is object owner
+            if (entity.ObjectOwnerId == user.Id)
+            {
+                return true;
             }
 
             return false;

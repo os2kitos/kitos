@@ -9,14 +9,12 @@ namespace Presentation.Web.Controllers.API
 {
     public class LocalAdminController : BaseApiController
     {
-        private readonly IUserService _userService;
-        private readonly IAdminService _adminService;
+        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly IGenericRepository<Organization> _organizationRepository;
 
-        public LocalAdminController(IUserService userService, IAdminService adminService, IGenericRepository<Organization> organizationRepository)
+        public LocalAdminController(IOrganizationRoleService organizationRoleService, IGenericRepository<Organization> organizationRepository)
         {
-            _userService = userService;
-            _adminService = adminService;
+            _organizationRoleService = organizationRoleService;
             _organizationRepository = organizationRepository;
         }
 
@@ -25,13 +23,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var user = UserRepository.GetByKey(item.UserId);
-
                 var organization = _organizationRepository.GetByKey(item.OrganizationId);
-
-                _adminService.MakeLocalAdmin(user, organization, KitosUser);
-
+                _organizationRoleService.MakeLocalAdmin(user, organization, KitosUser);
                 return Created(AutoMapper.Mapper.Map<User, UserDTO>(user), new Uri(Request.RequestUri + "/" + user.Id));
-
             }
             catch (Exception e)
             {
