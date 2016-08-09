@@ -437,6 +437,7 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\components\local-config\local-config-module-admin.html" />
     <Content Include="app\components\reports\reports-overview.html" />
     <Content Include="app\shared\autosave.directive.js" />
     <Content Include="app\shared\datereader.directive.js" />
@@ -609,6 +610,7 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-module-admin.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\models\api\organization-role.ts" />

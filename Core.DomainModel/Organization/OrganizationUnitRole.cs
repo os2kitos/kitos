@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.Organization
 {

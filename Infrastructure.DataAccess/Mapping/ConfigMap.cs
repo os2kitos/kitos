@@ -7,14 +7,14 @@ namespace Infrastructure.DataAccess.Mapping
         public ConfigMap()
         {
             // Primary Key
-            this.HasKey(t => t.Id);
+            HasKey(t => t.Id);
 
             // Table & Column Mappings
-            this.ToTable("Config");
-            this.Property(t => t.Id).HasColumnName("Id");
+            ToTable("Config");
+            Property(t => t.Id).HasColumnName("Id");
 
             // Relationships
-            this.HasRequired(t => t.Organization)
+            HasRequired(t => t.Organization)
                 .WithOptional(t => t.Config);
         }
     }

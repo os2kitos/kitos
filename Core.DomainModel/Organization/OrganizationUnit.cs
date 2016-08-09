@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.Organization
 {
@@ -12,12 +13,12 @@ namespace Core.DomainModel.Organization
     {
         public OrganizationUnit()
         {
-            this.TaskUsages = new List<TaskUsage>();
-            this.TaskRefs = new List<TaskRef>();
-            this.OwnedTasks = new List<TaskRef>();
-            this.DefaultUsers = new List<OrganizationRight>();
-            this.Using = new List<ItSystemUsageOrgUnitUsage>();
-            this.UsingItProjects = new List<ItProjectOrgUnitUsage>();
+            TaskUsages = new List<TaskUsage>();
+            TaskRefs = new List<TaskRef>();
+            OwnedTasks = new List<TaskRef>();
+            DefaultUsers = new List<OrganizationRight>();
+            Using = new List<ItSystemUsageOrgUnitUsage>();
+            UsingItProjects = new List<ItProjectOrgUnitUsage>();
         }
 
         public string LocalId { get; set; }

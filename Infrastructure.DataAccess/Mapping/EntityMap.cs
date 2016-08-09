@@ -8,14 +8,14 @@ namespace Infrastructure.DataAccess.Mapping
     {
         protected EntityMap()
         {
-            this.HasKey(t => t.Id);
+            HasKey(t => t.Id);
 
-            this.HasRequired(t => t.ObjectOwner)
+            HasRequired(t => t.ObjectOwner)
                 .WithMany()
                 .HasForeignKey(d => d.ObjectOwnerId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.LastChangedByUser)
+            HasRequired(t => t.LastChangedByUser)
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId)
                 .WillCascadeOnDelete(false);

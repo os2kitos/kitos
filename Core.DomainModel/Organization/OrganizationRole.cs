@@ -26,6 +26,10 @@
         /// <summary>
         /// Has write access to everything within the contract module
         /// </summary>
-        ContractModuleAdmin
+        ContractModuleAdmin,
+        /// <summary>
+        /// Has write access to organization reports.
+        /// </summary>
+        ReportModuleAdmin
     }
 }

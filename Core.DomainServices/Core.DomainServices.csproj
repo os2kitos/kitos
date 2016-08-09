@@ -71,7 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IAdminService.cs" />
+    <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="ICryptoService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IItProjectService.cs" />

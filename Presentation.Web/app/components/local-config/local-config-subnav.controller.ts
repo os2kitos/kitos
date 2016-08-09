@@ -19,7 +19,8 @@
                         { state: 'local-config.project', text: 'IT Projekt' },
                         { state: 'local-config.system', text: 'IT System' },
                         { state: 'local-config.contract', text: 'IT Kontrakt' },
-                        { state: 'local-config.import.organization', text: 'Masse Opret'}
+                        { state: 'local-config.import.organization', text: 'Masse Opret'},
+                        { state: 'local-config.module-admin', text: 'Module Admin'}
                     ];
 
                     $scope.config = config;
