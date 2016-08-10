@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using System;
+﻿using System;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Models
@@ -20,10 +19,7 @@ namespace Presentation.Web.Models
 
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
+        public string ObjectOwnerFullName => ObjectOwnerName + " " + ObjectOwnerLastName;
         public string DefaultOrgUnitName { get; set; }
     }
 }

@@ -14,6 +14,8 @@
         /** Has write access to everything within the system module */
         SystemModuleAdmin,
         /** Has write access to everything within the contract module */
-        ContractModuleAdmin
+        ContractModuleAdmin,
+        /** Has write access to organization reports. */
+        ReportModuleAdmin
     }
 }
