@@ -1,20 +1,70 @@
 ﻿module Kitos.LocalAdmin.ModuleAdmin {
     "use strict";
 
+    export interface IX extends Kitos.Models.IEntity {
+        
+    }
+
+
     export class ModuleAdminController {
-        public orgAutosaveUrl: string;
-        public typeName: string;
-        public static $inject: string[] = ['$scope', '$http', 'notify', 'organization'];
+        public mainGrid: IKendoGrid<IX>;
 
-        constructor(private $scope, private $http, private notify, public organization) {
-            switch (organization.typeId) {
-                case 1: this.typeName = 'Kommune'; break;
-                case 2: this.typeName = 'Interessefællesskab'; break;
-                case 3: this.typeName = 'Virksomhed'; break;
-                case 4: this.typeName = 'Anden offentlig myndighed'; break;
-            }
+        public static $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$window",
+            "$state",
+            "$",
+            "_",
+            "moment",
+            "notify",
+            "projectRoles",
+            "user",
+            "gridStateService",
+            "orgUnits",
+            "economyCalc"
+        ];
 
-            this.orgAutosaveUrl = 'api/organization/' + organization.id;
+        constructor(
+            private $rootScope: IRootScope,
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private $window: ng.IWindowService,
+            private $state: ng.ui.IStateService,
+            private $: JQueryStatic,
+            private _: ILoDashWithMixins,
+            private moment: moment.MomentStatic,
+            private notify,
+            private projectRoles,
+            private user,
+            private gridStateService: Services.IGridStateFactory,
+            private orgUnits: any,
+            private economyCalc) {
+            this.$rootScope.page.title = "IT Projekt - Overblik";
+
+            this.$scope.$on("kendoWidgetCreated", (event, widget) => {
+                // the event is emitted for every widget; if we have multiple
+                // widgets in this controller, we need to check that the event
+                // is for the one we're interested in.
+                if (widget === this.mainGrid) {
+                    this.mainGrid.dataSource.read();
+
+                    // show loadingbar when export to excel is clicked
+                    // hidden again in method exportToExcel callback
+                    $(".k-grid-excel").click(() => {
+                        kendo.ui.progress(this.mainGrid.element, true);
+                    });
+                }
+            });
+
+            this.activate();
+        }
+
+        private activate() {
+             throw new Error("Not implemented");
         }
     }
 
