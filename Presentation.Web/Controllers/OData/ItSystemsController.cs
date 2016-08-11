@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 5)]
         [ODataRoute("ItSystems")]
         public override IHttpActionResult Get()
         {

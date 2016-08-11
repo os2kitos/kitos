@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
 
         //GET /Organizations(1)/OrganizationUnits
         [EnableQuery]
-       [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
+        [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits(int orgKey)
         {
             var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
@@ -59,14 +59,12 @@ namespace Presentation.Web.Controllers.OData
             {
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
-                return Ok(result);
-            }
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+            return Ok(result);
         }
 
-        // GET /Organizations(1)/OrganizationUnits
+        // GET /Organizations(1)/OrganizationUnits(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})")]
         public IHttpActionResult GetOrganizationUnit(int orgKey, int unitKey)
