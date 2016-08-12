@@ -687,7 +687,7 @@ Kontakt: info@kitos.dk",
             {
                 Name = name,
                 Config = Config.Default(objectOwner),
-                Type = organizationType,
+                TypeId = organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
                 LastChangedByUserId = objectOwner?.Id
             };
