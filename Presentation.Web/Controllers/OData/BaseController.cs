@@ -1,20 +1,44 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
+using Core.ApplicationServices;
+using Core.DomainModel;
 using Core.DomainServices;
+using Ninject;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [Authorize]
+    //[Authorize]
     public abstract class BaseController<T> : ODataController where T : class
     {
         protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
+        private User _curentUser;
+
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
+        [Inject]
+        public IAuthenticationService AuthenticationService { get; set; }
 
         protected BaseController(IGenericRepository<T> repository)
         {
-            ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
+            ValidationSettings = new ODataValidationSettings { AllowedQueryOptions = AllowedQueryOptions.All };
             Repository = repository;
+        }
+
+
+        public User CurentUser
+        {
+            get
+            {
+                if (_curentUser == null && UserId != 0)
+                    _curentUser = UserRepository.GetByKey(UserId);
+
+                return _curentUser;
+            }
+            set { _curentUser = value; }
         }
 
         protected int UserId
@@ -23,7 +47,6 @@ namespace Presentation.Web.Controllers.OData
             {
                 int userId;
                 int.TryParse(User.Identity.Name, out userId);
-
                 return userId;
             }
         }
@@ -48,47 +71,60 @@ namespace Presentation.Web.Controllers.OData
         //    return StatusCode(HttpStatusCode.NotImplemented);
         //}
 
-        //protected IHttpActionResult Post(T entity)
-        //{
-        //    Validate(entity);
+        public virtual IHttpActionResult Post(T entity)
+        {
+            //if (!AuthenticationService.HasWriteAccess(UserId, entity))
+            //    return Unauthorized();
 
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
+            Validate(entity);
 
-        //    try
-        //    {
-        //        entity = Repository.Insert(entity);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
+            T newEntity;
 
-        //    return Created(entity);
-        //}
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        //protected IHttpActionResult Patch(int key, Delta<T> delta)
-        //{
-        //    Validate(delta.GetEntity());
+            try
+            {
+                var e = entity as Entity;
+                if(e!=null)
+                {
+                    e.ObjectOwner = CurentUser;
+                }
+                newEntity = Repository.Insert(entity);
+                Repository.Save();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
 
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
+            return Created(newEntity);
+        }
 
-        //    var entity = Repository.GetByKey(key);
-        //    if(entity == null)
-        //        return NotFound();
+        protected IHttpActionResult Patch(int key, Delta<T> delta)
+        {
+            Validate(delta.GetEntity());
 
-        //    try
-        //    {
-        //        delta.Patch(entity);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        //    return Updated(entity);
-        //}
+            var entity = Repository.GetByKey(key);
+            if (entity == null)
+                return NotFound();
+
+            if (!AuthenticationService.HasWriteAccess(UserId, entity))
+                return Unauthorized();
+
+            try
+            {
+                delta.Patch(entity);
+                Repository.Save();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+            return Updated(entity);
+        }
 
         //protected IHttpActionResult Delete(int key)
         //{

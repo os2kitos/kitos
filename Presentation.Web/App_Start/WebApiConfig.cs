@@ -7,9 +7,8 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Presentation.Web
 {
@@ -56,7 +55,7 @@ namespace Presentation.Web
             //builder.EntitySet<IContractType>("ItContractTypes");
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
-            dataRowUsage.EntityType.HasKey(x => new {x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId});
+            dataRowUsage.EntityType.HasKey(x => new { x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
             //builder.EntitySet<EconomyYear>("EconomyYears");
 
@@ -93,7 +92,7 @@ namespace Presentation.Web
             itProjectRoles.EntityType.HasKey(x => x.Id);
 
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages");
-            itProjectOrgUnitUsage.EntityType.HasKey(x => new {x.ItProjectId, x.OrganizationUnitId});
+            itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
             var itProject = builder.EntitySet<ItProject>("ItProjects");
             itProject.EntityType.HasKey(x => x.Id);
@@ -213,6 +212,9 @@ namespace Presentation.Web
             //builder.EntitySet<Text>("Texts");
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
+
+            builder.EntitySet<Report>("Reports").EntityType.HasKey(x => x.Id);
+            builder.EntitySet<ReportCategoryType>("ReportCategories").EntityType.HasKey(x => x.Id);
 
             return builder.GetEdmModel();
         }

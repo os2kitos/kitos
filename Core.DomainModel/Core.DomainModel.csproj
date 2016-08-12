@@ -158,9 +158,9 @@
     <Compile Include="Organization\OrganizationRole.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Organization\TaskUsage.cs" />
+    <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
-    <Compile Include="Reports\ReportAccess.cs" />
-    <Compile Include="Reports\ReportCategory.cs" />
+    <Compile Include="Reports\ReportCategoryType.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />

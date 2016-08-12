@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItSystem
 {
@@ -12,7 +13,7 @@ namespace Core.DomainModel.ItSystem
     {
         public ItInterfaceUse()
         {
-            this.ItInterfaceUsages = new List<ItInterfaceUsage>();
+            ItInterfaceUsages = new List<ItInterfaceUsage>();
         }
 
         public int ItInterfaceId { get; set; }

@@ -8,6 +8,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 
 namespace Infrastructure.DataAccess.Migrations
 {
@@ -103,6 +104,8 @@ namespace Infrastructure.DataAccess.Migrations
             AddOptions<TerminationDeadlineType, ItContract>(context.TerminationDeadlineTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
 
             AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
+
+            AddOptions<ReportCategoryType, Report>(context.ReportCategoryTypes, globalAdmin, "IT Kontrakt", "IT Projekt", "IT System", "Organisation", "Økonomi");
 
             context.SaveChanges();
 
@@ -538,7 +541,9 @@ namespace Infrastructure.DataAccess.Migrations
             #region TEXTS
 
             context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text() { Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
+                                      new Text()
+                                      {
+                                          Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
 Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
 KITOS er bygget op omkring flg. moduler:
 1.	IT understøttelse af organisation
@@ -549,8 +554,9 @@ KITOS er bygget op omkring flg. moduler:
 De første kommuner tager KITOS i brug i oktober 2014.
 Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
 Kontakt: info@kitos.dk",
-                       ObjectOwnerId = globalAdmin.Id,
-                       LastChangedByUserId = globalAdmin.Id },
+                                          ObjectOwnerId = globalAdmin.Id,
+                                          LastChangedByUserId = globalAdmin.Id
+                                      },
                                       new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
 
             #endregion
@@ -625,14 +631,14 @@ Kontakt: info@kitos.dk",
             where T : Entity, IOptionEntity<TReference>, new()
         {
             return new T()
-                {
-                    IsActive = isActive,
-                    IsSuggestion = isSuggestion,
-                    Name = name,
-                    Note = note,
-                    ObjectOwnerId = objectOwner.Id,
-                    LastChangedByUserId = objectOwner.Id
-                };
+            {
+                IsActive = isActive,
+                IsSuggestion = isSuggestion,
+                Name = name,
+                Note = note,
+                ObjectOwnerId = objectOwner.Id,
+                LastChangedByUserId = objectOwner.Id
+            };
         }
 
         /// <summary>
@@ -671,14 +677,14 @@ Kontakt: info@kitos.dk",
         {
             var salt = cryptoService.Encrypt(name + "salt");
             return new User()
-                {
-                    Name = name,
-                    Email = email,
-                    Salt = salt,
-                    Password = cryptoService.Encrypt(password + salt),
-                    ObjectOwnerId = objectOwner?.Id,
-                    LastChangedByUserId = objectOwner?.Id
-                };
+            {
+                Name = name,
+                Email = email,
+                Salt = salt,
+                Password = cryptoService.Encrypt(password + salt),
+                ObjectOwnerId = objectOwner?.Id,
+                LastChangedByUserId = objectOwner?.Id
+            };
         }
 
         private static Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)

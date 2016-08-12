@@ -6,9 +6,6 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ConfigMap()
         {
-            // Primary Key
-            HasKey(t => t.Id);
-
             // Table & Column Mappings
             ToTable("Config");
             Property(t => t.Id).HasColumnName("Id");

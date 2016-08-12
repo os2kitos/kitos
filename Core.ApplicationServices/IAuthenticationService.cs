@@ -10,5 +10,6 @@ namespace Core.ApplicationServices
         bool IsLocalAdmin(int userId, int organizationId);
         bool IsLocalAdmin(int userId);
         bool HasReadAccessOutsideContext(int userId);
+        bool HasWriteAccess(int userId, object entity);
     }
 }

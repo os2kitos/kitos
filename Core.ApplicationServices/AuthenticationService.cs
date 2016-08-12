@@ -4,7 +4,9 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
+using System.Security.AccessControl;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices
 {
@@ -68,6 +70,12 @@ namespace Core.ApplicationServices
             // if the user is logged into an organization that allows sharing,
             // then the user have read access outside the context.
             return user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality;
+        }
+
+        public bool HasWriteAccess(int userId, object entity)
+        {
+            var e = entity as Entity;
+            return e != null && HasWriteAccess(userId, e);
         }
 
         /// <summary>
@@ -157,6 +165,13 @@ namespace Core.ApplicationServices
             {
                 return true;
             }
+
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin)
+                && entity is IReportModule)
+            {
+                return true;
+            }
+
 
             // check if user has a write role on the target entity
             if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here

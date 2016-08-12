@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItSystem
 {
@@ -7,48 +8,50 @@ namespace Core.DomainModel.ItSystem
     {
         public ItInterface()
         {
-            this.DataRows = new List<DataRow>();
-            this.CanBeUsedBy = new List<ItInterfaceUse>();
-            this.InterfaceLocalUsages = new List<ItInterfaceUsage>();
-            this.InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
+            DataRows = new List<DataRow>();
+            CanBeUsedBy = new List<ItInterfaceUse>();
+            InterfaceLocalUsages = new List<ItInterfaceUsage>();
+            InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
         }
 
         /// <summary>
-        /// Gets or sets the version.
+        ///     Gets or sets the version.
         /// </summary>
         /// <value>
-        /// The version.
+        ///     The version.
         /// </value>
         public string Version { get; set; }
 
         /// <summary>
-        /// Gets or sets the user defined interface identifier.
+        ///     Gets or sets the user defined interface identifier.
         /// </summary>
         /// <remarks>
-        /// This identifier is NOT the primary key.
+        ///     This identifier is NOT the primary key.
         /// </remarks>
         /// <value>
-        /// The user defined interface identifier.
+        ///     The user defined interface identifier.
         /// </value>
         public string ItInterfaceId { get; set; }
 
         public int? InterfaceId { get; set; }
+
         /// <summary>
-        /// Gets or sets the interface option.
-        /// Provides details about an it system of type interface.
+        ///     Gets or sets the interface option.
+        ///     Provides details about an it system of type interface.
         /// </summary>
         /// <value>
-        /// The interface option.
+        ///     The interface option.
         /// </value>
         public virtual InterfaceType Interface { get; set; }
 
         public int? InterfaceTypeId { get; set; }
+
         /// <summary>
-        /// Gets or sets the type of the interface.
-        /// Provides details about an it system of type interface.
+        ///     Gets or sets the type of the interface.
+        ///     Provides details about an it system of type interface.
         /// </summary>
         /// <value>
-        /// The type of the interface.
+        ///     The type of the interface.
         /// </value>
         public virtual ItInterfaceType InterfaceType { get; set; }
 
@@ -60,36 +63,37 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }
+
         /// <summary>
-        /// Gets or sets it systems that can use this instance.
+        ///     Gets or sets it systems that can use this instance.
         /// </summary>
         /// <value>
-        /// It systems that can used by this instance.
+        ///     It systems that can used by this instance.
         /// </value>
         public virtual ICollection<ItInterfaceUse> CanBeUsedBy { get; set; }
 
         //public int? ExhibitedById { get; set; } TODO
         /// <summary>
-        /// Gets or sets it system that exhibits this interface instance.
+        ///     Gets or sets it system that exhibits this interface instance.
         /// </summary>
         /// <value>
-        /// The it system that exhibits this instance.
+        ///     The it system that exhibits this instance.
         /// </value>
         public virtual ItInterfaceExhibit ExhibitedBy { get; set; }
 
         /// <summary>
-        /// Gets or sets local usages of the system, in case the system is an interface.
+        ///     Gets or sets local usages of the system, in case the system is an interface.
         /// </summary>
         /// <value>
-        /// The interface local usages.
+        ///     The interface local usages.
         /// </value>
         public virtual ICollection<ItInterfaceUsage> InterfaceLocalUsages { get; set; }
 
         /// <summary>
-        /// Gets or sets local exposure of the system, in case the system is an interface.
+        ///     Gets or sets local exposure of the system, in case the system is an interface.
         /// </summary>
         /// <value>
-        /// The interface local exposure.
+        ///     The interface local exposure.
         /// </value>
         public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
     }
