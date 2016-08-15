@@ -2,7 +2,6 @@
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainServices;
 using System.Web.Http.Results;
 using System.Net;
@@ -11,7 +10,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationUnitsController : BaseController<OrganizationUnit>
+    public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;

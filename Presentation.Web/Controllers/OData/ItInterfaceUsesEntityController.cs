@@ -3,9 +3,9 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItInterfaceUsesController : BaseController<ItInterfaceUse>
+    public class ItInterfaceUsesEntityController : BaseController<ItInterfaceUse>
     {
-        public ItInterfaceUsesController(IGenericRepository<ItInterfaceUse> repository)
+        public ItInterfaceUsesEntityController(IGenericRepository<ItInterfaceUse> repository)
             : base(repository)
         {
         }

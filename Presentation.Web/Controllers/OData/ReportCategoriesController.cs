@@ -3,7 +3,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ReportCategoriesController : BaseController<ReportCategoryType>
+    public class ReportCategoriesController : BaseEntityController<ReportCategoryType>
     {
         public ReportCategoriesController(IGenericRepository<ReportCategoryType> repository)
             : base(repository)

@@ -254,9 +254,10 @@
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\InterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
-    <Compile Include="Controllers\OData\ItInterfaceUsesController.cs" />
+    <Compile Include="Controllers\OData\ItInterfaceUsesEntityController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\ItContractRolesController.cs" />

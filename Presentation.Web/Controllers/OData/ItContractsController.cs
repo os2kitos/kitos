@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.ApplicationServices;
@@ -14,7 +13,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItContractsController : BaseController<ItContract>
+    public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IUserService _userService;

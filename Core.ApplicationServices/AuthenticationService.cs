@@ -71,13 +71,7 @@ namespace Core.ApplicationServices
             // then the user have read access outside the context.
             return user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality;
         }
-
-        public bool HasWriteAccess(int userId, object entity)
-        {
-            var e = entity as Entity;
-            return e != null && HasWriteAccess(userId, e);
-        }
-
+        
         /// <summary>
         /// Checks if the user have read access to a given instance.
         /// </summary>
@@ -113,12 +107,11 @@ namespace Core.ApplicationServices
         /// <summary>
         /// Checks if the user have write access to a given instance.
         /// </summary>
-        /// <param name="userId">The user.</param>
+        /// <param name="user">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have write access to the given instance, else false.</returns>
-        public bool HasWriteAccess(int userId, Entity entity)
+        public bool HasWriteAccess(User user, Entity entity)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
             // check if global admin
@@ -154,24 +147,14 @@ namespace Core.ApplicationServices
                 return true;
             }
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin)
-                && entity is IProjectModule)
-            {
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
                 return true;
-            }
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin)
-                && entity is ISystemModule)
-            {
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
                 return true;
-            }
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin)
-                && entity is IReportModule)
-            {
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
                 return true;
-            }
-
 
             // check if user has a write role on the target entity
             if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here

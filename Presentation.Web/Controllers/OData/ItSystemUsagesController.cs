@@ -4,7 +4,6 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.ApplicationServices;
@@ -14,7 +13,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemUsagesController : BaseController<ItSystemUsage>
+    public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IUserService _userService;

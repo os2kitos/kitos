@@ -4,13 +4,14 @@ using System.Web.OData;
 using System.Web.OData.Query;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Ninject;
 
 namespace Presentation.Web.Controllers.OData
 {
     //[Authorize]
-    public abstract class BaseController<T> : ODataController where T : class
+    public abstract class BaseController<T> : ODataController where T : ItInterfaceUse
     {
         protected ODataValidationSettings ValidationSettings;
         protected IGenericRepository<T> Repository;
@@ -71,60 +72,62 @@ namespace Presentation.Web.Controllers.OData
         //    return StatusCode(HttpStatusCode.NotImplemented);
         //}
 
-        public virtual IHttpActionResult Post(T entity)
-        {
-            //if (!AuthenticationService.HasWriteAccess(UserId, entity))
-            //    return Unauthorized();
+        //public virtual IHttpActionResult Post(T entity)
+        //{
+        //    if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
+        //        return Unauthorized();
 
-            Validate(entity);
+        //    Validate(entity);
 
-            T newEntity;
+        //    T newEntity;
 
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            try
-            {
-                var e = entity as Entity;
-                if(e!=null)
-                {
-                    e.ObjectOwner = CurentUser;
-                }
-                newEntity = Repository.Insert(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
+        //    try
+        //    {
+        //        var e = entity as Entity;
+        //        if (e != null)
+        //        {
+        //            e.ObjectOwner = CurentUser;
+        //            e.LastChangedByUser = CurentUser;
+        //        }
+        //        newEntity = Repository.Insert(entity);
+        //        Repository.Save();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return InternalServerError(e);
+        //    }
 
-            return Created(newEntity);
-        }
+        //    return Created(newEntity);
+        //}
 
-        protected IHttpActionResult Patch(int key, Delta<T> delta)
-        {
-            Validate(delta.GetEntity());
+        //protected IHttpActionResult Patch(int key, Delta<T> delta)
+        //{
+        //    Validate(delta.GetEntity());
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            var entity = Repository.GetByKey(key);
-            if (entity == null)
-                return NotFound();
+        //    var entity = Repository.GetByKey(key);
+        //    if (entity == null)
+        //        return NotFound();
 
-            if (!AuthenticationService.HasWriteAccess(UserId, entity))
-                return Unauthorized();
+        //    if (!AuthenticationService.HasWriteAccess(UserId, entity))
+        //        return Unauthorized();
 
-            try
-            {
-                delta.Patch(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-            return Updated(entity);
-        }
+        //    try
+        //    {
+        //        delta.Patch(entity);
+        //        Repository.Save();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return InternalServerError(e);
+        //    }
+        //    return Updated(entity);
+        //}
 
         //protected IHttpActionResult Delete(int key)
         //{

@@ -8,7 +8,7 @@ using Core.DomainModel.ItSystem;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItInterfacesController : BaseController<ItInterface>
+    public class ItInterfacesController : BaseEntityController<ItInterface>
     {
         public ItInterfacesController(IGenericRepository<ItInterface> repository)
             : base(repository)

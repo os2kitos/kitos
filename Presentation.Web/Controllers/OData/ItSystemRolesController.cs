@@ -6,7 +6,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemRolesController : BaseController<ItSystemRole>
+    public class ItSystemRolesController : BaseEntityController<ItSystemRole>
     {
         public ItSystemRolesController(IGenericRepository<ItSystemRole> repository)
             : base(repository)

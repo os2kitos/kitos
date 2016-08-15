@@ -7,7 +7,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemRightsController : BaseController<ItSystemRight>
+    public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
         public ItSystemRightsController(IGenericRepository<ItSystemRight> repository)
             : base(repository)

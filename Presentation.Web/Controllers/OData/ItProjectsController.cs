@@ -14,7 +14,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItProjectsController : BaseController<ItProject>
+    public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IUserService _userService;

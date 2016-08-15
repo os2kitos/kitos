@@ -11,7 +11,7 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
-    public class EconomyStreamsController : ODataController // doesn't derive from BaseController because we need absolute control over what is exposed here
+    public class EconomyStreamsController : ODataController // doesn't derive from BaseEntityController because we need absolute control over what is exposed here
     {
         private readonly IGenericRepository<EconomyStream> _repository;
         private readonly IGenericRepository<User> _userRepository;

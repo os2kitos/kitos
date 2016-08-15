@@ -11,7 +11,7 @@ using System.Net;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemsController : BaseController<ItSystem>
+    public class ItSystemsController : BaseEntityController<ItSystem>
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
