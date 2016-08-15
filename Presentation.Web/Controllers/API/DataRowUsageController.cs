@@ -98,7 +98,8 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+
+                return LogError(e);
             }
         }
     }

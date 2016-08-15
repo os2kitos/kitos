@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -113,7 +113,7 @@ namespace Presentation.Web.Controllers.API
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
                             return Conflict(e.InnerException.InnerException.Message);
 
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -256,7 +256,7 @@ namespace Presentation.Web.Controllers.API
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
                             return Conflict(e.InnerException.InnerException.Message);
 
-                return Error(e);
+                return LogError(e);
             }
         }
 

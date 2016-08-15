@@ -18,7 +18,6 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Repository.Get(x => x.ItInterfaceId == interfaceId);
-
                 if (item == null) return NotFound();
 
                 var dto = Map(item);
@@ -26,7 +25,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
     }

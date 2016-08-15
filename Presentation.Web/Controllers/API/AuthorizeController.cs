@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IOrganizationService _organizationService;
         private readonly ILogger _logger;
 
-        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService, ILogger logger)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService, ILogger logger)
         {
             _userRepository = userRepository;
             _userService = userService;
@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -80,7 +80,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
