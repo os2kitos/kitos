@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
+using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
+using WebGrease.Activities;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -17,22 +20,38 @@ namespace Presentation.Web.Controllers.API
     public abstract class BaseApiController : ApiController
     {
         [Inject]
-        public IGenericRepository<User> UserRepository { get; set; }
+        protected IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        public IAuthenticationService AuthenticationService { get; set; }
+        protected IAuthenticationService AuthenticationService { get; set; }
+
+        [Inject]
+        protected ILogger Logger { get; set; }
+
+        protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
+        {
+            Logger.Error(exp, memberName);
+            // TODO return proper error msg
+            return Error("Der opstod en ukendt fejl. Kontakt din IT-afdeling, hvis problemet gentager sig.");
+        }
+
+        //protected HttpResponseMessage LogError(string uiMsg,Exception exp, [CallerMemberName] string memberName = "")
+        //{
+        //    Logger.Error(exp, memberName);
+        //    // TODO return proper error msg
+        //    return Error(uiMsg);
+        //}
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
             var wrap = new ApiReturnDTO<T>
-                {
-                    Msg = msg,
-                    Response = response
-                };
+            {
+                Msg = msg,
+                Response = response
+            };
 
             return Request.CreateResponse(statusCode, wrap);
         }
-
 
         protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string msg = "")
         {
@@ -140,10 +159,10 @@ namespace Presentation.Web.Controllers.API
                     //var user = MemoryCache.Default.Get(User.Identity.Name) as User;
                     //if (user == null)
                     //{
-                        var id = Convert.ToUInt32(User.Identity.Name);
-                        var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
-                        if (user == null) throw new SecurityException();
-                      //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
+                    var id = Convert.ToUInt32(User.Identity.Name);
+                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
+                    if (user == null) throw new SecurityException();
+                    //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
                     //}
 
                     return user;

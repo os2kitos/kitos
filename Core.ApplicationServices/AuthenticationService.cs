@@ -4,7 +4,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
-using System.Security.AccessControl;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 
@@ -61,7 +60,12 @@ namespace Core.ApplicationServices
 
         public bool HasReadAccessOutsideContext(int userId)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                return false;
+            }
+
             if (user.IsGlobalAdmin)
             {
                 return true;

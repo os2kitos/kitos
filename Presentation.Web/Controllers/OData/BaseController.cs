@@ -65,6 +65,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(entity);
         }
 
+       
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
 
         //protected IHttpActionResult Put(int key, T entity)

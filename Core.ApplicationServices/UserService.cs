@@ -180,8 +180,9 @@ namespace Core.ApplicationServices
 
         public int GetCurrentOrganizationId(int userId)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            return user.DefaultOrganizationId.Value;
+            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
+
+            return user?.DefaultOrganizationId ?? 0;
         }
     }
 }

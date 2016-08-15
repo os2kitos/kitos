@@ -42,6 +42,62 @@ namespace Presentation.Web.Controllers.OData
             }
         }
 
+        [EnableQuery]
+        [ODataRoute("ItContracts({key})")]
+        public override IHttpActionResult Get(int key)
+        {
+            if (_authService.HasReadAccessOutsideContext(UserId))
+            {
+                return base.Get(key);
+            }
+
+            var orgId = _userService.GetCurrentOrganizationId(UserId);
+            var entity = Repository.GetByKey(key);
+            if (entity.OrganizationId != orgId)
+            {
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            }
+            return Ok(entity);
+        }
+
+        // GET /ItContracts(1)/ResponsibleOrganizationUnit
+        [EnableQuery]
+        [ODataRoute("ItContracts({contractKey})/ResponsibleOrganizationUnit")]
+        public IHttpActionResult GetResponsibleOrganizationUnit(int contractKey)
+        {
+            var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
+            if (entity == null)
+                return NotFound();
+
+            if (_authService.HasReadAccess(UserId, entity))
+            {
+                return Ok(entity);
+            }
+            else
+            {
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            }
+        }
+
+        // GET /ItContracts(1)/ResponsibleOrganizationUnit
+        [EnableQuery]
+        [ODataRoute("ItContracts({contractKey})/Organization")]
+        public IHttpActionResult GetOrganization(int contractKey)
+        {
+            var entity = Repository.GetByKey(contractKey).Organization;
+            if (entity == null)
+                return NotFound();
+
+            if (_authService.HasReadAccess(UserId, entity))
+            {
+                return Ok(entity);
+            }
+            else
+            {
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            }
+        }
+
         // GET /Organizations(1)/ItContracts
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItContracts")]
@@ -52,11 +108,24 @@ namespace Presentation.Web.Controllers.OData
             {
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
-            else
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            return Ok(result);
+        }
+
+        // GET /Organizations(1)/Supplier
+        [EnableQuery(MaxExpansionDepth = 3)]
+        [ODataRoute("Organizations({key})/Supplier")]
+        public IHttpActionResult GetSupplier(int key)
+        {
+            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                return Ok(result);
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
+
+            var result = Repository.AsQueryable().Where(m => m.SupplierId == key);
+            return Ok(result);
         }
 
         // GET /Organizations(1)/ItContracts(1)
