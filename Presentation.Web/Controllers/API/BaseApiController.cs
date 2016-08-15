@@ -167,8 +167,9 @@ namespace Presentation.Web.Controllers.API
 
                     return user;
                 }
-                catch (Exception)
+                catch (Exception exp)
                 {
+                    Logger.Error("Error in property KitosUser", exp);
                     throw new SecurityException();
                 }
             }

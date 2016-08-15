@@ -11,7 +11,7 @@ using Core.ApplicationServices;
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
-    public class UsersController : BaseController<User>
+    public class UsersController : BaseEntityController<User>
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
