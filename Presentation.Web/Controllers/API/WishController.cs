@@ -8,13 +8,13 @@ namespace Presentation.Web.Controllers.API
 {
     public class WishController : GenericContextAwareApiController<Wish, WishDTO>
     {
-        public WishController(IGenericRepository<Wish> repository) 
+        public WishController(IGenericRepository<Wish> repository)
             : base(repository)
         {
         }
 
         public HttpResponseMessage GetWishes([FromUri] int userId, [FromUri] int usageId)
-        {          
+        {
             var wishes = Repository.Get(x => x.ItSystemUsageId == usageId && (x.IsPublic || x.UserId == userId));
             return Ok(Map(wishes));
         }

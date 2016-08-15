@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
 
-        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository) 
+        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository)
             : base(repository)
         {
             _repository = repository;
@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
     }
