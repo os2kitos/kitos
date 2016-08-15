@@ -20,17 +20,17 @@ namespace Presentation.Web.Controllers.API
     public abstract class BaseApiController : ApiController
     {
         [Inject]
-        protected IGenericRepository<User> UserRepository { get; set; }
+        public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        protected IAuthenticationService AuthenticationService { get; set; }
+        public IAuthenticationService AuthenticationService { get; set; }
 
         [Inject]
-        protected ILogger Logger { get; set; }
+        public ILogger Logger { get; set; }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
-            Logger.Error(exp, memberName);
+            Logger?.Error(exp, memberName);
             // TODO return proper error msg
             return Error("Der opstod en ukendt fejl. Kontakt din IT-afdeling, hvis problemet gentager sig.");
         }
@@ -169,7 +169,7 @@ namespace Presentation.Web.Controllers.API
                 }
                 catch (Exception exp)
                 {
-                    Logger.Error("Error in property KitosUser", exp);
+                    Logger?.Error("Error in property KitosUser", exp);
                     throw new SecurityException();
                 }
             }

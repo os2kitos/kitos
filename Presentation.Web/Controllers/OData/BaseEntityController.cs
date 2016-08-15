@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.OData
         {
             get
             {
-                return 1;
+                //return 1;
                 int userId;
                 int.TryParse(User.Identity.Name, out userId);
                 return userId;
