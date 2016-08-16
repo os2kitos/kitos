@@ -46,11 +46,14 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            _logger.Debug("PostLogin called", loginDto);
+            var loginInformation = new { loginDto.Email, Password = "********", LoginSuccessful = false };
+
             try
             {
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                {
                     throw new ArgumentException();
+                }
 
                 var user = _userRepository.GetByEmail(loginDto.Email);
 
@@ -58,14 +61,22 @@ namespace Presentation.Web.Controllers.API
 
                 var response = CreateLoginResponse(user);
 
+                loginInformation = new { loginDto.Email, Password = "********", LoginSuccessful = true };
+
+                _logger.Info("Uservalidation: Successful {@loginInformation}", loginInformation);
+
                 return Created(response);
             }
             catch (ArgumentException)
             {
+                _logger.Info("Uservalidation: Not valid. {@loginInformation}", loginInformation);
+
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
+                _logger.Info("Uservalidation: Error. {@loginInformation}", loginInformation);
+
                 return LogError(e);
             }
         }
