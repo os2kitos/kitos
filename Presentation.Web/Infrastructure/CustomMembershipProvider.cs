@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Web.Security;
 using Core.DomainServices;
 using Ninject;
+using Ninject.Extensions.Logging;
+
 
 namespace Presentation.Web.Infrastructure
 {
@@ -12,6 +15,10 @@ namespace Presentation.Web.Infrastructure
 
         [Inject]
         public ICryptoService CryptoService { get; set; }
+
+        private readonly ILogger _logger;
+        private int _maxInvalidPasswordAttempts;
+        private int _passwordAttemptWindow;
 
         #region not implemented
 
@@ -96,10 +103,7 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override int MaxInvalidPasswordAttempts
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override int MaxInvalidPasswordAttempts => _maxInvalidPasswordAttempts;
 
         public override int MinRequiredNonAlphanumericCharacters
         {
@@ -111,10 +115,7 @@ namespace Presentation.Web.Infrastructure
             get { throw new NotImplementedException(); }
         }
 
-        public override int PasswordAttemptWindow
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override int PasswordAttemptWindow => _passwordAttemptWindow;
 
         public override MembershipPasswordFormat PasswordFormat
         {
@@ -153,14 +154,29 @@ namespace Presentation.Web.Infrastructure
 
         #endregion
 
+        public override void Initialize(string name, NameValueCollection config)
+        {
+            base.Initialize(name, config);
+            _maxInvalidPasswordAttempts = Convert.ToInt32(config["maxInvalidPasswordAttempts"]);
+            _passwordAttemptWindow = Convert.ToInt32(config["passwordAttemptWindow"]);
+        }
+
+
         public override bool ValidateUser(string username, string password)
         {
+
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
             if (user == null) return false;
 
-            //TODO: HASHING
-            return user.Password == CryptoService.Encrypt(password + user.Salt);
+            //check om bruger er locked out, hvis bruger ikke er locked out så er IsLockedOut = null eller har den en timespan value (IsLockedOut skal være nullable)
+
+            var result = user.Password == CryptoService.Encrypt(password + user.Salt);
+
+            //if result = true, password er korrekt og failed attemtps nulstilles
+            //else result = false, password er forkert og failed attemtps + 1
+
+            return result;
         }
     }
 }
