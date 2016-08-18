@@ -1,0 +1,39 @@
+﻿<div class="modal-header">
+    <h3>Opret/Rediger Rapport</h3>
+</div>
+<div class="modal-body">
+    <form>
+        <div class="form-group">
+            <label for="navn">Navn</label>
+            <input type="text" class="form-control" id="name" placeholder="Navn">
+        </div>
+
+        <div class="form-group">
+            <label for="beskrivelse">Beskrivelse</label>
+            <input type="textarea" rows="4" class="form-control" id="beskrivelse" placeholder="Beskrivelse">
+             <p class="help-block">Kort beskrivelse af formålet med rapporten.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Kategori</label>
+            <select class="form-control" id="category">
+                <option>IT-Projekt</option>
+                <option>IT-Kontrakt</option>
+                <option>Økonomi</option>
+                <option>Mine Rapporter</option>
+            </select>
+             <p class="help-block">Hvis rapporten falder inden for en af de nævnte kategorier, så vælg den.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="accesstype">Adgangstype</label>
+            <select class="form-control" id="accesstype">
+                <option>Private</option>
+                <option>Organisation</option>
+                <option>Global</option>
+            </select>
+            <p class="help-block">Vælg synligheden for rapporten.</p>
+        </div>
+        
+    </form>
+</div>

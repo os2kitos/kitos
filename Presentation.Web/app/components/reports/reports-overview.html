@@ -1,3 +1,18 @@
 ﻿<h1>{{vm.title}}</h1>
-
-
+<table class="table table-hover" >
+    <caption>List over rapporter</caption>
+    <thead>
+        <tr>
+            <th>Navn</th>
+            <th>Beskrivelse</th>
+            <th>Kategori</th>
+        </tr>
+    </thead>
+    <tbody ng-repeat="rpt in allReports">
+        <tr>
+            <td>{{rpt.name}}</td>
+            <td>{{rpt.description}}</td>
+            <td>{{rpt.categoryId}}</td>
+        </tr>
+    </tbody>
+</table>

@@ -1,11 +1,20 @@
 ﻿module Kitos.Reports.Overview {
     'use strict';
 
-    class ReportsOverviewController {
+    export class ReportsOverviewController {
         public title:string;
-        constructor() {
+
+        public static $inject: string[] = ['reportService'];
+        constructor(private reportService) {
             this.title = 'Så mangler vi bare nogle rapporter ...';
         }
+
+        allreports = () => {
+            (new this.reportService()).$getAll().then((data) => {
+                return data;
+            })
+        }
+
     }
 
     angular
@@ -15,7 +24,7 @@
                 $stateProvider.state("reports.overview", {
                     url: "/overblik",
                     templateUrl: "app/components/reports/reports-overview.html",
-                    controller: ReportsOverviewController,
+                    controller: ReportsOverviewController, 
                     controllerAs: "vm"
                 });
             }
