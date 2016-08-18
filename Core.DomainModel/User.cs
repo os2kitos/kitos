@@ -22,6 +22,8 @@ namespace Core.DomainModel
             this.ResponsibleForCommunications = new List<Communication>();
             this.HandoverParticipants = new List<Handover>();
             this.SignerForContracts = new Collection<ItContract.ItContract>();
+            LockedOutDate = null;
+            FailedAttempts = 0;
         }
 
         public string Name { get; set; }
@@ -83,6 +85,10 @@ namespace Core.DomainModel
         /// The contracts that the user has been marked as contract signer for
         /// </summary>
         public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
+
+        public DateTime? LockedOutDate { get; set; }
+
+        public int FailedAttempts { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {

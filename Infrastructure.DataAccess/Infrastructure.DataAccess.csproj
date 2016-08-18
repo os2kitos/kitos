@@ -175,6 +175,10 @@
     <Compile Include="Migrations\201608111143069_AddedReports.Designer.cs">
       <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.cs" />
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.Designer.cs">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -216,6 +220,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608111143069_AddedReports.resx">
       <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.resx">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

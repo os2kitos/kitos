@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Web.Security;
+using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
-
 
 namespace Presentation.Web.Infrastructure
 {
@@ -16,7 +16,9 @@ namespace Presentation.Web.Infrastructure
         [Inject]
         public ICryptoService CryptoService { get; set; }
 
-        private readonly ILogger _logger;
+        [Inject]
+        public ILogger Logger { get; set; }
+
         private int _maxInvalidPasswordAttempts;
         private int _passwordAttemptWindow;
 
@@ -103,8 +105,6 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override int MaxInvalidPasswordAttempts => _maxInvalidPasswordAttempts;
-
         public override int MinRequiredNonAlphanumericCharacters
         {
             get { throw new NotImplementedException(); }
@@ -114,8 +114,6 @@ namespace Presentation.Web.Infrastructure
         {
             get { throw new NotImplementedException(); }
         }
-
-        public override int PasswordAttemptWindow => _passwordAttemptWindow;
 
         public override MembershipPasswordFormat PasswordFormat
         {
@@ -154,6 +152,8 @@ namespace Presentation.Web.Infrastructure
 
         #endregion
 
+        public override int MaxInvalidPasswordAttempts => _maxInvalidPasswordAttempts;
+        public override int PasswordAttemptWindow => _passwordAttemptWindow;
         public override void Initialize(string name, NameValueCollection config)
         {
             base.Initialize(name, config);
@@ -161,22 +161,78 @@ namespace Presentation.Web.Infrastructure
             _passwordAttemptWindow = Convert.ToInt32(config["passwordAttemptWindow"]);
         }
 
-
         public override bool ValidateUser(string username, string password)
         {
-
+            var isValid = false;
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
-            if (user == null) return false;
 
-            //check om bruger er locked out, hvis bruger ikke er locked out så er IsLockedOut = null eller har den en timespan value (IsLockedOut skal være nullable)
+            if (user == null)
+            {
+                Logger.Debug("User not found");
 
-            var result = user.Password == CryptoService.Encrypt(password + user.Salt);
+                return isValid;
+            }
 
-            //if result = true, password er korrekt og failed attemtps nulstilles
-            //else result = false, password er forkert og failed attemtps + 1
+            var userInfomation = new { user.Email, user.FailedAttempts, user.LockedOutDate };
 
-            return result;
+            if (user.LockedOutDate != null)
+            {
+                var lastLockoutDate = user.LockedOutDate;
+                var unlockDate = lastLockoutDate.Value.AddMinutes(PasswordAttemptWindow);
+
+                if (DateTime.Now >= unlockDate)
+                {
+                    ResetLockedOutDate(user);
+                    ResetAttempts(user);
+                    Logger.Debug("User has been unlocked");
+
+                    isValid = CheckPassword(user, password);
+                }
+
+                Logger.Debug("User will be unlocked {unlockDate}", unlockDate);
+            }
+            else
+            {
+                isValid = CheckPassword(user, password);
+
+                if (isValid)
+                {
+                    ResetAttempts(user);
+                }
+                else
+                {
+                    user.FailedAttempts++;
+
+                    if (user.FailedAttempts == MaxInvalidPasswordAttempts)
+                    {
+                        user.LockedOutDate = DateTime.Now;
+                        ResetAttempts(user);
+                        Logger.Debug("User was locked");
+                    }
+                }
+            }
+
+            Logger.Debug("Current User: {userInfomation}", userInfomation);
+
+            userRepository.Save();
+
+            return isValid;
+        }
+
+        private void ResetAttempts(User user)
+        {
+            user.FailedAttempts = 0;
+        }
+
+        private void ResetLockedOutDate(User user)
+        {
+            user.LockedOutDate = null;
+        }
+
+        private bool CheckPassword(User user, string password)
+        {
+            return user.Password == CryptoService.Encrypt(password + user.Salt);
         }
     }
 }
