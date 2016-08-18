@@ -8,11 +8,11 @@
             <th>Kategori</th>
         </tr>
     </thead>
-    <tbody ng-repeat="rpt in vm.allReports">
+    <tbody ng-repeat="rpt in vm.reports">
         <tr>
-            <td>{{rpt.name}}</td>
-            <td>{{rpt.description}}</td>
-            <td>{{rpt.categoryId}}</td>
+            <td>{{rpt.Name}}</td>
+            <td>{{rpt.Note}}</td>
+            <td>{{rpt.CategoryType.Name}}</td>
         </tr>
     </tbody>
 </table>

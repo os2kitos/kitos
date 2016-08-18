@@ -4,28 +4,25 @@
     export class ReportsOverviewController {
         public title:string;
 
-        public static $inject: string[] = ['ReportService'];
-        constructor(private reportService) {
+        public static $inject: string[] = ["reports"];
+        constructor(public reports) {
             this.title = 'Så mangler vi bare nogle rapporter ...';
         }
-
-        allreports = () => {
-            (new this.reportService()).$getAll().then((data) => {
-                return data;
-            });
-        }
-
     }
 
     angular
         .module("app")
         .config([
-            "$stateProvider", $stateProvider => {
+            "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
                 $stateProvider.state("reports.overview", {
                     url: "/overblik",
                     templateUrl: "app/components/reports/reports-overview.html",
                     controller: ReportsOverviewController, 
-                    controllerAs: "vm"
+                    controllerAs: "vm",
+                    resolve: {
+                        reports: ["$http", ($http: ng.IHttpService) => $http.get<Models.IOdataWrapper<any>>("/odata/reports?$expand=CategoryType")
+                            .then(result => result.data.value)]
+                    } 
                 });
             }
         ]);
