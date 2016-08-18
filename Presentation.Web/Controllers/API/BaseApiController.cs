@@ -31,16 +31,9 @@ namespace Presentation.Web.Controllers.API
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
             Logger?.Error(exp, memberName);
-            // TODO return proper error msg
+
             return Error("Der opstod en ukendt fejl. Kontakt din IT-afdeling, hvis problemet gentager sig.");
         }
-
-        //protected HttpResponseMessage LogError(string uiMsg,Exception exp, [CallerMemberName] string memberName = "")
-        //{
-        //    Logger.Error(exp, memberName);
-        //    // TODO return proper error msg
-        //    return Error(uiMsg);
-        //}
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
