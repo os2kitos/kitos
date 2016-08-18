@@ -4,7 +4,7 @@
     export class ReportsOverviewController {
         public title:string;
 
-        public static $inject: string[] = ['reportService'];
+        public static $inject: string[] = ['ReportService'];
         constructor(private reportService) {
             this.title = 'Så mangler vi bare nogle rapporter ...';
         }
@@ -12,7 +12,7 @@
         allreports = () => {
             (new this.reportService()).$getAll().then((data) => {
                 return data;
-            })
+            });
         }
 
     }

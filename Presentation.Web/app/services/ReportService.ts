@@ -4,7 +4,7 @@
 
 (function (ng, app) {
     angular.module('app')
-        .factory('reportService', function ($resource) {
+        .factory('ReportService', function ($resource) {
             var odataUrl = '/odata/reports';
             return $resource('', {},
                 {
