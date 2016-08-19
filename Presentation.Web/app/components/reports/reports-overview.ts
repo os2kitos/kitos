@@ -8,6 +8,11 @@
         constructor(public reports) {
             this.title = 'Så mangler vi bare nogle rapporter ...';
         }
+
+        private activate() {
+
+        }
+
     }
 
     angular
@@ -20,8 +25,7 @@
                     controller: ReportsOverviewController, 
                     controllerAs: "vm",
                     resolve: {
-                        reports: ["$http", ($http: ng.IHttpService) => $http.get<Models.IOdataWrapper<any>>("/odata/reports?$expand=CategoryType")
-                            .then(result => result.data.value)]
+                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)]
                     } 
                 });
             }
