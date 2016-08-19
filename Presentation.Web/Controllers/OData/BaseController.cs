@@ -10,7 +10,7 @@ using Ninject;
 
 namespace Presentation.Web.Controllers.OData
 {
-    //[Authorize]
+    [Authorize]
     public abstract class BaseController<T> : ODataController where T : class 
     {
         protected ODataValidationSettings ValidationSettings;
