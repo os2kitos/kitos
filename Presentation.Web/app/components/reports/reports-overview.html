@@ -1,18 +1,1 @@
-﻿<h1>{{vm.title}}</h1>
-<table class="table table-hover" >
-    <caption>List over rapporter</caption>
-    <thead>
-        <tr>
-            <th>Navn</th>
-            <th>Beskrivelse</th>
-            <th>Kategori</th>
-        </tr>
-    </thead>
-    <tbody ng-repeat="rpt in vm.reports">
-        <tr>
-            <td>{{rpt.Name}}</td>
-            <td>{{rpt.Note}}</td>
-            <td>{{rpt.CategoryType.Name}}</td>
-        </tr>
-    </tbody>
-</table>
+﻿<div id="mainGrid" kendo-grid="vm.mainGrid" k-options="vm.mainGridOptions"></div>
