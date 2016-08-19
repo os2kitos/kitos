@@ -59,7 +59,7 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
 
             /*
-            var userRepository = UserRepositoryFactory.GetUserRepository();
+            var userRepository = UserRepositoryFactoryMock.GetUserRepository();
             if(String.IsNullOrEmpty(username))
                 throw new ProviderException("Bad username: null or empty");
 
@@ -87,7 +87,7 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
 
             /*
-            var userRepository = UserRepositoryFactory.GetUserRepository();
+            var userRepository = UserRepositoryFactoryMock.GetUserRepository();
             var user = userRepository.GetByEmail(username);
 
             if (user == null || user.Role == null) return false;

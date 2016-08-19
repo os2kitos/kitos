@@ -163,13 +163,21 @@ namespace Presentation.Web.Infrastructure
 
         public override bool ValidateUser(string username, string password)
         {
-            var isValid = false;
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
+            var result = Validate(user, password);
+            userRepository.Save();
+
+            return result;
+        }
+
+        private bool Validate(User user, string password)
+        {
+            var isValid = false;
 
             if (user == null)
             {
-                Logger.Debug("User not found");
+                Logger.Info("User not found");
 
                 return isValid;
             }
@@ -185,37 +193,42 @@ namespace Presentation.Web.Infrastructure
                 {
                     ResetLockedOutDate(user);
                     ResetAttempts(user);
-                    Logger.Debug("User has been unlocked");
+                    Logger.Info("User has been unlocked");
 
                     isValid = CheckPassword(user, password);
                 }
 
-                Logger.Debug("User will be unlocked {unlockDate}", unlockDate);
+                Logger.Info("User will be unlocked {unlockDate}", unlockDate);
             }
             else
             {
                 isValid = CheckPassword(user, password);
-
-                if (isValid)
-                {
-                    ResetAttempts(user);
-                }
-                else
-                {
-                    user.FailedAttempts++;
-
-                    if (user.FailedAttempts == MaxInvalidPasswordAttempts)
-                    {
-                        user.LockedOutDate = DateTime.Now;
-                        ResetAttempts(user);
-                        Logger.Debug("User was locked");
-                    }
-                }
             }
 
-            Logger.Debug("Current User: {userInfomation}", userInfomation);
+            Logger.Info("Current User: {userInfomation}", userInfomation);
 
-            userRepository.Save();
+            return isValid;
+        }
+
+        private bool CheckPassword(User user, string password)
+        {
+            var isValid = user.Password == CryptoService.Encrypt(password + user.Salt);
+
+            if (isValid)
+            {
+                ResetAttempts(user);
+            }
+            else
+            {
+                user.FailedAttempts++;
+
+                if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
+                {
+                    user.LockedOutDate = DateTime.Now;
+                    ResetAttempts(user);
+                    Logger.Debug("User was locked");
+                }
+            }
 
             return isValid;
         }
@@ -228,11 +241,6 @@ namespace Presentation.Web.Infrastructure
         private void ResetLockedOutDate(User user)
         {
             user.LockedOutDate = null;
-        }
-
-        private bool CheckPassword(User user, string password)
-        {
-            return user.Password == CryptoService.Encrypt(password + user.Salt);
         }
     }
 }
