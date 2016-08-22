@@ -13,10 +13,17 @@ namespace Presentation.Web
                 .Include("~/app/utility/lodash.mixin.js")
             );
 
+            // stimulsoft (reports) bundle
+            bundles.Add(new ScriptBundle("~/Scripts/stimulsoft")
+                .IncludeDirectory("~/Scripts/stimulsoft","*.js")
+			);
+            
             // angular module bundle
             bundles.Add(new ScriptBundle("~/Scripts/angular")
                 .Include("~/Scripts/angular-bundle.min.js")
 			);
+
+            
 
             // angular app files
             bundles.Add(new ScriptBundle("~/Scripts/app")

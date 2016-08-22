@@ -23,6 +23,7 @@ module.exports = {
         bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
 
+
     // angular script bundle
     // not minified
     angularSrc: [

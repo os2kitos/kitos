@@ -71,19 +71,16 @@
                             url: (data) => {
                                 return baseUrl + "(" + data.Id + ")";
                             },
-                            dataType: "json",
                             type: "PATCH"
                         },
                         destroy: {
                             url: (data) => {
                                 return baseUrl + "(" + data.Id + ")";
                             },
-                            dataType: "json",
                             type: "DELETE"
                         },
                         create: {
                             url: baseUrl,
-                            dataType: "json",
                             type: "POST"
                         },
                         parameterMap: (data, type) => {
@@ -112,7 +109,6 @@
                     serverSorting: true,
                     pageSize: 5,
                     schema: {
-                        total: function (data) { return data['@@odata.count']; },
                         model: {
                             id: "Id",
                             fields: {
