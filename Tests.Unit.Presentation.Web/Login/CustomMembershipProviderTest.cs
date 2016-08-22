@@ -1,4 +1,6 @@
-﻿using System.Web.Mvc.Html;
+﻿using System;
+using System.Threading;
+using System.Web.Mvc.Html;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject.Extensions.Logging;
@@ -27,14 +29,14 @@ namespace Tests.Unit.Presentation.Web.Login
         }
 
         [Fact]
-        public void Should_Be_Able_To_Validate_User()
+        public void Should_Validate_User()
         {
             // Arrange
             // Get an existing user
             CustomMembershipProviderMock.UserRepositoryFactory.GetUserRepository().GetByEmail("existingUser@kitos.dk").Returns(MockUser);
             // Set user password
             MockUser.Password = "thePassword";
-            // Helper method CheckPassord in ValidateUser -> Validate returns true if the passed password to ValidateUser is equal to the user objects password property
+            // Helper method CheckPassord in ValidateUser -> Validate returns true if the password passed to ValidateUser is equal to the user objects password property
             CustomMembershipProviderMock.CryptoService.Encrypt("").ReturnsForAnyArgs("thePassword");
 
             // Act
@@ -46,7 +48,7 @@ namespace Tests.Unit.Presentation.Web.Login
         }
 
         [Fact]
-        public void Should_Not_Be_Able_To_Validate_User()
+        public void Should_Not_Validate_User()
         {
             // Arrange
             // Get a non-existing user
@@ -69,7 +71,7 @@ namespace Tests.Unit.Presentation.Web.Login
             // Arrange
             // Failed attempts are zero a the outset
             var previousFailedAttempts = MockUser.FailedAttempts;
-            // Make sure the password validation returns false. The password passed to to ValidateUser must not match "notTheUsersPassword".
+            // Make sure the password validation returns false. The password passed to ValidateUser must not match "notTheUsersPassword".
             CustomMembershipProviderMock.CryptoService.Encrypt("").ReturnsForAnyArgs("notTheUsersPassword");
 
             // Act
@@ -77,7 +79,7 @@ namespace Tests.Unit.Presentation.Web.Login
             CustomMembershipProviderMock.ValidateUser("support@kitos.dk", "incorrectPassword");
 
             // Assert
-            // Failed attempts is the actual value and should sit between the previous value and previous value + 2
+            // PreviousFailedAttempts < MockUser.FailedAttempts < previousFailedAttempts + 2
             Assert.InRange(MockUser.FailedAttempts, previousFailedAttempts, previousFailedAttempts + 2);
         }
 
@@ -87,7 +89,7 @@ namespace Tests.Unit.Presentation.Web.Login
             // Arrange
             // Get an existing user
             CustomMembershipProviderMock.UserRepositoryFactory.GetUserRepository().GetByEmail("existingUser@kitos.dk").Returns(MockUser);
-            // Failed attempts >= 5 locks the user. Next login attempt should trigger a lockout.
+            // Next login attempt should trigger a lockout when failed attempts >= 5.
             MockUser.FailedAttempts = 4;
             // The user was previously not locked and LockedOutDate is therefore null
             MockUser.LockedOutDate = null;
@@ -105,13 +107,21 @@ namespace Tests.Unit.Presentation.Web.Login
         }
 
         [Fact]
-        public void Snippet()
+        public void Should_Not_Allow_Further_Login_Attempts()
         {
             // Arrange
+            // Get an existing user
+            CustomMembershipProviderMock.UserRepositoryFactory.GetUserRepository().GetByEmail("existingUser@kitos.dk").Returns(MockUser);
 
             // Act
+            // Input existing user with valid password
+            CustomMembershipProviderMock.CryptoService.Encrypt("").ReturnsForAnyArgs("thePassword");
+            // User is lock out if User.LockedOutDate != null
+            MockUser.LockedOutDate = new DateTime(2016, 08, 22, 9, 00, 00);
+            var success = CustomMembershipProviderMock.ValidateUser("existingUser@kitos.dk", "thePassword");
 
             // Assert
+            Assert.False(success);
         }
     }
 }

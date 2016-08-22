@@ -226,7 +226,7 @@ namespace Presentation.Web.Infrastructure
                 {
                     user.LockedOutDate = DateTime.Now;
                     ResetAttempts(user);
-                    Logger.Debug("User was locked");
+                    Logger.Info("User was locked");
                 }
             }
 
