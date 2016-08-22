@@ -28,6 +28,7 @@
             "_",
             "moment",
             "notify",
+            "user",
             "reports"
         ];
 
@@ -41,6 +42,7 @@
             private _: Kitos.ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
+            private user,
             public reports) {
 
             this.$rootScope.page.title = "Raport Oversigt";
@@ -73,7 +75,9 @@
                             type: "PATCH"
                         },
                         destroy: {
-                            url: baseUrl,
+                            url: (data) => {
+                                return baseUrl + "(" + data.Id + ")";
+                            },
                             dataType: "json",
                             type: "DELETE"
                         },
@@ -85,21 +89,30 @@
                         parameterMap: (options, type) => {
                             if(type === "update") {
                                 var model: any = options.models[0];
-                                var patch = {
+                                let patch = {
                                     Name: model.Name,
                                     Description: model.Description
                                 }
                                 return JSON.stringify(patch);     
                             }
-                            if(type === "create")
-                                return JSON.stringify(options.models[0])
+                            if(type === "create") {
+                                var model: any = options.models[0];
+                                let patch = {
+                                    Id: 0,
+                                    Name: model.Name,
+                                    Description: model.Description,
+                                    OrganizationId: this.user.currentOrganizationId
+                                }
+                                return JSON.stringify(patch)
+                            }
                         }
                     },
-                    batch: true,
+                    batch: false,
                     serverPaging: true,
                     serverSorting: true,
-                    pageSize: 20,
+                    pageSize: 5,
                     schema: {
+                        total: function (data) { return data['@@odata.count']; },
                         model: {
                             id: "Id",
                             fields: {
@@ -109,7 +122,6 @@
                             }
                         }
                     }
-
                 });
 
             this.mainGridOptions = ({
@@ -136,6 +148,7 @@
                     controller: ReportsOverviewController,
                     controllerAs: "vm",
                     resolve: {
+                        user: ["userService", userService => userService.getUser()],
                         reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)]
                     }
                 });
