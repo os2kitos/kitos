@@ -9,7 +9,7 @@
 
     export interface IReportOverview {
         Name: string;
-        Note: string;
+        Description: string;
     }
 
     export class ReportsOverviewController {
