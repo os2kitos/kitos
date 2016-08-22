@@ -57,24 +57,24 @@
         }
 
         private setupGrid() {
-            var crudServiceBaseUrl = "odata/reports",
+            var baseUrl = "odata/reports",
             dataSource = new kendo.data.DataSource({
                 type: "odata-v4",
                 transport: {
                     read: {
-                        url: crudServiceBaseUrl,
+                        url: baseUrl,
                         dataType: "jsonp"
                     },
                     update: {
-                        url: crudServiceBaseUrl,
+                        url: baseUrl,
                         dataType: "jsonp"
                     },
                     destroy: {
-                        url: crudServiceBaseUrl,
+                        url: baseUrl,
                         dataType: "jsonp"
                     },
                     create: {
-                        url: crudServiceBaseUrl,
+                        url: baseUrl,
                         dataType: "jsonp"
                     },
                     parameterMap: function (options, operation) {

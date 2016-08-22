@@ -8,7 +8,7 @@ module Kitos.Services.ReportService {
     class ReportService {
 
         static $inject = ['$http'];
-        private baseUrl = '/odata/Reports';
+        private baseUrl = '/odata/reports';
 
         /** returns a promise resolve with  then(success, error) */
         /** https://docs.angularjs.org/api/ng/service/$http */
@@ -20,7 +20,7 @@ module Kitos.Services.ReportService {
         }
 
         GetAll = () => {
-            return this.$http.get<Kitos.Models.IOdataWrapper<any>>("/odata/reports?$expand=CategoryType");
+            return this.$http.get<Kitos.Models.IOdataWrapper<any>>(this.baseUrl + "?$expand=CategoryType");
         }
 
     }
