@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Linq;
+using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
@@ -38,8 +39,8 @@ namespace Presentation.Web
 
             config.EnableEnumPrefixFree(true);
             config.EnableCaseInsensitive(true);
-            //var formatters = ODataMediaTypeFormatters.Create();
-            //config.Formatters.InsertRange(0, formatters);
+            var appXmlType = config.Formatters.XmlFormatter.SupportedMediaTypes.FirstOrDefault(t => t.MediaType == "application/xml");
+            config.Formatters.XmlFormatter.SupportedMediaTypes.Remove(appXmlType);
         }
 
         public static IEdmModel GetModel()
