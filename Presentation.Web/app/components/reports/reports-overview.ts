@@ -58,44 +58,59 @@
 
         private setupGrid() {
             var baseUrl = "odata/reports",
-            dataSource = new kendo.data.DataSource({
-                type: "odata-v4",
-                transport: {
-                    read: {
-                        url: baseUrl,
-                        dataType: "jsonp"
+                dataSource = new kendo.data.DataSource({
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: baseUrl,
+                            dataType: "json"
+                        },
+                        update: {
+                            url: (data) => {
+                                return baseUrl + "(" + data.models[0].Id + ")";
+                            },
+                            dataType: "json",
+                            type: "PATCH"
+                        },
+                        destroy: {
+                            url: baseUrl,
+                            dataType: "json",
+                            type: "DELETE"
+                        },
+                        create: {
+                            url: baseUrl,
+                            dataType: "json",
+                            type: "POST"
+                        },
+                        parameterMap: (options, type) => {
+                            if(type === "update") {
+                                var model: any = options.models[0];
+                                var patch = {
+                                    Name: model.Name,
+                                    Description: model.Description
+                                }
+                                return JSON.stringify(patch);     
+                            }
+                            if(type === "create")
+                                return JSON.stringify(options.models[0])
+                        }
                     },
-                    update: {
-                        url: baseUrl,
-                        dataType: "jsonp"
-                    },
-                    destroy: {
-                        url: baseUrl,
-                        dataType: "jsonp"
-                    },
-                    create: {
-                        url: baseUrl,
-                        dataType: "jsonp"
-                    },
-                    parameterMap: function (options, operation) {
-                        if (operation !== "read" && options.models) {
-                            return { models: kendo.stringify(options.models) };
+                    batch: true,
+                    serverPaging: true,
+                    serverSorting: true,
+                    pageSize: 20,
+                    schema: {
+                        model: {
+                            id: "Id",
+                            fields: {
+                                Id: { editable: false, nullable: true },
+                                Name: { validation: { required: true } },
+                                Description: { validation: { required: true } }
+                            }
                         }
                     }
-                },
-                batch: true,
-                pageSize: 20,
-                schema: {
-                    model: {
-                        id: "Id",
-                        fields: {
-                            Id: { editable: false, nullable: true },
-                            Name: { validation: { required: true } },
-                            Note: { validation: { required: true } }
-                        }
-                    }
-                }
-            });
+
+                });
 
             this.mainGridOptions = ({
                 dataSource: dataSource,
@@ -103,37 +118,11 @@
                 height: 550,
                 toolbar: ["create"],
                 columns: [
-                    { field: "ProductName", title: "Navn", width: "120px" },
-                    { field: "Note", title: "Note", width: "250px" },
+                    { field: "Name", title: "Navn", width: "115px" },
+                    { field: "Description", title: "Beskrivelse", width: "250px" },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }],
                 editable: "inline"
             });
-        }
-
-        private activate() {
-            var mainGridOptions: IKendoGridOptions<IReportOverview> = {
-                autoBind: true, // disable auto fetch, it's done in the kendoRendered event handler
-                dataSource: {
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: (options) => {
-                                var urlParameters = `?$expand=Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner`;
-                                return `/odata/Reports`;// + urlParameters;
-                            }
-                        },
-                        dataType: "json"
-                    },
-                    sort: {
-                        field: "Name",
-                        dir: "asc"
-                    },
-                    pageSize: 100,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true
-                }
-            }
         }
     }
 
