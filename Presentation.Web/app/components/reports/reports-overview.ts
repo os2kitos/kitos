@@ -69,7 +69,7 @@
                         },
                         update: {
                             url: (data) => {
-                                return baseUrl + "(" + data.models[0].Id + ")";
+                                return baseUrl + "(" + data.Id + ")";
                             },
                             dataType: "json",
                             type: "PATCH"
@@ -86,9 +86,9 @@
                             dataType: "json",
                             type: "POST"
                         },
-                        parameterMap: (options, type) => {
+                        parameterMap: (data, type) => {
                             if(type === "update") {
-                                var model: any = options.models[0];
+                                var model: any = data;
                                 let patch = {
                                     Name: model.Name,
                                     Description: model.Description
@@ -96,7 +96,7 @@
                                 return JSON.stringify(patch);     
                             }
                             if(type === "create") {
-                                var model: any = options.models[0];
+                                var model: any = data;
                                 let patch = {
                                     Id: 0,
                                     Name: model.Name,
