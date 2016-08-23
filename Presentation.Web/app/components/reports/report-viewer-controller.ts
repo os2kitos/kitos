@@ -22,7 +22,7 @@ module Kitos.Reports.Viewer {
                     controllerAs: "vm",
                     resolve: {
                         user: ["userService", userService => userService.getUser()],
-                        report: ["reportService,$stateParams", (rpt:Services.ReportService,$stateParams) => rpt.GetById($stateParams.id).then(result => result.data.value)]
+                        report: ["reportService, $stateParams", (rpt:Services.ReportService, $stateParams) => rpt.GetById($stateParams['id']).then(result => result.data.value)]
                     }
                 });
             }

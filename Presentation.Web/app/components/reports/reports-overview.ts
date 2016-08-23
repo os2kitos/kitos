@@ -84,15 +84,15 @@
                             type: "POST"
                         },
                         parameterMap: (data, type) => {
-                            if(type === "update") {
+                            if (type === "update") {
                                 var model: any = data;
                                 let patch = {
                                     Name: model.Name,
                                     Description: model.Description
                                 }
-                                return JSON.stringify(patch);     
+                                return JSON.stringify(patch);
                             }
-                            if(type === "create") {
+                            if (type === "create") {
                                 var model: any = data;
                                 let patch = {
                                     Id: 0,
@@ -121,15 +121,33 @@
                 });
 
             this.mainGridOptions = ({
+                autoBind: false,
                 dataSource: dataSource,
-                pageable: true,
+                editable: "inline",
                 height: 550,
                 toolbar: ["create"],
+                pageable: {
+                    refresh: true,
+                    pageSizes: [50, 100, 200],
+                    buttonCount: 5
+                },
+                sortable: {
+                    mode: "single"
+                },
+                reorderable: true,
+                resizable: true,
+                groupable: false,
+                columnMenu: {
+                    filterable: true
+                },
                 columns: [
-                    { field: "Name", title: "Navn", width: "115px" },
+                    {
+                        field: "Name", title: "Navn", width: 150,
+                        template: dataItem => dataItem.Id ? `<a ui-sref="reports.viewer({id:${dataItem.Id}})">${dataItem.Name}</a>` : ""
+                    },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
-                    { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }],
-                editable: "inline"
+                    { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                ]
             });
         }
     }
