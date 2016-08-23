@@ -15,7 +15,7 @@ namespace Presentation.Web
 
             // stimulsoft (reports) bundle
             bundles.Add(new ScriptBundle("~/Scripts/stimulsoft")
-                .IncludeDirectory("~/Scripts/stimulsoft","*.js")
+                .Include("~/Scripts/stimulsoft-bundle.js")
 			);
             
             // angular module bundle

@@ -22,7 +22,12 @@ module.exports = {
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
-
+    stimulsoftSrc: [
+        script("/stimulsoft/stimulsoft.designer.js"),
+        script("/stimulsoft/stimulsoft.reports.js"),
+        script("/stimulsoft/stimulsoft.viewer.js"),
+    ],
+    stimulsoftBundle: "stimulsoft-bundle.js",
 
     // angular script bundle
     // not minified

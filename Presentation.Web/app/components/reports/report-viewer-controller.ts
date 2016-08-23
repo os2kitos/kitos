@@ -1,12 +1,14 @@
 module Kitos.Reports.Viewer {
     'use strict';
+
     export class ReportViewerController {
         Title: string;
 
-        constructor() {
-            this.Title = "This is a ReportViewer";
-        }
+        static $inject = ['user,report'];
 
+        constructor(user, report) {
+            this.Title = "This is a ReportViewer for report id:" + report.id;
+        }
     }
 
     angular
@@ -14,15 +16,15 @@ module Kitos.Reports.Viewer {
         .config([
             "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
                 $stateProvider.state("reports.viewer", {
-                    url: "/reportviewer",
+                    url: "/reportviewer/{id:int}",
                     templateUrl: "app/components/reports/report-viewer.view.html",
                     controller: ReportViewerController,
                     controllerAs: "vm",
                     resolve: {
-                        user: ["userService", userService => userService.getUser()]
+                        user: ["userService", userService => userService.getUser()],
+                        report: ["reportService,$stateParams", (rpt:Services.ReportService,$stateParams) => rpt.GetById($stateParams.id).then(result => result.data.value)]
                     }
                 });
             }
         ]);
-
 }

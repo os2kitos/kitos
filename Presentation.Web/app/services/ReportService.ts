@@ -3,9 +3,9 @@
 // https://docs.angularjs.org/api/ngResource/service/$resource
 // https://chsakell.com/2015/04/04/asp-net-web-api-feat-odata/
 
-module Kitos.Services.ReportService {
+module Kitos.Services {
 
-    class ReportService {
+    export class ReportService {
 
         static $inject = ['$http'];
         private baseUrl = '/odata/reports';
@@ -16,7 +16,8 @@ module Kitos.Services.ReportService {
         }
 
         GetById = (id: number) => {
-            return this.$http.get(`${this.baseUrl}(${id})`);
+            return this.$http.get<Kitos.Models.IOdataWrapper<any>>(`${this.baseUrl}(${id})`);
+            
         }
 
         GetAll = () => {
