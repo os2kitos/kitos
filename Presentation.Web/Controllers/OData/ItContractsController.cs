@@ -42,23 +42,23 @@ namespace Presentation.Web.Controllers.OData
             }
         }
 
-        [EnableQuery]
-        [ODataRoute("ItContracts({key})")]
-        public override IHttpActionResult Get(int key)
-        {
-            if (_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return base.Get(key);
-            }
+        //[EnableQuery]
+        //[ODataRoute("ItContracts({key})")]
+        //public override IHttpActionResult Get(int key)
+        //{
+        //    if (_authService.HasReadAccessOutsideContext(UserId))
+        //    {
+        //        return base.Get(key);
+        //    }
 
-            var orgId = _userService.GetCurrentOrganizationId(UserId);
-            var entity = Repository.GetByKey(key);
-            if (entity.OrganizationId != orgId)
-            {
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            }
-            return Ok(entity);
-        }
+        //    var orgId = _userService.GetCurrentOrganizationId(UserId);
+        //    var entity = Repository.GetByKey(key);
+        //    if (entity.OrganizationId != orgId)
+        //    {
+        //        return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+        //    }
+        //    return Ok(entity);
+        //}
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
         [EnableQuery]

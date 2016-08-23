@@ -4,7 +4,7 @@ module Kitos.Reports.Viewer {
     export class ReportViewerController {
         Title: string;
 
-        static $inject = ['user,report'];
+        static $inject = ['user','report'];
 
         constructor(user, report) {
             this.Title = "This is a ReportViewer for report id:" + report.id;
@@ -22,7 +22,7 @@ module Kitos.Reports.Viewer {
                     controllerAs: "vm",
                     resolve: {
                         user: ["userService", userService => userService.getUser()],
-                        report: ["reportService, $stateParams", (rpt:Services.ReportService, $stateParams) => rpt.GetById($stateParams['id']).then(result => result.data.value)]
+                        report: ['reportService', '$stateParams', (rpt:Services.ReportService, $stateParams) => rpt.GetById($stateParams['id']).then(result => result.data.value)]
                     }
                 });
             }
