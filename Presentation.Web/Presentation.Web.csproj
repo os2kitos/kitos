@@ -695,6 +695,7 @@
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
+    <TypeScriptCompile Include="app\models\odata-wrapper.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\organization-type.ts" />
     <TypeScriptCompile Include="app\models\organization-unit.ts" />
