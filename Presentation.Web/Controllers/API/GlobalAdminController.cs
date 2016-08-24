@@ -6,7 +6,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    //TODO refactor this into AdminRightsController
+    //TODO refactor this into OrganizationRightsController
     public class GlobalAdminController : BaseApiController
     {
         public HttpResponseMessage Get()
@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
                 UserRepository.Save();
 
                 var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
-                
+
                 return Created(outDto); //TODO location?
 
             }

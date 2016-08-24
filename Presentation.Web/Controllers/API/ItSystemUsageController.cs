@@ -400,5 +400,10 @@ namespace Presentation.Web.Controllers.API
                 return Error(e);
             }
         }
+
+        protected override void DeleteQuery(ItSystemUsage entity)
+        {
+            _itSystemUsageService.Delete(entity.Id);
+        }
     }
 }

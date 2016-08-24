@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using System.Linq;
 
 namespace Core.ApplicationServices
 {
@@ -93,6 +95,17 @@ namespace Core.ApplicationServices
                 parents.AddRange(GetHierarchyParents(itSystem.Parent));
             }
             return parents;
+        }
+
+        public void Delete(int id)
+        {
+            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
+            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
+            var system = _repository.Get(x => x.Id == id, null, $"{nameof(ItSystem.TaskRefs)}").FirstOrDefault();
+
+            // delete it project
+            _repository.Delete(system);
+            _repository.Save();
         }
     }
 }

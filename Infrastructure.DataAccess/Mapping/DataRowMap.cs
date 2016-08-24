@@ -17,8 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.ItInterface)
                 .WithMany(d => d.DataRows)
                 .HasForeignKey(t => t.ItInterfaceId)
-                .WillCascadeOnDelete(true);
-
+                .WillCascadeOnDelete(false);
         }
     }
 }

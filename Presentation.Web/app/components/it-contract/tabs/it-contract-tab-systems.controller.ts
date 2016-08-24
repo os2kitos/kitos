@@ -20,7 +20,7 @@
                     ],
                     usedInterfaces: [
                         '$http', 'contract', function($http, contract) {
-                            return $http.get('api/InterfaceUsage/?contractId=' + contract.id).then(function(result) {
+                            return $http.get('api/ItInterfaceUsage/?contractId=' + contract.id).then(function(result) {
                                 return result.data.response;
                             });
                         }
@@ -57,7 +57,7 @@
             $scope.deleteUsed = function(usageId, sysId, interfaceId) {
                 $http({
                         method: 'PATCH',
-                        url: 'api/interfaceUsage/?usageId=' + usageId + '&sysId=' + sysId + '&interfaceId=' + interfaceId + '&organizationId=' + user.currentOrganizationId,
+                        url: 'api/ItInterfaceUsage/?usageId=' + usageId + '&sysId=' + sysId + '&interfaceId=' + interfaceId + '&organizationId=' + user.currentOrganizationId,
                         data: {
                             itContractId: null
                         }
@@ -133,7 +133,7 @@
                     url = 'api/itInterfaceExhibitUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id + '&exhibitId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id;
 
                 if ($scope.newAssociatedInterfaceRelation == 'using')
-                    url = 'api/interfaceUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id
+                    url = 'api/ItInterfaceUsage?usageId=' + $scope.newAssociatedInterfaceSelectedSystemUsage.id
                         + '&sysId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.sysId
                         + '&interfaceId=' + $scope.newAssociatedInterfaceSelectedInterfaceUsage.id.intfId
                         + '&organizationId=' + user.currentOrganizationId;

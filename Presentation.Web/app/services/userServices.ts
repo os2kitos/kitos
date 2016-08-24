@@ -8,7 +8,7 @@
             var defaultOrgUnit = orgAndDefaultUnit.defaultOrgUnit;
             var defaultOrgUnitId = defaultOrgUnit == null ? null : defaultOrgUnit.id;
 
-            var isLocalAdmin = _.some(user.adminRights, function (userRight: { roleName; organizationId; }) {
+            var isLocalAdmin = _.some(user.organizationRights, function (userRight: { roleName; organizationId; }) {
                 return userRight.roleName == "LocalAdmin" && userRight.organizationId == currOrg.id;
             });
 

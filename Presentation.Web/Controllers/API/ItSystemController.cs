@@ -48,6 +48,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        protected override void DeleteQuery(ItSystem entity)
+        {
+            _systemService.Delete(entity.Id);
+        }
+
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try

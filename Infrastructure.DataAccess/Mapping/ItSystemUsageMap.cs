@@ -15,8 +15,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItSystemUsages);
 
             this.HasMany(t => t.OrgUnits)
-                .WithMany(t => t.ItSystemUsages)
-                .Map(t => t.ToTable("OrgUnitSystemUsage"));
+                .WithMany(t => t.ItSystemUsages);
 
             this.HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);
@@ -35,18 +34,21 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.Overview)
                 .WithMany()
                 .HasForeignKey(d => d.OverviewId)
-                .WillCascadeOnDelete(true);
+                .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedBy)
                 .WithRequired(t => t.ItSystemUsage)
-                .HasForeignKey(d => d.ItSystemUsageId);
+                .HasForeignKey(d => d.ItSystemUsageId)
+                .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.MainContract)
-                .WithOptionalPrincipal();
+                .WithOptionalPrincipal()
+                .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.Contracts)
                 .WithRequired(t => t.ItSystemUsage)
-                .HasForeignKey(d => d.ItSystemUsageId);
+                .HasForeignKey(d => d.ItSystemUsageId)
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace Core.DomainModel.ItSystem
         public string Note { get; set; }
 
         /// <summary>
-        /// The ItSystems that has been marked with this ArchiveType 
+        /// The ItSystems that has been marked with this ArchiveType
         /// </summary>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> References { get; set; }
     }

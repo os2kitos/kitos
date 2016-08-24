@@ -182,7 +182,7 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 // Get all users inside the organization
-                pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
 
@@ -204,7 +204,7 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 // Get all users inside the organization
-                pagingModel.Where(u => u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
                 var dtos = new List<UserOverviewDTO>();
@@ -229,7 +229,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var users = Repository.Get(u => u.AdminRights.Count(r => r.ObjectId == orgId) != 0);
+                var users = Repository.Get(u => u.OrganizationRights.Count(r => r.ObjectId == orgId) != 0);
 
                 var dtos = Map(users);
 
@@ -285,12 +285,12 @@ namespace Presentation.Web.Controllers.API
 
         private string GetOrgRights(int orgId, int userId)
         {
-            var rightsRepository = _kernel.Get<IGenericRepository<OrganizationRight>>();
+            var rightsRepository = _kernel.Get<IGenericRepository<OrganizationUnitRight>>();
             var orgUnitService = _kernel.Get<IOrgUnitService>();
 
             var orgUnits = orgUnitService.GetSubTree(orgId);
 
-            var theRights = new List<OrganizationRight>();
+            var theRights = new List<OrganizationUnitRight>();
             foreach (var orgUnit in orgUnits)
             {
                 var id = orgUnit.Id;
@@ -363,7 +363,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
         {
-            var users = Repository.Get(u => u.Email == email && u.AdminRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+            var users = Repository.Get(u => u.Email == email && u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
 
             if (users.Any()) return Ok();
 
@@ -386,7 +386,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(User obj, User user, int organizationId)
         {
-            var isLocalAdmin = KitosUser.AdminRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
+            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
             if (isLocalAdmin)
                 return true;
 
