@@ -1,14 +1,37 @@
 module Kitos.Reports.Viewer {
-    'use strict';
+    "use strict";
 
     export class ReportViewerController {
-        Title: string;
+        public title: string;
 
-        static $inject = ['user','report'];
+        public static $inject = ["user", "report", "stimulsoftService", "$timeout"];
 
-        constructor(user: Models.IUser, report: Models.IReport) {
-            this.Title = "This is a ReportViewer for report id:" + report.Id;
+        constructor(user: Models.IUser, report: Models.IReport, stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
+            this.title = `This is a ReportViewer for report id:${report.Id}`;
 
+            const options = stimulsoftService.getOptions();
+            options.height = "100%";
+            options.appearance.scrollbarsMode = true;
+            options.toolbar.showDesignButton = true;
+            options.appearance.fullScreenMode = false;
+
+            var viewer = stimulsoftService.getViewer(options, "Viewer");
+            viewer.showProcessIndicator();
+
+            $timeout(() => {
+                //Create a new report instance
+                var reportFoo = stimulsoftService.getReport();
+
+                if (reportFoo.Definition && reportFoo.Definition.length > 0) {
+                    //  Load reports from JSON object
+                    reportFoo.load(report.Definition);
+                }
+
+                //Assign the report to the viewer
+                viewer.report = reportFoo;
+            }, 50);
+
+            viewer.renderHtml("reportViewer");
         }
     }
 
@@ -23,7 +46,7 @@ module Kitos.Reports.Viewer {
                     controllerAs: "vm",
                     resolve: {
                         user: ["userService", userService => userService.getUser()],
-                        report: ['reportService', '$stateParams', (rpt:Services.ReportService, $stateParams) => rpt.GetById($stateParams['id']).then(result => result.data)]
+                        report: ["reportService", "$stateParams", (rpt: Services.ReportService, $stateParams) => rpt.GetById($stateParams["id"]).then(result => result.data)]
                     }
                 });
             }

@@ -717,6 +717,7 @@
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
     <TypeScriptCompile Include="app\services\ReportService.ts" />
+    <TypeScriptCompile Include="app\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
