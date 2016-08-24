@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API
                          // it's public everyone can see it
                          s.AccessModifier == AccessModifier.Public ||
                          // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Normal &&
+                         s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API
                     // it's public everyone can see it
                     s.AccessModifier == AccessModifier.Public ||
                     // everyone in the same organization can see normal objects
-                    s.AccessModifier == AccessModifier.Normal &&
+                    s.AccessModifier == AccessModifier.Local &&
                     s.OrganizationId == organizationId
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.API
                         // it's public everyone can see it
                         x.AccessModifier == AccessModifier.Public ||
                         // everyone in the same organization can see normal objects
-                        x.AccessModifier == AccessModifier.Normal &&
+                        x.AccessModifier == AccessModifier.Local &&
                         x.OrganizationId == organizationId
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects
@@ -195,7 +195,7 @@ namespace Presentation.Web.Controllers.API
                          // it's public everyone can see it
                          s.AccessModifier == AccessModifier.Public ||
                          // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Normal &&
+                         s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
                         // it systems doesn't have roles so private doesn't make sense
                         // only object owners will be albe to see private objects

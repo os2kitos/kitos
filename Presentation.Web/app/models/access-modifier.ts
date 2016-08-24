@@ -1,6 +1,6 @@
 ﻿module Kitos.Models {
     export enum AccessModifier {
-        Normal,
-        Public
+        Local = "Local" as any,
+        Public = "Public" as any
     }
 }

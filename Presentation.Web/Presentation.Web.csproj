@@ -23,7 +23,7 @@
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
-    <UseGlobalApplicationHostFile />
+    <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
     <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -377,40 +377,44 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="app\shared\autosave.directive.js" />
-    <Content Include="app\shared\datereader.directive.js" />
-    <Content Include="app\components\local-config\fileModel.directive.js" />
-    <Content Include="app\shared\confirmClick.directive.js" />
-    <Content Include="app\shared\disabledOnBusy.directive.js" />
-    <Content Include="app\components\global-config\globalOptionList\globalOptionList.directive.js" />
-    <Content Include="app\components\global-config\globalOptionRoleList\globalOptionRoleList.directive.js" />
+    <TypeScriptCompile Include="app\services\httpServices.ts" />
+    <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
+    <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
+    <TypeScriptCompile Include="app\shared\confirmClick.directive.ts" />
+    <TypeScriptCompile Include="app\shared\disabledOnBusy.directive.ts" />
+    <TypeScriptCompile Include="app\components\global-config\globalOptionList\globalOptionList.directive.ts" />
+    <TypeScriptCompile Include="app\components\global-config\globalOptionRoleList\globalOptionRoleList.directive.ts" />
+    <TypeScriptCompile Include="app\services\userServices.ts" />
+    <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
+    <Content Include="app\shared\displayAccessModifier\displayAccessModifier.view.html" />
     <Content Include="app\shared\filters\joinBy.filter.js" />
-    <Content Include="app\shared\kleFilter\kleFilter.directive.js" />
-    <Content Include="app\shared\match.directive.js" />
-    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.directive.js" />
+    <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
+    <TypeScriptCompile Include="app\shared\match.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
-    <Content Include="app\shared\selectOption\selectOption.directive.js" />
+    <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
-    <Content Include="app\shared\optionList\optionList.directive.js" />
-    <Content Include="app\shared\orderBy\orderBy.directive.js" />
-    <Content Include="app\shared\paginationButtons\paginationButtons.directive.js" />
-    <Content Include="app\shared\searchBox\searchBox.directive.js" />
-    <Content Include="app\shared\selectAccessModifier\selectAccessModifier.directive.js" />
-    <Content Include="app\shared\selectOrgUnit\selectOrgUnit.directive.js" />
-    <Content Include="app\shared\selectStatus2\selectStatus2.directive.js" />
-    <Content Include="app\shared\selectUser\selectUser.directive.js" />
-    <Content Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.directive.js" />
-    <Content Include="app\shared\showErrors.directive.js" />
-    <Content Include="app\shared\showStatus\showStatus.directive.js" />
-    <Content Include="app\components\it-project\simpleComment.directive.js" />
-    <Content Include="app\components\it-project\squareTrafficLight.directive.js" />
-    <Content Include="app\components\local-config\suggestNew\suggestNew.directive.js" />
-    <Content Include="app\components\local-config\suggestNewRole\suggestNewRole.directive.js" />
-    <Content Include="app\components\it-system\unique.directive.js" />
-    <Content Include="app\components\org\uniqueEmail.directive.js" />
-    <Content Include="app\components\it-system\uniqueItInterfaceIdName.directive.js" />
-    <Content Include="app\components\org\uniqueOrgUser.directive.js" />
-    <Content Include="app\shared\autofocus.directive.js" />
+    <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
+    <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
+    <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
+    <TypeScriptCompile Include="app\shared\searchBox\searchBox.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccessModifier.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectOrgUnit\selectOrgUnit.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
+    <TypeScriptCompile Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.directive.ts" />
+    <TypeScriptCompile Include="app\shared\showErrors.directive.ts" />
+    <TypeScriptCompile Include="app\shared\showStatus\showStatus.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-project\simpleComment.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-project\squareTrafficLight.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\suggestNew\suggestNew.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\suggestNewRole\suggestNewRole.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-system\unique.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueEmail.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueOrgUser.directive.ts" />
+    <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
     <Content Include="app\utility\lodash.mixin.js" />
     <Content Include="Content\css\app.css" />
     <Content Include="Content\css\app.min.css" />
@@ -773,12 +777,10 @@
     <TypeScriptCompile Include="app\components\org\org-subnav.controller.ts" />
     <TypeScriptCompile Include="app\components\org\overview\org-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
-    <Content Include="app\components\it-project\angularjs-dropdown-multiselect.directive.js" />
-    <Content Include="app\shared\hrefBlank.directive.js" />
+    <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
+    <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
     <Content Include="app\shared\limitToDots.filter.js" />
-    <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
-    <Content Include="app\services\httpServices.js" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
     <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
     <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />

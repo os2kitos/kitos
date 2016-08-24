@@ -233,6 +233,7 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         hidden: true,
                         filterable: {
@@ -622,9 +623,6 @@
                     case "Kitos.AccessModifier1":
                         kendoElem.select(2);
                         break;
-                    case "Kitos.AccessModifier2":
-                        kendoElem.select(3);
-                        break;
                     default:
                         kendoElem.select(0); // select placeholder
                 }
@@ -653,9 +651,8 @@
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
                 dataSource: [
-                    { value: "Kitos.AccessModifier0", text: "Normal" },
-                    { value: "Kitos.AccessModifier1", text: "Public" },
-                    { value: "Kitos.AccessModifier2", text: "Private" }
+                    { value: "Kitos.AccessModifier0", text: "Lokal" },
+                    { value: "Kitos.AccessModifier1", text: "Offentlig" }
                 ],
                 dataTextField: "text",
                 dataValueField: "value",

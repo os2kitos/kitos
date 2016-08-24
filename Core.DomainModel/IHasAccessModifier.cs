@@ -5,7 +5,7 @@
         /// <summary>
         /// Only users within the organization this instance was created in have read access.
         /// </summary>
-        Normal,
+        Local,
         /// <summary>
         /// Everyone have read access.
         /// </summary>
