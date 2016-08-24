@@ -695,6 +695,7 @@
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
+    <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\organization-type.ts" />
     <TypeScriptCompile Include="app\models\organization-unit.ts" />
     <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
@@ -707,6 +708,7 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
     <TypeScriptCompile Include="app\models\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
+    <TypeScriptCompile Include="app\models\report\report.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />

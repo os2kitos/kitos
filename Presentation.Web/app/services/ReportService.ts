@@ -4,11 +4,10 @@
 // https://chsakell.com/2015/04/04/asp-net-web-api-feat-odata/
 
 module Kitos.Services {
-
     export class ReportService {
 
-        static $inject = ['$http'];
-        private baseUrl = '/odata/reports';
+        static $inject = ["$http"];
+        private baseUrl = "/odata/reports";
 
         /** returns a promise resolve with  then(success, error) */
         /** https://docs.angularjs.org/api/ng/service/$http */
@@ -16,14 +15,13 @@ module Kitos.Services {
         }
 
         GetById = (id: number) => {
-            return this.$http.get<Kitos.Models.IOdataWrapper<any>>(`${this.baseUrl}(${id})`);
-            
+            return this.$http.get<Models.IReport>(`${this.baseUrl}(${id})`);
+
         }
 
         GetAll = () => {
-            return this.$http.get<Kitos.Models.IOdataWrapper<any>>(this.baseUrl + "?$expand=CategoryType");
+            return this.$http.get<Kitos.Models.IOdataWrapper<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
         }
-
     }
 
     app.service("reportService", ReportService);
