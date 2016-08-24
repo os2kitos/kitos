@@ -20,15 +20,15 @@ module Kitos.Reports.Viewer {
 
             $timeout(() => {
                 //Create a new report instance
-                var reportFoo = stimulsoftService.getReport();
+                var stiReport= stimulsoftService.getReport();
 
-                if (reportFoo.Definition && reportFoo.Definition.length > 0) {
+                if (report.Definition && report.Definition.length > 0) {
                     //  Load reports from JSON object
-                    reportFoo.load(report.Definition);
+                    stiReport.load(report.Definition);
                 }
 
                 //Assign the report to the viewer
-                viewer.report = reportFoo;
+                viewer.report = stiReport;
             }, 50);
 
             viewer.renderHtml("reportViewer");
