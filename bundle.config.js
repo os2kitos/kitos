@@ -20,12 +20,14 @@ module.exports = {
         bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select2/select2.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        bower("/angular-loading-bar/build/loading-bar.min.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css"),
+        content("/report/stimulsoft.viewer.office2013.css"),
+        content("/report/stimulsoft.designer.office2013.white.blue.css")
     ],
     stimulsoftSrc: [
         script("/stimulsoft/stimulsoft.reports.js"),
         script("/stimulsoft/stimulsoft.viewer.js"),
-        script("/stimulsoft/stimulsoft.designer.js"),
+        script("/stimulsoft/stimulsoft.designer.js")
     ],
     stimulsoftBundle: "stimulsoft-bundle.js",
 

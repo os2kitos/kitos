@@ -480,6 +480,8 @@
     <Content Include="app\shared\autofocus.directive.js" />
     <Content Include="app\utility\lodash.mixin.js" />
     <Content Include="Content\css\app.min.css" />
+    <Content Include="Content\report\stimulsoft.designer.office2013.white.blue.css" />
+    <Content Include="Content\report\stimulsoft.viewer.office2013.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -878,11 +880,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
+    <Content Include="Scripts\stimulsoft-bundle.js" />
     <Content Include="Scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="Scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="Scripts\stimulsoft\stimulsoft.viewer.js" />
