@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Web.Security;
+using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
+using Ninject.Extensions.Logging;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -12,6 +15,12 @@ namespace Presentation.Web.Infrastructure
 
         [Inject]
         public ICryptoService CryptoService { get; set; }
+
+        [Inject]
+        public ILogger Logger { get; set; }
+
+        private int _maxInvalidPasswordAttempts;
+        private int _passwordAttemptWindow;
 
         #region not implemented
 
@@ -96,22 +105,12 @@ namespace Presentation.Web.Infrastructure
             throw new NotImplementedException();
         }
 
-        public override int MaxInvalidPasswordAttempts
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public override int MinRequiredNonAlphanumericCharacters
         {
             get { throw new NotImplementedException(); }
         }
 
         public override int MinRequiredPasswordLength
-        {
-            get { throw new NotImplementedException(); }
-        }
-
-        public override int PasswordAttemptWindow
         {
             get { throw new NotImplementedException(); }
         }
@@ -153,14 +152,95 @@ namespace Presentation.Web.Infrastructure
 
         #endregion
 
+        public override int MaxInvalidPasswordAttempts => _maxInvalidPasswordAttempts;
+        public override int PasswordAttemptWindow => _passwordAttemptWindow;
+        public override void Initialize(string name, NameValueCollection config)
+        {
+            base.Initialize(name, config);
+            _maxInvalidPasswordAttempts = Convert.ToInt32(config["maxInvalidPasswordAttempts"]);
+            _passwordAttemptWindow = Convert.ToInt32(config["passwordAttemptWindow"]);
+        }
+
         public override bool ValidateUser(string username, string password)
         {
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
-            if (user == null) return false;
+            var result = Validate(user, password);
+            userRepository.Save();
 
-            //TODO: HASHING
-            return user.Password == CryptoService.Encrypt(password + user.Salt);
+            return result;
+        }
+
+        private bool Validate(User user, string password)
+        {
+            var isValid = false;
+
+            if (user == null)
+            {
+                Logger.Info("User not found");
+
+                return isValid;
+            }
+
+            var userInfomation = new { user.Email, user.FailedAttempts, user.LockedOutDate };
+
+            if (user.LockedOutDate != null)
+            {
+                var lastLockoutDate = user.LockedOutDate;
+                var unlockDate = lastLockoutDate.Value.AddMinutes(PasswordAttemptWindow);
+
+                if (DateTime.Now >= unlockDate)
+                {
+                    ResetLockedOutDate(user);
+                    ResetAttempts(user);
+                    Logger.Info("User has been unlocked");
+
+                    isValid = CheckPassword(user, password);
+                }
+
+                Logger.Info("User will be unlocked {unlockDate}", unlockDate);
+            }
+            else
+            {
+                isValid = CheckPassword(user, password);
+            }
+
+            Logger.Info("Current User: {userInfomation}", userInfomation);
+
+            return isValid;
+        }
+
+        private bool CheckPassword(User user, string password)
+        {
+            var isValid = user.Password == CryptoService.Encrypt(password + user.Salt);
+
+            if (isValid)
+            {
+                ResetAttempts(user);
+            }
+            else
+            {
+                user.FailedAttempts++;
+
+                if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
+                {
+                    user.LockedOutDate = DateTime.Now;
+                    ResetAttempts(user);
+                    Logger.Info("User was locked");
+                }
+            }
+
+            return isValid;
+        }
+
+        private void ResetAttempts(User user)
+        {
+            user.FailedAttempts = 0;
+        }
+
+        private void ResetLockedOutDate(User user)
+        {
+            user.LockedOutDate = null;
         }
     }
 }
