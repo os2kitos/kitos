@@ -1,8 +1,8 @@
 ﻿(function(ng, app) {
     'use strict';
 
-    app.directive('datereader', [
-        function() {
+    app.directive('datereader', ['moment',
+        function (moment) {
             return {
                 scope: true,
                 template: '<span>{{dateStr}}</span>',
