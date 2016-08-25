@@ -64,8 +64,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: baseUrl,
-                            dataType: "json"
+                            url: baseUrl + "?$expand=CategoryType",
                         },
                         update: {
                             url: (data) => {
@@ -97,8 +96,7 @@
                                 let patch = {
                                     Id: 0,
                                     Name: model.Name,
-                                    Description: model.Description,
-                                    OrganizationId: this.user.currentOrganizationId
+                                    Description: model.Description
                                 }
                                 return JSON.stringify(patch)
                             }
@@ -114,7 +112,8 @@
                             fields: {
                                 Id: { editable: false, nullable: true },
                                 Name: { validation: { required: true } },
-                                Description: { validation: { required: true } }
+                                Description: { validation: { required: true } },
+                                CategoryType: { validation: { required: false } }
                             }
                         }
                     }
@@ -128,7 +127,7 @@
                 toolbar: ["create"],
                 pageable: {
                     refresh: true,
-                    pageSizes: [50, 100, 200],
+                    pageSizes: [5, 50, 100, 200],
                     buttonCount: 5
                 },
                 sortable: {
@@ -136,7 +135,7 @@
                 },
                 reorderable: true,
                 resizable: true,
-                groupable: false,
+                groupable: true,
                 columnMenu: {
                     filterable: true
                 },
@@ -146,10 +145,31 @@
                         template: dataItem => dataItem.Id ? `<a ui-sref="reports.viewer({id:${dataItem.Id}})">${dataItem.Name}</a>` : ""
                     },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
+                    {
+                        field: "CategoryType", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
+                        template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
+                    },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
                 ]
             });
         }
+
+        CategoryDropDownEditor = (container, options) => {
+            this.$('<input required name="' + options.field + '"/>')
+                .appendTo(container)
+                .kendoDropDownList({
+                    autoBind: false,
+                    dataTextField: "Name",
+                    dataValueField: "Id",
+                    dataSource: {
+                        type: "odata-v4",
+                        transport: {
+                            read: "odata/ReportCategories"
+                        }
+                    }
+                });
+        }
+
     }
 
     angular

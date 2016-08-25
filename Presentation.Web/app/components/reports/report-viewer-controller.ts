@@ -3,7 +3,7 @@ module Kitos.Reports.Viewer {
 
     export class ReportViewerController {
         public title: string;
-
+        public categories: any;
         public static $inject = ["user", "report", "stimulsoftService", "$timeout"];
 
         constructor(user: Models.IUser, report: Models.IReport, stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {

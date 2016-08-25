@@ -16,7 +16,6 @@ module Kitos.Services {
 
         GetById = (id: number) => {
             return this.$http.get<Models.IReport>(`${this.baseUrl}(${id})`);
-
         }
 
         GetAll = () => {
