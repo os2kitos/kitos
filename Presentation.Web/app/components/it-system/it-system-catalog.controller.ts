@@ -111,6 +111,8 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
                                 // replaces "startswith(TaskName,'11')" with "TaskRefs/any(c: startswith(c/Description),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/, "TaskRefs/any(c: $1c/Description$2)");
+                                // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
                             }
 
                             return parameterMap;
@@ -416,7 +418,13 @@
                         field: "Uuid", title: "UUID", width: 150,
                         persistId: "uuid", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };

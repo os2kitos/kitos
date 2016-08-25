@@ -196,6 +196,9 @@
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
                                 parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+
+                                // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
                             }
 
                             return parameterMap;
@@ -617,7 +620,13 @@
                         field: "ItSystem.Uuid", title: "UUID", width: 150,
                         persistId: "uuid", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };
