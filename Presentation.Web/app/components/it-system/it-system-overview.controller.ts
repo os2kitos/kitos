@@ -307,6 +307,19 @@
                         }
                     },
                     {
+                        field: "ItSystem.Uuid", title: "UUID", width: 150,
+                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.ItSystem.Uuid,
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
                         field: "ItSystem.Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentsysname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.ItSystem.Parent ? dataItem.ItSystem.Parent.Name : "",
@@ -613,19 +626,6 @@
                             cell: {
                                 showOperators: false,
                                 operator: "gte"
-                            }
-                        }
-                    },
-                    {
-                        field: "ItSystem.Uuid", title: "UUID", width: 150,
-                        persistId: "uuid", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => dataItem.ItSystem.Uuid,
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
                             }
                         }
                     }
