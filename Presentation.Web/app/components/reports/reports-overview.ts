@@ -105,7 +105,7 @@
                     batch: false,
                     serverPaging: true,
                     serverSorting: true,
-                    pageSize: 5,
+                    pageSize: 50,
                     schema: {
                         model: {
                             id: "Id",
@@ -113,7 +113,7 @@
                                 Id: { editable: false, nullable: true },
                                 Name: { validation: { required: true } },
                                 Description: { validation: { required: true } },
-                                CategoryType: { validation: { required: false } }
+                                CategoryTypeId: { defaultValue: { Id: 1, Name: "IT Kontrakt"} }
                             }
                         }
                     }
@@ -127,7 +127,7 @@
                 toolbar: ["create"],
                 pageable: {
                     refresh: true,
-                    pageSizes: [5, 50, 100, 200],
+                    pageSizes: [50, 100, 200],
                     buttonCount: 5
                 },
                 sortable: {
