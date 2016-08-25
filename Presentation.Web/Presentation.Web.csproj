@@ -379,7 +379,6 @@
     <TypeScriptCompile Include="app\components\global-config\globalOptionRoleList\globalOptionRoleList.directive.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
-    <Content Include="app\shared\displayAccessModifier\displayAccessModifier.view.html" />
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
