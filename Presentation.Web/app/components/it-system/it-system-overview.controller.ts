@@ -619,6 +619,7 @@
                     {
                         field: "ItSystem.Uuid", title: "UUID", width: 150,
                         persistId: "uuid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.ItSystem.Uuid,
                         hidden: true,
                         filterable: {
                             cell: {
