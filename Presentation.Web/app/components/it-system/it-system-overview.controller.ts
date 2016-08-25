@@ -612,6 +612,12 @@
                                 operator: "gte"
                             }
                         }
+                    },
+                    {
+                        field: "ItSystem.Uuid", title: "UUID", width: 150,
+                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: false
                     }
                 ]
             };

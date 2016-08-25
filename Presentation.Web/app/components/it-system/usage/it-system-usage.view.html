@@ -20,10 +20,19 @@
                         <label for="system-name" class="control-label small">IT System</label>
                         <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
                     </div>
+
                     <!--Parent system-->
                     <div class="form-group">
                         <label for="system-parent" class="control-label small">Overordnet system</label>
                         <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
+                    </div>
+
+                    <!--Usage type-->
+                    <div class="form-group">
+                        <label for="system-business-type" class="control-label small">Forretningstype</label>
+                        <select id="system-business-type" class="form-control input-sm" disabled>
+                            <option value="" selected>{{ usage.itSystem.businessTypeName }}</option>
+                        </select>
                     </div>
                 </div>
 
@@ -40,22 +49,22 @@
                         <label class="control-label small">Oprettet af</label>
                         <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
                     </div>
+
                     <!--Access modifier -->
                     <div class="form-group">
                         <label for="system-access" class="control-label small">Synlighed</label>
                         <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
                     </div>
+
+                    <!-- UUID -->
+                    <div class="form-group">
+                        <label class="control-label small">UUID</label>
+                        <input type="text" value="{{usage.itSystem.uuid}}" class="form-control input-sm" disabled="disabled" />
+                    </div>
                 </div>
 
                 <!-- full width -->
                 <div class="col-md-12">
-                    <!--Usage type-->
-                    <div class="form-group">
-                        <label for="system-business-type" class="control-label small">Forretningstype</label>
-                        <select id="system-business-type" class="form-control input-sm" disabled>
-                            <option value="" selected>{{ usage.itSystem.businessTypeName }}</option>
-                        </select>
-                    </div>
                     <!-- Description and URL -->
                     <div class="form-group">
                         <label for="system-description" class="control-label small">Beskrivelse</label>
