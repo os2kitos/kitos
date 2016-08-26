@@ -441,9 +441,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\components\local-config\local-config-module-admin.html" />
+    <Content Include="app\components\reports\Index.html" />
     <Content Include="app\components\reports\report-edit.html" />
     <Content Include="app\components\reports\report-viewer.view.html" />
-    <Content Include="app\components\reports\reportApp\Index.html" />
     <Content Include="app\components\reports\reports-overview.html" />
     <Content Include="app\shared\autosave.directive.js" />
     <Content Include="app\shared\datereader.directive.js" />
@@ -481,7 +481,9 @@
     <Content Include="app\shared\autofocus.directive.js" />
     <Content Include="app\utility\lodash.mixin.js" />
     <Content Include="Content\css\app.min.css" />
+    <Content Include="Content\report\report.css" />
     <Content Include="Content\report\stimulsoft.designer.office2013.white.blue.css" />
+    <Content Include="Content\report\stimulsoft.designer.office2013.white.teal.css" />
     <Content Include="Content\report\stimulsoft.viewer.office2013.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
@@ -490,6 +492,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\kitos.css" />
+    <Content Include="Content\report\stimulsoft.viewer.office2013.white.teal.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
