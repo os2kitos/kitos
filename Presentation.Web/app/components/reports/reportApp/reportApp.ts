@@ -6,6 +6,7 @@ var reportApp = angular.module('reportApp', [
     'ngSanitize']);
 
 angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
+//angular.module("reportApp").controller("stimulsoftService", Kitos.Reports.ReportViewerController);
 
 angular.element(document).ready(() => {
     angular.bootstrap(document, ["reportApp"]);

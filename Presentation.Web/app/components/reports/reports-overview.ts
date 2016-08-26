@@ -142,7 +142,7 @@
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 150,
-                        template: dataItem => dataItem.Id ? `<a ui-sref="reports.viewer({id:${dataItem.Id}})">${dataItem.Name}</a>` : ""
+                        template: dataItem => dataItem.Id ? `<a href='app/components/reports/index.html?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
                     },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
                     {
