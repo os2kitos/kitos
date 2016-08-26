@@ -8,14 +8,14 @@
                 resolve: {
                     orgUnits: [
                         '$http', 'user', function ($http: ng.IHttpService, user) {
-                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationunit?organization=' + user.currentOrganizationId).then((result) => {
+                            return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationunit?organization=' + user.currentOrganizationId).then((result) => {
                                 return result.data.response;
                             });
                         }
                     ],
                     orgUnitRoles: [
                         '$http', function ($http: ng.IHttpService) {
-                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnitRole/?nonsuggestions').then((result) => {
+                            return $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnitRole/?nonsuggestions').then((result) => {
                                 return result.data.response;
                             });
                         }
