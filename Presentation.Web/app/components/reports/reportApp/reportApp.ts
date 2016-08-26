@@ -1,14 +1,10 @@
 ﻿module ReportApp {
 
-    angular.module("reportApp", []);
+    //angular.module("reportApp", []);
 
     export class ReportAppCtrl {
-        public title: string;
-
         public static $inject = ["stimulsoftService", "$timeout"];
         constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
-            //constructor() {
-            this.title = "Er der hul igennem, hva?";
 
             const options = stimulsoftService.getOptions();
             options.height = "100%";
@@ -31,13 +27,13 @@
                 //Assign the report to the viewer
                 viewer.report = stiReport;
             }, 50);
-
             viewer.renderHtml("reportViewer");
-
         }
     }
 
     angular.module("reportApp").controller("ReportAppCtrl", ReportAppCtrl);
+    angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
+
 
     angular.element(document).ready(() => {
         angular.bootstrap(document, ["reportApp"]);
