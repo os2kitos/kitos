@@ -1,16 +1,16 @@
 ﻿module ReportApp {
 
-    //angular.module("reportApp", []);
+    angular.module("reportApp", []);
 
     export class ReportAppCtrl {
         public static $inject = ["stimulsoftService", "$timeout"];
         constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
 
             const options = stimulsoftService.getOptions();
-            options.height = "100%";
-            options.appearance.scrollbarsMode = true;
-            options.toolbar.showDesignButton = true;
-            options.appearance.fullScreenMode = false;
+            // options.height = "100%";
+            // options.appearance.scrollbarsMode = true;
+            // options.toolbar.showDesignButton = true;
+            // options.appearance.fullScreenMode = false;
 
             var viewer = stimulsoftService.getViewer(options, "Viewer");
             viewer.showProcessIndicator();
@@ -26,7 +26,7 @@
 
                 //Assign the report to the viewer
                 viewer.report = stiReport;
-            }, 50);
+            },50);
             viewer.renderHtml("reportViewer");
         }
     }
