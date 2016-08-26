@@ -100,6 +100,8 @@
                             if (parameterMap.$filter) {
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
+                                // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
                             }
 
                             return parameterMap;
@@ -219,6 +221,7 @@
                     {
                         field: "AccessModifier", title: "Synlighed", width: 120,
                         persistId: "accessmod", // DON'T YOU DARE RENAME!
+                        template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         excelTemplate: dataItem => dataItem && dataItem.AccessModifier.toString() || "",
                         filterable: {
                             cell: {
@@ -420,6 +423,19 @@
                                 operator: "gte"
                             }
                         }
+                    },
+                    {
+                        field: "Uuid", title: "UUID", width: 150,
+                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.Uuid,
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };
@@ -569,9 +585,8 @@
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
                 dataSource: [
-                    { value: "Kitos.AccessModifier0", text: "Normal" },
-                    { value: "Kitos.AccessModifier1", text: "Public" },
-                    { value: "Kitos.AccessModifier2", text: "Private" }
+                    { value: "Kitos.AccessModifier0", text: "Lokal" },
+                    { value: "Kitos.AccessModifier1", text: "Offentlig" }
                 ],
                 dataTextField: "text",
                 dataValueField: "value",

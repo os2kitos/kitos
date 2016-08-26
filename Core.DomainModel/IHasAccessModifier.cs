@@ -9,11 +9,7 @@
         /// <summary>
         /// Everyone have read access.
         /// </summary>
-        Public,
-        /// <summary>
-        /// Only users with a role on the instance have read access.
-        /// </summary>
-        Private
+        Public
     }
 
     /// <summary>
