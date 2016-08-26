@@ -484,6 +484,8 @@
 	<Content Include="Content\css\app.min.css" />
 	<Content Include="Content\report\stimulsoft.designer.office2013.white.blue.css" />
 	<Content Include="Content\report\stimulsoft.viewer.office2013.css" />
+	<Content Include="Content\report\stimulsoft.viewer.office2013.white.teal.css" />
+	  <Content Include="Content\report\stimulsoft.designer.office2013.white.teal.css" />
 	<Content Include="Content\css\select2-spinner.gif" />
 	<Content Include="Content\css\select2.png" />
 	<Content Include="Content\css\select2x2.png" />
@@ -621,6 +623,9 @@
 	<TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
 	<TypeScriptCompile Include="app\components\local-config\local-config-module-admin.ts" />
 	<TypeScriptCompile Include="app\components\reports\report-edit.ts" />
+	<TypeScriptCompile Include="app\components\reports\reportApp\report-viewer.controller.ts" />
+    <TypeScriptCompile Include="app\components\reports\reportApp\reportApp.ts" />
+    <TypeScriptCompile Include="app\components\reports\reportApp\stimulsoftService.ts" />
 	<TypeScriptCompile Include="app\components\reports\report-viewer-controller.ts" />
 	<TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
 	<TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
@@ -857,7 +862,9 @@
 	<TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
 	<TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
 	<Content Include="app\shared\limitToDots.filter.js" />
+	<TypeScriptCompile Include="app\services\userServices.ts" />
 	<TypeScriptCompile Include="app\utility\utility.ts" />
+	<Content Include="app\services\httpServices.js" />
 	<Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
 	<Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
 	<Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
