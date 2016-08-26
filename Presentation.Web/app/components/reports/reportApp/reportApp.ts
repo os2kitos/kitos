@@ -1,42 +1,26 @@
-﻿module ReportApp {
+﻿
+var reportApp = angular.module('reportApp', [
+    'ui.router',
+    'ui.bootstrap',
+    'ngAnimate',
+    'ngSanitize']);
 
-    angular.module("reportApp", []);
+angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
 
-    export class ReportAppCtrl {
-        public static $inject = ["stimulsoftService", "$timeout"];
-        constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
+angular.element(document).ready(() => {
+    angular.bootstrap(document, ["reportApp"]);
+});
 
-            const options = stimulsoftService.getOptions();
-            //options.height = "100%";
-            options.appearance.scrollbarsMode = true;
-            options.toolbar.showDesignButton = true;
-            options.appearance.fullScreenMode = false;
+reportApp.run([
+    '$rootScope', '$state',
+    ($rootScope, $state) => {
+        // init info
+        $rootScope.page = {
+            title: 'Index',
+            subnav: []
+        };
 
-            var viewer = stimulsoftService.getViewer(options, "Viewer");
-            viewer.showProcessIndicator();
-
-            $timeout(() => {
-                //Create a new report instance
-                var stiReport = stimulsoftService.getReport();
-
-            //    if (report.Definition && report.Definition.length > 0) {
-            //        //  Load reports from JSON object
-            //        stiReport.load(report.Definition);
-            //    }
-
-                //Assign the report to the viewer
-                viewer.report = stiReport;
-            },50);
-            viewer.renderHtml("reportViewer");
-        }
+        $rootScope.$state = $state;
+        $state.go("reports-viewer");
     }
-
-    angular.module("reportApp").service("stimulsoftService",Kitos.Services.StimulsoftService);
-    angular.module("reportApp").controller("ReportAppCtrl", ReportAppCtrl);
-    angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
-
-
-    angular.element(document).ready(() => {
-        angular.bootstrap(document, ["reportApp"]);
-    });
-}
+]);

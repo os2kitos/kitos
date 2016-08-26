@@ -24,9 +24,13 @@
 
     <!--app-->
     <script src="./reportApp/reportApp.js"></script>
+    <script src="./reportApp/report-viewer.controller.js"></script>
+
+    
 </head>
-<body ng-app="reportApp">
-    <div ng-controller="ReportAppCtrl as vm"></div>
-    <div id="reportViewer"></div>
+<body ng-app="reportApp" ng-cloak ng-strict-di>
+    <!--<div ng-controller="ReportAppCtrl as vm"></div>
+    <div id="reportViewer"></div>-->
+    <ui-view></ui-view>
 </body>
 </html>

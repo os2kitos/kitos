@@ -35,20 +35,16 @@ module Kitos.Reports.Viewer {
         }
     }
 
-    angular
-        .module("app")
-        .config([
-            "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-                $stateProvider.state("reports.viewer", {
-                    url: "/reportviewer/{id:int}",
-                    templateUrl: "app/components/reports/report-viewer.view.html",
-                    controller: ReportViewerController,
-                    controllerAs: "vm",
-                    resolve: {
-                        user: ["userService", userService => userService.getUser()],
-                        report: ["reportService", "$stateParams", (rpt: Services.ReportService, $stateParams) => rpt.GetById($stateParams["id"]).then(result => result.data)]
-                    }
-                });
-            }
-        ]);
+    // angular
+    //     .module("reportApp")
+    //     .config([
+    //         "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+    //             $stateProvider.state("reports.viewer", {
+    //                 url: "/reportviewer/{id:int}",
+    //                 templateUrl: "app/components/reports/report-viewer.view.html",
+    //                 controller: ReportViewerController,
+    //                 controllerAs: "vm",
+    //             });
+    //         }
+    //     ]);
 }
