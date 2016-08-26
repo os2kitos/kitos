@@ -58,10 +58,8 @@ namespace Presentation.Web.Controllers.API
                         (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
-                        // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Local ||
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
+                        // everyone in the same organization can see local objects
+                        p.AccessModifier == AccessModifier.Local)
                     );
 
                 var projects = Page(Repository.AsQueryable(), pagingModel);
@@ -90,10 +88,8 @@ namespace Presentation.Web.Controllers.API
                         (KitosUser.IsGlobalAdmin ||
                         // object owner sees his own objects
                         p.ObjectOwnerId == KitosUser.Id ||
-                        // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Local &&
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id))
+                        // everyone in the same organization can see local objects
+                        p.AccessModifier == AccessModifier.Local)
                     );
 
                 return Ok(Map(items));
@@ -140,11 +136,8 @@ namespace Presentation.Web.Controllers.API
                         p.ObjectOwnerId == KitosUser.Id && p.OrganizationId == orgId ||
                         // it's public everyone can see it
                         p.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        p.AccessModifier == AccessModifier.Local &&
-                        p.OrganizationId == orgId ||
-                        // only users with a role on the object can see private objects
-                        p.AccessModifier == AccessModifier.Private && p.Rights.Any(x => x.UserId == KitosUser.Id)
+                        // everyone in the same organization can see local objects
+                        p.AccessModifier == AccessModifier.Local && p.OrganizationId == orgId
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));

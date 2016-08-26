@@ -18,7 +18,7 @@
                     disabled: "&ngDisabled",
                 },
                 link: function (scope, element, attr, ctrl) {
-                    var foundSelectedInOptions = _.find(scope.options(), function(option) { return option.id === scope.selectedId });
+                    var foundSelectedInOptions = _.find(scope.options(), function(option: any) { return option.id === scope.selectedId });
                     scope.isDeletedSelected = scope.selectedId != null && !foundSelectedInOptions;
 
                     scope.savedId = scope.selectedId;

@@ -238,6 +238,9 @@
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
                                 parameterMap.$filter = this.fixKleDescFilter(parameterMap.$filter, "ItSystem/TaskRefs/Description");
+
+                                // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
+                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
                             }
 
                             return parameterMap;
@@ -341,6 +344,19 @@
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "ItSystem.Uuid", title: "UUID", width: 150,
+                        persistId: "uuid", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem.ItSystem.Uuid,
                         hidden: true,
                         filterable: {
                             cell: {

@@ -40,6 +40,20 @@
                                data-placeholder="Vælg system"
                                data-ng-model="system.parent">
                     </div>
+
+                    <!-- Usage type -->
+                    <div class="form-group">
+                        <select-option data-id="system-business-type"
+                                       data-label="Forretningstype"
+                                       data-placeholder="Vælg forretningstype"
+                                       data-selected-text="{{ system.businessTypeName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="system.businessTypeId"
+                                       data-options="businessTypes"
+                                       data-auto-save-url="{{ system.updateUrl }}"
+                                       data-field="businessTypeId">
+                        </select-option>
+                    </div>
                 </div>
                 <div class="col-md-6">
                     <!-- belongs to -->
@@ -53,10 +67,13 @@
                                data-field="belongsToId"
                                data-ng-model="system.belongsTo">
                     </div>
+
+                    <!-- Object owner -->
                     <div class="form-group">
                         <label class="control-label small">Oprettet af</label>
-                        <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="true" />
+                        <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
                     </div>
+
                     <!-- Access modifier -->
                     <div class="form-group">
                         <label for="system-access" class="control-label small">Synlighed</label>
@@ -67,20 +84,11 @@
                                data-ng-model="system.accessModifier"
                                data-select-access-modifier="">
                     </div>
-                </div>
-                <div class="col-md-12">
-                    <!-- Usage type -->
+
+                    <!-- UUID -->
                     <div class="form-group">
-                        <select-option data-id="system-business-type"
-                                       data-label="Forretningstype"
-                                       data-placeholder="Vælg forretningstype"
-                                       data-selected-text="{{ system.businessTypeName }}"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="system.businessTypeId"
-                                       data-options="businessTypes"
-                                       data-auto-save-url="{{ system.updateUrl }}"
-                                       data-field="businessTypeId">
-                        </select-option>
+                        <label class="control-label small">UUID</label>
+                        <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
                     </div>
                 </div>
             </div>

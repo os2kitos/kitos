@@ -13,9 +13,9 @@
                             });
                         }
                     ],
-                    orgRoles: [
+                    orgUnitRoles: [
                         '$http', function ($http: ng.IHttpService) {
-                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationRole/?nonsuggestions').then((result) => {
+                            return $http.get<Kitos.Models.IApiWrapper<any>>('api/organizationUnitRole/?nonsuggestions').then((result) => {
                                 return result.data.response;
                             });
                         }
@@ -31,8 +31,8 @@
     ]);
 
     app.controller('org.StructureCtrl', [
-        '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgRoles', 'user',
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgRoles, user) {
+        '$scope', '$http', '$q', '$filter', '$uibModal', '$state', 'notify', 'orgUnits', 'orgUnitRoles', 'user',
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgUnitRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -49,9 +49,9 @@
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = _.where(orgRoles, { isActive: true });
+            $scope.activeOrgRoles = _.where(orgUnitRoles, { isActive: true });
             $scope.orgRoles = {};
-            _.each(orgRoles, function(orgRole: { id }) {
+            _.each(orgUnitRoles, function(orgRole: { id }) {
                 $scope.orgRoles[orgRole.id] = orgRole;
             });
 
