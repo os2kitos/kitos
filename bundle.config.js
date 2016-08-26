@@ -18,7 +18,7 @@ module.exports = {
         bower("/bootstrap/dist/css/bootstrap.min.css"),
         // bower("/bootstrap/dist/css/bootstrap-theme.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
-        bower("/select2/select2.css"),
+        bower("/select/dist/select.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css"),
         content("/report/stimulsoft.viewer.office2013.css"),
@@ -40,7 +40,7 @@ module.exports = {
         bower("/angular-sanitize/angular-sanitize.min.js"),
         bower("/angular-ui-router/release/angular-ui-router.min.js"),
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
-        bower("/angular-ui-select2/src/select2.js"),
+        bower("/angular-ui-select/dist/select.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js")
     ],
