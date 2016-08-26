@@ -625,6 +625,7 @@
     <TypeScriptCompile Include="app\components\reports\report-edit.ts" />
     <TypeScriptCompile Include="app\components\reports\report-viewer-controller.ts" />
     <TypeScriptCompile Include="app\components\reports\reportApp\reportApp.ts" />
+    <TypeScriptCompile Include="app\components\reports\reportApp\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />
@@ -725,7 +726,6 @@
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
     <TypeScriptCompile Include="app\services\ReportService.ts" />
-    <TypeScriptCompile Include="app\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />

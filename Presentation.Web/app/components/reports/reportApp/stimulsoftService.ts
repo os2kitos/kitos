@@ -31,5 +31,4 @@
         }
     }
 
-    angular.module("app").service("stimulsoftService", StimulsoftService);
 }

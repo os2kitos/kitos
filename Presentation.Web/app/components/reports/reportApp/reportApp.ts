@@ -31,6 +31,7 @@
         }
     }
 
+    angular.module("reportApp").service("stimulsoftService",Kitos.Services.StimulsoftService);
     angular.module("reportApp").controller("ReportAppCtrl", ReportAppCtrl);
     angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
 
