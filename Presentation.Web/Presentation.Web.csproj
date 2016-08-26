@@ -443,6 +443,7 @@
     <Content Include="app\components\local-config\local-config-module-admin.html" />
     <Content Include="app\components\reports\report-edit.html" />
     <Content Include="app\components\reports\report-viewer.view.html" />
+    <Content Include="app\components\reports\reportApp\Index.html" />
     <Content Include="app\components\reports\reports-overview.html" />
     <Content Include="app\shared\autosave.directive.js" />
     <Content Include="app\shared\datereader.directive.js" />
@@ -620,6 +621,7 @@
     <TypeScriptCompile Include="app\components\local-config\local-config-module-admin.ts" />
     <TypeScriptCompile Include="app\components\reports\report-edit.ts" />
     <TypeScriptCompile Include="app\components\reports\report-viewer-controller.ts" />
+    <TypeScriptCompile Include="app\components\reports\reportApp\reportApp.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />

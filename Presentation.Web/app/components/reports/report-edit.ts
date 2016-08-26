@@ -1,7 +1,7 @@
 ﻿/// <reference path="../../index.d.ts" />
 
 module Kitos.Reports {
-    "use strict"
+    "use strict";
 
     export class EditReportController {
 
