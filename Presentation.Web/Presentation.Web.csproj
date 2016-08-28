@@ -453,6 +453,8 @@
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
+    <Content Include="app\components\reports\Index.html" />
+    <Content Include="app\components\reports\reportApp\reports-viewer.view.html" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <Content Include="app\components\reports\reports-overview.html" />
