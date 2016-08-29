@@ -15,8 +15,6 @@ module.exports = {
 
     libraryStylesSrc: [
         bower("/bootstrap/dist/css/bootstrap.min.css"),
-        bower("/bootstrap/dist/css/bootstrap.min.css"),
-        // bower("/bootstrap/dist/css/bootstrap-theme.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select/dist/select.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
