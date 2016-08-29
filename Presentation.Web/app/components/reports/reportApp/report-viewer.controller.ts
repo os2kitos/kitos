@@ -28,17 +28,6 @@ module Kitos.Reports {
         }
     }
 
-    angular
-        .module("reportApp")
-        .config(["$stateProvider", ($stateProvider) => {
-            $stateProvider.state("reports-viewer",
-                {
-                    url: "/viewer",
-                    templateUrl: "reportApp/reports-viewer.view.html",
-                    controller: ReportViewerController,
-                    controllerAs: "vm"
-                });
-        }
-        ]);
+    
 
 }
