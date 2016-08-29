@@ -15,15 +15,12 @@ module.exports = {
 
     libraryStylesSrc: [
         bower("/bootstrap/dist/css/bootstrap.min.css"),
-        bower("/bootstrap/dist/css/bootstrap.min.css"),
-        // bower("/bootstrap/dist/css/bootstrap-theme.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select/dist/select.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        bower("/angular-loading-bar/build/loading-bar.min.css"),
-        content("/report/stimulsoft.viewer.office2013.css"),
-        content("/report/stimulsoft.designer.office2013.white.blue.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
+
     stimulsoftSrc: [
         script("/stimulsoft/stimulsoft.reports.js"),
         script("/stimulsoft/stimulsoft.viewer.js"),

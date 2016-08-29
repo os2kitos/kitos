@@ -1,6 +1,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ExcludeFromPackageFolders Include="Scripts/stimulsoft">
+    <ExcludeFromPackageFolders Include="Scripts/stimulsoft; Tests">
       <FromTarget>Not usually needed</FromTarget>
     </ExcludeFromPackageFolders>
   </ItemGroup>
