@@ -2,6 +2,7 @@ module Kitos.Reports {
 
     export class ReportViewerController {
         public static $inject = ["stimulsoftService", "$timeout"];
+
         constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
 
             const options = stimulsoftService.getOptions();
@@ -10,6 +11,32 @@ module Kitos.Reports {
             options.appearance.fullScreenMode = true;
 
             var viewer = stimulsoftService.getViewer(options, "Viewer");
+
+            // Add the design button event
+            viewer.onDesignReport = function (e) {
+                this.visible = false;
+                var designOptions = stimulsoftService.getDesignerOptions();
+                designOptions.appearance.fullScreenMode = true;
+                var designer = stimulsoftService.getDesigner(designOptions, "designer");
+
+                designer.onSaveReport = function(saveEvent) {
+                    viewer.report = saveEvent.report;
+                    console.log("saving a report");
+                }
+
+                designer.onExit = function (exitEvent) {
+                    console.log("Closing designer");
+                    designer.visible = false;
+                    //viewer.report = exitEvent.report;
+                    viewer.visible = true;
+                }
+
+
+                designer.renderHtml("reportDesigner");
+                designer.visible = true;
+                designer.report = e.report;
+            };
+
             viewer.showProcessIndicator();
 
             $timeout(() => {
