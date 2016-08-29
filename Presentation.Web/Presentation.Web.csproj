@@ -483,6 +483,7 @@
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
     <Content Include="app\utility\lodash.mixin.js" />
     <Content Include="Content\css\app.min.css" />
+    <Content Include="Content\report\report.css" />
     <Content Include="Content\report\stimulsoft.designer.office2013.white.blue.css" />
     <Content Include="Content\report\stimulsoft.viewer.office2013.css" />
     <Content Include="Content\report\stimulsoft.viewer.office2013.white.teal.css" />
