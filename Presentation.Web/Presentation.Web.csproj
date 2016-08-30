@@ -440,7 +440,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="appReport\index.d.ts" />
     <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
+    <TypeScriptCompile Include="appReport\reportApp.module.ts" />
     <TypeScriptCompile Include="appReport\reportApp.ts" />
     <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
@@ -464,7 +466,6 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
-    <Content Include="appReport\services\stimulsoftService.js" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <Content Include="app\components\reports\reports-overview.html" />
@@ -492,11 +493,6 @@
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
     <Content Include="app\utility\lodash.mixin.js" />
     <Content Include="Content\css\app.min.css" />
-    <Content Include="Content\report\report.css" />
-    <Content Include="Content\report\stimulsoft.designer.office2013.white.blue.css" />
-    <Content Include="Content\report\stimulsoft.viewer.office2013.css" />
-    <Content Include="Content\report\stimulsoft.viewer.office2013.white.teal.css" />
-    <Content Include="Content\report\stimulsoft.designer.office2013.white.teal.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -884,7 +880,6 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
-    <Content Include="appReport\services\stimulsoftService.js.map" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
