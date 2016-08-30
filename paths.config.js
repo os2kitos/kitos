@@ -1,12 +1,13 @@
-'use strict';
+"use strict";
 
 var source = "Presentation.Web",
     sourceApp = source + "/app",
     sourceScript = source + "/Scripts",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.js"],
-    allJavaScriptNoTests = [sourceApp + "/**/!(*.spec|*.po).js"],
+    allJavaScriptNoTests = sourceApp + "/**/!(*.spec|*.po).js",
     allTypeScript = [sourceApp + "/**/*.ts"],
     bowerComponents = "bower_components",
+    appMaps = sourceApp + "/**/*.js.map",
 
     // dependency files of files to unit test
     unitDependencies = [
@@ -57,6 +58,7 @@ var source = "Presentation.Web",
 module.exports = {
     source: source,
     sourceApp: sourceApp,
+    appMaps: appMaps,
     sourceScript: sourceScript,
     allJavaScript: allJavaScript,
     allTypeScript: allTypeScript,
