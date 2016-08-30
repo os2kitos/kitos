@@ -46,6 +46,10 @@ module Kitos.Reports {
             this.viewer.showProcessIndicator();
             this.viewer.renderHtml("reportViewer");
             this.loadReport();
+
+            var absUrl = $location.absUrl();
+            var searchObject = $location.search().id;
+
         }
 
         loadReport = () => {
@@ -64,7 +68,7 @@ module Kitos.Reports {
 
         saveReport = () => {
             alert("Rapporten gemmes!");
-        }
+        };
     }
 
     angular.module("reportApp").controller("reportViewerController", Kitos.Reports.ReportViewerController);
