@@ -440,6 +440,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
+    <TypeScriptCompile Include="appReport\reportApp.ts" />
+    <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
@@ -453,12 +456,18 @@
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
-    <Content Include="app\components\reports\Index.html" />
-    <Content Include="app\components\reports\reportApp\reports-viewer.view.html" />
+    <Content Include="appReport\css\report.css" />
+    <Content Include="appReport\css\stimulsoft.designer.office2013.white.teal.css" />
+    <Content Include="appReport\css\stimulsoft.viewer.office2013.white.teal.css" />
+    <Content Include="appReport\Index.html" />
+    <Content Include="appReport\reports-viewer.view.html" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
+    <Content Include="appReport\services\stimulsoftService.js" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <Content Include="app\shared\filters\joinBy.filter.js" />
     <Content Include="app\components\reports\reports-overview.html" />
-    <Content Include="app\components\reports\report-edit.html" />
     <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
@@ -625,9 +634,6 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-module-admin.ts" />
     <TypeScriptCompile Include="app\components\reports\report-edit.ts" />
-    <TypeScriptCompile Include="app\components\reports\reportApp\report-viewer.controller.ts" />
-    <TypeScriptCompile Include="app\components\reports\reportApp\reportApp.ts" />
-    <TypeScriptCompile Include="app\components\reports\reportApp\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
     <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />
@@ -878,6 +884,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
+    <Content Include="appReport\services\stimulsoftService.js.map" />
     <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
@@ -893,9 +900,6 @@
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Scripts\stimulsoft-bundle.js" />
-    <Content Include="Scripts\stimulsoft\stimulsoft.designer.js" />
-    <Content Include="Scripts\stimulsoft\stimulsoft.reports.js" />
-    <Content Include="Scripts\stimulsoft\stimulsoft.viewer.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

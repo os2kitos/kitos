@@ -1,5 +1,5 @@
 ﻿module Kitos.Reports.Overview {
-    'use strict';
+    "use strict";
 
     export interface IOverviewController {
         mainGrid: IKendoGrid<IReportOverview>;
@@ -60,11 +60,12 @@
 
         private setupGrid() {
             var baseUrl = "odata/reports",
-                dataSource = new kendo.data.DataSource({
+                dataSource = {
                     type: "odata-v4",
                     transport: {
                         read: {
                             url: baseUrl + "?$expand=CategoryType",
+                            dataType: "json"
                         },
                         update: {
                             url: (data) => {
@@ -88,7 +89,7 @@
                                 let patch = {
                                     Name: model.Name,
                                     Description: model.Description
-                                }
+                                };
                                 return JSON.stringify(patch);
                             }
                             if (type === "create") {
@@ -97,14 +98,19 @@
                                     Id: 0,
                                     Name: model.Name,
                                     Description: model.Description
-                                }
-                                return JSON.stringify(patch)
+                                };
+                                return JSON.stringify(patch);
                             }
                         }
+                    },
+                    sort: {
+                        field: "Name",
+                        dir: "asc"
                     },
                     batch: false,
                     serverPaging: true,
                     serverSorting: true,
+                    serverFiltering: true,
                     pageSize: 50,
                     schema: {
                         model: {
@@ -117,9 +123,9 @@
                             }
                         }
                     }
-                });
+                };
 
-            this.mainGridOptions = ({
+            this.mainGridOptions = {
                 autoBind: false,
                 dataSource: dataSource,
                 editable: "inline",
@@ -142,7 +148,7 @@
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 150,
-                        template: dataItem => dataItem.Id ? `<a href='app/components/reports/index.html?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
+                        template: dataItem => dataItem.Id ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
                     },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
                     {
@@ -151,11 +157,11 @@
                     },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
                 ]
-            });
+            };
         }
 
         CategoryDropDownEditor = (container, options) => {
-            this.$('<input required name="' + options.field + '"/>')
+            this.$(`<input required name="" + options.field + ""/>`)
                 .appendTo(container)
                 .kendoDropDownList({
                     autoBind: false,
@@ -168,7 +174,7 @@
                         }
                     }
                 });
-        }
+        };
 
     }
 

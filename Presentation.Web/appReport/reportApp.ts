@@ -1,96 +1,60 @@
 ﻿
-angular.module("reportApp", [
-    "ui.router",
-    "ui.bootstrap",
-    "ngAnimate",
-    "ngSanitize"]);
+module Kitos.Reports {
+    "use strict";
 
-export class ReportAppController {
-    public static $inject = ["stimulsoftService", "$timeout"];
-    constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService) {
+    export class ReportAppController {
+        public static $inject = ["stimulsoftService", "$timeout"];
+        constructor(stimulsoftService: Kitos.Services.StimulsoftService, private $timeout: ng.ITimeoutService, reportService: Kitos.Services.ReportService) {
 
-        const options = stimulsoftService.getOptions();
-        options.appearance.scrollbarsMode = true;
-        options.toolbar.showDesignButton = true;
-        options.appearance.fullScreenMode = true;
+            const options = stimulsoftService.getOptions();
+            options.appearance.scrollbarsMode = true;
+            options.toolbar.showDesignButton = true;
+            options.appearance.fullScreenMode = true;
 
-        var viewer = stimulsoftService.getViewer(options, "Viewer");
+            var viewer = stimulsoftService.getViewer(options, "Viewer");
 
-        // Add the design button event
-        viewer.onDesignReport = function (e) {
-            this.visible = false;
-            var designOptions = stimulsoftService.getDesignerOptions();
-            designOptions.appearance.fullScreenMode = true;
-            var designer = stimulsoftService.getDesigner(designOptions, "designer");
+            // Add the design button event
+            viewer.onDesignReport = function (e) {
+                this.visible = false;
+                var designOptions = stimulsoftService.getDesignerOptions();
+                designOptions.appearance.fullScreenMode = true;
+                var designer = stimulsoftService.getDesigner(designOptions, "designer");
 
-            designer.onSaveReport = function (saveEvent) {
-                viewer.report = saveEvent.report;
-                console.log("saving a report");
+                designer.onSaveReport = function (saveEvent) {
+                    viewer.report = saveEvent.report;
+                    console.log("saving a report");
+                };
+
+                designer.onExit = function (exitEvent) {
+                    console.log("Closing designer");
+                    designer.visible = false;
+                    //viewer.report = exitEvent.report;
+                    viewer.visible = true;
+                };
+
+
+                designer.renderHtml("reportDesigner");
+                designer.visible = true;
+                designer.report = e.report;
             };
 
-            designer.onExit = function (exitEvent) {
-                console.log("Closing designer");
-                designer.visible = false;
-                //viewer.report = exitEvent.report;
-                viewer.visible = true;
-            };
+            viewer.showProcessIndicator();
 
+            $timeout(() => {
+                //Create a new report instance
+                var stiReport = stimulsoftService.getReport();
 
-            designer.renderHtml("reportDesigner");
-            designer.visible = true;
-            designer.report = e.report;
-        };
+                //    if (report.Definition && report.Definition.length > 0) {
+                //        //  Load reports from JSON object
+                //        stiReport.load(report.Definition);
+                //    }
 
-        viewer.showProcessIndicator();
-
-        $timeout(() => {
-            //Create a new report instance
-            var stiReport = stimulsoftService.getReport();
-
-            //    if (report.Definition && report.Definition.length > 0) {
-            //        //  Load reports from JSON object
-            //        stiReport.load(report.Definition);
-            //    }
-
-            //Assign the report to the viewer
-            viewer.report = stiReport;
-        }, 50);
-        viewer.renderHtml("reportViewer");
+                //Assign the report to the viewer
+                viewer.report = stiReport;
+            }, 50);
+            viewer.renderHtml("reportViewer");
+        }
     }
+
+    angular.module("reportApp").controller("reportAppController", Kitos.Reports.ReportAppController);
 }
-
-//angular.module("reportApp").controller("stimulsoftService", Kitos.Reports.ReportViewerController);
-
-angular.element(document).ready(() => {
-    angular.module("reportApp").controller("reportAppController", ReportAppController);
-    angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
-
-    // angular
-    //     .module("reportApp")
-    //     .config(["$stateProvider", ($stateProvider) => {
-    //         $stateProvider.state("reports-viewer",
-    //             {
-    //                 url: "/viewer",
-    //                 templateUrl: "reportApp/reports-viewer.view.html",
-    //                 controller: Kitos.Reports.ReportViewerController,
-    //                 controllerAs: "vm"
-    //             });
-    //     }
-    //     ]);
-
-    angular.bootstrap(document, ["reportApp"]);
-});
-
-// reportApp.run([
-//     '$rootScope', '$state',
-//     ($rootScope, $state) => {
-//         // init info
-//         $rootScope.page = {
-//             title: 'Index',
-//             subnav: []
-//         };
-
-//         $rootScope.$state = $state;
-//         $state.go("reports-viewer");
-//     }
-// ]);

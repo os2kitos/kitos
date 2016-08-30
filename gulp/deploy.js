@@ -20,13 +20,13 @@ gulp.task("clean-scripts", function () {
 });
 
 // create stimulsoft report ressources
-gulp.task("stimulsoft-bundle", ["clean-scripts", "bower-restore"], function () {
-    return gulp.src(config.stimulsoftSrc)
-        .pipe(sourcemaps.init())
-        .pipe(concat(config.stimulsoftBundle))
-        .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(paths.sourceScript));
-});
+// gulp.task("stimulsoft-bundle", ["clean-scripts", "bower-restore"], function () {
+//     return gulp.src(config.stimulsoftSrc)
+//         .pipe(sourcemaps.init())
+//         .pipe(concat(config.stimulsoftBundle))
+//         .pipe(sourcemaps.write(config.maps))
+//         .pipe(gulp.dest(paths.sourceScript));
+// });
 
 // create external library bundled file
 gulp.task("library-bundle", ["clean-scripts", "bower-restore"], function () {

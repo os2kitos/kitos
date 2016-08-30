@@ -36,4 +36,5 @@
         }
     }
 
+    angular.module("reportApp").service("stimulsoftService", Kitos.Services.StimulsoftService);
 }
