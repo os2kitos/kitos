@@ -21,6 +21,10 @@ module Kitos.Services {
         GetAll = () => {
             return this.$http.get<Kitos.Models.IOdataWrapper<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
         }
+
+        saveReport = (report: Kitos.Models.IReport) => {
+            this.$http.patch(this.baseUrl + "(" + report.Id + ")", report);
+        }
     }
 
     app.service("reportService", ReportService);

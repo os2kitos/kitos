@@ -1,0 +1,7 @@
+var options = new Stimulsoft.Designer.StiDesignerOptions();
+options.appearance.showSaveDialog = false;
+
+https://www.stimulsoft.com/en/documentation/online/programming-manual/
+
+https://www.stimulsoft.com/en/documentation/online/programming-manual/index.html?using_js_designer_options.htm
+

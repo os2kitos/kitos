@@ -8,42 +8,56 @@ var Kitos;
                 var _this = this;
                 this.stimulsoftService = stimulsoftService;
                 this.reportService = reportService;
+                this.buildViewerOptions = function () {
+                    var options = _this.stimulsoftService.getOptions();
+                    options.appearance.scrollbarsMode = true;
+                    options.toolbar.showDesignButton = true;
+                    options.appearance.fullScreenMode = true;
+                    options.showSaveDialog = false;
+                    return options;
+                };
                 this.loadReport = function () {
                     _this.reportService.GetById(1).then(function (result) {
                         _this.report = result.data;
-                        var stiReport = _this.stimulsoftService.getReport();
+                        _this.stiReport = _this.stimulsoftService.getReport();
                         if (_this.report.Definition && _this.report.Definition.length > 0) {
                             //  Load reports from JSON object
-                            stiReport.load(_this.report.Definition);
+                            _this.stiReport.load(_this.report.Definition);
                         }
                         //Assign the report to the viewer
-                        _this.viewer.report = stiReport;
+                        _this.viewer.report = _this.stiReport;
                     });
                 };
-                var options = stimulsoftService.getOptions();
-                options.appearance.scrollbarsMode = true;
-                options.toolbar.showDesignButton = true;
-                options.appearance.fullScreenMode = true;
-                this.viewer = stimulsoftService.getViewer(options, "Viewer");
+                this.designerSaveReport = function (saveEvent) {
+                    _this.report.Definition = saveEvent.report.saveToJsonString();
+                    _this.reportService.saveReport(_this.report);
+                    _this.viewer.report = saveEvent.report;
+                    console.log("saving a report");
+                    // save to DB
+                };
+                this.designerOnExit = function (exitEvent) {
+                    console.log("Closing designer");
+                    _this.designer.visible = false;
+                    _this.viewer.report = exitEvent.report;
+                    _this.viewer.visible = true;
+                };
+                var self = this;
+                this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
                 // Add the design button event
                 this.viewer.onDesignReport = function (e) {
                     this.visible = false;
+                    // set designer options TODO load from db
                     var designOptions = stimulsoftService.getDesignerOptions();
                     designOptions.appearance.fullScreenMode = true;
-                    var designer = stimulsoftService.getDesigner(designOptions, "designer");
-                    designer.onSaveReport = function (saveEvent) {
-                        this.viewer.report = saveEvent.report;
-                        console.log("saving a report");
-                    };
-                    designer.onExit = function (exitEvent) {
-                        console.log("Closing designer");
-                        designer.visible = false;
-                        //viewer.report = exitEvent.report;
-                        this.viewer.visible = true;
-                    };
-                    designer.renderHtml("reportDesigner");
-                    designer.visible = true;
-                    designer.report = e.report;
+                    // create designer object
+                    this.designer = stimulsoftService.getDesigner(designOptions, "designer");
+                    // bind events to designer object
+                    this.designer.onExit = self.designerOnExit;
+                    this.designer.onSaveReport = self.designerSaveReport;
+                    // render designer on dom element
+                    this.designer.renderHtml("reportDesigner");
+                    this.designer.visible = true;
+                    this.designer.report = e.report;
                 };
                 this.viewer.showProcessIndicator();
                 this.viewer.renderHtml("reportViewer");
