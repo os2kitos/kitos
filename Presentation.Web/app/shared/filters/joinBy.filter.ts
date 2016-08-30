@@ -9,7 +9,7 @@
             input = typeof input !== 'undefined' ? input : [];
 
             if (displayName) {
-                var list = _.pluckDeep(input, displayName);
+                var list = (_ as Kitos.ILoDashWithMixins).pluckDeep(input, displayName);
                 return list.join(delimiter);
             } else {
                 return (input).join(delimiter);
