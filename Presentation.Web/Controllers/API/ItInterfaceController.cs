@@ -229,7 +229,7 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
                 item.ItInterfaceId = item.ItInterfaceId ?? "";
-                item.Uuid = Guid.NewGuid();
+                item.Uuid = dto.Uuid == Guid.Empty ? Guid.NewGuid() : dto.Uuid;
 
                 foreach (var dataRow in item.DataRows)
                 {

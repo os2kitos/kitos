@@ -243,7 +243,7 @@ namespace Presentation.Web.Controllers.API
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
-                item.Uuid = Guid.NewGuid();
+                item.Uuid = dto.Uuid == Guid.Empty ? Guid.NewGuid() : dto.Uuid;
 
                 foreach (var id in dto.TaskRefIds)
                 {
