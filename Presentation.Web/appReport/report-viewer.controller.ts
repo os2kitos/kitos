@@ -61,6 +61,10 @@ module Kitos.Reports {
                 this.viewer.report = stiReport;
             });
         };
+
+        saveReport = () => {
+            alert("Rapporten gemmes!");
+        }
     }
 
     angular.module("reportApp").controller("reportViewerController", Kitos.Reports.ReportViewerController);
