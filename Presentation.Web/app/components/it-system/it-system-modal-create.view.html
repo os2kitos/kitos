@@ -11,6 +11,13 @@
             <span class="help-block" data-ng-show="createForm.name.$error.available">Navnet er brugt!</span>
             <span class="help-block" data-ng-show="createForm.name.$error.lookup">Der skete en fejl ved tjek om navnet er ledig!</span>
         </div>
+        <div class="form-group has-feedback" data-show-errors>
+            <label class="control-label" for="uuid">UUID</label>
+            <input type="text" class="form-control" name="uuid" id="uuid" placeholder="uuid" data-ng-model="formData.uuid" ng-pattern="uuidPattern">
+            <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.uuid.$invalid && createForm.uuid.$dirty, 'glyphicon-ok': createForm.uuid.$valid && createForm.uuid.$dirty }"></span>
+            <span class="help-block" data-ng-show="createForm.uuid.$error.pattern">UUID er ugyldigt!</span>
+            <span class="help-block" data-ng-hide="createForm.uuid.$error.pattern">Hvis du ikke indtaster et UUID vil der blive auto-genereret et.</span>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="submit" class="btn btn-primary" data-ng-disabled="createForm.$invalid">OK</button>

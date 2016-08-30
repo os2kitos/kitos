@@ -35,12 +35,14 @@
                         templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
                         controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = {};
+                            $scope.uuidPattern = /^[0-9A-Fa-f]{8}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{12}$/;
                             $scope.type = 'IT System';
                             $scope.checkAvailbleUrl = 'api/itSystem/';
 
                             $scope.submit = function() {
                                 var payload = {
                                     name: $scope.formData.name,
+                                    uuid: $scope.formData.uuid,
                                     belongsToId: user.currentOrganizationId,
                                     organizationId: user.currentOrganizationId,
                                     taskRefIds: [],
@@ -108,9 +110,9 @@
                         templateUrl: 'app/components/it-system/it-interface/it-interface-modal-create.view.html',
                         controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
                             $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
+                            $scope.uuidPattern = /^[0-9A-Fa-f]{8}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{4}\-[0-9A-Fa-f]{12}$/;
                             $scope.type = 'IT Snitflade';
                             $scope.checkAvailbleUrl = 'api/itInterface/';
-
 
                             $scope.validateName = function () {
                                 $scope.createForm.name.$validate();
@@ -124,6 +126,7 @@
                             $scope.submit = function () {
                                 var payload = {
                                     name: $scope.formData.name,
+                                    uuid: $scope.formData.uuid,
                                     itInterfaceId: $scope.formData.itInterfaceId,
                                     belongsToId: user.currentOrganizationId,
                                     organizationId: user.currentOrganizationId
