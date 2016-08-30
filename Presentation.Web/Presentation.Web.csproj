@@ -467,7 +467,7 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
-    <Content Include="app\shared\filters\joinBy.filter.js" />
+    <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
     <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
@@ -491,7 +491,7 @@
     <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueOrgUser.directive.ts" />
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
-    <Content Include="app\utility\lodash.mixin.js" />
+    <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
@@ -863,7 +863,7 @@
     <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
-    <Content Include="app\shared\limitToDots.filter.js" />
+    <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />

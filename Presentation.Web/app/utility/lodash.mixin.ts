@@ -67,8 +67,8 @@ _.mixin({
 //
 // _.pluckDeep(arr, 'deeply.nested'); // ['foo', 'bar']
 _.mixin({
-    pluckDeep: function(obj, key) {
-        return _.map(obj, function(value) { return _.deep(value, key); });
+    pluckDeep: function (obj, key) {
+        return _.map(obj, function (value) { return (_ as Kitos.ILoDashWithMixins).deep(value, key); });
     }
 });
 
@@ -185,7 +185,7 @@ _.mixin({
         parentIdPropertyName = typeof parentIdPropertyName !== 'undefined' ? parentIdPropertyName : 'parentId';
         childPropertyName = typeof childPropertyName !== 'undefined' ? childPropertyName : 'children';
 
-        function self(array, parent, tree) {
+        function self(array, parent?, tree?) {
             tree = typeof tree !== 'undefined' ? tree : [];
             parent = typeof parent !== 'undefined' ? parent : { id: null };
 

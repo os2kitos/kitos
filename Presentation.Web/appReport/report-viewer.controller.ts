@@ -39,6 +39,10 @@ module Kitos.Reports {
             this.viewer.showProcessIndicator();
             this.viewer.renderHtml("reportViewer");
             this.loadReport();
+
+            var absUrl = $location.absUrl();
+            var searchObject = $location.search().id;
+
         }
 
         buildViewerOptions = () => {
