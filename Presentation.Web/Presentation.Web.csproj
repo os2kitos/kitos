@@ -862,7 +862,6 @@
     <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
     <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
     <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />
-    <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\utility\utility.ts" />
     <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
     <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
