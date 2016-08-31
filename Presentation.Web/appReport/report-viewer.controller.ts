@@ -5,42 +5,33 @@ module Kitos.Reports {
     export class ReportViewerController {
         public static $inject = ["stimulsoftService", "$timeout", "reportService", "$window"];
         viewer: any;
+        designer: any;
         report: Kitos.Models.IReport;
+        stiReport: any;
 
         constructor(private stimulsoftService: Kitos.Services.StimulsoftService,
             $timeout: ng.ITimeoutService,
             private reportService: Kitos.Services.ReportService,
             private $window: ng.IWindowService) {
+            let self = this;
 
-            const options = stimulsoftService.getOptions();
-            options.appearance.scrollbarsMode = true;
-            options.toolbar.showDesignButton = true;
-            options.appearance.fullScreenMode = true;
-
-            this.viewer = stimulsoftService.getViewer(options, "Viewer");
+            this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
             // Add the design button event
             this.viewer.onDesignReport = function (e) {
                 this.visible = false;
+                // set designer options TODO load from db
                 var designOptions = stimulsoftService.getDesignerOptions();
                 designOptions.appearance.fullScreenMode = true;
-                var designer = stimulsoftService.getDesigner(designOptions, "designer");
-
-                designer.onSaveReport = function (saveEvent) {
-                    this.viewer.report = saveEvent.report;
-                    console.log("saving a report");
-                };
-
-                designer.onExit = function (exitEvent) {
-                    console.log("Closing designer");
-                    designer.visible = false;
-                    //viewer.report = exitEvent.report;
-                    this.viewer.visible = true;
-                };
-
-                designer.renderHtml("reportDesigner");
-                designer.visible = true;
-                designer.report = e.report;
+                // create designer object
+                this.designer = stimulsoftService.getDesigner(designOptions, "designer");
+                // bind events to designer object
+                this.designer.onExit = self.designerOnExit;
+                this.designer.onSaveReport = self.designerSaveReport;
+                // render designer on dom element
+                this.designer.renderHtml("reportDesigner");
+                this.designer.visible = true;
+                this.designer.report = e.report;
             };
 
             this.viewer.showProcessIndicator();
@@ -58,23 +49,43 @@ module Kitos.Reports {
             }
         };
 
+        buildViewerOptions = () => {
+            const options = this.stimulsoftService.getOptions();
+            options.appearance.scrollbarsMode = true;
+            options.toolbar.showDesignButton = true;
+            options.appearance.fullScreenMode = true;
+            options.showSaveDialog = false;
+            return options;
+        };
+
         loadReport = (id: number) => {
             this.reportService.GetById(id).then((result) => {
                 this.report = result.data;
-                let stiReport = this.stimulsoftService.getReport();
+                this.stiReport = this.stimulsoftService.getReport();
 
                 if (this.report.Definition && this.report.Definition.length > 0) {
                     //  Load reports from JSON object
-                    stiReport.load(this.report.Definition);
+                    this.stiReport.load(this.report.Definition);
                 }
                 //Assign the report to the viewer
-                this.viewer.report = stiReport;
+                this.viewer.report = this.stiReport;
             });
         };
 
-        saveReport = () => {
-            alert("Rapporten gemmes!");
+        designerSaveReport = (saveEvent) => {
+            this.report.Definition = saveEvent.report.saveToJsonString();
+            this.reportService.saveReport(this.report);
+            this.viewer.report = saveEvent.report;
+            console.log("saving a report");
+            // save to DB
         };
+
+        designerOnExit = (exitEvent) => {
+            console.log("Closing designer");
+            this.designer.visible = false;
+            this.viewer.report = exitEvent.report;
+            this.viewer.visible = true;
+        }
     }
 
     angular.module("reportApp").controller("reportViewerController", Kitos.Reports.ReportViewerController);

@@ -443,7 +443,6 @@
     <TypeScriptCompile Include="appReport\index.d.ts" />
     <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
     <TypeScriptCompile Include="appReport\reportApp.module.ts" />
-    <TypeScriptCompile Include="appReport\reportApp.ts" />
     <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
@@ -462,7 +461,6 @@
     <Content Include="appReport\css\stimulsoft.designer.office2013.white.teal.css" />
     <Content Include="appReport\css\stimulsoft.viewer.office2013.white.teal.css" />
     <Content Include="appReport\Index.html" />
-    <Content Include="appReport\reports-viewer.view.html" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
