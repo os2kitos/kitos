@@ -5,3 +5,4 @@ https://www.stimulsoft.com/en/documentation/online/programming-manual/
 
 https://www.stimulsoft.com/en/documentation/online/programming-manual/index.html?using_js_designer_options.htm
 
+report.dictionary.databases.add(new StiODataDatabase("OData", "http://services.odata.org/v3/odata/OData.svc/"));

@@ -22,6 +22,10 @@ module Kitos.Services {
             return this.$http.get<Kitos.Models.IOdataWrapper<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
         }
 
+        GetEmptyReport = () => {
+            return this.$http.get("/appReport/empty-report.json")
+        }
+
         saveReport = (report: Kitos.Models.IReport) => {
             this.$http.patch(this.baseUrl + "(" + report.Id + ")", report);
         }
