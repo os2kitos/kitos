@@ -14,7 +14,6 @@ gulp.task("clean-scripts", function () {
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
         config.script(config.appBundle),
-        config.script(config.stimulsoftBundle),
         paths.allJavaScriptNoTests,
         paths.appMaps
     ]);
