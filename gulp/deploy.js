@@ -99,7 +99,7 @@ gulp.task("bower-restore", function () {
 gulp.task("styles", ["css", "assets", "fonts"]);
 
 // run bundle tasks
-gulp.task("scripts", ["stimulsoft-bundle", "library-bundle", "angular-bundle"]);
+gulp.task("scripts", ["library-bundle", "angular-bundle"]);
 
 // bundle and deploy scripts and styles
 gulp.task("deploy", ["scripts", "styles"]);
