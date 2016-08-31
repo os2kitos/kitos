@@ -3,14 +3,14 @@ module Kitos.Reports {
     "use strict";
 
     export class ReportViewerController {
-        public static $inject = ["stimulsoftService", "$timeout", "reportService", "$location"];
+        public static $inject = ["stimulsoftService", "$timeout", "reportService", "$window"];
         viewer: any;
         report: Kitos.Models.IReport;
 
         constructor(private stimulsoftService: Kitos.Services.StimulsoftService,
             $timeout: ng.ITimeoutService,
             private reportService: Kitos.Services.ReportService,
-            $location: ng.ILocationService) {
+            private $window: ng.IWindowService) {
 
             const options = stimulsoftService.getOptions();
             options.appearance.scrollbarsMode = true;
@@ -45,15 +45,21 @@ module Kitos.Reports {
 
             this.viewer.showProcessIndicator();
             this.viewer.renderHtml("reportViewer");
-            this.loadReport();
-
-            var absUrl = $location.absUrl();
-            var searchObject = $location.search().id;
-
+            this.loadReport(this.getReportId());
         }
 
-        loadReport = () => {
-            this.reportService.GetById(1).then((result) => {
+        getReportId = () => {
+            var searchObject = this.$window.location.search;
+            var regex = /([0-9]+)/g;
+            var matches = searchObject.match(regex);
+            let id = matches[0];
+            if (matches.length === 1) {
+                return parseInt(id);
+            }
+        };
+
+        loadReport = (id: number) => {
+            this.reportService.GetById(id).then((result) => {
                 this.report = result.data;
                 let stiReport = this.stimulsoftService.getReport();
 
