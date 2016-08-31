@@ -1,6 +1,6 @@
 ﻿module Kitos.Services {
     interface IStimulsoftService {
-        getOptions(): any;
+        getViewerOptions(): any;
         getViewer(options: any, name: string): any;
         getReport(): any;
         getDesigner(options: any, name: string): any;
@@ -14,7 +14,7 @@
         constructor(private $window) {
         }
 
-        public getOptions(): any {
+        public getViewerOptions(): any {
             return new this.$window.Stimulsoft.Viewer.StiViewerOptions();
         }
 
@@ -33,6 +33,10 @@
 
         public getDesigner(options, name: string): any {
             return new this.$window.Stimulsoft.Designer.StiDesigner(options, name, false);
+        }
+
+        public setLocalizationFile(path:string) {
+            this.$window.Stimulsoft.Base.Localization.StiLocalization.setLocalizationFile(path);
         }
     }
 

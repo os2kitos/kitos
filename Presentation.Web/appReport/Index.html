@@ -13,6 +13,7 @@
     <link href="./css/stimulsoft.designer.office2013.white.teal.css" rel="stylesheet" />
     <link href="./css/stimulsoft.viewer.office2013.white.teal.css" rel="stylesheet" />
     <link href="./css/report.css" rel="stylesheet" />
+    <link href="./locales/nb-NO.xml" />
 
     <!--angular-->
     <script src="../../Scripts/angular-bundle.min.js"></script>
@@ -24,15 +25,21 @@
 
     <!--app-->
     <script src="./reportApp.module.js"></script>
+    <script src="../app/shared/notify/notify.module.js"></script>
+    <script src="../app/shared/notify/notify.directive.js"></script>
+    <script src="../app/shared/notify/notify.factory.js"></script>
     <script src="./services/stimulsoftService.js"></script>
     <script src="./report-viewer.controller.js"></script>
     <script src="../app/services/ReportService.js"></script>
-
 </head>
 
 <body ng-app="reportApp" ng-cloak ng-strict-di ng-controller="reportViewerController as vm">
+    <!-- NOTIFICATION AREA -->
+    
     <div id="reportViewer"></div>
-    <div id="reportDesigner"></div>
+    <div id="reportDesigner">
+        <div data-notify style="z-index:-2;"></div>
+    </div>
 </body>
 
 </html>

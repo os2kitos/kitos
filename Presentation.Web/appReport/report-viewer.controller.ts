@@ -2,29 +2,50 @@
 module Kitos.Reports {
     "use strict";
 
+/*
+
+Use next commands to change language of viewer's GUI.
+Add a new language to the Select UI language menu. The file is uploaded to a client when the language is selected.
+JavaScript
+Stimulsoft.Base.Localization.StiLocalization.addLocalizationFile("Localizations/pt-BR.xml", false, "Portuguese (Brazil)");
+
+Add a new language to the Select UI language menu and upload the file to a client.
+JavaScript
+Stimulsoft.Base.Localization.StiLocalization.addLocalizationFile("Localizations/ro.xml", true);
+
+Add a new language to the Select UI language menu and set it as a current language.
+JavaScript
+Stimulsoft.Base.Localization.StiLocalization.setLocalizationFile("Localizations/es.xml");
+
+Remove all languages from the Select UI language menu, upload it to a client and set it as a current language.
+JavaScript
+Stimulsoft.Base.Localization.StiLocalization.setLocalizationFile("Localizations/es.xml", true);
+
+*/
+
+
     export class ReportViewerController {
-        public static $inject = ["stimulsoftService", "$timeout", "reportService", "$window"];
+        public static $inject = ["stimulsoftService", "reportService", "$window", "notify"];
         viewer: any;
         designer: any;
         report: Kitos.Models.IReport;
         stiReport: any;
 
         constructor(private stimulsoftService: Kitos.Services.StimulsoftService,
-            $timeout: ng.ITimeoutService,
             private reportService: Kitos.Services.ReportService,
-            private $window: ng.IWindowService) {
+            private $window: ng.IWindowService,
+            private notify) {
             let self = this;
 
+            //stimulsoftService.setLocalizationFile("./locales/nb-NO.xml")
             this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
             // Add the design button event
             this.viewer.onDesignReport = function (e) {
                 this.visible = false;
-                // set designer options TODO load from db
-                var designOptions = stimulsoftService.getDesignerOptions();
-                designOptions.appearance.fullScreenMode = true;
+
                 // create designer object
-                this.designer = stimulsoftService.getDesigner(designOptions, "designer");
+                this.designer = stimulsoftService.getDesigner(self.buildDesignerOptions(), "designer");
                 // bind events to designer object
                 this.designer.onExit = self.designerOnExit;
                 this.designer.onSaveReport = self.designerSaveReport;
@@ -50,11 +71,18 @@ module Kitos.Reports {
         };
 
         buildViewerOptions = () => {
-            const options = this.stimulsoftService.getOptions();
+            let options = this.stimulsoftService.getViewerOptions();
             options.appearance.scrollbarsMode = true;
             options.toolbar.showDesignButton = true;
             options.appearance.fullScreenMode = true;
-            options.showSaveDialog = false;
+            return options;
+        };
+
+        buildDesignerOptions = () => {
+            // set designer options TODO load from db
+            let options = this.stimulsoftService.getDesignerOptions();
+            options.appearance.fullScreenMode = true;
+            options.appearance.showSaveDialog = false;
             return options;
         };
 
@@ -76,8 +104,7 @@ module Kitos.Reports {
             this.report.Definition = saveEvent.report.saveToJsonString();
             this.reportService.saveReport(this.report);
             this.viewer.report = saveEvent.report;
-            console.log("saving a report");
-            // save to DB
+            this.notify.addSuccessMessage("Rapporten er gemt", true);
         };
 
         designerOnExit = (exitEvent) => {
