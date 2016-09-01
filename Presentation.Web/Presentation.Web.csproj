@@ -734,7 +734,7 @@
     <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2016.1.112\kendo.web.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2016.2.714\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash-3.10.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
