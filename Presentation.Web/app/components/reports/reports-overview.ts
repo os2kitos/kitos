@@ -71,17 +71,20 @@
                         url: (data) => {
                             return baseUrl + "(" + data.Id + ")";
                         },
-                        type: "PATCH"
+                        type: "PATCH",
+                        dataType: "json"
                     },
                     destroy: {
                         url: (data) => {
                             return baseUrl + "(" + data.Id + ")";
                         },
-                        type: "DELETE"
+                        type: "DELETE",
+                        dataType: "json"
                     },
                     create: {
                         url: baseUrl,
-                        type: "POST"
+                        type: "POST",
+                        dataType: "json"
                     },
                     parameterMap: (data, type) => {
                         if (type === "update") {
@@ -111,15 +114,12 @@
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
-                pageSize: 50,
+                pageSize: 5,
                 schema: {
                     model: {
                         id: "Id",
                         fields: {
-                            Id: { editable: false, nullable: true },
-                            Name: { validation: { required: true } },
-                            Description: { validation: { required: true } },
-                            CategoryTypeId: { defaultValue: { Id: 1, Name: "IT Kontrakt" } }
+                            Id: { editable: false, nullable: true }
                         }
                     }
                 }
@@ -133,7 +133,7 @@
                 toolbar: ["create"],
                 pageable: {
                     refresh: true,
-                    pageSizes: [50, 100, 200],
+                    pageSizes: [5],
                     buttonCount: 5
                 },
                 sortable: {
@@ -141,7 +141,7 @@
                 },
                 reorderable: true,
                 resizable: true,
-                groupable: true,
+                groupable: false,
                 columnMenu: {
                     filterable: true
                 },
@@ -157,6 +157,7 @@
                     },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
                 ]
+
             };
         }
 
