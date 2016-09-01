@@ -458,8 +458,8 @@
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
     <Content Include="appReport\css\report.css" />
-    <Content Include="appReport\css\stimulsoft.designer.office2013.white.teal.css" />
-    <Content Include="appReport\css\stimulsoft.viewer.office2013.white.teal.css" />
+    <Content Include="appReport\css\stimulsoft.designer.office2013.white.blue.css" />
+    <Content Include="appReport\css\stimulsoft.viewer.office2013.css" />
     <Content Include="appReport\Index.html" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
@@ -891,7 +891,6 @@
     <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
-    <Content Include="Scripts\stimulsoft-bundle.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
