@@ -6,3 +6,20 @@ https://www.stimulsoft.com/en/documentation/online/programming-manual/
 https://www.stimulsoft.com/en/documentation/online/programming-manual/index.html?using_js_designer_options.htm
 
 report.dictionary.databases.add(new StiODataDatabase("OData", "http://services.odata.org/v3/odata/OData.svc/"));
+
+
+CategoryDropDownEditor = (container, options) => {
+this.$(`<input required name="" + options.field + ""/>`)
+    .appendTo(container)
+    .kendoDropDownList({
+        autoBind: false,
+        dataTextField: "Name",
+        dataValueField: "Id",
+        dataSource: {
+            type: "odata-v4",
+            transport: {
+                read: "odata/ReportCategories"
+            }
+        }
+    });
+};
