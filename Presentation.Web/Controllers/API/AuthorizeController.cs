@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInformation = new { loginDto.Email, Password = "********", LoginSuccessful = false };
+            var loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = false };
 
             try
             {
@@ -55,26 +55,22 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var user = _userRepository.GetByEmail(loginDto.Email);
-
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-
                 var response = CreateLoginResponse(user);
-
-                loginInformation = new { loginDto.Email, Password = "********", LoginSuccessful = true };
-
-                _logger.Info("Uservalidation: Successful {@loginInformation}", loginInformation);
+                loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = true };
+                _logger.Info("Uservalidation: Successful {@loginInfo}", loginInfo);
 
                 return Created(response);
             }
             catch (ArgumentException)
             {
-                _logger.Info("Uservalidation: Not valid. {@loginInformation}", loginInformation);
+                _logger.Info("Uservalidation: Unsuccessful. {@loginInfo}", loginInfo);
 
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                _logger.Info("Uservalidation: Error. {@loginInformation}", loginInformation);
+                _logger.Info("Uservalidation: Error. {@loginInfo}", loginInfo);
 
                 return LogError(e);
             }
