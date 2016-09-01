@@ -891,7 +891,6 @@
     <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
-    <Content Include="Scripts\stimulsoft-bundle.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
