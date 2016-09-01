@@ -29,7 +29,7 @@ gulp.task("clean-scripts", function () {
 // });
 
 // create external library bundled file
-gulp.task("library-bundle", ["clean-scripts", "bower-restore"], function () {
+gulp.task("library-bundle", ["clean-scripts"], function () {
     return gulp.src(config.librarySrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.libraryBundle))
@@ -38,7 +38,7 @@ gulp.task("library-bundle", ["clean-scripts", "bower-restore"], function () {
 });
 
 // create angular library bundled file
-gulp.task("angular-bundle", ["clean-scripts", "bower-restore"], function () {
+gulp.task("angular-bundle", ["clean-scripts"], function () {
     return gulp.src(config.angularSrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.angularBundle))
@@ -67,13 +67,13 @@ gulp.task("clean-styles", function () {
 });
 
 // copy assets
-gulp.task("assets", ["clean-styles", "bower-restore"], function () {
+gulp.task("assets", ["clean-styles"], function () {
     return gulp.src(config.assetsSrc)
         .pipe(gulp.dest(config.cssDest));
 });
 
 // create css bundled file
-gulp.task("css", ["clean-styles", "bower-restore"], function () {
+gulp.task("css", ["clean-styles"], function () {
     return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
         .pipe(sourcemaps.init())
         .pipe(concat(config.cssBundle))
@@ -85,7 +85,7 @@ gulp.task("css", ["clean-styles", "bower-restore"], function () {
 });
 
 // copy fonts
-gulp.task("fonts", ["clean-styles", "bower-restore"], function () {
+gulp.task("fonts", ["clean-styles"], function () {
     return gulp.src(config.fontSrc)
         .pipe(gulp.dest(config.fontDest));
 });
