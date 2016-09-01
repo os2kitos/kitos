@@ -9,4 +9,7 @@
 /// <reference path="globals/angular/index.d.ts" />
 /// <reference path="globals/jasmine-expect/index.d.ts" />
 /// <reference path="globals/jasmine/index.d.ts" />
+/// <reference path="globals/lodash/index.d.ts" />
+/// <reference path="globals/moment/index.d.ts" />
 /// <reference path="globals/selenium-webdriver/index.d.ts" />
+/// <reference path="globals/ui-select/index.d.ts" />

@@ -99,8 +99,8 @@
             $scope.orgUnits = orgUnits;
             $scope.contracts = contracts;
             $scope.agreementElements = agreementElements;
-            $scope.selectedAgreementElementIds = _.pluck(contract.agreementElements, 'id');
-            $scope.selectedAgreementElementNames = _.pluck(contract.agreementElements, 'name');
+            $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
+            $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",

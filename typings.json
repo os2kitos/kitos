@@ -13,6 +13,9 @@
     "angular-ui-router": "registry:dt/angular-ui-router#1.1.5+20160810191828",
     "jasmine": "registry:dt/jasmine#2.2.0+20160621224255",
     "jasmine-expect": "registry:dt/jasmine-expect#2.0.0-beta2+20160317120654",
-    "selenium-webdriver": "registry:dt/selenium-webdriver#2.44.0+20160317120654"
+    "lodash": "registry:dt/lodash#4.14.0+20160830145422",
+    "moment": "registry:dt/moment#2.11.1+20160829143156",
+    "selenium-webdriver": "registry:dt/selenium-webdriver#2.44.0+20160317120654",
+    "ui-select": "registry:dt/ui-select#0.13.2+20160317120654"
   }
 }

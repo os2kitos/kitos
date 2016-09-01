@@ -39,7 +39,7 @@
             };
 
             $scope.getGoalTypeName = function(goalTypeId) {
-                var type = _.findWhere(goalTypes, { id: goalTypeId });
+                var type = _.find(goalTypes, { id: goalTypeId });
 
                 return type && type.name;
             };
@@ -51,7 +51,7 @@
                 goal.show = true;
 
                 //see if goal already in list - in that case, just update it
-                var prevEntry = _.findWhere($scope.goals, { id: goal.id });
+                var prevEntry = _.find($scope.goals, { id: goal.id });
                 if (prevEntry) {
                     prevEntry = goal;
                     return;

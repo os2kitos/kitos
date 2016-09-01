@@ -343,7 +343,7 @@
                         template: dataItem => {
                             var value = "";
                             if (dataItem.DataRows.length > 0) {
-                                value = this._.pluck(dataItem.DataRows.slice(0, 4), "DataType.Name").join(", ");
+                                value = this._.map(dataItem.DataRows.slice(0, 4), "DataType.Name").join(", ");
                             }
                             if (dataItem.DataRows.length > 5) {
                                 value += ", ...";
@@ -353,7 +353,7 @@
                         excelTemplate: dataItem => {
                             var value = "";
                             if (dataItem && dataItem.DataRows.length > 0) {
-                                value = this._.pluck(dataItem.DataRows, "DataType.Name").join(", ");
+                                value = this._.map(dataItem.DataRows, "DataType.Name").join(", ");
                             }
                             return value;
                         },

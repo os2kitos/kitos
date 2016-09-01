@@ -128,7 +128,7 @@
 
                 if (newValue.length > oldValue.length) {
                     // something was added
-                    var addIds = this._.difference(this._.pluck(newValue, "id"), this._.pluck(oldValue, "id"));
+                    var addIds = this._.difference(this._.map(newValue, "id"), this._.map(oldValue, "id"));
                     this._.each(addIds, (id: number) => {
                         switch (id) {
                         case 1:
@@ -159,7 +159,7 @@
                     });
                 } else if (newValue.length < oldValue.length) {
                     // something was removed
-                    var removedIds = _.difference(this._.pluck(oldValue, "id"), this._.pluck(newValue, "id"));
+                    var removedIds = _.difference(this._.map(oldValue, "id"), this._.map(newValue, "id"));
                     this._.each(removedIds, id => {
                         switch (id) {
                         case 1:

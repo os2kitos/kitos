@@ -458,7 +458,7 @@
                     {
                         field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.pluck(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
+                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -473,7 +473,7 @@
                     {
                         field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
                         persistId: "klename", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.pluck(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
+                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
@@ -680,7 +680,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index

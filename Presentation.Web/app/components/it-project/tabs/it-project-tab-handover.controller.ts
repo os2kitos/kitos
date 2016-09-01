@@ -33,7 +33,7 @@
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
 
-                                        var role = _.findWhere(roles, { id: right.roleId });
+                                        var role = _.find(roles, { id: right.roleId });
 
                                         var roleNames = user.roleNames || [];
                                         roleNames.push(role.name);

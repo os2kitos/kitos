@@ -286,7 +286,7 @@
                     {
                         field: "TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "TaskKey").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -301,7 +301,7 @@
                     {
                         field: "TaskName", title: "KLE Navn", width: 155,
                         persistId: "taskname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "Description").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {

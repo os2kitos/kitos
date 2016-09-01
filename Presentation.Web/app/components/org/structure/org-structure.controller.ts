@@ -49,7 +49,7 @@
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = _.where(orgUnitRoles, { isActive: true });
+            $scope.activeOrgRoles = _.filter(orgUnitRoles, { isActive: true });
             $scope.orgRoles = {};
             _.each(orgUnitRoles, function(orgRole: { id }) {
                 $scope.orgRoles[orgRole.id] = orgRole;

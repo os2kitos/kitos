@@ -1,4 +1,5 @@
-﻿// Usage:
+﻿/// <reference path="../index.d.ts" />
+// Usage:
 //
 // var obj = {
 //   a: {
@@ -213,7 +214,7 @@ _.mixin({
 
 _.mixin({
     removeFiltersForField: function (filterObj, field) {
-        var clonedFilterObj = _.clone(filterObj, true);
+        var clonedFilterObj = _.cloneDeep(filterObj);
 
         function searchAndDestory(filters) {
             // iterate backwards so we don't screw the index when removing elements
@@ -258,7 +259,7 @@ _.mixin({
 
 _.mixin({
     addFilter: function(filterObj, field, operator, value, logic) {
-        var clonedFilterObj = _.clone(filterObj, true);
+        var clonedFilterObj = _.cloneDeep(filterObj);
 
         function findGroupByField(filters) {
             for (var i = 0; i < filters.length; i++) {
