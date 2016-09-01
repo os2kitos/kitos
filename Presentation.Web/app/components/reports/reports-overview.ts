@@ -60,70 +60,70 @@
 
         private setupGrid() {
             var baseUrl = "odata/reports",
-                dataSource = {
-                    type: "odata-v4",
-                    transport: {
-                        read: {
-                            url: baseUrl + "?$expand=CategoryType",
-                            dataType: "json"
+            dataSource = {
+                type: "odata-v4",
+                transport: {
+                    read: {
+                        url: baseUrl + "?$expand=CategoryType",
+                        dataType: "json"
+                    },
+                    update: {
+                        url: (data) => {
+                            return baseUrl + "(" + data.Id + ")";
                         },
-                        update: {
-                            url: (data) => {
-                                return baseUrl + "(" + data.Id + ")";
-                            },
-                            type: "PATCH"
+                        type: "PATCH"
+                    },
+                    destroy: {
+                        url: (data) => {
+                            return baseUrl + "(" + data.Id + ")";
                         },
-                        destroy: {
-                            url: (data) => {
-                                return baseUrl + "(" + data.Id + ")";
-                            },
-                            type: "DELETE"
-                        },
-                        create: {
-                            url: baseUrl,
-                            type: "POST"
-                        },
-                        parameterMap: (data, type) => {
-                            if (type === "update") {
-                                var model: any = data;
-                                let patch = {
-                                    Name: model.Name,
-                                    Description: model.Description
-                                };
-                                return JSON.stringify(patch);
-                            }
-                            if (type === "create") {
-                                var model: any = data;
-                                let patch = {
-                                    Id: 0,
-                                    Name: model.Name,
-                                    Description: model.Description
-                                };
-                                return JSON.stringify(patch);
-                            }
+                        type: "DELETE"
+                    },
+                    create: {
+                        url: baseUrl,
+                        type: "POST"
+                    },
+                    parameterMap: (data, type) => {
+                        if (type === "update") {
+                            var model: any = data;
+                            let patch = {
+                                Name: model.Name,
+                                Description: model.Description
+                            };
+                            return JSON.stringify(patch);
                         }
-                    },
-                    sort: {
-                        field: "Name",
-                        dir: "asc"
-                    },
-                    batch: false,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true,
-                    pageSize: 50,
-                    schema: {
-                        model: {
-                            id: "Id",
-                            fields: {
-                                Id: { editable: false, nullable: true },
-                                Name: { validation: { required: true } },
-                                Description: { validation: { required: true } },
-                                CategoryTypeId: { defaultValue: { Id: 1, Name: "IT Kontrakt"} }
-                            }
+                        if (type === "create") {
+                            var model: any = data;
+                            let patch = {
+                                Id: 0,
+                                Name: model.Name,
+                                Description: model.Description
+                            };
+                            return JSON.stringify(patch);
                         }
                     }
-                };
+                },
+                sort: {
+                    field: "Name",
+                    dir: "asc"
+                },
+                batch: false,
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true,
+                pageSize: 50,
+                schema: {
+                    model: {
+                        id: "Id",
+                        fields: {
+                            Id: { editable: false, nullable: true },
+                            Name: { validation: { required: true } },
+                            Description: { validation: { required: true } },
+                            CategoryTypeId: { defaultValue: { Id: 1, Name: "IT Kontrakt" } }
+                        }
+                    }
+                }
+            };
 
             this.mainGridOptions = {
                 autoBind: false,
@@ -175,7 +175,6 @@
                     }
                 });
         };
-
     }
 
     angular
