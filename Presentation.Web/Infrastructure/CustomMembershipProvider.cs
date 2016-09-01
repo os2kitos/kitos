@@ -165,47 +165,44 @@ namespace Presentation.Web.Infrastructure
         {
             var userRepository = UserRepositoryFactory.GetUserRepository();
             var user = userRepository.GetByEmail(username);
-            var result = Validate(user, password);
-            userRepository.Save();
 
-            return result;
-        }
-
-        private bool Validate(User user, string password)
-        {
             var isValid = false;
 
             if (user == null)
             {
-                Logger.Info("User not found");
+                Logger.Info("User not found.");
 
                 return isValid;
             }
 
-            var userInfomation = new { user.Email, user.FailedAttempts, user.LockedOutDate };
-
+            // having a LockedOutDate means that the user is locked out
             if (user.LockedOutDate != null)
             {
                 var lastLockoutDate = user.LockedOutDate;
                 var unlockDate = lastLockoutDate.Value.AddMinutes(PasswordAttemptWindow);
 
+                // check if user should be allowed to login again
                 if (DateTime.Now >= unlockDate)
                 {
                     ResetLockedOutDate(user);
                     ResetAttempts(user);
-                    Logger.Info("User has been unlocked");
-
+                    Logger.Info("User has been unlocked.");
                     isValid = CheckPassword(user, password);
                 }
+                else
+                {
+                    Logger.Info("User will be unlocked {unlockDate}.", unlockDate);
+                }
 
-                Logger.Info("User will be unlocked {unlockDate}", unlockDate);
             }
             else
             {
                 isValid = CheckPassword(user, password);
             }
 
-            Logger.Info("Current User: {userInfomation}", userInfomation);
+            userRepository.Save();
+            var userInfo = new { user.Email, user.FailedAttempts, user.LockedOutDate };
+            Logger.Info("Current User: {userInfo}", userInfo);
 
             return isValid;
         }
@@ -225,8 +222,8 @@ namespace Presentation.Web.Infrastructure
                 if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
                 {
                     user.LockedOutDate = DateTime.Now;
+                    Logger.Info(MaxInvalidPasswordAttempts + " invalid login attempts. User has been locked.");
                     ResetAttempts(user);
-                    Logger.Info("User was locked");
                 }
             }
 
