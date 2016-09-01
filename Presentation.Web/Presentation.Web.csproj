@@ -735,7 +735,7 @@
     <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2016.1.112\kendo.web.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\kendo\2016.2.714\kendo.web.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash-3.10.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
@@ -892,7 +892,6 @@
     <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
-    <Content Include="Scripts\stimulsoft-bundle.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
