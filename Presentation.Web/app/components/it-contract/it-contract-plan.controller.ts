@@ -607,7 +607,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add special contract signer role
             var signerRole = {

@@ -81,7 +81,7 @@
                     return $q.all(_.map(userCollection, function (iteratee: { adminRights; canBeEdited; id; }) {
                         var deferred = $q.defer();
 
-                        iteratee.adminRights = _.findWhere(iteratee.adminRights, { roleName: "Medarbejder", organizationId: user.currentOrganizationId });
+                        iteratee.adminRights = _.find(iteratee.adminRights, { roleName: "Medarbejder", organizationId: user.currentOrganizationId });
 
                         setTimeout(function () {
                             $http.get("api/user/" + iteratee.id + "?hasWriteAccess" + '&organizationId=' + user.currentOrganizationId)

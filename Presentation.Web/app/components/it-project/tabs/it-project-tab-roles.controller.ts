@@ -49,12 +49,12 @@
             this.projectId = project.id;
 
             this.orgId = this.user.currentOrganizationId;
-            this.activeItProjectRoles = _.where(this.itProjectRoles, { isActive: true });
+            this.activeItProjectRoles = _.filter(this.itProjectRoles, { isActive: true });
             this.newRole = "1";
 
             this.rights = [];
             _.each(itProjectRights, (right: { role; roleId; show; userForSelect; roleForSelect; user; }) => {
-                right.role = _.findWhere(this.itProjectRoles, { id: right.roleId });
+                right.role = _.find(this.itProjectRoles, { id: right.roleId });
                 right.show = true;
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -126,7 +126,7 @@
                                     right.user = result.data.response.user;
                                     right.userId = result.data.response.userId;
 
-                                    right.role = _.findWhere(this.itProjectRoles, { id: right.roleId }),
+                                    right.role = _.find(this.itProjectRoles, { id: right.roleId }),
 
                                     right.edit = false;
 
@@ -197,7 +197,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: this._.findWhere(this.itProjectRoles, { id: result.data.response.roleId }),
+                            role: this._.find(this.itProjectRoles, { id: result.data.response.roleId }),
                             show: true
                         });
 

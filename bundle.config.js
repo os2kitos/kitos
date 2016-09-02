@@ -4,7 +4,7 @@ module.exports = {
     // library script bundle
     // not minified!
     librarySrc: [
-        bower("/lodash/lodash.min.js"),
+        bower("/lodash/dist/lodash.min.js"),
         bower("/jquery/dist/jquery.min.js"),
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),

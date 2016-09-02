@@ -123,14 +123,14 @@
             }
 
             activity.updatePhase = () => {
-                activity.phase = _.findWhere(this.project.phases, { id: activity.associatedPhaseId });
+                activity.phase = _.find(this.project.phases, { id: activity.associatedPhaseId });
             };
 
             activity.updatePhase();
 
             activity.updateUser = () => {
                 if (activity.associatedUserId) {
-                    activity.associatedUser = _.findWhere(this.usersWithRoles, { id: activity.associatedUserId });
+                    activity.associatedUser = _.find(this.usersWithRoles, { id: activity.associatedUserId });
                 }
             };
 

@@ -732,15 +732,6 @@
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
-    <TypeScriptCompile Include="Scripts\typings\angular-protractor\angular-protractor.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jasmine-expect\jasmine-expect.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jasmine\jasmine.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\kendo\2016.2.714\kendo.web.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\lodash\lodash-3.10.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\moment\moment-node.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\moment\moment.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\selenium-webdriver\selenium-webdriver.d.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\it-system-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-kle.e2e.spec.ts" />
@@ -787,8 +778,6 @@
     <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\JSONfn\jsonfn.d.ts" />
     <TypeScriptCompile Include="app\app.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-create.controller.ts" />
@@ -888,8 +877,6 @@
     </None>
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
-    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
-    <TypeScriptCompile Include="Scripts\typings\protractor-http-mock\protractor-http-mock.d.ts" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
     <Content Include="Web.config">

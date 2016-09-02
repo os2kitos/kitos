@@ -32,13 +32,13 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            $scope.activeItContractRoles = _.where(itContractRoles, { isActive: true });
+            $scope.activeItContractRoles = _.filter(itContractRoles, { isActive: true });
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
             _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
-                right.role = _.findWhere(itContractRoles, { id: right.roleId });
+                right.role = _.find(itContractRoles, { id: right.roleId });
                 right.show = true;
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -74,7 +74,7 @@
                         user: result.response.user,
                         userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
-                        role: _.findWhere(itContractRoles, { id: result.response.roleId }),
+                        role: _.find(itContractRoles, { id: result.response.roleId }),
                         show: true
                     });
 
@@ -134,7 +134,7 @@
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
-                        right.role = _.findWhere(itContractRoles, { id: right.roleId }),
+                        right.role = _.find(itContractRoles, { id: right.roleId }),
 
                         right.edit = false;
 

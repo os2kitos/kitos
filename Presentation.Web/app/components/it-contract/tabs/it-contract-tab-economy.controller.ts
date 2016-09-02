@@ -58,7 +58,7 @@
                     stream.ean = " - ";
 
                     if (stream.organizationUnitId) {
-                        var orgUnit: { ean } = _.findWhere(orgUnits, { id: parseInt(stream.organizationUnitId) });
+                        var orgUnit: { ean } = _.find(orgUnits, { id: parseInt(stream.organizationUnitId) });
 
                         if (orgUnit && orgUnit.ean) stream.ean = orgUnit.ean;
                     }

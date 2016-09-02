@@ -22,7 +22,7 @@
                     function saveIfNew() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -37,7 +37,7 @@
                     function saveDate() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -73,7 +73,7 @@
 
                             var viewValue = ctrl.$viewValue;
                             if (angular.isArray(viewValue)) {
-                                newValue = _.pluck(viewValue, 'id');
+                                newValue = _.map(viewValue, 'id');
                             } else if (angular.isObject(viewValue)) {
                                 newValue = viewValue.id;
                             } else {

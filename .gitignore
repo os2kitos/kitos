@@ -47,6 +47,9 @@ bower_components/
 jspm_packages/
 packages/
 
+# typings
+typings/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*

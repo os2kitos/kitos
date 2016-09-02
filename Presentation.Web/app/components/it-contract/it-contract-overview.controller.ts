@@ -228,20 +228,20 @@
                             // iterrate each contract
                             this._.forEach(response.value, contract => {
                                 // HACK to add economy data to result
-                                var ecoData = <Array<any>>this._.where(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
-                                contract.Acquisition = this._.sum(ecoData, "Acquisition");
-                                contract.Operation = this._.sum(ecoData, "Operation");
-                                contract.Other = this._.sum(ecoData, "Other");
+                                var ecoData = <Array<any>>this._.filter(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
+                                contract.Acquisition = this._.sumBy(ecoData, "Acquisition");
+                                contract.Operation = this._.sumBy(ecoData, "Operation");
+                                contract.Other = this._.sumBy(ecoData, "Other");
 
-                                var earliestAuditDate = this._.first(this._.sortByOrder(ecoData, ["AuditDate"], ["desc"]));
+                                var earliestAuditDate = this._.first(this._.sortBy(ecoData, ["AuditDate"], ["desc"]));
                                 if (earliestAuditDate && earliestAuditDate.AuditDate) {
                                     contract.AuditDate = earliestAuditDate.AuditDate;
                                 }
 
-                                var totalWhiteStatuses = this._.where(ecoData, { AuditStatus: "White" }).length;
-                                var totalRedStatuses = this._.where(ecoData, { AuditStatus: "Red" }).length;
-                                var totalYellowStatuses = this._.where(ecoData, { AuditStatus: "Yellow" }).length;
-                                var totalGreenStatuses = this._.where(ecoData, { AuditStatus: "Green" }).length;
+                                var totalWhiteStatuses = this._.filter(ecoData, { AuditStatus: "White" }).length;
+                                var totalRedStatuses = this._.filter(ecoData, { AuditStatus: "Red" }).length;
+                                var totalYellowStatuses = this._.filter(ecoData, { AuditStatus: "Yellow" }).length;
+                                var totalGreenStatuses = this._.filter(ecoData, { AuditStatus: "Green" }).length;
 
                                 contract.status = {
                                     max: totalWhiteStatuses + totalRedStatuses + totalYellowStatuses + totalGreenStatuses,
@@ -572,7 +572,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add special contract signer role
             var signerRole: IKendoGridColumn<IItContractOverview> = {
@@ -813,7 +813,7 @@
                 }
             }
         };
-        
+
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";
 
@@ -834,36 +834,36 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider) => {
-                $stateProvider.state("it-contract.overview",
-                    {
-                        url: "/overview",
-                        templateUrl: "app/components/it-contract/it-contract-overview.view.html",
-                        controller: OverviewController,
-                        controllerAs: "contractOverviewVm",
-                        resolve: {
-                            itContractRoles: [
-                                "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
-                            ],
-                            user: [
-                                "userService", userService => userService.getUser()
-                            ],
-                            orgUnits: [
-                                "$http", "user", "_",
-                                ($http, user, _) => $http
-                                    .get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
-                                    .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
-                            ],
-                            // TODO this isn't a sustainable solution - but a workaround for now...
-                            ecoStreamData: [
-                                "$http", "user", "notify", ($http, user, notify) =>
-                                    $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
-                                        .then(function successCallback(result) { result.data.value; },
-                                        function errorCallback(result) {
-                                            $stateProvider.transitionTo("home", { q: 'updated search term' });
-                                        })
-                            ]
-                        }
-                    });
-            }
+            $stateProvider.state("it-contract.overview",
+                {
+                    url: "/overview",
+                    templateUrl: "app/components/it-contract/it-contract-overview.view.html",
+                    controller: OverviewController,
+                    controllerAs: "contractOverviewVm",
+                    resolve: {
+                        itContractRoles: [
+                            "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
+                        ],
+                        user: [
+                            "userService", userService => userService.getUser()
+                        ],
+                        orgUnits: [
+                            "$http", "user", "_",
+                            ($http, user, _) => $http
+                                .get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`)
+                                .then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                        ],
+                        // TODO this isn't a sustainable solution - but a workaround for now...
+                        ecoStreamData: [
+                            "$http", "user", "notify", ($http, user, notify) =>
+                                $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
+                                    .then(function successCallback(result) { result.data.value; },
+                                    function errorCallback(result) {
+                                        $stateProvider.transitionTo("home", { q: 'updated search term' });
+                                    })
+                        ]
+                    }
+                });
+        }
         ]);
 }

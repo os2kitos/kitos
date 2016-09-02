@@ -23,14 +23,14 @@
     app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
-        $scope.activeItSystemRoles = _.where(itSystemRoles, { isActive: true });
+        $scope.activeItSystemRoles = _.filter(itSystemRoles, { isActive: true });
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;
 
         $scope.rights = [];
         _.each(itSystemUsage.rights, function (right: { roleId; role; show; user; userForSelect; roleForSelect; }) {
-            right.role = _.findWhere(itSystemRoles, { id: right.roleId });
+            right.role = _.find(itSystemRoles, { id: right.roleId });
             right.show = true;
 
             right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -67,7 +67,7 @@
                     user: result.response.user,
                     userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                     roleForSelect: result.response.roleId,
-                    role: _.findWhere(itSystemRoles, { id: result.response.roleId }),
+                    role: _.find(itSystemRoles, { id: result.response.roleId }),
                     show: true
                 });
 
@@ -127,7 +127,7 @@
                     right.user = result.response.user;
                     right.userId = result.response.userId;
 
-                    right.role = _.findWhere(itSystemRoles, { id: right.roleId }),
+                    right.role = _.find(itSystemRoles, { id: right.roleId }),
 
                     right.edit = false;
 

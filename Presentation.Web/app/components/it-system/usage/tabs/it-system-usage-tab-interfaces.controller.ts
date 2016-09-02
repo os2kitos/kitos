@@ -92,13 +92,13 @@
 
             // resolving complex types from ids
             function resolveTypes(theInterface) {
-                theInterface.interfaceType = _.findWhere(interfaceTypes, { id: theInterface.interfaceTypeId });
-                theInterface.interface = _.findWhere(interfaces, { id: theInterface.interfaceId });
-                theInterface.method = _.findWhere(methods, { id: theInterface.methodId });
-                theInterface.tsa = _.findWhere(tsas, { id: theInterface.tsaId });
+                theInterface.interfaceType = _.find(interfaceTypes, { id: theInterface.interfaceTypeId });
+                theInterface.interface = _.find(interfaces, { id: theInterface.interfaceId });
+                theInterface.method = _.find(methods, { id: theInterface.methodId });
+                theInterface.tsa = _.find(tsas, { id: theInterface.tsaId });
 
                 _.each(theInterface.dataRows, function(dataRow: { dataTypeId; dataType; }) {
-                    dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                    dataRow.dataType = _.find(dataTypes, { id: dataRow.dataTypeId });
                 });
 
                 theInterface.numRows = theInterface.dataRows.length;
@@ -132,9 +132,9 @@
                     _.each(canUseInterface.dataRows, function (dataRow: { updateUrl; urlParams; dataType; usage; id; dataTypeId; }) {
                         dataRow.updateUrl = "api/dataRowUsage/";
                         dataRow.urlParams = "&rowId=" + dataRow.id + "&usageId=" + itSystemUsage.id + "&sysId=" + itSystemUsage.itSystem.id + "&interfaceId=" + canUseInterface.id;
-                        dataRow.dataType = _.findWhere(dataTypes, { id: dataRow.dataTypeId });
+                        dataRow.dataType = _.find(dataTypes, { id: dataRow.dataTypeId });
                         if (canUseInterface.usage)
-                            dataRow.usage = _.findWhere(canUseInterface.usage.dataRowUsages, { dataRowId: dataRow.id });
+                            dataRow.usage = _.find(canUseInterface.usage.dataRowUsages, { dataRowId: dataRow.id });
                     });
                 });
 
