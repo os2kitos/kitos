@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel
 {
@@ -14,14 +15,14 @@ namespace Core.DomainModel
     {
         public User()
         {
-            this.PasswordResetRequests = new List<PasswordResetRequest>();
-            this.OrganizationRights = new List<OrganizationRight>();
-            this.Wishes = new List<Wish>();
-            this.ItProjectStatuses = new List<ItProjectStatus>();
-            this.ResponsibleForRisks = new List<Risk>();
-            this.ResponsibleForCommunications = new List<Communication>();
-            this.HandoverParticipants = new List<Handover>();
-            this.SignerForContracts = new Collection<ItContract.ItContract>();
+            PasswordResetRequests = new List<PasswordResetRequest>();
+            OrganizationRights = new List<OrganizationRight>();
+            Wishes = new List<Wish>();
+            ItProjectStatuses = new List<ItProjectStatus>();
+            ResponsibleForRisks = new List<Risk>();
+            ResponsibleForCommunications = new List<Communication>();
+            HandoverParticipants = new List<Handover>();
+            SignerForContracts = new Collection<ItContract.ItContract>();
             LockedOutDate = null;
             FailedAttempts = 0;
         }

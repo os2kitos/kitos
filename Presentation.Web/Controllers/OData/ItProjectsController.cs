@@ -14,6 +14,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [Authorize]
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -33,14 +34,10 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Get()
         {
             if (_authService.HasReadAccessOutsideContext(UserId))
-            {
                 return base.Get();
-            }
-            else
-            {
-                var orgId = _userService.GetCurrentOrganizationId(UserId);
-                return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
-            }
+
+            var orgId = _userService.GetCurrentOrganizationId(UserId);
+            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /Organizations(1)/ItProjects

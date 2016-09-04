@@ -11,7 +11,7 @@ using Ninject;
 
 namespace Presentation.Web.Controllers.OData
 {
-    //[Authorize]
+    [Authorize]
     public abstract class BaseEntityController<T> : ODataController where T : Entity
     {
         protected ODataValidationSettings ValidationSettings;
@@ -57,6 +57,9 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public virtual IHttpActionResult Get()
         {
+            if (CurentUser == null)
+                return Unauthorized();
+
             return Ok(Repository.AsQueryable());
         }
 
@@ -67,6 +70,10 @@ namespace Presentation.Web.Controllers.OData
 
             if (!result.Any())
                 return NotFound();
+
+            var entity = result.First();
+            if(!AuthenticationService.HasReadAccess(UserId,entity))
+                return Unauthorized();
 
             return Ok(SingleResult.Create(result));
         }
