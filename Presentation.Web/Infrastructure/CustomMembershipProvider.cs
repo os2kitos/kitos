@@ -170,7 +170,7 @@ namespace Presentation.Web.Infrastructure
 
             if (user == null)
             {
-                Logger.Info("User not found.");
+                Logger.Info("{0} not found.", username);
 
                 return isValid;
             }
@@ -186,12 +186,12 @@ namespace Presentation.Web.Infrastructure
                 {
                     ResetLockedOutDate(user);
                     ResetAttempts(user);
-                    Logger.Info("User has been unlocked.");
+                    Logger.Info("{0} has been unlocked.", user.Email);
                     isValid = CheckPassword(user, password);
                 }
                 else
                 {
-                    Logger.Info("User will be unlocked {unlockDate}.", unlockDate);
+                    Logger.Info("{0} will be unlocked {unlockDate}.", user.Email, unlockDate);
                 }
 
             }
@@ -222,7 +222,7 @@ namespace Presentation.Web.Infrastructure
                 if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
                 {
                     user.LockedOutDate = DateTime.Now;
-                    Logger.Info(MaxInvalidPasswordAttempts + " invalid login attempts. User has been locked.");
+                    Logger.Info(MaxInvalidPasswordAttempts + " invalid login attempts. {0} has been locked.", user.Email);
                     ResetAttempts(user);
                 }
             }
