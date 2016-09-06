@@ -16,19 +16,17 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly ILogger _logger;
 
         public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService, ILogger logger)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
-            _logger = logger;
         }
 
         public HttpResponseMessage GetLogin()
         {
-            _logger.Debug("GetLogin called for {user}", KitosUser);
+            Logger.Debug("GetLogin called for {user}", KitosUser);
             try
             {
                 var response = CreateLoginResponse(KitosUser);
@@ -58,19 +56,19 @@ namespace Presentation.Web.Controllers.API
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = CreateLoginResponse(user);
                 loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = true };
-                _logger.Info("Uservalidation: Successful {@loginInfo}", loginInfo);
+                Logger.Info("Uservalidation: Successful {@loginInfo}", loginInfo);
 
                 return Created(response);
             }
             catch (ArgumentException)
             {
-                _logger.Info("Uservalidation: Unsuccessful. {@loginInfo}", loginInfo);
+                Logger.Info("Uservalidation: Unsuccessful. {@loginInfo}", loginInfo);
 
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                _logger.Info("Uservalidation: Error. {@loginInfo}", loginInfo);
+                Logger.Info("Uservalidation: Error. {@loginInfo}", loginInfo);
 
                 return LogError(e);
             }
