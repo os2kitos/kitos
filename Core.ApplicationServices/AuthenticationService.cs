@@ -58,34 +58,44 @@ namespace Core.ApplicationServices
             return user != null;
         }
 
-        public bool HasReadAccessOutsideContext(int userId)
+        public bool HasReadAccessOutsideContext(User user)
         {
-            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
             if (user == null)
-            {
                 return false;
-            }
 
             if (user.IsGlobalAdmin)
-            {
                 return true;
-            }
 
             // if the user is logged into an organization that allows sharing,
             // then the user have read access outside the context.
             return user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality;
         }
-        
+
+        public bool HasReadAccessOutsideContext(int userId)
+        {
+            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
+            return HasReadAccessOutsideContext(user);
+        }
+
+        public bool HasReadAccess(int userId, Entity entity)
+        {
+            var user = _userRepository.AsQueryable().FirstOrDefault(x => x.Id == userId);
+            return HasReadAccess(user, entity);
+        }
+
+
         /// <summary>
         /// Checks if the user have read access to a given instance.
         /// </summary>
-        /// <param name="userId">The user.</param>
+        /// <param name="user">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
-        public bool HasReadAccess(int userId, Entity entity)
+        public bool HasReadAccess(User user, Entity entity)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            if (user == null)
+                return false;
+
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
             // check if global admin
             if (user.IsGlobalAdmin)
             {
@@ -116,7 +126,7 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have write access to the given instance, else false.</returns>
         public bool HasWriteAccess(User user, Entity entity)
         {
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
 
             // check if global admin
             if (user.IsGlobalAdmin)

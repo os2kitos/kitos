@@ -5,10 +5,12 @@ namespace Core.ApplicationServices
     public interface IAuthenticationService
     {
         bool HasReadAccess(int userId, Entity entity);
+        bool HasReadAccess(User user, Entity entity);
         bool IsGlobalAdmin(int userId);
         bool IsLocalAdmin(int userId, int organizationId);
         bool IsLocalAdmin(int userId);
         bool HasReadAccessOutsideContext(int userId);
+        bool HasReadAccessOutsideContext(User user);
 
         /// <summary>
         /// Checks if the user have write access to a given instance.

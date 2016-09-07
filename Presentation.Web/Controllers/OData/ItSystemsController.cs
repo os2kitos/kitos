@@ -5,7 +5,6 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.ApplicationServices;
 using System.Web.Http.Results;
 using System.Net;
 
@@ -13,29 +12,19 @@ namespace Presentation.Web.Controllers.OData
 {
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        private readonly IUserService _userService;
-        private readonly IAuthenticationService _authService;
-
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IUserService userService, IAuthenticationService authService)
+        public ItSystemsController(IGenericRepository<ItSystem> repository)
             : base(repository)
-        {
-            _userService = userService;
-            _authService = authService;
-        }
+        {}
 
         [EnableQuery(MaxExpansionDepth = 5)]
         [ODataRoute("ItSystems")]
         public override IHttpActionResult Get()
         {
-            if (_authService.HasReadAccessOutsideContext(UserId))
-            {
+            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return base.Get();
-            }
-            else
-            {
-                var orgId = _userService.GetCurrentOrganizationId(UserId);
-                return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
-            }
+
+            var orgId = UserService.GetCurrentOrganizationId(UserId);
+            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /Organizations(1)/ItSystems
@@ -43,18 +32,14 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItSystems")]
         public IHttpActionResult GetItSystems(int key)
         {
-            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                {
                     return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-                }
-                else
-                {
-                    var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                    return Ok(result);
-                }
+
+                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+                return Ok(result);
             }
             else
             {
@@ -68,18 +53,14 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/BelongingSystems")]
         public IHttpActionResult GetBelongingSystems(int key)
         {
-            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                {
                     return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-                }
-                else
-                {
-                    var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
-                    return Ok(result);
-                }
+
+                var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
+                return Ok(result);
             }
             else
             {
@@ -97,14 +78,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (_authService.HasReadAccess(UserId, entity))
-            {
+            if (AuthenticationService.HasReadAccess(UserId, entity))
                 return Ok(entity);
-            }
-            else
-            {
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            }
+
+            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
         }
     }
 }

@@ -19,6 +19,9 @@ namespace Presentation.Web.Controllers.OData
         private User _curentUser;
 
         [Inject]
+        public IUserService UserService { get; set; }
+
+        [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
@@ -47,7 +50,6 @@ namespace Presentation.Web.Controllers.OData
         {
             get
             {
-                //return 1;
                 int userId;
                 int.TryParse(User.Identity.Name, out userId);
                 return userId;
@@ -72,7 +74,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             var entity = result.First();
-            if(!AuthenticationService.HasReadAccess(UserId,entity))
+            if (!AuthenticationService.HasReadAccess(UserId, entity))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
@@ -105,7 +107,7 @@ namespace Presentation.Web.Controllers.OData
                     e.ObjectOwner = CurentUser;
                     e.LastChangedByUser = CurentUser;
                 }
-                
+
 
                 newEntity = Repository.Insert(entity);
                 Repository.Save();
