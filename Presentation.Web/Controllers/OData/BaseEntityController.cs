@@ -8,6 +8,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
+using Ninject.Extensions.Logging;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -26,6 +27,9 @@ namespace Presentation.Web.Controllers.OData
 
         [Inject]
         public IAuthenticationService AuthenticationService { get; set; }
+
+        [Inject]
+        public ILogger Logger { get; set; }
 
         protected BaseEntityController(IGenericRepository<T> repository)
         {

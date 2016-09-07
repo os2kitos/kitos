@@ -1,10 +1,4 @@
-﻿using System.Linq;
-using System.Net;
-using System.Web.Http;
-using System.Web.Http.Results;
-using System.Web.OData;
-using System.Web.OData.Routing;
-using Core.DomainModel.Reports;
+﻿using System.Web.Http;
 using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData
@@ -22,6 +16,13 @@ namespace Presentation.Web.Controllers.OData
 
             var orgId = UserService.GetCurrentOrganizationId(UserId);
             return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+        }
+
+        public override IHttpActionResult Post(Report entity)
+        {
+            entity.OrganizationId = CurentUser.DefaultOrganization.Id;
+
+            return base.Post(entity);
         }
 
         // GET /Organizations(1)/Reports
