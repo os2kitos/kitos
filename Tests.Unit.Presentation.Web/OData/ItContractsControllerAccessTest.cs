@@ -11,7 +11,10 @@ using Core.DomainServices;
 using FluentAssertions;
 using NSubstitute;
 using Presentation.Web.Controllers.OData;
+using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
+
+//https://datatellblog.wordpress.com/2015/05/05/unit-testing-asp-net-mvc-authorization/
 
 namespace Tests.Unit.Presentation.Web.OData
 {
@@ -34,8 +37,8 @@ namespace Tests.Unit.Presentation.Web.OData
                 AuthenticationService = new AuthenticationService(_userRepository)
 
             };
-            //_itContractsController.UserService = new UserService();
-
+            var usr = new UserMock(_itContractsController, "1");
+            usr.LogOn();
         }
 
         [Fact]
@@ -43,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // Arrange
             const int orgKey = 1;
-            SetAccess(true, orgKey,isGlobalmin:true);
+            SetAccess(true, orgKey, isGlobalmin: true);
 
             IQueryable<ItContract> list = new EnumerableQuery<ItContract>(new List<ItContract>
             {
@@ -77,7 +80,7 @@ namespace Tests.Unit.Presentation.Web.OData
             {
                 list.Add(new User
                 {
-                    Id = 0,
+                    Id = 1,
                     IsGlobalAdmin = isGlobalmin,
                     DefaultOrganizationId = orgKey,
                     OrganizationRights = new List<OrganizationRight>
@@ -92,6 +95,9 @@ namespace Tests.Unit.Presentation.Web.OData
 
             _userRepository.Get(Arg.Any<Expression<Func<User, bool>>>())
                 .Returns(list);
+
+            _userRepository.GetByKey(Arg.Any<int>())
+                .Returns(list.First());
         }
 
         #endregion;
