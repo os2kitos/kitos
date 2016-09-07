@@ -170,7 +170,9 @@ namespace Presentation.Web.Infrastructure
 
             if (user == null)
             {
-                Logger.Info("Uservalidation: {0} not found.", username);
+                Logger.Info(username == null
+                    ? "Uservalidation: user not found."
+                    : $"Uservalidation: {username} not found.");
 
                 return isValid;
             }
@@ -186,12 +188,12 @@ namespace Presentation.Web.Infrastructure
                 {
                     ResetLockedOutDate(user);
                     ResetAttempts(user);
-                    Logger.Info("Uservalidation: {0} has been unlocked.", user.Email);
+                    Logger.Info($"Uservalidation: {user.Email} has been unlocked.");
                     isValid = CheckPassword(user, password);
                 }
                 else
                 {
-                    Logger.Info("Uservalidation: {0} will be unlocked {unlockDate}.", user.Email, unlockDate);
+                    Logger.Info($"Uservalidation: {user.Email} will be unlocked {unlockDate}.");
                 }
 
             }
@@ -202,7 +204,7 @@ namespace Presentation.Web.Infrastructure
 
             userRepository.Save();
             var userInfo = new { user.Email, user.FailedAttempts, user.LockedOutDate };
-            Logger.Info("Uservalidation: Current User: {userInfo}", userInfo);
+            Logger.Info($"Uservalidation: Current User: {userInfo}");
 
             return isValid;
         }

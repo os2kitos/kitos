@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
 
-        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService, ILogger logger)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
-            Logger.Debug("GetLogin called for {user}", KitosUser);
+            Logger.Debug($"GetLogin called for {KitosUser}");
             try
             {
                 var response = CreateLoginResponse(KitosUser);
@@ -43,7 +43,10 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = false };
+            var loginInfo = new { Email = "", Password = "", LoginSuccessful = false };
+
+            if (loginDto != null)
+                loginInfo = new { Email = loginDto.Email, Password = "********", LoginSuccessful = false };
 
             try
             {
@@ -56,19 +59,19 @@ namespace Presentation.Web.Controllers.API
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = CreateLoginResponse(user);
                 loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = true };
-                Logger.Info("Uservalidation: Successful {@loginInfo}", loginInfo);
+                Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
             }
             catch (ArgumentException)
             {
-                Logger.Info("Uservalidation: Unsuccessful. {@loginInfo}", loginInfo);
+                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
 
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                Logger.Info("Uservalidation: Error. {@loginInfo}", loginInfo);
+                Logger.Info($"Uservalidation: Error. {loginInfo}");
 
                 return LogError(e);
             }
