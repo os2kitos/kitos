@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public abstract class ItSystemBase : Entity, IContextAware, ISystemModule
+    public abstract class ItSystemBase : Entity, IContextAware, ISystemModule, IHasOrganization
     {
         public string Name { get; set; }
         public Guid Uuid { get; set; }

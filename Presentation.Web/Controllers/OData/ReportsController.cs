@@ -10,12 +10,5 @@ namespace Presentation.Web.Controllers.OData
             : base(repository)
         {
         }
-
-        public override IHttpActionResult Post(Report entity)
-        {
-            entity.OrganizationId = CurentUser.DefaultOrganization.Id;
-
-            return base.Post(entity);
-        }
     }
 }
