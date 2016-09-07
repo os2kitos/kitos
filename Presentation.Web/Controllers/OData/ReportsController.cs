@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.OData
             if (AuthenticationService.HasReadAccessOutsideContext(UserId))
                 return base.Get();
 
-            var orgId = UserService.GetCurrentOrganizationId(UserId);
+            var orgId = CurrentOrganizationId;
             return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/Reports")]
         public IHttpActionResult GetItContracts(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 

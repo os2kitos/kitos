@@ -19,9 +19,8 @@ namespace Presentation.Web.Controllers.OData
         protected IGenericRepository<T> Repository;
         private User _curentUser;
 
-        [Inject]
-        public IUserService UserService { get; set; }
-
+        public int CurrentOrganizationId => CurentUser?.DefaultOrganizationId ?? 0;
+        
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 

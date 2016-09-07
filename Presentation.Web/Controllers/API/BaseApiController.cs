@@ -12,7 +12,6 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
-using WebGrease.Activities;
 
 namespace Presentation.Web.Controllers.API
 {

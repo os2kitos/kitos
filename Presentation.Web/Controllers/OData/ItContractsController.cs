@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [Authorize]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -29,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
             if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return base.Get();
 
-            var orgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var orgId = CurrentOrganizationId;
             return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
@@ -68,7 +69,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItContracts")]
         public IHttpActionResult GetItContracts(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -81,7 +82,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/Supplier")]
         public IHttpActionResult GetSupplier(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -109,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 

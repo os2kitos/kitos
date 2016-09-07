@@ -4,6 +4,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
+using System.Security.Authentication;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 
@@ -60,8 +61,8 @@ namespace Core.ApplicationServices
 
         public bool HasReadAccessOutsideContext(User user)
         {
-            if (user == null)
-                return false;
+            if(user == null)
+                throw new AuthenticationException("User is null");
 
             if (user.IsGlobalAdmin)
                 return true;
