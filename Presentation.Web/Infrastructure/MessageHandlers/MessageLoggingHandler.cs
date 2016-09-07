@@ -13,20 +13,20 @@ namespace Presentation.Web.Infrastructure.MessageHandlers
         {
             var corrId = request.GetCorrelationId();
 
-            var requestMessage = Encoding.UTF8.GetString(await request.Content.ReadAsByteArrayAsync());
+            var requestMessage = await request.Content.ReadAsStringAsync();
 
-            await Task.Run(() => Log.Logger.Debug("{corrId} - Request: {requestMethod} {requestUri}\r\n{body}", corrId, request.Method, request.RequestUri, requestMessage));
+            await Task.Run(() => Log.Logger.Debug("{CorrId} - Request: {Method} {RawUrl}\r\n{Body}", corrId, request.Method, request.RequestUri, requestMessage));
 
             var response = await base.SendAsync(request, cancellationToken);
 
             string responseMessage;
 
             if (response.IsSuccessStatusCode)
-                responseMessage = Encoding.UTF8.GetString(await response.Content.ReadAsByteArrayAsync());
+                responseMessage = await response.Content.ReadAsStringAsync();
             else
                 responseMessage = response.ReasonPhrase;
 
-            await Task.Run(() => Log.Logger.Debug("{corrId} - Response: {requestMethod} {requestUri}\r\n{body}", corrId, request.Method, request.RequestUri, responseMessage));
+            await Task.Run(() => Log.Logger.Debug("{CorrId} - Response: {Method} {RawUrl}\r\n{Body}", corrId, request.Method, request.RequestUri, responseMessage, response.StatusCode));
 
             return response;
         }
