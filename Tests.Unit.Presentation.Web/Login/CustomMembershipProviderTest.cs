@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading;
-using System.Web.Mvc.Html;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject.Extensions.Logging;
@@ -103,11 +101,10 @@ namespace Tests.Unit.Presentation.Web.Login
             // Assert
             // MockUser is locked out if it has an LockedOutDate
             Assert.True(MockUser.LockedOutDate != null);
-            //Assert.InRange(MockUser.FailedAttempts, 4, 6);
         }
 
         [Fact]
-        public void Should_Not_Allow_Further_Login_Attempts()
+        public void Should_Not_Allow_Login_Attempts()
         {
             // Arrange
             // Get an existing user
