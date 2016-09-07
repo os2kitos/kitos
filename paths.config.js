@@ -13,7 +13,6 @@ var source = "Presentation.Web",
     unitDependencies = [
         "bower_components/lodash/lodash.js",
         "bower_components/jquery/dist/jquery.js",
-        "bower_components/select2/select2.js",
         "bower_components/moment/moment.js",
         "bower_components/jsonfn-bower/jsonfn.js",
         "bower_components/angular/angular.js",
@@ -24,7 +23,7 @@ var source = "Presentation.Web",
         "bower_components/angular-ui-router/release/angular-ui-router.js",
         "bower_components/angular-bootstrap/ui-bootstrap.js",
         "bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-        "bower_components/angular-ui-select2/src/select2.js"
+        "bower_components//angular-ui-select/dist/select.js"        
     ],
 
     // unit
