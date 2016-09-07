@@ -4,7 +4,6 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 ﻿using Core.DomainServices;
@@ -13,11 +12,9 @@ namespace Presentation.Web.Controllers.OData
 {
     public class ItInterfacesController : BaseEntityController<ItInterface>
     {
-        private readonly IAuthenticationService _authService;
-        public ItInterfacesController(IGenericRepository<ItInterface> repository, IAuthenticationService authService)
+        public ItInterfacesController(IGenericRepository<ItInterface> repository)
             : base(repository)
         {
-            _authService = authService;
         }
 
         [EnableQuery]
@@ -45,14 +42,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (_authService.HasReadAccess(UserId, entity))
-            {
+            if (AuthenticationService.HasReadAccess(UserId, entity))
                 return Ok(entity);
-            }
-            else
-            {
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            }
+
+            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
         }
     }
 }

@@ -20,6 +20,9 @@ namespace Presentation.Web.Controllers.OData
         private User _curentUser;
 
         [Inject]
+        public IUserService UserService { get; set; }
+
+        [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
@@ -51,7 +54,6 @@ namespace Presentation.Web.Controllers.OData
         {
             get
             {
-                //return 1;
                 int userId;
                 int.TryParse(User.Identity.Name, out userId);
                 return userId;
@@ -61,6 +63,9 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public virtual IHttpActionResult Get()
         {
+            if (CurentUser == null)
+                return Unauthorized();
+
             return Ok(Repository.AsQueryable());
         }
 
@@ -71,6 +76,10 @@ namespace Presentation.Web.Controllers.OData
 
             if (!result.Any())
                 return NotFound();
+
+            var entity = result.First();
+            if (!AuthenticationService.HasReadAccess(UserId, entity))
+                return Unauthorized();
 
             return Ok(SingleResult.Create(result));
         }
