@@ -151,6 +151,9 @@
       <HintPath>..\packages\Serilog.Sinks.Elasticsearch.3.0.134\lib\net45\Serilog.Sinks.Elasticsearch.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SerilogWeb.Classic">
+      <HintPath>externalreferences\SerilogWeb.Classic.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -495,6 +498,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\kitos.css" />
+    <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Images\excel.png" />
@@ -999,10 +1003,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\serilogwebclassic\src\SerilogWeb.Classic\SerilogWeb.Classic.csproj">
-      <Project>{13cec8dd-6087-4fee-aec1-0511b8959ccd}</Project>
-      <Name>SerilogWeb.Classic</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
