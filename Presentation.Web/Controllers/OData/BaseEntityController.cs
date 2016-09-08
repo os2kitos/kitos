@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Query;
 using Core.ApplicationServices;
@@ -65,7 +66,12 @@ namespace Presentation.Web.Controllers.OData
             if (CurentUser == null)
                 return Unauthorized();
 
-            return Ok(Repository.AsQueryable());
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+
+            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser) || hasOrg == false)
+                return Ok(Repository.AsQueryable());
+
+            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization) x).OrganizationId == CurrentOrganizationId));
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -81,6 +87,20 @@ namespace Presentation.Web.Controllers.OData
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
+        }
+
+        [EnableQuery(MaxExpansionDepth = 5)]
+        public IHttpActionResult GetByOrganizationKey(int key)
+        {
+            if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
+                throw new InvalidCastException("Entity must implement IHasOrganization");
+
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
+                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            
+            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
+            return Ok(result);
         }
 
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
