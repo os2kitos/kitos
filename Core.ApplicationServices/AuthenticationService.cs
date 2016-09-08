@@ -96,17 +96,15 @@ namespace Core.ApplicationServices
             if (user == null)
                 return false;
 
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
-            // check if global admin
+            // global admin always have access
             if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
                 return true;
-            }
 
             var awareEntity = entity as IContextAware;
             if (awareEntity == null)
                 return false;
+
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
 
             // check if user is part of target organization (he's trying to access)
             if (awareEntity.IsInContext(loggedIntoOrganizationId))
@@ -130,11 +128,9 @@ namespace Core.ApplicationServices
             var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
 
             // check if global admin
+            // global admin always have access
             if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
                 return true;
-            }
 
             // check if user is in context
             var awareEntity = entity as IContextAware;
@@ -172,16 +168,13 @@ namespace Core.ApplicationServices
                 return true;
 
             // check if user has a write role on the target entity
-            if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
-            {
+            // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
+            if (entity.HasUserWriteAccess(user))
                 return true;
-            }
 
             // check if user is object owner
             if (entity.ObjectOwnerId == user.Id)
-            {
                 return true;
-            }
 
             return false;
         }

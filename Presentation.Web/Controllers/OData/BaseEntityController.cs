@@ -110,8 +110,6 @@ namespace Presentation.Web.Controllers.OData
                     e.ObjectOwner = CurentUser;
                     e.LastChangedByUser = CurentUser;
                 }
-
-
                 newEntity = Repository.Insert(entity);
                 Repository.Save();
             }

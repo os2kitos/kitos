@@ -127,17 +127,18 @@ namespace Presentation.Web.Controllers.OData
                 var orgUnit = _orgUnitRepository.AsQueryable()
                     .Include(x => x.Children)
                     .Include(x => x.ResponsibleForItContracts)
-                    .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
+                    .FirstOrDefault(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
 
-                contracts.AddRange(orgUnit.ResponsibleForItContracts);
-
-                var childIds = orgUnit.Children.Select(x => x.Id);
-                foreach (var childId in childIds)
+                if (orgUnit != null)
                 {
-                    queue.Enqueue(childId);
-                }
-            }
+                    contracts.AddRange(orgUnit.ResponsibleForItContracts);
 
+                    var childIds = orgUnit.Children.Select(x => x.Id);
+                    foreach (var childId in childIds)
+                        queue.Enqueue(childId);
+                }
+
+            }
             return Ok(contracts);
         }
     }
