@@ -92,9 +92,6 @@ namespace Presentation.Web.Controllers.OData
 
         public virtual IHttpActionResult Post(T entity)
         {
-            if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
-                return Unauthorized();
-
             Validate(entity);
 
             if (!ModelState.IsValid)
@@ -108,8 +105,19 @@ namespace Presentation.Web.Controllers.OData
                 if (e != null)
                 {
                     e.ObjectOwner = CurentUser;
+                    e.ObjectOwnerId = CurentUser.Id;
                     e.LastChangedByUser = CurentUser;
+                    var entityWithOrganization = e as IHasOrganization;
+                    if (entityWithOrganization != null && CurentUser.DefaultOrganizationId.HasValue)
+                    {
+                        entityWithOrganization.OrganizationId = CurentUser.DefaultOrganizationId.Value;
+                        entityWithOrganization.Organization = CurentUser.DefaultOrganization;
+                    }
                 }
+
+                if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
+                    return Unauthorized();
+
                 newEntity = Repository.Insert(entity);
                 Repository.Save();
             }

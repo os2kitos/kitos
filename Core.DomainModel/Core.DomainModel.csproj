@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItProject\Assignment.cs" />
+    <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />

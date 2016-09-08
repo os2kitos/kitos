@@ -24,12 +24,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
-        public override IHttpActionResult Post(Report entity)
-        {
-            entity.OrganizationId = CurentUser.DefaultOrganization.Id;
-
-            return base.Post(entity);
-        }
+        
 
         // GET /Organizations(1)/Reports
         [EnableQuery(MaxExpansionDepth = 3)]

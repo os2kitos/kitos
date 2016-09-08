@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule, IHasOrganization
     {
         public ItProject()
         {
