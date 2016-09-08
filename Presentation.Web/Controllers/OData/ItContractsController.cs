@@ -12,7 +12,6 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [Authorize]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
