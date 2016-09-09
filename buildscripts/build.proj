@@ -26,7 +26,7 @@
     <Exec Command="gulp deploy" WorkingDirectory="$(RootFolder)" />
     <MakeDir Directories="$(DeployFolder)\Web" />
     <MSBuild Projects="$(WebProjects)" Targets="Build" 
-             Properties="Configuration=$(Configuration);DeployOnBuild=True;PackageAsSingleFile=False;ExcludeGeneratedDebugSymbol=False;RunCodeAnalysis=True" />
+             Properties="Configuration=$(Configuration);DeployOnBuild=False;PackageAsSingleFile=False;ExcludeGeneratedDebugSymbol=False;RunCodeAnalysis=True" />
     
     <CreateItem Include="$(RootFolder)\Presentation.Web\obj/$(Configuration)/Package/PackageTmp\**\*.*">
       <Output TaskParameter="Include" ItemName="WebFiles" />
