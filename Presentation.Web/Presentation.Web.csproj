@@ -293,6 +293,8 @@
     <Compile Include="Controllers\OData\UsersController.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
