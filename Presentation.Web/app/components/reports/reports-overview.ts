@@ -16,6 +16,7 @@
         public title: string;
         public mainGrid: Kitos.IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public currentEditModel: kendo.data.Model;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -58,46 +59,7 @@
             this.setupGrid();
         }
 
-        private getCategories() {
-            var categories = [{
-                "value": 1,
-                "text": "Beverages"
-            }, {
-                    "value": 2,
-                    "text": "Condiments"
-                }, {
-                    "value": 3,
-                    "text": "Confections"
-                }, {
-                    "value": 4,
-                    "text": "Dairy Products"
-                }, {
-                    "value": 5,
-                    "text": "Grains/Cereals"
-                }, {
-                    "value": 6,
-                    "text": "Meat/Poultry"
-                }, {
-                    "value": 7,
-                    "text": "Produce"
-                }, {
-                    "value": 8,
-                    "text": "Seafood"
-                }];
-
-            return categories;
-
-
-            // this.$http.get("odata/ReportCategories").then((result: any) => {
-            //     var data = result.data.value;
-
-
-
-            // })
-        }
-
         private setupGrid() {
-            let categories = this.getCategories();
             let baseUrl = "odata/reports";
             let dataSource = {
                 type: "odata-v4",
@@ -109,6 +71,9 @@
                     update: {
                         url: (data) => {
                             return baseUrl + "(" + data.Id + ")";
+                        },
+                        beforeSend: function(req) {
+                           req.setRequestHeader("Prefer", "return=representation")
                         },
                         type: "PATCH",
                         dataType: "json"
@@ -130,7 +95,6 @@
                         var result = kendo.data.transports["odata-v4"].parameterMap(data, type);
                         if (type == "read") {
                             result.$count = true;
-                            delete result.$inlinecount;
                         }
 
                         if (type === "update") {
@@ -142,6 +106,7 @@
                             };
                             return JSON.stringify(patch);
                         }
+
                         if (type === "create") {
                             let model: any = data;
                             let patch = {
@@ -149,7 +114,6 @@
                                 Name: model.Name,
                                 Description: model.Description,
                                 CategoryTypeId: model.CategoryTypeId
-
                             };
                             return JSON.stringify(patch);
                         }
@@ -161,6 +125,7 @@
                     dir: "asc"
                 },
                 batch: false,
+                sync: false,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -184,6 +149,9 @@
                 editable: "inline",
                 height: 550,
                 toolbar: ["create"],
+                edit: (e) => {
+                    this.currentEditModel = e.model;
+                },
                 pageable: {
                     refresh: true,
                     pageSizes: [5],
@@ -206,7 +174,7 @@
                     { field: "Description", title: "Beskrivelse", width: "250px" },
                     // { field: "CategoryTypeId", title: "Category", width: "180px", values: categories },
                     {
-                        field: "CategoryType", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
+                        field: "CategoryTypeId", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
                     },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
@@ -219,14 +187,27 @@
             this.$(`<input required name="" + options.field + ""/>`)
                 .appendTo(container)
                 .kendoDropDownList({
-                    autoBind: false,
+                    autoBind: true,
                     dataTextField: "Name",
                     dataValueField: "Id",
+                    dataBound: (e) => {
+                        var catId = this.currentEditModel.get("CategoryTypeId");
+                        e.sender.select((dataItem) => {
+                            return dataItem.Id === catId;
+                        })
+                    },
                     dataSource: {
                         type: "odata-v4",
                         transport: {
                             read: "odata/ReportCategories"
                         }
+                    },
+
+                    change: (e: kendo.ui.DropDownListChangeEvent) => {
+                        var newValue = e.sender.dataItem();
+                        var cur = this.currentEditModel;
+                        cur.set("CategoryType", newValue);
+                        cur.set("CategoryTypeId", newValue.Id);
                     }
                 });
         };

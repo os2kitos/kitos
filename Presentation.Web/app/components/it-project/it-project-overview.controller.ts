@@ -380,20 +380,6 @@
                             }
                         }
                     },
-                    // MySQL ERROR: String was not recognized as a valid Boolean
-                    //{
-                    //    field: "ItSystemUsages.ItSystem.Name", title: "IT System", width: 150,
-                    //    persistId: "sysnames", // DON'T YOU DARE RENAME!
-                    //    template: "#: Parent ? Parent.Name : '' #",
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
                     {
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
