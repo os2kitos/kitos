@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(UserId))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 

@@ -20,11 +20,12 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ItSystems")]
         public override IHttpActionResult Get()
         {
-            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return base.Get();
+            return base.Get();
+            //if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
+            //    return base.Get();
 
-            var orgId = UserService.GetCurrentOrganizationId(UserId);
-            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+            //var orgId = CurrentOrganizationId;
+            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /Organizations(1)/ItSystems
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItSystems")]
         public IHttpActionResult GetItSystems(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
@@ -53,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/BelongingSystems")]
         public IHttpActionResult GetBelongingSystems(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)

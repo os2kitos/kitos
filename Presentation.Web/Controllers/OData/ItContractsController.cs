@@ -26,11 +26,12 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ItContracts")]
         public override IHttpActionResult Get()
         {
-            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return base.Get();
+            return base.Get();
+            //if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
+            //    return base.Get();
 
-            var orgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
-            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+            //var orgId = CurrentOrganizationId;
+            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
@@ -68,7 +69,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItContracts")]
         public IHttpActionResult GetItContracts(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -81,7 +82,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/Supplier")]
         public IHttpActionResult GetSupplier(int key)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -109,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = UserService.GetCurrentOrganizationId(CurentUser.Id);
+            var loggedIntoOrgId = CurrentOrganizationId;
             if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
 
@@ -126,17 +127,18 @@ namespace Presentation.Web.Controllers.OData
                 var orgUnit = _orgUnitRepository.AsQueryable()
                     .Include(x => x.Children)
                     .Include(x => x.ResponsibleForItContracts)
-                    .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
+                    .FirstOrDefault(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
 
-                contracts.AddRange(orgUnit.ResponsibleForItContracts);
-
-                var childIds = orgUnit.Children.Select(x => x.Id);
-                foreach (var childId in childIds)
+                if (orgUnit != null)
                 {
-                    queue.Enqueue(childId);
-                }
-            }
+                    contracts.AddRange(orgUnit.ResponsibleForItContracts);
 
+                    var childIds = orgUnit.Children.Select(x => x.Id);
+                    foreach (var childId in childIds)
+                        queue.Enqueue(childId);
+                }
+
+            }
             return Ok(contracts);
         }
     }

@@ -4,6 +4,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
+using System.Security.Authentication;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 
@@ -20,8 +21,7 @@ namespace Core.ApplicationServices
 
         public bool IsGlobalAdmin(int userId)
         {
-            var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
             return user.IsGlobalAdmin;
         }
 
@@ -33,8 +33,13 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         public bool IsLocalAdmin(int userId, int organizationId)
         {
+            //var user = _userRepository.GetByKey(userId);
+            //return user.OrganizationRights.Any(
+            //            right => right.Role == OrganizationRole.LocalAdmin &&
+            //            right.OrganizationId == organizationId);
+
             var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId &&
+                .FirstOrDefault(x => x.Id == userId &&
                     x.OrganizationRights.Any(
                         right => right.Role == OrganizationRole.LocalAdmin &&
                         right.OrganizationId == organizationId));
@@ -49,19 +54,13 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         public bool IsLocalAdmin(int userId)
         {
-            var user = _userRepository.AsQueryable()
-                .Single(x => x.Id == userId &&
-                    x.OrganizationRights.Any(
-                        right => right.Role == OrganizationRole.LocalAdmin &&
-                        right.OrganizationId == x.DefaultOrganizationId));
-
-            return user != null;
+            var user = _userRepository.GetByKey(userId);
+            return user.IsLocalAdmin;
         }
 
         public bool HasReadAccessOutsideContext(User user)
         {
-            if (user == null)
-                return false;
+            AssertUserIsNotNull(user);
 
             if (user.IsGlobalAdmin)
                 return true;
@@ -73,13 +72,17 @@ namespace Core.ApplicationServices
 
         public bool HasReadAccessOutsideContext(int userId)
         {
-            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
+            AssertUserIsNotNull(user);
+
             return HasReadAccessOutsideContext(user);
         }
 
         public bool HasReadAccess(int userId, Entity entity)
         {
-            var user = _userRepository.AsQueryable().FirstOrDefault(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
+            AssertUserIsNotNull(user);
+
             return HasReadAccess(user, entity);
         }
 
@@ -92,20 +95,17 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
         public bool HasReadAccess(User user, Entity entity)
         {
-            if (user == null)
-                return false;
+            AssertUserIsNotNull(user);
 
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
-            // check if global admin
+            // global admin always have access
             if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
                 return true;
-            }
 
             var awareEntity = entity as IContextAware;
             if (awareEntity == null)
                 return false;
+
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
 
             // check if user is part of target organization (he's trying to access)
             if (awareEntity.IsInContext(loggedIntoOrganizationId))
@@ -126,14 +126,14 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have write access to the given instance, else false.</returns>
         public bool HasWriteAccess(User user, Entity entity)
         {
+            AssertUserIsNotNull(user);
+
             var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault();
 
             // check if global admin
+            // global admin always have access
             if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
                 return true;
-            }
 
             // check if user is in context
             var awareEntity = entity as IContextAware;
@@ -155,11 +155,8 @@ namespace Core.ApplicationServices
                 return true;
             }
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin)
-                && entity is IOrganizationModule)
-            {
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
                 return true;
-            }
 
             if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
                 return true;
@@ -171,18 +168,22 @@ namespace Core.ApplicationServices
                 return true;
 
             // check if user has a write role on the target entity
-            if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
-            {
+            if (entity.HasUserWriteAccess(user))
                 return true;
-            }
-
-            // check if user is object owner
-            if (entity.ObjectOwnerId == user.Id)
-            {
-                return true;
-            }
 
             return false;
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        private void AssertUserIsNotNull(User user)
+        {
+            if (user == null)
+                throw new AuthenticationException("User is null");
+        }
+
+        private User GetUserByKey(int key)
+        {
+            return _userRepository.GetByKey(key);
         }
     }
 }

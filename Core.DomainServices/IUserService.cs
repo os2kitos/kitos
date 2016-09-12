@@ -10,6 +10,6 @@ namespace Core.DomainServices
         PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
         PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
-        int GetCurrentOrganizationId(int userId);
+        //int GetCurrentOrganizationId(int userId);
     }
 }

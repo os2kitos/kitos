@@ -23,3 +23,15 @@ this.$(`<input required name="" + options.field + ""/>`)
         }
     });
 };
+
+schema: {
+    model: {
+        id: "Id",
+        fields: {
+            Id: { editable: false, nullable: true },
+            Name: { editable: true, validation: { required: true } },
+            Description: { editable: true, validation: { required: true } },
+            CategoryTypeId: { type: "number" }
+        }
+    }
+}

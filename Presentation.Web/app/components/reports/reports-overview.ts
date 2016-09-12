@@ -58,9 +58,48 @@
             this.setupGrid();
         }
 
+        private getCategories() {
+            var categories = [{
+                "value": 1,
+                "text": "Beverages"
+            }, {
+                    "value": 2,
+                    "text": "Condiments"
+                }, {
+                    "value": 3,
+                    "text": "Confections"
+                }, {
+                    "value": 4,
+                    "text": "Dairy Products"
+                }, {
+                    "value": 5,
+                    "text": "Grains/Cereals"
+                }, {
+                    "value": 6,
+                    "text": "Meat/Poultry"
+                }, {
+                    "value": 7,
+                    "text": "Produce"
+                }, {
+                    "value": 8,
+                    "text": "Seafood"
+                }];
+
+            return categories;
+
+
+            // this.$http.get("odata/ReportCategories").then((result: any) => {
+            //     var data = result.data.value;
+
+
+
+            // })
+        }
+
         private setupGrid() {
-            var baseUrl = "odata/reports",
-            dataSource = {
+            let categories = this.getCategories();
+            let baseUrl = "odata/reports";
+            let dataSource = {
                 type: "odata-v4",
                 transport: {
                     read: {
@@ -87,23 +126,34 @@
                         dataType: "json"
                     },
                     parameterMap: (data, type) => {
+                        // Call the default OData V4 parameterMap. 
+                        var result = kendo.data.transports["odata-v4"].parameterMap(data, type);
+                        if (type == "read") {
+                            result.$count = true;
+                            delete result.$inlinecount;
+                        }
+
                         if (type === "update") {
-                            var model: any = data;
+                            let model: any = data;
                             let patch = {
                                 Name: model.Name,
-                                Description: model.Description
+                                Description: model.Description,
+                                CategoryTypeId: model.CategoryTypeId
                             };
                             return JSON.stringify(patch);
                         }
                         if (type === "create") {
-                            var model: any = data;
+                            let model: any = data;
                             let patch = {
                                 Id: 0,
                                 Name: model.Name,
-                                Description: model.Description
+                                Description: model.Description,
+                                CategoryTypeId: model.CategoryTypeId
+
                             };
                             return JSON.stringify(patch);
                         }
+                        return result;
                     }
                 },
                 sort: {
@@ -119,7 +169,10 @@
                     model: {
                         id: "Id",
                         fields: {
-                            Id: { editable: false, nullable: true }
+                            Id: { editable: false, nullable: true },
+                            Name: { editable: true, validation: { required: true } },
+                            Description: { editable: true, validation: { required: true } },
+                            CategoryTypeId: { type: "number" }
                         }
                     }
                 }
@@ -151,6 +204,7 @@
                         template: dataItem => dataItem.Id ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
                     },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
+                    // { field: "CategoryTypeId", title: "Category", width: "180px", values: categories },
                     {
                         field: "CategoryType", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""

@@ -34,28 +34,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //var orgs = Repository.Get(
-                //    org =>
-                //        // filter by project name
-                //        org.Name.Contains(q) &&
-                //        // global admin sees all
-                //        (KitosUser.IsGlobalAdmin ||
-                //        // object owner sees his own objects
-                //        org.ObjectOwnerId == KitosUser.Id ||
-                //        // it's public everyone can see it
-                //        org.AccessModifier == AccessModifier.Public ||
-                //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Local &&
-                //        org.Id == orgId ||
-                //        // user with a role on the object can see it
-                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
-                //        // !SPECIAL CASE! user with a role on a org unit can see it
-                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
-                //    );
-
-                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
-                // so have to do it the slow way :(
-
                 var orgs = Repository.Get(
                     org =>
                         // filter by project name or cvr

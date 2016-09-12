@@ -5,28 +5,22 @@ using System.Web.OData.Routing;
 using Core.DomainServices;
 using System.Web.Http.Results;
 using System.Net;
-using Core.ApplicationServices;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
     {
-        private readonly IUserService _userService;
-        private readonly IAuthenticationService _authService;
-
-        public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository, IUserService userService, IAuthenticationService authService)
+        public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository)
             : base(repository)
         {
-            _userService = userService;
-            _authService = authService;
         }
 
         [EnableQuery]
         [ODataRoute("OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits()
         {
-            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             var result = Repository.AsQueryable().Where(ou => ou.OrganizationId == loggedIntoOrgId);
             return Ok(result);
         }
@@ -36,16 +30,12 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("OrganizationUnits({unitKey})")]
         public IHttpActionResult GetOrganizationUnit(int unitKey)
         {
-            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
+            var loggedIntoOrgId = CurrentOrganizationId;
             var result = Repository.GetByKey(unitKey);
-            if (loggedIntoOrgId != result.OrganizationId && !_authService.HasReadAccessOutsideContext(UserId))
-            {
+            if (loggedIntoOrgId != result.OrganizationId && !AuthenticationService.HasReadAccessOutsideContext(UserId))
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            }
-            else
-            {
-                return Ok(result);
-            }
+
+            return Ok(result);
         }
 
         //GET /Organizations(1)/OrganizationUnits
@@ -53,8 +43,8 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits(int orgKey)
         {
-            var loggedIntoOrgId = _userService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = CurrentOrganizationId;
+            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
             {
                 return new StatusCodeResult(HttpStatusCode.Forbidden, this);
             }
@@ -72,14 +62,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (_authService.HasReadAccess(UserId, entity))
-            {
+            if (AuthenticationService.HasReadAccess(CurentUser, entity))
                 return Ok(entity);
-            }
-            else
-            {
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            }
+
+            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
         }
     }
 }
