@@ -59,6 +59,13 @@
             this.setupGrid();
         }
 
+        private getAccessModifier = () => {
+            return [
+                { Id: 0, Name: "Lokal" },
+                { Id: 1, Name: "Offentlig" }
+            ]
+        }
+
         private setupGrid() {
             let baseUrl = "odata/reports";
             let dataSource = {
@@ -72,8 +79,8 @@
                         url: (data) => {
                             return baseUrl + "(" + data.Id + ")";
                         },
-                        beforeSend: function(req) {
-                           req.setRequestHeader("Prefer", "return=representation")
+                        beforeSend: function (req) {
+                            req.setRequestHeader("Prefer", "return=representation")
                         },
                         type: "PATCH",
                         dataType: "json"
@@ -102,7 +109,9 @@
                             let patch = {
                                 Name: model.Name,
                                 Description: model.Description,
-                                CategoryTypeId: model.CategoryTypeId
+                                CategoryTypeId: model.CategoryTypeId,
+                                AccessModifier: model.AccessModifier
+
                             };
                             return JSON.stringify(patch);
                         }
@@ -113,7 +122,8 @@
                                 Id: 0,
                                 Name: model.Name,
                                 Description: model.Description,
-                                CategoryTypeId: model.CategoryTypeId
+                                CategoryTypeId: model.CategoryTypeId,
+                                AccessModifier: model.AccessModifier
                             };
                             return JSON.stringify(patch);
                         }
@@ -137,7 +147,8 @@
                             Id: { editable: false, nullable: true },
                             Name: { editable: true, validation: { required: true } },
                             Description: { editable: true, validation: { required: true } },
-                            CategoryTypeId: { type: "number" }
+                            CategoryTypeId: { type: "number" },
+                            AccessModifier: { type: "string" }
                         }
                     }
                 }
@@ -172,16 +183,50 @@
                         template: dataItem => dataItem.Id ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
                     },
                     { field: "Description", title: "Beskrivelse", width: "250px" },
-                    // { field: "CategoryTypeId", title: "Category", width: "180px", values: categories },
                     {
                         field: "CategoryTypeId", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
+                    },
+                    {
+                        field: "AccessModifier", title: "Adgang", width: "60px", editor: this.AccessModifierEditor,
+                        template: dataitem => {
+                            switch (dataitem.AccessModifier) {
+                                case "Local": return "Lokal";
+                                case "Public": return "Offentlig";
+                                default: return "";
+                            }
+                        }
                     },
                     { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
                 ]
 
             };
         }
+
+        AccessModifierEditor = (container, options) => {
+            this.$(`<input required name="" + options.field + ""/>`)
+                .appendTo(container)
+                .kendoDropDownList({
+                    autoBind: true,
+                    dataTextField: "Name",
+                    dataValueField: "Id",
+                    dataBound: (e) => {
+                        let edata = e;
+                        this.$timeout((edata) => {
+                            var catId = this.currentEditModel.get("AccessModifier");
+                            edata.sender.select((dataItem) => {
+                                return dataItem.Id === catId;
+                            })
+                        });
+                    },
+                    dataSource: this.getAccessModifier(),
+                    change: (e: kendo.ui.DropDownListChangeEvent) => {
+                        var newValue = e.sender.dataItem();
+                        var cur = this.currentEditModel;
+                        cur.set("AccessModifier", newValue.Id);
+                    }
+                });
+        };
 
         CategoryDropDownEditor = (container, options) => {
             this.$(`<input required name="" + options.field + ""/>`)
