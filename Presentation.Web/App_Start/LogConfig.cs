@@ -23,7 +23,7 @@ namespace Presentation.Web.App_Start
                 .Enrich.With<HttpRequestUserAgentEnricher>()
                 .Enrich.With<ExceptionEnricher>()
                 .Enrich.With<HttpRequestClientHostIPEnricher>()
-                .WriteTo.Trace()
+                //.WriteTo.Trace()
                 .CreateLogger();
         }
     }
