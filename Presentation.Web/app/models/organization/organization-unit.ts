@@ -23,7 +23,7 @@
         /** Gets or sets it system usages.TODO write better summary */
         ItSystemUsages: Array<IItSystemUsage>;
         /** Users which have set this as their default OrganizationUnit. */
-        DefaultUsers: Array<IAdminRight>;
+        DefaultUsers: Array<IOrganizationRight>;
         /** This Organization Unit is using these IT Systems (Via ItSystemUsage) */
         Using: Array<IItSystemUsageOrgUnitUsage>;
         /** This Organization Unit is using these IT projects */

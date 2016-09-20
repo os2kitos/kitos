@@ -12,10 +12,9 @@ module Kitos.Services {
         }
 
         GetAll = () => {
-            return this.$http.get<Kitos.Models.IOdataWrapper<Models.IOptionEntity>>(this.baseUrl);
+            return this.$http.get<Kitos.Models.IODataResult<Models.IOptionEntity>>(this.baseUrl);
         }
     }
 
     app.service("reportCategoriesService", ReportCategoriesService);
-    
 }

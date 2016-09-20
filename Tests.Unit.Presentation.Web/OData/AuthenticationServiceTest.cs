@@ -51,12 +51,8 @@ namespace Tests.Unit.Presentation.Web.OData
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
 
-            _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository)
-            {
-                UserRepository = _userRepository,
-                AuthenticationService = _authenticationService
+            _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository, _authenticationService);
 
-            };
             var usr = new UserMock(_itContractsController, "1");
             usr.LogOn();
         }
@@ -174,17 +170,17 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // test as user
             SetAccess(true, 1);
-            var hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First());
+            var hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First().Id);
             hasAccess.Should().BeFalse("User is standard user and should NOT have access");
 
             // test as global admin
             SetAccess(true, 1, true);
-            hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First());
+            hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First().Id);
             hasAccess.Should().BeTrue("User is global admin and should have access");
 
             // test as logged into an organization that allows sharing
             SetAccess(true, 1, true, organizationCategory: OrganizationCategory.Municipality);
-            hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First());
+            hasAccess = _authenticationService.HasReadAccessOutsideContext(_userRepository.AsQueryable().First().Id);
             hasAccess.Should().BeTrue("User is logged in OrganizationCategory.Municipality and should have access");
         }
 
@@ -195,13 +191,13 @@ namespace Tests.Unit.Presentation.Web.OData
             var user = SetAccess(true, 1);
             var owner = CreateTestUser(2, userId: 2);
             var entity = CreateReport(owner);
-            var hasAccess = _authenticationService.HasReadAccess(user, entity);
+            var hasAccess = _authenticationService.HasReadAccess(user.Id, entity);
             hasAccess.Should().BeFalse("user is standard user and has not created the object");
 
             // test as user, that has created the object, access == true
             owner = SetAccess(true, 1);
             entity = CreateReport(owner);
-            hasAccess = _authenticationService.HasReadAccess(user, entity);
+            hasAccess = _authenticationService.HasReadAccess(user.Id, entity);
             hasAccess.Should().BeTrue("user is standard user and has created the object");
         }
 
@@ -212,13 +208,13 @@ namespace Tests.Unit.Presentation.Web.OData
             var user = SetAccess(true, 1);
             var owner = CreateTestUser(2, userId: 2);
             Entity entity = CreateReport(owner);
-            var hasAccess = _authenticationService.HasWriteAccess(user, entity);
+            var hasAccess = _authenticationService.HasWriteAccess(user.Id, entity);
             hasAccess.Should().BeFalse("user is standard user and has not created the object");
 
             // test as user, that has created the object, access == true
             owner = SetAccess(true, 1);
             entity = CreateReport(owner);
-            hasAccess = _authenticationService.HasWriteAccess(user, entity);
+            hasAccess = _authenticationService.HasWriteAccess(user.Id, entity);
             hasAccess.Should().BeTrue("user is standard user and has created the object");
 
             // test as user, that that is entity admin, access == true, but not owner of the object
@@ -259,7 +255,7 @@ namespace Tests.Unit.Presentation.Web.OData
                         entity = SetOwner(new ItSystem(), owner);
                         break;
                 }
-                hasAccess = _authenticationService.HasWriteAccess(user, entity);
+                hasAccess = _authenticationService.HasWriteAccess(user.Id, entity);
                 hasAccess.Should().BeTrue("user is entity admin and has access to the " + entity.GetType().Name);
                 Console.WriteLine("user is entity admin and has access to the " + entity.GetType().Name);
             }
@@ -314,8 +310,14 @@ namespace Tests.Unit.Presentation.Web.OData
         private User SetAccess(bool allow, int orgKey, bool isGlobalmin = false, OrganizationRole role = OrganizationRole.User, OrganizationCategory organizationCategory = OrganizationCategory.Other)
         {
             var list = new List<User>();
+
             if (allow)
-                list.Add(CreateTestUser(orgKey, isGlobalmin, role, organizationCategory));
+            {
+                var user = CreateTestUser(orgKey, isGlobalmin, role, organizationCategory);
+                list.Add(user);
+
+                _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+            }
 
             _userRepository.Get(Arg.Any<Expression<Func<User, bool>>>())
                 .Returns(list);

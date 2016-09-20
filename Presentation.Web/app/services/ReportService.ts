@@ -19,7 +19,7 @@ module Kitos.Services {
         }
 
         GetAll = () => {
-            return this.$http.get<Kitos.Models.IOdataWrapper<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
+            return this.$http.get<Kitos.Models.IODataResult<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
         }
 
         GetEmptyReport = () => {

@@ -6,7 +6,6 @@ using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API

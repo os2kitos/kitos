@@ -6,20 +6,22 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using System.Web.Http.Results;
 using System.Net;
 using Core.DomainModel.Organization;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IAuthenticationService _authService;
 
-        public ItContractsController(IGenericRepository<ItContract> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
-            : base(repository)
+        public ItContractsController(IGenericRepository<ItContract> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
+            : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
+            _authService = authService;
         }
 
         [EnableQuery]
@@ -43,10 +45,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (AuthenticationService.HasReadAccess(CurentUser, entity))
+            if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
@@ -58,10 +60,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (AuthenticationService.HasReadAccess(CurentUser, entity))
+            if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         // GET /Organizations(1)/ItContracts
@@ -69,9 +71,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItContracts")]
         public IHttpActionResult GetItContracts(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             return Ok(result);
@@ -82,9 +84,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/Supplier")]
         public IHttpActionResult GetSupplier(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             return Ok(result);
@@ -99,10 +101,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (AuthenticationService.HasReadAccess(CurentUser, entity))
+            if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
@@ -110,9 +112,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var contracts = new List<ItContract>();
 

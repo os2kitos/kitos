@@ -17,7 +17,11 @@ namespace Core.ApplicationServices
             _orgRightRepository = orgRightRepository;
         }
 
-        //returns a list of organizations that the user is a member of
+        /// <summary>
+        /// lists the organizations the user is a member of
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns>a list of organizations that the user is a member of</returns>
         public IEnumerable<Organization> GetOrganizations(User user)
         {
             if (user.IsGlobalAdmin) return _orgRepository.Get();
@@ -50,6 +54,21 @@ namespace Core.ApplicationServices
                     ObjectOwner = org.ObjectOwner,
                     LastChangedByUser = objectOwner
                 });
+        }
+
+        /// <summary>
+        /// Remove all organization rights from a user.
+        /// </summary>
+        /// <param name="organizationId">The organization the user should be removed from.</param>
+        /// <param name="userId">The user to be removed.</param>
+        public void RemoveUser(int organizationId, int userId)
+        {
+            var rights = _orgRightRepository.Get(x => x.UserId == userId && x.OrganizationId == organizationId);
+            foreach (var right in rights)
+            {
+                _orgRightRepository.DeleteByKey(right.Id);
+            }
+            _orgRightRepository.Save();
         }
     }
 }

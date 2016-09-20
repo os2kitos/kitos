@@ -2,7 +2,7 @@
     'use strict';
 
     app.directive('uniqueEmail', [
-            '$http', 'userService', function($http, userService) {
+        '$http', 'userService', '_', function ($http: ng.IHttpService, userService, _: _.LoDashStatic) {
                 return {
                     require: 'ngModel',
                     link: function(scope, element, attrs, ctrl) {
@@ -10,21 +10,21 @@
                         userService.getUser().then(function(result) {
                             user = result;
                         });
-                        var validateAsync = _.debounce(function(viewValue) {
-                            $http.get(attrs.uniqueEmail + '?checkname=' + viewValue + '&orgId=' + user.currentOrganizationId)
-                                .success(function() {
-                                    scope.emailExists = false;
-                                    ctrl.$setValidity('available', true);
-                                    ctrl.$setValidity('lookup', true);
-                                })
-                                .error(function(data, status) {
-                                    // conflict
-                                    if (status == 409) {
-                                        scope.emailExists = true;
+                        var validateAsync = _.debounce(function (viewValue) {
+                            $http.get<Kitos.Models.IODataResult<boolean>>(`/odata/Users/IsEmailAvailable(email='${viewValue}')`)
+                                .then((response) => {
+                                    if (response.data.value) {
+                                        // email is available
+                                        scope.emailExists = false;
+                                        ctrl.$setValidity('available', true);
+                                        ctrl.$setValidity('lookup', true);
                                     } else {
-                                        // something went wrong
-                                        ctrl.$setValidity('lookup', false);
+                                        // email is in use
+                                        scope.emailExists = true;
                                     }
+                                }, () => {
+                                    // something went wrong
+                                    ctrl.$setValidity('lookup', false);
                                 });
                         }, 500);
 

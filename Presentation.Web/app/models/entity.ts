@@ -1,16 +1,16 @@
 ﻿module Kitos.Models {
     export interface IEntity {
         /** Gets or sets the primary identifier. */
-        Id: number;
+        Id?: number;
         /** Gets or sets the object owner  identifier. */
-        ObjectOwnerId: number;
+        ObjectOwnerId?: number;
         /** Gets or sets the  that owns this instance. */
-        ObjectOwner: IUser;
+        ObjectOwner?: IUser;
         /** Gets or sets the DateTime of when the last change occurred to this instance. */
-        LastChanged: Date;
+        LastChanged?: Date;
         /** Gets or sets the User identifier for */
-        LastChangedByUserId: number;
+        LastChangedByUserId?: number;
         /** Gets or sets the User which made the most recent change to this instance. */
-        LastChangedByUser: IUser;
+        LastChangedByUser?: IUser;
     }
 }

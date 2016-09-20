@@ -1,0 +1,65 @@
+﻿<div class="modal-header">
+    <h3>Redigér bruger</h3>
+</div>
+<div class="modal-body">
+    <form name="editUser.form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <label for="email" class="col-md-3 control-label">
+                Email-adresse
+            </label>
+            <div class="col-md-8">
+                <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-disabled-on-busy>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label">
+                Navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-disabled-on-busy>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="lastName" class="col-md-3 control-label">
+                Efternavn
+            </label>
+            <div class="col-md-8">
+                <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-disabled-on-busy>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="phoneNumber" class="col-md-3 control-label">
+                Telefon
+            </label>
+            <div class="col-md-8">
+                <input type="text" name="phoneNumber" id="phoneNumber" data-ng-model="ctrl.vm.phoneNumber" class="form-control" data-ng-required="false" data-disabled-on-busy>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="roller" class="col-md-3 control-label">
+                Roller
+            </label>
+            <div class="col-md-8">
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isLocalAdmin">Lokal admin</label>
+                </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserOrgAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isOrgAdmin">Organisations admin</label>
+                </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserProjectAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isProjectAdmin">Projekt admin</label>
+                </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserSystemAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isSystemAdmin">System admin</label>
+                </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserContractAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isContractAdmin">Kontrakt admin</label>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="ctrl.ok()" data-ng-disabled="editUser.form.$invalid || editUser.form.$pristine" data-disabled-on-busy>Gem ændringer</button>
+    <button class="btn btn-warning" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
+</div>

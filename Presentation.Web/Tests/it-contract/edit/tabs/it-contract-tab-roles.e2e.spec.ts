@@ -128,7 +128,7 @@ describe("contract edit tab roles", () => {
             element.selectFirst("t");
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itcontractrights/" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itcontractright/" });
         });
 
         it("should repeat rights", () => {
@@ -169,8 +169,8 @@ describe("contract edit tab roles", () => {
                 .click();
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontractrights" });
-            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itcontractrights" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontractright" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "POST", url: "api/itcontractright" });
         });
 
         it("should delete right when delete confirmed", () => {
@@ -184,7 +184,7 @@ describe("contract edit tab roles", () => {
             browserHelper.acceptAlert();
 
             // assert
-            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontractrights" });
+            expect(mock.requestsMade()).toMatchInRequests({ method: "DELETE", url: "api/itcontractright" });
         });
 
         it("should not delete right when delete dismissed", () => {
@@ -197,7 +197,7 @@ describe("contract edit tab roles", () => {
             browserHelper.dismissAlert();
 
             // assert
-            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itContractRights" });
+            expect(mock.requestsMade()).not.toMatchInRequests({ method: "DELETE", url: "api/itContractRight" });
         });
     });
 });

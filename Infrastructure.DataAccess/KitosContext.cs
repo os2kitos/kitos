@@ -94,8 +94,6 @@ namespace Infrastructure.DataAccess
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
-        
-
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

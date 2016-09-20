@@ -8,14 +8,14 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ItContractRightsController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
+    public class ItContractRightController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
     {
         private readonly IGenericRepository<ItContract> _objectRepository;
-        public ItContractRightsController(IGenericRepository<ItContractRight> rightRepository, IGenericRepository<ItContract> objectRepository) : base(rightRepository, objectRepository)
+        public ItContractRightController(IGenericRepository<ItContractRight> rightRepository, IGenericRepository<ItContract> objectRepository) : base(rightRepository, objectRepository)
         {
             _objectRepository = objectRepository;
         }
-        
+
         /// <summary>
         /// Returns all ItContractRight for a specific user
         /// </summary>

@@ -141,7 +141,7 @@
 
             function loadRights(node) {
                 //get org rights on the org unit and subtree
-                $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnitRights/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).then((result) => {
+                $http.get<Kitos.API.Models.IApiWrapper<any>>('api/organizationUnitRight/' + node.id + '?paged&take=' + $scope.rightsPagination.take + '&skip=' + $scope.rightsPagination.skip).then((result) => {
                     var paginationHeader = JSON.parse(result.headers('X-Pagination'));
                     $scope.totalRightsCount = paginationHeader.TotalCount;
                     node.orgRights = result.data.response;
@@ -181,7 +181,7 @@
                     "userId": uId
                 };
 
-                $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + oId + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
                     notify.addSuccessMessage(result.data.response.user.fullName + " er knyttet i rollen");
 
                     $scope.chosenOrgUnit.orgRights.push({
@@ -206,7 +206,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }, (error) => {
@@ -234,13 +234,13 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
+                $http.delete<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + oIdOld + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).then((deleteResult) => {
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRights/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
+                    $http.post<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + oIdNew + '?organizationId=' + user.currentOrganizationId, data).then((result) => {
                         right.roleId = result.data.response.roleId;
                         right.user = result.data.response.user;
                         right.userId = result.data.response.userId;

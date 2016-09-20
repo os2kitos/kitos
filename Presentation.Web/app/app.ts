@@ -38,7 +38,7 @@ app.config([
 
         // encode all url requests - fixes IE not correctly encoding special chars
         $httpProvider.interceptors.push(() => ({
-            "request"(config) {
+            request(config) {
                 config.url = $window.encodeURI(config.url);
                 return config;
             }

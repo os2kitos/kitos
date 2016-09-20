@@ -7,9 +7,9 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using System.Web.Http.Results;
 using System.Net;
 using Core.DomainModel.Organization;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -17,11 +17,13 @@ namespace Presentation.Web.Controllers.OData
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IAuthenticationService _authService;
 
-        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
-            : base(repository)
+        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
+            : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
+            _authService = authService;
         }
 
         [EnableQuery]
@@ -42,11 +44,11 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItProjects")]
         public IHttpActionResult GetItProjects(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+                    return StatusCode(HttpStatusCode.Forbidden);
 
                 var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
                 return Ok(result);
@@ -67,10 +69,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (AuthenticationService.HasReadAccess(UserId, entity))
+            if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
@@ -79,9 +81,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var projects = new List<ItProject>();
 

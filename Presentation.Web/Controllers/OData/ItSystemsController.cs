@@ -5,16 +5,20 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using System.Web.Http.Results;
 using System.Net;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        public ItSystemsController(IGenericRepository<ItSystem> repository)
-            : base(repository)
-        {}
+        private readonly IAuthenticationService _authService;
+
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService)
+            : base(repository, authService)
+        {
+            _authService = authService;
+        }
 
         [EnableQuery(MaxExpansionDepth = 5)]
         [ODataRoute("ItSystems")]
@@ -33,11 +37,11 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItSystems")]
         public IHttpActionResult GetItSystems(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+                    return StatusCode(HttpStatusCode.Forbidden);
 
                 var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
                 return Ok(result);
@@ -54,11 +58,11 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/BelongingSystems")]
         public IHttpActionResult GetBelongingSystems(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (!AuthenticationService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+                    return StatusCode(HttpStatusCode.Forbidden);
 
                 var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
                 return Ok(result);
@@ -79,10 +83,10 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (AuthenticationService.HasReadAccess(UserId, entity))
+            if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
     }
 }

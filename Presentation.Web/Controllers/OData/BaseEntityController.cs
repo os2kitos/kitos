@@ -1,89 +1,48 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Web.Http;
-using System.Web.Http.Results;
+﻿using System.Web.Http;
 using System.Web.OData;
-using System.Web.OData.Query;
-using Core.ApplicationServices;
-using Core.DomainModel;
 using Core.DomainServices;
-using Ninject;
-using Ninject.Extensions.Logging;
+using Core.ApplicationServices;
+using System.Net;
+using System;
+using Core.DomainModel;
+using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [Authorize]
-    public abstract class BaseEntityController<T> : ODataController where T : Entity
+    public abstract class BaseEntityController<T> : BaseController<T> where T : Entity
     {
-        protected ODataValidationSettings ValidationSettings;
-        protected IGenericRepository<T> Repository;
-        private User _curentUser;
+        private readonly IAuthenticationService _authService;
 
-        public int CurrentOrganizationId => CurentUser?.DefaultOrganizationId ?? 0;
-        
-        [Inject]
-        public IGenericRepository<User> UserRepository { get; set; }
-
-        [Inject]
-        public IAuthenticationService AuthenticationService { get; set; }
-
-        [Inject]
-        public ILogger Logger { get; set; }
-
-        protected BaseEntityController(IGenericRepository<T> repository)
+        protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
+            : base(repository)
         {
-            ValidationSettings = new ODataValidationSettings { AllowedQueryOptions = AllowedQueryOptions.All };
-            Repository = repository;
-        }
-
-
-        public User CurentUser
-        {
-            get
-            {
-                if (_curentUser == null && UserId != 0)
-                    _curentUser = UserRepository.GetByKey(UserId);
-
-                return _curentUser;
-            }
-            set { _curentUser = value; }
-        }
-
-        protected int UserId
-        {
-            get
-            {
-                int userId;
-                int.TryParse(User.Identity.Name, out userId);
-                return userId;
-            }
+            _authService = authService;
         }
 
         [EnableQuery]
-        public virtual IHttpActionResult Get()
+        public override IHttpActionResult Get()
         {
-            if (CurentUser == null)
+            if (UserId == 0)
                 return Unauthorized();
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
 
-            if (AuthenticationService.HasReadAccessOutsideContext(CurentUser) || hasOrg == false)
+            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
                 return Ok(Repository.AsQueryable());
 
-            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization) x).OrganizationId == CurrentOrganizationId));
+            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)));
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public virtual IHttpActionResult Get(int key)
+        public override IHttpActionResult Get(int key)
         {
-            IQueryable<T> result = Repository.AsQueryable().Where(p => p.Id == key);
+            var result = Repository.AsQueryable().Where(p => p.Id == key);
 
             if (!result.Any())
                 return NotFound();
 
             var entity = result.First();
-            if (!AuthenticationService.HasReadAccess(UserId, entity))
+            if (!_authService.HasReadAccess(UserId, entity))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
@@ -95,50 +54,35 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
-            
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
             return Ok(result);
         }
 
-        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
+        public IHttpActionResult Put(int key, T entity)
+        {
+            return StatusCode(HttpStatusCode.NotImplemented);
+        }
 
-        //protected IHttpActionResult Put(int key, T entity)
-        //{
-        //    return StatusCode(HttpStatusCode.NotImplemented);
-        //}
-
+        // TODO how do we check access here?
         public virtual IHttpActionResult Post(T entity)
         {
-            Validate(entity);
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            T newEntity;
-
             try
             {
-                var e = entity as Entity;
-                if (e != null)
+                entity.ObjectOwnerId = UserId;
+                entity.LastChangedByUserId = UserId;
+                var entityWithOrganization = entity as IHasOrganization;
+                if (entityWithOrganization != null)
                 {
-                    e.ObjectOwner = CurentUser;
-                    e.ObjectOwnerId = CurentUser.Id;
-                    e.LastChangedByUser = CurentUser;
-                    var entityWithOrganization = e as IHasOrganization;
-                    if (entityWithOrganization != null && CurentUser.DefaultOrganizationId.HasValue)
-                    {
-                        entityWithOrganization.OrganizationId = CurentUser.DefaultOrganizationId.Value;
-                        entityWithOrganization.Organization = CurentUser.DefaultOrganization;
-                    }
+                    entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
                 }
-
-                if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
-                    return Unauthorized();
-
-                newEntity = Repository.Insert(entity);
+                entity = Repository.Insert(entity);
                 Repository.Save();
             }
             catch (Exception e)
@@ -146,25 +90,28 @@ namespace Presentation.Web.Controllers.OData
                 return InternalServerError(e);
             }
 
-            return Created(newEntity);
+            return Created(entity);
         }
 
-        public IHttpActionResult Patch(int key, Delta<T> delta)
+        public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
-            Validate(delta.GetEntity());
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var entity = Repository.GetByKey(key);
+
+            // does the entity exist?
             if (entity == null)
                 return NotFound();
 
-            if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
-                return Unauthorized();
+            // check if user is allowed to write to the entity
+            if (!_authService.HasWriteAccess(UserId, entity))
+                return StatusCode(HttpStatusCode.Forbidden);
+
+            // check model state
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             try
             {
+                // patch the entity
                 delta.Patch(entity);
                 Repository.Save();
             }
@@ -172,6 +119,10 @@ namespace Presentation.Web.Controllers.OData
             {
                 return InternalServerError(e);
             }
+
+            // add the request header "Prefer: return=representation"
+            // if you want the updated entity returned,
+            // else you'll just get 204 (No Content) returned
             return Updated(entity);
         }
 
@@ -181,7 +132,7 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (!AuthenticationService.HasWriteAccess(CurentUser, entity))
+            if (!_authService.HasWriteAccess(UserId, entity))
                 return Unauthorized();
 
             try

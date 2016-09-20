@@ -6,20 +6,22 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using System.Web.Http.Results;
 using System.Net;
 using Core.DomainModel.Organization;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IAuthenticationService _authService;
 
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
-            : base(repository)
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
+            : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
+            _authService = authService;
         }
 
         // GET /Organizations(1)/ItSystemUsages
@@ -27,9 +29,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != key && !AuthenticationService.HasReadAccessOutsideContext(UserId))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             return Ok(result);
@@ -40,9 +42,9 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = CurrentOrganizationId;
-            if (loggedIntoOrgId != orgKey && !AuthenticationService.HasReadAccessOutsideContext(UserId))
-                return new StatusCodeResult(HttpStatusCode.Forbidden, this);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             var systemUsages = new List<ItSystemUsage>();
 

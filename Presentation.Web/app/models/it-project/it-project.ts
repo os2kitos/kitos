@@ -13,7 +13,7 @@
         Folder: string;
         ParentId: number;
         Parent: IItProject;
-        Children: Array<IItProject>;
+        Children: IItProject[];
 
         ItProjectTypeId: number;
         ItProjectType: IItProjectType;
@@ -37,30 +37,30 @@
         IsCommunicationVisible: boolean;
         IsHandoverVisible: boolean;
         Handover: IHandover;
-        Communications: Array<ICommunication>;
-        TaskRefs: Array<ITaskRef>;
-        Risks: Array<IRisk>;
-        Stakeholders: Array<IStakeholder>;
+        Communications: ICommunication[];
+        TaskRefs: ITaskRef[];
+        Risks: IRisk[];
+        Stakeholders: IStakeholder[];
 
         /** Determines if this project is an IT digitalization strategy */
         IsStrategy: boolean;
 
         JointMunicipalProjectId: number;
         JointMunicipalProject: IItProject;
-        JointMunicipalProjects: Array<IItProject>;
+        JointMunicipalProjects: IItProject[];
 
         CommonPublicProjectId: number;
         CommonPublicProject: IItProject;
-        CommonPublicProjects: Array<IItProject>;
+        CommonPublicProjects: IItProject[];
 
         /** Organization Unit responsible for this project. */
         ResponsibleUsage: IItProjectOrgUnitUsage;
         /** Organization units that are using this project. */
-        UsedByOrgUnits: Array<IItProjectOrgUnitUsage>;
+        UsedByOrgUnits: IItProjectOrgUnitUsage[];
 
         /** Gets or sets the associated it system usages. */
-        ItSystemUsages: Array<ItSystemUsage.IItSystemUsage>;
-        EconomyYears: Array<IEconomyYear>;
+        ItSystemUsages: ItSystemUsage.IItSystemUsage[];
+        EconomyYears: IEconomyYear[];
 
 
         /** Traffic-light dropdown for overall statusr */
@@ -79,7 +79,7 @@
         CurrentPhase: number;
 
         /** The "milestones and tasks" table. */
-        ItProjectStatuses: Array<IItProjectStatus>;
+        ItProjectStatuses: IItProjectStatus[];
 
 
         /** Gets or sets the original it project identifier this it project was "cloned" from. */
@@ -87,7 +87,7 @@
         /** Gets or sets the original it project this it project was "cloned" from. */
         Original: IItProject;
         /** Gets or sets the it projects that were cloned from this it project. */
-        Clones: Array<IItProject>;
+        Clones: IItProject[];
         GoalStatus: IGoalStatus;
     }
 }

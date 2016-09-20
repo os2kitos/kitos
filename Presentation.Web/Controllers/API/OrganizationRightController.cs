@@ -10,12 +10,12 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class OrganizationRightsController : BaseApiController
+    public class OrganizationRightController : BaseApiController
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
         private readonly IGenericRepository<Organization> _objectRepository;
 
-        public OrganizationRightsController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository)
+        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository)
         {
             _rightRepository = rightRepository;
             _objectRepository = objectRepository;
@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -87,13 +87,13 @@ namespace Presentation.Web.Controllers.API
             {
                 var rId = _rightRepository.Get().Where(r => r.OrganizationId == orgId && r.UserId == uId);
 
-                if(rId.Any()) _rightRepository.DeleteByKey(rId);
+                if (rId.Any()) _rightRepository.DeleteByKey(rId);
 
                 return Ok();
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -212,7 +212,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 
@@ -242,7 +242,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return LogError(e);
+                return Error(e);
             }
         }
 

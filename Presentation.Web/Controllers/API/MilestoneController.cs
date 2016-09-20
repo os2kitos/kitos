@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Models;
 
