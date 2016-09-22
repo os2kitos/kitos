@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.API
                 _repository.Insert(entity);
                 _repository.Save();
 
-                return Ok(entity); // TODO should be DTO
+                return Ok(entity);
             }
             catch (Exception e)
             {
