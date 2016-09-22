@@ -448,7 +448,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="appReport\locales\nb-NO.xml" />
+    <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
