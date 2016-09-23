@@ -447,7 +447,12 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
+    <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
+    <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\locales\nb-NO.xml" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\local-config\local-config-module-admin.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
@@ -481,8 +486,6 @@
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
     <Content Include="appReport\css\report.css" />
-    <Content Include="appReport\css\stimulsoft.designer.office2013.white.blue.css" />
-    <Content Include="appReport\css\stimulsoft.viewer.office2013.css" />
     <Content Include="appReport\Index.html" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
