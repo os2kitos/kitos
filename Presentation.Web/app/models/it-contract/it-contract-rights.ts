@@ -5,7 +5,7 @@
         RoleId: number;
         ObjectId: number;
         User: IUser;
-        Role: IItContractRole;
+        Role: IRoleEntity;
         Object: IItContract;
     }
 }

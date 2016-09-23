@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices;
+﻿using System;
+using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
@@ -7,9 +8,9 @@ using System.Web.OData;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class InterfaceTypesController : BaseEntityController<InterfaceType>
+    public class FrequencyTypesController : BaseEntityController<FrequencyType>
     {
-        public InterfaceTypesController(IGenericRepository<InterfaceType> repository, IAuthenticationService authService)
+        public FrequencyTypesController(IGenericRepository<FrequencyType> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
         }

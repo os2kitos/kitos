@@ -7,9 +7,9 @@ using System.Web.OData;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class InterfaceTypesController : BaseEntityController<InterfaceType>
+    public class ArchiveTypesController : BaseEntityController<ArchiveType>
     {
-        public InterfaceTypesController(IGenericRepository<InterfaceType> repository, IAuthenticationService authService)
+        public ArchiveTypesController(IGenericRepository<ArchiveType> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
         }
