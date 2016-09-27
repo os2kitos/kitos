@@ -39,7 +39,7 @@ module Kitos.Reports {
             private notify) {
             let self = this;
 
-            //stimulsoftService.setLocalizationFile("./locales/nb-NO.xml")
+            stimulsoftService.setLocalizationFile("./locales/da-DK.xml")
             this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
             // Add the design button event
