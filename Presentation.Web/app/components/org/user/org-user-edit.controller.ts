@@ -11,6 +11,7 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
+        isReportAdmin: boolean;
     }
 
     class EditOrganizationUserController {
@@ -21,6 +22,7 @@
         public isUserProjectAdmin = false;
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
+        public isUserReportAdmin = false;
 
         private userId: number;
         private originalVm;
@@ -44,7 +46,8 @@
                 isOrgAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.OrganizationModuleAdmin }) !== undefined,
                 isProjectAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ProjectModuleAdmin }) !== undefined,
                 isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
-                isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined
+                isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
+                isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined
             };
             this.originalVm = _.clone(userVm);
             this.vm = userVm;
@@ -55,6 +58,7 @@
             this.isUserProjectAdmin = currentUser.isProjectAdmin;
             this.isUserSystemAdmin = currentUser.isSystemAdmin;
             this.isUserContractAdmin = currentUser.isContractAdmin;
+            this.isUserReportAdmin = currentUser.isReportAdmin;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
@@ -87,6 +91,7 @@
             promises.push(this.changeRight(diffRights, "isProjectAdmin", Models.OrganizationRole.ProjectModuleAdmin));
             promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
+            promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,

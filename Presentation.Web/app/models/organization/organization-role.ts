@@ -14,6 +14,8 @@
         /** Has write access to everything within the system module */
         SystemModuleAdmin = "SystemModuleAdmin" as any,
         /** Has write access to everything within the contract module */
-        ContractModuleAdmin = "ContractModuleAdmin" as any
+        ContractModuleAdmin = "ContractModuleAdmin" as any,
+            /** Has write access to everything within the report module */
+        ReportModuleAdmin = "ReportModuleAdmin" as any
     }
 }

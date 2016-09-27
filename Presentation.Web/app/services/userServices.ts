@@ -15,6 +15,7 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
+        isReportAdmin: boolean;
 
         orgAndDefaultUnit: any;
 
