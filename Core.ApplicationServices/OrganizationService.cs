@@ -51,8 +51,8 @@ namespace Core.ApplicationServices
             org.OrgUnits.Add(new OrganizationUnit()
                 {
                     Name = org.Name,
-                    ObjectOwner = org.ObjectOwner,
-                    LastChangedByUser = objectOwner
+                    ObjectOwnerId = objectOwner.Id,
+                    LastChangedByUserId = objectOwner.Id
                 });
         }
 

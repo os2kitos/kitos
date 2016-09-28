@@ -73,6 +73,11 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (!_authService.HasWriteAccess(UserId, entity))
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 entity.ObjectOwnerId = UserId;
