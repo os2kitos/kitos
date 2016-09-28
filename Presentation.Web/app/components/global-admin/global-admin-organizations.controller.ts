@@ -2,55 +2,248 @@
     "use strict";
 
     export class OrganizationController {
-        public pagination;
-        public totalCount: number;
-        public organizations;
-        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user'];
+        public mainGrid: IKendoGrid<Models.IOrganization>;
+        public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user) {
+        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout'];
+
+        constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout) {
             $rootScope.page.title = 'Organisationer';
 
-            this.pagination = {
-                search: '',
-                skip: 0,
-                take: 100
+            this.mainGridOptions = {
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: `/odata/Organizations`,
+                            dataType: "json"
+                        },
+                        destroy: {
+                            url: (entity) => {
+                                return `/odata/Organizations(${entity.Id})`;
+                            },
+                            dataType: "json",
+                            contentType: "application/json"
+                        }
+                    },
+                    sort: {
+                        field: "Name",
+                        dir: "asc"
+                    },
+                    pageSize: 100,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    schema: {
+                        model: {
+                            id: "Id"
+                        }
+                    }
+                } as kendo.data.DataSourceOptions,
+                    toolbar: [
+                        {
+                            name: "opretOrganisation",
+                            text: "Opret Organisation",
+                            template: "<a ui-sref='global-admin.organizations.create' class='btn btn-success pull-right'>#: text #</a>"
+                        },
+                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                ],
+                excel: {
+                    fileName: "Organisationer.xlsx",
+                    filterable: true,
+                    allPages: true
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
+                },
+                sortable: {
+                    mode: "single"
+                },
+                editable: "popup",
+                reorderable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                groupable: false,
+                columnMenu: {
+                    filterable: false
+                },
+                excelExport: this.exportToExcel,
+                columns: [
+                    {
+                        field: "Name", title: "Navn", width: 230,
+                        persistId: "name", // DON'T YOU DARE RENAME!,
+                        hidden: false,
+                        excelTemplate: (dataItem) => dataItem.Name,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Cvr", title: "CVR", width: 230,
+                        persistId: "cvr", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        excelTemplate: (dataItem) => dataItem.Cvr,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Type", title: "Type", width: 230,
+                        persistId: "type", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        template: (dataItem) => {
+                            switch (dataItem.TypeId) {
+                                case 1:
+                                    return "Kommune";
+                                case 2:
+                                    return "Interessefælleskab";
+                                case 3:
+                                    return "Virksomhed";
+                                case 4:
+                                    return "Anden offentlig myndighed";
+                            }
+                        },
+                        excelTemplate: (dataItem) => {
+                            switch (dataItem.TypeId) {
+                                case 1:
+                                    return "Kommune";
+                                case 2:
+                                    return "Interessefælleskab";
+                                case 3:
+                                    return "Virksomhed";
+                                case 4:
+                                    return "Anden offentlig myndighed";
+                            }
+                        },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "AccessModifier", title: "Synlighed", width: 230,
+                        persistId: "synlighed", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
+                        excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        command: [
+                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                        ],
+                        title: " ", width: 176,
+                        persistId: "command"
+                    }
+                ]
             };
+        }
+            
 
-            $scope.$watchCollection(() => this.pagination, () => {
-                this.loadOrganizations();
-            });
+        private exportFlag = false;
+        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
+            var columns = e.sender.columns;
+
+            if (!this.exportFlag) {
+                e.preventDefault();
+                this._.forEach(columns, column => {
+                    if (column.hidden) {
+                        column.tempVisual = true;
+                        e.sender.showColumn(column);
+                    }
+                });
+                this.$timeout(() => {
+                    this.exportFlag = true;
+                    e.sender.saveAsExcel();
+                });
+            } else {
+                this.exportFlag = false;
+
+                // hide columns on visual grid
+                this._.forEach(columns, column => {
+                    if (column.tempVisual) {
+                        delete column.tempVisual;
+                        e.sender.hideColumn(column);
+                    }
+                });
+
+                // render templates
+                const sheet = e.workbook.sheets[0];
+
+                // skip header row
+                for (let rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
+                    const row = sheet.rows[rowIndex];
+
+                    // -1 as sheet has header and dataSource doesn't
+                    const dataItem = e.data[rowIndex - 1];
+
+                    for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
+                        if (columns[columnIndex].field === "") continue;
+                        const cell = row.cells[columnIndex];
+                        const template = this.getTemplateMethod(columns[columnIndex]);
+
+                        cell.value = template(dataItem);
+                    }
+                }
+
+                // hide loading bar when export is finished
+                kendo.ui.progress(this.mainGrid.element, false);
+            }
         }
 
-        private loadOrganizations() {
-            var url = 'api/organization/';
-            url += '?skip=' + this.pagination.skip + "&take=" + this.pagination.take;
+        private getTemplateMethod(column) {
+            let template: Function;
 
-            if (this.pagination.orderBy) {
-                url += '&orderBy=' + this.pagination.orderBy;
-                if (this.pagination.descending) url += '&descending=' + this.pagination.descending;
+            if (column.excelTemplate) {
+                template = column.excelTemplate;
+            } else if (typeof column.template === "function") {
+                template = (column.template as Function);
+            } else if (typeof column.template === "string") {
+                template = kendo.template(column.template as string);
+            } else {
+                template = t => t;
             }
 
-            if (this.pagination.search) url += '&q=' + this.pagination.search;
-            else url += "&q=";
-
-            this.$http.get(url).success((result, status, headers) => {
-                var paginationHeader = JSON.parse(headers('X-Pagination'));
-                this.totalCount = paginationHeader.TotalCount;
-                this.organizations = result.response;
-            }).error(() => {
-                this.notify.addErrorMessage("Kunne ikke hente organisationer!");
-            });
+            return template;
         }
 
-        public delete(orgId) {
-            this.$http.delete('api/organization/' + orgId + '?organizationId=' + this.user.currentOrganizationId)
-                .success(() => {
-                    this.notify.addSuccessMessage("Organisationen er blevet slettet!");
-                    this.loadOrganizations();
-                })
-                .error(() => {
-                    this.notify.addErrorMessage("Kunne ikke slette organisationen!");
-                });
+        private onEdit = (e: JQueryEventObject) => {
+            e.preventDefault();
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = dataItem["Id"];
+            this.$state.go("global-admin.organizations.edit", { id: entityId });
+        }
+
+        private onDelete = (e: JQueryEventObject) => {
+            e.preventDefault();
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+
+            if (this.$window.confirm("Er du sikker på at slette " + dataItem["Name"] + "?")) {
+                this.mainGrid.dataSource.remove(dataItem);
+                this.mainGrid.dataSource.sync();
+            }
         }
     }
 

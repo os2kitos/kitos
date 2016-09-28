@@ -59,12 +59,19 @@ namespace Presentation.Web
             organizationRights.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<Advice>("Advices");
-            //builder.EntitySet<AgreementElementType>("AgreementElementTypes");
+
+            var agreementElementTypes = builder.EntitySet<AgreementElementType>(nameof(AgreementElementTypesController).Replace("Controller", string.Empty));
+            agreementElementTypes.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
             //builder.EntitySet<Config>("Configs");
-            //builder.EntitySet<ItContractTemplateTypes>("ItContractTemplateTypes");
-            //builder.EntitySet<IContractType>("ItContractTypes");
+
+            var itContractTemplateTypes = builder.EntitySet<ItContractTemplateType>(nameof(ItContractTemplateTypesController).Replace("Controller", string.Empty));
+            itContractTemplateTypes.EntityType.HasKey(x => x.Id);
+
+            var itContractTypes = builder.EntitySet<ItContractType>(nameof(ItContractTypesController).Replace("Controller", string.Empty));
+            itContractTypes.EntityType.HasKey(x => x.Id);
 
             var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
             dataRowUsage.EntityType.HasKey(x => new { x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
@@ -78,17 +85,22 @@ namespace Presentation.Web
             economyFunc.Parameter<int>("Organization");
             economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>("EconomyStreams");
 
-            //builder.EntitySet<FrequencyType>("FrequencyTypes");
+            var frequencyTypes = builder.EntitySet<FrequencyType>(nameof(FrequencyTypesController).Replace("Controller", string.Empty));
+            frequencyTypes.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Goal>("Goals");
             //builder.EntitySet<GoalStatus>("GoalStatus");
-            //builder.EntitySet<GoalType>("GoalTypes");
+            var goalTypes = builder.EntitySet<GoalType>(nameof(GoalTypesController).Replace("Controller", string.Empty));
+            goalTypes.EntityType.HasKey(x => x.Id);
             //builder.EntitySet<Handover>("Handovers");
             //builder.EntitySet<HandoverTrial>("HandoverTrials");
-            //builder.EntitySet<HandoverTrialType>("HandoverTrialTypes");
+
+            var handoverTrialTypes = builder.EntitySet<HandoverTrialType>(nameof(HandoverTrialTypesController).Replace("Controller", string.Empty));
+            handoverTrialTypes.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Interface>("Interfaces");
             //builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits");
             //builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibtUsages");
-            //builder.EntitySet<InterfaceType>("InterfaceTypes");
             //builder.EntitySet<ItSystemUsageOrgUnitUsage>("ItSystemUsageOrgUnitUsages");
 
             var itContractRights = builder.EntitySet<ItContractRight>(nameof(ItContractRightsController).Replace("Controller", string.Empty));
@@ -114,22 +126,22 @@ namespace Presentation.Web
             var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
             interfaceUsage.EntityType.HasKey(x => new { x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
 
-            var dataOption = builder.EntitySet<DataType>("DataTypes"); // no controller yet
+            var dataOption = builder.EntitySet<DataType>(nameof(DataTypesController).Replace("Controller", string.Empty));
             dataOption.EntityType.HasKey(x => x.Id);
 
             var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
             dataRow.EntityType.HasKey(x => x.Id);
 
-            var archiveOption = builder.EntitySet<ArchiveType>("ArchiveTypes"); // no controller yet
+            var archiveOption = builder.EntitySet<ArchiveType>(nameof(ArchiveTypesController).Replace("Controller", string.Empty));
             archiveOption.EntityType.HasKey(x => x.Id);
 
             var itSystems = builder.EntitySet<ItSystem>(nameof(ItSystemsController).Replace("Controller", string.Empty));
             itSystems.EntityType.HasKey(x => x.Id);
 
-            var itSystemTypeOptions = builder.EntitySet<ItSystemType>("ItSystemTypes"); // no controller yet
-            itSystemTypeOptions.EntityType.HasKey(x => x.Id);
+            var itSystemType = builder.EntitySet<ItSystemType>(nameof(ItSystemTypesController).Replace("Controller", string.Empty));
+            itSystemType.EntityType.HasKey(x => x.Id);
 
-            var businessTypes = builder.EntitySet<BusinessType>("BusinessTypes"); // no controller yet
+            var businessTypes = builder.EntitySet<BusinessType>(nameof(BusinessTypesController).Replace("Controller", string.Empty));
             businessTypes.EntityType.HasKey(x => x.Id);
 
             var taskRefs = builder.EntitySet<TaskRef>("TaskRefs"); // no controller yet
@@ -186,13 +198,13 @@ namespace Presentation.Web
             // if ItContract.Terminated has a value
             contracts.EntityType.Ignore(x => x.IsActive);
 
-            var interfaceTypes = builder.EntitySet<InterfaceType>("InterfaceTypes"); // no controller yet
+            var interfaceTypes = builder.EntitySet<InterfaceType>(nameof(InterfaceTypesController).Replace("Controller", string.Empty));
             interfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaces = builder.EntitySet<ItInterface>(nameof(ItInterfacesController).Replace("Controller", string.Empty));
             itInterfaces.EntityType.HasKey(x => x.Id);
 
-            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>("ItInterfaceTypes"); // no controller yet
+            var itInterfaceTypes = builder.EntitySet<ItInterfaceType>(nameof(ItInterfaceTypesController).Replace("Controller", string.Empty));
             itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
@@ -208,16 +220,17 @@ namespace Presentation.Web
                 .HasKey(x => x.ItSystemId)
                 .HasKey(x => x.ItInterfaceId);
 
-            var tsas = builder.EntitySet<TsaType>("TsaTypes"); // no controller yet
+            var tsas = builder.EntitySet<TsaType>(nameof(TsaTypesController).Replace("Controller", string.Empty));
             tsas.EntityType.HasKey(x => x.Id);
 
-            var methods = builder.EntitySet<MethodType>("MethodTypes"); // no controller yet
-            methods.EntityType.HasKey(x => x.Id);
+            var methodTypes = builder.EntitySet<MethodType>(nameof(MethodTypesController).Replace("Controller", string.Empty));
+            methodTypes.EntityType.HasKey(x => x.Id);
 
-            var sensitiveDataOption = builder.EntitySet<SensitiveDataType>("SensitiveDataTypes"); // no controller yet
+            var sensitiveDataOption = builder.EntitySet<SensitiveDataType>(nameof(SensitiveDataTypesController).Replace("Controller", string.Empty));
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
-            //builder.EntitySet<Optionend>("OptionExtendTypes");
+            var optionExtendTypes = builder.EntitySet<OptionExtendType>(nameof(OptionExtendTypesController).Replace("Controller", string.Empty));
+            optionExtendTypes.EntityType.HasKey(x => x.Id);
 
             var organizationUnitRights = builder.EntitySet<OrganizationUnitRight>(nameof(OrganizationUnitRightsController).Replace("Controller", string.Empty));
             organizationUnitRights.EntityType.HasKey(x => x.Id);
@@ -226,16 +239,33 @@ namespace Presentation.Web
             organiationUnitRoles.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<PasswordResetRequest>("PasswordResetRequests");
-            //builder.EntitySet<PaymentFreqencyType>("PaymentFreqencyTypes");
+
+            var paymentFreqencyTypes = builder.EntitySet<PaymentFreqencyType>(nameof(PaymentFrequencyTypesController).Replace("Controller", string.Empty));
+            paymentFreqencyTypes.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<PaymentMilestone>("PaymentMilestones");
             //builder.EntitySet<PaymentModelType>("PaymentModelTypes");
-            //builder.EntitySet<PriceRegulationType>("PriceRegulationTypes");
+
+            var paymentModelTypes = builder.EntitySet<PaymentModelType>(nameof(PaymentModelTypesController).Replace("Controller", string.Empty));
+            paymentModelTypes.EntityType.HasKey(x => x.Id);
+
+            var priceRegulationTypes = builder.EntitySet<PriceRegulationType>(nameof(PriceRegulationTypesController).Replace("Controller", string.Empty));
+            priceRegulationTypes.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
-            builder.EntitySet<ItProjectType>("ItProjectTypes"); // no controller yet
-            //builder.EntitySet<PurchaseFormType>("PurchaseFormTypes");
+
+            var itProjectTypes = builder.EntitySet<ItProjectType>(nameof(ItProjectTypesController).Replace("Controller", string.Empty));
+            itProjectTypes.EntityType.HasKey(x => x.Id);
+
+            var purchaseFormType = builder.EntitySet<PurchaseFormType>(nameof(PurchaseFormTypesController).Replace("Controller", string.Empty));
+            purchaseFormType.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
-            //builder.EntitySet<TerminationDeadlineType>("TerminationDeadlineTypes");
+
+            var terminationDeadlineType = builder.EntitySet<TerminationDeadlineType>(nameof(TerminationDeadlineTypesController).Replace("Controller", string.Empty));
+            terminationDeadlineType.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");

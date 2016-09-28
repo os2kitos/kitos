@@ -1,5 +1,5 @@
 ﻿using Core.ApplicationServices;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using System.Linq;
 using System.Web.Http;
@@ -7,9 +7,9 @@ using System.Web.OData;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class InterfaceTypesController : BaseEntityController<InterfaceType>
+    public class GoalTypesController : BaseEntityController<GoalType>
     {
-        public InterfaceTypesController(IGenericRepository<InterfaceType> repository, IAuthenticationService authService)
+        public GoalTypesController(IGenericRepository<GoalType> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
         }

@@ -1,0 +1,55 @@
+﻿<div class="col-md-12">
+    <div class="panel panel-default">
+        <div class="panel-heading">Indstillinger for denne organisation</div>
+        <div class="panel-body">
+            <div class="form-group">
+                <label>Navn</label>
+                <input type="text" class="form-control" data-ng-model="currentOrgCtrl.organization.name" data-autosave="{{ currentOrgCtrl.orgAutosaveUrl }}" data-field="name">
+            </div>
+            <div class="form-group">
+                <label>CVR</label>
+                <input type="text" class="form-control" data-ng-model="currentOrgCtrl.organization.cvr" data-autosave="{{ currentOrgCtrl.orgAutosaveUrl }}" data-field="cvr" data-ng-pattern="/[0-9]{8}/">
+            </div>
+            <div class="form-group">
+                <div>
+                    <label>
+                        Type
+                    </label>
+                    <div>
+                        <input type="radio" checked="checked">
+                        {{ currentOrgCtrl.typeName }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<form class="form-horizontal">
+    <div class="form-group">
+        <label class="col-md-2 control-label">
+            Overblik
+        </label>
+        <div class="col-md-10">
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showTabOverview" data-autosave="{{config.autosaveUrl}}" data-field="showTabOverview" tabindex="1" />
+                    Medtag fanen 'Overblik'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showColumnTechnology" data-autosave="{{config.autosaveUrl}}" data-field="showColumnTechnology" tabindex="2" />
+                    Medtag kolonnen 'Teknologi'
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" data-ng-model="config.showColumnUsage" data-autosave="{{config.autosaveUrl}}" data-field="showColumnUsage" tabindex="3" />
+                    Medtag kolonnen 'Anvendelse'
+                </label>
+            </div>
+        </div>
+    </div>
+    <div data-option-list="" title="Roller" data-options-url="api/organizationUnitRole"></div>
+    <div data-suggest-new-role="" data-url="api/organizationUnitRole"></div>
+</form>

@@ -12,11 +12,5 @@ namespace Presentation.Web.Controllers.OData
             : base(repository)
         {
         }
-
-        [EnableQuery]
-        public override IHttpActionResult Get()
-        {
-            return Ok(Repository.AsQueryable().Where(x => x.IsActive && !x.IsSuggestion));
-        }
     }
 }
