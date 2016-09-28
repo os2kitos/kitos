@@ -1,10 +1,10 @@
-﻿module Kitos.GlobalConfig.Directives {
+﻿module Kitos.LocalAdmin.Directives {
     "use strict";
 
     function setupDirective(): ng.IDirective {
         return {
             scope: {},
-            controller: GlobalOptionRoleListDirective,
+            controller: LocalOptionListDirective,
             controllerAs: "ctrl",
             bindToController: {
                 optionsUrl: "@",
@@ -19,12 +19,12 @@
         title: string;
     }
 
-    class GlobalOptionRoleListDirective implements IDirectiveScope {
+    class LocalOptionListDirective implements IDirectiveScope {
         public optionsUrl: string;
         public title: string;
 
-        public mainGrid: IKendoGrid<Models.IRoleEntity>;
-        public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
+        public mainGrid: IKendoGrid<Models.IOptionEntity>;
+        public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
 
         public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
 
@@ -40,16 +40,9 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `${this.optionsUrl}?$filter=IsActive eq true`,
+                            url: this.optionsUrl,
                             dataType: "json"
                         }
-                        //,destroy: {
-                        //    url: (entity) => {
-                        //        return `/odata/Organizations(${this.user.currentOrganizationId})/RemoveUser()`;
-                        //    },
-                        //    dataType: "json",
-                        //    contentType: "application/json"
-                        //},
                     },
                     sort: {
                         field: "Name",
@@ -65,14 +58,6 @@
                         }
                     }
                 } as kendo.data.DataSourceOptions,
-                toolbar: [
-                    {
-                        //TODO ng-show='hasWriteAccess'
-                        name: "opretRolle",
-                        text: "Opret rolle",
-                        template: "<a ng-click='ctrl.opretRolle()' class='btn btn-success pull-right'>#: text #</a>"
-                    }
-                ],
                 pageable: {
                     refresh: true,
                     pageSizes: [10, 25, 50, 100, 200],
@@ -96,17 +81,10 @@
                         field: "IsActive", title: "Aktiv", width: 112,
                         persistId: "isActive", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(IsActive) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        template: `<input type="checkbox" data-ng-model="dataItem.IsActive" data-autosave="${ this.optionsUrl }({{ dataItem.Id }})" data-field="IsActive"> {{ Name }}`,
                         hidden: false,
                         filterable: false,
                         sortable: false
-                    },
-                    {
-                        command: [
-                            { text: "Op/Ned", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                        ],
-                        title: " ", width: 176,
-                        persistId: "command"
                     },
                     {
                         field: "Id", title: "Nr.", width: 230,
@@ -135,15 +113,6 @@
                         }
                     },
                     {
-                        field: "HasWriteAccess", title: "Skriv", width: 112,
-                        persistId: "hasWriteAccess", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
                         field: "Note", title: "Beskrivelse", width: 230,
                         persistId: "note", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Note,
@@ -159,7 +128,7 @@
                     {
                         command: [
                             { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                           ],
+                        ],
                         title: " ", width: 176,
                         persistId: "command"
                     }
@@ -175,5 +144,5 @@
         }
     }
     angular.module("app")
-        .directive("globalOptionRoleList", setupDirective);
+        .directive("localOptionList", setupDirective);
 }
