@@ -4,4 +4,6 @@ var app = angular.module("reportApp", [
     "ngAnimate",
     "ngSanitize",
     "notify"]);
-    
+
+app.constant("$", $)
+   .constant("_", _);

@@ -450,7 +450,6 @@
     <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
-    <Content Include="appReport\locales\nb-NO.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
     <Content Include="app\components\local-config\local-config-module-admin.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
