@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <base href="/">
     <title>Report Viewer</title>
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -10,33 +11,34 @@
     <meta name="viewport" content="width=device-width">
 
     <!--stimulsoft css-->
-    <link href="./css/stimulsoft.designer.office2013.white.blue.css" rel="stylesheet" />
-    <link href="./css/stimulsoft.viewer.office2013.css" rel="stylesheet" />
-    <link href="./css/report.css" rel="stylesheet" />
-    <link href="./locales/nb-NO.xml" />
-    <link href="./empty-report.json" />
+    <link href="./appReport/css/stimulsoft.designer.office2013.whiteblue.css" rel="stylesheet" />
+    <link href="./appReport/css/stimulsoft.viewer.office2013.whiteblue.css" rel="stylesheet" />
+    <link href="./appReport/css/report.css" rel="stylesheet" />
+    <link href="./appReport/locales/da-DK.xml" />
+    <link href="./appReport/empty-report.json" />
 
     <!--angular-->
+    <script src="../../Scripts/library-bundle.min.js"></script>
     <script src="../../Scripts/angular-bundle.min.js"></script>
 
     <!--stimulsoft-->
-    <script src="./Scripts/stimulsoft/stimulsoft.reports.js"></script>
-    <script src="./Scripts/stimulsoft/stimulsoft.viewer.js"></script>
-    <script src="./Scripts/stimulsoft/stimulsoft.designer.js"></script>
+    <script src="./appReport/Scripts/stimulsoft/stimulsoft.reports.js"></script>
+    <script src="./appReport/Scripts/stimulsoft/stimulsoft.viewer.js"></script>
+    <script src="./appReport/Scripts/stimulsoft/stimulsoft.designer.js"></script>
 
     <!--app-->
-    <script src="./reportApp.module.js"></script>
+    <script src="./appReport/reportApp.module.js"></script>
     <script src="../app/shared/notify/notify.module.js"></script>
     <script src="../app/shared/notify/notify.directive.js"></script>
     <script src="../app/shared/notify/notify.factory.js"></script>
-    <script src="./services/stimulsoftService.js"></script>
-    <script src="./report-viewer.controller.js"></script>
+    <script src="./appReport/services/stimulsoftService.js"></script>
     <script src="../app/services/ReportService.js"></script>
+    <script src="../app/services/userServices.js"></script>
+    <script src="./appReport/report-viewer.controller.js"></script>
 </head>
 
 <body ng-app="reportApp" ng-cloak ng-strict-di ng-controller="reportViewerController as vm">
     <!-- NOTIFICATION AREA -->
-    
     <div id="reportViewer"></div>
     <div id="reportDesigner">
         <div data-notify style="z-index:-2;"></div>

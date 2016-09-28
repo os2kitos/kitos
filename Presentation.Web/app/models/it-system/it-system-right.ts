@@ -4,7 +4,7 @@
         RoleId: number;
         ObjectId: number;
         User: IUser;
-        Role: IItSystemRole;
+        Role: IRoleEntity;
         Object: ItSystemUsage.IItSystemUsage;
     }
 }

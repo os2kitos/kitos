@@ -8,6 +8,7 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
+        isReportAdmin: boolean;
     }
 
     class OrganizationUserController {
@@ -100,12 +101,19 @@
                                 usr.isProjectAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ProjectModuleAdmin) !== undefined;
                                 usr.isSystemAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.SystemModuleAdmin) !== undefined;
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
+                                usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
                             });
                             return response;
                         }
                     }
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretOrganisation",
+                        text: "Opret Organisation",
+                        template: "<a ng-click='orgC.opretITProjekt()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
                 ],
                 excel: {
@@ -256,6 +264,15 @@
                         sortable: false
                     },
                     {
+                        field: "isReportAdmin", title: "Rapport Admin", width: 112,
+                        persistId: "reportadminrole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isReportAdmin ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
                         command: [
                             { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                             { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
@@ -276,6 +293,7 @@
                     case Models.OrganizationRole.ProjectModuleAdmin: roleNames[index] = "Projekt Admin"; break;
                     case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
                     case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
+                    case Models.OrganizationRole.ReportModuleAdmin: roleNames[index] = "Rapport Admin"; break;
                 }
             });
             return roleNames.join(",");

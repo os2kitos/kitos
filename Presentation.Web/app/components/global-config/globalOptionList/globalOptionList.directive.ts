@@ -1,67 +1,170 @@
-﻿(function(ng, app) {
-    'use strict';
+﻿module Kitos.GlobalConfig.Directives {
+    "use strict";
 
-    app.directive('globalOptionList', [
-        '$http', '$timeout', '$state', '$stateParams', 'notify', function($http, $timeout, $state, $stateParams, notify) {
-            return {
-                scope: {
-                    optionsUrl: '@',
-                    title: '@',
-                    orgid: '@'
+    function setupDirective(): ng.IDirective {
+        return {
+            scope: {},
+            controller: GlobalOptionListDirective,
+            controllerAs: "ctrl",
+            bindToController: {
+                optionsUrl: "@",
+                title: "@"
+            },
+            template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
+        };
+    }
+
+    interface IDirectiveScope {
+        optionsUrl: string;
+        title: string;
+    }
+
+    class GlobalOptionListDirective implements IDirectiveScope {
+        public optionsUrl: string;
+        public title: string;
+
+        public mainGrid: IKendoGrid<Models.IOptionEntity>;
+        public mainGridOptions: IKendoGridOptions<Models.IOptionEntity>;
+
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
+
+        constructor(
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private _: ILoDashWithMixins,
+            private $: JQueryStatic,
+            private $state: ng.ui.IStateService,
+            private notify) {
+            this.mainGridOptions = {
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: `${ this.optionsUrl }?$filter=IsActive eq true`,
+                            dataType: "json"
+                        }
+                        //,destroy: {
+                        //    url: (entity) => {
+                        //        return `/odata/Organizations(${this.user.currentOrganizationId})/RemoveUser()`;
+                        //    },
+                        //    dataType: "json",
+                        //    contentType: "application/json"
+                        //},
+                    },
+                    sort: {
+                        field: "Name",
+                        dir: "asc"
+                    },
+                    pageSize: 100,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                    schema: {
+                        model: {
+                            id: "Id"
+                        }
+                    }
+                } as kendo.data.DataSourceOptions,
+                toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretType",
+                        text: "Opret type",
+                        template: "<a ng-click='ctrl.opretType()' class='btn btn-success pull-right'>#: text #</a>"
+                    }
+                ],
+                pageable: {
+                    refresh: true,
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
                 },
-                templateUrl: 'app/shared/optionList/optionList.view.html',
-                link: function(scope, element, attrs) {
-
-                    scope.list = [];
-                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&nonsuggestions').success(function(result) {
-                        _.each(result.response, function(v) {
-                            scope.list.push({
-                                id: v.id,
-                                name: v.name,
-                                note: v.note,
-                                isActive: v.isActive
-                            });
-                        });
-                    });
-
-                    scope.suggestions = [];
-                    $http.get(scope.optionsUrl + '?organizationId=' + scope.orgid + '&suggestions').success(function(result) {
-                        _.each(result.response, function(v) {
-                            scope.suggestions.push({
-                                id: v.id,
-                                name: v.name,
-                                note: v.note
-                            });
-                        });
-                    });
-
-                    scope.approve = function(id) {
-                        var msg = notify.addInfoMessage("Gemmer...", false);
-                        $http({ method: 'PATCH', url: scope.optionsUrl + '/' + id + '?organizationId=' + scope.orgid, data: { isSuggestion: false } })
-                            .success(function() {
-                                msg.toSuccessMessage("Valgmuligheden er opdateret.");
-                                // reload page to show changes
-                                reload();
-                            })
-                            .error(function() {
-                                msg.toErrorMessage("Fejl! Valgmuligheden kunne ikke ændres!");
-                            });
-                    };
-
-                    // work around for $state.reload() not updating scope
-                    // https://github.com/angular-ui/ui-router/issues/582
-                    function reload() {
-                        return $state.transitionTo($state.current, $stateParams, {
-                            reload: true
-                        }).then(function() {
-                            scope.hideContent = true;
-                            return $timeout(function() {
-                                return scope.hideContent = false;
-                            }, 1);
-                        });
-                    };
-                }
+                sortable: {
+                    mode: "single"
+                },
+                editable: "popup",
+                reorderable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row"
+                },
+                groupable: false,
+                columnMenu: {
+                    filterable: false
+                },
+                columns: [
+                    {
+                        field: "IsActive", title: "Aktiv", width: 112,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: `# if(IsActive) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        command: [
+                            { text: "Op/Ned", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                        ],
+                        title: " ", width: 176,
+                        persistId: "command"
+                    },
+                    {
+                        field: "Id", title: "Nr.", width: 230,
+                        persistId: "id", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Id.toString(),
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Name", title: "Navn", width: 230,
+                        persistId: "name", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Name,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Note", title: "Beskrivelse", width: 230,
+                        persistId: "note", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Note,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        command: [
+                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                        ],
+                        title: " ", width: 176,
+                        persistId: "command"
+                    }
+                ]
             };
         }
-    ]);
-})(angular, app);
+
+        private onEdit = (e: JQueryEventObject) => {
+            e.preventDefault();
+            //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            //var entityId = dataItem["Id"];
+            //this.$state.go("organization.user.edit", { id: entityId });
+        }
+    }
+    angular.module("app")
+        .directive("globalOptionList", setupDirective);
+}
