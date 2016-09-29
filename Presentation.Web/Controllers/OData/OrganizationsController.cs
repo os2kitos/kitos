@@ -5,6 +5,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainModel;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -12,12 +13,14 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IOrganizationService _organizationService;
         private readonly IAuthenticationService _authService;
+        private readonly IGenericRepository<User> _userRepository;
 
-        public OrganizationsController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IAuthenticationService authService)
+        public OrganizationsController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IAuthenticationService authService, IGenericRepository<User> userRepository)
             : base(repository, authService)
         {
             _organizationService = organizationService;
             _authService = authService;
+            _userRepository = userRepository;
         }
 
         [ODataRoute("Organizations({orgKey})/RemoveUser")]
@@ -76,6 +79,14 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.GetByKey(orgKey).Type;
             return Ok(result);
+        }
+
+        [EnableQuery]
+        public override IHttpActionResult Post(Organization organization)
+        {
+            var user = _userRepository.GetByKey(UserId);
+            _organizationService.SetupDefaultOrganization(organization, user);
+            return base.Post(organization);
         }
     }
 }

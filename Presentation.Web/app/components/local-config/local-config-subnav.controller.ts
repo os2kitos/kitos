@@ -5,22 +5,26 @@
             abstract: true,
             template: '<ui-view autoscroll="false" />',
             resolve: {
-                config: ['$http', 'userService', function ($http, userService) {
-                    return userService.getUser().then(function(user) {
-                        return user.currentConfig;
+                user: ['$http', 'userService', function ($http, userService) {
+                    return userService.getUser().then(function (user) {
+                        return user;
                     });
+                }],
+
+                config: ['user', function (user) {
+                    return user.currentConfig;
                 }]
             },
-            controller: ['$rootScope', '$scope', 'config',
-                function ($rootScope, $scope, config) {
+            controller: ['$rootScope', '$scope', 'config', 'user',
+                function ($rootScope, $scope, config, user: Kitos.Services.IUser) {
                     $rootScope.page.title = 'Konfiguration';
                     $rootScope.page.subnav = [
+                        { state: 'local-config.current-org', text: user.currentOrganizationName },
                         { state: 'local-config.org', text: 'Organisation' },
                         { state: 'local-config.project', text: 'IT Projekt' },
                         { state: 'local-config.system', text: 'IT System' },
                         { state: 'local-config.contract', text: 'IT Kontrakt' },
-                        { state: 'local-config.import.organization', text: 'Masse Opret'},
-                        { state: 'local-config.module-admin', text: 'Module Admin'}
+                        { state: 'local-config.import.organization', text: 'Masse Opret' }
                     ];
 
                     $scope.config = config;

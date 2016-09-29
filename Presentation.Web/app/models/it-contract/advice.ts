@@ -12,11 +12,11 @@
         /** Gets or sets the receiver contract role identifier. */
         ReceiverId: number;
         /** Gets or sets the receiver contract role. */
-        Receiver: IItContractRole;
+        Receiver: IRoleEntity;
         /** Gets or sets the carbon copy receiver contract role identifier. */
         CarbonCopyReceiverId: number;
         /** Gets or sets the carbon copy contract role receiver. */
-        CarbonCopyReceiver: IItContractRole;
+        CarbonCopyReceiver: IRoleEntity;
         /** Gets or sets the subject of the email. */
         Subject: string;
         /** Gets or sets it contract identifier. */
