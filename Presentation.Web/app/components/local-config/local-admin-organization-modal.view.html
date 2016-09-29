@@ -1,0 +1,46 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">{{ ctrl.title }}</h3>
+</div>
+
+<form class="form-horizontal" role="form" name="form" novalidate data-ng-submit="ctrl.submit()">
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="access" class="col-md-3 control-label">
+                Synlighed
+            </label>
+            <div class="col-md-8">
+                <input id="access" data-ng-model="ctrl.org.accessModifier" class="form-control input-sm" data-select-access-modifier="" data-ng-required="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label">
+                Organisationens navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" data-ng-model="ctrl.org.name" id="name" class="form-control" data-ng-required="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="cvr" class="col-md-3 control-label">
+                CVR nummer
+            </label>
+            <div class="col-md-8">
+                <input type="text" data-ng-model="ctrl.org.cvr" id="cvr" class="form-control" data-ng-required="false" data-ng-pattern="/[0-9]{8}/">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-8 col-md-offset-3">
+                <label class="radio-inline">
+                    <input type="radio" data-ng-model="ctrl.org.typeId" value="1"> Interessefælleskab
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" data-ng-model="ctrl.org.typeId" value="2"> Virksomhed
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success" data-disabled-on-busy="">Gem</button>
+        <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
+    </div>
+</form>

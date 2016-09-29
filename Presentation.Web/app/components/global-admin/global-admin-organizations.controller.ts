@@ -160,7 +160,6 @@
                 ]
             };
         }
-            
 
         private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {

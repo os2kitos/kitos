@@ -5,7 +5,7 @@
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        public static $inject: string[] = ['$scope', '$http', 'notify', '$timeout', '_'];
+        public static $inject: string[] = ["$scope", "$http", "notify", "$timeout", "_"];
 
         constructor(private $scope, private $http, private notify, private $timeout, private _) {
             this.mainGridOptions = {
@@ -27,6 +27,11 @@
                     serverFiltering: true,
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
+                    {
+                        name: "opretOrganisation",
+                        text: "Opret Organisation",
+                        template: "<a ui-sref='local-config.org.create' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
                 ],
                 excel: {
@@ -87,25 +92,17 @@
                         template: (dataItem) => {
                             switch (dataItem.TypeId) {
                                 case 1:
-                                    return "Kommune";
-                                case 2:
                                     return "Interessefælleskab";
-                                case 3:
+                                case 2:
                                     return "Virksomhed";
-                                case 4:
-                                    return "Anden offentlig myndighed";
                             }
                         },
                         excelTemplate: (dataItem) => {
                             switch (dataItem.TypeId) {
                                 case 1:
-                                    return "Kommune";
-                                case 2:
                                     return "Interessefælleskab";
-                                case 3:
+                                case 2:
                                     return "Virksomhed";
-                                case 4:
-                                    return "Anden offentlig myndighed";
                             }
                         },
                         filterable: {
@@ -205,12 +202,19 @@
     angular
         .module("app")
         .config([
-            '$stateProvider', ($stateProvider: ng.ui.IStateProvider) => {
-                $stateProvider.state('local-config.org', {
-                    url: '/org',
-                    templateUrl: 'app/components/local-config/local-config-org.view.html',
+            "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+                $stateProvider.state("local-config.org", {
+                    url: "/org",
+                    templateUrl: "app/components/local-config/local-config-org.view.html",
                     controller: OrganizationController,
-                    controllerAs: 'orgCtrl',
+                    controllerAs: "orgCtrl",
+                    resolve: {
+                        user: [
+                            "userService", (userService) => {
+                                return userService.getUser();
+                            }
+                        ]
+                    }
                 });
             }]);
 }
