@@ -8,6 +8,7 @@
         /** The organization which the unit belongs to. */
         Organization: any;
         Definition: string;
+        AccessModifier: string;
     }
 
      export interface IReportCategory extends IEntity {

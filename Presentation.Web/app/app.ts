@@ -7,7 +7,9 @@
     "angularjs-dropdown-multiselect",
     "ngSanitize",
     "kendo.directives",
-    "angular-loading-bar"]);
+    "angular-loading-bar",
+    "angular-confirm",
+    "ui.bootstrap.tpls"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
