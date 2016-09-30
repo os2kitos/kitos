@@ -4,7 +4,7 @@ module.exports = {
     // library script bundle
     // not minified!
     librarySrc: [
-        bower("/lodash/lodash.min.js"),
+        bower("/lodash/dist/lodash.min.js"),
         bower("/jquery/dist/jquery.min.js"),
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
@@ -39,7 +39,9 @@ module.exports = {
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
         bower("/angular-ui-select/dist/select.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
-        bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js")
+        bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
+        bower("/angular-confirm-modal/angular-confirm.min.js")
+
     ],
     angularBundle: "angular-bundle.min.js",
 

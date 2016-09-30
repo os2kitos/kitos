@@ -289,7 +289,7 @@
             var modal = this.$uibModal.open({
                 backdrop: "static",
                 templateUrl: "app/components/home/choose-organization.html",
-                controller: ["$scope", "$uibModalInstance", "autofocus", function ($modalScope, $modalInstance, autofocus) {
+                controller: ["$scope", "$uibModalInstance", "autofocus", ($modalScope, $modalInstance, autofocus) => {
                     autofocus();
 
                     $modalScope.organizations = this._.map(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
@@ -300,7 +300,7 @@
                         selectedId: null
                     };
 
-                    $modalScope.ok = function () {
+                    $modalScope.ok = () => {
                         var selectedOrgAndUnit = this._.find(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
@@ -309,7 +309,7 @@
                 }]
             });
 
-            modal.result.then(function (selectedOrgAndUnit) {
+            modal.result.then((selectedOrgAndUnit) => {
                 this.setSavedOrgId(selectedOrgAndUnit.organization.id);
                 deferred.resolve(selectedOrgAndUnit);
             }, function () {
