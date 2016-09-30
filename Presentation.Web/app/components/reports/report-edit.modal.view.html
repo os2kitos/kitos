@@ -1,0 +1,52 @@
+<div class="modal-header">
+    <h3>{{vm.title}}</h3>
+</div>
+<div class="modal-body">
+    <form name="editReport.form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <label for="name" class="col-md-3 control-label">
+                Navn
+            </label>
+            <div class="col-md-8">
+                <input type="text" name="name" id="name" data-ng-model="vm.name" class="form-control" data-ng-required="true" data-disabled-on-busy autofocus>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="description" class="col-md-3 control-label">
+                Beskrivelse
+            </label>
+            <div class="col-md-8">
+                <textarea description="description" id="description" data-ng-model="vm.description" class="form-control" data-ng-required="true"
+                    data-disabled-on-busy></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="categoryType" class="col-md-3 control-label">
+                Kategori
+            </label>
+            <div class="col-md-8">
+                <select name="categoryType" id="categoryType" data-disabled-on-busy ng-model="vm.selectedCategory" ng-options="cat.Name for cat in vm.categories" class="form-control">
+                    <option value="">-- Vælg kategori --</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="accessModifier" class="col-md-3 control-label">
+                Synlighed
+            </label>
+            <div class="col-md-8">
+                <label class="radio-inline">
+                    <input type="radio" data-ng-model="vm.accessModifier" value="Local"> Lokal
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" data-ng-model="vm.accessModifier" value="Public"> Global
+                </label>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="vm.ok()" data-ng-disabled="editReport.form.$invalid || editReport.form.$pristine"
+        data-disabled-on-busy>Gem ændringer</button>
+    <button class="btn btn-warning" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
+</div>

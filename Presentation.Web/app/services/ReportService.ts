@@ -26,6 +26,10 @@ module Kitos.Services {
         saveReport = (report: Kitos.Models.IReport) => {
             this.$http.patch(this.baseUrl + "(" + report.Id + ")", report);
         }
+
+        getReportCategories = () => {
+            return this.$http.get<Kitos.Models.IODataResult<Models.IReportCategory>>("/odata/ReportCategories")
+        }
     }
 
     app.service("reportService", ReportService);
