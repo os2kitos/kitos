@@ -5,17 +5,8 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project type option.
     /// </summary>
-    public class ItProjectType : Entity, IOptionEntity<ItProject>
+    public class ItProjectType : OptionEntity<ItProject>, IOptionReference<ItProject>
     {
-        public ItProjectType()
-        {
-            References = new List<ItProject>();
-        }
-
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public virtual ICollection<ItProject> References { get; set; }
+        public virtual ICollection<ItProject> References { get; set; } = new HashSet<ItProject>();
     }
 }

@@ -295,6 +295,7 @@
     <Compile Include="Controllers\OData\ItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionExtendTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionTypesController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\ItSystemRolesController.cs" />

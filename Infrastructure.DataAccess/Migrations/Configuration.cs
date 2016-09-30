@@ -117,7 +117,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Chef",
-                Note = "Lederen af en organisationsenhed",
+                Description = "Lederen af en organisationsenhed",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -127,7 +127,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Ressourceperson",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -137,7 +137,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Medarbejder",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = false,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -147,7 +147,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Digitaliseringskonsulent",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -157,7 +157,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "IT konsulent",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -167,7 +167,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Leder",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -177,7 +177,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 IsActive = true,
                 Name = "Direktør",
-                Note = "...",
+                Description = "...",
                 HasWriteAccess = false,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -623,19 +623,19 @@ Kontakt: info@kitos.dk",
         /// <typeparam name="TReference">Reference type for the option</typeparam>
         /// <param name="name">The name of the new option entity</param>
         /// <param name="objectOwner">Object owner of the new entity</param>
-        /// <param name="note">Note for the entity</param>
+        /// <param name="note">Description for the entity</param>
         /// <param name="isActive">Is the option active</param>
         /// <param name="isSuggestion">Is the option an suggestion</param>
         /// <returns></returns>
-        private static T CreateOption<T, TReference>(string name, User objectOwner, string note = "...", bool isActive = true, bool isSuggestion = false)
-            where T : Entity, IOptionEntity<TReference>, new()
+        private static T CreateOption<T, TReference>(string name, User objectOwner, string description = "...", bool isActive = true, bool isSuggestion = false)
+            where T : OptionEntity<TReference>, new()
         {
             return new T()
             {
                 IsActive = isActive,
                 IsSuggestion = isSuggestion,
                 Name = name,
-                Note = note,
+                Description = description,
                 ObjectOwnerId = objectOwner.Id,
                 LastChangedByUserId = objectOwner.Id
             };
@@ -650,7 +650,7 @@ Kontakt: info@kitos.dk",
         /// <param name="objectOwner">Object owner of the new entities</param>
         /// <param name="names">The names of the new options</param>
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names)
-            where T : Entity, IOptionEntity<TReference>, new()
+            where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
             try
