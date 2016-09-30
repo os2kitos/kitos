@@ -17,6 +17,9 @@
         public mainGrid: Kitos.IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
         public currentEditModel: kendo.data.Model;
+        private canDelete: boolean = true;
+        private canCreate: boolean = true;
+        private canEdit: boolean = true;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -30,7 +33,8 @@
             "moment",
             "notify",
             "user",
-            "reports"
+            "reports",
+            "$confirm"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
@@ -43,8 +47,9 @@
             private _: Kitos.ILoDashWithMixins,
             private moment: moment.MomentStatic,
             private notify,
-            private user,
-            public reports) {
+            private user: Services.IUser,
+            public reports,
+            private $confirm) {
 
             this.$rootScope.page.title = "Raport Oversigt";
 
@@ -56,8 +61,40 @@
                     this.mainGrid.dataSource.read();
                 }
             });
+            this.setUpSequrity();
             this.setupGrid();
         }
+
+        private setUpSequrity = () => {
+            let canAll = this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isReportAdmin;
+            this.canCreate = this.canDelete = this.canEdit = canAll; 
+        }
+
+        private onEdit = (e: JQueryEventObject) => {
+            e.preventDefault();
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = dataItem["Id"];
+            this.$state.go("reports.report-edit", { id: entityId });
+        }
+
+        private onCreate = (e: JQueryEventObject) => {
+            //e.preventDefault();
+            this.$state.go("reports.report-edit", { id: 0 });
+        }
+
+        private onDelete = (e: JQueryEventObject) => {
+            e.preventDefault();
+
+            this.$confirm({ text: 'Ønsker du at slette rapporten?', title: 'Slet rapport', ok: 'Ja', cancel: 'Nej' })
+                .then(() => {
+                    var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+                    var entityId = dataItem["Id"];
+                    this.mainGrid.dataSource.remove(dataItem);
+                    this.mainGrid.dataSource.sync();
+                });
+        }
+
+
 
         private getAccessModifier = () => {
             return [
@@ -136,9 +173,11 @@
                 },
                 batch: false,
                 sync: false,
+                columnMenu: false,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
+                groupable: false,
                 pageSize: 5,
                 schema: {
                     model: {
@@ -157,9 +196,14 @@
             this.mainGridOptions = {
                 autoBind: false,
                 dataSource: dataSource,
-                editable: "inline",
+                editable: "popup",
                 height: 550,
-                toolbar: ["create"],
+                toolbar: [
+                    {
+                        name: "createReport",
+                        template: "<button type='button' class='btn btn-success' title='Opret rapport' data-ng-click='vm.onCreate()' data-ng-disabled='!vm.canCreate'>Opret rapport</button>"
+                    }
+                ],
                 edit: (e) => {
                     this.currentEditModel = e.model;
                 },
@@ -174,21 +218,18 @@
                 reorderable: true,
                 resizable: true,
                 groupable: false,
-                columnMenu: {
-                    filterable: true
-                },
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 150,
+                        field: "Name", title: "Navn", width: 150, menu: false,
                         template: dataItem => dataItem.Id ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
-                    },
-                    { field: "Description", title: "Beskrivelse", width: "250px" },
+                    } as any,
+                    { field: "Description", title: "Beskrivelse", width: "250px", menu: false },
                     {
-                        field: "CategoryTypeId", title: "Category", width: "180px", editor: this.CategoryDropDownEditor,
+                        field: "CategoryTypeId", title: "Category", width: "180px", menu: false,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
                     },
                     {
-                        field: "AccessModifier", title: "Adgang", width: "60px", editor: this.AccessModifierEditor,
+                        field: "AccessModifier", title: "Adgang", width: "60px", menu: false,
                         template: dataitem => {
                             switch (dataitem.AccessModifier) {
                                 case "Local": return "Lokal";
@@ -197,65 +238,24 @@
                             }
                         }
                     },
-                    { command: ["edit", "destroy"], title: "&nbsp;", width: "250px" }
+                    {
+                        command: [
+                            {
+                                name: "editReport",
+                                template: "<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit()' data-ng-disabled='!vm.canEdit'><i class='fa fa-pencil' aria-hidden='true'></i></button>"
+                            } as any,
+                            {
+                                name: "deleteReport",
+                                template: "<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete()' data-ng-disabled='!vm.canDelete'><i class='fa fa-minus' style='color:darkred' aria-hidden='true'></i></button>"
+                            } as any,
+
+                        ],
+                        title: "Handlinger", width: 50
+                    }
                 ]
 
             };
         }
-
-        AccessModifierEditor = (container, options) => {
-            this.$(`<input required name="" + options.field + ""/>`)
-                .appendTo(container)
-                .kendoDropDownList({
-                    autoBind: true,
-                    dataTextField: "Name",
-                    dataValueField: "Id",
-                    dataBound: (e) => {
-                        let edata = e;
-                        this.$timeout((edata) => {
-                            var catId = this.currentEditModel.get("AccessModifier");
-                            edata.sender.select((dataItem) => {
-                                return dataItem.Id === catId;
-                            })
-                        });
-                    },
-                    dataSource: this.getAccessModifier(),
-                    change: (e: kendo.ui.DropDownListChangeEvent) => {
-                        var newValue = e.sender.dataItem();
-                        var cur = this.currentEditModel;
-                        cur.set("AccessModifier", newValue.Id);
-                    }
-                });
-        };
-
-        CategoryDropDownEditor = (container, options) => {
-            this.$(`<input required name="" + options.field + ""/>`)
-                .appendTo(container)
-                .kendoDropDownList({
-                    autoBind: true,
-                    dataTextField: "Name",
-                    dataValueField: "Id",
-                    dataBound: (e) => {
-                        var catId = this.currentEditModel.get("CategoryTypeId");
-                        e.sender.select((dataItem) => {
-                            return dataItem.Id === catId;
-                        })
-                    },
-                    dataSource: {
-                        type: "odata-v4",
-                        transport: {
-                            read: "odata/ReportCategories"
-                        }
-                    },
-
-                    change: (e: kendo.ui.DropDownListChangeEvent) => {
-                        var newValue = e.sender.dataItem();
-                        var cur = this.currentEditModel;
-                        cur.set("CategoryType", newValue);
-                        cur.set("CategoryTypeId", newValue.Id);
-                    }
-                });
-        };
     }
 
     angular

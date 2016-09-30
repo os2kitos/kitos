@@ -32,7 +32,8 @@
     "angularjs-dropdown-multiselect": "^1.5.2",
     "angular-resource": "^1.5.8",
     "angular-ui-select": "^0.19.4",
-    "select2-bootstrap-css": "^1.4.6"
+    "select2-bootstrap-css": "^1.4.6",
+    "angular-confirm-modal": "^1.2.6"
   },
   "resolutions": {
     "angular": "^1.5.6",
