@@ -65,7 +65,7 @@
                         });
                     }
 
-                    function saveSelectUi() {
+                    function saveSelect2() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function() {
@@ -87,7 +87,7 @@
                         });
                     }
 
-                    function saveMultipleSelectUi(e) {
+                    function saveMultipleSelect2(e) {
                         var id, msg = notify.addInfoMessage("Gemmer...", false);
                         if (e.added) {
                             id = e.added.id;
@@ -129,12 +129,12 @@
                             });
                     }
 
-                    // ui select fields trigger the change event
-                    if (!angular.isUndefined(attrs.uiSelect)) {
+                    // select2 fields trigger the change event
+                    if (!angular.isUndefined(attrs.uiSelect2)) {
                         if (attrs.multiple) {
-                            element.bind('change', saveMultipleSelectUi);
+                            element.bind('change', saveMultipleSelect2);
                         } else {
-                            element.bind('change', saveSelectUi);
+                            element.bind('change', saveSelect2);
                         }
                         // kendo date picker
                     } else if (!angular.isUndefined(attrs.kendoDatePicker)) {
