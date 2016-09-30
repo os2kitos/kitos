@@ -482,6 +482,7 @@
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\reports\report-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\general-role-entity.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
@@ -674,7 +675,6 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
-    <TypeScriptCompile Include="app\components\reports\report-edit.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
