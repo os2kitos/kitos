@@ -104,7 +104,7 @@
         }
 
         private addRole(organizationId: number, userId: number, role: Models.OrganizationRole): ng.IHttpPromise<Models.IOrganizationRight> {
-            var rightsPayload = {
+            var rightsPayload: Models.IOrganizationRight = {
                 UserId: userId,
                 Role: role,
             };

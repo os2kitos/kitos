@@ -225,7 +225,7 @@
         auth = (adminRoles) => {
             return this.getUser().then((user: any) => {
                 if (adminRoles) {
-                    var hasRequiredRole = this._.some(adminRoles, role => ((role == "GlobalAdmin" && user.isGlobalAdmin) || (role == "LocalAdmin" && user.isLocalAdmin)));
+                    var hasRequiredRole = this._.some(adminRoles, role => ((role === "GlobalAdmin" && user.isGlobalAdmin) || (role === Models.OrganizationRole.LocalAdmin && user.isLocalAdmin)));
 
                     if (!hasRequiredRole) return this.$q.reject("User doesn't have the required permissions");
                 }

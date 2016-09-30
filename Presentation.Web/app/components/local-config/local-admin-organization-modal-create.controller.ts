@@ -5,9 +5,9 @@
         public title: string;
         public org;
 
-        public static $inject: string[] = ["$rootScope", "$scope", "$http", "notify"];
+        public static $inject: string[] = ["$rootScope", "$scope", "$http", "notify", "OrganizationService", "userService"];
 
-        constructor(private $rootScope, private $scope, private $http, private notify) {
+        constructor(private $rootScope, private $scope, private $http, private notify, private organizationService: Services.OrganizationService, private userService: Services.UserService) {
             $rootScope.page.title = "Ny organisation";
             this.title = "Opret organisation";
             this.org = {};
@@ -20,6 +20,9 @@
         }
 
         public submit() {
+
+            //this.organizationService.attachUser();
+
             var payload = this.org;
             this.$http.post("api/organization", payload)
                 .success((result) => {
@@ -38,7 +41,7 @@
             "$stateProvider", ($stateProvider) => {
                 $stateProvider.state("local-config.org.create", {
                     url: "/create",
-                    //authRoles: ['GlobalAdmin'],
+                    authRoles: Models.OrganizationRole.LocalAdmin,
                     onEnter: ["$state", "$stateParams", "$uibModal",
                         ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: ng.ui.bootstrap.IModalService) => {
                             $modal.open({
