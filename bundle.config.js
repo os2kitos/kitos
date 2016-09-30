@@ -41,7 +41,7 @@ module.exports = {
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js")
-        
+
     ],
     angularBundle: "angular-bundle.min.js",
 
