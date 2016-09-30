@@ -1,7 +1,7 @@
 ﻿var app = angular.module("app", [
     "ui.router",
     "ui.bootstrap",
-    "ui.select2",
+    "ui.select",
     "ngAnimate",
     "notify",
     "angularjs-dropdown-multiselect",
@@ -49,8 +49,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelectConfig",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelectConfig) => {
         // init info
         $rootScope.page = {
             title: "Index",
@@ -62,7 +62,7 @@ app.run([
         // this will try to authenticate - to see if the user's already logged in
         userService.getUser();
 
-        uiSelect2Config.dropdownAutoWidth = true;
+        uiSelectConfig.dropdownAutoWidth = true;
 
         // logout function for top navigation bar
         $rootScope.logout = () => {
