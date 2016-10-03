@@ -174,7 +174,7 @@
                 serverSorting: true,
                 serverFiltering: true,
                 groupable: false,
-                pageSize: 5,
+                pageSize: 20,
                 schema: {
                     model: {
                         id: "Id",
@@ -193,7 +193,7 @@
                 autoBind: false,
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,
+                height: 550,    
                 toolbar: [
                     {
                         name: "createReport",
@@ -205,8 +205,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [5],
-                    buttonCount: 5
+                    pageSizes: [20],
+                    buttonCount: 20
                 },
                 sortable: {
                     mode: "single"
