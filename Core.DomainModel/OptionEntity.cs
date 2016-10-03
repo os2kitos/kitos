@@ -42,14 +42,6 @@ namespace Core.DomainModel
         /// <value>
         /// The note.
         /// </value>
-        public string Description { get; set; }
-
-        /// <summary>
-        /// Gets or sets the references to an object which uses this option.
-        /// </summary>
-        /// <value>
-        /// The references.
-        /// </value>
-        public virtual ICollection<TReference> References { get; set; } = new HashSet<TReference>();
+        public string Description { get; set; } 
     }
 }

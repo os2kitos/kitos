@@ -10,17 +10,8 @@ namespace Core.DomainModel.ItSystem
     /// Notice that this is NOT an interface, nor does it
     /// distinguish systems from interfaces.
     /// </remarks>
-    public class InterfaceType : Entity, IOptionEntity<ItInterface> // TODO find a better suited name for this, note that InterfaceType is taken
+    public class InterfaceType : OptionEntity<ItInterface>, IOptionReference<ItInterface> // TODO find a better suited name for this, note that InterfaceType is taken
     {
-        public InterfaceType()
-        {
-            References = new List<ItInterface>();
-        }
-
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public virtual ICollection<ItInterface> References { get; set; }
+        public virtual ICollection<ItInterface> References { get; set; } = new HashSet<ItInterface>();
     }
 }

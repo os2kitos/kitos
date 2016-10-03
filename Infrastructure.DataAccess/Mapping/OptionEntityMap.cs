@@ -3,7 +3,7 @@
 namespace Infrastructure.DataAccess.Mapping
 {
     public abstract class OptionEntityMap<T, TReference> : EntityMap<T>
-        where T : Entity, IOptionEntity<TReference>
+        where T : OptionEntity<TReference>
     {
         protected OptionEntityMap()
         {

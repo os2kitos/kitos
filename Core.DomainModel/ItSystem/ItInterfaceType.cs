@@ -6,17 +6,8 @@ namespace Core.DomainModel.ItSystem
     /// Dropdown type for the <see cref="ItSystem"/>.
     /// Provides details about an ItSystem of type interface.
     /// </summary>
-    public class ItInterfaceType : Entity, IOptionEntity<ItInterface>
+    public class ItInterfaceType : OptionEntity<ItInterface>, IOptionReference<ItInterface>
     {
-        public ItInterfaceType()
-        {
-            References = new List<ItInterface>();
-        }
-
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public virtual ICollection<ItInterface> References { get; set; }
+        public virtual ICollection<ItInterface> References { get; set; } = new HashSet<ItInterface>();
     }
 }

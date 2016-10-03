@@ -181,6 +181,10 @@
     <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.Designer.cs">
       <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201609301133049_Option Entity to base class.cs" />
+    <Compile Include="Migrations\201609301133049_Option Entity to base class.Designer.cs">
+      <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -225,6 +229,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.resx">
       <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609301133049_Option Entity to base class.resx">
+      <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
