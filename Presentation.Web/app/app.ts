@@ -72,13 +72,13 @@ app.run([
         };
 
         // when changing states, we might need to authorize the user
-        $rootScope.$on("$stateChangeStart", (event, toState, toParams, fromState, fromParams) => {
+        $rootScope.$on("$stateChangeStart", (event, toState: Kitos.AuthRoles, toParams, fromState, fromParams) => {
 
             if (toState.noAuth) { // no need to auth
                 return;
             }
 
-            userService.auth(toState.adminRoles).then(val => {
+            userService.auth(toState.authRoles).then(val => {
                 // authentication OK!
 
             }, () => {

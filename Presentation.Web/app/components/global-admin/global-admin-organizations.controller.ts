@@ -108,7 +108,7 @@
                                 case 1:
                                     return "Kommune";
                                 case 2:
-                                    return "Interessefælleskab";
+                                    return "Interessefællesskab";
                                 case 3:
                                     return "Virksomhed";
                                 case 4:
@@ -120,7 +120,7 @@
                                 case 1:
                                     return "Kommune";
                                 case 2:
-                                    return "Interessefælleskab";
+                                    return "Interessefællesskab";
                                 case 3:
                                     return "Virksomhed";
                                 case 4:
@@ -160,7 +160,6 @@
                 ]
             };
         }
-            
 
         private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {

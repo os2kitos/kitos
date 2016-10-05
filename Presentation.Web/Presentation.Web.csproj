@@ -473,8 +473,11 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
+    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionRoleList\localOptionRoleList.directive.ts" />
@@ -495,6 +498,7 @@
     <TypeScriptCompile Include="appReport\reportApp.module.ts" />
     <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
+    <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
