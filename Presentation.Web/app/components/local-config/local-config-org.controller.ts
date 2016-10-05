@@ -92,17 +92,25 @@
                         template: (dataItem) => {
                             switch (dataItem.TypeId) {
                                 case 1:
-                                    return "Interessefælleskab";
+                                    return "Kommune";
                                 case 2:
+                                    return "Interessefællesskab";
+                                case 3:
                                     return "Virksomhed";
+                                case 4:
+                                    return "Anden offentlig myndighed";
                             }
                         },
                         excelTemplate: (dataItem) => {
                             switch (dataItem.TypeId) {
                                 case 1:
-                                    return "Interessefælleskab";
+                                    return "Kommune";
                                 case 2:
+                                    return "Interessefællesskab";
+                                case 3:
                                     return "Virksomhed";
+                                case 4:
+                                    return "Anden offentlig myndighed";
                             }
                         },
                         filterable: {
@@ -202,12 +210,13 @@
     angular
         .module("app")
         .config([
-            "$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+            "$stateProvider", ($stateProvider) => {
                 $stateProvider.state("local-config.org", {
                     url: "/org",
                     templateUrl: "app/components/local-config/local-config-org.view.html",
                     controller: OrganizationController,
                     controllerAs: "orgCtrl",
+                    authRoles: [Models.OrganizationRole.LocalAdmin],
                     resolve: {
                         user: [
                             "userService", (userService) => {

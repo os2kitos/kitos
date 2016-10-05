@@ -38,9 +38,9 @@
         .module("app")
         .config([
             "$stateProvider", ($stateProvider) => {
-                $stateProvider.state("local-admin.organizations.edit", {
+                $stateProvider.state("local-config.org.edit", {
                     url: "/edit/:id",
-                    //authRoles: ['GlobalAdmin'],
+                    authRoles: [Models.OrganizationRole.LocalAdmin],
                     onEnter: ["$state", "$stateParams", "$uibModal",
                         ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $modal: ng.ui.bootstrap.IModalService) => {
                             $modal.open({
