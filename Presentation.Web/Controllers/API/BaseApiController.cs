@@ -152,12 +152,14 @@ namespace Presentation.Web.Controllers.API
                     //if (user == null)
                     //{
                     var id = Convert.ToUInt32(User.Identity.Name);
-                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
-                    if (user == null) throw new SecurityException();
+                    var user = UserRepository.Get(u => u.Id == id);
+                    var firstUser = user.FirstOrDefault();
+                    if (firstUser == null)
+                        throw new SecurityException();
                     //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
                     //}
 
-                    return user;
+                    return firstUser;
                 }
                 catch (Exception exp)
                 {

@@ -67,24 +67,22 @@
 
         private setUpSequrity = () => {
             let canAll = this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isReportAdmin;
-            this.canCreate = this.canDelete = this.canEdit = canAll; 
+            this.canCreate = this.canDelete = this.canEdit = canAll;
         }
 
-        private onEdit = (e: JQueryEventObject) => {
+        public onEdit = (e: JQueryEventObject) => {
             e.preventDefault();
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = dataItem["Id"];
-            this.$state.go("reports.report-edit", { id: entityId });
+            this.$state.go("reports.overview.report-edit", { id: entityId });
         }
 
-        private onCreate = (e: JQueryEventObject) => {
-            //e.preventDefault();
-            this.$state.go("reports.report-edit", { id: 0 });
+        public onCreate = () => {
+            this.$state.go("reports.overview.report-edit", { id: 0 });
         }
 
-        private onDelete = (e: JQueryEventObject) => {
+        public onDelete = (e: JQueryEventObject) => {
             e.preventDefault();
-
             this.$confirm({ text: 'Ønsker du at slette rapporten?', title: 'Slet rapport', ok: 'Ja', cancel: 'Nej' })
                 .then(() => {
                     var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
@@ -93,8 +91,6 @@
                     this.mainGrid.dataSource.sync();
                 });
         }
-
-
 
         private getAccessModifier = () => {
             return [
@@ -178,7 +174,7 @@
                 serverSorting: true,
                 serverFiltering: true,
                 groupable: false,
-                pageSize: 5,
+                pageSize: 20,
                 schema: {
                     model: {
                         id: "Id",
@@ -197,11 +193,11 @@
                 autoBind: false,
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,
+                height: 550,    
                 toolbar: [
                     {
                         name: "createReport",
-                        template: "<button type='button' class='btn btn-success' title='Opret rapport' data-ng-click='vm.onCreate()' data-ng-disabled='!vm.canCreate'>Opret rapport</button>"
+                        template: `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     }
                 ],
                 edit: (e) => {
@@ -209,8 +205,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [5],
-                    buttonCount: 5
+                    pageSizes: [20],
+                    buttonCount: 20
                 },
                 sortable: {
                     mode: "single"
@@ -240,21 +236,43 @@
                     },
                     {
                         command: [
+                            // {
+                            //     name: "editReport",
+                            //     template: "<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit()' data-ng-disabled='!vm.canEdit'><i class='fa fa-pencil' aria-hidden='true'></i></button>"
+                            // } as any,
+                            // {
+                            //     name: "deleteReport",
+                            //     template: "<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete()' data-ng-disabled='!vm.canDelete'><i class='fa fa-minus' style='color:darkred' aria-hidden='true'></i></button>"
+                            // } as any,
                             {
                                 name: "editReport",
-                                template: "<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit()' data-ng-disabled='!vm.canEdit'><i class='fa fa-pencil' aria-hidden='true'></i></button>"
+                                buttonType: "Image",
+                                title: "Redigér rapport",
+                                text: "",
+                                imageClass: "fa fa-pencil",
+                                className: "btn btn-link",
+                                iconClass: "fa",
+                                click: this.onEdit
                             } as any,
                             {
                                 name: "deleteReport",
-                                template: "<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete()' data-ng-disabled='!vm.canDelete'><i class='fa fa-minus' style='color:darkred' aria-hidden='true'></i></button>"
-                            } as any,
+                                buttonType: "Image",
+                                title: "Slet rapport",
+                                text: "",
+                                imageClass: "fa fa-minus",
+                                className: "btn btn-link",
+                                iconClass: "fa",
+                                style: "color:darkred",
+                                click: this.onDelete
+                            } as any
 
                         ],
-                        title: "Handlinger", width: 50
+                        title: "Handlinger", name: "handlinger", width: 70
                     }
                 ]
-
             };
+            if (!this.canDelete || !this.canEdit)
+                this.mainGridOptions.columns.pop();
         }
     }
 

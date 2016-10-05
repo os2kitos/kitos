@@ -40,8 +40,8 @@ module.exports = {
         bower("/angular-ui-select/dist/select.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
-        bower("/angular-confirm-modal/angular-confirm.min.js")
-
+        bower("/angular-confirm-modal/angular-confirm.min.js"),
+        bower("/angular-messages/angular-messages.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
 

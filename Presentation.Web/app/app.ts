@@ -9,7 +9,8 @@
     "kendo.directives",
     "angular-loading-bar",
     "angular-confirm",
-    "ui.bootstrap.tpls"]);
+    "ui.bootstrap.tpls",
+    "ngMessages"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)

@@ -2,12 +2,8 @@ using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemType : Entity, IOptionEntity<ItSystem>
+    public class ItSystemType : OptionEntity<ItSystem>, IOptionReference<ItSystem>
     {
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public ICollection<ItSystem> References { get; set; }
+        public virtual ICollection<ItSystem> References { get; set; } = new HashSet<ItSystem>();
     }
 }

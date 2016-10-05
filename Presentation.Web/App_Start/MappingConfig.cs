@@ -33,7 +33,7 @@ namespace Presentation.Web
             base.Configure();
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
-            // like IsActive and Note
+            // like IsActive and Description
 
             Mapper.CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()

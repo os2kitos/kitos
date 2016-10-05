@@ -77,7 +77,7 @@ namespace Core.ApplicationServices
         //    clone.Background = original.Background;
         //    clone.IsTransversal = original.IsTransversal;
         //    clone.Name = original.Name;
-        //    clone.Note = original.Note;
+        //    clone.Description = original.Description;
         //    clone.Description = original.Description;
         //    clone.IsStrategy = original.IsStrategy;
 

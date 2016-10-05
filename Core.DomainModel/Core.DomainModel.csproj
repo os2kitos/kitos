@@ -73,11 +73,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItProject\Assignment.cs" />
     <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
+    <Compile Include="LocalOptionEntity.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IContextAware.cs" />
@@ -121,7 +123,7 @@
     <Compile Include="Organization\OrganizationUnit.cs" />
     <Compile Include="Organization\OrganizationUnitRight.cs" />
     <Compile Include="HasRightsEntity.cs" />
-    <Compile Include="IOptionEntity.cs" />
+    <Compile Include="OptionEntity.cs" />
     <Compile Include="IRight.cs" />
     <Compile Include="IRoleEntity.cs" />
     <Compile Include="ItContract\AgreementElementType.cs" />

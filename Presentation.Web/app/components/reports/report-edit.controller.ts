@@ -65,7 +65,9 @@
                     CategoryTypeId: this.categoryTypeId,
                     AccessModifier: this.accessModifier
                 }
-                this.$http.post("/odata/reports", payload);
+                this.$http.post("/odata/reports", payload).then((response)=>{
+                    this.$uibModalInstance.close();
+                });
             }
             else {
                 let payload = {
@@ -74,7 +76,9 @@
                     CategoryTypeId: this.categoryTypeId,
                     AccessModifier: this.accessModifier
                 }
-                this.$http.patch(`/odata/reports(${this.reportId})`, payload);
+                this.$http.patch(`/odata/reports(${this.reportId})`, payload).then((response)=>{
+                    this.$uibModalInstance.close();
+                });
             }
         }
 
@@ -86,7 +90,7 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("reports.report-edit", {
+            $stateProvider.state("reports.overview.report-edit", {
                 url: "/{id:int}/edit",
                 onEnter: [
                     "$state", "$stateParams", "$uibModal",
