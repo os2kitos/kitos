@@ -164,7 +164,6 @@ namespace Presentation.Web
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
             users.EntityType.Property(x => x.Name).IsRequired();
-            users.EntityType.Property(x => x.LastName).IsRequired();
             users.EntityType.Property(x => x.Email).IsRequired();
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
