@@ -42,6 +42,6 @@ namespace Core.DomainModel
         /// <value>
         /// The note.
         /// </value>
-        public string Description { get; set; } 
+        public string Description { get; set; }
     }
 }

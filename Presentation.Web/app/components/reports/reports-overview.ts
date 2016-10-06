@@ -51,7 +51,7 @@
             public reports,
             private $confirm) {
 
-            this.$rootScope.page.title = "Raport Oversigt";
+            this.$rootScope.page.title = "Rapport Oversigt";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -131,7 +131,7 @@
                         dataType: "json"
                     },
                     parameterMap: (data, type) => {
-                        // Call the default OData V4 parameterMap. 
+                        // Call the default OData V4 parameterMap.
                         var result = kendo.data.transports["odata-v4"].parameterMap(data, type);
                         if (type == "read") {
                             result.$count = true;
@@ -193,7 +193,7 @@
                 autoBind: false,
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,    
+                height: 550,
                 toolbar: [
                     {
                         name: "createReport",

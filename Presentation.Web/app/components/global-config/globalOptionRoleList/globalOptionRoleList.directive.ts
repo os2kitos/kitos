@@ -23,7 +23,7 @@
         public optionsUrl: string;
         public title: string;
 
-        public mainGrid: IKendoGrid<Models.IRoleEntity>;
+        //public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
         public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
@@ -33,7 +33,7 @@
             private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
-            private $state: ng.ui.IStateService,
+            //private $state: ng.ui.IStateService,
             private notify) {
             this.mainGridOptions = {
                 dataSource: {
@@ -70,7 +70,7 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretRolle",
                         text: "Opret rolle",
-                        template: "<a ng-click='ctrl.opretRolle()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<a ng-click='ctrl.createOption()' class='btn btn-success pull-right'>#: text #</a>"
                     }
                 ],
                 pageable: {
@@ -103,7 +103,7 @@
                     },
                     {
                         command: [
-                            { text: "Op/Ned", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { text: "Op/Ned", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                         ],
                         title: " ", width: 176,
                         persistId: "command"
@@ -144,7 +144,8 @@
                         sortable: false
                     },
                     {
-                        field: "Note", title: "Beskrivelse", width: 230,
+                        //field: "Note", title: "Beskrivelse", width: 230,
+                        field: "Description", title: "Beskrivelse", width: 230,
                         persistId: "note", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Note,
                         hidden: false,
@@ -158,7 +159,7 @@
                     },
                     {
                         command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { text: "Redigér", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                            ],
                         title: " ", width: 176,
                         persistId: "command"
@@ -167,11 +168,20 @@
             };
         }
 
-        private onEdit = (e: JQueryEventObject) => {
+        public createOption = () => {
+            //TODO OS2KITOS-256
+        }
+
+        private editOption = (e: JQueryEventObject) => {
+            //TODO OS2KITOS-257
             e.preventDefault();
             //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             //var entityId = dataItem["Id"];
             //this.$state.go("organization.user.edit", { id: entityId });
+        }
+
+        public deactivateOption = () => {
+            //TODO OS2KITOS-258
         }
     }
     angular.module("app")
