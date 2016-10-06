@@ -26,7 +26,7 @@
             this.userService.getUser().then((user: Services.IUser) => {
                 this.currentUser = user;
             }).catch((error) => {
-                this.notify.addErrorMessage("User not found!");
+                //this.notify.addErrorMessage("User not found!");
             });
 
         }
@@ -45,7 +45,7 @@
                         this.assignRoles(result.response.id);
                         this.notify
                             .addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet med ${
-                            this.currentUser.fullName} som lokal admin og bruger.`);
+                            this.currentUser.fullName} som lokal admin.`);
                     } else {
                         this.notify.addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet!`);
                     }
