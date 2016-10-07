@@ -1,9 +1,29 @@
 ﻿<div class="input-group full-width">
-    <input type="hidden"
+    <!--<input type="hidden"
            class="input-sm form-control"
            data-ng-model="userModel"
            data-ui-select2="selectUserOptions"
            data-placeholder="Vælg bruger"
            data-ng-change="onChange()"
-           data-ng-disabled="ngDisabled">
+           data-ng-disabled="ngDisabled">-->
+
+    <ui-select 
+        class="input-sm form-control"
+        theme="bootstrap"
+        ng-model="userModel"
+        ng-disabled="ngDisabled"
+        title="Vælg en bruger"
+        on-select="onChange()"
+        <ui-select-match placeholder="Vælg bruger">{{$select.selected.value.text}}</ui-select-match>
+        <!--<ui-select-choices 
+            repeat="bruger in results track by $index"
+            refresh="selectUserOptions($select.search)"
+            refresh-delay="500"
+            minimum-input-length="1"
+            <div ng-bind-html="bruger.text | highlight: $select.search"></div>
+                <small>
+                    email: {{bruger.user.email}}
+                </small>
+        </ui-select-choices>-->
+    </ui-select>
 </div>
