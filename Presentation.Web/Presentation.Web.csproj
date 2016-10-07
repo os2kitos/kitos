@@ -547,6 +547,7 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
+    <Content Include="app\components\reports\report-edit.modal.view.html" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
