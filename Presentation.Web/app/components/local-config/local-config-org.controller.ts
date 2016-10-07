@@ -5,7 +5,7 @@
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        public static $inject: string[] = ['$scope', '$http', 'notify', '$timeout', '_'];
+        public static $inject: string[] = ["$scope", "$http", "notify", "$timeout", "_"];
 
         constructor(private $scope, private $http, private notify, private $timeout, private _) {
             this.mainGridOptions = {
@@ -27,6 +27,11 @@
                     serverFiltering: true,
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
+                    {
+                        name: "opretOrganisation",
+                        text: "Opret Organisation",
+                        template: "<a ui-sref='local-config.org.create' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
                 ],
                 excel: {
@@ -89,7 +94,7 @@
                                 case 1:
                                     return "Kommune";
                                 case 2:
-                                    return "Interessefælleskab";
+                                    return "Interessefællesskab";
                                 case 3:
                                     return "Virksomhed";
                                 case 4:
@@ -101,7 +106,7 @@
                                 case 1:
                                     return "Kommune";
                                 case 2:
-                                    return "Interessefælleskab";
+                                    return "Interessefællesskab";
                                 case 3:
                                     return "Virksomhed";
                                 case 4:
@@ -205,12 +210,20 @@
     angular
         .module("app")
         .config([
-            '$stateProvider', ($stateProvider: ng.ui.IStateProvider) => {
-                $stateProvider.state('local-config.org', {
-                    url: '/org',
-                    templateUrl: 'app/components/local-config/local-config-org.view.html',
+            "$stateProvider", ($stateProvider) => {
+                $stateProvider.state("local-config.org", {
+                    url: "/org",
+                    templateUrl: "app/components/local-config/local-config-org.view.html",
                     controller: OrganizationController,
-                    controllerAs: 'orgCtrl',
+                    controllerAs: "orgCtrl",
+                    authRoles: [Models.OrganizationRole.LocalAdmin],
+                    resolve: {
+                        user: [
+                            "userService", (userService) => {
+                                return userService.getUser();
+                            }
+                        ]
+                    }
                 });
             }]);
 }

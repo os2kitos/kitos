@@ -60,4 +60,10 @@
     export interface IHttpInterceptorWithCustomConfig extends ng.IHttpInterceptor {
         request?: (config: IRequestConfigWithCustomConfig) => IRequestConfigWithCustomConfig | ng.IPromise<IRequestConfigWithCustomConfig>;
     }
+
+    export interface AuthRoles extends ng.ui.IStateProvider {
+        authRoles: [Models.OrganizationRole|"GlobalAdmin"];
+        noAuth: string;
+        name: string;
+    }
 }
