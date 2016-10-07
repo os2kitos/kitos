@@ -15,7 +15,7 @@
         title="Vælg en bruger"
         on-select="onChange()"
         <ui-select-match placeholder="Vælg bruger">{{$select.selected.value.text}}</ui-select-match>
-        <!--<ui-select-choices 
+        <ui-select-choices 
             repeat="bruger in results track by $index"
             refresh="selectUserOptions($select.search)"
             refresh-delay="500"
@@ -24,6 +24,6 @@
                 <small>
                     email: {{bruger.user.email}}
                 </small>
-        </ui-select-choices>-->
+        </ui-select-choices>
     </ui-select>
 </div>
