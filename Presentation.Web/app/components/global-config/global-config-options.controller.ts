@@ -9,7 +9,7 @@
         public name: string;
         public hasWriteAccess: boolean;
         public description: string;
-        public action: string;
+        public optionId: number;
 
 
         public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "_"];
@@ -19,19 +19,48 @@
             private $http: ng.IHttpService,
             private notify,
             private reportService: Services.ReportService,
-            private _: ILoDashWithMixins) {
+            private _: ILoDashWithMixins,
+            private baseUrl: string) {
 
-            this.actionSelector($stateParams["action"]);
+            this.baseUrl = "/odata/options";
+            this.initModal($stateParams["optionId"]);
         }
 
-        private actionSelector = (action: string) => {
-            switch (action) {
-                case "create":
-                    this.title = "Opret";
-                    break;
-                case "edit":
-                    this.title = "Redigér";
-                    break;
+        //TODO Not done!
+        private initModal = (optionId: number) => {
+            this.optionId = optionId;
+
+            if (optionId === 0) {
+                this.title = "Opret";
+            } else {
+                this.title = "Redigér";
+            }
+
+            if (optionId === 1) {
+                let option = this.$http.get<Models.IOptionEntity>(`${this.baseUrl}(${optionId})`);
+
+                option.then((result) => {
+                    let opt = result.data;
+                    this.name = opt.Name;
+                    this.description = opt.Note;
+                });
+            }
+
+        }
+
+        //TODO Not done!
+        public ok() {
+            if (this.optionId === 0) {
+                let payload = {
+                    Name: this.name,
+                    Note: this.description
+                }
+                this.$http.post(`${this.baseUrl}`, payload).then((response) => {
+                    this.$uibModalInstance.close();
+                    this.notify.addSuccessMessage("Oprettet.");
+                }).catch((response) => {
+                    this.notify.addErrorMessage("Oprettelse mislykkedes.");
+                });
             }
         }
 

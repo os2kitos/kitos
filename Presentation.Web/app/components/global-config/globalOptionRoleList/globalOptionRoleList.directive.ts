@@ -33,7 +33,7 @@
             private $timeout: ng.ITimeoutService,
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
-            //private $state: ng.ui.IStateService,
+            private $state: ng.ui.IStateService,
             private notify) {
             this.mainGridOptions = {
                 dataSource: {
@@ -159,7 +159,8 @@
                     },
                     {
                         command: [
-                            { text: "Redigér", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            //{ text: "Redigér", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { name: "editOption", text: "", click: this.editOption, imageClass: "fa fa-pencil", className: "btn btn-link", iconClass: "fa" } as any /* kendo typedef is missing imageClass and iconClass so casting to any */
                            ],
                         title: " ", width: 176,
                         persistId: "command"
@@ -170,6 +171,7 @@
 
         public createOption = () => {
             //TODO OS2KITOS-256
+            this.$state.go("", {optionId: 0});
         }
 
         private editOption = (e: JQueryEventObject) => {
