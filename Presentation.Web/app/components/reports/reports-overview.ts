@@ -121,7 +121,7 @@
                         dataType: "json"
                     },
                     parameterMap: (data, type) => {
-                        // Call the default OData V4 parameterMap. 
+                        // Call the default OData V4 parameterMap.
                         var result = kendo.data.transports["odata-v4"].parameterMap(data, type);
                         if (type == "read") {
                             result.$count = true;
@@ -198,7 +198,7 @@
                 toolbar: [
                     {
                         name: "createReport",
-                        template: `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canEdit()">Opret rapport</button>`
+                        template: `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     }
                 ],
                 pageable: {
@@ -237,7 +237,7 @@
                         width: 70,
                         template: dataItem => `<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit($event)' data-ng-disabled='!${dataItem.canEdit}'><i class='fa fa-pencil' aria-hidden='true'></i></button>` +
                                               `<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete($event)' data-ng-disabled='!${dataItem.canEdit}'><i class='fa fa-minus' aria-hidden='true'></i></button>`
-                    }                    
+                    }
                 ]
             };
         }
