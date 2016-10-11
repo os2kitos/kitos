@@ -28,7 +28,7 @@
                     ];
 
                     $scope.config = config;
-                    $scope.config.autosaveUrl = "api/config/" + config.id;
+                    $scope.config.autosaveUrl = "odata/Configs(" + config.id + ")";
                 }]
         });
     }]);

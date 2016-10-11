@@ -8,6 +8,11 @@ namespace Presentation.Web.Models
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }
 
+        /* SHOW/HIDE 'IT' PREFIX */
+        public bool ShowItProjectPrefix { get; set; }
+        public bool ShowItSystemPrefix { get; set; }
+        public bool ShowItContractPrefix { get; set; }
+
         /* ORGANIZATION */
         public bool ShowTabOverview { get; set; }
         public bool ShowColumnTechnology { get; set; }

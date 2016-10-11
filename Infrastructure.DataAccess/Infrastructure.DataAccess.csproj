@@ -185,6 +185,10 @@
     <Compile Include="Migrations\201609301133049_Option Entity to base class.Designer.cs">
       <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610100846446_Added the IT prefix to config.cs" />
+    <Compile Include="Migrations\201610100846446_Added the IT prefix to config.Designer.cs">
+      <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -232,6 +236,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201609301133049_Option Entity to base class.resx">
       <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610100846446_Added the IT prefix to config.resx">
+      <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
