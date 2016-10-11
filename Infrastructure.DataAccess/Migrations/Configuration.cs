@@ -693,12 +693,12 @@ Kontakt: info@kitos.dk",
             {
                 Name = name,
                 Config = Config.Default(objectOwner),
-                TypeId = (OrganizationTypeType) organizationType.Id,
+                TypeId = organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
                 LastChangedByUserId = objectOwner?.Id
             };
 
-            org.OrgUnits.Add(new OrganizationUnit()
+            org.OrgUnits.Add(new OrganizationUnit
             {
                 Name = org.Name,
                 ObjectOwnerId = objectOwner?.Id,

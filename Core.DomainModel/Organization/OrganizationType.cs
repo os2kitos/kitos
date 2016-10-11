@@ -17,7 +17,7 @@ namespace Core.DomainModel.Organization
             Organizations = new HashSet<Organization>();
         }
 
-        public OrganizationTypeKeys Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public OrganizationCategory Category { get; set; }
         public virtual ICollection<Organization> Organizations { get; set; }
