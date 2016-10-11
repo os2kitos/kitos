@@ -265,6 +265,9 @@ namespace Presentation.Web
             var terminationDeadlineType = builder.EntitySet<TerminationDeadlineType>(nameof(TerminationDeadlineTypesController).Replace("Controller", string.Empty));
             terminationDeadlineType.EntityType.HasKey(x => x.Id);
 
+            var config = builder.EntitySet<Config>(nameof(ConfigsController).Replace("Controller", string.Empty));
+            config.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");

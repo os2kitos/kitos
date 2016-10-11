@@ -10,6 +10,11 @@ namespace Core.DomainModel
         public bool ShowItSystemModule { get; set; }
         public bool ShowItContractModule { get; set; }
 
+        /* SHOW/HIDE 'IT' PREFIX */
+        public bool ShowItProjectPrefix { get; set; }
+        public bool ShowItSystemPrefix { get; set; }
+        public bool ShowItContractPrefix { get; set; }
+
         /* IT SUPPORT */
         public int ItSupportModuleNameId { get; set; }
         public string ItSupportGuide { get; set; }
@@ -26,6 +31,9 @@ namespace Core.DomainModel
                     ShowItContractModule = true,
                     ShowItProjectModule = true,
                     ShowItSystemModule = true,
+                    ShowItContractPrefix = true,
+                    ShowItProjectPrefix = true,
+                    ShowItSystemPrefix = true,
                     ShowColumnTechnology = true,
                     ShowColumnUsage = true,
                     ShowTabOverview = true,

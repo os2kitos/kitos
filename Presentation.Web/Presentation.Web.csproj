@@ -300,6 +300,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
+    <Compile Include="Controllers\OData\ConfigsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
