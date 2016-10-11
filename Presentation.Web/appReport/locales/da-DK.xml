@@ -346,11 +346,11 @@
     <StiCrossFooterBand>Krydsbundtekst</StiCrossFooterBand>
     <StiCrossGroupFooterBand>Krydsgruppe bundtekst</StiCrossGroupFooterBand>
     <StiCrossGroupHeaderBand>Krydsgruppe Toptekst</StiCrossGroupHeaderBand>
-    <StiCrossHeaderBand>KrydsToptekst</StiCrossHeaderBand>
-    <StiCrossRow>Krydsrad</StiCrossRow>
-    <StiCrossRowTotal>Krydsrad totalt</StiCrossRowTotal>
-    <StiCrossSummary>Krydsoppsummering</StiCrossSummary>
-    <StiCrossSummaryHeader>Krydsoppsummering toptekst</StiCrossSummaryHeader>
+    <StiCrossHeaderBand>Krydstoptekst</StiCrossHeaderBand>
+    <StiCrossRow>Krydsrække</StiCrossRow>
+    <StiCrossRowTotal>Krydsrække totalt</StiCrossRowTotal>
+    <StiCrossSummary>Krydsopsummering</StiCrossSummary>
+    <StiCrossSummaryHeader>Krydsopsummering toptekst</StiCrossSummaryHeader>
     <StiCrossTab>Krydsfane</StiCrossTab>
     <StiCrossTitle>Krydstitel</StiCrossTitle>
     <StiDataBand>Data</StiDataBand>
@@ -358,11 +358,11 @@
     <StiFooterBand>Bundtekst</StiFooterBand>
     <StiGauge>Mål</StiGauge>
     <StiGroupFooterBand>Gruppebundtekst</StiGroupFooterBand>
-    <StiGroupHeaderBand>GruppeToptekst</StiGroupHeaderBand>
-    <StiHeaderBand>Topptekst</StiHeaderBand>
+    <StiGroupHeaderBand>Gruppetoptekst</StiGroupHeaderBand>
+    <StiHeaderBand>Toptekst</StiHeaderBand>
     <StiHierarchicalBand>Hierarkisk data</StiHierarchicalBand>
     <StiHorizontalLinePrimitive>Horisontal linje</StiHorizontalLinePrimitive>
-    <StiImage>Bilde</StiImage>
+    <StiImage>Billede</StiImage>
     <StiOverlayBand>Overlappe</StiOverlayBand>
     <StiPage>Side</StiPage>
     <StiPageFooterBand>Sidens bundtekst</StiPageFooterBand>
@@ -371,12 +371,12 @@
     <StiRectanglePrimitive>Rektangel</StiRectanglePrimitive>
     <StiReport>Rapport</StiReport>
     <StiReportSummaryBand>Rapportsammendrag</StiReportSummaryBand>
-    <StiReportTitleBand>Rapporttittel</StiReportTitleBand>
+    <StiReportTitleBand>Rapporttitel</StiReportTitleBand>
     <StiRichText>Rich Text</StiRichText>
-    <StiRoundedRectanglePrimitive>Avrundet rektangel</StiRoundedRectanglePrimitive>
+    <StiRoundedRectanglePrimitive>Afrundet rektangel</StiRoundedRectanglePrimitive>
     <StiShape>Form</StiShape>
     <StiSubReport>Underrapport</StiSubReport>
-    <StiSystemText>Systemtext</StiSystemText>
+    <StiSystemText>Systemtekst</StiSystemText>
     <StiTable>Tabel</StiTable>
     <StiText>Tekst</StiText>
     <StiTextInCells>Tekst i celler</StiTextInCells>
@@ -405,69 +405,69 @@
     <DatabaseXml>XML-data</DatabaseXml>
   </Database>
   <DesignerFx>
-    <AlreadyExists>"{0}" eksidsterer allerede</AlreadyExists>
-    <CanNotLoadThisReportTemplate>Kan ikke laste denne rapportmalen.</CanNotLoadThisReportTemplate>
+    <AlreadyExists>"{0}" eksisterer allerede</AlreadyExists>
+    <CanNotLoadThisReportTemplate>Kan ikke hente denne rapportskabelon.</CanNotLoadThisReportTemplate>
     <CloseDataSourceEditor>You want to close data source editor?</CloseDataSourceEditor>
-    <CloseEditor>Vil du avsludte redigeringen?</CloseEditor>
+    <CloseEditor>Vil du afslutte redigeringen?</CloseEditor>
     <CompilingReport>Kompilerer rapport</CompilingReport>
-    <Connecting>Kobler til server</Connecting>
-    <ConnectionError>forbindelsesfeil</ConnectionError>
-    <ConnectionSuccessfull>forbindelse lykkes</ConnectionSuccessfull>
-    <Continue>Fortsett</Continue>
-    <DecryptionError>Dekrypteringsfeil: Fejl passord eller korrupt fil.</DecryptionError>
-    <EmailSuccessfullySent>E-posten ble sendt.</EmailSuccessfullySent>
+    <Connecting>Forbinder til server</Connecting>
+    <ConnectionError>forbindelsesfejl</ConnectionError>
+    <ConnectionSuccessfull>forbindelse lykkedes</ConnectionSuccessfull>
+    <Continue>Fortsæt</Continue>
+    <DecryptionError>Dekrypteringsfeil: Fejl i kodeord eller korrupt fil.</DecryptionError>
+    <EmailSuccessfullySent>E-posten blev sendt.</EmailSuccessfullySent>
     <ErrorAtSaving>Fejl ved Lavring</ErrorAtSaving>
     <ErrorCode>Fejl under Lavring. Fejlkode: {0}</ErrorCode>
     <ErrorServer>Fejl under Lavring. Serveren svarer ikke.</ErrorServer>
     <ExportingReport>Eksporterer rapport</ExportingReport>
-    <LoadingCode>Laster inn kode</LoadingCode>
-    <LoadingConfiguration>Laster inn konfigurasjon</LoadingConfiguration>
-    <LoadingData>Laster inn data</LoadingData>
-    <LoadingDocument>Laster inn dokument</LoadingDocument>
-    <LoadingImages>Laster inn billeder</LoadingImages>
-    <LoadingLanguage>Laster inn sprog</LoadingLanguage>
-    <LoadingReport>Laster inn rapport</LoadingReport>
+    <LoadingCode>Indlæser kode</LoadingCode>
+    <LoadingConfiguration>Indlæser konfiguration</LoadingConfiguration>
+    <LoadingData>Indlæser data</LoadingData>
+    <LoadingDocument>Indlæser dokument</LoadingDocument>
+    <LoadingImages>Indlæser billeder</LoadingImages>
+    <LoadingLanguage>Indlæser sprog</LoadingLanguage>
+    <LoadingReport>Indlæser rapport</LoadingReport>
     <PreviewAs>Forhåndsvis som {0}</PreviewAs>
-    <RenderingReport>Gjengivelsesrapport</RenderingReport>
-    <ReportSuccessfullySaved>Rapporten ble Gemmet.</ReportSuccessfullySaved>
-    <RetrieveError>Hent kolonnefeil</RetrieveError>
+    <RenderingReport>Gengivelsesrapport</RenderingReport>
+    <ReportSuccessfullySaved>Rapporten blev gemt.</ReportSuccessfullySaved>
+    <RetrieveError>Hent kolonnefejl</RetrieveError>
     <RetrievingColumns>Henter kolonner</RetrievingColumns>
-    <SavingConfiguration>Gemmer konfigurasjon</SavingConfiguration>
+    <SavingConfiguration>Gemmer konfiguration</SavingConfiguration>
     <SavingReport>Gemmer rapport</SavingReport>
     <TestConnection>Test forbindelse</TestConnection>
-    <TextNotFound>Den spesifiserte teksten ble ikke fundet. Tekst: {0}</TextNotFound>
+    <TextNotFound>Den specificerede tekst blev ikke fundet. Tekst: {0}</TextNotFound>
   </DesignerFx>
   <Dialogs>
-    <StiBudtonControl>Knapp</StiBudtonControl>
-    <StiCheckBoxControl>AvKrydsningsboks</StiCheckBoxControl>
+    <StiBudtonControl>Knap</StiBudtonControl>
+    <StiCheckBoxControl>Afkrydsningsboks</StiCheckBoxControl>
     <StiCheckedListBoxControl>Checklisteboks</StiCheckedListBoxControl>
     <StiComboBoxControl>Komboboks</StiComboBoxControl>
-    <StiDateTimePickerControl>Dato- og tidsVælger</StiDateTimePickerControl>
+    <StiDateTimePickerControl>Dato- og tidsvælger</StiDateTimePickerControl>
     <StiForm>Form</StiForm>
     <StiGridControl>gitter</StiGridControl>
     <StiGroupBoxControl>Gruppeboks</StiGroupBoxControl>
-    <StiLabelControl>Etikett</StiLabelControl>
+    <StiLabelControl>Etiket</StiLabelControl>
     <StiListBoxControl>Listeboks</StiListBoxControl>
     <StiListViewControl>Listevisning</StiListViewControl>
     <StiLookUpBoxControl>Søgeboks</StiLookUpBoxControl>
     <StiNumericUpDownControl>Numerisk op ned</StiNumericUpDownControl>
     <StiPanelControl>Panel</StiPanelControl>
-    <StiPictureBoxControl>Bildeboks</StiPictureBoxControl>
-    <StiRadioBudtonControl>Radioknapp</StiRadioBudtonControl>
+    <StiPictureBoxControl>Billedeboks</StiPictureBoxControl>
+    <StiRadioBudtonControl>Radioknap</StiRadioBudtonControl>
     <StiReportControl>Rapportkontrol</StiReportControl>
-    <StiRichTextBoxControl>Rik tekst-boks</StiRichTextBoxControl>
+    <StiRichTextBoxControl>Rig tekst-boks</StiRichTextBoxControl>
     <StiTextBoxControl>Tekstboks</StiTextBoxControl>
-    <StiTreeViewControl>Trevisning</StiTreeViewControl>
+    <StiTreeViewControl>Trævisning</StiTreeViewControl>
   </Dialogs>
   <Editor>
-    <CantFind>Kan ikke finne det du søker efter.</CantFind>
-    <CollapseToDefinitions>&amp;Kollaps til definisjoner</CollapseToDefinitions>
+    <CantFind>Kan ikke finde det du søger efter.</CantFind>
+    <CollapseToDefinitions>&amp;Kollaps til definitioner</CollapseToDefinitions>
     <Column>Kolonne: {0}</Column>
     <EntireScope>&amp;Hele området</EntireScope>
     <Find>&amp;Find</Find>
-    <FindNext>&amp;Find neste</FindNext>
+    <FindNext>&amp;Find næste</FindNext>
     <FindWhat>Søgeord:</FindWhat>
-    <FromCursor>Fra musepekeren</FromCursor>
+    <FromCursor>Fra musepilen</FromCursor>
     <GotoLine>Gå til &amp;linje</GotoLine>
     <Line>Linje: {0}</Line>
     <LineNumber>Linjenummer:</LineNumber>
@@ -484,15 +484,15 @@
     <SearchHiddenText>Skjult tekst</SearchHiddenText>
     <SearchUp>Søg &amp;opad</SearchUp>
     <SelectionOnly>Bare &amp;udvalg</SelectionOnly>
-    <ShowAutoGeneratedCode>Vis audogenerert kode</ShowAutoGeneratedCode>
+    <ShowAutoGeneratedCode>Vis autogenereret kode</ShowAutoGeneratedCode>
     <ShowLineNumbers>Vis linjenummer</ShowLineNumbers>
-    <StopOudlining>Sto&amp;p skissering</StopOudlining>
+    <StopOudlining>Sto&amp;p skitsering</StopOudlining>
     <titleFind>Find</titleFind>
     <titleGotoLine>Gå til linje</titleGotoLine>
-    <titleReplace>Erstatt</titleReplace>
+    <titleReplace>Erstat</titleReplace>
     <ToggleAllOutlining>Skift a&amp;lle skitseringer</ToggleAllOutlining>
     <ToggleOutliningExpansion>&amp;Skift skitseringsudvidelse</ToggleOutliningExpansion>
-    <UseRegularExpressions>Brug &amp;regulære udtrykk</UseRegularExpressions>
+    <UseRegularExpressions>Brug &amp;regulære udtryk</UseRegularExpressions>
   </Editor>
   <Errors>
     <ComponentIsNotRelease>Komponenten er ikke frigivet "{0}".</ComponentIsNotRelease>
@@ -504,41 +504,41 @@
     <FileNotFound>Fil "{0}" ikke fundet.</FileNotFound>
     <IdentifierIsNotValid>Identifikatoren '{0}' er ikke gyldig.</IdentifierIsNotValid>
     <ImpossibleFindDataSource>Finder ikke datakilde.</ImpossibleFindDataSource>
-    <NameExists>Det er allerede et objekt som hedder '{0}'. Objekter skal have unikke navnr, og må ikke skelne mellem store og små bogstaver.</NameExists>
-    <NoServices>Tjenester bleb ikke fundet i '{0}'</NoServices>
-    <NotAssign>Datakilde ikke spesifisert.</NotAssign>
-    <NotCorrectFormat>Inddatastring var ikke i et korrekt format.</NotCorrectFormat>
+    <NameExists>Det er allerede et objekt som hedder '{0}'. Objekter skal have unikke navne, og må ikke skelne mellem store og små bogstaver.</NameExists>
+    <NoServices>Tjenester blev ikke fundet i '{0}'</NoServices>
+    <NotAssign>Datakilde ikke specificeret.</NotAssign>
+    <NotCorrectFormat>Inputdata var ikke i et korrekt format.</NotCorrectFormat>
     <RelationsNotFound>Relationer ikke fundet.</RelationsNotFound>
-    <ReportCannotBeSaveDueToErrors>Rapport kan ikke Gemmes på grunn af feil!</ReportCannotBeSaveDueToErrors>
+    <ReportCannotBeSaveDueToErrors>Rapport kan ikke gemmes på grund af en fejl!</ReportCannotBeSaveDueToErrors>
     <ServiceNotFound>'{0}' tjeneste ikke fundet.</ServiceNotFound>
   </Errors>
   <Export>
     <AddPageBreaks>Tilføj sideskift</AddPageBreaks>
     <AllBands>Alle bånd</AllBands>
-    <AllowAddOrModifyTextAnnotations>Tillad at legge til eller endre tekstbeskrivelser</AllowAddOrModifyTextAnnotations>
-    <AllowCopyTextAndGraphics>Tillad kopiering af tekst og grafikk</AllowCopyTextAndGraphics>
+    <AllowAddOrModifyTextAnnotations>Tillad at tilføje eller redigere tekstbeskrivelser</AllowAddOrModifyTextAnnotations>
+    <AllowCopyTextAndGraphics>Tillad kopiering af tekst og grafik</AllowCopyTextAndGraphics>
     <AllowEditable>Tillad redigering:</AllowEditable>
-    <AllowModifyContents>Tillad redigering af innhold</AllowModifyContents>
+    <AllowModifyContents>Tillad redigering af indhold</AllowModifyContents>
     <AllowPrintDocument>Tillad udskrift af dokument</AllowPrintDocument>
     <BandsFilter>Båndfilter:</BandsFilter>
     <Color>Farve</Color>
-    <Compressed>Komprimert</Compressed>
+    <Compressed>Komprimeret</Compressed>
     <CompressToArchive>Komprimer til arkiv</CompressToArchive>
     <ContinuousPages>Kontinuerlige sider</ContinuousPages>
-    <DataAndHeadersFooters>Data og Toptekster/bundtekster</DataAndHeadersFooters>
+    <DataAndHeadersFooters>Data og toptekster/bundtekster</DataAndHeadersFooters>
     <DataOnly>Kun data</DataOnly>
     <DigitalSignature>Digital signatur</DigitalSignature>
-    <DigitalSignatureCertificateNotSelected>Ingen sertifikater er valgt</DigitalSignatureCertificateNotSelected>
-    <DigitalSignatureError>Fejl med digital signatur ved trinn</DigitalSignatureError>
-    <DocumentSecurity>Dokumentsikkerhet</DocumentSecurity>
-    <DotMatrixMode>Prikkmatriseformat</DotMatrixMode>
-    <EmbeddedFonts>Innebygde skrifttyper</EmbeddedFonts>
-    <EmbeddedImageData>Innebygde bildedata</EmbeddedImageData>
+    <DigitalSignatureCertificateNotSelected>Ingen certifikater er valgt</DigitalSignatureCertificateNotSelected>
+    <DigitalSignatureError>Fejl med digital signatur ved trin</DigitalSignatureError>
+    <DocumentSecurity>Dokumentsikkerhed</DocumentSecurity>
+    <DotMatrixMode>Dotmatrix format</DotMatrixMode>
+    <EmbeddedFonts>Indbyggede skrifttyper</EmbeddedFonts>
+    <EmbeddedImageData>Indbyggede billededata</EmbeddedImageData>
     <Encoding>Koding:</Encoding>
-    <EncryptionError>Krypteringsfeil ved trinn</EncryptionError>
-    <EscapeCodes>Unngat koder</EscapeCodes>
+    <EncryptionError>Krypteringsfejl ved trin</EncryptionError>
+    <EscapeCodes>Undtagelseskoder</EscapeCodes>
     <ExceptEditableFields>Udskriv redigerbare felter</ExceptEditableFields>
-    <ExportDataOnly>Bare eksporter data</ExportDataOnly>
+    <ExportDataOnly>Eksporter kun data</ExportDataOnly>
     <ExportEachPageToSheet>Eksporter hver side til ark</ExportEachPageToSheet>
     <ExportingCalculatingCoordinates>Beregner koordinater</ExportingCalculatingCoordinates>
     <ExportingCreatingDocument>Laver dokument</ExportingCreatingDocument>
@@ -549,8 +549,8 @@
     <ExportModeTable>Tabel</ExportModeTable>
     <ExportObjectFormatting>Eksporter objektsformatering</ExportObjectFormatting>
     <ExportPageBreaks>Eksporter sideskift</ExportPageBreaks>
-    <ExportRtfTextAsImage>Eksporter rik tekst som bilde</ExportRtfTextAsImage>
-    <ExportTypeBmpFile>BMP-bilde...</ExportTypeBmpFile>
+    <ExportRtfTextAsImage>Eksporter rig tekst som billede</ExportRtfTextAsImage>
+    <ExportTypeBmpFile>BMP-billede...</ExportTypeBmpFile>
     <ExportTypeCalcFile>OpenDocument Calc-fil...</ExportTypeCalcFile>
     <ExportTypeCsvFile>CSV-fil...</ExportTypeCsvFile>
     <ExportTypeDataFile>Datafil ...</ExportTypeDataFile>
@@ -559,65 +559,65 @@
     <ExportTypeExcel2007File>Microsoft Excel 2007-fil...</ExportTypeExcel2007File>
     <ExportTypeExcelFile>Microsoft Excel-fil...</ExportTypeExcelFile>
     <ExportTypeExcelXmlFile>Microsoft Excel Xml-fil...</ExportTypeExcelXmlFile>
-    <ExportTypeGifFile>GIF-bilde...</ExportTypeGifFile>
+    <ExportTypeGifFile>GIF-billede...</ExportTypeGifFile>
     <ExportTypeHtml5File>HTML5-fil...</ExportTypeHtml5File>
     <ExportTypeHtmlFile>HTML-fil...</ExportTypeHtmlFile>
     <ExportTypeImageFile>Bildefil ...</ExportTypeImageFile>
-    <ExportTypeJpegFile>JPEG-bilde...</ExportTypeJpegFile>
+    <ExportTypeJpegFile>JPEG-billede...</ExportTypeJpegFile>
     <ExportTypeMetafile>Windows Metafil...</ExportTypeMetafile>
     <ExportTypeMhtFile>MHT Webarkiv...</ExportTypeMhtFile>
-    <ExportTypePcxFile>PCX-bilde...</ExportTypePcxFile>
+    <ExportTypePcxFile>PCX-billede...</ExportTypePcxFile>
     <ExportTypePdfFile>Adobe PDF-fil...</ExportTypePdfFile>
-    <ExportTypePngFile>PNG-bilde...</ExportTypePngFile>
+    <ExportTypePngFile>PNG-billede...</ExportTypePngFile>
     <ExportTypePpt2007File>Microsoft PowerPoint-fil...</ExportTypePpt2007File>
     <ExportTypeRtfFile>Rich Text-fil...</ExportTypeRtfFile>
     <ExportTypeSvgFile>Scalable Vector Graphics (SVG)-fil...</ExportTypeSvgFile>
     <ExportTypeSvgzFile>Compressed SVG (SVGZ)-fil...</ExportTypeSvgzFile>
     <ExportTypeSylkFile>Symbolic Link (SYLK)-fil...</ExportTypeSylkFile>
-    <ExportTypeTiffFile>TIFF-bilde...</ExportTypeTiffFile>
+    <ExportTypeTiffFile>TIFF-billede...</ExportTypeTiffFile>
     <ExportTypeTxtFile>Tekstfil...</ExportTypeTxtFile>
     <ExportTypeWord2007File>Microsoft Word-fil...</ExportTypeWord2007File>
     <ExportTypeWriterFile>OpenDocument Writer-fil...</ExportTypeWriterFile>
     <ExportTypeXmlFile>XML-fil...</ExportTypeXmlFile>
     <ExportTypeXpsFile>Microsoft XPS-fil...</ExportTypeXpsFile>
-    <GetCertificateFromCryptoUI>Hent sertifikat fra Crypto UI</GetCertificateFromCryptoUI>
-    <ImageCompressionMethod>Metode for bildekomprimering:</ImageCompressionMethod>
+    <GetCertificateFromCryptoUI>Hent certifikat fra Crypto UI</GetCertificateFromCryptoUI>
+    <ImageCompressionMethod>Metode for billedekomprimering:</ImageCompressionMethod>
     <ImageCudEdges>Kudt kanter</ImageCudEdges>
-    <ImageFormat>Bildeformat:</ImageFormat>
+    <ImageFormat>Billedeformat:</ImageFormat>
     <ImageGrayscale>Gråtone</ImageGrayscale>
     <ImageMonochrome>Monokrom</ImageMonochrome>
-    <ImageQuality>Bildekvalitet</ImageQuality>
-    <ImageResoludion>Bildeoppløsning:</ImageResoludion>
-    <ImageType>Bildetype</ImageType>
-    <labelEncryptionKeyLength>Lengde på krypteringsnøkkel:</labelEncryptionKeyLength>
-    <labelOwnerPassword>Eierpassord:</labelOwnerPassword>
-    <labelSubjectNameString>Emne navnestreng:</labelSubjectNameString>
-    <labelUserPassword>Brugerpassord:</labelUserPassword>
+    <ImageQuality>Billedekvalitet</ImageQuality>
+    <ImageResoludion>Billedeopløsning:</ImageResoludion>
+    <ImageType>Billedetype</ImageType>
+    <labelEncryptionKeyLength>Længde på krypteringsnøgle:</labelEncryptionKeyLength>
+    <labelOwnerPassword>Ejerkodeord:</labelOwnerPassword>
+    <labelSubjectNameString>Emne navn:</labelSubjectNameString>
+    <labelUserPassword>Brugerkodeord:</labelUserPassword>
     <MonochromeDitheringType>Monokrom ditheringtype:</MonochromeDitheringType>
     <MoreSettings>Flere indstillinger</MoreSettings>
     <MultipleFiles>Flere filer</MultipleFiles>
-    <OpenAfterExport>Åbne efter eksportering</OpenAfterExport>
+    <OpenAfterExport>Åbne efter eksport</OpenAfterExport>
     <PdfACompliance>PDF/A Compliance</PdfACompliance>
-    <RemoveEmptySpaceAtBottom>Fjern tomrom nederst  på siden</RemoveEmptySpaceAtBottom>
-    <RestrictEditing>Begrense redigering:</RestrictEditing>
+    <RemoveEmptySpaceAtBottom>Fjern tomrum nederst på siden</RemoveEmptySpaceAtBottom>
+    <RestrictEditing>Begrænse redigering:</RestrictEditing>
     <Scale>Skala:</Scale>
     <Separator>Separator:</Separator>
-    <Settings>Instillinger</Settings>
-    <SkipColumnHeaders>Hop over kolonneToptekst</SkipColumnHeaders>
+    <Settings>Indstillinger</Settings>
+    <SkipColumnHeaders>Hop over kolonnetoptekst</SkipColumnHeaders>
     <StandardPDFFonts>Standard PDF-skrifttype</StandardPDFFonts>
-    <TiffCompressionScheme>TIFF-komprimeringsskjema:</TiffCompressionScheme>
+    <TiffCompressionScheme>TIFF-komprimeringsskema:</TiffCompressionScheme>
     <title>Eksporter indstillinger</title>
     <TxtBorderType>Kanttype</TxtBorderType>
     <TxtBorderTypeDouble>Unicode-dobbel</TxtBorderTypeDouble>
     <TxtBorderTypeSimple>Enkel</TxtBorderTypeSimple>
-    <TxtBorderTypeSingle>Unicode-singel</TxtBorderTypeSingle>
+    <TxtBorderTypeSingle>Unicode-single</TxtBorderTypeSingle>
     <TxtCudLongLines>Kudt lange linjer</TxtCudLongLines>
     <TxtDrawBorder>Tegn kant</TxtDrawBorder>
-    <TxtKillSpaceGraphLines>Ta bort radmellemrom i graf</TxtKillSpaceGraphLines>
-    <TxtKillSpaceLines>Ta bort radmellemrom</TxtKillSpaceLines>
+    <TxtKillSpaceGraphLines>Fjern rækkemellemrum i graf</TxtKillSpaceGraphLines>
+    <TxtKillSpaceLines>Fjern rækkemellemrum</TxtKillSpaceLines>
     <TxtPudFeedPageCode>Pud Feed Page Code</TxtPudFeedPageCode>
     <Type>Type:</Type>
-    <UseDefaultSystemEncoding>Brug systemets standardkoding</UseDefaultSystemEncoding>
+    <UseDefaultSystemEncoding>Brug systemets standardkodning</UseDefaultSystemEncoding>
     <UseDigitalSignature>Brug digital signatur</UseDigitalSignature>
     <UseEscapeCodes>Brug escapekoder</UseEscapeCodes>
     <UseOnePageHeaderAndFooter>Brug en Toptekst og en bundtekst</UseOnePageHeaderAndFooter>
@@ -628,9 +628,9 @@
     <Zoom>Zoom:</Zoom>
   </Export>
   <FileFilters>
-    <AllImageFiles>Alle bildefiler</AllImageFiles>
+    <AllImageFiles>Alle billedefiler</AllImageFiles>
     <BitmapFiles>Bitmap-filer</BitmapFiles>
-    <BmpFiles>BMP-bilde (*.bmp)|*.bmp</BmpFiles>
+    <BmpFiles>BMP-billede (*.bmp)|*.bmp</BmpFiles>
     <CalcFiles>OpenDocument Calc-filer (*.ods)|*.ods</CalcFiles>
     <CsvFiles>CSV-filer (*.csv)|*.csv</CsvFiles>
     <DataSetXmlData>DataSet XML data (*.xml)|*.xml</DataSetXmlData>
@@ -647,10 +647,10 @@
     <ExcelFiles>Microsoft Excel-filer (*.xls)|*.xls</ExcelFiles>
     <ExcelXmlFiles>Microsoft Excel XML-filer (*.xls)|*.xls</ExcelXmlFiles>
     <ExeFiles>EXE-filer (*.exe)|*.exe</ExeFiles>
-    <GifFiles>GIF-bilde (*.gif)|*.gif</GifFiles>
+    <GifFiles>GIF-billede (*.gif)|*.gif</GifFiles>
     <HtmlFiles>HTML-filer (*.html)|*.html</HtmlFiles>
     <InheritedLanguageFiles>{0} files for inherited reports (*.{1})|*.{2}</InheritedLanguageFiles>
-    <JpegFiles>JPEG-bilde (*.jpeg)|*.jpeg</JpegFiles>
+    <JpegFiles>JPEG-billede (*.jpeg)|*.jpeg</JpegFiles>
     <LanguageFiles>{0} filer (*.{1})|*.{2}</LanguageFiles>
     <LanguageForSilverlightFiles>{0} filer for Silverlightrapporter (*.{1})|*.{2}</LanguageForSilverlightFiles>
     <MetaFiles>Meta Files</MetaFiles>
@@ -658,18 +658,18 @@
     <PackedDocumentFiles>Files packed document (*.mdz)|*.mdz</PackedDocumentFiles>
     <PackedReportFiles>Files packed report (*.mrz)|*.mrz</PackedReportFiles>
     <PageFiles>Files page (*.pg)|*.pg</PageFiles>
-    <PcxFiles>PCX-bilde (*.pcx)|*.pcx</PcxFiles>
+    <PcxFiles>PCX-billede (*.pcx)|*.pcx</PcxFiles>
     <PdfFiles>Adobe PDF-filer (*.pdf)|*.pdf</PdfFiles>
-    <PngFiles>PNG-bilde (*.png)|*.png</PngFiles>
+    <PngFiles>PNG-billede (*.png)|*.png</PngFiles>
     <Ppt2007Files>Microsoft PowerPoint 2007/2010-filer (*.pptx)|*.pptx</Ppt2007Files>
     <ReportFiles>Files report (*.mrt)|*.mrt</ReportFiles>
     <RtfFiles>Rich Text (*.rtf)|*.rtf</RtfFiles>
     <StandaloneReportFiles>Standalone report (*.exe)|*.exe</StandaloneReportFiles>
     <StylesFiles>Files style (*.sts)|*.sts</StylesFiles>
-    <SvgFiles>SVG-bilde (*.svg)|*.svg</SvgFiles>
-    <SvgzFiles>Komprimert SVG-bilde (*.svgz)|*.svgz</SvgzFiles>
+    <SvgFiles>SVG-billede (*.svg)|*.svg</SvgFiles>
+    <SvgzFiles>Komprimert SVG-billede (*.svgz)|*.svgz</SvgzFiles>
     <SylkFiles>SYLK-billeder (*.slk)|*.slk</SylkFiles>
-    <TiffFiles>TIFF-bilde (*.tiff)|*.tiff</TiffFiles>
+    <TiffFiles>TIFF-billede (*.tiff)|*.tiff</TiffFiles>
     <TxtFiles>Tekst (*.txt)|*.txt</TxtFiles>
     <Word2007Files>Microsoft Word 2007/2010-filer (*.docx)|*.docx</Word2007Files>
     <WriterFiles>OpenDocument Writer-filer (*.odt)|*.odt</WriterFiles>
@@ -812,7 +812,7 @@
     <DockingPanels>Paneler</DockingPanels>
     <HtmlPreview>HTML forhåndsvisning</HtmlPreview>
     <labelPleaseSelectTypeOfInterface>Vennligst Vælg grensesnitt</labelPleaseSelectTypeOfInterface>
-    <LoadImage>Last bilde...</LoadImage>
+    <LoadImage>Last billede...</LoadImage>
     <LocalizePropertyGrid>Localize Property Grid</LocalizePropertyGrid>
     <MarginsNarrow>Smal</MarginsNarrow>
     <MarginsNormal>Normal</MarginsNormal>
@@ -936,7 +936,7 @@
     <Drawing>Tegning</Drawing>
     <DrawMarkersWhenMoving>Tegn markører under Flyting</DrawMarkersWhenMoving>
     <EditAfterInsert>Rediger efter innsetting</EditAfterInsert>
-    <EnableAutoSaveMode>Slat på audoLavring</EnableAutoSaveMode>
+    <EnableAutoSaveMode>Slat på autoLavring</EnableAutoSaveMode>
     <FillBands>Fyll bånd</FillBands>
     <FillComponents>Fyll komponenter</FillComponents>
     <FillContainers>Fyll beholdere</FillContainers>
@@ -947,7 +947,7 @@
     <GridLines>Linjer</GridLines>
     <GridMode>gittermodus</GridMode>
     <GridSize>gitterstørrelse</GridSize>
-    <groupAutoSaveOptions>Instillinger for audoLavring</groupAutoSaveOptions>
+    <groupAutoSaveOptions>Instillinger for autoLavring</groupAutoSaveOptions>
     <groupColorScheme>Vennligst Vælg farveskjema for GUI</groupColorScheme>
     <groupGridDrawingOptions>Alternativer for tegning af gitter</groupGridDrawingOptions>
     <groupGridOptions>Instillinger for gitter</groupGridOptions>
@@ -958,7 +958,7 @@
     <groupPleaseSelectTypeOfGui>Vennligst Vælg GUI-type</groupPleaseSelectTypeOfGui>
     <groupReportDisplayOptions>Valg for rapportvisning</groupReportDisplayOptions>
     <labelColorScheme>Farveskjema:</labelColorScheme>
-    <labelInfoAutoSave>Ændre parametere for audoLavring af rapporter</labelInfoAutoSave>
+    <labelInfoAutoSave>Ændre parametere for autoLavring af rapporter</labelInfoAutoSave>
     <labelInfoDrawing>Sæt parametere for rapporttegning</labelInfoDrawing>
     <labelInfoGrid>Hvordan gitteret blir brugt og vises i en rapport</labelInfoGrid>
     <labelInfoGui>Vælg GUI-modus for rapportdesigner</labelInfoGui>
@@ -995,7 +995,7 @@
     <labelColumnGaps>Kolonnemellemrom:</labelColumnGaps>
     <labelColumnWidth>Kolonnebredde:</labelColumnWidth>
     <labelImageAlignment>Bildeoppstilling:</labelImageAlignment>
-    <labelImageTransparency>Gjennomsiktighet for bilde:</labelImageTransparency>
+    <labelImageTransparency>Gjennomsiktighet for billede:</labelImageTransparency>
     <labelInfoColumns>Sæt sidekolonner</labelInfoColumns>
     <labelInfoPaper>Sæt størrelse og orientasjon for gældende side</labelInfoPaper>
     <labelInfoUnit>Sidemarginer er spesifisert in nuværende enheter</labelInfoUnit>
@@ -1005,7 +1005,7 @@
     <labelPaperSourceOfOtherPages>Papirkilde for andre sider:</labelPaperSourceOfOtherPages>
     <labelSelectColor>Vælg farve:</labelSelectColor>
     <labelSelectFont>Vælg teksttype:</labelSelectFont>
-    <labelSelectImage>Vælg bilde:</labelSelectImage>
+    <labelSelectImage>Vælg billede:</labelSelectImage>
     <labelText>Tekst:</labelText>
     <Left>Venstre:</Left>
     <Margins>Marginer</Margins>
@@ -1168,7 +1168,7 @@
     <barname_name>&amp;Navn:</barname_name>
     <barname_ok>OK</barname_ok>
     <barrename_caption>Ændre navn på Værktøjslinje</barrename_caption>
-    <barsys_audohide_tooltip>Autoskjul</barsys_audohide_tooltip>
+    <barsys_autohide_tooltip>Autoskjul</barsys_autohide_tooltip>
     <barsys_close_tooltip>Afbryd</barsys_close_tooltip>
     <barsys_customize_tooltip>Tilpas</barsys_customize_tooltip>
     <colorpicker_morecolors>&amp;Flere farver...</colorpicker_morecolors>
@@ -1484,20 +1484,20 @@
     <ExportModeRtf>Presentasjon af rapportdataene efter eksport. Tabel – rapporten vil se ud som en Tabel hvor hver rapportside er en Tabelcelle. Ramme – hver komponent vil se ud som en enkelt ramme, men uden noget forhold mellem seg.</ExportModeRtf>
     <ExportObjectFormatting>Brug formattering på eksportdata fra databånd (Tabelkomponent, hierarkisk bånd).</ExportObjectFormatting>
     <ExportPageBreaks>Vis rammene til rapportsidene i Excel-arket.</ExportPageBreaks>
-    <ExportRtfTextAsImage>Konverter RTF-teksten inn i bildet. Hvis dette alternativet er aktivert, blir rik tekst redusert til enklere primitive typer som støttes af PDF-formatet ved eksport. Rik tekst med kompleks formattering (innebygde billeder, Tabeler) blir ikke alltid riktig konvertert. Hvis dette er tilfelle, anbefaler vi at du aktiverer dette alternativet.</ExportRtfTextAsImage>
+    <ExportRtfTextAsImage>Konverter RTF-teksten inn i billedet. Hvis dette alternativet er aktivert, blir rik tekst redusert til enklere primitive typer som støttes af PDF-formatet ved eksport. Rik tekst med kompleks formattering (innebygde billeder, Tabeler) blir ikke alltid riktig konvertert. Hvis dette er tilfelle, anbefaler vi at du aktiverer dette alternativet.</ExportRtfTextAsImage>
     <Find>Søg efter tekst i rapport.</Find>
     <FullScreen>Fullskjermvisning.</FullScreen>
     <GetCertificateFromCryptoUI>Bruger grensesnittet til kryptografibiblioteket i systemet.</GetCertificateFromCryptoUI>
     <ImageCompressionMethod>Komprimeringsmetoden: JPEG – dette kan føre til kvalitetstap, Flate – ingen kvalitetstap, Enkel, I rekkefølge, FloydSt. – billeder tegnes i svart-hvitt.</ImageCompressionMethod>
     <ImageFormat>Bildeformatet til den ferdige filen.</ImageFormat>
-    <ImageQuality>Gir deg mulighet til at Vælge bildekvalitetsgraden/filstørrelsen. Jo høyere kvaliteten er, jo større blir den ferdige filen.</ImageQuality>
-    <ImageQualityPdf>Alternativet er bare tilgjengelig for JPEG-komprimering og gir deg mulighet til at Vælge bildekvalitetsgraden/filstørrelsen. Jo høyere kvaliteten er, jo større blir den ferdige filen.</ImageQualityPdf>
-    <ImageResoludion>Antal piksler per tomme. Jo større Antal piksler, jo bedre blir kvaliteten på bildet. Størrelsen til den ferdige filen er mye større.</ImageResoludion>
-    <ImageType>Farveskjemaet til bildet: farve – efter eksport er bildet helt likt bildet i visningsprogrammet, grått – efter eksport er bildet gråskalert, monokrom – bildene blir udeLukende svart-hvite. Du bør samtidig huske at monokrom har tre moduser: Ingen, I rekkefølge, FloydSt.</ImageType>
+    <ImageQuality>Gir deg mulighet til at Vælge billedekvalitetsgraden/filstørrelsen. Jo høyere kvaliteten er, jo større blir den ferdige filen.</ImageQuality>
+    <ImageQualityPdf>Alternativet er bare tilgjengelig for JPEG-komprimering og gir deg mulighet til at Vælge billedekvalitetsgraden/filstørrelsen. Jo høyere kvaliteten er, jo større blir den ferdige filen.</ImageQualityPdf>
+    <ImageResoludion>Antal piksler per tomme. Jo større Antal piksler, jo bedre blir kvaliteten på billedet. Størrelsen til den ferdige filen er mye større.</ImageResoludion>
+    <ImageType>Farveskjemaet til billedet: farve – efter eksport er billedet helt likt billedet i visningsprogrammet, grått – efter eksport er billedet gråskalert, monokrom – billedene blir udeLukende svart-hvite. Du bør samtidig huske at monokrom har tre moduser: Ingen, I rekkefølge, FloydSt.</ImageType>
     <KillSpaceLines>Fjern blanke linjer (rader) i dokumentet.</KillSpaceLines>
     <MultipleFiles>Hver rapportsiden kan være en egen fil.</MultipleFiles>
     <Open>Åbne tidligere Gemmet rapport i forhåndsvisningsvindu.</Open>
-    <OpenAfterExport>Det nyopprettede dokumentet Åbnes audomatisk af programmet som er angitt for disse filtypene efter eksport.</OpenAfterExport>
+    <OpenAfterExport>Det nyopprettede dokumentet Åbnes automatisk af programmet som er angitt for disse filtypene efter eksport.</OpenAfterExport>
     <OwnerPassword>Passordet som gir tilgang til filene.</OwnerPassword>
     <PageAll>Behandling af alle rapportsider.</PageAll>
     <PageDelete>Slet valgt side i rapport.</PageDelete>
@@ -1524,7 +1524,7 @@
     <SkipColumnHeaders>Aktiver/deaktiver kolonneoverskrifter.</SkipColumnHeaders>
     <StandardPdfFonts>14 standard Adobe-skrifttyper. Hvis dette alternativer er aktivert, bruges bare de 14 standardskrifttypene i PDF-filen. Alle rapportskrifttyper konverteres til dem.</StandardPdfFonts>
     <SubjectNameString>Sertifikatidentifikator. Identifikatoren er navnet til eieren af sertifikatet (full linje) eller deler af navnet (delstreng).</SubjectNameString>
-    <Thumbnails>Vis miniatyrbilde som kan bruges for rask navigasjon og for at finne rapportseksjonen du vil hoppe til.</Thumbnails>
+    <Thumbnails>Vis miniatyrbillede som kan bruges for rask navigasjon og for at finne rapportseksjonen du vil hoppe til.</Thumbnails>
     <TiffCompressionScheme>Komprimeringsmåden til TIFF-filer.</TiffCompressionScheme>
     <ToolEditor>Dette værktøj tillader redigering af indhold i tekstkomponenter direkte i rapportviseren.</ToolEditor>
     <TypeExport>Filen rapporten bliver konvertert til.</TypeExport>
@@ -1927,9 +1927,9 @@
     <LeftRightAlignmentLeft>Venstre</LeftRightAlignmentLeft>
     <LeftRightAlignmentRight>Højre</LeftRightAlignmentRight>
     <PictureBoxSizeModeAutoSize>Autostørrelse</PictureBoxSizeModeAutoSize>
-    <PictureBoxSizeModeCenterImage>Centrer bilde</PictureBoxSizeModeCenterImage>
+    <PictureBoxSizeModeCenterImage>Centrer billede</PictureBoxSizeModeCenterImage>
     <PictureBoxSizeModeNormal>Normal</PictureBoxSizeModeNormal>
-    <PictureBoxSizeModeStretchImage>Stræk bilde</PictureBoxSizeModeStretchImage>
+    <PictureBoxSizeModeStretchImage>Stræk billede</PictureBoxSizeModeStretchImage>
     <RightToLeftInherit>Arv</RightToLeftInherit>
     <RightToLeftNo>Nej</RightToLeftNo>
     <RightToLeftYes>Ja</RightToLeftYes>
@@ -2310,8 +2310,8 @@
     <GetExcelSheetEvent>Hent Excel-ark</GetExcelSheetEvent>
     <GetExcelValueEvent>Hent Excel-værdi</GetExcelValueEvent>
     <GetHyperlinkEvent>Hent hyperkobling</GetHyperlinkEvent>
-    <GetImageDataEvent>Hent bildedata</GetImageDataEvent>
-    <GetImageURLEvent>Hent bilde-URL</GetImageURLEvent>
+    <GetImageDataEvent>Hent billededata</GetImageDataEvent>
+    <GetImageURLEvent>Hent billede-URL</GetImageURLEvent>
     <GetListOfArgumentsEvent>Hent liste med argumenter</GetListOfArgumentsEvent>
     <GetListOfHyperlinksEvent>Hent liste med hyperkoblinger</GetListOfHyperlinksEvent>
     <GetListOfTagsEvent>Hent liste med tags</GetListOfTagsEvent>
@@ -2334,7 +2334,7 @@
     <MouseLeaveEvent>Mus forlader</MouseLeaveEvent>
     <MouseMoveEvent>Mus Flyttes</MouseMoveEvent>
     <MouseUpEvent>Museklik op</MouseUpEvent>
-    <NewAutoSeriesEvent>Ny audoserie</NewAutoSeriesEvent>
+    <NewAutoSeriesEvent>Ny autoserie</NewAutoSeriesEvent>
     <PositionChangedEvent>Position ændret</PositionChangedEvent>
     <PrintedEvent>Udskrevet</PrintedEvent>
     <PrintingEvent>Udskriver</PrintingEvent>
@@ -2612,7 +2612,7 @@
     <ExcelSheet>Excel-ark</ExcelSheet>
     <ExcelValue>Excel-værdi</ExcelValue>
     <Exponential>Eksponentiell</Exponential>
-    <ExportAsImage>Eksporter som bilde</ExportAsImage>
+    <ExportAsImage>Eksporter som billede</ExportAsImage>
     <Expression>udtrykk</Expression>
     <FaqPage>Faq-side</FaqPage>
     <FieldIs>Felt er</FieldIs>
@@ -2695,14 +2695,14 @@
     <ImageAlign>Justere billeder</ImageAlign>
     <ImageAlignment>Bildejustering</ImageAlignment>
     <ImageData>Bildedata</ImageData>
-    <ImageHorAlignment>Horisontal justering af bilde</ImageHorAlignment>
+    <ImageHorAlignment>Horisontal justering af billede</ImageHorAlignment>
     <ImageMultipleFactor>Bilde multipelfaktor</ImageMultipleFactor>
     <ImageRotation>Bilderotasjon</ImageRotation>
-    <ImageStretch>Stræk bilde</ImageStretch>
+    <ImageStretch>Stræk billede</ImageStretch>
     <ImageTiling>Bildetiling</ImageTiling>
-    <ImageTransparency>Gjennomsiktighet for bilde</ImageTransparency>
+    <ImageTransparency>Gjennomsiktighet for billede</ImageTransparency>
     <ImageURL>Bilde-URL</ImageURL>
-    <ImageVertAlignment>Juster bilde vertikalt</ImageVertAlignment>
+    <ImageVertAlignment>Juster billede vertikalt</ImageVertAlignment>
     <ImportRelations>Importer relasjoner</ImportRelations>
     <Increment>Øk</Increment>
     <Indent>Innrykk</Indent>
@@ -2945,7 +2945,7 @@
     <ShowBehind>Vis bak</ShowBehind>
     <ShowDialog>Vis dialog</ShowDialog>
     <ShowEdgeValues>Vis kantværdier</ShowEdgeValues>
-    <ShowImageBehind>Vis bilde bak</ShowImageBehind>
+    <ShowImageBehind>Vis billede bak</ShowImageBehind>
     <ShowInLegend>Vis i forklaring</ShowInLegend>
     <ShowInPercent>Vis i prosent</ShowInPercent>
     <ShowLabels>Vis etikefter</ShowLabels>
