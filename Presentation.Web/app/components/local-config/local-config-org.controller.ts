@@ -24,7 +24,7 @@
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
-                    serverFiltering: true,
+                    serverFiltering: false,
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
@@ -86,7 +86,7 @@
                         }
                     },
                     {
-                        field: "Type", title: "Type", width: 230,
+                        field: "TypeId", title: "Type", width: 230,
                         persistId: "type", // DON'T YOU DARE RENAME!
                         hidden: false,
                         template: (dataItem) => {
@@ -115,9 +115,15 @@
                         },
                         filterable: {
                             cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Kommune", typeId: 1 }, { type: "Interessefællesskab", typeId: 2 }, { type: "Virksomhed", typeId: 3 }, { type: "Anden offentlig myndighed", typeId: 4 }],
+                                        dataTextField: "type",
+                                        dataValueField: "typeId",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },
@@ -129,9 +135,15 @@
                         excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),
                         filterable: {
                             cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Lokal", value: "Local" }, { type: "Offentlig", value: "Public" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     }
