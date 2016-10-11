@@ -693,7 +693,7 @@ Kontakt: info@kitos.dk",
             {
                 Name = name,
                 Config = Config.Default(objectOwner),
-                TypeId = organizationType.Id,
+                TypeId = (OrganizationTypeType) organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
                 LastChangedByUserId = objectOwner?.Id
             };
