@@ -17,15 +17,15 @@ namespace Core.ApplicationServices
         MakeReportAdmin,
         MakeOrganization,
         CanSetAccessModifierToPublic,
-        CanCreateOrganizationTypeKommune,
-        CanCreateOrganizationTypeInteressefællesskab,
-        CanCreateOrganizationTypeVirksomhed,
-        CanCreateOrganizationTypeAndenOffentligMyndighed,
+        CanSetOrganizationTypeKommune,
+        CanSetOrganizationTypeInteressefællesskab,
+        CanSetOrganizationTypeVirksomhed,
+        CanSetOrganizationTypeAndenOffentligMyndighed,
     }
 
     public interface IFeatureChecker
     {
-        bool CanExecuteFeature(User user, Feature feature);
+        bool CanExecute(User user, Feature feature);
     }
 
     public class FeatureChecker : IFeatureChecker
@@ -37,7 +37,7 @@ namespace Core.ApplicationServices
             Init();
         }
 
-        public bool CanExecuteFeature(User user, Feature feature)
+        public bool CanExecute(User user, Feature feature)
         {
             var userRoles = CreateRoleList(user);
             var featureRoles = _features[feature];
@@ -59,10 +59,11 @@ namespace Core.ApplicationServices
             {
                 {Feature.MakeGlobalAdmin, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.MakeLocalAdmin, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanCreateOrganizationTypeKommune, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-                {Feature.CanCreateOrganizationTypeInteressefællesskab, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanCreateOrganizationTypeVirksomhed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanCreateOrganizationTypeAndenOffentligMyndighed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
+                {Feature.CanSetOrganizationTypeKommune, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
+                {Feature.CanSetOrganizationTypeInteressefællesskab, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
+                {Feature.CanSetOrganizationTypeVirksomhed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
+                {Feature.CanSetOrganizationTypeAndenOffentligMyndighed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
+                {Feature.CanSetAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
             };
         }
 

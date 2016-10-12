@@ -24,6 +24,7 @@ namespace Presentation.Web.Controllers.API
         [Inject]
         public IAuthenticationService AuthenticationService { get; set; }
 
+        [Inject]
         public IFeatureChecker FeatureChecker { get; set; }
 
         [Inject]

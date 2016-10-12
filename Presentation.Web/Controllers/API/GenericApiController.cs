@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -105,13 +106,16 @@ namespace Presentation.Web.Controllers.API
             {
                 return Conflict(e.Message);
             }
+            catch (SecurityException e)
+            {
+                return Unauthorized(e.Message);
+            }
             catch (Exception e)
             {
                 // check if inner message is a duplicate, if so return conflict
-                if (e.InnerException != null)
-                    if (e.InnerException.InnerException != null)
-                        if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
-                            return Conflict(e.InnerException.InnerException.Message);
+                if (e.InnerException?.InnerException != null)
+                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                        return Conflict(e.InnerException.InnerException.Message);
 
                 return LogError(e);
             }
