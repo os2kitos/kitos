@@ -940,7 +940,7 @@
     <FillBands>Fyll bånd</FillBands>
     <FillComponents>Fyll komponenter</FillComponents>
     <FillContainers>Fyll beholdere</FillContainers>
-    <FillCrossBands>Fyll cryssbånd</FillCrossBands>
+    <FillCrossBands>Fyll krydsbånd</FillCrossBands>
     <GenerateLocalizedName>Generer lokalisert navn</GenerateLocalizedName>
     <Grid>gitter</Grid>
     <GridDots>Prikker</GridDots>
