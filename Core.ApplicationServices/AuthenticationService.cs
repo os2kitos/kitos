@@ -97,17 +97,28 @@ namespace Core.ApplicationServices
                     // users part of an orgaization have read access to all entities inside the organization
                     return true;
                 }
-                else // if not, check if organization, he's logged into, allows sharing
+                if (user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality)
                 {
-                    if (user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality)
-                    {
-                        // organizations of type OrganizationCategory.Municipality have read access to other organizations
-                        return true;
-                    }
+                    // organizations of type OrganizationCategory.Municipality have read access to other organizations
+                    return true;
                 }
             }
 
+            // User is a special case
+            if (entity is User)
+                return CheckUserSpecialCase((User) entity, user);
+
             return false;
+        }
+
+        private static bool CheckUserSpecialCase(User entity, User user)
+        {
+            if (user.IsLocalAdmin)
+                return true;
+
+            // check if the user is trying edit himself
+            // a user always has write access to himself
+            return entity.Id == user.Id;
         }
 
         /// <summary>
@@ -191,16 +202,7 @@ namespace Core.ApplicationServices
 
             // User is a special case
             if (entity is User)
-            {
-                var userEntity = entity as User;
-
-                // check if the user is trying edit himself
-                if (userEntity.Id == user.Id)
-                {
-                    // a user always has write access to himself
-                    return true;
-                }
-            }
+                return CheckUserSpecialCase((User) entity, user);
 
             // all white-list checks failed, deny access
             return false;
