@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -7,70 +6,10 @@ using Core.DomainServices;
 using System.Linq;
 using System.Security.Authentication;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices
 {
-    public enum Feature
-    {
-        MakeGlobalAdmin = 1,
-        MakeLocalAdmin,
-        MakeReportAdmin,
-        MakeOrganization,
-        CanSetAccessModifierToPublic,
-        CanSetOrganizationTypeKommune,
-        CanSetOrganizationTypeInteressefællesskab,
-        CanSetOrganizationTypeVirksomhed,
-        CanSetOrganizationTypeAndenOffentligMyndighed,
-    }
-
-    public interface IFeatureChecker
-    {
-        bool CanExecute(User user, Feature feature);
-    }
-
-    public class FeatureChecker : IFeatureChecker
-    {
-        private Dictionary<Feature, List<OrganizationRole>> _features;
-
-        public FeatureChecker()
-        {
-            Init();
-        }
-
-        public bool CanExecute(User user, Feature feature)
-        {
-            var userRoles = CreateRoleList(user);
-            var featureRoles = _features[feature];
-            return userRoles.Any(userRole => featureRoles.Contains(userRole));
-        }
-
-        private static IEnumerable<OrganizationRole> CreateRoleList(User user)
-        {
-            var roles = user.OrganizationRights.Select(x => x.Role).Distinct().ToList();
-            if (user.IsGlobalAdmin)
-                roles.Add(OrganizationRole.GlobalAdmin);
-
-            return roles;
-        }
-
-        private void Init()
-        {
-            _features = new Dictionary<Feature, List<OrganizationRole>>
-            {
-                {Feature.MakeGlobalAdmin, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-                {Feature.MakeLocalAdmin, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeKommune, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-                {Feature.CanSetOrganizationTypeInteressefællesskab, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeVirksomhed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeAndenOffentligMyndighed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-                {Feature.CanSetAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-            };
-        }
-
-
-    }
-
-
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IGenericRepository<User> _userRepository;
@@ -180,6 +119,7 @@ namespace Core.ApplicationServices
         public bool HasWriteAccess(int userId, Entity entity)
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            AssertUserIsNotNull(user);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
             // check if global admin
@@ -192,7 +132,7 @@ namespace Core.ApplicationServices
             // check if user is in context
             if (entity is IContextAware) // TODO I don't like this impl
             {
-                var awareEntity = entity as IContextAware;
+                var awareEntity = (IContextAware) entity;
 
                 // check if user is part of target organization (he's trying to access)
                 if (!awareEntity.IsInContext(loggedIntoOrganizationId))
@@ -211,39 +151,24 @@ namespace Core.ApplicationServices
                 }
 
                 // check if module admin in target organization and target entity is of the correct type
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin)
-                    && entity is IContractModule)
-                {
-                    // contract admins have write access to everything deemed part of the contract module
+                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
                     return true;
-                }
 
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin)
-                    && entity is IOrganizationModule)
-                {
-                    // organization admins have write access to everything deemed part of the organization module
+                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
                     return true;
-                }
 
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin)
-                    && entity is IProjectModule)
-                {
-                    // project admins have write access to everything deemed part of the project module
+                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
                     return true;
-                }
 
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin)
-                    && entity is ISystemModule)
-                {
-                    // system admins have write access to everything deemed part of the system module
+                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
                     return true;
-                }
+
+                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
+                    return true;
 
                 // check if user has a write role on the target entity
-                if (entity.HasUserWriteAccess(user)) // TODO HasUserWriteAccess isn't ideal, it should be rewritten into checking roles as the other checks are done here
-                {
+                if (entity.HasUserWriteAccess(user))
                     return true;
-                }
 
                 // check if user is object owner
                 if (entity.ObjectOwnerId == user.Id)

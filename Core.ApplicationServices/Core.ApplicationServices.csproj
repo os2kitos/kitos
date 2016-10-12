@@ -73,6 +73,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FeatureChecker.cs" />
+    <Compile Include="IFeatureChecker.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
     <Compile Include="CryptoService.cs" />
