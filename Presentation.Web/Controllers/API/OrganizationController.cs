@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (!string.IsNullOrWhiteSpace(q))
                 paging.Where(x => x.Name.Contains(q) || x.Cvr.Contains(q));
-            return base.GetAll(paging);
+            return GetAll(paging);
         }
 
         public HttpResponseMessage GetBySearch(string q, int orgId)
@@ -60,28 +60,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //var orgs = Repository.Get(
-                //    org =>
-                //        // filter by project name or cvr
-                //        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
-                //        // global admin sees all
-                //        (KitosUser.IsGlobalAdmin ||
-                //        // object owner sees his own objects
-                //        org.ObjectOwnerId == KitosUser.Id ||
-                //        // it's public everyone can see it
-                //        org.AccessModifier == AccessModifier.Public ||
-                //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Local &&
-                //        org.Id == orgId ||
-                //        // user with a role on the object can see it
-                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
-                //        // !SPECIAL CASE! user with a role on a org unit can see it
-                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
-                //    );
-
-                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
-                // so have to do it the slow way :(
-
                 var orgs = Repository.Get(
                     org =>
                         // filter by project name or cvr
@@ -115,14 +93,6 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                // OLD METHOD
-                // gets users with a role in the organization
-                //var qry =
-                //    Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
-                //              .Select(z => z.User)
-                //              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
-
-                //var qry = _useRepository.Get(x => x.CreatedInId == id && (x.Name.Contains(q) || x.Email.Contains(q)));
                 var qry =
                     _useRepository.Get(
                         u =>
