@@ -2,7 +2,8 @@
     "use strict";
 
     export class OptionsController {
-        public title: string;
+        public pageTitle: string;
+        public isObligatory: boolean;
         public isActive: boolean;
         //Op/ned
         public nr: number;
@@ -10,7 +11,6 @@
         public hasWriteAccess: boolean;
         public description: string;
         public optionId: number;
-
 
         public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "_"];
 
@@ -31,9 +31,9 @@
             this.optionId = optionId;
 
             if (optionId === 0) {
-                this.title = "Opret";
+                this.pageTitle = "Opret";
             } else {
-                this.title = "Redigér";
+                this.pageTitle = "Redigér";
             }
 
             if (optionId === 1) {
@@ -46,7 +46,7 @@
                 });
             }
 
-        }
+        };
 
         //TODO Not done!
         public ok() {
@@ -54,7 +54,7 @@
                 let payload = {
                     Name: this.name,
                     Note: this.description
-                }
+                };
                 this.$http.post(`${this.baseUrl}`, payload).then((response) => {
                     this.$uibModalInstance.close();
                     this.notify.addSuccessMessage("Oprettet.");
@@ -62,10 +62,40 @@
                     this.notify.addErrorMessage("Oprettelse mislykkedes.");
                 });
             }
-        }
+        };
 
         public cancel() {
             this.$uibModalInstance.close();
-        }
+        };
     }
+
+    angular
+        .module("app")
+        .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
+            $stateProvider.state("config.global-config-edit", {
+                url: "/{id:int}/edit",
+                onEnter: [
+                    "$state", "$stateParams", "$uibModal",
+                    ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService) => {
+                        $uibModal.open({
+                            templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                            // fade in instead of slide from top, fixes strange cursor placement in IE
+                            // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                            windowClass: "modal fade in",
+                            controller: OptionsController,
+                            controllerAs: "vm",
+                        }).result.then(() => {
+                            // OK
+                            // GOTO parent state and reload
+                            $state.go("^", null, { reload: true });
+                        },
+                            () => {
+                                // Cancel
+                                // GOTO parent state
+                                $state.go("^");
+                            });
+                    }
+                ]
+            });
+        }]);
 }
