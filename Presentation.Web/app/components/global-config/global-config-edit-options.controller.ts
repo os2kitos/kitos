@@ -27,7 +27,7 @@
         }
 
         //TODO Not done!
-        private initModal = (optionId: number) => {
+        initModal = (optionId: number) => {
             this.optionId = optionId;
 
             if (optionId === 0) {
@@ -72,7 +72,7 @@
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-            $stateProvider.state("config.global-config-edit", {
+            $stateProvider.state("config.org.edit-roles", {
                 url: "/{id:int}/edit",
                 onEnter: [
                     "$state", "$stateParams", "$uibModal",
@@ -83,7 +83,7 @@
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",
                             controller: OptionsController,
-                            controllerAs: "vm",
+                            controllerAs: "vm"
                         }).result.then(() => {
                             // OK
                             // GOTO parent state and reload

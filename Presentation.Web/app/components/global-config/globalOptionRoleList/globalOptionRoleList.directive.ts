@@ -8,7 +8,8 @@
             controllerAs: "ctrl",
             bindToController: {
                 optionsUrl: "@",
-                title: "@"
+                title: "@",
+                editState: "@"
             },
             template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
@@ -17,11 +18,13 @@
     interface IDirectiveScope {
         optionsUrl: string;
         title: string;
+        editState: string;
     }
 
     class GlobalOptionRoleListDirective implements IDirectiveScope {
         public optionsUrl: string;
         public title: string;
+        public editState: string;
 
         //public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
@@ -171,7 +174,7 @@
 
         public createOption = () => {
             //TODO OS2KITOS-256
-            this.$state.go("", {optionId: 0});
+            this.$state.go(this.editState, {optionId: 0});
         }
 
         private editOption = (e: JQueryEventObject) => {

@@ -1,22 +1,27 @@
 ﻿(function(ng, app) {
-    var subnav = [
-        { state: 'config.org', text: 'Organisation' },
-        { state: 'config.project', text: 'IT Projekt' },
-        { state: 'config.system', text: 'IT System' },
-        { state: 'config.contract', text: 'IT Kontrakt' }
-    ];
 
-    app.config(['$stateProvider', function($stateProvider) {
+    // The class is used for testing purposes to demonstrate that the state can be reached from the controller but not through the directive
+    class GlobalConfigOrgCtrl {
+
+        private static $inject = ["$state"];
+        constructor(private $state: ng.ui.IStateService) {
+        }
+
+        public showDialog = () => {
+            console.log("goto config.org.edit-roles");
+            this.$state.go("config.org.edit-roles", { id: 0 });
+        }
+
+    }
+
+    app.config(['$stateProvider', $stateProvider => {
         $stateProvider.state('config.org', {
             url: '/org',
             templateUrl: 'app/components/global-config/global-config-org.view.html',
-            controller: 'globalConfig.OrgCtrl',
+            controller: GlobalConfigOrgCtrl,
+            controllerAs: "vm",
             authRoles: ['GlobalAdmin']
         });
     }]);
 
-    app.controller('globalConfig.OrgCtrl', ['$rootScope', '$scope', function ($rootScope, $scope) {
-        $rootScope.page.title = 'Global konfiguration';
-        $rootScope.page.subnav = subnav;
-    }]);
 })(angular, app);
