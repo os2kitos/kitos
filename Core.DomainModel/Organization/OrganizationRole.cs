@@ -30,6 +30,10 @@
         /// <summary>
         /// Has write access to organization reports.
         /// </summary>
-        ReportModuleAdmin
+        ReportModuleAdmin,
+        /// <summary>
+        /// God mode
+        /// </summary>
+        GlobalAdmin
     }
 }

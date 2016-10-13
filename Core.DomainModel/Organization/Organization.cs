@@ -6,6 +6,8 @@ using Core.DomainModel.Reports;
 
 namespace Core.DomainModel.Organization
 {
+   
+
     /// <summary>
     /// Represents an Organization (such as a municipality, or a company).
     /// Holds local configuration and admin roles, as well as collections of

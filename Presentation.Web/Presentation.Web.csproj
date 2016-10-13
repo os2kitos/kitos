@@ -300,6 +300,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
+    <Compile Include="Controllers\OData\ConfigsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
@@ -548,6 +549,7 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
+    <Content Include="app\components\reports\report-edit.modal.view.html" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />

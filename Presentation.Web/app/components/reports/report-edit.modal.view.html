@@ -8,7 +8,7 @@
                 Navn
             </label>    
             <div class="col-md-8">
-                <input type="text" name="name" id="name" data-ng-model="vm.name" class="form-control" ng-required="true" ng-maxlength="80"
+                <input type="text" name="name" id="name" data-ng-model="vm.name" class="form-control" ng-required="true" ng-maxlength="80" autocomplete="false"
                     ng-minlength="5" data-disabled-on-busy autofocus>
                 <div ng-messages="editReport.name.$error" ng-if="editReport.name.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Navn skal udfyldes.</div>
@@ -60,6 +60,6 @@
     </form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" data-ng-click="vm.ok()" data-ng-disabled="editReport.$invalid || editReport.$pristine" data-disabled-on-busy>Gem ændringer</button>
-    <button class="btn btn-warning" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
+    <button type="submit" class="btn btn-primary" data-ng-click="vm.ok()" data-ng-disabled="editReport.$invalid || editReport.$pristine" data-disabled-on-busy>Gem ændringer</button>
+    <button type="button" class="btn btn-warning" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
 </div>

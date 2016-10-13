@@ -10,6 +10,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
+using Presentation.Web.Controllers.API;
 using Presentation.Web.Controllers.OData;
 
 namespace Presentation.Web
@@ -164,7 +165,6 @@ namespace Presentation.Web
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
             users.EntityType.Property(x => x.Name).IsRequired();
-            users.EntityType.Property(x => x.LastName).IsRequired();
             users.EntityType.Property(x => x.Email).IsRequired();
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
@@ -252,7 +252,8 @@ namespace Presentation.Web
             var priceRegulationTypes = builder.EntitySet<PriceRegulationType>(nameof(PriceRegulationTypesController).Replace("Controller", string.Empty));
             priceRegulationTypes.EntityType.HasKey(x => x.Id);
 
-            //builder.EntitySet<ProcurementStrategyType>("ProcurementStrategyTypes");
+            var procurementStrategyTypes = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyController).Replace("Controller", string.Empty));
+            procurementStrategyTypes.EntityType.HasKey(x => x.Id);
 
             var itProjectTypes = builder.EntitySet<ItProjectType>(nameof(ItProjectTypesController).Replace("Controller", string.Empty));
             itProjectTypes.EntityType.HasKey(x => x.Id);
@@ -265,6 +266,9 @@ namespace Presentation.Web
 
             var terminationDeadlineType = builder.EntitySet<TerminationDeadlineType>(nameof(TerminationDeadlineTypesController).Replace("Controller", string.Empty));
             terminationDeadlineType.EntityType.HasKey(x => x.Id);
+
+            var config = builder.EntitySet<Config>(nameof(ConfigsController).Replace("Controller", string.Empty));
+            config.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");

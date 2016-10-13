@@ -16,10 +16,7 @@
         public title: string;
         public mainGrid: Kitos.IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
-        public currentEditModel: kendo.data.Model;
-        private canDelete: boolean = true;
         private canCreate: boolean = true;
-        private canEdit: boolean = true;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -61,13 +58,7 @@
                     this.mainGrid.dataSource.read();
                 }
             });
-            this.setUpSequrity();
             this.setupGrid();
-        }
-
-        private setUpSequrity = () => {
-            let canAll = this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isReportAdmin;
-            this.canCreate = this.canDelete = this.canEdit = canAll;
         }
 
         public onEdit = (e: JQueryEventObject) => {
@@ -86,7 +77,6 @@
             this.$confirm({ text: 'Ønsker du at slette rapporten?', title: 'Slet rapport', ok: 'Ja', cancel: 'Nej' })
                 .then(() => {
                     var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-                    var entityId = dataItem["Id"];
                     this.mainGrid.dataSource.remove(dataItem);
                     this.mainGrid.dataSource.sync();
                 });
@@ -191,6 +181,17 @@
 
             this.mainGridOptions = {
                 autoBind: false,
+                dataBinding: (e) => {
+                    let isGlobalAdmin = this.user.isGlobalAdmin;
+                    let isReportAdmin = this.user.isReportAdmin || this.user.isLocalAdmin;
+                    let currentOrganizationId = this.user.currentOrganizationId
+
+                    this.canCreate = isGlobalAdmin || isReportAdmin
+
+                    for (let i = 0; i < e.items.length; i++) {
+                        e.items[i].canEdit = isGlobalAdmin || (isReportAdmin && e.items[i].OrganizationId == currentOrganizationId)
+                    }
+                },
                 dataSource: dataSource,
                 editable: "popup",
                 height: 550,
@@ -200,9 +201,6 @@
                         template: `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     }
                 ],
-                edit: (e) => {
-                    this.currentEditModel = e.model;
-                },
                 pageable: {
                     refresh: true,
                     pageSizes: [20],
@@ -235,44 +233,13 @@
                         }
                     },
                     {
-                        command: [
-                            // {
-                            //     name: "editReport",
-                            //     template: "<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit()' data-ng-disabled='!vm.canEdit'><i class='fa fa-pencil' aria-hidden='true'></i></button>"
-                            // } as any,
-                            // {
-                            //     name: "deleteReport",
-                            //     template: "<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete()' data-ng-disabled='!vm.canDelete'><i class='fa fa-minus' style='color:darkred' aria-hidden='true'></i></button>"
-                            // } as any,
-                            {
-                                name: "editReport",
-                                buttonType: "Image",
-                                title: "Redigér rapport",
-                                text: "",
-                                imageClass: "fa fa-pencil",
-                                className: "btn btn-link",
-                                iconClass: "fa",
-                                click: this.onEdit
-                            } as any,
-                            {
-                                name: "deleteReport",
-                                buttonType: "Image",
-                                title: "Slet rapport",
-                                text: "",
-                                imageClass: "fa fa-minus",
-                                className: "btn btn-link",
-                                iconClass: "fa",
-                                style: "color:darkred",
-                                click: this.onDelete
-                            } as any
-
-                        ],
-                        title: "Handlinger", name: "handlinger", width: 70
+                        title: "Handlinger",
+                        width: 70,
+                        template: dataItem => `<button type='button' class='btn btn-link' title='Redigér rapport' data-ng-click='vm.onEdit($event)' data-ng-disabled='!${dataItem.canEdit}'><i class='fa fa-pencil' aria-hidden='true'></i></button>` +
+                                              `<button type='button' class='btn btn-link' title='Slet rapport' data-ng-click='vm.onDelete($event)' data-ng-disabled='!${dataItem.canEdit}'><i class='fa fa-minus' aria-hidden='true'></i></button>`
                     }
                 ]
             };
-            if (!this.canDelete || !this.canEdit)
-                this.mainGridOptions.columns.pop();
         }
     }
 

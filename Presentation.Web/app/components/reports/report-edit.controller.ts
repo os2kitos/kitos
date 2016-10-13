@@ -11,10 +11,11 @@
         public selectedCategory: any
         reportId: number
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "reportService", "_"];
+        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "notify", "reportService", "_"];
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $stateParams: ng.ui.IStateParamsService,
             private $http: ng.IHttpService,
+            private $scope,
             private notify,
             private reportService: Services.ReportService,
             private _: ILoDashWithMixins) {
@@ -65,7 +66,7 @@
                     CategoryTypeId: this.categoryTypeId,
                     AccessModifier: this.accessModifier
                 }
-                this.$http.post("/odata/reports", payload).then((response)=>{
+                this.$http.post("/odata/reports", payload).then((response) => {
                     this.$uibModalInstance.close();
                 });
             }
@@ -76,7 +77,7 @@
                     CategoryTypeId: this.categoryTypeId,
                     AccessModifier: this.accessModifier
                 }
-                this.$http.patch(`/odata/reports(${this.reportId})`, payload).then((response)=>{
+                this.$http.patch(`/odata/reports(${this.reportId})`, payload).then((response) => {
                     this.$uibModalInstance.close();
                 });
             }

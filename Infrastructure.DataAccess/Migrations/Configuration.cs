@@ -698,7 +698,7 @@ Kontakt: info@kitos.dk",
                 LastChangedByUserId = objectOwner?.Id
             };
 
-            org.OrgUnits.Add(new OrganizationUnit()
+            org.OrgUnits.Add(new OrganizationUnit
             {
                 Name = org.Name,
                 ObjectOwnerId = objectOwner?.Id,
