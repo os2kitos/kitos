@@ -504,6 +504,7 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
@@ -951,6 +952,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
+    <Content Include="app\components\it-project\it-project-modal-create.view.html" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
     <None Include="Properties\PublishProfiles\MiracleTest.pubxml" />
     <None Include="Properties\Settings.settings">
