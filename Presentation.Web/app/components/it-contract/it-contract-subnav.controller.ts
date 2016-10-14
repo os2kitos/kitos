@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$http', '$state', 'notify', 'user', function ($rootScope, $http, $state, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
                     { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
@@ -22,17 +22,35 @@
                 ];
 
                 function create() {
-                    var orgId = user.currentOrganizationId;
-                    var msg = notify.addInfoMessage("Opretter kontrakt...", false);
-                    $http.post('api/itcontract', { organizationId: orgId, name: 'Unavngivet kontrakt' })
-                        .success(function(result) {
-                            msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                            var contract = result.response;
-                            $state.go('it-contract.edit.systems', { id: contract.id });
-                        })
-                        .error(function() {
-                            msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
-                        });
+
+                    var self = this;
+
+                    var modalInstance = $modal.open({
+                        windowClass: 'modal fade in',
+                        templateUrl: 'app/components/it-contract/it-contract-modal-create.view.html',
+                         controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                            $scope.formData = {};
+                            $scope.type = 'IT Kontrakt';
+                            $scope.checkAvailbleUrl = 'api/itProject/';
+
+                            $scope.submit = function () {
+
+                                var orgId = user.currentOrganizationId;
+                                var msg = notify.addInfoMessage("Opretter kontrakt...", false);
+
+                                $http.post('api/itcontract', { organizationId: orgId, name: $scope.formData.name })
+                                    .success(function (result) {
+                                        msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                        var contract = result.response;
+                                        $modalInstance.close(contract.id);
+                                        $state.go('it-contract.edit.systems', { id: contract.id });
+                                    })
+                                    .error(function () {
+                                        msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                                    });
+                            };
+                        }]
+                    });
                 }
 
                 function remove() {
