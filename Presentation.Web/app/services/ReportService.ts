@@ -15,7 +15,7 @@ module Kitos.Services {
             return this.$http.get<Models.IReport>(`${this.baseUrl}(${id})`);
         }
 
-        GetAll = () => {
+        GetAll = (user: Kitos.Services.IUser) => {
             return this.$http.get<Kitos.Models.IODataResult<Models.IReport>>(this.baseUrl + "?$expand=CategoryType");
         }
 

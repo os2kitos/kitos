@@ -951,8 +951,6 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
-    <None Include="Properties\PublishProfiles\Kitos - Prodmiljø.pubxml" />
-    <None Include="Properties\PublishProfiles\Kitos - Testmiljø.pubxml" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
     <None Include="Properties\PublishProfiles\MiracleTest.pubxml" />
     <None Include="Properties\Settings.settings">
@@ -1073,9 +1071,6 @@
     <Content Include="Tests\mocks\advice.json" />
     <Content Include="Tests\mocks\interfaceUsage.json" />
     <None Include="Web.MiracleTest.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Sandbox.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
