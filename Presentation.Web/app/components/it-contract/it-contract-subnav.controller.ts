@@ -33,7 +33,7 @@
                             $scope.type = 'IT Kontrakt';
                             $scope.checkAvailbleUrl = 'api/itProject/';
 
-                            $scope.submit = function () {
+                            $scope.saveAndProceed = function () {
 
                                 var orgId = user.currentOrganizationId;
                                 var msg = notify.addInfoMessage("Opretter kontrakt...", false);
@@ -44,6 +44,23 @@
                                         var contract = result.response;
                                         $modalInstance.close(contract.id);
                                         $state.go('it-contract.edit.systems', { id: contract.id });
+                                    })
+                                    .error(function () {
+                                        msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                                    });
+                            };
+
+                            $scope.save = function () {
+
+                                var orgId = user.currentOrganizationId;
+                                var msg = notify.addInfoMessage("Opretter kontrakt...", false);
+
+                                $http.post('api/itcontract', { organizationId: orgId, name: $scope.formData.name })
+                                    .success(function (result) {
+                                        msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                        var contract = result.response;
+                                        $modalInstance.close(contract.id);
+                                        $state.reload();
                                     })
                                     .error(function () {
                                         msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");

@@ -13,7 +13,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" data-ng-disabled="createForm.$invalid">OK</button>
-        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+        <button type="submit" class="btn btn-primary" ng-click="saveAndProceed()" data-ng-disabled="createForm.$invalid">Gem, og gå til {{type}}</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="createForm.$invalid">Gem</button>
+        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
     </div>
 </form>

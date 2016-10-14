@@ -83,6 +83,7 @@
         }
         public opretITProjekt() {
             var self = this;
+
             var modalInstance = this.$modal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
@@ -93,10 +94,9 @@
                     $scope.type = 'IT Projekt';
                     $scope.checkAvailbleUrl = 'api/itProject/';
 
-                    $scope.submit = function () {
+                    $scope.saveAndProceed = function () {
 
                         let orgUnitId = self.user.currentOrganizationUnitId;
-
                         const payload = {
                             name: $scope.formData.name,
                             responsibleOrgUnitId: orgUnitId,
@@ -115,6 +115,33 @@
                                     self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
                                 }
                                 self.$state.go("it-project.edit.status-project", { id: projectId });
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+                            });
+                    };
+
+                    $scope.save = function () {
+
+                        let orgUnitId = self.user.currentOrganizationUnitId;
+                        const payload = {
+                            name: $scope.formData.name,
+                            responsibleOrgUnitId: orgUnitId,
+                            organizationId: self.user.currentOrganizationId
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter projekt...', false);
+
+                        self.$http.post("api/itproject", payload)
+                            .success((result: any) => {
+                                msg.toSuccessMessage("Et nyt projekt er oprettet!");
+                                let projectId = result.response.id;
+                                $modalInstance.close(projectId);
+                                if (orgUnitId) {
+                                    // add users default org unit to the new project
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                }
+                                self.$state.reload();
                             })
                             .error(() => {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
