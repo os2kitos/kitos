@@ -17,8 +17,8 @@
                     ],
                     goalTypes: [
                         "$http", function($http) {
-                            return $http.get("api/goalType").then(function(result) {
-                                return result.data.response;
+                            return $http.get("odata/LocalGoalTypes?$filter=IsActive+eq+true").then(function(result) {
+                                return result.data.value;
                             });
                         }
                     ]

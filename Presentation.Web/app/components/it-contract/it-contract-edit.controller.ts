@@ -15,29 +15,29 @@
                     ],
                     contractTypes: [
                         '$http', function ($http) {
-                            return $http.get('api/contracttype/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalItContractTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     contractTemplates: [
                         '$http', function ($http) {
-                            return $http.get('api/contracttemplate/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     purchaseForms: [
                         '$http', function ($http) {
-                            return $http.get('api/purchaseform/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     procurementStrategies: [
                         '$http', function ($http) {
-                            return $http.get('api/procurementStrategy/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
@@ -57,8 +57,8 @@
                     ],
                     agreementElements: [
                         '$http', function ($http) {
-                            return $http.get('api/agreementelement/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],

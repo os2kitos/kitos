@@ -9,6 +9,7 @@ using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
+using Core.DomainModel.LocalOptions;
 
 namespace Infrastructure.DataAccess
 {
@@ -94,6 +95,34 @@ namespace Infrastructure.DataAccess
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
+
+        public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
+        public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
+        public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
+        public DbSet<LocalDataType> LocalDataTypes { get; set; }
+        public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }
+        public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
+        public DbSet<LocalHandoverTrialType> LocalHandoverTrialTypes { get; set; }
+        public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
+        public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
+        public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
+        public DbSet<LocalItContractType> LocalItContractTypes { get; set; }
+        public DbSet<LocalItInterfaceType> LocalItInterfaceTypes { get; set; }
+        public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
+        public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
+        public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
+        public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
+        public DbSet<LocalMethodType> LocalMethodTypes { get; set; }
+        public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
+        public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
+        public DbSet<LocalPaymentModelType> LocalPaymentModelTypes { get; set; }
+        public DbSet<LocalPriceRegulationType> LocalPriceRegulationTypes { get; set; }
+        public DbSet<LocalProcurementStrategyType> LocalProcurementStrategyTypes { get; set; }
+        public DbSet<LocalPurchaseFormType> LocalPurchaseFormTypes { get; set; }
+        public DbSet<LocalReportCategoryType> LocalReportCategoryTypes { get; set; }
+        public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
+        public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
+        public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

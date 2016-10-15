@@ -1,17 +1,15 @@
-﻿using Core.DomainModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.DomainModel
+﻿namespace Core.DomainModel
 {
-    class LocalOptionEntity : Entity
+    public abstract class LocalOptionEntity<OptionType> : Entity, IHasOrganization
     {
-        public virtual int OrganizationId { get; set; }
-        public Entity OptionEntity { get; set; }
-        public bool IsLocallyActive { get; set; }
         public string Description { get; set; }
+
+        public virtual Organization.Organization Organization { get; set; }
+
+        public int OrganizationId { get; set; }
+
+        public virtual OptionEntity<OptionType> Option { get; set; }
+
+        public int OptionId { get; set; }
     }
 }

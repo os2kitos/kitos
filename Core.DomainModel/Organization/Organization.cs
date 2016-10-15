@@ -26,6 +26,7 @@ namespace Core.DomainModel.Organization
             Rights = new List<OrganizationRight>();
             DefaultOrganizationForUsers = new List<User>();
             Reports = new List<Report>();
+            OrganizationOptions = new List<LocalOptionEntity<Entity>>();
         }
 
         public string Name { get; set; }
@@ -41,6 +42,8 @@ namespace Core.DomainModel.Organization
         public AccessModifier AccessModifier { get; set; }
         public Guid? Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
+
+        public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }
 
         /// <summary>
         /// ItProjects created inside this organization

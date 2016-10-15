@@ -232,8 +232,8 @@
                     ],
                         itProjectRoles: [
                             "$http",
-                            $http => $http.get("api/itprojectrole/?nonsuggestions=")
-                            .then(result => result.data.response)
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsActive+eq+true")
+                                .then(result => result.data.value)
                     ],
                         user: [
                             "userService",

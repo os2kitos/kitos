@@ -19,9 +19,9 @@
                             var rights = rightResult.data.response;
 
                             //get the role names
-                            return $http.get("api/itprojectrole/")
+                            return $http.get("odata/LocalItProjectRoles?$filter=IsActive+eq+true")
                                 .then(function (roleResult) {
-                                    var roles: { name }[] = roleResult.data.response;
+                                    var roles: { name }[] = roleResult.data.value;
 
                                     //the resulting map
                                     var users = {};
