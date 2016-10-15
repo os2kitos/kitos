@@ -81,7 +81,7 @@
                         field: "IsActive", title: "Aktiv", width: 112,
                         persistId: "isActive", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `<input type="checkbox" data-ng-model="dataItem.IsActive" data-autosave="${ this.optionsUrl }({{ dataItem.Id }})" data-field="IsActive"> {{ Name }}`,
+                        template: `<input type="checkbox" data-ng-model="dataItem.IsActive" data-global-option-id="{{ dataItem.Id }}" data-autosave="${ this.optionsUrl }" data-field="OptionId"> {{ Name }}`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -113,9 +113,9 @@
                         }
                     },
                     {
-                        field: "Note", title: "Beskrivelse", width: 230,
-                        persistId: "note", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Note,
+                        field: "Description", title: "Beskrivelse", width: 230,
+                        persistId: "description", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
                             cell: {
@@ -141,6 +141,15 @@
             //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             //var entityId = dataItem["Id"];
             //this.$state.go("organization.user.edit", { id: entityId });
+        }
+
+        public refreshKendoGrid() {
+            console.log(this.mainGrid);
+            console.log(123);
+            if (this.mainGrid) {
+                console.log(1234);
+                this.mainGrid.refresh();
+            }
         }
     }
     angular.module("app")

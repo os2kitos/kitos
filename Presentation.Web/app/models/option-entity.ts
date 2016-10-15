@@ -3,6 +3,7 @@
         Name: string;
         IsActive: boolean;
         IsSuggestion: boolean;
-        Note: string;
+        Description: string;
+        IsDisabled: boolean;
     }
 }

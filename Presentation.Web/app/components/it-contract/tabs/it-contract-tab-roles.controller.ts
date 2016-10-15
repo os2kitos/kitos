@@ -8,13 +8,13 @@
                 itContractRights: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("api/itcontractright/" + $stateParams.id)
                         .then(function (result) {
-                            return result.data.response;
+                            return result.data.value;
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("api/itcontractrole/?nonsuggestions=")
+                    return $http.get("odata/LocalItContractRoles?$filter=IsActive+eq+true")
                         .then(function (result) {
-                            return result.data.response;
+                            return result.data.value;
                         });
                 }],
                 user: ['userService', function(userService) {
@@ -32,7 +32,7 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            $scope.activeItContractRoles = _.filter(itContractRoles, { isActive: true });
+            //$scope.activeItContractRoles = _.filter(itContractRoles, { isActive: true });
             $scope.itContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 

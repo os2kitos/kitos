@@ -12,6 +12,8 @@ using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Controllers.OData;
+using Presentation.Web.Controllers.OData.LocalOptionControllers;
+using Core.DomainModel.LocalOptions;
 
 namespace Presentation.Web
 {
@@ -261,6 +263,89 @@ namespace Presentation.Web
             var purchaseFormType = builder.EntitySet<PurchaseFormType>(nameof(PurchaseFormTypesController).Replace("Controller", string.Empty));
             purchaseFormType.EntityType.HasKey(x => x.Id);
 
+            //Local options
+
+            var LocalAgreementElementType = builder.EntitySet<LocalAgreementElementType>(nameof(LocalAgreementElementTypesController).Replace("Controller", string.Empty));
+            LocalAgreementElementType.EntityType.HasKey(x => x.Id);
+
+            var LocalArchiveType = builder.EntitySet<LocalArchiveType>(nameof(LocalArchiveTypesController).Replace("Controller", string.Empty));
+            LocalArchiveType.EntityType.HasKey(x => x.Id);
+
+            var LocalBusinessType = builder.EntitySet<LocalBusinessType>(nameof(LocalBusinessTypesController).Replace("Controller", string.Empty));
+            LocalBusinessType.EntityType.HasKey(x => x.Id);
+
+            var LocalDataType = builder.EntitySet<LocalDataType>(nameof(LocalDataTypesController).Replace("Controller", string.Empty));
+            LocalDataType.EntityType.HasKey(x => x.Id);
+
+            var LocalFrequencyType = builder.EntitySet<LocalFrequencyType>(nameof(LocalFrequencyTypesController).Replace("Controller", string.Empty));
+            LocalFrequencyType.EntityType.HasKey(x => x.Id);
+
+            var LocalGoalType = builder.EntitySet<LocalGoalType>(nameof(LocalGoalTypesController).Replace("Controller", string.Empty));
+            LocalGoalType.EntityType.HasKey(x => x.Id);
+
+            var LocalHandoverTrialType = builder.EntitySet<LocalHandoverTrialType>(nameof(LocalHandoverTrialTypesController).Replace("Controller", string.Empty));
+            LocalHandoverTrialType.EntityType.HasKey(x => x.Id);
+
+            var LocalInterfaceType = builder.EntitySet<LocalInterfaceType>(nameof(LocalInterfaceTypesController).Replace("Controller", string.Empty));
+            LocalInterfaceType.EntityType.HasKey(x => x.Id);
+
+            var LocalItContractRole = builder.EntitySet<LocalItContractRole>(nameof(LocalItContractRolesController).Replace("Controller", string.Empty));
+            LocalItContractRole.EntityType.HasKey(x => x.Id);
+
+            var LocalItContractTemplateType = builder.EntitySet<LocalItContractTemplateType>(nameof(LocalItContractTemplateTypesController).Replace("Controller", string.Empty));
+            LocalItContractTemplateType.EntityType.HasKey(x => x.Id);
+
+            var LocalItContractType = builder.EntitySet<LocalItContractType>(nameof(LocalItContractTypesController).Replace("Controller", string.Empty));
+            LocalItContractType.EntityType.HasKey(x => x.Id);
+
+            var LocalItInterfaceType = builder.EntitySet<LocalItInterfaceType>(nameof(LocalItInterfaceTypesController).Replace("Controller", string.Empty));
+            LocalItInterfaceType.EntityType.HasKey(x => x.Id);
+
+            var LocalItProjectRole = builder.EntitySet<LocalItProjectRole>(nameof(LocalItProjectRolesController).Replace("Controller", string.Empty));
+            LocalItProjectRole.EntityType.HasKey(x => x.Id);
+
+            var LocalItProjectType = builder.EntitySet<LocalItProjectType>(nameof(LocalItProjectTypesController).Replace("Controller", string.Empty));
+            LocalItProjectType.EntityType.HasKey(x => x.Id);
+
+            var LocalItSystemRole = builder.EntitySet<LocalItSystemRole>(nameof(LocalItSystemRolesController).Replace("Controller", string.Empty));
+            LocalItSystemRole.EntityType.HasKey(x => x.Id);
+
+            var LocalItSystemType = builder.EntitySet<LocalItSystemType>(nameof(LocalItSystemTypesController).Replace("Controller", string.Empty));
+            LocalItSystemType.EntityType.HasKey(x => x.Id);
+
+            var LocalMethodType = builder.EntitySet<LocalMethodType>(nameof(LocalMethodTypesController).Replace("Controller", string.Empty));
+            LocalMethodType.EntityType.HasKey(x => x.Id);
+
+            var LocalOptionExtendType = builder.EntitySet<LocalOptionExtendType>(nameof(LocalOptionExtendTypesController).Replace("Controller", string.Empty));
+            LocalOptionExtendType.EntityType.HasKey(x => x.Id);
+
+            var LocalPaymentFreqencyType = builder.EntitySet<LocalPaymentFreqencyType>(nameof(LocalPaymentFrequencyTypesController).Replace("Controller", string.Empty));
+            LocalPaymentFreqencyType.EntityType.HasKey(x => x.Id);
+
+            var LocalPaymentModelType = builder.EntitySet<LocalPaymentModelType>(nameof(LocalPaymentModelTypesController).Replace("Controller", string.Empty));
+            LocalPaymentModelType.EntityType.HasKey(x => x.Id);
+
+            var LocalPriceRegulationType = builder.EntitySet<LocalPriceRegulationType>(nameof(LocalPriceRegulationTypesController).Replace("Controller", string.Empty));
+            LocalPriceRegulationType.EntityType.HasKey(x => x.Id);
+
+            var LocalProcurementStrategyType = builder.EntitySet<LocalProcurementStrategyType>(nameof(LocalProcurementStrategyTypesController).Replace("Controller", string.Empty));
+            LocalProcurementStrategyType.EntityType.HasKey(x => x.Id);
+
+            var LocalPurchaseFormType = builder.EntitySet<LocalPurchaseFormType>(nameof(LocalPurchaseFormTypesController).Replace("Controller", string.Empty));
+            LocalPurchaseFormType.EntityType.HasKey(x => x.Id);
+
+            var LocalReportCategoryType = builder.EntitySet<LocalReportCategoryType>(nameof(LocalReportCategoryTypesController).Replace("Controller", string.Empty));
+            LocalReportCategoryType.EntityType.HasKey(x => x.Id);
+
+            var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
+            LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
+
+            var LocalTerminationDeadlineType = builder.EntitySet<LocalTerminationDeadlineType>(nameof(LocalTerminationDeadlineTypesController).Replace("Controller", string.Empty));
+            LocalTerminationDeadlineType.EntityType.HasKey(x => x.Id);
+
+            var LocalTsaType = builder.EntitySet<LocalTsaType>(nameof(LocalTsaTypesController).Replace("Controller", string.Empty));
+            LocalTsaType.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
 
@@ -277,7 +362,9 @@ namespace Presentation.Web
             //builder.EntitySet<Wish>("Wishes");
 
             builder.EntitySet<Report>("Reports").EntityType.HasKey(x => x.Id);
-            builder.EntitySet<ReportCategoryType>("ReportCategories").EntityType.HasKey(x => x.Id);
+
+            var reportCategoryTypes = builder.EntitySet<ReportCategoryType>(nameof(ReportCategoryTypesController).Replace("Controller", string.Empty));
+            reportCategoryTypes.EntityType.HasKey(x => x.Id);
 
             return builder.GetEdmModel();
         }

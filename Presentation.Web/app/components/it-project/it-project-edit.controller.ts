@@ -266,8 +266,8 @@
                         ],
                         projectTypes: [
                             "$http", $http => {
-                                return $http.get("api/itprojecttype/")
-                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
+                                return $http.get("odata/LocalItProjectTypes?$filter=IsActive+eq+true")
+                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.value);
                             }
                         ],
                         user: [

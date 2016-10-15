@@ -6,13 +6,13 @@
             controller: 'contract.DeadlinesCtrl',
             resolve: {
                 optionExtensions: ['$http', function($http) {
-                    return $http.get('api/optionextend').then(function(result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalOptionExtendTypes?$filter=IsActive+eq+true').then(function(result) {
+                        return result.data.value;
                     });
                 }],
                 terminationDeadlines: ['$http', function ($http) {
-                    return $http.get('api/terminationdeadline').then(function (result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalTerminationDeadlineTypes').then(function (result) {
+                        return result.data.value;
                     });
                 }],
                 paymentMilestones: ['$http', '$stateParams', function ($http, $stateParams) {
@@ -21,8 +21,8 @@
                     });
                 }],
                 handoverTrialTypes: ['$http', function ($http) {
-                    return $http.get('api/handoverTrialType').then(function (result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalHandoverTrialTypes?$filter=IsActive+eq+true').then(function (result) {
+                        return result.data.value;
                     });
                 }],
                 handoverTrials: ['$http', '$stateParams', function ($http, $stateParams) {

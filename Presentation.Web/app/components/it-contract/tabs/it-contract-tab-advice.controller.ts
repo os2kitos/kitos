@@ -6,9 +6,9 @@
             controller: 'contract.EditAdviceCtrl',
             resolve: {
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("api/itcontractrole/")
+                    return $http.get("odata/LocalItContractRoles?$filter=IsActive+eq+true")
                         .then(function (result) {
-                            return result.data.response;
+                            return result.data.value;
                         });
                 }],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
