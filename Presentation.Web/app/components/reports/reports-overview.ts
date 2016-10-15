@@ -95,7 +95,9 @@
                 type: "odata-v4",
                 transport: {
                     read: {
-                        url: baseUrl + "?$expand=CategoryType",
+                        url: function () {
+                            return  baseUrl + "?$expand=CategoryType";
+                        },
                         dataType: "json"
                     },
                     update: {

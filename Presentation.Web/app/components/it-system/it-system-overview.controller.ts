@@ -101,7 +101,7 @@
                     $scope.type = 'IT System';
                     $scope.checkAvailbleUrl = 'api/itSystem/';
 
-                    $scope.submit = function () {
+                    $scope.saveAndProceed = function () {
                         var payload = {
                             name: $scope.formData.name,
                             belongsToId: self.user.currentOrganizationId,
@@ -115,6 +115,32 @@
                                 msg.toSuccessMessage('Et nyt system er oprettet!');
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
+                                if (systemId) { 
+                                    self.$state.go('it-system.edit.interfaces', { id: systemId });
+                                }
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                            });
+                    };
+
+                    $scope.save = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId,
+                            taskRefIds: [],
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        self.$http.post('api/itsystem', payload)
+                            .success(function (result: any) {
+                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                var systemId = result.response.id;
+                                $modalInstance.close(systemId);
+                                if (systemId) {
+                                    self.$state.reload();
+                                }
+                               
                             }).error(function () {
                                 msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
                             });
@@ -122,10 +148,10 @@
                 }]
             });
 
-            modalInstance.result.then(function (id) {
+            /*modalInstance.result.then(function (id) {
                 // modal was closed with OK
                 self.$state.go('it-system.edit.interfaces', { id: id });
-            });
+            });*/
         };
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"

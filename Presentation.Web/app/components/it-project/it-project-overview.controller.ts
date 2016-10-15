@@ -40,7 +40,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "economyCalc"
+            "economyCalc",
+            "$uibModal"
         ];
 
         constructor(
@@ -58,7 +59,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: any,
-            private economyCalc) {
+            private economyCalc,
+            private $modal) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -79,33 +81,74 @@
 
             this.activate();
         }
-
-
         public opretITProjekt() {
-            let orgUnitId = this.user.currentOrganizationUnitId;
-            const payload = {
-                name: "Unavngivet projekt",
-                responsibleOrgUnitId: orgUnitId,
-                organizationId: this.user.currentOrganizationId
-            };
+            var self = this;
 
-            var msg = this.notify.addInfoMessage("Opretter projekt...", false);
+            var modalInstance = this.$modal.open({
+                // fade in instead of slide from top, fixes strange cursor placement in IE
+                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                windowClass: 'modal fade in',
+                templateUrl: 'app/components/it-project/it-project-modal-create.view.html',
+                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = 'IT Projekt';
+                    $scope.checkAvailbleUrl = 'api/itProject/';
 
-            this.$http.post("api/itproject", payload)
-                .success((result: any) => {
-                    msg.toSuccessMessage("Et nyt projekt er oprettet!");
-                    let projectId = result.response.id;
+                    $scope.saveAndProceed = function () {
 
-                    if (orgUnitId) {
-                        // add users default org unit to the new project
-                        this.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
-                    }
+                        let orgUnitId = self.user.currentOrganizationUnitId;
+                        const payload = {
+                            name: $scope.formData.name,
+                            responsibleOrgUnitId: orgUnitId,
+                            organizationId: self.user.currentOrganizationId
+                        };
 
-                    this.$state.go("it-project.edit.status-project", { id: projectId });
-                })
-                .error(() => {
-                    msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
-                });
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+
+                        self.$http.post("api/itproject", payload)
+                            .success((result: any) => {
+                                msg.toSuccessMessage("Et nyt projekt er oprettet!");
+                                let projectId = result.response.id;
+                                $modalInstance.close(projectId);
+                                if (orgUnitId) {
+                                     // add users default org unit to the new project
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                }
+                                self.$state.go("it-project.edit.status-project", { id: projectId });
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+                            });
+                    };
+
+                    $scope.save = function () {
+
+                        let orgUnitId = self.user.currentOrganizationUnitId;
+                        const payload = {
+                            name: $scope.formData.name,
+                            responsibleOrgUnitId: orgUnitId,
+                            organizationId: self.user.currentOrganizationId
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter projekt...', false);
+
+                        self.$http.post("api/itproject", payload)
+                            .success((result: any) => {
+                                msg.toSuccessMessage("Et nyt projekt er oprettet!");
+                                let projectId = result.response.id;
+                                $modalInstance.close(projectId);
+                                if (orgUnitId) {
+                                    // add users default org unit to the new project
+                                    self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+                                }
+                                self.$state.reload();
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+                            });
+                    };
+                }]
+            });
         };
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
