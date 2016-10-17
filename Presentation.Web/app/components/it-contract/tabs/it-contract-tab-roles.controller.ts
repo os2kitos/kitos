@@ -8,7 +8,7 @@
                 itContractRights: ['$http', '$stateParams', function ($http, $stateParams) {
                     return $http.get("api/itcontractright/" + $stateParams.id)
                         .then(function (result) {
-                            return result.data.value;
+                            return result.data.response;
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
@@ -32,8 +32,7 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            //$scope.activeItContractRoles = _.filter(itContractRoles, { isActive: true });
-            $scope.itContractRoles = itContractRoles;
+            $scope.activeItContractRoles = itContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];

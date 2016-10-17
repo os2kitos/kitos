@@ -93,8 +93,8 @@
                             data-ng-model="right.roleForSelect"
                             class="form-control input-sm edit-right-user">
                         <option data-ng-show="right.role.isActive == false" disabled="true" value="{{right.role.id}}">{{right.role.name}} {{right.role.isActive == true ? "" : "(Inaktiv rolle)"}}</option>
-                        <option data-ng-repeat="contractRole in activeItContractRoles" value="{{contractRole.id}}">
-                            {{contractRole.name}} ({{contractRole.hasWriteAccess && "skriv" || "læs" }})
+                        <option data-ng-repeat="contractRole in activeItContractRoles" value="{{contractRole.Id}}">
+                            {{contractRole.Name}} ({{contractRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>
@@ -122,8 +122,8 @@
                             data-placeholder="Vælg en kontraktrolle"
                             data-ng-change="submitRight()">
                         <option value=""></option>
-                        <option data-ng-repeat="contractRole in activeItContractRoles" value="{{contractRole.id}}">
-                            {{contractRole.name}} ({{contractRole.hasWriteAccess && "skriv" || "læs" }})
+                        <option data-ng-repeat="contractRole in activeItContractRoles" value="{{contractRole.Id}}">
+                            {{contractRole.Name}} ({{contractRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>

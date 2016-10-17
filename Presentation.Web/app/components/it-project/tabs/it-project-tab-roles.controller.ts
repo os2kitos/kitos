@@ -49,7 +49,7 @@
             this.projectId = project.id;
 
             this.orgId = this.user.currentOrganizationId;
-            this.activeItProjectRoles = _.filter(this.itProjectRoles, { isActive: true });
+            this.activeItProjectRoles = this.itProjectRoles;
             this.newRole = "1";
 
             this.rights = [];
