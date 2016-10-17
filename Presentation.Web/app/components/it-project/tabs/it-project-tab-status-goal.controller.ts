@@ -29,7 +29,7 @@
 
     app.controller("project.EditStatusGoalCtrl", [
         "$scope", "$http", "notify", "$uibModal", "$state", "project", "goalTypes", "user",
-        function ($scope, $http, notify, $modal, $state, project, goalTypes: { name }[], user) {
+        function ($scope, $http, notify, $modal, $state, project, goalTypes: { Name }[], user) {
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 
@@ -39,9 +39,9 @@
             };
 
             $scope.getGoalTypeName = function(goalTypeId) {
-                var type = _.find(goalTypes, { id: goalTypeId });
+                var type = _.find(goalTypes, { Id: goalTypeId });
 
-                return type && type.name;
+                return type && type.Name;
             };
 
             $scope.goals = [];
