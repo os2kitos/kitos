@@ -233,6 +233,10 @@
     <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610181141397_Priority added.cs" />
+    <Compile Include="Migrations\201610181141397_Priority added.Designer.cs">
+      <DependentUpon>201610181141397_Priority added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -316,6 +320,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610181141397_Priority added.resx">
+      <DependentUpon>201610181141397_Priority added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
