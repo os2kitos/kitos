@@ -125,7 +125,7 @@
                         //field: "Note", title: "Beskrivelse", width: 230,
                         field: "Description", title: "Beskrivelse", width: 230,
                         persistId: "note", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Note,
+                        template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
                             cell: {

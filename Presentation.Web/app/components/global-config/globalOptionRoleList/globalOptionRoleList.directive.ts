@@ -3,13 +3,15 @@
 
     function setupDirective(): ng.IDirective {
         return {
-            scope: {},
+            scope: {
+                editState: "@state"
+            },
             controller: GlobalOptionRoleListDirective,
             controllerAs: "ctrl",
             bindToController: {
                 optionsUrl: "@",
                 title: "@",
-                editState: "@"
+                name: "="
             },
             template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
@@ -19,17 +21,19 @@
         optionsUrl: string;
         title: string;
         editState: string;
+        optionId: string;
     }
 
     class GlobalOptionRoleListDirective implements IDirectiveScope {
         public optionsUrl: string;
         public title: string;
         public editState: string;
+        public optionId: string;
 
-        //public mainGrid: IKendoGrid<Models.IRoleEntity>;
+        public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -37,13 +41,22 @@
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private notify) {
+            private notify,
+            private $scope) {
+
+            this.editState = $scope.editState;
+            this.$scope.$state = $state;
+
+            console.log(`editState in globalOptionRoleList: ${this.editState}`);
+            console.log(`optionsUrl in globalOptionRoleList: ${this.optionsUrl}`);
+
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `${this.optionsUrl}?$filter=IsActive eq true`,
+                            //url: `${this.optionsUrl}?$filter=IsActive eq true`,
+                            url: `${this.optionsUrl}`,
                             dataType: "json"
                         }
                         //,destroy: {
@@ -96,7 +109,9 @@
                 },
                 columns: [
                     {
-                        field: "IsActive", title: "Aktiv", width: 112,
+                        field: "IsActive",
+                        title: "Aktiv",
+                        width: 112,
                         persistId: "isActive", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: `# if(IsActive) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
@@ -104,15 +119,17 @@
                         filterable: false,
                         sortable: false
                     },
+                    //{
+                    //    command: [
+                    //        { text: "Op/Ned", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                    //    ],
+                    //    title: " ", width: 176,
+                    //    persistId: "command"
+                    //},
                     {
-                        command: [
-                            { text: "Op/Ned", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                        ],
-                        title: " ", width: 176,
-                        persistId: "command"
-                    },
-                    {
-                        field: "Id", title: "Nr.", width: 230,
+                        field: "Id",
+                        title: "Nr.",
+                        width: 230,
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
@@ -125,7 +142,9 @@
                         }
                     },
                     {
-                        field: "Name", title: "Navn", width: 230,
+                        field: "Name",
+                        title: "Navn",
+                        width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Name,
                         hidden: false,
@@ -138,19 +157,23 @@
                         }
                     },
                     {
-                        field: "HasWriteAccess", title: "Skriv", width: 112,
+                        field: "HasWriteAccess",
+                        title: "Skriv",
+                        width: 112,
                         persistId: "hasWriteAccess", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        template:
+                        `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
                     },
                     {
-                        //field: "Note", title: "Beskrivelse", width: 230,
-                        field: "Description", title: "Beskrivelse", width: 230,
+                        field: "Description",
+                        title: "Beskrivelse",
+                        width: 230,
                         persistId: "note", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Note,
+                        template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
                             cell: {
@@ -161,33 +184,38 @@
                         }
                     },
                     {
-                        command: [
-                            //{ text: "Redigér", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                            { name: "editOption", text: "", click: this.editOption, imageClass: "fa fa-pencil", className: "btn btn-link", iconClass: "fa" } as any /* kendo typedef is missing imageClass and iconClass so casting to any */
-                           ],
-                        title: " ", width: 176,
-                        persistId: "command"
-                    }
+                        name: "editOption",
+                        text: "Redigér",
+                        template: "<button type='button' class='btn btn-link' title='Redigér rolle' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button>",
+                        title: " ",
+                        width: 176
+                    } as any
                 ]
             };
         }
 
         public createOption = () => {
             //TODO OS2KITOS-256
-            this.$state.go(this.editState, {optionId: 0});
-        }
+            this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl });
 
-        private editOption = (e: JQueryEventObject) => {
+            console.log(`optionUrl: ${this.optionsUrl}`);
+            console.log(`editState: ${this.editState}`);
+        };
+
+        public editOption = (e: JQueryEventObject) => {
             //TODO OS2KITOS-257
             e.preventDefault();
-            //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            //var entityId = dataItem["Id"];
-            //this.$state.go("organization.user.edit", { id: entityId });
-        }
+            var entityGrid = this.$("#mainGrid").data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            this.optionId = selectedItem.get("id");
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl });
+
+            console.log(`selectedItem: ${selectedItem.get("id")}`);
+        };
 
         public deactivateOption = () => {
             //TODO OS2KITOS-258
-        }
+        };
     }
     angular.module("app")
         .directive("globalOptionRoleList", setupDirective);

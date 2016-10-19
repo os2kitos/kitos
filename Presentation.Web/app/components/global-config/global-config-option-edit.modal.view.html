@@ -4,40 +4,40 @@
 <div class="modal-body">
     <form name="editOption" class="form-horizontal">
         <div class="form-group" ng-class="{ 'has-error': editOption.name.$touched && editOption.name.$invalid }">
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="isObligatory">
-                    Obligatorisk
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="isActive">
-                    Aktiv
-                </label>
-            </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="isActive">
-                    Skriverettighed
-                </label>
-            </div>
-			<label for="name" class="col-md-3 control-label">
+
+            <label for="name" class="col-md-2 control-label">
                 Navn
             </label>
             <div class="col-md-8">
                 <input type="text" name="name" id="name" data-ng-model="vm.name" class="form-control" ng-required="true" ng-maxlength="80"
-                       ng-minlength="5" data-disabled-on-busy autofocus>
+                       ng-minlength="1" data-disabled-on-busy autofocus>
                 <div ng-messages="editOption.name.$error" ng-if="editOption.name.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Navn skal udfyldes.</div>
                     <div ng-message="minlength" style="margin:5px 0">Navnet er for kort.</div>
                     <div ng-message="maxlength" style="margin:5px 0">Navnet er for lang.</div>
                 </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="isObligatory">
+                        Obligatorisk
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="isActive">
+                        Aktiv
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="hasWriteAccess">
+                        Skriverettighed
+                    </label>
+                </div>
             </div>
-
         </div>
         <div class="form-group" ng-class="{ 'has-error': editOption.description.$touched && editOption.description.$invalid }">
-            <label for="description" class="col-md-3 control-label">
+            <label for="description" class="col-md-2 control-label">
                 Beskrivelse
             </label>
             <div class="col-md-8">
