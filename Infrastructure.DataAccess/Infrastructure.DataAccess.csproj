@@ -237,6 +237,10 @@
     <Compile Include="Migrations\201610170909312_added priority on roles and types.Designer.cs">
       <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610190757511_priority added.cs" />
+    <Compile Include="Migrations\201610190757511_priority added.Designer.cs">
+      <DependentUpon>201610190757511_priority added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -325,6 +329,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610170909312_added priority on roles and types.resx">
       <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610190757511_priority added.resx">
+      <DependentUpon>201610190757511_priority added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

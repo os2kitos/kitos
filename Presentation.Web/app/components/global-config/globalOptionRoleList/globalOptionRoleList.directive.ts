@@ -174,6 +174,34 @@
                 ]
             };
         
+            /* var initMainGrid = this.$('#mainGrid').data('kendoGrid');
+
+            
+           // console.log(this.mainGrid.table);
+
+           initMainGrid.table.kendoSortable({
+                filter: ">tbody >tr",
+                hint: $.noop,
+                cursor: "move",
+                placeholder: function (element) {
+                    return element.clone().addClass("k-state-hover").css("opacity", 0.65);
+                },
+                container: "#grid tbody",
+                change: function (e) {
+                    var skip = this.mainGrid.dataSource.skip(),
+                        oldIndex = e.oldIndex + skip,
+                        newIndex = e.newIndex + skip,
+                        data = this.mainGrid.dataSource.data(),
+                        dataItem = this.mainGrid.dataSource.getByUid(e.item.data("uid"));
+
+                    this.mainGrid.dataSource.remove(dataItem);
+                    this.mainGrid.dataSource.insert(newIndex, dataItem);
+
+                }
+            });*/
+
+
+
 
          /*  this.mainGrid = {
                 getOptions() { return this.mainGridOptions },
