@@ -49,7 +49,7 @@
             this.projectId = project.id;
 
             this.orgId = this.user.currentOrganizationId;
-            this.activeItProjectRoles = _.filter(this.itProjectRoles, { isActive: true });
+            this.activeItProjectRoles = this.itProjectRoles;
             this.newRole = "1";
 
             this.rights = [];
@@ -232,8 +232,8 @@
                     ],
                         itProjectRoles: [
                             "$http",
-                            $http => $http.get("api/itprojectrole/?nonsuggestions=")
-                            .then(result => result.data.response)
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsActive+eq+true")
+                                .then(result => result.data.value)
                     ],
                         user: [
                             "userService",

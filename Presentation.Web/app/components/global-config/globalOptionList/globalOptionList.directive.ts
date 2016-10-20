@@ -135,9 +135,9 @@
                         }
                     },
                     {
-                        field: "Note", title: "Beskrivelse", width: 230,
-                        persistId: "note", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Note,
+                        field: "Description", title: "Beskrivelse", width: 230,
+                        persistId: "description", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Description,
                         hidden: false,
                         filterable: {
                             cell: {

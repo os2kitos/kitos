@@ -189,6 +189,50 @@
     <Compile Include="Migrations\201610100846446_Added the IT prefix to config.Designer.cs">
       <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610121636117_Added OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121636117_Added OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121636117_Added OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121639127_Updated OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121639127_Updated OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121639127_Updated OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121906591_LocalOptions11.cs" />
+    <Compile Include="Migrations\201610121906591_LocalOptions11.Designer.cs">
+      <DependentUpon>201610121906591_LocalOptions11.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121910277_LocalOptions1.cs" />
+    <Compile Include="Migrations\201610121910277_LocalOptions1.Designer.cs">
+      <DependentUpon>201610121910277_LocalOptions1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121914148_LocalOptions2.cs" />
+    <Compile Include="Migrations\201610121914148_LocalOptions2.Designer.cs">
+      <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.cs" />
+    <Compile Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.Designer.cs">
+      <DependentUpon>201610140911085_Added prop LocalOptionId on OptionEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141036395_Added LocalItSystemRole.cs" />
+    <Compile Include="Migrations\201610141036395_Added LocalItSystemRole.Designer.cs">
+      <DependentUpon>201610141036395_Added LocalItSystemRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.cs" />
+    <Compile Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.Designer.cs">
+      <DependentUpon>201610141039072_Added LocalItSystemRole in KitosContext.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141101480_Added LocalBusinessType.cs" />
+    <Compile Include="Migrations\201610141101480_Added LocalBusinessType.Designer.cs">
+      <DependentUpon>201610141101480_Added LocalBusinessType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610152053249_Added rest of the local options.cs" />
+    <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
+      <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -239,6 +283,39 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610100846446_Added the IT prefix to config.resx">
       <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121636117_Added OrganizationOptions.resx">
+      <DependentUpon>201610121636117_Added OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121639127_Updated OrganizationOptions.resx">
+      <DependentUpon>201610121639127_Updated OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.resx">
+      <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121906591_LocalOptions11.resx">
+      <DependentUpon>201610121906591_LocalOptions11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121910277_LocalOptions1.resx">
+      <DependentUpon>201610121910277_LocalOptions1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121914148_LocalOptions2.resx">
+      <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.resx">
+      <DependentUpon>201610140911085_Added prop LocalOptionId on OptionEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141036395_Added LocalItSystemRole.resx">
+      <DependentUpon>201610141036395_Added LocalItSystemRole.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.resx">
+      <DependentUpon>201610141039072_Added LocalItSystemRole in KitosContext.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141101480_Added LocalBusinessType.resx">
+      <DependentUpon>201610141101480_Added LocalBusinessType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
+      <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

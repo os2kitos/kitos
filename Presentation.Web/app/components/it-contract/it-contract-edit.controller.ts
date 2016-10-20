@@ -15,29 +15,29 @@
                     ],
                     contractTypes: [
                         '$http', function ($http) {
-                            return $http.get('api/contracttype/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalItContractTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     contractTemplates: [
                         '$http', function ($http) {
-                            return $http.get('api/contracttemplate/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     purchaseForms: [
                         '$http', function ($http) {
-                            return $http.get('api/purchaseform/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
                     procurementStrategies: [
                         '$http', function ($http) {
-                            return $http.get('api/procurementStrategy/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
@@ -57,8 +57,8 @@
                     ],
                     agreementElements: [
                         '$http', function ($http) {
-                            return $http.get('api/agreementelement/').then(function (result) {
-                                return result.data.response;
+                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsActive+eq+true').then(function (result) {
+                                return result.data.value;
                             });
                         }
                     ],
@@ -99,8 +99,10 @@
             $scope.orgUnits = orgUnits;
             $scope.contracts = contracts;
             $scope.agreementElements = agreementElements;
-            $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
-            $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
+            console.log(agreementElements);
+            console.log(contract);
+            $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'Id');
+            $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'Name');
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",

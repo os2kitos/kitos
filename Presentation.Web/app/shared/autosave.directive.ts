@@ -58,11 +58,58 @@
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function() {
-                            var newValue = ctrl.$modelValue;
-                            var payload = {};
-                            payload[attrs.field] = newValue;
-                            save(payload);
+                            if (attrs.globalOptionId) {
+                                saveLocalOption();
+                            } else {
+                                var newValue = ctrl.$modelValue
+                                var payload = {};
+                                payload[attrs.field] = newValue;
+                                save(payload);
+                            }
                         });
+                    }
+
+                    function saveLocalOption() {
+                        var globalOptionId = parseInt(attrs.globalOptionId, 10);
+                        var isActive = ctrl.$modelValue;
+                        var payload = {};
+                        payload[attrs.field] = globalOptionId;
+
+                        if (isActive) {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            if (!attrs.appendurl)
+                                attrs.appendurl = '';
+
+                            $http({ method: 'POST', url: attrs.autosave, data: payload, ignoreLoadingBar: true })
+                                .success(function () {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                    oldValue = ctrl.$modelValue;
+                                })
+                                .error(function (result, status) {
+                                    if (status === 409) {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                                    } else {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    }
+                                });
+                        } else {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            if (!attrs.appendurl)
+                                attrs.appendurl = '';
+
+                            $http({ method: 'DELETE', url: attrs.autosave + "(" + globalOptionId + ")", ignoreLoadingBar: true })
+                                .success(function () {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                    oldValue = ctrl.$modelValue;
+                                })
+                                .error(function (result, status) {
+                                    if (status === 409) {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                                    } else {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    }
+                                });
+                        }
                     }
 
                     function saveSelect2() {

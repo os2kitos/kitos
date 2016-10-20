@@ -19,13 +19,13 @@
                 }],
                 businessTypes: [
                     '$http', function($http) {
-                        return $http.get("api/businesstype");
+                        return $http.get("odata/LocalBusinessTypes?$filter=IsActive+eq+true");
                     }
                 ],
                 appTypeOptions: [
                     '$http', function ($http) {
-                        return $http.get("api/itSystemTypeOption").then(function (result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalItSystemTypes?$filter=IsActive+eq+true").then(function (result) {
+                            return result.data.value;
                         });
                     }
                 ],
@@ -56,7 +56,7 @@
             $scope.appTypeOptions = appTypeOptions;
             $scope.system = itSystem;
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.businessTypes = businessTypes.data.response;
+            $scope.businessTypes = businessTypes.data.value;
             $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
             $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
 

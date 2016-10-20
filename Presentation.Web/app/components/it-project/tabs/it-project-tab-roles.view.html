@@ -52,8 +52,8 @@
                                 disabled="disabled"
                                 value="{{right.role.id}}">{{right.role.name}} {{ right.role.isActive == true ? "" : "(Inaktiv rolle)"}}</option>
                         <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles"
-                                value="{{projectRole.id}}">
-                            {{projectRole.name}} ({{projectRole.hasWriteAccess && "skriv" || "læs" }})
+                                value="{{projectRole.Id}}">
+                            {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>
@@ -77,8 +77,8 @@
                             data-ng-model="projectRolesVm.newRole"
                             data-placeholder="Vælg en projektrolle"
                             data-ng-change="projectRolesVm.submitRight()">
-                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.id}}">
-                            {{projectRole.name}} ({{projectRole.hasWriteAccess && "skriv" || "læs" }})
+                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.Id}}">
+                            {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>

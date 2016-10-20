@@ -9,5 +9,5 @@
         data-field="{{ field }}">
     <option value=""></option>
     <option value="{{ savedId }}" data-ng-if="isDeletedSelected">{{ selectedText }} (udgået)</option>
-    <option data-ng-repeat="option in options()" value="{{ option.id }}">{{ option.name }}</option>
+    <option data-ng-repeat="option in options()" value="{{ option.Id }}">{{ option.Name }}</option>
 </select>

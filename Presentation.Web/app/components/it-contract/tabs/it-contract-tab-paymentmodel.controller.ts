@@ -6,18 +6,18 @@
             controller: 'contract.PaymentmodelCtrl',
             resolve: {
                 paymentFrequencies: ['$http', function ($http) {
-                    return $http.get('api/paymentFrequency').then(function (result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalPaymentFrequencyTypes?$filter=IsActive+eq+true').then(function (result) {
+                        return result.data.value;
                     });
                 }],
                 paymentModels: ['$http', function ($http) {
-                    return $http.get('api/paymentModel').then(function (result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalPaymentModelTypes?$filter=IsActive+eq+true').then(function (result) {
+                        return result.data.value;
                     });
                 }],
                 priceRegulations: ['$http', function ($http) {
-                    return $http.get('api/priceRegulation').then(function (result) {
-                        return result.data.response;
+                    return $http.get('odata/LocalPriceRegulationTypes?$filter=IsActive+eq+true').then(function (result) {
+                        return result.data.value;
                     });
                 }]
             }

@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.OData
             return Updated(entity);
         }
 
-        public IHttpActionResult Delete(int key)
+        public virtual IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
             if (entity == null)
