@@ -4,7 +4,8 @@
     function setupDirective(): ng.IDirective {
         return {
             scope: {
-                editState: "@state"
+                editState: "@state",
+                dirId: "@"
             },
             controller: GlobalOptionRoleListDirective,
             controllerAs: "ctrl",
@@ -12,7 +13,7 @@
                 optionsUrl: "@",
                 title: "@"
             },
-            template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
+            template: `<h2>{{ ctrl.title }}</h2><div id="{{ctrl.dirId}}" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
     }
 
@@ -28,7 +29,7 @@
         public title: string;
         public editState: string;
         public optionId: string;
-
+        public dirId: string;
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
@@ -43,11 +44,12 @@
             private notify,
             private $scope) {
 
+            this.dirId = $scope.dirId;
             this.editState = $scope.editState;
             this.$scope.$state = $state;
 
-            console.log(`editState in globalOptionRoleList: ${this.editState}`);
-            console.log(`optionsUrl in globalOptionRoleList: ${this.optionsUrl}`);
+            //console.log(`editState in globalOptionRoleList: ${this.editState}`);
+            //console.log(`optionsUrl in globalOptionRoleList: ${this.optionsUrl}`);
 
             this.mainGridOptions = {
                 dataSource: {
@@ -132,13 +134,14 @@
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        filterable: false
+                        //{
+                        //    cell: {
+                        //        dataSource: [],
+                        //        showOperators: false,
+                        //        operator: "contains"
+                        //    }
+                        //}
                     },
                     {
                         field: "Name",
@@ -197,14 +200,14 @@
             //TODO OS2KITOS-256
             this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl });
 
-            console.log(`optionUrl: ${this.optionsUrl}`);
-            console.log(`editState: ${this.editState}`);
+            //console.log(`optionUrl: ${this.optionsUrl}`);
+            //console.log(`editState: ${this.editState}`);
         };
 
         public editOption = (e: JQueryEventObject) => {
             //TODO OS2KITOS-257
             e.preventDefault();
-            var entityGrid = this.$("#mainGrid").data("kendoGrid");
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             this.optionId = selectedItem.get("id");
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl });
