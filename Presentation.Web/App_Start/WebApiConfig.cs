@@ -12,6 +12,7 @@ using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Controllers.OData;
+using Presentation.Web.Controllers.OData.OptionControllers;
 
 namespace Presentation.Web
 {

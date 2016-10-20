@@ -10,8 +10,7 @@
             controllerAs: "ctrl",
             bindToController: {
                 optionsUrl: "@",
-                title: "@",
-                name: "="
+                title: "@"
             },
             template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
