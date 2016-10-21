@@ -189,6 +189,10 @@
     <Compile Include="Migrations\201610100846446_Added the IT prefix to config.Designer.cs">
       <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610210857465_Adding IsObligatory for OptionEntities.cs" />
+    <Compile Include="Migrations\201610210857465_Adding IsObligatory for OptionEntities.Designer.cs">
+      <DependentUpon>201610210857465_Adding IsObligatory for OptionEntities.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -239,6 +243,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610100846446_Added the IT prefix to config.resx">
       <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610210857465_Adding IsObligatory for OptionEntities.resx">
+      <DependentUpon>201610210857465_Adding IsObligatory for OptionEntities.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

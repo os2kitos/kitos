@@ -504,7 +504,8 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
-    <Content Include="app\components\global-config\global-config-option-edit.modal.view.html" />
+    <Content Include="app\components\global-config\global-config-option-edit-roles.modal.view.html" />
+    <Content Include="app\components\global-config\global-config-option-edit-types.modal.view.html" />
     <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />

@@ -5,23 +5,25 @@
         return {
             scope: {
                 editState: "@state",
-                dirId: "@"
+                dirId: "@",
+                optionType: "@"
             },
             controller: GlobalOptionRoleListDirective,
             controllerAs: "ctrl",
             bindToController: {
-                optionsUrl: "@",
-                title: "@"
+                title: "@",
+                optionsUrl: "@"
             },
             template: `<h2>{{ ctrl.title }}</h2><div id="{{ctrl.dirId}}" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
     }
 
     interface IDirectiveScope {
-        optionsUrl: string;
         title: string;
         editState: string;
+        optionsUrl: string;
         optionId: string;
+        optionType: string;
     }
 
     class GlobalOptionRoleListDirective implements IDirectiveScope {
@@ -30,6 +32,7 @@
         public editState: string;
         public optionId: string;
         public dirId: string;
+        public optionType: string;
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
@@ -44,19 +47,16 @@
             private notify,
             private $scope) {
 
-            this.dirId = $scope.dirId;
-            this.editState = $scope.editState;
             this.$scope.$state = $state;
-
-            //console.log(`editState in globalOptionRoleList: ${this.editState}`);
-            //console.log(`optionsUrl in globalOptionRoleList: ${this.optionsUrl}`);
+            this.editState = $scope.editState;
+            this.dirId = $scope.dirId;
+            this.optionType = $scope.optionType;
 
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            //url: `${this.optionsUrl}?$filter=IsActive eq true`,
                             url: `${this.optionsUrl}`,
                             dataType: "json"
                         }
@@ -78,7 +78,14 @@
                     serverFiltering: true,
                     schema: {
                         model: {
-                            id: "Id"
+                            id: "Id",
+                            fields: {
+                                IsActive: { type: "boolean" },
+                                IsObligatory: { type: "boolean" },
+                                Name: { type: "string" },
+                                HasWriteAccess: { type: "boolean" },
+                                Description: { type: "string" }
+                            }
                         }
                     }
                 } as kendo.data.DataSourceOptions,
@@ -120,6 +127,17 @@
                         filterable: false,
                         sortable: false
                     },
+                    {
+                        field: "IsObligatory",
+                        title: "Obligatorisk",
+                        width: 112,
+                        persistId: "IsObligatory", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
                     //{
                     //    command: [
                     //        { text: "Op/Ned", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
@@ -135,13 +153,6 @@
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
                         filterable: false
-                        //{
-                        //    cell: {
-                        //        dataSource: [],
-                        //        showOperators: false,
-                        //        operator: "contains"
-                        //    }
-                        //}
                     },
                     {
                         field: "Name",
@@ -197,22 +208,15 @@
         }
 
         public createOption = () => {
-            //TODO OS2KITOS-256
-            this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl });
-
-            //console.log(`optionUrl: ${this.optionsUrl}`);
-            //console.log(`editState: ${this.editState}`);
+            this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
         public editOption = (e: JQueryEventObject) => {
-            //TODO OS2KITOS-257
             e.preventDefault();
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             this.optionId = selectedItem.get("id");
-            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl });
-
-            console.log(`selectedItem: ${selectedItem.get("id")}`);
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
         public deactivateOption = () => {

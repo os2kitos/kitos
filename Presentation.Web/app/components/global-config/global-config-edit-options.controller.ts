@@ -18,15 +18,16 @@
             private notify,
             private reportService: Services.ReportService,
             private _: ILoDashWithMixins,
+            private optionsUrl: string,
             private optionId: number,
-            private optionsUrl: string) {
+            private optionType: string) {
 
             this.optionsUrl = this.$stateParams["optionsUrl"];
             this.optionId = this.$stateParams["id"];
+            this.optionType = this.$stateParams["optionType"];
             this.initModal(this.optionId, this.optionsUrl);
         }
 
-        //TODO Not done!
         private initModal = (optionId: number, optionsUrl: string) => {
 
             if (optionId === 0) {
@@ -49,39 +50,46 @@
 
         };
 
-        //TODO Not done!
-        public ok() {
-            if (this.optionId === 0) {
-                const payload = {
-                    Id: 0,
-                    Name: this.name,
-                    IsObligatory: this.isObligatory,
-                    IsActive: this.isActive,
-                    HasWriteAccess: this.hasWriteAccess,
-                    Description: this.description
-                };
-                this.$http.post(`${this.optionsUrl}`, payload)
-                    .then((response) => {
-                        this.$uibModalInstance.close();
-                        this.notify.addSuccessMessage("Værdien blev oprettet.");
-                    })
-                    .catch((response) => {
-                        this.notify.addErrorMessage("Oprettelse mislykkedes.");
-                    });
-            } else {
-                const payload = {
+        private createPayload(type: string): Object | Object {
+            if (type === "role") {
+                return {
                     Name: this.name,
                     IsObligatory: this.isObligatory,
                     IsActive: this.isActive,
                     HasWriteAccess: this.hasWriteAccess,
                     Description: this.description
                 }
-                this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
-                    this.$uibModalInstance.close();
-                    this.notify.addSuccessMessage("Værdien blev redigeret.");
-                }).catch((response) => {
-                    this.notify.addErrorMessage("Værdien blev ikke redigeret.");
-                });
+            }
+            return {
+                Name: this.name,
+                IsObligatory: this.isObligatory,
+                IsActive: this.isActive,
+                Description: this.description
+            }
+
+        }
+
+        //TODO Not done!
+        public ok() {
+
+            if (this.optionId === 0) {
+                const payload = this.createPayload(this.optionType);
+                this.$http.post(`${this.optionsUrl}`, payload)
+                    .then((response) => {
+                        this.$uibModalInstance.close();
+                        this.notify.addSuccessMessage("Værdien blev oprettet.");
+                    }).catch((response) => {
+                        this.notify.addErrorMessage("Oprettelse mislykkedes.");
+                    });
+            } else {
+                const payload = this.createPayload(this.optionType);
+                this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload)
+                    .then((response) => {
+                        this.$uibModalInstance.close();
+                        this.notify.addSuccessMessage("Værdien blev redigeret.");
+                    }).catch((response) => {
+                        this.notify.addErrorMessage("Værdien blev ikke redigeret.");
+                    });
             }
         };
 
@@ -92,14 +100,14 @@
 
     angular.module("app").config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
         $stateProvider.state("config.org.edit-org-roles", {
-            url: "/{:optionsUrl}/{id:int}/edit-organisation-roles",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-organisation-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -119,14 +127,14 @@
                 }
             ]
         }).state("config.project.edit-project-roles", {
-            url: "/{:optionsUrl}/{id:int}/edit-project-roles",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -146,14 +154,14 @@
                 }
             ]
         }).state("config.system.edit-system-roles", {
-            url: "/{:optionsUrl}/{id:int}/edit-system-roles",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-system-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -173,14 +181,14 @@
                 }
             ]
         }).state("config.contract.edit-contract-roles", {
-            url: "/{:optionsUrl}/{id:int}/edit-contract-roles",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-contract-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -200,14 +208,14 @@
                 }
             ]
         }).state("config.project.edit-project-types", {
-            url: "/{:optionsUrl}/{id:int}/edit-project-types",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-types",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -227,13 +235,13 @@
                 }
             ]
         }).state("config.system.edit-system-types", {
-            url: "/{:optionsUrl}/{id:int}/edit-system-types",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-system-types",
             onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -251,13 +259,13 @@
                 }
             ]
         }).state("config.contract.edit-contract-types", {
-            url: "/{:optionsUrl}/{id:int}/edit-contract-types",
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-contract-types",
             onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit.modal.view.html",
+                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",

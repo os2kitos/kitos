@@ -2,7 +2,7 @@
 using Core.DomainModel.Reports;
 using Core.DomainServices;
 
-namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     public class ReportCategoriesController : BaseEntityController<ReportCategoryType>
     {
