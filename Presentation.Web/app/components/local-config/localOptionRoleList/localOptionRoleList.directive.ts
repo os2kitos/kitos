@@ -122,6 +122,7 @@
                         sortable: false
                     },
                     {
+                        //field: "Note", title: "Beskrivelse", width: 230,
                         field: "Description", title: "Beskrivelse", width: 230,
                         persistId: "description", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Description,

@@ -14,6 +14,7 @@ using Presentation.Web.Controllers.API;
 using Presentation.Web.Controllers.OData;
 using Presentation.Web.Controllers.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
+using Presentation.Web.Controllers.OData.OptionControllers;
 
 namespace Presentation.Web
 {
@@ -254,7 +255,14 @@ namespace Presentation.Web
             var priceRegulationTypes = builder.EntitySet<PriceRegulationType>(nameof(PriceRegulationTypesController).Replace("Controller", string.Empty));
             priceRegulationTypes.EntityType.HasKey(x => x.Id);
 
-            var procurementStrategyTypes = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyController).Replace("Controller", string.Empty));
+            // These two lines causes an 404 error when requesting odata/ProcurementStrategyTypes at https://localhost:44300/#/global-config/contract
+            // Requesting api/ProcurementStrategy works but not odata/ProcurementStrategyTypes
+            //var procurementStrategy = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyController).Replace("Controller", string.Empty));
+            //procurementStrategy.EntityType.HasKey(x => x.Id);
+
+            // There two lines fixes the 404 error at https://localhost:44300/#/global-config/contract
+            // Requesting api/ProcurementStrategy and odata/ProcurementStrategyTypes both work
+            var procurementStrategyTypes = builder.EntitySet<ProcurementStrategyType>(nameof(ProcurementStrategyTypesController).Replace("Controller", string.Empty));
             procurementStrategyTypes.EntityType.HasKey(x => x.Id);
 
             var itProjectTypes = builder.EntitySet<ItProjectType>(nameof(ItProjectTypesController).Replace("Controller", string.Empty));
