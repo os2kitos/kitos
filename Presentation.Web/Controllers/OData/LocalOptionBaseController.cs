@@ -90,10 +90,10 @@ namespace Presentation.Web.Controllers.OData
             return Ok(option);
         }
 
-        public override IHttpActionResult Delete(int globalOptionId)
+        public override IHttpActionResult Delete(int key)
         {
             int orgId = _authService.GetCurrentOrganizationId(UserId);
-            LocalOptionEntity<OptionType> localOption = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == globalOptionId).First();
+            LocalOptionEntity<OptionType> localOption = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key).First();
 
             if (localOption == null)
                 return NotFound();
