@@ -50,6 +50,6 @@ namespace Core.DomainModel
         /// The note.
         /// </value>
         public string Description { get; set; }
-        public bool IsDisabled { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

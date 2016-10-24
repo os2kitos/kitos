@@ -6,6 +6,6 @@
         //IsSuggestion: boolean;
         HasWriteAccess: boolean;
         Description: string;
-        IsDisabled: boolean;
+        IsEnabled: boolean;
     }
 }

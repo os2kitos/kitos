@@ -229,6 +229,10 @@
     <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs" />
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.Designer.cs">
+      <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -309,6 +313,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610240722136_AddedIsObligatory.resx">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.resx">
+      <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
