@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class LocalOptions1 : IMigrationMetadata
+    public sealed partial class AddedIsObligatory : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(LocalOptions1));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedIsObligatory));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610121910277_LocalOptions1"; }
+            get { return "201610240722136_AddedIsObligatory"; }
         }
         
         string IMigrationMetadata.Source

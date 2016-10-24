@@ -266,7 +266,7 @@
                         ],
                         projectTypes: [
                             "$http", $http => {
-                                return $http.get("odata/LocalItProjectTypes?$filter=IsActive+eq+true")
+                                return $http.get("odata/LocalItProjectTypes?$filter=IsActive eq true or IsObligatory eq true")
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.value);
                             }
                         ],

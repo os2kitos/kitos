@@ -232,7 +232,7 @@
                     ],
                         itProjectRoles: [
                             "$http",
-                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsActive+eq+true")
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsActive eq true or IsObligatory eq true")
                                 .then(result => result.data.value)
                     ],
                         user: [

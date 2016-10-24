@@ -58,8 +58,8 @@
         }
 
         public assignRoles(orgId: number) {
-            this.organizationService.addRole(orgId, this.currentUser.id, Models.OrganizationRole.LocalAdmin);
-            this.organizationService.addRole(orgId, this.currentUser.id, Models.OrganizationRole.User);
+            this.organizationService.addRole(orgId, this.currentUser, Models.OrganizationRole.LocalAdmin);
+            this.organizationService.addRole(orgId, this.currentUser, Models.OrganizationRole.User);
         }
 
     }

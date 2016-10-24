@@ -3,30 +3,42 @@
 
     function setupDirective(): ng.IDirective {
         return {
-            scope: {},
+            scope: {
+                editState: "@state",
+                dirId: "@",
+                optionType: "@"
+            },
             controller: LocalOptionRoleListDirective,
             controllerAs: "ctrl",
             bindToController: {
                 optionsUrl: "@",
                 title: "@"
             },
-            template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
+            template: `<h2>{{ ctrl.title }}</h2><div id="{{ ctrl.dirId }}" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
     }
 
     interface IDirectiveScope {
-        optionsUrl: string;
         title: string;
+        editState: string;
+        optionsUrl: string;
+        optionId: string;
+        optionType: string;
+        dirId: string;
     }
 
     class LocalOptionRoleListDirective implements IDirectiveScope {
         public optionsUrl: string;
         public title: string;
+        public editState: string;
+        public optionId: string;
+        public dirId: string;
+        public optionType: string;
 
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -34,7 +46,14 @@
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private notify) {
+            private notify,
+            private $scope) {
+
+            this.$scope.$state = $state;
+            this.editState = $scope.editState;
+            this.dirId = $scope.dirId;
+            this.optionType = $scope.optionType;
+
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -90,14 +109,7 @@
                         field: "Id", title: "Nr.", width: 230,
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        hidden: false
                     },
                     {
                         field: "Name", title: "Navn", width: 230,
@@ -135,21 +147,22 @@
                         }
                     },
                     {
-                        command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                        ],
-                        title: " ", width: 176,
-                        persistId: "command"
-                    }
+                        name: "editOption",
+                        text: "Redigér",
+                        template: "<button type='button' class='btn btn-link' title='Redigér rolle' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button>",
+                        title: " ",
+                        width: 176
+                    } as any
                 ]
             };
         }
 
-        private onEdit = (e: JQueryEventObject) => {
+        private editOption = (e: JQueryEventObject) => {
             e.preventDefault();
-            //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            //var entityId = dataItem["Id"];
-            //this.$state.go("organization.user.edit", { id: entityId });
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            this.optionId = selectedItem.get("id");
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         }
     }
     angular.module("app")

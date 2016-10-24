@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class LocalOptions11 : IMigrationMetadata
+    public sealed partial class RenamedIsDisabledtoIsEnabledonoptionEntity : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(LocalOptions11));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(RenamedIsDisabledtoIsEnabledonoptionEntity));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610121906591_LocalOptions11"; }
+            get { return "201610240857400_Renamed IsDisabled to IsEnabled on optionEntity"; }
         }
         
         string IMigrationMetadata.Source

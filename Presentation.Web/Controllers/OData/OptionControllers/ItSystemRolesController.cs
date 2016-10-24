@@ -1,11 +1,8 @@
-﻿using System.Linq;
-using System.Web.Http;
-using System.Web.OData;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.ApplicationServices;
 
-namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     public class ItSystemRolesController : BaseEntityController<ItSystemRole>
     {

@@ -30,6 +30,13 @@ namespace Core.DomainModel
         /// </value>
         public bool IsActive { get; set; }
         /// <summary>
+        /// Gets or sets a value indicating whether this instance is obligatory.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is active; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsObligatory { get; set; }
+        /// <summary>
         /// Gets or sets a value indicating whether this instance is a suggestion.
         /// </summary>
         /// <value>
@@ -37,12 +44,12 @@ namespace Core.DomainModel
         /// </value>
         public bool IsSuggestion { get; set; }
         /// <summary>
-        /// Gets or sets the note.
+        /// Gets or sets the description.
         /// </summary>
         /// <value>
         /// The note.
         /// </value>
         public string Description { get; set; }
-        public bool IsDisabled { get; set; }
+        public bool IsEnabled { get; set; }
     }
 }

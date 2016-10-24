@@ -533,13 +533,16 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
-    <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
+    <Content Include="app\components\global-config\global-config-option-edit-roles.modal.view.html" />
+    <Content Include="app\components\global-config\global-config-option-edit-types.modal.view.html" />
     <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
+    <TypeScriptCompile Include="app\components\global-config\global-config-edit-options.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionRoleList\localOptionRoleList.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
@@ -985,6 +988,7 @@
     <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
     <None Include="Properties\PublishProfiles\Local.pubxml">
       <SubType>Designer</SubType>
     </None>
