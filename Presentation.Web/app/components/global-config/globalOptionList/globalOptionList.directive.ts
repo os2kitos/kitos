@@ -117,12 +117,12 @@
                 },
                 columns: [
                     {
-                        field: "IsActive",
-                        title: "Aktiv",
+                        field: "IsEnabled",
+                        title: "Tilgængelig",
                         width: 112,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        persistId: "isEnabled", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(IsActive) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        template: `# if(IsEnabled) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -187,10 +187,10 @@
                     {
                         name: "editOption",
                         text: "Redigér",
-                        template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button>",
+                        template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
                         title: " ",
                         width: 176
-                    } as any
+                    } as any,
                 ]
             };
         }
@@ -207,8 +207,28 @@
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
-        public deactivateOption = () => {
-            //TODO OS2KITOS-258
+        public disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
+            e.preventDefault();
+            var superClass = this;
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = selectedItem.get("Id");
+            var payload = { IsEnabled: enable };
+
+            var msg = this.notify.addInfoMessage("Gemmer...", false);
+
+            this.$http.patch(this.optionsUrl + "(" + entityId + ")", payload)
+                .success(function () {
+                    msg.toSuccessMessage("Feltet er opdateret.");
+                    superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
+                })
+                .error(function (result, status) {
+                    if (status === 409) {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                    } else {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    }
+                });
         };
     }
     angular.module("app")

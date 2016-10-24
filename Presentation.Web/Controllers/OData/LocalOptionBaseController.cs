@@ -37,6 +37,9 @@ namespace Presentation.Web.Controllers.OData
 
             foreach (var item in globalOptionsResult)
             {
+                if (!item.IsEnabled)
+                    continue;
+
                 OptionType itemToAdd = item;
                 item.IsActive = false;
 

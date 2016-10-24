@@ -15,28 +15,28 @@
                     ],
                     contractTypes: [
                         '$http', function ($http) {
-                            return $http.get('odata/LocalItContractTypes?$filter=IsActive+eq+true').then(function (result) {
+                            return $http.get('odata/LocalItContractTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
                                 return result.data.value;
                             });
                         }
                     ],
                     contractTemplates: [
                         '$http', function ($http) {
-                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsActive+eq+true').then(function (result) {
+                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
                                 return result.data.value;
                             });
                         }
                     ],
                     purchaseForms: [
                         '$http', function ($http) {
-                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsActive+eq+true').then(function (result) {
+                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
                                 return result.data.value;
                             });
                         }
                     ],
                     procurementStrategies: [
                         '$http', function ($http) {
-                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsActive+eq+true').then(function (result) {
+                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
                                 return result.data.value;
                             });
                         }
@@ -57,7 +57,7 @@
                     ],
                     agreementElements: [
                         '$http', function ($http) {
-                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsActive+eq+true').then(function (result) {
+                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
                                 return result.data.value;
                             });
                         }
