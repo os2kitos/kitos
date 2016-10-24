@@ -237,6 +237,10 @@
     <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.Designer.cs">
       <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.cs" />
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.Designer.cs">
+      <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -320,6 +324,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.resx">
       <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610241230380_Added new contract props running, byEnding.resx">
+      <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
