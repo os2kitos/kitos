@@ -541,6 +541,7 @@
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionRoleList\localOptionRoleList.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
@@ -983,6 +984,7 @@
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
     <Content Include="app\components\it-project\it-project-modal-create.view.html" />
+    <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
     <None Include="Properties\PublishProfiles\Local.pubxml">
       <SubType>Designer</SubType>
     </None>
