@@ -5,10 +5,10 @@
     <form name="editOption" class="form-horizontal">
         <div class="form-group" ng-class="{ 'has-error': editOption.name.$touched && editOption.name.$invalid }">
 
-            <label for="name" class="col-md-2 control-label">
+            <label class="col-md-2 control-label">
                 Navn
             </label>
-            <label for="optionName" class="col-md-2 control-label">
+            <label class="col-md-2 control-label">
                 {{vm.optionName}}
             </label>
         </div>
@@ -18,7 +18,7 @@
             </label>
             <div class="col-md-8">
                 <textarea name="description" id="description" data-ng-model="vm.description" class="form-control" ng-required="true"
-                          ng-maxlength="1024" ng-minlength="1" data-disabled-on-busy rows="8"></textarea>
+                          ng-maxlength="1024" data-disabled-on-busy rows="8"></textarea>
                 <div ng-messages="editOption.description.$error" ng-if="editOption.description.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Beskrivelsen skal udfyldes.</div>
                     <div ng-message="minlength" style="margin:5px 0">Beskrivelsen er for kort.</div>
