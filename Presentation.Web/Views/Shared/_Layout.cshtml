@@ -21,13 +21,8 @@
     <!-- Kendo globalization -->
     <script src="//kendo.cdn.telerik.com/2016.2.714/js/cultures/kendo.culture.da-DK.min.js"></script>
     
-    <style>
-        #navbar-top {
-            background-color: red !important;
-        }
-    </style>
-
-    @*@if (ViewBag.Environment != "Prod")
+    
+    @if (ViewBag.Environment != "Prod")
     {
         if (ViewBag.Environment == "Test")
         {
@@ -45,7 +40,7 @@
                 }
             </style>
         }
-    }*@
+    }
 </head>
 <body data-ng-app="app" data-ng-cloak data-ng-strict-di>
     @RenderBody()
