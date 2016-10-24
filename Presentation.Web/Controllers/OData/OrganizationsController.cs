@@ -86,6 +86,12 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Organization organization)
         {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+
             var user = _userRepository.GetByKey(UserId);
             _organizationService.SetupDefaultOrganization(organization, user);
             return base.Post(organization);

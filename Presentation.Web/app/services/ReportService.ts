@@ -20,7 +20,7 @@ module Kitos.Services {
         }
 
         GetEmptyReport = () => {
-            return this.$http.get("/appReport/empty-report.json")
+            return this.$http.get("/appReport/empty-report.json");
         }
 
         saveReport = (report: Kitos.Models.IReport) => {
@@ -28,7 +28,7 @@ module Kitos.Services {
         }
 
         getReportCategories = () => {
-            return this.$http.get<Kitos.Models.IODataResult<Models.IReportCategory>>("/odata/ReportCategories")
+            return this.$http.get<Kitos.Models.IODataResult<Models.IReportCategory>>("/odata/ReportCategoryTypes");
         }
     }
 

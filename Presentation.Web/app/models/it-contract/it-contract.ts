@@ -92,6 +92,10 @@
         OptionExtendId: number;
         OptionExtend: IOptionExtend;
         ExtendMultiplier: number;
+        /** (løbende) */
+        Running: string;
+        /** (indtil udgangen af) */
+        ByEnding: string;
         /** Gets or sets the handover trials. */
         HandoverTrials: Array<IHandoverTrial>;
 

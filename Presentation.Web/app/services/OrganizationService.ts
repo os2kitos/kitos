@@ -8,9 +8,11 @@
         constructor(private $http: IHttpServiceWithCustomConfig) {
         }
 
-        public addRole(organizationId: number, userId: number, role: Models.OrganizationRole): ng.IHttpPromise<Models.IOrganizationRight> {
+        public addRole(organizationId: number, user: Services.IUser, role: Models.OrganizationRole): ng.IHttpPromise<Models.IOrganizationRight> {
             var rightsPayload: Models.IOrganizationRight = {
-                UserId: userId,
+                UserId: user.id,
+                ObjectOwner: user,
+                ObjectOwnerId: user.id,
                 Role: role
             };
 

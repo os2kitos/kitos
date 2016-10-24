@@ -478,6 +478,22 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
 
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <value>
+        ///     (løbende)
+        /// </value>
+        public string Running { get; set; }
+
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <value>
+        ///     (indtil udgangen af)
+        /// </value>
+        public string ByEnding { get; set; }
+
         #endregion
 
         #region Payment Model

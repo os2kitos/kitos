@@ -37,6 +37,9 @@ namespace Presentation.Web.Controllers.OData
 
             foreach (var item in globalOptionsResult)
             {
+                if (!item.IsEnabled)
+                    continue;
+
                 OptionType itemToAdd = item;
                 item.IsActive = false;
 
@@ -54,6 +57,37 @@ namespace Presentation.Web.Controllers.OData
                 returnList.Add(itemToAdd);
             }
             return Ok(returnList);
+        }
+
+        [EnableQuery]
+        public override IHttpActionResult Get(int key)
+        {
+            if (UserId == 0)
+                return Unauthorized();
+
+            int orgId = _authService.GetCurrentOrganizationId(UserId);
+            var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
+
+            if (!globalOptionResult.Any())
+                return NotFound();
+
+            var option = globalOptionResult.First();
+
+            var localOptionResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+
+            if (localOptionResult.Any())
+            {
+                option.IsActive = true;
+                var localOption = localOptionResult.First();
+                if (!String.IsNullOrEmpty(localOption.Description))
+                {
+                    option.Description = localOption.Description;
+                }
+            } else {
+                option.IsActive = false;
+            }
+
+            return Ok(option);
         }
 
         public override IHttpActionResult Delete(int globalOptionId)

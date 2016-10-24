@@ -5,14 +5,18 @@
 
      
         return {
-            scope: {},
+            scope: {
+                editState: "@state",
+                dirId: "@",
+                optionType: "@"
+            },
             controller: GlobalOptionRoleListDirective,
             controllerAs: "ctrl",
             bindToController: {
-                optionsUrl: "@",
-                title: "@"
+                title: "@",
+                optionsUrl: "@"
             },
-            template: `<h2>{{ ctrl.title }}</h2><div id="mainGrid" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
+            template: `<h2>{{ ctrl.title }}</h2><div id="{{ctrl.dirId}}" data-kendo-grid="{{ ctrl.mainGrid }}" data-k-options="{{ ctrl.mainGridOptions }}"></div>`
         };
 
     }
@@ -20,18 +24,24 @@
 
 
     interface IDirectiveScope {
-        optionsUrl: string;
         title: string;
+        editState: string;
+        optionsUrl: string;
+        optionId: string;
+        optionType: string;
     }
 
     class GlobalOptionRoleListDirective implements IDirectiveScope {
         public optionsUrl: string;
         public title: string;
-
+        public editState: string;
+        public optionId: string;
+        public dirId: string;
+        public optionType: string;
         public mainGrid: IKendoGrid<Models.IRoleEntity>;
         public mainGridOptions: IKendoGridOptions<Models.IRoleEntity>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "$scope"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -39,25 +49,20 @@
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
-            private notify) {
+            private notify,
+            private $scope) {
 
+            this.$scope.$state = $state;
+            this.editState = $scope.editState;
+            this.dirId = $scope.dirId;
+            this.optionType = $scope.optionType;
 
-            function changePriority() {
-                alert("click");
-             
-                //e.preventDefault();
-                //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-                //var entityId = dataItem["Id"];
-                //this.$state.go("organization.user.edit", { id: entityId });
-            }
-            
-            
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `${this.optionsUrl}?$filter=IsActive eq true`,
+                            url: `${this.optionsUrl}`,
                             dataType: "json"
                         },
                         //,destroy: {
@@ -78,7 +83,14 @@
                     serverFiltering: true,
                     schema: {
                         model: {
-                            id: "Id"
+                            id: "Id",
+                            fields: {
+                                IsActive: { type: "boolean" },
+                                IsObligatory: { type: "boolean" },
+                                Name: { type: "string" },
+                                HasWriteAccess: { type: "boolean" },
+                                Description: { type: "string" }
+                            }
                         }
                     }
                 } as kendo.data.DataSourceOptions,
@@ -87,7 +99,7 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretRolle",
                         text: "Opret rolle",
-                        template: "<a ng-click='ctrl.opretRolle()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<a ng-click='ctrl.createOption()' class='btn btn-success pull-right'>#: text #</a>"
                     }
                 ],
                 pageable: {
@@ -111,10 +123,12 @@
                 },
                 columns: [
                     {
-                        field: "IsActive", title: "Aktiv", width: 112,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        field: "IsEnabled",
+                        title: "Tilgængelig",
+                        width: 112,
+                        persistId: "isEnabled", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(IsActive) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        template: `# if(IsEnabled) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -126,22 +140,36 @@
                         template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>`,
                         title: " ", width: 176,
                         persistId: "command"
+                        field: "IsObligatory",
+                        title: "Obligatorisk",
+                        width: 112,
+                        persistId: "IsObligatory", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
                     },
+                    //{
+                    //    command: [
+                    //        { text: "Op/Ned", click: this.editOption, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                    //    ],
+                    //    title: " ", width: 176,
+                    //    persistId: "command"
+                    //},
                     {
-                        field: "Id", title: "Nr.", width: 230,
+                        field: "Id",
+                        title: "Nr.",
+                        width: 230,
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        filterable: false
                     },
                     {
-                        field: "Name", title: "Navn", width: 230,
+                        field: "Name",
+                        title: "Navn",
+                        width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Name,
                         hidden: false,
@@ -154,16 +182,21 @@
                         }
                     },
                     {
-                        field: "HasWriteAccess", title: "Skriv", width: 112,
+                        field: "HasWriteAccess",
+                        title: "Skriv",
+                        width: 112,
                         persistId: "hasWriteAccess", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                        template:
+                        `# if(HasWriteAccess) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "Description", title: "Beskrivelse", width: 230,
+                        field: "Description",
+                        title: "Beskrivelse",
+                        width: 230,
                         persistId: "description", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Description,
                         hidden: false,
@@ -176,17 +209,29 @@
                         }
                     },
                     {
-                        command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                           ],
-                        title: " ", width: 176,
-                        persistId: "command"
-                    },
+                        name: "editOption",
+                        text: "Redigér",
+                        template: "<button type='button' class='btn btn-link' title='Redigér rolle' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør rolle utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør rolle tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
+                        title: " ",
+                        width: 176
+                    } as any
                 ]
             };
         }
 
-        private onEdit = (e: JQueryEventObject) => {
+        public createOption = () => {
+            this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
+        };
+
+        public editOption = (e: JQueryEventObject) => {
+            e.preventDefault();
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            this.optionId = selectedItem.get("id");
+            this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
+        };
+
+        public disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
             e.preventDefault();
             alert("Hey ;-) ");
            // var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
@@ -212,6 +257,27 @@
             alert("NEEEEED ;-) ");
             
         }
+            var superClass = this;
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = selectedItem.get("Id");
+            var payload = { IsEnabled: enable };
+
+            var msg = this.notify.addInfoMessage("Gemmer...", false);
+
+            this.$http.patch(this.optionsUrl + "(" + entityId + ")", payload)
+                .success(function () {
+                    msg.toSuccessMessage("Feltet er opdateret.");
+                    superClass.$(`#${superClass.dirId}`).data("kendoGrid").dataSource.read();
+                })
+                .error(function (result, status) {
+                    if (status === 409) {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                    } else {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    }
+                });
+        };
     }
     /*
     function up(): void {
@@ -219,6 +285,4 @@
     }*/
     angular.module("app")
         .directive("globalOptionRoleList", setupDirective);
-
-    
 }

@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title data-ng-bind="page.title + ' - KITOS'">KITOS deployed from CI</title>
+    <title data-ng-bind="page.title + ' - KITOS'">KITOS</title>
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <meta name="viewport" content="width=device-width">
 
@@ -20,22 +20,15 @@
     <script src="//kendo.cdn.telerik.com/2016.2.714/js/messages/kendo.messages.da-DK.min.js"></script>
     <!-- Kendo globalization -->
     <script src="//kendo.cdn.telerik.com/2016.2.714/js/cultures/kendo.culture.da-DK.min.js"></script>
-
+    
+    
     @if (ViewBag.Environment != "Prod")
     {
         if (ViewBag.Environment == "Test")
         {
             <style>
                 #navbar-top {
-                    background-color: red !important;
-                }
-            </style>
-        }
-        else if (ViewBag.Environment == "Sandbox")
-        {
-            <style>
-                #navbar-top {
-                    background-color: #444 !important;
+                    background-color: purple !important;
                 }
             </style>
         }

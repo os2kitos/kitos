@@ -48,7 +48,7 @@
             public reports,
             private $confirm) {
 
-            this.$rootScope.page.title = "Raport Oversigt";
+            this.$rootScope.page.title = "Rapport Oversigt";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
