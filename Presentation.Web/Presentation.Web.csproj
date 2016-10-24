@@ -49,6 +49,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
@@ -984,11 +985,16 @@
     <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
     <Content Include="Content\css\maps\app.min.css.map" />
     <Content Include="app\components\it-project\it-project-modal-create.view.html" />
+    <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
     <None Include="Properties\PublishProfiles\Local.pubxml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\PublishProfiles\MiracleTest.pubxml" />
+    <None Include="Properties\PublishProfiles\MiracleTest.pubxml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1006,6 +1012,11 @@
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web.Test.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
     </None>
     <Content Include="Scripts\_references.js" />
     <Content Include="Images\accent.png" />
@@ -1106,9 +1117,6 @@
     <Content Include="Tests\mocks\itContractRole.json" />
     <Content Include="Tests\mocks\advice.json" />
     <Content Include="Tests\mocks\interfaceUsage.json" />
-    <None Include="Web.MiracleTest.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
     <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusProject.e2e.spec.ts" />
   </ItemGroup>
@@ -1151,7 +1159,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
+    <OutputPath>..\..\..\bin\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -1193,8 +1201,7 @@
   <Target Name="AfterBuild">
   </Target> -->
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <TransformXml Source="Web.config" Transform="Web.Sandbox.config" Destination="$(OutputPath)\Web.Sandbox.config" />
-    <TransformXml Source="Web.config" Transform="Web.MiracleTest.config" Destination="$(OutputPath)\Web.MiracleTest.config" />
+    <TransformXml Source="Web.config" Transform="Web.Test.config" Destination="$(OutputPath)\Web.Test.config" />
   </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
