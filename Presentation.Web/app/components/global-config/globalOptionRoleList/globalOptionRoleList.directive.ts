@@ -17,6 +17,8 @@
 
     }
 
+
+
     interface IDirectiveScope {
         optionsUrl: string;
         title: string;
@@ -40,6 +42,14 @@
             private notify) {
 
 
+            function changePriority() {
+                alert("click");
+             
+                //e.preventDefault();
+                //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+                //var entityId = dataItem["Id"];
+                //this.$state.go("organization.user.edit", { id: entityId });
+            }
             
             
             this.mainGridOptions = {
@@ -110,9 +120,10 @@
                         sortable: false
                     },
                     {
-                        command: [
-                            { text: "Op/Ned", click: this.changePriority, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                        ],
+                        /*command: [
+                            { text: "Op/Ned", click: "google.com", imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any  as any,*/
+                        //],
+                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>`,
                         title: " ", width: 176,
                         persistId: "command"
                     },
@@ -173,223 +184,39 @@
                     },
                 ]
             };
-        
-            /* var initMainGrid = this.$('#mainGrid').data('kendoGrid');
-
-            
-           // console.log(this.mainGrid.table);
-
-           initMainGrid.table.kendoSortable({
-                filter: ">tbody >tr",
-                hint: $.noop,
-                cursor: "move",
-                placeholder: function (element) {
-                    return element.clone().addClass("k-state-hover").css("opacity", 0.65);
-                },
-                container: "#grid tbody",
-                change: function (e) {
-                    var skip = this.mainGrid.dataSource.skip(),
-                        oldIndex = e.oldIndex + skip,
-                        newIndex = e.newIndex + skip,
-                        data = this.mainGrid.dataSource.data(),
-                        dataItem = this.mainGrid.dataSource.getByUid(e.item.data("uid"));
-
-                    this.mainGrid.dataSource.remove(dataItem);
-                    this.mainGrid.dataSource.insert(newIndex, dataItem);
-
-                }
-            });*/
-
-
-
-
-         /*  this.mainGrid = {
-                getOptions() { return this.mainGridOptions },
-                columns: this.mainGridOptions.columns,
-                dataSource: this.mainGridOptions.dataSource,
-                options: this.mainGridOptions,
-                tbody: null,
-                pager: null,
-                footer: null,
-                table: {kendoSortable:null,},
-                thead: null,
-                content: null,
-                lockedHeader: null,
-                lockedTable: null,
-                lockedContent: null,
-                element: null,
-                wrapper: null,
-                addRow() { return null; },
-                autoFitColumn() { return null },
-                cancelChanges() { return null },
-                cancelRow() { return null },
-                cellIndex() { return null },
-                clearSelection() { return null },
-                bind() { return null },
-                closeCell() { return null },
-                collapseGroup() { return null },
-                collapseRow() { return null },
-                current() { return null },
-                dataItem() { return null },
-                destroy() { return null },
-                editCell() { return null },
-                editRow() { return null },
-                events: null,
-                expandGroup() { return null },
-                expandRow() { return null },
-                unlockColumn() { return null },
-                first() { return null },
-                hideColumn() { return null },
-                init() { return null },
-                items() { return null },
-                lockColumn() { return null },
-                one() { return null },
-                refresh() { return null },
-                removeRow() { return null },
-                reorderColumn() { return null },
-                resize() { return null },
-                saveAsExcel() { return null },
-                saveAsPDF() { return null },
-                saveChanges() { return null },
-                saveRow() { return null },
-                select() { return null },
-                setDataSource() { return null },
-                setOptions() { return null },
-                showColumn() { return null },
-                trigger() { return null },
-                unbind() { return null }
-            };
-            
-           
-           this.mainGrid = {
-                getOptions() { return this.mainGridOptions},
-                columns: this.mainGridOptions.columns,
-                dataSource: this.mainGridOptions.dataSource,
-                options: this.mainGridOptions,
-                footer: null,
-                pager: null,
-                table: {
-                    kendoSortable() {
-
-
-
-                    },
-                },
-                tbody: null,
-                thead: null,
-                content: null,
-                lockedHeader: null,
-                lockedTable: null,
-                lockedContent: null,
-                element: null,
-                wrapper: null,
-                addRow() { return null; },
-                autoFitColumn() { return null },
-                cancelChanges() { return null },
-                cancelRow() { return null },
-                cellIndex() { return null },
-                clearSelection() { return null },
-                bind() { return null },
-                closeCell() { return null },
-                collapseGroup() { return null },
-                collapseRow() { return null },
-                current() { return null },
-                dataItem() { return null },
-                destroy() { return null },
-                editCell() { return null },
-                editRow() { return null },
-                events: null,
-                expandGroup() { return null },
-                expandRow() { return null },
-                unlockColumn() { return null },
-                first() { return null },
-                hideColumn() { return null },
-                init() { return null },
-                items() { return null },
-                lockColumn() { return null },
-                one() { return null },
-                refresh() { return null },
-                removeRow() { return null },
-                reorderColumn() { return null },
-                resize() { return null },
-                saveAsExcel() { return null },
-                saveAsPDF() { return null },
-                saveChanges() { return null },
-                saveRow() { return null },
-                select() { return null },
-                setDataSource() { return null },
-                setOptions() { return null },
-                showColumn() { return null },
-                trigger() { return null },
-                unbind() { return null }
-           }
-           
-           this.mainGrid.table.kendoSortable({
-               filter: ">tbody >tr",
-               hint: $.noop,
-               cursor: "move",
-               placeholder: function (element) {
-                   return element.clone().addClass("k-state-hover").css("opacity", 0.65);
-               },
-               container: "#grid tbody",
-               change: function (e) {
-                   var skip = this.mainGrid.dataSource.skip(),
-                       oldIndex = e.oldIndex + skip,
-                       newIndex = e.newIndex + skip,
-                       data = this.mainGrid.dataSource.data(),
-                       dataItem = this.mainGrid.dataSource.getByUid(e.item.data("uid"));
-
-                   this.mainGrid.dataSource.remove(dataItem);
-                   this.mainGrid.dataSource.insert(newIndex, dataItem);
-
-               }
-           }); */
-
-           /* this.mainGrid = {
-                table: {
-                    kendoSortable({
-                        filter: ">tbody >tr",
-                        hint: $.noop,
-                        cursor: "move",
-                        placeholder: function (element) {
-                            return element.clone().addClass("k-state-hover").css("opacity", 0.65);
-                        },
-                        container: "#grid tbody",
-                        change: function (e) {
-                            var skip = this.mainGrid.dataSource.skip(),
-                                oldIndex = e.oldIndex + skip,
-                                newIndex = e.newIndex + skip,
-                                data = this.mainGrid.dataSource.data(),
-                                dataItem = this.mainGrid.dataSource.getByUid(e.item.data("uid"));
-
-                            this.mainGrid.dataSource.remove(dataItem);
-                            this.mainGrid.dataSource.insert(newIndex, dataItem);
-
-                        }
-                    };
-                   
-                    
-                }
-
-            };*/
         }
 
         private onEdit = (e: JQueryEventObject) => {
             e.preventDefault();
+            alert("Hey ;-) ");
            // var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
            // var entityId = dataItem["Id"];
            // this.$state.go("organization.user.edit", { id: entityId });
         }
-       
-        private changePriority = (e: JQueryEventObject) => {
-            alert("click");
-            var test = this.mainGrid.table;
+        private pushUp = (e: JQueryEventObject) => {
             e.preventDefault();
-            //var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            //var entityId = dataItem["Id"];
-            //this.$state.go("organization.user.edit", { id: entityId });
+            alert("OOOP ;-) ");
+
+            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var entityId = dataItem["Id"];
+            alert(entityId);
+
+           /* let payload = {
+                Priority: this.
+            }
+            this.$http.patch(`/odata/reports(${this.reportId})`, payload).then((response) => {
+            });*/
         }
-}
+        private pushDown = (e: JQueryEventObject) => {
+            e.preventDefault();
+            alert("NEEEEED ;-) ");
+            
+        }
+    }
+    /*
+    function up(): void {
+        alert("Hey ;-) ");
+    }*/
     angular.module("app")
         .directive("globalOptionRoleList", setupDirective);
 

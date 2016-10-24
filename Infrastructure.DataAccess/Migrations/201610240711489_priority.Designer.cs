@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class priorityadded : IMigrationMetadata
+    public sealed partial class priority : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(priorityadded));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(priority));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610190757511_priority added"; }
+            get { return "201610240711489_priority"; }
         }
         
         string IMigrationMetadata.Source
