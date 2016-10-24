@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddingIsObligatoryforOptionEntities : DbMigration
+    public partial class AddedIsObligatory : DbMigration
     {
         public override void Up()
         {

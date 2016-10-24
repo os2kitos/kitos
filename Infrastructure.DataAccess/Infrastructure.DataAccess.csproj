@@ -201,14 +201,6 @@
     <Compile Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.Designer.cs">
       <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201610121906591_LocalOptions11.cs" />
-    <Compile Include="Migrations\201610121906591_LocalOptions11.Designer.cs">
-      <DependentUpon>201610121906591_LocalOptions11.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201610121910277_LocalOptions1.cs" />
-    <Compile Include="Migrations\201610121910277_LocalOptions1.Designer.cs">
-      <DependentUpon>201610121910277_LocalOptions1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201610121914148_LocalOptions2.cs" />
     <Compile Include="Migrations\201610121914148_LocalOptions2.Designer.cs">
       <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
@@ -232,6 +224,10 @@
     <Compile Include="Migrations\201610152053249_Added rest of the local options.cs" />
     <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.cs" />
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
+      <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -293,12 +289,6 @@
     <EmbeddedResource Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.resx">
       <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201610121906591_LocalOptions11.resx">
-      <DependentUpon>201610121906591_LocalOptions11.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201610121910277_LocalOptions1.resx">
-      <DependentUpon>201610121910277_LocalOptions1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610121914148_LocalOptions2.resx">
       <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
     </EmbeddedResource>
@@ -316,6 +306,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610240722136_AddedIsObligatory.resx">
+      <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
