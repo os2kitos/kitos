@@ -60,20 +60,20 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Get(int globalOptionId)
+        public override IHttpActionResult Get(int key)
         {
             if (UserId == 0)
                 return Unauthorized();
 
             int orgId = _authService.GetCurrentOrganizationId(UserId);
-            var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == globalOptionId);
+            var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
                 return NotFound();
 
             var option = globalOptionResult.First();
 
-            var localOptionResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == globalOptionId);
+            var localOptionResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOptionResult.Any())
             {
