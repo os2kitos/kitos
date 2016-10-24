@@ -24,6 +24,7 @@
         optionsUrl: string;
         optionId: string;
         optionType: string;
+        dirId: string;
     }
 
     class GlobalOptionListDirective implements IDirectiveScope {

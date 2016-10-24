@@ -6,6 +6,7 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -34,6 +35,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
+        [ODataRoute("LocalItProjectRoles({orgKey})")]
         public override IHttpActionResult Get(int key)
         {
             var result = Repository.AsQueryable().Where(p => p.Id == key);
