@@ -6,7 +6,7 @@
             controller: 'contract.EditAdviceCtrl',
             resolve: {
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItContractRoles?$filter=IsActive+eq+true")
+                    return $http.get("odata/LocalItContractRoles?$filter=IsActive eq true or IsObligatory eq true")
                         .then(function (result) {
                             return result.data.value;
                         });
