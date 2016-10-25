@@ -51,7 +51,8 @@
             "gridStateService",
             "itContractRoles",
             "orgUnits",
-            "ecoStreamData"
+            "ecoStreamData",
+            "$uibModal"
         ];
 
         constructor(
@@ -69,7 +70,8 @@
             private gridStateService: Services.IGridStateFactory,
             private itContractRoles,
             private orgUnits,
-            private ecoStreamData) {
+            private ecoStreamData,
+            private $modal) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -89,6 +91,55 @@
             });
 
             this.activate();
+        }
+
+        public opretITKontrakt() {
+
+            var self = this;
+
+            var modalInstance = this.$modal.open({
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = "IT Kontrakt";
+                    $scope.checkAvailbleUrl = "api/itProject/";
+
+                    $scope.saveAndProceed = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.go("it-contract.edit.systems", { id: contract.id });
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+
+                    $scope.save = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.reload();
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+                }]
+            });
         }
 
         // saves grid state to localStorage
@@ -268,6 +319,12 @@
                     }
                 },
                 toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretITKontrakt",
+                        text: "Opret IT Kontrakt",
+                        template: "<a ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
@@ -572,7 +629,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 
             // add special contract signer role
             var signerRole: IKendoGridColumn<IItContractOverview> = {
@@ -859,7 +916,7 @@
                                 $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
                                     .then(function successCallback(result) { result.data.value; },
                                     function errorCallback(result) {
-                                        $stateProvider.transitionTo("home", { q: 'updated search term' });
+                                        $stateProvider.transitionTo("home", { q: "updated search term" });
                                     })
                         ]
                     }

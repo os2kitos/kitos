@@ -6,7 +6,6 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
-using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {

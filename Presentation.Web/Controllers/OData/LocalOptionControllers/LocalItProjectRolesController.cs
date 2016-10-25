@@ -1,5 +1,4 @@
 ﻿using Core.ApplicationServices;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
