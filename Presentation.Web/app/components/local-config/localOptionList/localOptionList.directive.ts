@@ -155,15 +155,6 @@
             this.optionId = selectedItem.get("id");
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         }
-
-        public refreshKendoGrid() {
-            console.log(this.mainGrid);
-            console.log(123);
-            if (this.mainGrid) {
-                console.log(1234);
-                this.mainGrid.refresh();
-            }
-        }
     }
     angular.module("app")
         .directive("localOptionList", setupDirective);
