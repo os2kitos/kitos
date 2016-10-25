@@ -39,7 +39,6 @@
             });
         };
 
-        //TODO Not done!
         public ok() {
             const payload = {
                 Description: this.description
@@ -58,7 +57,8 @@
         };
 
         public resetDescription() {
-            this.$http.delete(`${this.optionsUrl}(${this.optionId})`);
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, { Description: null});
+            this.$uibModalInstance.close();
         };
     }
 
