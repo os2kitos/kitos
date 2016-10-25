@@ -28,7 +28,7 @@ namespace Core.DomainModel
         /// <value>
         ///   <c>true</c> if this instance is active; otherwise, <c>false</c>.
         /// </value>
-        public bool IsActive { get; set; }
+        public bool IsLocallyAvailable { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this instance is obligatory.
         /// </summary>

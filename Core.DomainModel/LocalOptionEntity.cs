@@ -11,5 +11,7 @@
         public virtual OptionEntity<OptionType> Option { get; set; }
 
         public int OptionId { get; set; }
+
+        public bool IsActive { get; set; }
     }
 }

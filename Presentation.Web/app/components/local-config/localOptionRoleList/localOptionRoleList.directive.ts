@@ -97,10 +97,10 @@
                 },
                 columns: [
                     {
-                        field: "IsActive", title: "Aktiv", width: 112,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        field: "IsLocallyAvailable", title: "Aktiv", width: 112,
+                        persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `<input type="checkbox" data-ng-model="dataItem.IsActive" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> {{ Name }}`,
+                        template: `<input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> {{ Name }}`,
                         hidden: false,
                         filterable: false,
                         sortable: false
