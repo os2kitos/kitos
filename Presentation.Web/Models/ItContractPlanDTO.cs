@@ -38,7 +38,7 @@ namespace Presentation.Web.Models
 
         //Tenth
         public string ProcurementStrategyName { get; set; }
-       
+
         //Eleventh
         public int? ProcurementPlanHalf { get; set; }
         public int? ProcurementPlanYear { get; set; }
