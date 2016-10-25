@@ -60,14 +60,11 @@
                     <tr>
                         <td>
                             <div class="form-group">
-                                <select id="handover-trial"
-                                        class="form-control input-sm"
-                                        data-ui-select2="allowClearOption"
+                                <select-option data-id="handover-trial"
                                         data-placeholder="Vælg overtagelsesprøve"
-                                        data-ng-model="handoverTrial.handoverTrialTypeId">
-                                    <option value=""></option>
-                                    <option data-ng-repeat="handoverTrialType in handoverTrialTypes" value="{{handoverTrialType.Id}}">{{handoverTrialType.Name}}</option>
-                                </select>
+                                        data-ng-model="handoverTrial.handoverTrialTypeId"
+                                        data-options="handoverTrialTypes">
+                                </select-option>
                             </div>
                         </td>
                         <td>
