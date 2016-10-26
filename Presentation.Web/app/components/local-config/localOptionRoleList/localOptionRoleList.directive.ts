@@ -64,8 +64,8 @@
                         }
                     },
                     sort: {
-                        field: "Name",
-                        dir: "asc"
+                        field: "priority",
+                        dir: "desc"
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -104,13 +104,19 @@
                         hidden: false,
                         filterable: false,
                         sortable: false
+                    }, {
+                        field: "priority",
+                        title: "priority",
+                        persistId: "priority", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: false
                     },
-                    {
+                    /*{
                         field: "Id", title: "Nr.", width: 230,
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false
-                    },
+                    },*/
                     {
                         field: "Name", title: "Navn", width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!
