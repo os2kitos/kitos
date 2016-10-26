@@ -17,8 +17,7 @@
                 Beskrivelse
             </label>
             <div class="col-md-8">
-                <textarea name="description" id="description" data-ng-model="vm.description" class="form-control" ng-required="true"
-                          ng-maxlength="1024" data-disabled-on-busy rows="8"></textarea>
+                <textarea name="description" id="description" data-ng-model="vm.description" class="form-control" ng-maxlength="1024" data-disabled-on-busy rows="8"></textarea>
                 <div ng-messages="editOption.description.$error" ng-if="editOption.description.$touched" style="color:maroon" role="alert">
                     <div ng-message="required" style="margin:5px 0">Beskrivelsen skal udfyldes.</div>
                     <div ng-message="minlength" style="margin:5px 0">Beskrivelsen er for kort.</div>
