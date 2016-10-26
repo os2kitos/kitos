@@ -10,6 +10,7 @@
     <option value=""></option>
     <option value="{{ savedId }}" data-ng-if="isDeletedSelected">{{ selectedText }} (udgået)</option>
     <option data-ng-repeat="option in options()" value="{{ option.Id }}">{{ option.Name }}</option>
+    <!-- {{option.HasWriteAccess && "(skriv)"}} {{option.HasReadAccess && "(læs)"}} -->
 </select>
 
 <span ng-if="optionDescription" class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> {{ optionDescription }}</span>

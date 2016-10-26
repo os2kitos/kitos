@@ -100,7 +100,7 @@
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
                         persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `<input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> {{ Name }}`,
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
