@@ -237,10 +237,6 @@
     <Compile Include="Migrations\201610240711489_priority.Designer.cs">
       <DependentUpon>201610240711489_priority.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201610241325163_MERGE migration.cs" />
-    <Compile Include="Migrations\201610241325163_MERGE migration.Designer.cs">
-      <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.cs" />
     <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.Designer.cs">
       <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
@@ -252,6 +248,10 @@
     <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.cs" />
     <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.Designer.cs">
       <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610261036468_merge migration.cs" />
+    <Compile Include="Migrations\201610261036468_merge migration.Designer.cs">
+      <DependentUpon>201610261036468_merge migration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -357,11 +357,11 @@
     <EmbeddedResource Include="Migrations\201610251400376_IsLocallyAvailable fix.resx">
       <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201610241325163_MERGE migration.resx">
-      <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610190915411_priority added.resx">
       <DependentUpon>201610190915411_priority added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610261036468_merge migration.resx">
+      <DependentUpon>201610261036468_merge migration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
