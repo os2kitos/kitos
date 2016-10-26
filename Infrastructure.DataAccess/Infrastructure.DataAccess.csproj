@@ -237,6 +237,10 @@
     <Compile Include="Migrations\201610240711489_priority.Designer.cs">
       <DependentUpon>201610240711489_priority.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610241325163_MERGE migration.cs" />
+    <Compile Include="Migrations\201610241325163_MERGE migration.Designer.cs">
+      <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -331,6 +335,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610241230380_Added new contract props running, byEnding.resx">
       <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610241325163_MERGE migration.resx">
+      <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

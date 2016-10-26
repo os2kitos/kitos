@@ -368,7 +368,7 @@
     <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\ReportsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />

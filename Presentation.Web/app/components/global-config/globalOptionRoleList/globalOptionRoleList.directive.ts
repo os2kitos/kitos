@@ -57,6 +57,10 @@
             this.dirId = $scope.dirId;
             this.optionType = $scope.optionType;
 
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+
+
+            
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -74,8 +78,8 @@
                         //},
                     },
                     sort: {
-                        field: "Name",
-                        dir: "asc"
+                        field: "priority",
+                        dir: "desc"
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -137,9 +141,11 @@
                         /*command: [
                             { text: "Op/Ned", click: "google.com", imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any  as any,*/
                         //],
-                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>`,
+                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>` +
+                        `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-minus' aria-hidden='true'></i></button>`,
                         title: " ", width: 176,
                         persistId: "command"
+                    },{
                         field: "IsObligatory",
                         title: "Obligatorisk",
                         width: 112,
@@ -157,13 +163,20 @@
                     //    title: " ", width: 176,
                     //    persistId: "command"
                     //},
-                    {
+                    /*{
                         field: "Id",
                         title: "Nr.",
                         width: 230,
                         persistId: "id", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
+                        filterable: false
+                    },*/
+                    {
+                        field: "priority",
+                        title: "priority",
+                        persistId: "priority", // DON'T YOU DARE RENAME!
+                        hidden: true,
                         filterable: false
                     },
                     {
@@ -238,26 +251,43 @@
            // var entityId = dataItem["Id"];
            // this.$state.go("organization.user.edit", { id: entityId });
         }
+
         private pushUp = (e: JQueryEventObject) => {
             e.preventDefault();
-            alert("OOOP ;-) ");
 
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var entityId = dataItem["Id"];
-            alert(entityId);
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
 
-           /* let payload = {
-                Priority: this.
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority + 1
             }
-            this.$http.patch(`/odata/reports(${this.reportId})`, payload).then((response) => {
-            });*/
+
+            this.$http.patch(`/odata/OrganizationUnitRoles(${this.optionId})`, payload).then((response) => {
+            });
+            this.$state.reload();
         }
         private pushDown = (e: JQueryEventObject) => {
             e.preventDefault();
-            alert("NEEEEED ;-) ");
-            
+
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
+
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority - 1
+            }
+
+            this.$http.patch(`/odata/OrganizationUnitRoles(${this.optionId})`, payload).then((response) => {
+            });
+
+            this.$state.reload();
         }
-            var superClass = this;
+           /* var superClass = this;
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             var entityId = selectedItem.get("Id");
@@ -277,7 +307,7 @@
                         msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                     }
                 });
-        };
+        };*/
     }
     /*
     function up(): void {
