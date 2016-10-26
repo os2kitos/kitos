@@ -6,7 +6,7 @@
             controller: 'contract.DeadlinesCtrl',
             resolve: {
                 optionExtensions: ['$http', function($http) {
-                    return $http.get('odata/LocalOptionExtendTypes?$filter=IsActive eq true or IsObligatory eq true').then(function(result) {
+                    return $http.get('odata/LocalOptionExtendTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function(result) {
                         return result.data.value;
                     });
                 }],
@@ -21,7 +21,7 @@
                     });
                 }],
                 handoverTrialTypes: ['$http', function ($http) {
-                    return $http.get('odata/LocalHandoverTrialTypes?$filter=IsActive eq true or IsObligatory eq true').then(function (result) {
+                    return $http.get('odata/LocalHandoverTrialTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
                         return result.data.value;
                     });
                 }],
