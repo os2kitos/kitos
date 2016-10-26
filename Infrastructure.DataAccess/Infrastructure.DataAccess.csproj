@@ -339,6 +339,9 @@
     <EmbeddedResource Include="Migrations\201610241325163_MERGE migration.resx">
       <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610190915411_priority added.resx">
+      <DependentUpon>201610190915411_priority added.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />

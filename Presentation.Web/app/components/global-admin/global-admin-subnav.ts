@@ -10,7 +10,8 @@
                 $rootScope.page.subnav = [
                     { state: 'global-admin.organizations', text: 'Organisation' },
                     { state: 'global-admin.global-users', text: 'Globale administratorer' },
-                    { state: 'global-admin.local-users', text: 'Lokale administratorer' }
+                    { state: 'global-admin.local-users', text: 'Lokale administratorer' },
+                    { state: 'global-admin.misc', text: 'Andet' }
                 ];
             }]
         });
