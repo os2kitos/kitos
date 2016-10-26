@@ -898,7 +898,7 @@
                     controllerAs: "projectOverviewVm",
                     resolve: {
                         projectRoles: [
-                            "$http", $http => $http.get("odata/LocalItProjectRoles?$filter=IsActive eq true or IsObligatory eq true").then(result => result.data.value)
+                            "$http", $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()

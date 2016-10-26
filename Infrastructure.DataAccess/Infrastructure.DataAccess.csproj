@@ -241,6 +241,18 @@
     <Compile Include="Migrations\201610241325163_MERGE migration.Designer.cs">
       <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.cs" />
+    <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.Designer.cs">
+      <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs" />
+    <Compile Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.Designer.cs">
+      <DependentUpon>201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.cs" />
+    <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.Designer.cs">
+      <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -335,6 +347,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610241230380_Added new contract props running, byEnding.resx">
       <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251319335_Added IsActive to LocalOptions.resx">
+      <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.resx">
+      <DependentUpon>201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251400376_IsLocallyAvailable fix.resx">
+      <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610241325163_MERGE migration.resx">
       <DependentUpon>201610241325163_MERGE migration.cs</DependentUpon>

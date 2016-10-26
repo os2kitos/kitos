@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable().Where(t => t.IsActive && !t.IsSuggestion);
+            return Repository.AsQueryable().Where(t => t.IsLocallyAvailable && !t.IsSuggestion);
         }
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)

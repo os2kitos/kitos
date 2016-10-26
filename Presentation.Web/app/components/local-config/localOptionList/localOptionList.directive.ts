@@ -97,10 +97,10 @@
                 },
                 columns: [
                     {
-                        field: "IsActive", title: "Aktiv", width: 112,
-                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        field: "IsLocallyAvailable", title: "Aktiv", width: 112,
+                        persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `<input type="checkbox" data-ng-model="dataItem.IsActive" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> {{ Name }}`,
+                        template: `<input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> {{ Name }}`,
                         hidden: false,
                         filterable: false,
                         sortable: false
@@ -160,15 +160,6 @@
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
             this.optionId = selectedItem.get("id");
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
-        }
-
-        public refreshKendoGrid() {
-            console.log(this.mainGrid);
-            console.log(123);
-            if (this.mainGrid) {
-                console.log(1234);
-                this.mainGrid.refresh();
-            }
         }
     }
     angular.module("app")

@@ -19,12 +19,12 @@
                 }],
                 businessTypes: [
                     '$http', function($http) {
-                        return $http.get("odata/LocalBusinessTypes?$filter=IsActive eq true or IsObligatory eq true");
+                        return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true");
                     }
                 ],
                 appTypeOptions: [
                     '$http', function ($http) {
-                        return $http.get("odata/LocalItSystemTypes?$filter=IsActive eq true or IsObligatory eq true").then(function (result) {
+                        return $http.get("odata/LocalItSystemTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function (result) {
                             return result.data.value;
                         });
                     }

@@ -6,7 +6,6 @@
 
         public name: string;
         public isObligatory: boolean;
-        public isActive: boolean;
         public hasWriteAccess: boolean;
         public description: string;
 
@@ -42,7 +41,6 @@
 
                     this.name = opt.Name;
                     this.isObligatory = opt.IsObligatory;
-                    this.isActive = opt.IsActive;
                     this.hasWriteAccess = opt.HasWriteAccess;
                     this.description = opt.Description;
                 });
@@ -55,7 +53,6 @@
                 return {
                     Name: this.name,
                     IsObligatory: this.isObligatory,
-                    IsActive: this.isActive,
                     HasWriteAccess: this.hasWriteAccess,
                     Description: this.description
                 }
@@ -63,7 +60,6 @@
             return {
                 Name: this.name,
                 IsObligatory: this.isObligatory,
-                IsActive: this.isActive,
                 Description: this.description
             }
 

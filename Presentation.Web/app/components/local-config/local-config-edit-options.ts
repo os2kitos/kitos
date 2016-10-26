@@ -39,10 +39,9 @@
             });
         };
 
-        //TODO Not done!
         public ok() {
             const payload = {
-                description: this.description
+                Description: this.description
             };
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload)
                 .then((response) => {
@@ -54,6 +53,11 @@
         };
 
         public cancel() {
+            this.$uibModalInstance.close();
+        };
+
+        public resetDescription() {
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, { Description: null});
             this.$uibModalInstance.close();
         };
     }

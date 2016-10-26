@@ -89,7 +89,6 @@
                         model: {
                             id: "Id",
                             fields: {
-                                IsActive: { type: "boolean" },
                                 IsObligatory: { type: "boolean" },
                                 Name: { type: "string" },
                                 HasWriteAccess: { type: "boolean" },

@@ -18,10 +18,20 @@
                     disabled: "&ngDisabled",
                 },
                 link: function (scope, element, attr, ctrl) {
-                    var foundSelectedInOptions = _.find(scope.options(), function(option: any) { return option.id === scope.selectedId });
-                    scope.isDeletedSelected = scope.selectedId != null && !foundSelectedInOptions;
+                   //var foundSelectedInOptions = _.find(scope.options(), function(option: any) { return option.Id === scope.selectedId });
+                   //scope.isDeletedSelected = scope.selectedId != null && !foundSelectedInOptions;
+
+                    scope.isDeletedSelected = false;
 
                     scope.savedId = scope.selectedId;
+
+                    scope.$watch('selectedId', function (value) {
+                        var foundSelectedInOptions = _.find(scope.options(), function (option: any) { return option.Id === parseInt(scope.selectedId, 10) });
+
+                        if (foundSelectedInOptions) {
+                            scope.optionDescription = foundSelectedInOptions.Description;
+                        }
+                    });
                 }
             };
         }

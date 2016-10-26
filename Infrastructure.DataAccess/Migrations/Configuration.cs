@@ -115,7 +115,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var boss = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Chef",
                 Description = "Lederen af en organisationsenhed",
                 HasWriteAccess = true,
@@ -125,7 +125,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var resourcePerson = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Ressourceperson",
                 Description = "...",
                 HasWriteAccess = true,
@@ -135,7 +135,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var employee = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Medarbejder",
                 Description = "...",
                 HasWriteAccess = false,
@@ -145,7 +145,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var digitalConsultant = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Digitaliseringskonsulent",
                 Description = "...",
                 HasWriteAccess = true,
@@ -155,7 +155,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var itConsultant = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "IT konsulent",
                 Description = "...",
                 HasWriteAccess = true,
@@ -165,7 +165,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var leader = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Leder",
                 Description = "...",
                 HasWriteAccess = true,
@@ -175,7 +175,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             var director = new OrganizationUnitRole()
             {
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Direktør",
                 Description = "...",
                 HasWriteAccess = false,
@@ -202,7 +202,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Projektejer",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -210,7 +210,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Projektleder",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -218,7 +218,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Delprojektleder",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -226,7 +226,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Projektdeltager",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -234,7 +234,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Teknisk projektleder",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -242,7 +242,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "IT konsulnet",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -250,7 +250,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Implementeringskonsulent",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -258,7 +258,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Proceskonsulent",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -266,7 +266,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Juridisk konsulent",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -274,7 +274,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "IT arkitekt",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -282,7 +282,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Testansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -290,7 +290,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Support",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -298,7 +298,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Programleder",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -306,7 +306,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Styregruppeformand",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -314,7 +314,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Styregruppemedlem",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -322,7 +322,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Forretningsejer",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -330,7 +330,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Forretningsansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -338,7 +338,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Gevinstejer",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -346,7 +346,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Gevinsansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -354,7 +354,7 @@ namespace Infrastructure.DataAccess.Migrations
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
-                    IsActive = true,
+                    IsLocallyAvailable = true,
                     Name = "Rådgiver",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
@@ -369,7 +369,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Systemejer",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -379,7 +379,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Systemansvarlig",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -389,7 +389,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Forretningsejer",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -399,7 +399,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Superbrugeransvarlig",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -409,7 +409,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Superbruger",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -419,7 +419,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Sikkerhedsansvarlig",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -429,7 +429,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Changemanager",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -439,7 +439,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Dataejer",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -449,7 +449,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasReadAccess = true,
                 HasWriteAccess = true,
-                IsActive = true,
+                IsLocallyAvailable = true,
                 Name = "Systemadminstrator",
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -466,42 +466,42 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Kontraktejer",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Kontraktmanager",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Juridisk rådgiver",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Konsulent",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Fakturamodtager",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
                 Name = "Budgetansvarlig",
-                IsActive = true,
+                IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             });
@@ -632,7 +632,7 @@ Kontakt: info@kitos.dk",
         {
             return new T()
             {
-                IsActive = isActive,
+                IsLocallyAvailable = isActive,
                 IsSuggestion = isSuggestion,
                 Name = name,
                 Description = description,

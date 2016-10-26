@@ -177,7 +177,7 @@
                     }
 
                     // ui select fields trigger the change event
-                    if (!angular.isUndefined(attrs.uiSelect)) {
+                    if (!angular.isUndefined(attrs.uiSelect2)) {
                         if (attrs.multiple) {
                             element.bind('change', saveMultipleSelect2);
                         } else {

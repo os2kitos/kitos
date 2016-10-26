@@ -1,6 +1,5 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System;
 using System.Collections.Generic;
@@ -8,16 +7,16 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
-using System.Web.OData.Routing;
+using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class LocalOptionBaseController<T, Type, OptionType> : BaseEntityController<T> where T : LocalOptionEntity<OptionType> where OptionType : OptionEntity<Type>
+    public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
     {
         private readonly IAuthenticationService _authService;
-        private readonly IGenericRepository<OptionType> _optionsRepository;
+        private readonly IGenericRepository<TOptionType> _optionsRepository;
 
-        public LocalOptionBaseController(IGenericRepository<T> repository, IAuthenticationService authService, IGenericRepository<OptionType> optionsRepository)
+        public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IAuthenticationService authService, IGenericRepository<TOptionType> optionsRepository)
             : base(repository, authService)
         {
             _authService = authService;
@@ -30,26 +29,26 @@ namespace Presentation.Web.Controllers.OData
             if (UserId == 0)
                 return Unauthorized();
 
-            int orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
             var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
-            var returnList = new List<OptionType>();
+            var returnList = new List<TOptionType>();
 
             foreach (var item in globalOptionsResult)
             {
                 if (!item.IsEnabled)
                     continue;
 
-                OptionType itemToAdd = item;
-                item.IsActive = false;
+                var itemToAdd = item;
+                item.IsLocallyAvailable = false;
 
                 var search = localOptionsResult.Where(x => x.OptionId == item.Id);
 
-                if (search.Count() > 0)
+                if (search.Any())
                 {
                     var localOption = search.First();
-                    itemToAdd.IsActive = true;
-                    if (!String.IsNullOrEmpty(localOption.Description))
+                    itemToAdd.IsLocallyAvailable = localOption.IsActive;
+                    if (!IsNullOrEmpty(localOption.Description))
                     {
                         itemToAdd.Description = localOption.Description;
                     }
@@ -65,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
             if (UserId == 0)
                 return Unauthorized();
 
-            int orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -77,23 +76,131 @@ namespace Presentation.Web.Controllers.OData
 
             if (localOptionResult.Any())
             {
-                option.IsActive = true;
                 var localOption = localOptionResult.First();
-                if (!String.IsNullOrEmpty(localOption.Description))
+                option.IsLocallyAvailable = localOption.IsActive;
+                if (!IsNullOrEmpty(localOption.Description))
                 {
                     option.Description = localOption.Description;
                 }
-            } else {
-                option.IsActive = false;
+            }
+            else
+            {
+                option.IsLocallyAvailable = false;
             }
 
             return Ok(option);
         }
 
-        public override IHttpActionResult Delete(int globalOptionId)
+        public override IHttpActionResult Post(TLocalModelType entity)
         {
-            int orgId = _authService.GetCurrentOrganizationId(UserId);
-            LocalOptionEntity<OptionType> localOption = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == globalOptionId).First();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_authService.HasWriteAccess(UserId, entity))
+            {
+                return Unauthorized();
+            }
+
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == entity.OptionId);
+
+            if(localOptionSearch.Any())
+            {
+                try
+                {
+                    var localOption = localOptionSearch.First();
+
+                    localOption.IsActive = true;
+                    Repository.Save();
+                }
+                catch (Exception e)
+                {
+                    return InternalServerError(e);
+                }
+            } else
+            {
+                try
+                {
+                    entity.ObjectOwnerId = UserId;
+                    entity.LastChangedByUserId = UserId;
+                    entity.IsActive = true;
+                    var entityWithOrganization = entity as IHasOrganization;
+                    if (entityWithOrganization != null)
+                    {
+                        entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                    }
+                    entity = Repository.Insert(entity);
+                    Repository.Save();
+                }
+                catch (Exception e)
+                {
+                    return InternalServerError(e);
+                }
+            }
+
+            return Ok();
+        }
+
+        public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
+        {
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
+
+            if (localOptionSearch.Any())
+            {
+                var localOption = localOptionSearch.First();
+                // does the entity exist?
+                if (localOption == null)
+                    return NotFound();
+
+                // check if user is allowed to write to the entity
+                if (!_authService.HasWriteAccess(UserId, localOption))
+                    return StatusCode(HttpStatusCode.Forbidden);
+
+                // check model state
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                try
+                {
+                    // patch the entity
+                    delta.Patch(localOption);
+                    Repository.Save();
+                }
+                catch (Exception e)
+                {
+                    return InternalServerError(e);
+                }
+            }
+            else {
+                try
+                {
+                    TLocalModelType entity = new TLocalModelType();
+                    entity.ObjectOwnerId = UserId;
+                    entity.LastChangedByUserId = UserId;
+                    entity.OptionId = key;
+                    var entityWithOrganization = entity as IHasOrganization;
+                    if (entityWithOrganization != null)
+                    {
+                        entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                    }
+                    delta.Patch(entity);
+                    entity = Repository.Insert(entity);
+                    Repository.Save();
+                }
+                catch (Exception e)
+                {
+                    return InternalServerError(e);
+                }
+            }
+
+            return Ok();
+        }
+
+        public override IHttpActionResult Delete(int key)
+        {
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOption == null)
                 return NotFound();
@@ -103,7 +210,9 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                Repository.DeleteByKey(localOption.Id);
+                //Repository.DeleteByKey(localOption.Id);
+
+                localOption.IsActive = false;
                 Repository.Save();
             }
             catch (Exception e)

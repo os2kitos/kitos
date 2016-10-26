@@ -76,5 +76,8 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
+
+        public string Running { get; set; }
+        public string ByEnding { get; set; }
     }
 }
