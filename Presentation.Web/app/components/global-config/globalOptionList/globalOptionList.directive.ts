@@ -70,8 +70,8 @@
                         //},
                     },
                     sort: {
-                        field: "Name",
-                        dir: "asc"
+                        field: "priority",
+                        dir: "desc"
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -145,7 +145,7 @@
                     //    title: " ", width: 176,
                     //    persistId: "command"
                     //},
-                    {
+                   /* {
                         field: "Id",
                         title: "Nr.",
                         width: 230,
@@ -153,6 +153,24 @@
                         template: (dataItem) => dataItem.Id.toString(),
                         hidden: false,
                         filterable: false
+                    },*/
+                    {
+                        field: "priority",
+                        title: "priority",
+                        persistId: "priority", // DON'T YOU DARE RENAME!
+                        hidden: true,
+                        filterable: false
+                    },
+                    {
+                        /*command: [
+                            { text: "Op/Ned", click: "google.com", imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any  as any,*/
+                        //],
+                        title: "Prioritet",
+                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>` +
+                        `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-minus' aria-hidden='true'></i></button>`,
+                        width: 100,
+                        attributes: { "class": "text-center" },
+                        persistId: "command"
                     },
                     {
                         field: "Name",
@@ -206,6 +224,44 @@
             this.optionId = selectedItem.get("id");
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
+
+        private pushUp = (e: JQueryEventObject) => {
+            e.preventDefault();
+
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
+
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority + 1
+            }
+
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
+            });
+            //this.$state.reload();
+
+        }
+        private pushDown = (e: JQueryEventObject) => {
+            e.preventDefault();
+
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
+
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority - 1
+            }
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
+            });
+
+            //this.$state.reload();
+        }
 
         public disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
             e.preventDefault();

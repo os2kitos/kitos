@@ -301,6 +301,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
+    <Compile Include="Controllers\OData\BaseRoleController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
@@ -368,7 +369,7 @@
     <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
-    <Compile Include="Controllers\OData\OrganizationUnitRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\ReportsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
@@ -1153,7 +1154,9 @@
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\BaseRole\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

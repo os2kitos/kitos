@@ -141,9 +141,11 @@
                         /*command: [
                             { text: "Op/Ned", click: "google.com", imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any  as any,*/
                         //],
+                        title: "Prioritet",
                         template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>` +
                         `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-minus' aria-hidden='true'></i></button>`,
-                        title: " ", width: 176,
+                         width: 100,
+                        attributes: { "class": "text-center" },
                         persistId: "command"
                     },{
                         field: "IsObligatory",
@@ -265,9 +267,11 @@
                 priority: priority + 1
             }
 
-            this.$http.patch(`/odata/OrganizationUnitRoles(${this.optionId})`, payload).then((response) => {
+            this.$http.patch(`${this.optionsUrl }(${this.optionId })`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
-            this.$state.reload();
+            //this.$state.reload();
+            
         }
         private pushDown = (e: JQueryEventObject) => {
             e.preventDefault();
@@ -281,11 +285,11 @@
             let payload = {
                 priority: priority - 1
             }
-
-            this.$http.patch(`/odata/OrganizationUnitRoles(${this.optionId})`, payload).then((response) => {
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
             });
 
-            this.$state.reload();
+            //this.$state.reload();
         }
            /* var superClass = this;
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
