@@ -43,6 +43,9 @@ namespace Infrastructure.DataAccess
             return orderBy?.Invoke(query).ToList() ?? query.ToList();
         }
 
+
+
+
         public IQueryable<T> AsQueryable()
         {
             return _dbSet.AsQueryable();
@@ -57,6 +60,7 @@ namespace Infrastructure.DataAccess
         {
             return _dbSet.Find(key);
         }
+       
 
         public T Insert(T entity)
         {

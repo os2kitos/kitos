@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class PriceRegulationTypesController : BaseEntityController<PriceRegulationType>
+    public class PriceRegulationTypesController : BaseRoleController<PriceRegulationType, ItContract>
     {
         public PriceRegulationTypesController(IGenericRepository<PriceRegulationType> repository, IAuthenticationService authService)
             : base(repository, authService)

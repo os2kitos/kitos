@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class ItSystemRolesController : BaseEntityController<ItSystemRole>
+    public class ItSystemRolesController : BaseRoleController<ItSystemRole, ItSystemRight>
     {
         public ItSystemRolesController(IGenericRepository<ItSystemRole> repository, IAuthenticationService authService)
             : base(repository, authService)

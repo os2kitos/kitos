@@ -1,10 +1,13 @@
-﻿using Core.ApplicationServices;
+﻿using Core.DomainServices;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
-
-namespace Presentation.Web.Controllers.OData.OptionControllers
+using System.Web.OData.Routing;
+using System.Web.Http;
+using System.Web.OData;
+using Core.ApplicationServices;
+using System.Linq;
+namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationUnitRolesController : BaseEntityController<OrganizationUnitRole>
+    public class OrganizationUnitRolesController : BaseRoleController<OrganizationUnitRole, OrganizationUnitRight>
     {
         public OrganizationUnitRolesController(IGenericRepository<OrganizationUnitRole> repository, IAuthenticationService authService)
             : base(repository, authService)

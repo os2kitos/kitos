@@ -70,6 +70,7 @@ namespace Presentation.Web.Controllers.OData
         // TODO how do we check access here?
         public virtual IHttpActionResult Post(T entity)
         {
+            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -101,6 +102,7 @@ namespace Presentation.Web.Controllers.OData
         public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);
+
 
             // does the entity exist?
             if (entity == null)
