@@ -16,7 +16,6 @@
                     { state: 'global-admin.project', text: 'IT Projekt' },
                     { state: 'global-admin.system', text: 'IT System' },
                     { state: 'global-admin.contract', text: 'IT Kontrakt' },
-                    { state: 'global-admin.local-users', text: 'Lokale administratorer' },
                     { state: 'global-admin.misc', text: 'Andet' }
                 ];
             }]
