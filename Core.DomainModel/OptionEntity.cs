@@ -51,5 +51,7 @@ namespace Core.DomainModel
         /// </value>
         public string Description { get; set; }
         public bool IsEnabled { get; set; }
+        public int priority { get; set; } 
+        
     }
 }

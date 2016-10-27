@@ -82,13 +82,13 @@
         public rightSort(right): string {
             switch (this.rightSortBy) {
                 case "roleName":
-                    return right.role.name;
+                    return right.role.Name;
                 case "userName":
                     return right.user.fullName;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.name;
+                    return right.role.Name;
             }
         }
 

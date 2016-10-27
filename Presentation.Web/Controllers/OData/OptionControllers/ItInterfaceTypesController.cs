@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class ItInterfaceTypesController : BaseEntityController<ItInterfaceType>
+    public class ItInterfaceTypesController : BaseRoleController<ItInterfaceType,ItInterface>
     {
         public ItInterfaceTypesController(IGenericRepository<ItInterfaceType> repository, IAuthenticationService authService)
             : base(repository, authService)
