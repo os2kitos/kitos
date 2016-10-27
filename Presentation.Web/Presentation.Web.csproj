@@ -1000,6 +1000,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
@@ -1007,6 +1008,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="tsconfig.json" />
+    <Content Include="Scripts\maps\app-bundle.min.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

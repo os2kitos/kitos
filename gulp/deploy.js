@@ -5,31 +5,30 @@ var del = require("del");
 var minifyCSS = require("gulp-minify-css");
 var bower = require("gulp-bower");
 var sourcemaps = require("gulp-sourcemaps");
+var runSequence = require('run-sequence');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
 
 //Synchronously delete the output script file(s)
-gulp.task("clean-scripts", function () {
+gulp.task("clean-js-and-maps", function () {
+    return del(
+        paths.allJavaScriptNoTests,
+        paths.appMaps
+    );
+});
+
+gulp.task("clean-script-bundles", function () {
     return del([
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
         config.script(config.appBundle),
-        paths.allJavaScriptNoTests,
-        paths.appMaps
     ]);
 });
 
-// create stimulsoft report ressources
-// gulp.task("stimulsoft-bundle", ["clean-scripts", "bower-restore"], function () {
-//     return gulp.src(config.stimulsoftSrc)
-//         .pipe(sourcemaps.init())
-//         .pipe(concat(config.stimulsoftBundle))
-//         .pipe(sourcemaps.write(config.maps))
-//         .pipe(gulp.dest(paths.sourceScript));
-// });
+gulp.task("clean-scripts", ["clean-script-bundles", "clean-js-maps"]);
 
 // create external library bundled file
-gulp.task("library-bundle", ["clean-scripts"], function () {
+gulp.task("library-bundle",  function () {
     return gulp.src(config.librarySrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.libraryBundle))
@@ -38,7 +37,7 @@ gulp.task("library-bundle", ["clean-scripts"], function () {
 });
 
 // create angular library bundled file
-gulp.task("angular-bundle", ["clean-scripts"], function () {
+gulp.task("angular-bundle", function () {
     return gulp.src(config.angularSrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.angularBundle))
@@ -47,12 +46,12 @@ gulp.task("angular-bundle", ["clean-scripts"], function () {
 });
 
 // create app bundled file
-// ASP.NET bundler used instead og this.
-gulp.task("app-bundle", ["clean-scripts"], function () {
+// 
+gulp.task("app-bundle", function () {
     return gulp.src(config.appSrc)
         .pipe(sourcemaps.init())
-        .pipe(uglify())
         .pipe(concat(config.appBundle))
+        .pipe(uglify())
         .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(paths.sourceScript));
 });
@@ -99,7 +98,9 @@ gulp.task("bower-restore", function () {
 gulp.task("styles", ["css", "assets", "fonts"]);
 
 // run bundle tasks
-gulp.task("scripts", ["library-bundle", "angular-bundle"]);
+gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
 
 // bundle and deploy scripts and styles
-gulp.task("deploy", ["scripts", "styles"]);
+gulp.task("deploy", function(callback) {
+    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback)
+});

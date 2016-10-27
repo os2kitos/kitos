@@ -21,13 +21,6 @@ module.exports = {
         bower("/angular-loading-bar/build/loading-bar.min.css")
     ],
 
-    // stimulsoftSrc: [
-    //     script("/stimulsoft/stimulsoft.reports.js"),
-    //     script("/stimulsoft/stimulsoft.viewer.js"),
-    //     script("/stimulsoft/stimulsoft.designer.js")
-    // ],
-    // stimulsoftBundle: "stimulsoft-bundle.js",
-
     // angular script bundle
     // not minified
     angularSrc: [
