@@ -237,6 +237,18 @@
     <Compile Include="Migrations\201610181141397_Priority added.Designer.cs">
       <DependentUpon>201610181141397_Priority added.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.cs" />
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
+      <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs" />
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.Designer.cs">
+      <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.cs" />
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.Designer.cs">
+      <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.cs" />
     <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.Designer.cs">
       <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
