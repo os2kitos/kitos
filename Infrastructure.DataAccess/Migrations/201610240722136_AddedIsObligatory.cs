@@ -7,7 +7,6 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            AddColumn("dbo.ItContractRoles", "IsObligatory", c => c.Boolean(nullable: false));
             AddColumn("dbo.ItSystemTypes", "IsObligatory", c => c.Boolean(nullable: false));
             AddColumn("dbo.BusinessTypes", "IsObligatory", c => c.Boolean(nullable: false));
             AddColumn("dbo.DataTypes", "IsObligatory", c => c.Boolean(nullable: false));
