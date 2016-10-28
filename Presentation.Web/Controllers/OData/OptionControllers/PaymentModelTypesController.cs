@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class PaymentModelTypesController : BaseEntityController<PaymentModelType>
+    public class PaymentModelTypesController : BaseOptionController<PaymentModelType, ItContract>
     {
         public PaymentModelTypesController(IGenericRepository<PaymentModelType> repository, IAuthenticationService authService)
             : base(repository, authService)

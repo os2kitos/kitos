@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class TsaTypesController : BaseEntityController<TsaType>
+    public class TsaTypesController : BaseOptionController<TsaType, ItInterface>
     {
         public TsaTypesController(IGenericRepository<TsaType> repository, IAuthenticationService authService)
             : base(repository, authService)

@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class ItContractTypesController : BaseEntityController<ItContractType>
+    public class ItContractTypesController : BaseOptionController<ItContractType, ItContract>
     {
         public ItContractTypesController(IGenericRepository<ItContractType> repository, IAuthenticationService authService)
             : base(repository, authService)

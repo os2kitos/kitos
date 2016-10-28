@@ -12,7 +12,7 @@
     <li data-ng-if="user.currentConfig.showItContractModule">
         <a data-ui-sref="it-contract.overview" data-ng-class="{'active': $state.includes('it-contract')}"><span ng-if="user.currentConfig.showItContractPrefix">IT </span>Kontrakter</a>
     </li>
-    <li data-ng-if="user.currentConfig.showItProjectModule"> 
+    <li data-ng-if="user.currentConfig.showItProjectModule">
         <a data-ui-sref="reports.overview" data-ng-class="{'active': $state.includes('reports')}">Rapporter</a>
     </li>
 </ul>
@@ -26,6 +26,5 @@
     <div>
         <a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config.org" data-ui-sref-active="active">Lokal admin</a>
         <a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin.organizations" data-ui-sref-active="active">Global admin</a>
-        <a data-ng-if="user.isGlobalAdmin" data-ui-sref="config.org" data-ui-sref-active="active">Global konfig</a>
     </div>
 </div>

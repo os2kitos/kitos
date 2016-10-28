@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class PurchaseFormTypesController : BaseEntityController<PurchaseFormType>
+    public class PurchaseFormTypesController : BaseOptionController<PurchaseFormType, ItContract>
     {
         public PurchaseFormTypesController(IGenericRepository<PurchaseFormType> repository, IAuthenticationService authService)
             : base(repository, authService)

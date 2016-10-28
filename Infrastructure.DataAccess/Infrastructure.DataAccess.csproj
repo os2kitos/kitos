@@ -257,6 +257,10 @@
     <Compile Include="Migrations\201610261432269_fix merge.Designer.cs">
       <DependentUpon>201610261432269_fix merge.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610270703312_Added Priority for OptionEntity.cs" />
+    <Compile Include="Migrations\201610270703312_Added Priority for OptionEntity.Designer.cs">
+      <DependentUpon>201610270703312_Added Priority for OptionEntity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -355,6 +359,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610261432269_fix merge.resx">
       <DependentUpon>201610261432269_fix merge.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610270703312_Added Priority for OptionEntity.resx">
+      <DependentUpon>201610270703312_Added Priority for OptionEntity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
