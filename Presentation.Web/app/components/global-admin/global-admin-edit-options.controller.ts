@@ -95,7 +95,7 @@
     }
 
     angular.module("app").config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-        $stateProvider.state("config.org.edit-org-roles", {
+        $stateProvider.state("global-admin.org.edit-org-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-organisation-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
@@ -103,7 +103,7 @@
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -122,7 +122,7 @@
                         });
                 }
             ]
-        }).state("config.project.edit-project-roles", {
+        }).state("global-admin.project.edit-project-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
@@ -130,7 +130,7 @@
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -149,7 +149,7 @@
                         });
                 }
             ]
-        }).state("config.system.edit-system-roles", {
+        }).state("global-admin.system.edit-system-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-system-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
@@ -157,7 +157,7 @@
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -176,7 +176,7 @@
                         });
                 }
             ]
-        }).state("config.contract.edit-contract-roles", {
+        }).state("global-admin.contract.edit-contract-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-contract-roles",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
@@ -184,7 +184,7 @@
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-roles.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-roles.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -203,7 +203,7 @@
                         });
                 }
             ]
-        }).state("config.project.edit-project-types", {
+        }).state("global-admin.project.edit-project-types", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-types",
             onEnter: [
                 "$state", "$stateParams", "$uibModal",
@@ -211,7 +211,7 @@
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -230,14 +230,14 @@
                         });
                 }
             ]
-        }).state("config.system.edit-system-types", {
+        }).state("global-admin.system.edit-system-types", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-system-types",
             onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
@@ -254,14 +254,14 @@
                     });
                 }
             ]
-        }).state("config.contract.edit-contract-types", {
+        }).state("global-admin.contract.edit-contract-types", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-contract-types",
             onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
                     $uibModal.open({
-                        templateUrl: "app/components/global-config/global-config-option-edit-types.modal.view.html",
+                        templateUrl: "app/components/global-admin/global-admin-option-edit-types.modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",

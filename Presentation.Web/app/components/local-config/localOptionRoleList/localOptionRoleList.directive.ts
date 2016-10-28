@@ -100,23 +100,18 @@
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,
                         persistId: "isLocallyAvailable", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true" title="Obligatorisk"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> # } #`,
+                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-grey" aria-hidden="true"></span> # } else { # <input type="checkbox" data-ng-model="dataItem.IsLocallyAvailable" data-global-option-id="{{ dataItem.Id }}" data-autosave="${this.optionsUrl}" data-field="OptionId"> # } #`,
                         hidden: false,
                         filterable: false,
                         sortable: false
-                    }, {
+                    },
+                    {
                         field: "priority",
                         title: "priority",
                         persistId: "priority", // DON'T YOU DARE RENAME!
                         hidden: true,
                         filterable: false
                     },
-                    /*{
-                        field: "Id", title: "Nr.", width: 230,
-                        persistId: "id", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Id.toString(),
-                        hidden: false
-                    },*/
                     {
                         field: "Name", title: "Navn", width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!

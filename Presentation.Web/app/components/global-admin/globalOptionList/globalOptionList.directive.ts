@@ -137,22 +137,6 @@
                         filterable: false,
                         sortable: false
                     },
-                    //{
-                    //    command: [
-                    //        { text: "Op/Ned", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                    //    ],
-                    //    title: " ", width: 176,
-                    //    persistId: "command"
-                    //},
-                   /* {
-                        field: "Id",
-                        title: "Nr.",
-                        width: 230,
-                        persistId: "id", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Id.toString(),
-                        hidden: false,
-                        filterable: false
-                    },*/
                     {
                         field: "priority",
                         title: "priority",
@@ -161,15 +145,13 @@
                         filterable: false
                     },
                     {
-                        /*command: [
-                            { text: "Op/Ned", click: "google.com", imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any  as any,*/
-                        //],
                         title: "Prioritet",
                         template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>` +
                         `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-minus' aria-hidden='true'></i></button>`,
                         width: 100,
                         attributes: { "class": "text-center" },
                         persistId: "command"
+
                     },
                     {
                         field: "Name",
@@ -224,44 +206,6 @@
             this.$scope.$state.go(this.editState, { id: this.optionId, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };
 
-        private pushUp = (e: JQueryEventObject) => {
-            e.preventDefault();
-
-            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
-            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority = selectedItem.get("priority");
-
-            this.optionId = selectedItem.get("Id");
-
-            let payload = {
-                priority: priority + 1
-            }
-
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
-                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
-            });
-            //this.$state.reload();
-
-        }
-        private pushDown = (e: JQueryEventObject) => {
-            e.preventDefault();
-
-            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
-            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority = selectedItem.get("priority");
-
-            this.optionId = selectedItem.get("Id");
-
-            let payload = {
-                priority: priority - 1
-            }
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
-                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
-            });
-
-            //this.$state.reload();
-        }
-
         public disableEnableOption = (e: JQueryEventObject, enable: boolean) => {
             e.preventDefault();
             var superClass = this;
@@ -285,6 +229,43 @@
                     }
                 });
         };
+
+        private pushUp = (e: JQueryEventObject) => {
+            e.preventDefault();
+
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
+
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority + 1
+            }
+
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
+            });
+
+        };
+
+        private pushDown = (e: JQueryEventObject) => {
+            e.preventDefault();
+
+            var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
+            var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            var priority = selectedItem.get("priority");
+
+            this.optionId = selectedItem.get("Id");
+
+            let payload = {
+                priority: priority - 1
+            }
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
+                this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
+            });
+        };
+
     }
     angular.module("app")
         .directive("globalOptionList", setupDirective);

@@ -1,9 +1,9 @@
-﻿module Kitos.Services {
+﻿﻿module Kitos.Services {
     "use strict";
 
     export class UploadFileService {
 
-        public static $inject: string[] = ["$http","notify"];
+        public static $inject: string[] = ["$http", "notify"];
 
         constructor(private $http: IHttpServiceWithCustomConfig, private notify) {
         }

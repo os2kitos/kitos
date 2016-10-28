@@ -301,8 +301,8 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
-    <Compile Include="Controllers\OData\BaseOptionController.cs" />
-	<Compile Include="Controllers\API\UploadFileController.cs" />
+    <Compile Include="Controllers\OData\BaseRoleController.cs" />
+    <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
@@ -535,15 +535,18 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\global-config\global-config-option-edit-roles.modal.view.html" />
+    <Content Include="app\components\global-config\global-config-option-edit-types.modal.view.html" />
+<<<<<<< HEAD
+=======
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
-    <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
-    <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+>>>>>>> 57e5c601d113e006bd347c05983a8a44f950024a
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
-    <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-config\global-config-edit-options.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
@@ -569,7 +572,7 @@
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
-    <TypeScriptCompile Include="app\services\uploadFileService.ts" />
+    <TypeScriptCompile Include="app\services\UploadFileService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
     <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
@@ -905,6 +908,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-organizations.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-subnav.ts" />
+    <TypeScriptCompile Include="app\components\global-config\global-config.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-edit-user.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-subnav.controller.ts" />
@@ -1005,7 +1009,6 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Content Include="Scripts\angular-bundle.min.js" />
-    <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
@@ -1013,7 +1016,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="tsconfig.json" />
-    <Content Include="Scripts\maps\app-bundle.min.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

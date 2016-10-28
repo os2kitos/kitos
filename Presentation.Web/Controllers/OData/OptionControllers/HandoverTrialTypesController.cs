@@ -4,7 +4,7 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class HandoverTrialTypesController : BaseRoleController<HandoverTrialType,HandoverTrial>
+    public class HandoverTrialTypesController : BaseOptionController<HandoverTrialType, HandoverTrial>
     {
         public HandoverTrialTypesController(IGenericRepository<HandoverTrialType> repository, IAuthenticationService authService)
             : base(repository, authService)
