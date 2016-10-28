@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.OData;
 using Core.DomainServices;
+using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {

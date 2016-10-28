@@ -229,6 +229,14 @@
     <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610170909312_added priority on roles and types.cs" />
+    <Compile Include="Migrations\201610170909312_added priority on roles and types.Designer.cs">
+      <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610181141397_Priority added.cs" />
+    <Compile Include="Migrations\201610181141397_Priority added.Designer.cs">
+      <DependentUpon>201610181141397_Priority added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201610240722136_AddedIsObligatory.cs" />
     <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
@@ -268,6 +276,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -338,6 +348,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610170909312_added priority on roles and types.resx">
+      <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610181141397_Priority added.resx">
+      <DependentUpon>201610181141397_Priority added.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610240722136_AddedIsObligatory.resx">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
