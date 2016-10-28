@@ -1,13 +1,19 @@
 "use strict";
 
 var source = "Presentation.Web",
+    typescriptOutput = source + "/typescriptOutput",
+    typescriptOutputApp = typescriptOutput + "/app",
+    typescriptOutputAppReport = typescriptOutput + "/appReport",
     sourceApp = source + "/app",
+    sourceAppReport = source + "/appReport",
     sourceScript = source + "/Scripts",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.module.js" ,sourceApp + "/**/*.js"],
     allJavaScriptNoTests = [sourceApp + "/app.js", sourceApp + "/**/*.module.js", sourceApp + "/**/!(*.spec|*.po).js"],
-    allTypeScript = [sourceApp + "/**/*.ts"],
+    appTypeScriptOut = [typescriptOutputApp + "/app.js", typescriptOutputApp + "/**/*.module.js",typescriptOutputApp + "/**/*"],
+    appReportTypeScriptOut = typescriptOutput + "/appReport",
     bowerComponents = "bower_components",
     appMaps = sourceApp + "/**/*.js.map",
+    appJavaScript = [typescriptOutput + "/app.js", sourceApp + "/**/*.module.js", sourceApp + "/**/!(*.spec|*.po).js"],
 
     // dependency files of files to unit test
     unitDependencies = [
@@ -60,8 +66,12 @@ module.exports = {
     appMaps: appMaps,
     sourceScript: sourceScript,
     allJavaScript: allJavaScript,
-    allTypeScript: allTypeScript,
     allJavaScriptNoTests: allJavaScriptNoTests,
+    typescriptOutput: typescriptOutput,
+    appTypeScriptOut: appTypeScriptOut,
+    typescriptOutputAppReport: typescriptOutputAppReport,
+    appReportTypeScriptOut: appReportTypeScriptOut,
+    sourceAppReport: sourceAppReport,
     bowerComponents: bowerComponents,
     unit: unit,
     e2eFiles: e2eFiles,
