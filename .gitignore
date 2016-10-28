@@ -25,6 +25,7 @@ Presentation.Web/Scripts/*-bundle*.js
 Presentation.Web/Scripts/maps/
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
+Presentation.Web/typescriptOutput
 
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
