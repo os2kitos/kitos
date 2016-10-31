@@ -7,25 +7,25 @@
             resolve: {
                 businessTypes: [
                     '$http', function ($http) {
-                        return $http.get('api/businesstype')
+                        return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                             .then(function (result) {
-                                return result.data.response;
+                                return result.data.value;
                             });
                     }
                 ],
                 archiveTypes: [
                     '$http', function ($http) {
-                        return $http.get('api/archivetype')
+                        return $http.get('odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true')
                             .then(function (result) {
-                                return result.data.response;
+                                return result.data.value;
                             });
                     }
                 ],
                 sensitiveDataTypes: [
                     '$http', function ($http) {
-                        return $http.get('api/sensitivedatatype')
+                        return $http.get('odata/LocalSensitiveDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true')
                             .then(function (result) {
-                                return result.data.response;
+                                return result.data.value;
                             });
                     }
                 ],

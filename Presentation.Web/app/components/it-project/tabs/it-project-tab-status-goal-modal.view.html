@@ -30,11 +30,11 @@
                 Type:
             </label>
             <div class="col-md-4">
-                <select id="type" class="input-sm form-control"
-                        data-ng-model="goal.goalTypeId"
-                        data-ng-options="type.Id as type.Name for type in goalTypes">
-                    <option value=""></option>
-                </select>
+                <select-option data-id="goal-type"
+                               data-placeholder="Vælg type"
+                               data-ng-model="goal.goalTypeId"
+                               data-options="goalTypes">
+                </select-option>
             </div>
 
             <!-- Measurable -->
