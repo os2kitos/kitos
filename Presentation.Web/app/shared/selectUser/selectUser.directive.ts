@@ -9,7 +9,7 @@
 
                 //obj.user might contain more info about the user
                 if (obj.user) {
-                    result += "<div class='small'>" + obj.user.email;
+                    result += "<div class='small'>" + obj.user.Email;
 
                     if (obj.user.defaultOrganizationUnitName)
                         result += ", " + obj.user.defaultOrganizationUnitName;
@@ -69,23 +69,21 @@
                                     return { query: term };
                                 },
                                 quietMillis: 500,
-                                transport: function(queryParams) {
-                                    var res = $http.get(userSrc + queryParams.data.query, { ignoreLoadingBar: true }).then(queryParams.success);
-                                    res.abort = function() {
+                                transport: queryParams => {
+                                    var res = userSearchParameters(queryParams.data.query).then(queryParams.success);
+                                    res.abort = () => {
                                         return null;
                                     };
-
                                     return res;
                                 },
 
-                                results: function(data, page) {
+                                results: (data, page) => {
                                     var results = [];
 
-                                    _.each(data.data.response, function(user) {
-
+                                    _.each(data.data.value, user => {
                                         results.push({
-                                            id: user.id, //select2 mandatory
-                                            text: user.fullName, //select2 mandatory
+                                            id: user.Id, //select2 mandatory
+                                            text: user.Name + " " + user.LastName, //select2 mandatory
                                             user: user //not mandatory, for extra info when formatting
                                         });
                                     });
@@ -93,6 +91,22 @@
                                     return { results: results };
                                 }
                             }
+                        };
+
+                        function userSearchParameters(queryParams) {
+                            console.log(queryParams);
+                            var userInputString1: string = "", userInputString2: string = "", userInputString3: string = "";
+                            var userInputString = [userInputString1, userInputString2, userInputString3];
+                            var userStrings = queryParams.split(' ', 3);
+                            console.log(userStrings);
+                            var index: number = 0;
+                            for (let userString of userStrings) {
+                                userInputString[index] = userString;
+                                index++;
+                            }
+                            var result = $http.get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId}) and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[0]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`, { ignoreLoadingBar: true })
+                            console.log(result);
+                            return result;
                         };
                     }
                 ]
