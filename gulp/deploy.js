@@ -80,6 +80,7 @@ gulp.task("appReport-bundle", function () {
         .pipe(uglify())
         .pipe(rev())
         .pipe(sourcemaps.write(config.maps))
+        .pipe(gulp.dest(paths.sourceScript))
         .pipe(rev.manifest({
             merge: true // merge with the existing manifest (if one exists) 
         }))
