@@ -466,6 +466,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Kontraktejer",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -473,6 +474,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Kontraktmanager",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -480,6 +482,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Juridisk rådgiver",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -487,6 +490,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Konsulent",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -494,6 +498,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Fakturamodtager",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
@@ -501,6 +506,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 HasWriteAccess = true,
                 Name = "Budgetansvarlig",
+                IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
