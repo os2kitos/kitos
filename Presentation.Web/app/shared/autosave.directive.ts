@@ -115,22 +115,24 @@
                     function saveSelect2() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
-                        $timeout(function() {
-                            var newValue;
+                        $timeout(function () {
+                            if (attrs.field) {
+                                var newValue;
 
-                            var viewValue = ctrl.$viewValue;
-                            if (angular.isArray(viewValue)) {
-                                newValue = _.map(viewValue, 'id');
-                            } else if (angular.isObject(viewValue)) {
-                                newValue = viewValue.id;
-                            } else {
-                                newValue = viewValue;
+                                var viewValue = ctrl.$viewValue;
+                                if (angular.isArray(viewValue)) {
+                                    newValue = _.map(viewValue, 'id');
+                                } else if (angular.isObject(viewValue)) {
+                                    newValue = viewValue.id;
+                                } else {
+                                    newValue = viewValue;
+                                }
+
+                                var payload = {};
+                                payload[attrs.field] = newValue;
+
+                                save(payload);
                             }
-
-                            var payload = {};
-                            payload[attrs.field] = newValue;
-
-                            save(payload);
                         });
                     }
 
