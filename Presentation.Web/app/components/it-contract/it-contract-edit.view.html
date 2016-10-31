@@ -291,7 +291,45 @@
                         </select-multiple-option>
                     </div>
                 </div>
-            </div>
+                
+                <div class="col-md-12">
+                    <label for="agreement-concluded" class="control-label small">
+                        Gyldig fra
+                    </label>
+                    <input id="agreement-concluded"
+                           type="text"
+                           class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="contract.concluded"
+                           data-autosave="{{autosaveUrl2}}"
+                           data-field="concluded">
+                </div>
+                <div class="col-md-12">
+                    <label for="agreement-expiration" class="control-label small">Gyldig til</label>
+                    <input type="text" class="form-control" id="agreement-expiration"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="contract.expirationDate"
+                           data-autosave="{{autosaveUrl2}}"
+                           data-field="expirationDate">
+                </div>
+                <div class="col-md-6">
+                    <!-- Extern contract is signed -->
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="contract-ext-signed"
+                                   data-ng-model="contract."
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{ autoSaveUrl }}"
+                                   data-field="Active">
+                            Gyldig
+                        </label>
+                    </div>
+                  </div>
+                </div>
         </div>
     </div>
 </form>

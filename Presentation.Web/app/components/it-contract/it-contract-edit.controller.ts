@@ -87,6 +87,7 @@
         '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
         function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
             $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
+            $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
             $scope.contract = contract;
             $scope.hasWriteAccess = hasWriteAccess;
 

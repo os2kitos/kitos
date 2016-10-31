@@ -443,7 +443,7 @@
                         }
                     },
                     {
-                        field: "Concluded", title: "Indgået", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "Concluded", title: "Gyldig fra", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "concluded", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.Concluded) {
@@ -473,7 +473,7 @@
                         }
                     },
                     {
-                        field: "ExpirationDate", title: "Udløbs dato", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "ExpirationDate", title: "Gyldig til", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "expirationDate", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.ExpirationDate) {
