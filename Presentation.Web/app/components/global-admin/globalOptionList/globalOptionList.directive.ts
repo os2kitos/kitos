@@ -235,12 +235,12 @@
 
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority = selectedItem.get("priority");
+            var priority = selectedItem.get("Priority");
 
             this.optionId = selectedItem.get("Id");
 
             let payload = {
-                priority: priority + 1
+                Priority: priority + 1
             }
 
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
@@ -254,12 +254,12 @@
 
             var entityGrid = this.$(`#${this.dirId}`).data("kendoGrid");
             var selectedItem = entityGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var priority = selectedItem.get("priority");
+            var priority = selectedItem.get("Priority");
 
             this.optionId = selectedItem.get("Id");
 
             let payload = {
-                priority: priority - 1
+                Priority: priority - 1
             }
             this.$http.patch(`${this.optionsUrl}(${this.optionId})`, payload).then((response) => {
                 this.$(`#${this.dirId}`).data("kendoGrid").dataSource.read();
