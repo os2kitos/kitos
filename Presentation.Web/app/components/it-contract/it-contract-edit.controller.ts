@@ -90,7 +90,7 @@
             $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
             $scope.contract = contract;
             $scope.hasWriteAccess = hasWriteAccess;
-
+            console.log(contract);
             autofocus();
 
             $scope.contractTypes = contractTypes;
@@ -105,7 +105,22 @@
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'Id');
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'Name');
 
-            $scope.datepickerOptions = {
+
+
+            var today = new Date();
+
+            if (!contract.active) {
+                if (contract.concluded < today && today < contract.expirationDate) {
+                    
+                    $scope.displayActive = true;
+                } else {
+                    $scope.displayActive = false;
+                }
+            } else {
+                $scope.displayActive = false;
+            }
+
+                $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };

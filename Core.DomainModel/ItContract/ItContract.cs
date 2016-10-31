@@ -39,28 +39,33 @@ namespace Core.DomainModel.ItContract
         {
             get
             {
-                var today = DateTime.UtcNow;
-                var startDate = Concluded ?? today;
-                var endDate = ExpirationDate ?? DateTime.MaxValue;
-
-                if (Terminated.HasValue)
+                if (!Active)
                 {
-                    var terminationDate = Terminated;
-                    if (TerminationDeadline != null)
-                    {
-                        int deadline;
-                        int.TryParse(TerminationDeadline.Name, out deadline);
-                        terminationDate = Terminated.Value.AddMonths(deadline);
-                    }
-                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                    return today >= startDate && today <= terminationDate;
-                }
+                    var today = DateTime.UtcNow;
+                    var startDate = Concluded ?? today;
+                    var endDate = ExpirationDate ?? DateTime.MaxValue;
 
-                // indgået-dato <= dags dato <= udløbs-dato
-                return today >= startDate && today <= endDate;
+                    if (Terminated.HasValue)
+                    {
+                        var terminationDate = Terminated;
+                        if (TerminationDeadline != null)
+                        {
+                            int deadline;
+                            int.TryParse(TerminationDeadline.Name, out deadline);
+                            terminationDate = Terminated.Value.AddMonths(deadline);
+                        }
+                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                        return today >= startDate && today <= terminationDate;
+                    }
+
+                    // indgået-dato <= dags dato <= udløbs-dato
+                    return today >= startDate && today <= endDate;
+                }
+                return Active;
             }
         }
 
+      
         /// <summary>
         ///     Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -97,6 +102,14 @@ namespace Core.DomainModel.ItContract
         ///     The name.
         /// </value>
         public string Name { get; set; }
+        
+        /// <summary>
+        ///     Gets or sets Active.
+        /// </summary>
+        /// <value>
+        ///   Active.
+        /// </value>
+        public bool Active { get; set; }
 
         /// <summary>
         ///     Gets or sets the note.
