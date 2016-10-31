@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class addedpriorityonrolesandtypes : IMigrationMetadata
+    public sealed partial class AddPriority : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(addedpriorityonrolesandtypes));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddPriority));
         
         string IMigrationMetadata.Id
         {
-            get { return "201610170909312_added priority on roles and types"; }
+            get { return "201610310911198_AddPriority"; }
         }
         
         string IMigrationMetadata.Source
