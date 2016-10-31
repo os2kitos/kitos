@@ -25,11 +25,15 @@
 
                     scope.savedId = scope.selectedId;
 
+                    scope.optionDescription = null;
+
                     scope.$watch('selectedId', function (value) {
                         var foundSelectedInOptions = _.find(scope.options(), function (option: any) { return option.Id === parseInt(scope.selectedId, 10) });
 
                         if (foundSelectedInOptions) {
                             scope.optionDescription = foundSelectedInOptions.Description;
+                        } else {
+                            scope.optionDescription = null;
                         }
                     });
                 }
