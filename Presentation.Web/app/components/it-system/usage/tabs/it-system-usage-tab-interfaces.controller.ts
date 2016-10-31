@@ -7,43 +7,43 @@
             resolve: {
                 tsas: [
                     "$http", function($http) {
-                        return $http.get("api/tsa").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalTsaTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
                 interfaces: [
                     "$http", function($http) {
-                        return $http.get("api/interface").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
                 interfaceTypes: [
                     "$http", function($http) {
-                        return $http.get("api/interfacetype").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalItInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
                 methods: [
                     "$http", function($http) {
-                        return $http.get("api/method").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalMethodTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
                 dataTypes: [
                     "$http", function($http) {
-                        return $http.get("api/datatype").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
                 frequencies: [
                     "$http", function($http) {
-                        return $http.get("api/frequency").then(function(result) {
-                            return result.data.response;
+                        return $http.get("odata/LocalFrequencyTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return result.data.value;
                         });
                     }
                 ],
@@ -92,13 +92,13 @@
 
             // resolving complex types from ids
             function resolveTypes(theInterface) {
-                theInterface.interfaceType = _.find(interfaceTypes, { id: theInterface.interfaceTypeId });
-                theInterface.interface = _.find(interfaces, { id: theInterface.interfaceId });
-                theInterface.method = _.find(methods, { id: theInterface.methodId });
-                theInterface.tsa = _.find(tsas, { id: theInterface.tsaId });
+                theInterface.interfaceType = _.find(interfaceTypes, { Id: theInterface.interfaceTypeId });
+                theInterface.interface = _.find(interfaces, { Id: theInterface.interfaceId });
+                theInterface.method = _.find(methods, { Id: theInterface.methodId });
+                theInterface.tsa = _.find(tsas, { Id: theInterface.tsaId });
 
                 _.each(theInterface.dataRows, function(dataRow: { dataTypeId; dataType; }) {
-                    dataRow.dataType = _.find(dataTypes, { id: dataRow.dataTypeId });
+                    dataRow.dataType = _.find(dataTypes, { Id: dataRow.dataTypeId });
                 });
 
                 theInterface.numRows = theInterface.dataRows.length;

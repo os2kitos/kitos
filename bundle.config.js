@@ -39,8 +39,22 @@ module.exports = {
     angularBundle: "angular-bundle.min.js",
 
     // app script bundle
-    appSrc: paths.allJavaScriptNoTests,
+    appSrc: paths.appTypeScriptOut,
     appBundle: "app-bundle.min.js",
+
+    // app script bundle
+    appReportSrc: [
+        app("models/api/organization-role.js"),
+        appReport("reportApp.module.js"),
+        app("shared/notify/notify.module.js"),
+        app("shared/notify/notify.directive.js"),
+        app("shared/notify/notify.factory.js"),
+        appReport("services/stimulsoftService.js"),
+        app("services/ReportService.js"),
+        app("services/userServices.js"),
+        appReport("report-viewer.controller.js")
+    ],
+    appReportBundle: "appReport-bundle.min.js",
 
     // font bundle
     fontSrc: [
@@ -84,3 +98,13 @@ function content(file) {
 function bower(file) {
     return paths.bowerComponents + "/" + file;
 }
+
+function app(file) {
+    return paths.appTypeScriptOut + "/" + file;
+}
+
+function appReport(file) {
+    return paths.appReportTypeScriptOut + "/" + file;
+}
+
+

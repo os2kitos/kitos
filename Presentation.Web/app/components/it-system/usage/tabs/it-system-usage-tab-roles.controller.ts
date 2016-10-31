@@ -6,9 +6,10 @@
             controller: "system.EditRoles",
             resolve: {
                 itSystemRoles: ["$http", function ($http) {
-                    return $http.get("api/itsystemrole/?nonsuggestions=")
+                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                         .then(function (result) {
-                            return result.data.response;
+                            console.log(result);
+                            return result.data.value;
                         });
                 }],
                 user: ["userService", function (userService) {
@@ -23,14 +24,14 @@
     app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
-        $scope.activeItSystemRoles = _.filter(itSystemRoles, { isActive: true });
+        $scope.activeItSystemRoles = itSystemRoles;
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;
 
         $scope.rights = [];
         _.each(itSystemUsage.rights, function (right: { roleId; role; show; user; userForSelect; roleForSelect; }) {
-            right.role = _.find(itSystemRoles, { id: right.roleId });
+            right.role = _.find(itSystemRoles, { Id: right.roleId });
             right.show = true;
 
             right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -67,7 +68,7 @@
                     user: result.response.user,
                     userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                     roleForSelect: result.response.roleId,
-                    role: _.find(itSystemRoles, { id: result.response.roleId }),
+                    role: _.find(itSystemRoles, { Id: result.response.roleId }),
                     show: true
                 });
 
@@ -127,7 +128,7 @@
                     right.user = result.response.user;
                     right.userId = result.response.userId;
 
-                    right.role = _.find(itSystemRoles, { id: right.roleId }),
+                    right.role = _.find(itSystemRoles, { Id: right.roleId }),
 
                     right.edit = false;
 
@@ -158,13 +159,13 @@
         $scope.rightSort = function (right) {
             switch ($scope.rightSortBy) {
                 case "roleName":
-                    return right.role.name;
+                    return right.role.Name;
                 case "userName":
                     return right.user.name;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.name;
+                    return right.role.Name;
             }
         };
 
