@@ -37,7 +37,7 @@
 
             $scope.rights = [];
             _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
-                right.role = _.find(itContractRoles, { id: right.roleId });
+                right.role = _.find(itContractRoles, { Id: right.roleId });
                 right.show = true;
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -164,13 +164,13 @@
             $scope.rightSort = function (right) {
                 switch ($scope.rightSortBy) {
                     case "roleName":
-                        return right.role.name;
+                        return right.role.Name;
                     case "userName":
                         return right.user.name;
                     case "userEmail":
                         return right.user.email;
                     default:
-                        return right.role.name;
+                        return right.role.Name;
                 }
             };
 

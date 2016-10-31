@@ -144,21 +144,24 @@
             // them together so that the correct options are overwritten
             function getStoredOptions(): IGridSavedState {
                 // load options from local storage
-                var localOptions = $window.localStorage.getItem(storageKey);
-                if (localOptions) {
-                    localOptions = JSONfn.parse(localOptions, true);
+                var localOptions;
+                var localStorageItem = $window.localStorage.getItem(storageKey);
+                if (localStorageItem) {
+                    localOptions = JSONfn.parse(localStorageItem, true);
                 }
 
                 // load options profile from local storage
-                var profileOptions = $window.localStorage.getItem(profileStorageKey);
-                if (profileOptions) {
-                    profileOptions = JSONfn.parse(profileOptions, true);
+                var profileOptions;
+                var profileStorageItem = $window.localStorage.getItem(profileStorageKey);
+                if (profileStorageItem) {
+                    profileOptions = JSONfn.parse(profileStorageItem, true);
                 }
 
                 // load options from session storage
-                var sessionOptions = $window.sessionStorage.getItem(storageKey);
-                if (sessionOptions) {
-                    sessionOptions = JSONfn.parse(sessionOptions, true);
+                var sessionOptions;
+                var sessionStorageItem = $window.sessionStorage.getItem(storageKey);
+                if (sessionStorageItem) {
+                    sessionOptions = JSONfn.parse(sessionStorageItem, true);
                 }
 
                 var options: IGridSavedState;
