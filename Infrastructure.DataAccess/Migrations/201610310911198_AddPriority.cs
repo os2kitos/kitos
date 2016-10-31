@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class AddedPriorityforOptionEntity : DbMigration
+    public partial class AddPriority : DbMigration
     {
         public override void Up()
         {

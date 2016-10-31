@@ -2,7 +2,7 @@ namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
-    
+
     public partial class AddedIsObligatory : DbMigration
     {
         public override void Up()
@@ -36,7 +36,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.TsaTypes", "IsObligatory", c => c.Boolean(nullable: false));
             AddColumn("dbo.ReportCategoryTypes", "IsObligatory", c => c.Boolean(nullable: false));
         }
-        
+
         public override void Down()
         {
             DropColumn("dbo.ReportCategoryTypes", "IsObligatory");
