@@ -229,10 +229,6 @@
     <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201610170909312_added priority on roles and types.cs" />
-    <Compile Include="Migrations\201610170909312_added priority on roles and types.Designer.cs">
-      <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\201610240722136_AddedIsObligatory.cs" />
     <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
@@ -256,6 +252,10 @@
     <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.cs" />
     <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.Designer.cs">
       <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610310911198_AddPriority.cs" />
+    <Compile Include="Migrations\201610310911198_AddPriority.Designer.cs">
+      <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -337,9 +337,6 @@
     <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
       <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201610170909312_added priority on roles and types.resx">
-      <DependentUpon>201610170909312_added priority on roles and types.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610240722136_AddedIsObligatory.resx">
       <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
     </EmbeddedResource>
@@ -357,6 +354,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610251400376_IsLocallyAvailable fix.resx">
       <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610310911198_AddPriority.resx">
+      <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
