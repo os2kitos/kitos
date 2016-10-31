@@ -9,6 +9,7 @@ var runSequence = require('run-sequence');
 var ts = require('gulp-typescript');
 var htmlreplace = require('gulp-html-replace');
 var debug = require('gulp-debug');
+var rev = require('gulp-rev');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
 var tsProject = ts.createProject('./Presentation.Web/tsconfig.json');
@@ -34,8 +35,10 @@ gulp.task("clean-script-bundles", function () {
 });
 
 gulp.task("replace-report-js", function () {
+    var manifest = require("../" + paths.sourceScript +  "/rev-manifest.json");
+    var revFileName = manifest["appReport-bundle.min.js"];
     return gulp.src(paths.sourceAppReport + "/Index.html")
-    .pipe(htmlreplace({"js": "../Scripts/appReport-bundle.min.js"}))
+    .pipe(htmlreplace({"js": "../Scripts/" + revFileName}))
     .pipe(gulp.dest(paths.sourceAppReport))
 });
 
@@ -75,7 +78,11 @@ gulp.task("appReport-bundle", function () {
         .pipe(sourcemaps.init())
         .pipe(concat(config.appReportBundle))
         .pipe(uglify())
+        .pipe(rev())
         .pipe(sourcemaps.write(config.maps))
+        .pipe(rev.manifest({
+            merge: true // merge with the existing manifest (if one exists) 
+        }))
         .pipe(gulp.dest(paths.sourceScript));
 });
 
