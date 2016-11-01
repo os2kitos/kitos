@@ -51,8 +51,6 @@
                             $timeout($scope.onSelect);
                         };
 
-                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users=true&q=' : 'api/user?q=';
-
                         $scope.selectUserOptions = {
                             //don't escape markup, otherwise formatResult will be bugged
                             escapeMarkup: function(m) { return m; },
@@ -70,6 +68,7 @@
                                 },
                                 quietMillis: 500,
                                 transport: queryParams => {
+                                    // calls function instead of making query here
                                     var res = userSearchParameters(queryParams.data.query).then(queryParams.success);
                                     res.abort = () => {
                                         return null;
@@ -93,6 +92,7 @@
                             }
                         };
 
+                        //Function to get up to 3 inputs from user and then making the call through Odata and getting the result from either/and firstname, lastname and email.
                         function userSearchParameters(queryParams) {
                             console.log(queryParams);
                             var userInputString1: string = "", userInputString2: string = "", userInputString3: string = "";
@@ -104,7 +104,12 @@
                                 userInputString[index] = userString;
                                 index++;
                             }
-                            var result = $http.get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId}) and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[0]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`, { ignoreLoadingBar: true })
+                            var result = $http
+                                .get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId
+                                    }) and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${
+                                    userInputString[0]
+                                    }') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`,
+                                    { ignoreLoadingBar: true });
                             console.log(result);
                             return result;
                         };
