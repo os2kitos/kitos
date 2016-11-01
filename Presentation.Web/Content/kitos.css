@@ -751,3 +751,7 @@ div.searchbox-wrapper {
 .nowrap {
     white-space: nowrap;
 }
+
+.no-top-margin {
+    margin-top: 0;
+}
