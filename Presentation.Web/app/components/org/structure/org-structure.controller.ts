@@ -9,6 +9,7 @@
                     orgUnits: [
                         "$http", "user", function ($http: ng.IHttpService, user) {
                             return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
+                                console.log(result);
                                 return result.data.response;
                             });
                         }
@@ -104,6 +105,7 @@
             function loadUnits() {
                 var rootNode = orgUnits;
                 $scope.nodes = [rootNode];
+                console.log($scope.nodes);
 
                 flattenAndSave(rootNode, false, null);
             }
@@ -114,12 +116,12 @@
 
             $scope.chooseOrgUnit = function (node, event) {
                 if (event) {
-                    var isDiv = angular.element(event.target)[0].tagName == "DIV";
+                    var isDiv = angular.element(event.target)[0].tagName === "DIV";
                     if (!isDiv) {
                         return;
                     }
                 }
-                if ($scope.chosenOrgUnit == node) return;
+                if ($scope.chosenOrgUnit === node) return;
 
                 // reset state between selecting the current organization
                 $scope.showChildren = false;
@@ -641,7 +643,7 @@
             $scope.treeOptions = {
                 accept: function (sourceNodeScope, destNodesScope, destIndex) {
                     return !angular.isUndefined(destNodesScope.$parentNodesScope);
-                    
+
                 },
                 dropped : function (e) {
                    var parent = e.dest.nodesScope.$parentNodesScope;

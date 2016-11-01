@@ -761,18 +761,14 @@ div.searchbox-wrapper {
 .dragable {
     cursor: move !important;
 }
-    
-.selected {
+
+.angular-ui-tree-handle .selected {
     background: #376092 !important;
     color: white !important;
 }
 
-.selected .glyphicon {
+.angular-ui-tree-handle .selected .glyphicon {
     color: white !important;
-}
-
-.btn {
-    margin-right: 8px;
 }
 
 .angular-ui-tree-handle {
@@ -830,9 +826,6 @@ tr.angular-ui-tree-empty {
     background: #428bca;
     color: #FFF;
     margin-right: 10px;
-}
-
-.angular-ui-tree-handle:hover {
 }
 
 .angular-ui-tree-placeholder {
