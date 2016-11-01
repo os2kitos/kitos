@@ -16,11 +16,70 @@
                 </div>
             </div>
         </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-list"></span>
+                <h7 class="panel-title">Organisation</h7>
+                <span class="pull-right">
+                    <a ng-if="!dragEnabled" data-ng-click="toggleDrag()">Flyt</a>
+                    <a ng-if="dragEnabled" data-ng-click="toggleDrag()">Færdig</a>
+                    {{dragEnabled}}
+                    <span data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <a data-ng-click="editUnit(chosenOrgUnit)">Rediger</a>
+                    </span>
+                </span>
+            </div>
+            <div class="panel-body">
+                <script type="text/ng-template" id="nodes_renderer.html">
+                    <div ui-tree-handle data-ng-click="chooseOrgUnit(node, $event)" class="tree-node tree-node-content"
+                          ng-class="{
+                                      'dragable': false,
+                                      'selected': node == chosenOrgUnit, 
+                                      'hasWriteAccess': node.hasWriteAccess
+                                    }">
+                        <a class="small" ng-if="node.unitChildren && node.unitChildren.length > 0" data-nodrag ng-click="toggle(this)">
+                            <span class="glyphicon"
+                                  ng-class="{
+                                      'glyphicon-chevron-right': collapsed,
+                                      'glyphicon-chevron-down': !collapsed
+                                    }">
+                            </span>
+                        </a>
+                        {{ node.name }}
+                    </div>
+                    <ol ui-tree-nodes="" data-ng-model="node.unitChildren" ng-class="{hidden: collapsed}">
+                        <li data-ng-repeat="node in node.unitChildren" ui-tree-node ng-include="'nodes_renderer.html'">
+                        </li>
+                    </ol>
+                </script>
+                <div ui-tree="treeOptions" data-drag-enabled="false" ng-if="!dragEnabled">
+                    <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
+                        <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+                    </ol>
+                </div>
+                <div ui-tree="treeOptions" ng-if="dragEnabled">
+                    <ol ui-tree-nodes="" data-ng-model="nodes" id="tree-root">
+                        <li data-ng-repeat="node in nodes" ui-tree-node ng-include="'nodes_renderer.html'"></li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-list"></span>
+                <h7 class="panel-title">Organisation</h7>
+            </div>
+            <div class="panel-body">
+                <div kendo-tree-view="tree2"
+                     k-data-source="treeData2"
+                     k-options="options"
+                     k-on-drop="onDrop(kendoEvent)">
+                </div>
+            </div>
+        </div>
     </div>
-
     <div class="col-md-8">
         <div class="row">
-
             <!-- if no org unit is selected, this is shown -->
             <div class="col-md-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
@@ -29,11 +88,11 @@
                     <strong>Start med at vælge en organisationsenhed i oversigten til venstre.</strong>
                 </p>
             </div>
-
             <!-- if an org unit has been selected -->
             <div class="col-md-12" data-ng-show="chosenOrgUnit">
                 <h3>
-                    {{ chosenOrgUnit.name }}
+                    {{ chosenOrgUnit.name
+                }}
                     <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
                     <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
 

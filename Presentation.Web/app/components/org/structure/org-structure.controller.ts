@@ -110,7 +110,13 @@
 
             $scope.chosenOrgUnit = null;
 
-            $scope.chooseOrgUnit = function(node) {
+            $scope.chooseOrgUnit = function (node, event) {
+                if (event) {
+                    var isDiv = angular.element(event.target)[0].tagName == "DIV";
+                    if (!isDiv) {
+                        return;
+                    }
+                }
                 if ($scope.chosenOrgUnit == node) return;
 
                 //get organization related to the org unit
@@ -606,6 +612,44 @@
             function reload() {
                 $state.go('.', null, { reload: true });
             }
+
+            $scope.dragEnabled = false;
+
+            $scope.toggleDrag = function () {
+                $scope.dragEnabled = !$scope.dragEnabled;
+            };
+
+            $scope.treeOptions = {
+                accept: function (sourceNodeScope, destNodesScope, destIndex) {
+                    return !angular.isUndefined(destNodesScope.$parentNodesScope);
+                    
+                },
+                dropped : function (e) {
+                   var parent = e.dest.nodesScope.$parentNodesScope;
+
+                    if (!angular.isUndefined(parent)) {
+                        var parentId = parent.$modelValue[0].id;
+                        var sourceId = e.source.nodeScope.$modelValue.id;
+                        console.log("parentId: ", parentId);
+                        console.log("sourceId: ", sourceId);
+
+                        //SEND API PATCH CALL
+
+                        var payload = {
+                            parentId: parentId
+                        };
+
+                        var url = 'api/organizationunit/' + sourceId;
+                        var msg = notify.addInfoMessage("Opdaterer...", false);
+                        $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
+                            msg.toSuccessMessage("Enheden er opdateret");
+                        }, (error) => {
+                            msg.toErrorMessage("Fejl!");
+                        });
+
+                    }
+                }
+            };
 
             // activate
             loadUnits();
