@@ -100,11 +100,11 @@ function bower(file) {
 }
 
 function app(file) {
-    return paths.appTypeScriptOut + "/" + file;
+    return "Presentation.Web/typescriptOutput/app/" + file;
 }
 
 function appReport(file) {
-    return paths.appReportTypeScriptOut + "/" + file;
+    return "Presentation.Web/typescriptOutput/appReport/" + file;
 }
 
 
