@@ -87,9 +87,10 @@
         '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
         function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
             $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
+            $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
             $scope.contract = contract;
             $scope.hasWriteAccess = hasWriteAccess;
-
+            console.log(contract);
             autofocus();
 
             $scope.contractTypes = contractTypes;
@@ -102,7 +103,22 @@
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
 
-            $scope.datepickerOptions = {
+
+
+            var today = new Date();
+
+            if (!contract.active) {
+                if (contract.concluded < today && today < contract.expirationDate) {
+                    
+                    $scope.displayActive = true;
+                } else {
+                    $scope.displayActive = false;
+                }
+            } else {
+                $scope.displayActive = false;
+            }
+
+                $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };

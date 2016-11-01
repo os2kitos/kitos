@@ -752,6 +752,10 @@ div.searchbox-wrapper {
     white-space: nowrap;
 }
 
+.no-top-margin {
+    margin-top: 0;
+}
+
 /* TREE VIEW */
 
 .dragable {

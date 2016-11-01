@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule, IHasOrganization
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IContextAware, IProjectModule, IHasOrganization
     {
         public ItProject()
         {
@@ -26,11 +26,12 @@ namespace Core.DomainModel.ItProject
             Phase3 = new ItProjectPhase();
             Phase4 = new ItProjectPhase();
             Phase5 = new ItProjectPhase();
-
+            
             // default value(s) TODO does these have an effect? Aren't they overwritten when mapped
             Priority = ItProjectPriority.None;
             PriorityPf = ItProjectPriority.None;
             AccessModifier = AccessModifier.Local;
+            ExternalReferences = new List<ExternalReference>();
         }
 
 
@@ -186,6 +187,9 @@ namespace Core.DomainModel.ItProject
         /// </value>
         public virtual Organization.Organization Organization { get; set; }
 
+
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
         #endregion
 
         #region Overview
@@ -229,7 +233,7 @@ namespace Core.DomainModel.ItProject
         ///     The "milestones and tasks" table.
         /// </summary>
         public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
-
+        
         #endregion
     }
 }

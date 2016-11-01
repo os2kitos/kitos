@@ -73,6 +73,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalReference.cs" />
+    <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />
     <Compile Include="ItProject\Assignment.cs" />

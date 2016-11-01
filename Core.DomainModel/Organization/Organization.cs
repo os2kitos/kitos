@@ -13,7 +13,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IContextAware, IOrganizationModule
+    public class Organization : Entity, IHasAccessModifier, IContextAware, IOrganizationModule, IHasReferences
     {
         public Organization()
         {
@@ -27,10 +27,12 @@ namespace Core.DomainModel.Organization
             DefaultOrganizationForUsers = new List<User>();
             Reports = new List<Report>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
+            ExternalReferences = new List<ExternalReference>();
         }
 
         public string Name { get; set; }
         public int TypeId { get; set; }
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public virtual OrganizationType Type { get; set; }
         /// <summary>
         /// Cvr number

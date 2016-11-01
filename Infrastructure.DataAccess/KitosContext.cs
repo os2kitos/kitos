@@ -123,6 +123,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
+        public DbSet<ExternalReference> ExternalReferences { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
