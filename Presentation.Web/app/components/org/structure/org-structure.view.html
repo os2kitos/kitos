@@ -23,7 +23,6 @@
                 <span class="pull-right">
                     <a ng-if="!dragEnabled" data-ng-click="toggleDrag()">Flyt</a>
                     <a ng-if="dragEnabled" data-ng-click="toggleDrag()">Færdig</a>
-                    {{dragEnabled}}
                     <span data-ng-show="chosenOrgUnit.hasWriteAccess">
                         <a data-ng-click="editUnit(chosenOrgUnit)">Rediger</a>
                     </span>
