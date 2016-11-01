@@ -16,9 +16,10 @@ module.exports = {
     libraryStylesSrc: [
         bower("/bootstrap/dist/css/bootstrap.min.css"),
         bower("/font-awesome/css/font-awesome.min.css"),
-        bower("/select2/select2.css"), 
+        bower("/select2/select2.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        bower("/angular-loading-bar/build/loading-bar.min.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.css")
     ],
 
     // angular script bundle
@@ -34,7 +35,8 @@ module.exports = {
         bower("/angular-loading-bar/build/loading-bar.min.js"),
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js"),
-        bower("/angular-messages/angular-messages.min.js")
+        bower("/angular-messages/angular-messages.min.js"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.js")
     ],
     angularBundle: "angular-bundle.min.js",
 

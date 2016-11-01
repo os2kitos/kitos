@@ -257,6 +257,14 @@
     <Compile Include="Migrations\201610310911198_AddPriority.Designer.cs">
       <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201610311056238_active added to it contract.cs" />
+    <Compile Include="Migrations\201610311056238_active added to it contract.Designer.cs">
+      <DependentUpon>201610311056238_active added to it contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611011111383_ExternalReference_added.cs" />
+    <Compile Include="Migrations\201611011111383_ExternalReference_added.Designer.cs">
+      <DependentUpon>201611011111383_ExternalReference_added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -357,6 +365,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201610310911198_AddPriority.resx">
       <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610311056238_active added to it contract.resx">
+      <DependentUpon>201610311056238_active added to it contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611011111383_ExternalReference_added.resx">
+      <DependentUpon>201611011111383_ExternalReference_added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

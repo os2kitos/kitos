@@ -9,7 +9,7 @@
 
                 //obj.user might contain more info about the user
                 if (obj.user) {
-                    result += "<div class='small'>" + obj.user.email;
+                    result += "<div class='small'>" + obj.user.Email;
 
                     if (obj.user.defaultOrganizationUnitName)
                         result += ", " + obj.user.defaultOrganizationUnitName;
@@ -51,8 +51,6 @@
                             $timeout($scope.onSelect);
                         };
 
-                        var userSrc = typeof $scope.orgId !== 'undefined' ? 'api/organization/' + $scope.orgId + '?users=true&q=' : 'api/user?q=';
-
                         $scope.selectUserOptions = {
                             //don't escape markup, otherwise formatResult will be bugged
                             escapeMarkup: function(m) { return m; },
@@ -69,23 +67,22 @@
                                     return { query: term };
                                 },
                                 quietMillis: 500,
-                                transport: function(queryParams) {
-                                    var res = $http.get(userSrc + queryParams.data.query, { ignoreLoadingBar: true }).then(queryParams.success);
-                                    res.abort = function() {
+                                transport: queryParams => {
+                                    // calls function instead of making query here
+                                    var res = userSearchParameters(queryParams.data.query).then(queryParams.success);
+                                    res.abort = () => {
                                         return null;
                                     };
-
                                     return res;
                                 },
 
-                                results: function(data, page) {
+                                results: (data, page) => {
                                     var results = [];
 
-                                    _.each(data.data.response, function(user) {
-
+                                    _.each(data.data.value, user => {
                                         results.push({
-                                            id: user.id, //select2 mandatory
-                                            text: user.fullName, //select2 mandatory
+                                            id: user.Id, //select2 mandatory
+                                            text: user.Name + " " + user.LastName, //select2 mandatory
                                             user: user //not mandatory, for extra info when formatting
                                         });
                                     });
@@ -93,6 +90,25 @@
                                     return { results: results };
                                 }
                             }
+                        };
+
+                        //Function to get up to 3 inputs from user and then making the call through Odata and getting the result from either/and firstname, lastname and email.
+                        function userSearchParameters(queryParams) {
+                            var userInputString1: string = "", userInputString2: string = "", userInputString3: string = "";
+                            var userInputString = [userInputString1, userInputString2, userInputString3];
+                            var userStrings = queryParams.split(' ', 3);
+                            var index: number = 0;
+                            for (let userString of userStrings) {
+                                userInputString[index] = userString;
+                                index++;
+                            }
+                            var result = $http
+                                .get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId
+                                    }) and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${
+                                    userInputString[0]
+                                    }') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`,
+                                    { ignoreLoadingBar: true });
+                            return result;
                         };
                     }
                 ]

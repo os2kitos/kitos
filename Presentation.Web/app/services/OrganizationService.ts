@@ -19,6 +19,9 @@
             return this.$http.post<Models.IOrganizationRight>(`odata/Organizations(${organizationId})/Rights`, rightsPayload);
         }
 
+        GetOrganisationRightsById = (id: number) => {
+            return this.$http.get<Models.IOrganizationRight>(`odata/Organizations(${id})/Rights`);
+        }
     }
 
     app.service("organizationService", OrganizationService);
