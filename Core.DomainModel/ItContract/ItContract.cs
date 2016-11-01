@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>,IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
     {
         public ItContract()
         {
@@ -22,6 +22,7 @@ namespace Core.DomainModel.ItContract
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
             Advices = new List<Advice>();
+            ExternalReferences = new List<ExternalReference>();
         }
 
         /// <summary>
@@ -573,6 +574,8 @@ namespace Core.DomainModel.ItContract
         ///     The extern economy streams.
         /// </value>
         public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
+
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
         #endregion
     }
