@@ -1,6 +1,4 @@
 ﻿﻿module Kitos.Services {
-    "use strict";
-
     export class UploadFileService {
 
         public static $inject: string[] = ["$http", "notify"];
@@ -10,7 +8,7 @@
 
         public uploadFile(file: File) {
 
-            var url = "/api/UploadFile";
+            var url = "/api/uploadFile";
             var fd = new FormData();
             fd.append('kontraktIndgåelse', file);
 
@@ -28,5 +26,5 @@
                 });
         }
     }
-    app.service("UploadFile", UploadFileService);
+    app.service("uploadFile", UploadFileService);
 }

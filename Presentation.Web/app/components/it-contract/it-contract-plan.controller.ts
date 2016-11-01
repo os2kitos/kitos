@@ -443,7 +443,7 @@
                         }
                     },
                     {
-                        field: "Concluded", title: "Indgået", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "Concluded", title: "Gyldig fra", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "concluded", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.Concluded) {
@@ -473,7 +473,7 @@
                         }
                     },
                     {
-                        field: "ExpirationDate", title: "Udløbs dato", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "ExpirationDate", title: "Gyldig til", format: "{0:dd-MM-yyyy}", width: 90,
                         persistId: "expirationDate", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.ExpirationDate) {
@@ -760,21 +760,24 @@
         }
 
         private isContractActive(dataItem) {
-            var today = this.moment();
-            var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded) : today;
-            var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+            
 
-            if (dataItem.Terminated) {
-                var terminationDate = this.moment(dataItem.Terminated);
-                if (dataItem.TerminationDeadline) {
-                    terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+            if (!dataItem.Active) {
+                var today = this.moment();
+                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded) : today;
+                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+
+                if (dataItem.Terminated) {
+                    var terminationDate = this.moment(dataItem.Terminated);
+                    if (dataItem.TerminationDeadline) {
+                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                    }
+                    return today >= startDate && today <= terminationDate;
                 }
-                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                return today >= startDate && today <= terminationDate;
+                return today >= startDate && today <= endDate;
             }
+            return dataItem.Active;
 
-            // indgået-dato <= dags dato <= udløbs-dato
-            return today >= startDate && today <= endDate;
         }
 
         private orgUnitDropDownList = (args) => {

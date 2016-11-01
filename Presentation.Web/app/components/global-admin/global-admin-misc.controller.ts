@@ -8,7 +8,7 @@
         });
     }]);
 
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "UploadFile", ($rootScope, $scope, $http, notify, uploadFile) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope","uploadFile", ($rootScope, $scope, uploadFile) => {
         $rootScope.page.title = "Andet";
         $scope.uploadFile = function () {
             var fileToBeUploaded = $scope.myFile;
