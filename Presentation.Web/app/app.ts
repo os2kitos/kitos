@@ -10,7 +10,8 @@ var app = angular.module("app", [
     "angular-loading-bar",
     "angular-confirm",
     "ui.bootstrap.tpls",
-    "ngMessages"]);
+    "ngMessages",
+    "ui.tree"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)

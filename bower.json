@@ -23,6 +23,7 @@
     "angular-loading-bar": "^0.9.0",
     "angular-sanitize": "1.4.7",
     "angular-ui-router": "^0.3.0",
+    "angular-ui-tree": "1.7.9",
     "bootstrap": "~3.3.6",
     "font-awesome": "~4.5.0",
     "jquery": "~2.2.3",

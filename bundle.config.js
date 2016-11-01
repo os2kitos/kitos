@@ -9,7 +9,8 @@ module.exports = {
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
-        bower("/jsonfn-bower/jsonfn.min.js")
+        bower("/jsonfn-bower/jsonfn.min.js"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.js")
     ],
     libraryBundle: "library-bundle.min.js",
 
@@ -18,7 +19,8 @@ module.exports = {
         bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select2/select2.css"), 
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        bower("/angular-loading-bar/build/loading-bar.min.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.css")
     ],
 
     // angular script bundle
