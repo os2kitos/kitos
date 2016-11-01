@@ -191,9 +191,9 @@
     <div class="panel panel-default">
         <div class="panel-heading">Aftalefrister</div>
         <div class="panel-body">
-            <div class="form-group">
+            <!--div class="form-group">
                 <label for="agreement-concluded" class="control-label small">
-                    Indgået
+                    Gyldig fra
                 </label>
                 <input id="agreement-concluded"
                        type="text"
@@ -204,7 +204,7 @@
                        data-ng-model="contract.concluded"
                        data-autosave="{{autosaveUrl}}"
                        data-field="concluded">
-            </div>
+            </div-->
             <div class="form-group">
                 <label for="agreement-duration" class="control-label small">Varighed</label>
                 <select id="agreement-duration"
@@ -262,8 +262,8 @@
                        data-autosave="{{autosaveUrl}}"
                        data-field="irrevocableTo">
             </div>
-            <div class="form-group">
-                <label for="agreement-expiration" class="control-label small">Udløbsdato</label>
+            <!--div class="form-group">
+                <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                 <input type="text" class="form-control" id="agreement-expiration"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
@@ -271,7 +271,7 @@
                        data-ng-model="contract.expirationDate"
                        data-autosave="{{autosaveUrl}}"
                        data-field="expirationDate">
-            </div>
+            </div-->
         </div>
     </div>
 </div>

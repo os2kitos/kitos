@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>,IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
     {
         public ItContract()
         {
@@ -22,6 +22,7 @@ namespace Core.DomainModel.ItContract
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
             Advices = new List<Advice>();
+            ExternalReferences = new List<ExternalReference>();
         }
 
         /// <summary>
@@ -39,28 +40,33 @@ namespace Core.DomainModel.ItContract
         {
             get
             {
-                var today = DateTime.UtcNow;
-                var startDate = Concluded ?? today;
-                var endDate = ExpirationDate ?? DateTime.MaxValue;
-
-                if (Terminated.HasValue)
+                if (!Active)
                 {
-                    var terminationDate = Terminated;
-                    if (TerminationDeadline != null)
-                    {
-                        int deadline;
-                        int.TryParse(TerminationDeadline.Name, out deadline);
-                        terminationDate = Terminated.Value.AddMonths(deadline);
-                    }
-                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                    return today >= startDate && today <= terminationDate;
-                }
+                    var today = DateTime.UtcNow;
+                    var startDate = Concluded ?? today;
+                    var endDate = ExpirationDate ?? DateTime.MaxValue;
 
-                // indgået-dato <= dags dato <= udløbs-dato
-                return today >= startDate && today <= endDate;
+                    if (Terminated.HasValue)
+                    {
+                        var terminationDate = Terminated;
+                        if (TerminationDeadline != null)
+                        {
+                            int deadline;
+                            int.TryParse(TerminationDeadline.Name, out deadline);
+                            terminationDate = Terminated.Value.AddMonths(deadline);
+                        }
+                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                        return today >= startDate && today <= terminationDate;
+                    }
+
+                    // indgået-dato <= dags dato <= udløbs-dato
+                    return today >= startDate && today <= endDate;
+                }
+                return Active;
             }
         }
 
+      
         /// <summary>
         ///     Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -97,6 +103,14 @@ namespace Core.DomainModel.ItContract
         ///     The name.
         /// </value>
         public string Name { get; set; }
+        
+        /// <summary>
+        ///     Gets or sets Active.
+        /// </summary>
+        /// <value>
+        ///   Active.
+        /// </value>
+        public bool Active { get; set; }
 
         /// <summary>
         ///     Gets or sets the note.
@@ -560,6 +574,8 @@ namespace Core.DomainModel.ItContract
         ///     The extern economy streams.
         /// </value>
         public virtual ICollection<EconomyStream> ExternEconomyStreams { get; set; }
+
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
         #endregion
     }

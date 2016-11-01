@@ -370,6 +370,7 @@ namespace Presentation.Web
             //builder.EntitySet<Wish>("Wishes");
 
             builder.EntitySet<Report>("Reports").EntityType.HasKey(x => x.Id);
+            builder.EntitySet<ExternalReference>("ExternalReferences").EntityType.HasKey(x => x.Id);
 
             var reportCategoryTypes = builder.EntitySet<ReportCategoryType>(nameof(ReportCategoryTypesController).Replace("Controller", string.Empty));
             reportCategoryTypes.EntityType.HasKey(x => x.Id);

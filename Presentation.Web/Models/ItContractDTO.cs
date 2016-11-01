@@ -79,5 +79,7 @@ namespace Presentation.Web.Models
 
         public string Running { get; set; }
         public string ByEnding { get; set; }
+        public bool? Active { get; set; }
+        public bool? IsActive { get; set; }
     }
 }
