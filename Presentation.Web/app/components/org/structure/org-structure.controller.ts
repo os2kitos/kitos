@@ -9,7 +9,6 @@
                     orgUnits: [
                         "$http", "user", function ($http: ng.IHttpService, user) {
                             return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationunit?organization=" + user.currentOrganizationId).then((result) => {
-                                console.log(result);
                                 return result.data.response;
                             });
                         }
@@ -105,7 +104,6 @@
             function loadUnits() {
                 var rootNode = orgUnits;
                 $scope.nodes = [rootNode];
-                console.log($scope.nodes);
 
                 flattenAndSave(rootNode, false, null);
             }
@@ -651,8 +649,6 @@
                     if (!angular.isUndefined(parent)) {
                         var parentId = parent.$modelValue[0].id;
                         var sourceId = e.source.nodeScope.$modelValue.id;
-                        console.log("parentId: ", parentId);
-                        console.log("sourceId: ", sourceId);
 
                         //SEND API PATCH CALL
 

@@ -97,7 +97,6 @@ module Kitos.Reports {
         };
 
         designerOnExit = (exitEvent) => {
-            console.log("Closing designer");
             this.designer.visible = false;
             this.viewer.report = exitEvent.report;
             this.viewer.visible = true;

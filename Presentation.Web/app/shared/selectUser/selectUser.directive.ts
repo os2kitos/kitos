@@ -94,11 +94,9 @@
 
                         //Function to get up to 3 inputs from user and then making the call through Odata and getting the result from either/and firstname, lastname and email.
                         function userSearchParameters(queryParams) {
-                            console.log(queryParams);
                             var userInputString1: string = "", userInputString2: string = "", userInputString3: string = "";
                             var userInputString = [userInputString1, userInputString2, userInputString3];
                             var userStrings = queryParams.split(' ', 3);
-                            console.log(userStrings);
                             var index: number = 0;
                             for (let userString of userStrings) {
                                 userInputString[index] = userString;
@@ -110,7 +108,6 @@
                                     userInputString[0]
                                     }') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`,
                                     { ignoreLoadingBar: true });
-                            console.log(result);
                             return result;
                         };
                     }

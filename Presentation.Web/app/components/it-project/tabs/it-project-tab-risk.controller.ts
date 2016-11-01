@@ -63,8 +63,6 @@
             $scope.risks = [];
             $scope.usersWithRoles = _.values(usersWithRoles);
 
-            console.log($scope.usersWithRoles);
-
             function pushRisk(risk) {
                 risk.show = true;
 
