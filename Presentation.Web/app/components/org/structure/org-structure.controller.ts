@@ -644,10 +644,14 @@
 
                 },
                 dropped : function (e) {
-                   var parent = e.dest.nodesScope.$parentNodesScope;
+                    var parent = e.dest.nodesScope.$nodeScope;
 
-                    if (!angular.isUndefined(parent)) {
-                        var parentId = parent.$modelValue[0].id;
+                    var sourceId = e.source.nodeScope.$modelValue.id;
+
+                    var currentParentId = e.source.nodeScope.$parentNodeScope.$modelValue.id;
+
+                    if (parent && currentParentId != parent.$modelValue.id) {
+                        var parentId = parent.$modelValue.id;
                         var sourceId = e.source.nodeScope.$modelValue.id;
 
                         //SEND API PATCH CALL
@@ -660,10 +664,10 @@
                         var msg = notify.addInfoMessage("Opdaterer...", false);
                         $http<Kitos.API.Models.IApiWrapper<any>>({ method: 'PATCH', url: url + '?organizationId=' + user.currentOrganizationId, data: payload }).then(() => {
                             msg.toSuccessMessage("Enheden er opdateret");
+                            $scope.chooseOrgUnit(orgUnits);
                         }, (error) => {
                             msg.toErrorMessage("Fejl!");
                         });
-
                     }
                 }
             };
