@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/Reports
         [ODataRoute("Organizations({key})/Reports")]
-        public IHttpActionResult GetItContracts(int key)
+        public IHttpActionResult GetReportsByOrganization(int key)
         {
             return GetByOrganizationKey(key);
         }
