@@ -9,7 +9,7 @@ var source = "Presentation.Web",
     sourceScript = source + "/Scripts",
     allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.module.js" ,sourceApp + "/**/*.js"],
     allJavaScriptNoTests = [sourceApp + "/app.js", sourceApp + "/**/*.module.js", sourceApp + "/**/!(*.spec|*.po).js"],
-    appTypeScriptOut = [typescriptOutputApp + "/app.js", typescriptOutputApp + "/**/*.module.js",typescriptOutputApp + "/**/*"],
+    appTypeScriptOut = [typescriptOutputApp + "/app.js", typescriptOutputApp + "/**/*.module.js", typescriptOutputApp + "/**/!(*.spec|*.po).js"],
     appReportTypeScriptOut = typescriptOutput + "/appReport",
     bowerComponents = "bower_components",
     appMaps = sourceApp + "/**/*.js.map",
@@ -29,7 +29,7 @@ var source = "Presentation.Web",
         "bower_components/angular-ui-router/release/angular-ui-router.js",
         "bower_components/angular-bootstrap/ui-bootstrap.js",
         "bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-        "bower_components//angular-ui-select/dist/select.js"        
+        "bower_components/angular-ui-select/dist/select.js"
     ],
 
     // unit

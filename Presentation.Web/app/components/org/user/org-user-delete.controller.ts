@@ -77,11 +77,6 @@
             this.vmItContracts = itContracts;
             this.vmOrganisationRights = organisationRights;
             this.vmGetUsers = getUsers;
-
-            console.log("test");
-            console.log(currentUser.currentOrganizationId);
-            console.log(organisationRights);
-            console.log(getUsers);
         }
 
         public ok() {

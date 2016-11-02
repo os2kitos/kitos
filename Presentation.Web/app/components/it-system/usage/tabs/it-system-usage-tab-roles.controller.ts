@@ -8,7 +8,6 @@
                 itSystemRoles: ["$http", function ($http) {
                     return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                         .then(function (result) {
-                            console.log(result);
                             return result.data.value;
                         });
                 }],

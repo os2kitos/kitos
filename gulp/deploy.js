@@ -35,11 +35,11 @@ gulp.task("clean-script-bundles", function () {
 });
 
 gulp.task("replace-report-js", function () {
-    var manifest = require("../" + paths.sourceScript +  "/rev-manifest.json");
+    var manifest = require("../" + paths.sourceScript + "/rev-manifest.json");
     var revFileName = manifest["appReport-bundle.min.js"];
     return gulp.src(paths.sourceAppReport + "/Index.html")
-    .pipe(htmlreplace({"js": "../Scripts/" + revFileName}))
-    .pipe(gulp.dest(paths.sourceAppReport))
+        .pipe(htmlreplace({ "js": "../Scripts/" + revFileName }))
+        .pipe(gulp.dest(paths.sourceAppReport))
 });
 
 gulp.task("clean-scripts", ["clean-script-bundles", "clean-js-and-maps"]);
