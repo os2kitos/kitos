@@ -45,5 +45,31 @@
                 <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)"/>
             </div>
         </div>
+        <div>
+            <label class="col-md-3 control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
+                Primær start enhed:  
+            </label>
+            
+            <label class="radio-inline">
+                <input type="radio" data-ng-model="user.defaultUserPreference" name="inlineRadioOptions" 
+                       id="inlineRadioOrganisation" ng-value="1"> Organisation {{user.defaultUserPreference}}
+            </label>
+            <label class="radio-inline">
+                <input type="radio" data-ng-model="user.defaultUserPreference" name="inlineRadioOptions" 
+                       id="inlineRadio2ItProjekter" ng-value="2"> IT Projekter
+            </label>
+            <label class="radio-inline">
+                <input type="radio" data-ng-model="user.defaultUserPreference" name="inlineRadioOptions" 
+                       id="inlineRadioItSystemer" ng-value="3"> IT Systemer
+            </label>
+            <label class="radio-inline">
+                <input type="radio" data-ng-model="user.defaultUserPreference" name="inlineRadioOptions" 
+                       id="inlineRadioItkontrakter" ng-value="4"> IT kontrakter
+            </label>
+            <label class="radio-inline">
+                <input type="radio" data-ng-model="user.defaultUserPreference" name="inlineRadioOptions" 
+                       id="inlineRadioRapporter" ng-value="5"> Rapporter
+            </label>
+        </div>
     </div>
 </form>

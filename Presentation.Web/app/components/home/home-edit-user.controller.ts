@@ -33,6 +33,7 @@
                     lastName: user.lastName,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
+                    defaultUserPreference: user.defaultUserPreference,
                     defaultOrganizationUnitId: user.defaultOrganizationUnitId,
                     isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
                     currentOrganizationName: user.currentOrganizationName,
@@ -52,6 +53,7 @@
                 $scope.fakeDefaultOrganizationUnitId = user.currentOrganization.root.id;
                 $scope.noOrgUnits = true;
             }
+            console.log(user);
 
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {

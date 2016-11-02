@@ -45,6 +45,8 @@ namespace Core.DomainModel
 
         public int? DefaultOrganizationId { get; set; }
 
+        public int DefaultUserPreference { get; set; }
+
         /// <summary>
         ///     The organization the user will be automatically logged into.
         /// </summary>

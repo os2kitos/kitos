@@ -265,6 +265,10 @@
     <Compile Include="Migrations\201611011111383_ExternalReference_added.Designer.cs">
       <DependentUpon>201611011111383_ExternalReference_added.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611011248088_DefaultUserPreference added to User entity.cs" />
+    <Compile Include="Migrations\201611011248088_DefaultUserPreference added to User entity.Designer.cs">
+      <DependentUpon>201611011248088_DefaultUserPreference added to User entity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -371,6 +375,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611011111383_ExternalReference_added.resx">
       <DependentUpon>201611011111383_ExternalReference_added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611011248088_DefaultUserPreference added to User entity.resx">
+      <DependentUpon>201611011248088_DefaultUserPreference added to User entity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

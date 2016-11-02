@@ -8,7 +8,7 @@
         email: string;
         phoneNumber: number;
         uuid: string;
-
+        defaultUserPreference: number;
         isGlobalAdmin: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
@@ -104,6 +104,7 @@
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
+                defaultUserPreference: user.defaultUserPreference,
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,
