@@ -1,5 +1,4 @@
-﻿(function(ng, app) {
-
+﻿(function (ng, app) {
     app.config(["$stateProvider", $stateProvider => {
         $stateProvider.state("global-admin.project", {
             url: "/project",
@@ -7,5 +6,4 @@
             authRoles: ["GlobalAdmin"]
         });
     }]);
-
 })(angular, app);

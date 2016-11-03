@@ -29,7 +29,7 @@
                                     }">
                             </span>
                         </a>
-                        {{ node.name }} {{ node.id }}
+                        {{ node.name }}
                     </div>
                     <ol ui-tree-nodes="" data-ng-model="node.children" ng-class="{hidden: collapsed}">
                         <li data-ng-repeat="node in node.children" ui-tree-node ng-include="'nodes_renderer.html'">
