@@ -33,7 +33,7 @@
                     lastName: user.lastName,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
-                    defaultUserPreference: user.defaultUserPreference,
+                    defaultUserStartPreference: user.defaultUserStartPreference,
                     defaultOrganizationUnitId: user.defaultOrganizationUnitId,
                     isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
                     currentOrganizationName: user.currentOrganizationName,
@@ -53,8 +53,6 @@
                 $scope.fakeDefaultOrganizationUnitId = user.currentOrganization.root.id;
                 $scope.noOrgUnits = true;
             }
-            console.log(user);
-
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
                 var payload = {};
@@ -81,6 +79,11 @@
                 notify.addSuccessMessage("Feltet er opdateret!");
             };
 
+            $scope.checkboxSelection = 2;
+
+            $scope.isCheckboxSelected = function (index) {
+                return index === $scope.checkboxSelection;
+            };
         }]);
 
 })(angular, app);

@@ -239,6 +239,7 @@ namespace Presentation.Web.Controllers.API
                 header.Add("Fornavn", "Fornavn");
                 header.Add("Efternavn", "Efternavn");
                 header.Add("Email", "Email");
+                header.Add("DefaultUserStartPreference", "DefaultUserStartPreference");
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
@@ -254,6 +255,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Fornavn", user.Name);
                     obj.Add("Efternavn", user.LastName);
                     obj.Add("Email", user.Email);
+                    obj.Add("DefaultUserStartPreference", user.DefaultUserStartPreference);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
                     obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
                     obj.Add("Oprettet", user.ObjectOwnerName + " " + user.ObjectOwnerLastName);

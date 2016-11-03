@@ -17,7 +17,7 @@
     ]);
 
     app.controller("home.IndexCtrl", [
-        "$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts",
+        "$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", 
         ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
@@ -33,6 +33,14 @@
                 userService.login($scope.email, $scope.password, $scope.remember)
                     .then(() => {
                         notify.addSuccessMessage("Du er nu logget ind!");
+                        userService.getUser()
+                            .then(data => {
+                                if (data.isAuth === true) {
+                                    if (data.defaultUserStartPreference.isNullOrEmpty) { $state.go("/"); } else {
+                                        $state.go(data.defaultUserStartPreference);
+                                    }
+                                };
+                            });
                     }, error => {
                         if (error.response === "User is locked")
                             notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
