@@ -1,0 +1,197 @@
+﻿<div class="row">
+    <!-- Left side -->
+    <div class="col-md-6">
+        <div class="row">
+            <!-- 1st column -->
+            <div class="col-md-6">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="project-name" class="control-label small">Projekt</label>
+                    <input type="text" id="project-name" class="form-control input-sm" required
+                            data-ng-model="project.EditMainCtrl.project.name"
+                            data-field="name"
+                            data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                            data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"
+                            autofocus>
+                </div>
+                <!-- ID -->
+                <div class="form-group">
+                    <label for="project-projectId" class="control-label small">Projekt ID</label>
+                    <input type="text" id="project-projectId" class="form-control input-sm"
+                            data-ng-model="project.EditMainCtrl.project.itProjectId"
+                            data-field="itProjectId"
+                            data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                            data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                </div>
+
+                <!-- type -->
+                <div class="form-group">
+                    <select-option data-id="project-type"
+                                    data-label="Type"
+                                    data-placeholder="Vælg projekt type"
+                                    data-selected-text="{{ project.EditMainCtrl.project.itProjectTypeName }}"
+                                    data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"
+                                    data-ng-model="project.EditMainCtrl.project.itProjectTypeId"
+                                    data-options="project.EditMainCtrl.projectTypes"
+                                    data-auto-save-url="{{ project.EditMainCtrl.autosaveUrl }}"
+                                    data-field="itProjectTypeId">
+                    </select-option>
+                    <span class="help-block small">&nbsp;</span>
+                </div>
+
+                <!-- cmdb ref -->
+                <div class="form-group">
+                    <label for="project-cmdb" class="control-label small">CMDB ref.</label>
+                    <div class="input-group">
+                        <input id="project-cmdb" class="form-control input-sm" type="text" placeholder="http://"
+                                data-ng-model="project.EditMainCtrl.project.cmdb"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"
+                                data-field="cmdb"
+                                data-autosave="api/itproject/{{project.EditMainCtrl.project.id}}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-sm btn-default" type="button" data-href-blank="project.EditMainCtrl.project.cmdb">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                    <span class="help-block small">Skal starte med http://</span>
+                </div>
+            </div>
+
+            <!-- 2nd column -->
+            <div class="col-md-6">
+                <!-- Object owner -->
+                <div class="form-group">
+                    <label class="control-label small">Oprettet af</label>
+                    <input type="text" value="{{project.EditMainCtrl.project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
+                </div>
+                <!-- access modifier -->
+                <div class="form-group">
+                    <label for="project-access" class="control-label small">Synlighed</label>
+                    <input id="project-access" class="form-control input-sm"
+                            data-ng-model="project.EditMainCtrl.project.accessModifier"
+                            data-select-access-modifier=""
+                            data-field="accessModifier"
+                            data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                            data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                </div>
+
+                <!-- esdh ref -->
+                <div class="form-group">
+                    <label for="project-esdh" class="control-label small">ESDH ref.</label>
+                    <div class="input-group">
+                        <input id="project-esdh" class="form-control input-sm" type="text" placeholder="http://"
+                                data-ng-model="project.EditMainCtrl.project.esdh"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"
+                                data-field="esdh"
+                                data-autosave="api/itproject/{{project.EditMainCtrl.project.id}}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-sm btn-default" type="button" data-href-blank="project.EditMainCtrl.project.esdh">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                    <span class="help-block small">Skal starte med http://</span>
+                </div>
+
+                <!-- link ref -->
+                <div class="form-group">
+                    <label for="project-url" class="control-label small">Mappe link</label>
+                    <div class="input-group">
+                        <input id="project-url" class="form-control input-sm" type="text" placeholder="http://"
+                                data-ng-model="project.EditMainCtrl.project.folder"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"
+                                data-field="folder"
+                                data-autosave="api/itproject/{{project.EditMainCtrl.project.id}}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-sm btn-default" type="button" data-href-blank="project.EditMainCtrl.project.folder">
+                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                    <span class="help-block small">Skal starte med http://</span>
+                </div>
+            </div>
+
+            <!-- full width (left side) -->
+            <div class="col-md-12">
+                <!-- archived -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.EditMainCtrl.project.isArchived"
+                                data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                                data-field="isArchived"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                        Inaktiv
+                    </label>
+                </div>
+
+                <!-- transversal -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.EditMainCtrl.project.isTransversal"
+                                data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                                data-field="isTransversal"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                        Tværgående
+                    </label>
+                </div>
+
+                <!-- strategy -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.EditMainCtrl.project.isStrategy"
+                                data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                                data-field="isStrategy"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                        Strategisk
+                    </label>
+                </div>
+
+                <!-- Parent -->
+                <div class="form-group">
+                    <label for="project-parent" class="control-label small">Overordnet projekt</label>
+                    <input type="hidden" id="project-parent" class="form-control input-sm"
+                            data-ui-select2="project.EditMainCtrl.parentSelectOptions"
+                            data-ng-model="project.EditMainCtrl.project.parent"
+                            data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                            data-field="parentId"
+                            data-ng-disabled="!project.EditMainCtrl.hasWriteAccess">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="col-md-6">
+        <div class="row">
+            <!-- full width -->
+            <div class="col-md-12">
+                <!-- background -->
+                <div class="form-group">
+                    <label for="project-background" class="control-label small">Formål/baggrund</label>
+                    <textarea id="project-background" class="form-control input-sm" rows="7"
+                                data-ng-model="project.EditMainCtrl.project.background"
+                                data-field="background"
+                                data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"></textarea>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <!-- notes -->
+                <div class="form-group">
+                    <label for="project-note" class="control-label small">Noter</label>
+                    <textarea id="project-note" class="form-control input-sm" rows="7"
+                                data-ng-model="project.EditMainCtrl.project.note"
+                                data-field="note"
+                                data-autosave="{{project.EditMainCtrl.autosaveUrl}}"
+                                data-ng-disabled="!project.EditMainCtrl.hasWriteAccess"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -74,7 +74,8 @@ module.exports = {
     customCssSrc: [
         content("custom-ui-select.css"),
         content("/notify/notify.css"),
-        content("/kitos.css")
+        content("/kitos.css"),
+        content("/kitosLess.css")
     ],
     cssBundle: "app.css",
     cssBundleMin: "app.min.css",

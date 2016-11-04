@@ -115,7 +115,7 @@
                                 msg.toSuccessMessage("En ny kontrakt er oprettet!");
                                 var contract = result.response;
                                 $modalInstance.close(contract.id);
-                                self.$state.go("it-contract.edit.systems", { id: contract.id });
+                                self.$state.go("it-contract.edit.main", { id: contract.id });
                             })
                             .error(() => {
                                 msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
@@ -416,7 +416,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet kontrakt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-contract.edit.main({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -430,7 +430,7 @@
                     {
                         field: "Name", title: "IT Kontrakt", width: 260,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-contract.edit.systems({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {

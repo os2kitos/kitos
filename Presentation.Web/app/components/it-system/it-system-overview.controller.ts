@@ -116,7 +116,7 @@
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) { 
-                                    self.$state.go('it-system.edit.interfaces', { id: systemId });
+                                    self.$state.go('it-system.edit.main', { id: systemId });
                                 }
                             }).error(function () {
                                 msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
@@ -408,7 +408,7 @@
                     {
                         field: "ItSystem.Name", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.usage.interfaces({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.ItSystem && dataItem.ItSystem.Name || "",
                         filterable: {
                             cell: {
