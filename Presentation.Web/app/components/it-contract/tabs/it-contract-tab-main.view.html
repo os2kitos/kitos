@@ -305,6 +305,7 @@
                        data-ng-disabled="!hasWriteAccess"
                        data-ng-model="contract.concluded"
                        data-autosave="{{ autosaveUrl2 }}"
+                       data-ng-blur="checkContractValidity()"
                        data-field="concluded">
             </div>
             <div class="col-md-12">
@@ -313,6 +314,7 @@
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-model="contract.expirationDate"
+                       data-ng-blur="checkContractValidity()"
                        data-autosave="{{ autosaveUrl2 }}"
                        data-field="expirationDate">
             </div>
@@ -327,7 +329,8 @@
                        data-ng-model="contract.active"
                        data-ng-disabled="!hasWriteAccess"
                        data-autosave="{{ autoSaveUrl }}"
-                       data-field="active">
+                       data-field="active"
+                       data-ng-change="checkContractValidity()">
                 Gyldig &emsp;
             </label>
             <span class="fa fa-file text-success" data-ng-hide="!contract.isActive" aria-hidden="true"></span>

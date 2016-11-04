@@ -255,5 +255,36 @@
                     };
                 }
 
+                $scope.checkContractValidity = function () {
+                    var expirationDateObject, concludedObject;
+                    var expirationDate = $scope.contract.expirationDate;
+                    var concluded = $scope.contract.concluded;
+                    var overrule = $scope.contract.active;
+                    var today = new Date();
+
+                    if (expirationDate.length > 10) {
+                        //ISO format
+                        expirationDateObject = new Date(expirationDate);
+
+                    } else {
+                        var splitArray = expirationDate.split("-");
+                        expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                    }
+
+                    if (concluded.length > 10) {
+                        //ISO format
+                        concludedObject = new Date(concluded);
+
+                    } else {
+                        var splitArray = concluded.split("-");
+                        concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                    }
+
+                    var isTodayBetween = (today > concludedObject && today < expirationDateObject);
+
+                    var isContractActive = (isTodayBetween || overrule);
+
+                    $scope.contract.isActive = isContractActive;
+                }
             }]);
 })(angular, app);
