@@ -1,19 +1,22 @@
 ﻿module Kitos.Contract.Details {
     "use strict";
 
-    // TODO modify to fit needs
     interface IDirectiveScope extends ng.IScope {
-        detail: string,
-        contractId: number,
-        mainGrid: IKendoGrid<>;
-        mainGridOptions: IKendoGridOptions<>;
+        detailType: string;
+        action: string;
+        fieldValue: string;
+        odataQuery: string;
+        mainGrid: IKendoGrid<any>;
+        mainGridOptions: IKendoGridOptions<any>;
     }
 
     class ContractDetails implements ng.IDirective {
         public templateUrl = "app/components/it-contract/it-contract-details/it-contract-details.view.html";
         public scope = {
-            detail: "@",
-            contractId: "@"
+            detailType: "@",
+            action: "@",
+            fieldValue: "@",
+            odataQuery: "@"
         };
 
         public static directiveName = "contractDetails";
@@ -24,39 +27,26 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: () => ``,
+                            url: () => `${scope.odataQuery}`,
                             dataType: "json"
-                        },
+                        }
                     },
                     sort: {
-                        field: "ObjectId",
+                        field: "Id",
                         dir: "asc"
-                    },
-                    pageSize: 100,
-                    serverPaging: true,
-                    serverSorting: true,
-                    serverFiltering: true,
+                    }
                 },
                 noRecords: true,
                 messages: {
-                    noRecords: `Systemet har ingen ${scope.detail} tilknyttet.`
+                    noRecords: `Kontrakten ${scope.action} ingen ${scope.detailType}.`
                 },
                 columns: [
                     {
-                        field: "Object.Name", title: `Antallet af ${scope.detail}`, width: 150,
-                        persistId: "numberOf", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Object.Name,
-                        excelTemplate: (dataItem) => dataItem.Object.Name,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                ],
+                        field: `${scope.fieldValue}`, title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
+                        persistId: "fieldValue", // DON'T YOU DARE RENAME!
+                        hidden: false
+                    }
+                ]
             };
         }
     }
