@@ -1,8 +1,25 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
+    interface IDeleteViewModel {
+        isLocalAdmin: boolean;
+        isOrgAdmin: boolean;
+        isProjectAdmin: boolean;
+        isSystemAdmin: boolean;
+        isContractAdmin: boolean;
+        isReportAdmin: boolean;
+    }
+
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
+        public vm: IDeleteViewModel;
+        public isUserGlobalAdmin = false;
+        public isUserLocalAdmin = false;
+        public isUserOrgAdmin = false;
+        public isUserProjectAdmin = false;
+        public isUserSystemAdmin = false;
+        public isUserContractAdmin = false;
+        public isUserReportAdmin = false;
 
         public vmProject: any;
         public vmProjectRights: any;
@@ -15,11 +32,15 @@
         public vmItContracts: any;
         public vmOrganisationRights: any;
         public vmGetUsers: any;
+        public vmOrgUnitRights: any;
+        public vmOrgUnitRoles: any;
+        public vmOrgUnits: any;
 
         private userId: number;
         private firstName: string;
         private lastName: string;
         private email: string;
+        private originalVm;
 
         // injecter resolve request i ctoren
         public static $inject: string[] = [
@@ -38,8 +59,10 @@
             "itContractsRoles",
             "itContractsRights",
             "itContracts",
-            "organisationRights",
             "getUsers",
+            "orgUnitRoles",
+            "orgUnitRights",
+            "orgUnits",
             "_"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
@@ -57,8 +80,10 @@
             public itContractsRoles,
             public itContractsRights,
             public itContracts,
-            public organisationRights,
             public getUsers,
+            public orgUnitRoles,
+            public orgUnitRights,
+            public orgUnits,
             private _: ILoDashWithMixins) {
 
             this.userId = user.Id;
@@ -75,8 +100,20 @@
             this.vmItContractsRights = itContractsRights;
             this.vmItContractsRoles = itContractsRoles;
             this.vmItContracts = itContracts;
-            this.vmOrganisationRights = organisationRights;
             this.vmGetUsers = getUsers;
+            this.vmOrgUnitRights = orgUnitRights;
+            this.vmOrgUnitRoles = orgUnitRoles;
+            this.vmOrgUnits = orgUnits;
+
+            var userVm: IDeleteViewModel = {
+                isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
+                isOrgAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.OrganizationModuleAdmin }) !== undefined,
+                isProjectAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ProjectModuleAdmin }) !== undefined,
+                isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
+                isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
+                isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined
+            };
+            this.vm = userVm;
         }
 
         public ok() {
@@ -164,19 +201,26 @@
                                     itContracts.GetAllItContracts()
                                         .then(systemResult => systemResult.data)
                                 ],
-
-                                organisationRights: ["$http", "userService",
-                                    ($http: ng.IHttpService, userService) =>
-                                        userService.getUser()
-                                            .then((currentUser) => $http
-                                                .get(`odata/Organizations(${currentUser.currentOrganizationId})/Rights?$filter=Role eq '0'`)
-                                                .then(result => result.data))
-                                ],
+                                
                                 getUsers: ["UserGetService", (userGet) =>
                                     userGet.GetAllUsers()
                                         .then(users => users.data)
-                                ]
+                                ],
 
+                                orgUnitRoles: ["organizationService", (orgUnitRoles) =>
+                                    orgUnitRoles.GetAllOrganizationUnitRoles()
+                                        .then(result => result.data)
+                                ],
+
+                                orgUnitRights: ["organizationService", (orgUnitRights) =>
+                                    orgUnitRights.GetOrganisationRightsById($stateParams["id"])
+                                        .then(result => result.data)
+                                ],
+
+                                orgUnits: ["organizationService", (orgUnits) =>
+                                    orgUnits.GetOrganizationUnitById()
+                                        .then(result => result.data)
+                                ]
                             }
                         })
                             .result.then(() => {
