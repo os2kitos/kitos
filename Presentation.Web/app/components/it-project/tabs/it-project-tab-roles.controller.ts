@@ -54,7 +54,7 @@
 
             this.rights = [];
             _.each(itProjectRights, (right: { role; roleId; show; userForSelect; roleForSelect; user; }) => {
-                right.role = _.find(this.itProjectRoles, { id: right.roleId });
+                right.role = _.find(this.itProjectRoles, { Id: right.roleId });
                 right.show = true;
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
@@ -126,7 +126,7 @@
                                     right.user = result.data.response.user;
                                     right.userId = result.data.response.userId;
 
-                                    right.role = _.find(this.itProjectRoles, { id: right.roleId }),
+                                    right.role = _.find(this.itProjectRoles, { Id: right.roleId }),
 
                                     right.edit = false;
 
@@ -197,7 +197,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: this._.find(this.itProjectRoles, { id: result.data.response.roleId }),
+                            role: this._.find(this.itProjectRoles, { Id: result.data.response.roleId }),
                             show: true
                         });
 

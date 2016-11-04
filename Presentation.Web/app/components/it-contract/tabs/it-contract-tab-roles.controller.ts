@@ -73,7 +73,7 @@
                         user: result.response.user,
                         userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
-                        role: _.find(itContractRoles, { id: result.response.roleId }),
+                        role: _.find(itContractRoles, { Id: result.response.roleId }),
                         show: true
                     });
 
@@ -133,7 +133,7 @@
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
-                        right.role = _.find(itContractRoles, { id: right.roleId }),
+                        right.role = _.find(itContractRoles, { Id: right.roleId }),
 
                         right.edit = false;
 
@@ -183,6 +183,44 @@
 
                 $scope.rightSortBy = val;
             };
+
+            function formatContractSigner(signer) {
+
+                var userForSelect = null;
+
+                $scope.contractSigner = {
+                    edit: false,
+                    signer: signer,
+                    userForSelect: userForSelect,
+                    update: function () {
+                        var selectedUser = $scope.contractSigner.userForSelect;
+
+                        if (selectedUser) {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+
+                            var signerId = selectedUser ? selectedUser.id : null;
+                            var signerUser = selectedUser ? selectedUser.user : null;
+
+                            $http({
+                                method: 'PATCH',
+                                url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
+                                data: {
+                                    contractSignerId: signerId
+                                }
+                            }).success(function (result) {
+                                msg.toSuccessMessage("Kontraktunderskriveren er gemt");
+
+                                formatContractSigner({ id: signerUser.Id, fullName: signerUser.Name + " " + signerUser.LastName });
+
+                            }).error(function () {
+                                msg.toErrorMessage("Fejl!");
+                            });
+                        }
+                    }
+                };
+            }
+
+            formatContractSigner(contract.contractSigner);
 
         }]);
 

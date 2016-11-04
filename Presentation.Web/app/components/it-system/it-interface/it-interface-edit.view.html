@@ -1,139 +1,22 @@
 ﻿<!-- interface master sheet -->
 <form role="form" class="container-fluid">
-    <div class="row">
-        <!-- Left side -->
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- Name -->
-                    <div class="form-group">
-                        <label for="interface-name" class="control-label small">Snitflade</label>
-                        <input type="text" id="interface-name" class="form-control input-sm" required
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="name"
-                               data-ng-model="interface.name">
-                    </div>
-
-                    <!-- ItInterfaceId -->
-                    <div class="form-group">
-                        <label for="interface-itInterfaceId" class="control-label small">Snitflade ID</label>
-                        <input type="text" id="interface-itInterfaceId" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="itInterfaceId"
-                               data-ng-model="interface.itInterfaceId">
-                    </div>
-
-                    <!-- Version -->
-                    <div class="form-group">
-                        <label for="interface-version" class="control-label small">Version</label>
-                        <input type="text" id="interface-version" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="interface.version"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="version">
-                    </div>
-
-                    <!-- UUID -->
-                    <div class="form-group">
-                        <label class="control-label small">UUID</label>
-                        <input type="text" value="{{interface.uuid}}" class="form-control input-sm" disabled="disabled" />
-                    </div>
-                </div>
+    <!-- Left menu -->
+    <div class="col-md-2">
+        <div class="left-menu">
+            <div class="header">
+                <h3>IT Projekt</h3>
             </div>
-        </div>
-
-        <!-- Middle -->
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-md-12">
-
-                    <!-- Object owner -->
-                    <div class="form-group">
-                        <label class="control-label small">Oprettet af</label>
-                        <input type="text" data-ng-disabled="true" class="form-control input-sm" value="{{interface.objectOwnerFullName}}" />
-                    </div>
-
-                    <!-- belongs to -->
-                    <div class="form-group">
-                        <label for="belongs-to" class="control-label small">Rettighedshaver</label>
-                        <input type="hidden" id="belongs-to" class="form-control input-sm"
-                               data-ui-select2="organizationSelectOptions"
-                               data-placeholder="Vælg organisation"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="belongsToId"
-                               data-ng-model="interface.belongsTo">
-                    </div>
-
-                    <!-- Access modifier -->
-                    <div class="form-group">
-                        <label for="interface-access" class="control-label small">Synlighed</label>
-                        <input id="interface-access" class="form-control input-sm"
-                               data-autosave="{{interface.updateUrl}}"
-                               data-field="accessModifier"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="interface.accessModifier"
-                               data-select-access-modifier="">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right side -->
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label for="interface-description" class="control-label small">Beskrivelse</label>
-                        <textarea id="interface-description" class="form-control input-sm" rows="7"
-                                  data-autosave="{{interface.updateUrl}}"
-                                  data-field="description"
-                                  data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="interface.description"></textarea>
-                    </div>
-
-                    <!-- Further description -->
-                    <div class="form-group">
-                        <label for="interface-url" class="control-label small">Link til yderligere beskrivelse</label>
-                        <div class="input-group">
-                            <input type="text" id="interface-url" class="form-control input-sm" placeholder="http://"
-                                   data-autosave="{{interface.updateUrl}}"
-                                   data-field="url"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="interface.url">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="interface.url">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-
-                    <!-- Note -->
-                    <div class="form-group">
-                        <label for="interface-note" class="control-label small">Note</label>
-                        <textarea id="interface-note" class="form-control input-sm" rows="4"
-                                  data-autosave="{{interface.updateUrl}}"
-                                  data-field="note"
-                                  data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="interface.note"></textarea>
-                    </div>
-                </div>
-            </div>
+            <ul>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.interface-edit.main"><i class="fa fa-pencil"></i> Projektforside</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.interface-edit.interface-details"><i class="fa fa-pencil"></i> Snitflade detaljer</a>
+                </li>
+            </ul>
         </div>
     </div>
+    <div class="col-md-10">
+        <ui-view />
+    </div>
 </form>
-
-<!-- sub tab buttons -->
-<ul class="nav nav-tabs">
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.interface-edit.interface-details">Snitflade detaljer</a>
-    </li>
-</ul>
-
-<!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs"/>

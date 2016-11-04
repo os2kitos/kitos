@@ -303,7 +303,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.status-project({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.main({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -317,7 +317,7 @@
                     {
                         field: "Name", title: "IT Projekt", width: 370,
                         persistId: "projname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref="it-project.edit.status-project({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
                             cell: {

@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-system.interface-edit', {
-            url: '/edit/{id:[0-9]+}',
+            url: '/edit/{id:[0-9]+}/interface',
             templateUrl: 'app/components/it-system/it-interface/it-interface-edit.view.html',
             controller: 'system.interfaceEditCtrl',
             resolve: {

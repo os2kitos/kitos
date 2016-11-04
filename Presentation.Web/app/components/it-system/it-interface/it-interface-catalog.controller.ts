@@ -195,7 +195,7 @@
                     {
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.interface-edit.interface-details({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
@@ -487,7 +487,7 @@
 
             modalInstance.result.then(function (id) {
                 // modal was closed with OK
-                self.$state.go('it-system.interface-edit.interface-details', { id: id });
+                self.$state.go('it-system.interface-edit.main', { id: id });
             });
         }
 
