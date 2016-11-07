@@ -67,8 +67,7 @@ module.exports = {
     // assets
     assetsSrc: [
         bower("/select2/*.png"),
-        bower("/select2/*.gif"),
-        content("/img/*.*")
+        bower("/select2/*.gif")
     ],
 
     // custom style bundle
