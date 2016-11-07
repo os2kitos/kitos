@@ -12,7 +12,7 @@
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                    return $http.get("odata/LocalItContractRoles")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -32,7 +32,7 @@
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            $scope.activeItContractRoles = itContractRoles;
+            $scope.activeItContractRoles = _.filter(itContractRoles, function (o: any) { return o.IsLocallyAvailable || o.IsObligatory; });
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];

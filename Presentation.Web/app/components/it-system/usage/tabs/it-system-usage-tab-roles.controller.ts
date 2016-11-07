@@ -6,7 +6,7 @@
             controller: "system.EditRoles",
             resolve: {
                 itSystemRoles: ["$http", function ($http) {
-                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                    return $http.get("odata/LocalItSystemRoles")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -23,7 +23,7 @@
     app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
-        $scope.activeItSystemRoles = itSystemRoles;
+        $scope.activeItSystemRoles = _.filter(itSystemRoles, function (o: any) { return o.IsLocallyAvailable || o.IsObligatory; });
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;
