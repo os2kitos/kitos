@@ -1,6 +1,11 @@
-﻿body {
+html {
+    height: 100%;
+}
+
+body {
     background-color: #F2F2F2;
     font-family: Calibri, Candara, Arial, sans-serif !important;
+    height: 100%;
 }
 
 div#page-wrapper {
@@ -8,16 +13,19 @@ div#page-wrapper {
     max-width: 1600px;
     margin: 0 auto;
     padding: 0;
+    height: 100%;
 }
 
 div#page-content {
     min-width: 1024px;
     max-width: 1600px;
+    height: 100%;
 }
 
 div#page-body {
     background-color: white;
-    padding: 10px 5px 20px 5px;
+    padding: 10px 0 20px 0;
+    height: 100%;
 }
 
 .footer {
