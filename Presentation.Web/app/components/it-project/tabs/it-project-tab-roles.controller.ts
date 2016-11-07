@@ -59,6 +59,12 @@
                 right.role = _.find(this.itProjectRoles, { Id: right.roleId });
                 right.show = true;
 
+                var localRole: any = _.find(this.activeItProjectRoles, { Id: right.roleId });
+
+                if (!angular.isUndefined(localRole) && localRole.Description) {
+                    right.role.Description = localRole.Description;
+                }
+
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
 
