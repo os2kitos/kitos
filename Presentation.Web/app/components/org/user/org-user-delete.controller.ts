@@ -150,76 +150,76 @@
                                 ],
                                 user: [
                                     "$http", "userService",
-                                    ($http: ng.IHttpService, userService) =>
+                                    ($http, userService) =>
                                         userService.getUser()
                                             .then((currentUser) => $http
                                                 .get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
-                                                .then(result => result.data))
+                                                .then(result => result.data.value))
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItProjectService"
                                 projectRoles: ["ItProjectService", (itProjectRoles) =>
                                     itProjectRoles.GetAllProjectRoles()
-                                        .then(roleResult => roleResult.data)
+                                        .then(roleResult => roleResult.data.value)
                                 ],
 
                                 projectRights: ["ItProjectService", (itProjectRights) =>
                                     itProjectRights.GetProjectRightsById($stateParams["id"])
-                                        .then(rightsResult => rightsResult.data)
+                                        .then(rightsResult => rightsResult.data.value)
                                 ],
 
                                 projects: ["ItProjectService", (itProjects) =>
                                     itProjects.GetAllProjects()
-                                        .then(projectResult => projectResult.data)
+                                        .then(projectResult => projectResult.data.value)
                                 ],
 
                                 systemRoles: ["ItSystemService", (itSystemRoles) =>
                                     itSystemRoles.GetAllSystemRoles()
-                                        .then(roleResult => roleResult.data)
+                                        .then(roleResult => roleResult.data.value)
                                 ],
 
                                 systemRights: ["ItSystemService", (itSystemRights) =>
                                     itSystemRights.GetSystemRightsById($stateParams["id"])
-                                        .then(rightsResult => rightsResult.data)
+                                        .then(rightsResult => rightsResult.data.value)
                                 ],
 
                                 system: ["ItSystemService", (itSystems) =>
                                     itSystems.GetAllSystems()
-                                        .then(systemResult => systemResult.data)
+                                        .then(systemResult => systemResult.data.value)
                                 ],
 
                                 itContractsRoles: ["ItContractsService", (itContractsRoles) =>
                                     itContractsRoles.GetAllItContractRoles()
-                                        .then(systemResult => systemResult.data)
+                                        .then(systemResult => systemResult.data.value)
                                 ],
 
                                 itContractsRights: ["ItContractsService", (itContractsRights) =>
                                     itContractsRights.GetItContractRightsById($stateParams["id"])
-                                        .then(systemResult => systemResult.data)
+                                        .then(systemResult => systemResult.data.value)
                                 ],
 
                                 itContracts: ["ItContractsService", (itContracts) =>
                                     itContracts.GetAllItContracts()
-                                        .then(systemResult => systemResult.data)
+                                        .then(systemResult => systemResult.data.value)
                                 ],
                                 
                                 getUsers: ["UserGetService", (userGet) =>
                                     userGet.GetAllUsers()
-                                        .then(users => users.data)
+                                        .then(users => users.data.value)
                                 ],
 
                                 orgUnitRoles: ["organizationService", (orgUnitRoles) =>
                                     orgUnitRoles.GetAllOrganizationUnitRoles()
-                                        .then(result => result.data)
+                                        .then(result => result.data.value)
                                 ],
 
                                 orgUnitRights: ["organizationService", (orgUnitRights) =>
                                     orgUnitRights.GetOrganisationRightsById($stateParams["id"])
-                                        .then(result => result.data)
+                                        .then(result => result.data.value)
                                 ],
 
                                 orgUnits: ["organizationService", (orgUnits) =>
                                     orgUnits.GetOrganizationUnitById()
-                                        .then(result => result.data)
+                                        .then(result => result.data.value)
                                 ]
                             }
                         })
