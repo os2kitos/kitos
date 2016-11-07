@@ -12,7 +12,7 @@
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItContractRoles")
+                    return $http.get("odata/ItContractRoles")
                         .then(function (result) {
                             return result.data.value;
                         });

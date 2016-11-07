@@ -6,7 +6,7 @@
             controller: "system.EditRoles",
             resolve: {
                 itSystemRoles: ["$http", function ($http) {
-                    return $http.get("odata/LocalItSystemRoles")
+                    return $http.get("odata/ItSystemRoles")
                         .then(function (result) {
                             return result.data.value;
                         });

@@ -232,7 +232,7 @@
                     ],
                         itProjectRoles: [
                             "$http",
-                            $http => $http.get("odata/LocalItProjectRoles")
+                            $http => $http.get("odata/ItProjectRoles")
                                 .then(result => result.data.value)
                     ],
                         user: [
