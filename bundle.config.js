@@ -67,11 +67,7 @@ module.exports = {
     // assets
     assetsSrc: [
         bower("/select2/*.png"),
-        bower("/select2/*.gif")
-    ],
-
-    // images
-    imagesSrc: [
+        bower("/select2/*.gif"),
         content("/img/*.*")
     ],
 
@@ -87,7 +83,6 @@ module.exports = {
 
     fontDest: content("/fonts"),
     cssDest: content("/css"),
-    imagesDest: content("/img"),
     maps: "maps",
 
     script: script,

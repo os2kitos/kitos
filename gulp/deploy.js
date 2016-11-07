@@ -102,12 +102,6 @@ gulp.task("assets", ["clean-styles"], function () {
         .pipe(gulp.dest(config.cssDest));
 });
 
-// copy images
-gulp.task("images", ["clean-styles"], function () {
-    return gulp.src(config.imagesSrc)
-        .pipe(gulp.dest(config.imagesDest));
-});
-
 // create css bundled file
 gulp.task("css", ["clean-styles"], function () {
     return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
@@ -132,7 +126,7 @@ gulp.task("bower-restore", function () {
 });
 
 // bundle, minify and copy styles, fonts and assets
-gulp.task("styles", ["css", "assets", "fonts", "images"]);
+gulp.task("styles", ["css", "assets", "fonts"]);
 
 // run bundle tasks
 gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
