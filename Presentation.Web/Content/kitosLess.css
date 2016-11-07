@@ -32,6 +32,10 @@
 .object-wrapper .left-menu-container .left-menu ul li a i {
   margin-right: 12px;
 }
+.object-wrapper .left-menu-container .left-menu ul li a img {
+  width: 14px;
+  margin-right: 12px;
+}
 .object-wrapper .left-menu-container .left-menu ul li.active,
 .object-wrapper .left-menu-container .left-menu ul li:hover,
 .object-wrapper .left-menu-container .left-menu ul li:active {
@@ -44,6 +48,12 @@
   text-decoration: none;
   color: white;
   font-weight: bold;
+}
+.object-wrapper .left-menu-container .left-menu ul li.active img,
+.object-wrapper .left-menu-container .left-menu ul li:hover img,
+.object-wrapper .left-menu-container .left-menu ul li:active img {
+  -webkit-filter: invert(1);
+  filter: invert(1);
 }
 .object-wrapper .object-content {
   padding-top: 20px;
