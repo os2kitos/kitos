@@ -11,6 +11,12 @@
                             return result.data.value;
                         });
                 }],
+                localItSystemRoles: ['$http', function ($http) {
+                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
                 user: ["userService", function (userService) {
                     return userService.getUser().then(function (user) {
                         return user;
@@ -20,10 +26,10 @@
         });
     }]);
 
-    app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
+    app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "localItSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, localItSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
-        $scope.activeItSystemRoles = _.filter(itSystemRoles, function (o: any) { return o.IsLocallyAvailable || o.IsObligatory; });
+        $scope.activeItSystemRoles = localItSystemRoles;
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;

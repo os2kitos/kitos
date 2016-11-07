@@ -17,6 +17,12 @@
                             return result.data.value;
                         });
                 }],
+                localItContractRoles: ['$http', function ($http) {
+                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
                 user: ['userService', function(userService) {
                     return userService.getUser().then(function(user) {
                         return user;
@@ -26,13 +32,13 @@
         });
     }]);
 
-    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'user',
-        function ($scope, $http, notify, contract, itContractRights, itContractRoles, user) {
+    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'localItContractRoles', 'user',
+        function ($scope, $http, notify, contract, itContractRights, itContractRoles, localItContractRoles, user) {
             var contractId = contract.id;
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            $scope.activeItContractRoles = _.filter(itContractRoles, function (o: any) { return o.IsLocallyAvailable || o.IsObligatory; });
+            $scope.activeItContractRoles = localItContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
