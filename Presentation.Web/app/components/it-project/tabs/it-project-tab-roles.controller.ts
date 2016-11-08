@@ -50,6 +50,8 @@
 
             this.projectId = project.id;
 
+            console.log(itProjectRoles, localItProjectRoles);
+
             this.orgId = this.user.currentOrganizationId;
             this.activeItProjectRoles = localItProjectRoles;
             this.newRole = "1";
@@ -245,7 +247,7 @@
                     ],
                         localItProjectRoles: [
                             "$http",
-                            $http => $http.get("odata/ItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                                 .then(result => result.data.value)
                     ],
 
