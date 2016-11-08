@@ -50,8 +50,6 @@
 
             this.projectId = project.id;
 
-            console.log(itProjectRoles, localItProjectRoles);
-
             this.orgId = this.user.currentOrganizationId;
             this.activeItProjectRoles = localItProjectRoles;
             this.newRole = "1";
