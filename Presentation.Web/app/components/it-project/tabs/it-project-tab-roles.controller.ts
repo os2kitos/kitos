@@ -32,6 +32,7 @@
             "project",
             "itProjectRights",
             "itProjectRoles",
+            "localItProjectRoles",
             "user"
         ];
 
@@ -44,18 +45,25 @@
             project,
             itProjectRights,
             private itProjectRoles,
+            private localItProjectRoles,
             private user) {
 
             this.projectId = project.id;
 
             this.orgId = this.user.currentOrganizationId;
-            this.activeItProjectRoles = this.itProjectRoles;
+            this.activeItProjectRoles = localItProjectRoles;
             this.newRole = "1";
 
             this.rights = [];
             _.each(itProjectRights, (right: { role; roleId; show; userForSelect; roleForSelect; user; }) => {
-                right.role = _.find(this.itProjectRoles, { id: right.roleId });
+                right.role = _.find(this.itProjectRoles, { Id: right.roleId });
                 right.show = true;
+
+                var localRole: any = _.find(this.activeItProjectRoles, { Id: right.roleId });
+
+                if (!angular.isUndefined(localRole) && localRole.Description) {
+                    right.role.Description = localRole.Description;
+                }
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
@@ -126,7 +134,7 @@
                                     right.user = result.data.response.user;
                                     right.userId = result.data.response.userId;
 
-                                    right.role = _.find(this.itProjectRoles, { id: right.roleId }),
+                                    right.role = _.find(this.localItProjectRoles, { Id: right.roleId }),
 
                                     right.edit = false;
 
@@ -197,7 +205,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: this._.find(this.itProjectRoles, { id: result.data.response.roleId }),
+                            role: this._.find(this.localItProjectRoles, { Id: result.data.response.roleId }),
                             show: true
                         });
 
@@ -232,9 +240,15 @@
                     ],
                         itProjectRoles: [
                             "$http",
+                            $http => $http.get("odata/ItProjectRoles")
+                                .then(result => result.data.value)
+                    ],
+                        localItProjectRoles: [
+                            "$http",
                             $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                                 .then(result => result.data.value)
                     ],
+
                         user: [
                             "userService",
                         userService => userService.getUser()

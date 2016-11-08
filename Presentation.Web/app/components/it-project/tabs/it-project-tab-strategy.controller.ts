@@ -13,20 +13,21 @@
                         });
                 }],
                 jointMunicipalProjects: ["$http", "project", "projectTypes", function ($http, project, projectTypes) {
-                    var type: { id } = _.find(projectTypes, function(t: { id; name; }) {
-                        return t.name == "Fælleskommunal"; // TODO hardcoded literal... find better solution!
+                    var type: { Id } = _.find(projectTypes, function(t: { Id; Name; }) {
+                        return t.Name == "Fælleskommunal"; // TODO hardcoded literal... find better solution!
                     });
-                    var typeId = type.id;
+                    console.log(projectTypes);
+                    var typeId = type.Id;
                     var orgId = project.organizationId;
                     return $http.get("api/itproject/?orgId=" + orgId + "&typeId=" + typeId).then(function(result) {
                         return result.data.response;
                     });
                 }],
                 commonPublicProjects: ["$http", "project", "projectTypes", function ($http, project, projectTypes) {
-                    var type = _.find(projectTypes, function (t: { id; name; }) {
-                        return t.name == "Fællesoffentlig"; // TODO hardcoded literal... find better solution!
+                    var type = _.find(projectTypes, function (t: { Id; Name; }) {
+                        return t.Name == "Fællesoffentlig"; // TODO hardcoded literal... find better solution!
                     });
-                    var typeId = type.id;
+                    var typeId = type.Id;
                     var orgId = project.organizationId;
                     return $http.get("api/itproject/?orgId=" + orgId + "&typeId=" + typeId).then(function (result) {
                         return result.data.response;

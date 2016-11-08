@@ -24,7 +24,7 @@
                             //get the role names
                             return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                                 .then(function(roleResult) {
-                                    var roles: { name }[] = roleResult.data.value;
+                                    var roles: { Name }[] = roleResult.data.value;
 
                                     //the resulting map
                                     var users = {};
@@ -33,10 +33,10 @@
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
 
-                                        var role = _.find(roles, { id: right.roleId });
+                                        var role = _.find(roles, { Id: right.roleId });
 
                                         var roleNames = user.roleNames || [];
-                                        roleNames.push(role.name);
+                                        roleNames.push(role.Name);
                                         user.roleNames = roleNames;
 
                                         users[right.userId] = user;

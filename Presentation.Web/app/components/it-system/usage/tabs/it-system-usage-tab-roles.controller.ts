@@ -6,9 +6,14 @@
             controller: "system.EditRoles",
             resolve: {
                 itSystemRoles: ["$http", function ($http) {
+                    return $http.get("odata/ItSystemRoles")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
+                localItSystemRoles: ['$http', function ($http) {
                     return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                         .then(function (result) {
-                            console.log(result);
                             return result.data.value;
                         });
                 }],
@@ -21,10 +26,10 @@
         });
     }]);
 
-    app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, user) {
+    app.controller("system.EditRoles", ["$scope", "$http", "notify", "itSystemUsage", "itSystemRoles", "localItSystemRoles", "user", function ($scope, $http, notify, itSystemUsage, itSystemRoles, localItSystemRoles, user) {
         var usageId = itSystemUsage.id;
 
-        $scope.activeItSystemRoles = itSystemRoles;
+        $scope.activeItSystemRoles = localItSystemRoles;
         $scope.itSystemRoles = itSystemRoles;
         $scope.newRole = 1;
         $scope.orgId = user.currentOrganizationId;
@@ -33,6 +38,12 @@
         _.each(itSystemUsage.rights, function (right: { roleId; role; show; user; userForSelect; roleForSelect; }) {
             right.role = _.find(itSystemRoles, { Id: right.roleId });
             right.show = true;
+
+            var localRole: any = _.find($scope.activeItSystemRoles, { Id: right.roleId });
+
+            if (!angular.isUndefined(localRole) && localRole.Description) {
+                right.role.Description = localRole.Description;
+            }
 
             right.userForSelect = { id: right.user.id, text: right.user.fullName };
             right.roleForSelect = right.roleId;
@@ -68,7 +79,7 @@
                     user: result.response.user,
                     userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                     roleForSelect: result.response.roleId,
-                    role: _.find(itSystemRoles, { Id: result.response.roleId }),
+                    role: _.find(localItSystemRoles, { Id: result.response.roleId }),
                     show: true
                 });
 
@@ -128,7 +139,7 @@
                     right.user = result.response.user;
                     right.userId = result.response.userId;
 
-                    right.role = _.find(itSystemRoles, { Id: right.roleId }),
+                    right.role = _.find(localItSystemRoles, { Id: right.roleId }),
 
                     right.edit = false;
 

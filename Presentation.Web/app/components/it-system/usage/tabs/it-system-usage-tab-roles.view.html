@@ -20,7 +20,7 @@
 
             <!-- show -->
             <tr data-ng-hide="right.edit">
-                <td>{{ right.role.Name }}</td>
+                <td>{{ right.role.Name }} <a uib-tooltip="{{ right.role.Description }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
                 <td>{{ right.user.fullName }}</td>
                 <td>
                     {{ right.user.email }}
@@ -49,7 +49,7 @@
                                 disabled="disabled"
                                 value="{{right.role.Id}}">{{right.role.Name}} {{right.role.IsActive == true ? "" : "(Inaktiv rolle)"}}</option>
                         <option data-ng-repeat="systemRole in activeItSystemRoles"
-                                value="{{systemRole.Id}}">{{systemRole.Name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                                value="{{systemRole.Id}}">{{systemRole.Name}} ({{systemRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>
@@ -78,7 +78,7 @@
                             data-ng-change="submitRight()">
                         <option value=""></option>
                         <option data-ng-repeat="systemRole in activeItSystemRoles" value="{{systemRole.Id}}">
-                            {{systemRole.Name}} ({{systemRole.hasWriteAccess && "skriv" || "læs" }})
+                            {{systemRole.Name}} ({{systemRole.HasWriteAccess && "skriv" || "læs" }})
                         </option>
                     </select>
                 </td>

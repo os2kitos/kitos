@@ -90,7 +90,6 @@
             $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
             $scope.contract = contract;
             $scope.hasWriteAccess = hasWriteAccess;
-            console.log(contract);
             autofocus();
 
             $scope.contractTypes = contractTypes;
@@ -103,13 +102,10 @@
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
             $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
 
-
-
             var today = new Date();
 
             if (!contract.active) {
                 if (contract.concluded < today && today < contract.expirationDate) {
-                    
                     $scope.displayActive = true;
                 } else {
                     $scope.displayActive = false;
@@ -258,47 +254,5 @@
                     }
                 };
             }
-
-            function formatContractSigner(signer) {
-
-                var userForSelect = null;
-                if (signer) {
-                    userForSelect = {
-                        id: signer.id,
-                        text: signer.fullName
-                    };
-                }
-
-                $scope.contractSigner = {
-                    edit: false,
-                    signer: signer,
-                    userForSelect: userForSelect,
-                    update: function () {
-                        var msg = notify.addInfoMessage("Gemmer...", false);
-
-                        var selectedUser = $scope.contractSigner.userForSelect;
-                        var signerId = selectedUser ? selectedUser.id : null;
-                        var signerUser = selectedUser ? selectedUser.user : null;
-
-                        $http({
-                            method: 'PATCH',
-                            url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
-                            data: {
-                                contractSignerId: signerId
-                            }
-                        }).success(function (result) {
-
-                            msg.toSuccessMessage("Kontraktunderskriveren er gemt");
-
-                            formatContractSigner(signerUser);
-
-                        }).error(function () {
-                            msg.toErrorMessage("Fejl!");
-                        });
-                    }
-                };
-            }
-
-            formatContractSigner(contract.contractSigner);
         }]);
 })(angular, app);

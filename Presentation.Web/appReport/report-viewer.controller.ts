@@ -21,7 +21,8 @@ module Kitos.Reports {
 
             this.userService.getUser().then((user: Services.IUser) => {
                 self.canDesignReport = user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
-                stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
+                // 02/11 MEMA: The translation is far from done. Add back, when translated.
+                //stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
                 this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
                 // Add the design button event
@@ -97,7 +98,6 @@ module Kitos.Reports {
         };
 
         designerOnExit = (exitEvent) => {
-            console.log("Closing designer");
             this.designer.visible = false;
             this.viewer.report = exitEvent.report;
             this.viewer.visible = true;

@@ -222,7 +222,7 @@
                     {
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref="it-system.edit.interfaces({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref="it-system.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
