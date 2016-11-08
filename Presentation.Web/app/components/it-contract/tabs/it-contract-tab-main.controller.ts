@@ -280,7 +280,7 @@
                         concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
                     }
 
-                    var isTodayBetween = (today > concludedObject && today < expirationDateObject);
+                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
 
                     var isContractActive = (isTodayBetween || overrule);
 
