@@ -44,7 +44,11 @@ namespace Core.DomainModel.ItContract
                 {
                     var today = DateTime.UtcNow;
                     var startDate = Concluded ?? today;
-                    var endDate = ExpirationDate ?? DateTime.MaxValue;
+                    var endDate = DateTime.MaxValue;
+
+                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue) {
+                        endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
+                    }
 
                     if (Terminated.HasValue)
                     {
@@ -56,11 +60,11 @@ namespace Core.DomainModel.ItContract
                             terminationDate = Terminated.Value.AddMonths(deadline);
                         }
                         // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate && today <= terminationDate;
+                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
 
                     // indgået-dato <= dags dato <= udløbs-dato
-                    return today >= startDate && today <= endDate;
+                    return today >= startDate.Date && today <= endDate;
                 }
                 return Active;
             }
