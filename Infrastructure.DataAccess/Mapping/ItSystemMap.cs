@@ -19,6 +19,13 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             this.ToTable("ItSystem");
 
+
+            HasMany(t => t.ExternalReferences)
+                .WithOptional(d => d.ItSystem)
+                .HasForeignKey(d => d.ItSystem_Id)
+                .WillCascadeOnDelete(true);
+
+
             // Relationships
             this.HasOptional(t => t.Parent)
                 .WithMany(d => d.Children)
