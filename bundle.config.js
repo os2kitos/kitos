@@ -36,7 +36,7 @@ module.exports = {
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js"),
         bower("/angular-messages/angular-messages.min.js"),
-        bower("/angular-ui-tree/dist/angular-ui-tree.js")
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
@@ -74,7 +74,8 @@ module.exports = {
     customCssSrc: [
         content("custom-ui-select.css"),
         content("/notify/notify.css"),
-        content("/kitos.css")
+        content("/kitos.css"),
+        content("/kitosLess.css")
     ],
     cssBundle: "app.css",
     cssBundleMin: "app.min.css",

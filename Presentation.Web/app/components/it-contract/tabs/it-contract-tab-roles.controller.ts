@@ -12,6 +12,12 @@
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
+                    return $http.get("odata/ItContractRoles")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
+                localItContractRoles: ['$http', function ($http) {
                     return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                         .then(function (result) {
                             return result.data.value;
@@ -26,19 +32,25 @@
         });
     }]);
 
-    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'user',
-        function ($scope, $http, notify, contract, itContractRights, itContractRoles, user) {
+    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'localItContractRoles', 'user',
+        function ($scope, $http, notify, contract, itContractRights, itContractRoles, localItContractRoles, user) {
             var contractId = contract.id;
             $scope.orgId = user.currentOrganizationId;
 
             //normal user roles
-            $scope.activeItContractRoles = itContractRoles;
+            $scope.activeItContractRoles = localItContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
             _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
                 right.role = _.find(itContractRoles, { Id: right.roleId });
                 right.show = true;
+
+                var localRole: any = _.find($scope.activeItContractRoles, { Id: right.roleId });
+
+                if (!angular.isUndefined(localRole) && localRole.Description) {
+                    right.role.Description = localRole.Description;
+                }
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
@@ -73,7 +85,7 @@
                         user: result.response.user,
                         userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
-                        role: _.find(itContractRoles, { id: result.response.roleId }),
+                        role: _.find(localItContractRoles, { Id: result.response.roleId }),
                         show: true
                     });
 
@@ -133,7 +145,7 @@
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
-                        right.role = _.find(itContractRoles, { id: right.roleId }),
+                        right.role = _.find(localItContractRoles, { Id: right.roleId }),
 
                         right.edit = false;
 
@@ -183,6 +195,44 @@
 
                 $scope.rightSortBy = val;
             };
+
+            function formatContractSigner(signer) {
+
+                var userForSelect = null;
+
+                $scope.contractSigner = {
+                    edit: false,
+                    signer: signer,
+                    userForSelect: userForSelect,
+                    update: function () {
+                        var selectedUser = $scope.contractSigner.userForSelect;
+
+                        if (selectedUser) {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+
+                            var signerId = selectedUser ? selectedUser.id : null;
+                            var signerUser = selectedUser ? selectedUser.user : null;
+
+                            $http({
+                                method: 'PATCH',
+                                url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
+                                data: {
+                                    contractSignerId: signerId
+                                }
+                            }).success(function (result) {
+                                msg.toSuccessMessage("Kontraktunderskriveren er gemt");
+
+                                formatContractSigner({ id: signerUser.Id, fullName: signerUser.Name + " " + signerUser.LastName });
+
+                            }).error(function () {
+                                msg.toErrorMessage("Fejl!");
+                            });
+                        }
+                    }
+                };
+            }
+
+            formatContractSigner(contract.contractSigner);
 
         }]);
 

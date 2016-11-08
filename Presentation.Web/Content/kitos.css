@@ -1,6 +1,11 @@
-﻿body {
+html {
+    height: 100%;
+}
+
+body {
     background-color: #F2F2F2;
     font-family: Calibri, Candara, Arial, sans-serif !important;
+    height: 100%;
 }
 
 div#page-wrapper {
@@ -8,16 +13,19 @@ div#page-wrapper {
     max-width: 1600px;
     margin: 0 auto;
     padding: 0;
+    height: 100%;
 }
 
 div#page-content {
     min-width: 1024px;
     max-width: 1600px;
+    height: 100%;
 }
 
 div#page-body {
     background-color: white;
-    padding: 10px 5px 20px 5px;
+    padding: 10px 0 20px 0;
+    height: 100%;
 }
 
 .footer {
@@ -758,28 +766,27 @@ div.searchbox-wrapper {
 
 /* TREE VIEW */
 
-.dragable {
-    cursor: move !important;
-}
-
-.angular-ui-tree-handle .selected {
-    background: #376092 !important;
-    color: white !important;
-}
-
-.angular-ui-tree-handle .selected .glyphicon {
-    color: white !important;
-}
-
 .angular-ui-tree-handle {
     border: 1px solid #dae2ea;
-    display: inline-block !important;
+    display: inline-block ;
     background: #b1cff3 !important;
     color: #376092 !important;
-    min-height: 20px !important;
-    line-height: 20px !important;
+    min-height: 20px;
+    line-height: 20px;
     font-weight: normal;
-    padding: 5px 10px !important;
+    padding: 5px 10px;
+}
+
+div.angular-ui-tree-handle.selected {
+    background-color: rgb(55, 96, 146) !important;
+}
+
+div.angular-ui-tree-handle.selected a span {
+    color: white !important;
+}
+
+div.angular-ui-tree-handle.selected {
+    color: white !important;
 }
 
 .angular-ui-tree-handle:hover {
@@ -805,8 +812,6 @@ tr.angular-ui-tree-empty {
     color: #FFF !important;
 }
 
-
-/* --- Tree --- */
 .tree-node {
     border: 1px solid #dae2ea;
     background: #f8faff;
@@ -817,10 +822,14 @@ tr.angular-ui-tree-empty {
     background-color: #f2dede;
 }
 
-.tree-node-content {
+.nonDragable .tree-node-content {
     cursor: pointer !important;
+}
+
+.tree-node-content {
     margin: 5px;
 }
+
 .tree-handle {
     padding: 10px;
     background: #428bca;
