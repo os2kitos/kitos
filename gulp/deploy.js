@@ -10,6 +10,7 @@ var ts = require('gulp-typescript');
 var htmlreplace = require('gulp-html-replace');
 var debug = require('gulp-debug');
 var rev = require('gulp-rev');
+var less = require('gulp-less');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
 var tsProject = ts.createProject('./Presentation.Web/tsconfig.json');
@@ -17,6 +18,11 @@ var tsProject = ts.createProject('./Presentation.Web/tsconfig.json');
 //Synchronously delete the output script file(s)
 gulp.task("clean-js-and-maps", function () {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
+});
+
+gulp.task("less", function() {
+    return gulp.src("glob")
+    .pipe(less())
 });
 
 gulp.task('typescript', function () {
