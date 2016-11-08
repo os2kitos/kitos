@@ -136,7 +136,7 @@
                                     right.user = result.data.response.user;
                                     right.userId = result.data.response.userId;
 
-                                    right.role = _.find(this.itProjectRoles, { Id: right.roleId }),
+                                    right.role = _.find(this.localItProjectRoles, { Id: right.roleId }),
 
                                     right.edit = false;
 
@@ -207,7 +207,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: this._.find(this.itProjectRoles, { Id: result.data.response.roleId }),
+                            role: this._.find(this.localItProjectRoles, { Id: result.data.response.roleId }),
                             show: true
                         });
 

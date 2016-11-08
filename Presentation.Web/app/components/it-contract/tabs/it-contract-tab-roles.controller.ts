@@ -85,7 +85,7 @@
                         user: result.response.user,
                         userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
-                        role: _.find(itContractRoles, { Id: result.response.roleId }),
+                        role: _.find(localItContractRoles, { Id: result.response.roleId }),
                         show: true
                     });
 
@@ -145,7 +145,7 @@
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
-                        right.role = _.find(itContractRoles, { Id: right.roleId }),
+                        right.role = _.find(localItContractRoles, { Id: right.roleId }),
 
                         right.edit = false;
 

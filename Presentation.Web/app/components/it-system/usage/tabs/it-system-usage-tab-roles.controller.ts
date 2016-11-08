@@ -79,7 +79,7 @@
                     user: result.response.user,
                     userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                     roleForSelect: result.response.roleId,
-                    role: _.find(itSystemRoles, { Id: result.response.roleId }),
+                    role: _.find(localItSystemRoles, { Id: result.response.roleId }),
                     show: true
                 });
 
@@ -139,7 +139,7 @@
                     right.user = result.response.user;
                     right.userId = result.response.userId;
 
-                    right.role = _.find(itSystemRoles, { Id: right.roleId }),
+                    right.role = _.find(localItSystemRoles, { Id: right.roleId }),
 
                     right.edit = false;
 
