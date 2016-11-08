@@ -20,15 +20,6 @@ gulp.task("clean-js-and-maps", function () {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
 });
 
-gulp.task("less", function() {
-    return gulp.src("./Presentation.Web/Content/less/styles.less")
-    .pipe(sourcemaps.init())
-    .pipe(less())
-    .pipe(minifyCSS())
-    .pipe(sourcemaps.write())
-    .pipe( gulp.dest("app.min.css"))
-});
-
 // create css bundled file
 gulp.task("css", ["clean-styles"], function () {
     return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
@@ -41,7 +32,6 @@ gulp.task("css", ["clean-styles"], function () {
         .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(config.cssDest));
 });
-
 
 gulp.task('typescript', function () {
     tsResult = tsProject.src()

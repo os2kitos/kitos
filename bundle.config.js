@@ -70,7 +70,7 @@ module.exports = {
 
     // custom style bundle
     customCssSrc: [
-        content("/less/styles.less")
+        content("/less/styles.less") 
     ],
     cssBundle: "app.css",
     cssBundleMin: "app.min.css",
