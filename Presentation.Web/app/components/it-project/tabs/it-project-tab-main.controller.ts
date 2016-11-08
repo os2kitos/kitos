@@ -33,7 +33,9 @@
     app.controller("project.EditMainCtrl",
         ["$scope", "$http", "_", "project", "projectTypes", "user", "hasWriteAccess", "autofocus",
             function ($scope, $http, _, project, projectTypes, user, hasWriteAccess, autofocus) {
-
+                $scope.project = project;
+                $scope.projectTypes = projectTypes;
+                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.autosaveUrl = `api/itproject/${project.id}`;
             }]);
 })(angular, app);
