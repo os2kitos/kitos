@@ -539,6 +539,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
@@ -553,6 +554,7 @@
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
