@@ -21,9 +21,27 @@ gulp.task("clean-js-and-maps", function () {
 });
 
 gulp.task("less", function() {
-    return gulp.src("glob")
+    return gulp.src("./Presentation.Web/Content/less/styles.less")
+    .pipe(sourcemaps.init())
     .pipe(less())
+    .pipe(minifyCSS())
+    .pipe(sourcemaps.write())
+    .pipe( gulp.dest("app.min.css"))
 });
+
+// create css bundled file
+gulp.task("css", ["clean-styles"], function () {
+    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
+        .pipe(sourcemaps.init())
+        .pipe(less())
+        .pipe(concat(config.cssBundle))
+        .pipe(gulp.dest(config.cssDest))
+        .pipe(minifyCSS())
+        .pipe(concat(config.cssBundleMin))
+        .pipe(sourcemaps.write(config.maps))
+        .pipe(gulp.dest(config.cssDest));
+});
+
 
 gulp.task('typescript', function () {
     tsResult = tsProject.src()
@@ -105,18 +123,6 @@ gulp.task("clean-styles", function () {
 // copy assets
 gulp.task("assets", ["clean-styles"], function () {
     return gulp.src(config.assetsSrc)
-        .pipe(gulp.dest(config.cssDest));
-});
-
-// create css bundled file
-gulp.task("css", ["clean-styles"], function () {
-    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
-        .pipe(sourcemaps.init())
-        .pipe(concat(config.cssBundle))
-        .pipe(gulp.dest(config.cssDest))
-        .pipe(minifyCSS())
-        .pipe(concat(config.cssBundleMin))
-        .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(config.cssDest));
 });
 
