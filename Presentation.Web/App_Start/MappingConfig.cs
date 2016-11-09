@@ -34,6 +34,8 @@ namespace Presentation.Web
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Description
+            Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
+                  .ReverseMap();
 
             Mapper.CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()
@@ -267,6 +269,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
                 .ForMember(dest => dest.InterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Count))
                 .ForMember(dest => dest.ActiveInterfaceUseCount, opt => opt.MapFrom(src => src.ItSystem.CanUseInterfaces.Sum(x => x.ItInterfaceUsages.Count(y => y.ItContract.IsActive))))
+
                 .ReverseMap()
                 .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())

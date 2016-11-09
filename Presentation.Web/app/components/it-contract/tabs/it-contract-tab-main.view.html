@@ -1,9 +1,9 @@
 ﻿<div class="row">
     <!-- Left side -->
-    <div class="col-md-6">
+    <div class="col-xs-6">
         <div class="row">
             <!-- 1st column -->
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <!-- Name -->
                 <div class="form-group">
                     <label for="contract-name" class="control-label small">IT kontraktnavn</label>
@@ -48,28 +48,10 @@
                                    data-field="contractTypeId">
                     </select-option>
                 </div>
-
-                <!-- ESDH -->
-                <div class="form-group">
-                    <label for="contract-esdh" class="control-label small">ESDH ref.</label>
-                    <div class="input-group">
-                        <input type="text" id="contract-esdh" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.esdh"
-                               data-autosave="{{ autoSaveUrl }}"
-                               data-field="esdh">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.esdh">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
-                </div>
             </div>
 
             <!-- 2nd column -->
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <!-- Object owner -->
                 <div class="form-group">
                     <label for="object-owner" class="control-label small">Oprettet af</label>
@@ -135,7 +117,7 @@
                 </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-xs-12">
                 <!-- Folder -->
                 <div class="form-group">
                     <label for="contract-folder" class="control-label small">Mappe</label>
@@ -168,9 +150,9 @@
     </div>
 
     <!-- Right side -->
-    <div class="col-md-6">
+    <div class="col-xs-6">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-xs-12">
                 <!-- Supplier -->
                 <div class="form-group">
                     <label for="contract-supplier" class="control-label small">Leverandør</label>
@@ -185,7 +167,7 @@
 
         <div class="row">
             <!-- 3rd column -->
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <!-- Extern contract signer -->
                 <div class="form-group">
                     <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
@@ -223,7 +205,7 @@
             </div>
 
             <!-- 4th column -->
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <!-- Extern contract is signed -->
                 <div class="checkbox">
                     <label>
@@ -273,7 +255,7 @@
                 </div>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-xs-12">
                 <!-- Agreement elements -->
                 <div class="form-group">
                     <select-multiple-option data-id="agreement-elements"
@@ -290,7 +272,7 @@
             </div>
 
 
-            <div class="col-md-12">
+            <div class="col-xs-12">
                 <label for="agreement-concluded" class="control-label small">
                     Gyldig fra
                 </label>
@@ -305,7 +287,7 @@
                        data-ng-blur="checkContractValidity()"
                        data-field="concluded">
             </div>
-            <div class="col-md-12">
+            <div class="col-xs-12">
                 <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                 <input type="text" class="form-control" id="agreement-expiration"
                        data-kendo-date-picker

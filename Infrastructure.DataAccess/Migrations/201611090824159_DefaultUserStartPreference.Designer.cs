@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class DefaultUserPreferenceaddedtoUserentity : IMigrationMetadata
+    public sealed partial class DefaultUserStartPreference : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(DefaultUserPreferenceaddedtoUserentity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(DefaultUserStartPreference));
         
         string IMigrationMetadata.Id
         {
-            get { return "201611011248088_DefaultUserPreference added to User entity"; }
+            get { return "201611090824159_DefaultUserStartPreference"; }
         }
         
         string IMigrationMetadata.Source

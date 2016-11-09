@@ -45,7 +45,7 @@
         constructor(
             private $rootScope: Kitos.IRootScope,
             private $scope: ng.IScope,
-            private $http: ng.IHttpService,
+            private $http,
             private $timeout: ng.ITimeoutService,
             private $window: ng.IWindowService,
             private $state: ng.ui.IStateService,
@@ -59,22 +59,22 @@
             private orgUnits: Array<any>) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
-            $scope.$on("kendoWidgetCreated", (event, widget) => {
-                // the event is emitted for every widget; if we have multiple
-                // widgets in this controller, we need to check that the event
-                // is for the one we're interested in.
-                if (widget === this.mainGrid) {
-                    this.loadGridOptions();
-                    this.mainGrid.dataSource.read();
+            $scope.$on("kendoWidgetCreated",
+                (event, widget) => {
+                    // the event is emitted for every widget; if we have multiple
+                    // widgets in this controller, we need to check that the event
+                    // is for the one we're interested in.
+                    if (widget === this.mainGrid) {
+                        this.loadGridOptions();
+                        this.mainGrid.dataSource.read();
 
-                    // show loadingbar when export to excel is clicked
-                    // hidden again in method exportToExcel callback
-                    $(".k-grid-excel").click(() => {
-                        kendo.ui.progress(this.mainGrid.element, true);
-                    });
-                }
-            });
-
+                        // show loadingbar when export to excel is clicked
+                        // hidden again in method exportToExcel callback
+                        $(".k-grid-excel").click(() => {
+                                kendo.ui.progress(this.mainGrid.element, true);
+                            });
+                    }
+                });
             this.activate();
         }
 
@@ -86,7 +86,8 @@
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
+            return filterUrl.replace(pattern,
+                `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
         }
 
         private fixProcurmentFilter(filterUrl) {
@@ -164,13 +165,17 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner`;
+                                var urlParameters =
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` + urlParameters;
+                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` +
+                                        urlParameters;
                                 } else {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
+                                    return `/odata/Organizations(${this.user.currentOrganizationId
+                                        })/OrganizationUnits(${orgUnitId})/ItContracts` +
+                                        urlParameters;
                                 }
                             },
                             dataType: "json"
@@ -189,9 +194,11 @@
                             }
 
                             if (parameterMap.$filter) {
-                                this._.forEach(this.itContractRoles, role => {
-                                    parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
-                                });
+                                this._.forEach(this.itContractRoles,
+                                    role => {
+                                        parameterMap.$filter = this
+                                            .fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
+                                    });
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
                             }
@@ -221,19 +228,22 @@
                         },
                         parse: response => {
                             // iterrate each contract
-                            this._.forEach(response.value, contract => {
-                                // HACK to flattens the Rights on usage so they can be displayed as single columns
-                                contract.roles = [];
-                                // iterrate each right
-                                this._.forEach(contract.Rights, right => {
-                                    // init an role array to hold users assigned to this role
-                                    if (!contract.roles[right.RoleId])
-                                        contract.roles[right.RoleId] = [];
+                            this._.forEach(response.value,
+                                contract => {
+                                    // HACK to flattens the Rights on usage so they can be displayed as single columns
+                                    contract.roles = [];
+                                    // iterrate each right
+                                    this._.forEach(contract.Rights,
+                                        right => {
+                                            // init an role array to hold users assigned to this role
+                                            if (!contract.roles[right.RoleId])
+                                                contract.roles[right.RoleId] = [];
 
-                                    // push username to the role array
-                                    contract.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
+                                            // push username to the role array
+                                            contract.roles[right.RoleId]
+                                                .push([right.User.Name, right.User.LastName].join(" "));
+                                        });
                                 });
-                            });
                             return response;
                         }
                     }
@@ -243,22 +253,26 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
+                        template:
+                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
+                        template:
+                            '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
+                        template:
+                            '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                        template:
+                            "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -286,6 +300,17 @@
                 columnMenu: {
                     filterable: false
                 },
+                detailTemplate: (dataItem) => `<uib-tabset active="0">
+                    <uib-tab index="0" heading="Systemer">
+                        <contract-details detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                    </uib-tab>
+                    <uib-tab index="1" heading="Udstillede snitflader">
+                        <contract-details detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                    </uib-tab>
+                    <uib-tab index="2" heading="Anvendte snitflader">
+                        <contract-details detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                    </uib-tab>
+                </uib-tabset>`,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -294,7 +319,9 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Active", title: "Aktiv", width: 45,
+                        field: "Active",
+                        title: "Aktiv",
+                        width: 45,
                         persistId: "active", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var isActive = this.isContractActive(dataItem);
@@ -313,7 +340,9 @@
                         filterable: false,
                     },
                     {
-                        field: "ItContractId", title: "KontraktID", width: 150,
+                        field: "ItContractId",
+                        title: "KontraktID",
+                        width: 150,
                         persistId: "contractid", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem && dataItem.ItContractId || "",
                         hidden: true,
@@ -326,9 +355,14 @@
                         }
                     },
                     {
-                        field: "Parent.Name", title: "Overordnet kontrakt", width: 150,
+                        field: "Parent.Name",
+                        title: "Overordnet kontrakt",
+                        width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent
+                            ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${
+                            dataItem.Parent.Name}</a>`
+                            : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -340,9 +374,12 @@
                         }
                     },
                     {
-                        field: "Name", title: "IT Kontrakt", width: 265,
+                        field: "Name",
+                        title: "IT Kontrakt",
+                        width: 265,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-contract.edit.systems({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-contract.edit.systems({id: ${dataItem.Id}})'>${
+                            dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
@@ -353,9 +390,13 @@
                         }
                     },
                     {
-                        field: "ResponsibleOrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,
+                        field: "ResponsibleOrganizationUnit.Name",
+                        title: "Ansv. organisationsenhed",
+                        width: 245,
                         persistId: "orgunit", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ResponsibleOrganizationUnit ? dataItem.ResponsibleOrganizationUnit.Name : "",
+                        template: dataItem => dataItem.ResponsibleOrganizationUnit
+                            ? dataItem.ResponsibleOrganizationUnit.Name
+                            : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -365,7 +406,9 @@
                         }
                     },
                     {
-                        field: "Supplier.Name", title: "Leverandør", width: 200,
+                        field: "Supplier.Name",
+                        title: "Leverandør",
+                        width: 200,
                         persistId: "suppliername", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Supplier ? dataItem.Supplier.Name : "",
                         filterable: {
@@ -377,9 +420,13 @@
                         }
                     },
                     {
-                        field: "Esdh", title: "ESDH ref", width: 150,
+                        field: "Esdh",
+                        title: "ESDH ref",
+                        width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
+                        template: dataItem => dataItem.Esdh
+                            ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>`
+                            : "",
                         excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -392,9 +439,13 @@
                         }
                     },
                     {
-                        field: "Folder", title: "Mappe ref", width: 150,
+                        field: "Folder",
+                        title: "Mappe ref",
+                        width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
+                        template: dataItem => dataItem.Folder
+                            ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>`
+                            : "",
                         excelTemplate: dataItem => dataItem && dataItem.Folder || "",
                         attributes: { "class": "text-center" },
                         hidden: true,
@@ -407,7 +458,9 @@
                         }
                     },
                     {
-                        field: "ContractType.Name", title: "Kontrakttype", width: 120,
+                        field: "ContractType.Name",
+                        title: "Kontrakttype",
+                        width: 120,
                         persistId: "contracttype", // DON'T YOU DARE RENAME!
                         template: "#: ContractType ? ContractType.Name : '' #",
                         filterable: {
@@ -419,7 +472,9 @@
                         }
                     },
                     {
-                        field: "ContractTemplate.Name", title: "Kontraktskabelon", width: 145,
+                        field: "ContractTemplate.Name",
+                        title: "Kontraktskabelon",
+                        width: 145,
                         persistId: "contracttmpl", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.ContractTemplate ? dataItem.ContractTemplate.Name : "",
                         filterable: {
@@ -431,7 +486,9 @@
                         }
                     },
                     {
-                        field: "PurchaseForm.Name", title: "Indkøbsform", width: 115,
+                        field: "PurchaseForm.Name",
+                        title: "Indkøbsform",
+                        width: 115,
                         persistId: "purchaseform", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.PurchaseForm ? dataItem.PurchaseForm.Name : "",
                         filterable: {
@@ -443,7 +500,10 @@
                         }
                     },
                     {
-                        field: "Concluded", title: "Gyldig fra", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "Concluded",
+                        title: "Gyldig fra",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 90,
                         persistId: "concluded", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.Concluded) {
@@ -460,7 +520,9 @@
                         }
                     },
                     {
-                        field: "Duration", title: "Varighed", width: 115,
+                        field: "Duration",
+                        title: "Varighed",
+                        width: 115,
                         persistId: "duration", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Duration ? `${dataItem.Duration} md` : "",
                         hidden: true,
@@ -473,7 +535,10 @@
                         }
                     },
                     {
-                        field: "ExpirationDate", title: "Gyldig til", format: "{0:dd-MM-yyyy}", width: 90,
+                        field: "ExpirationDate",
+                        title: "Gyldig til",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 90,
                         persistId: "expirationDate", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.ExpirationDate) {
@@ -490,7 +555,9 @@
                         }
                     },
                     {
-                        field: "OptionExtend", title: "Option", width: 150,
+                        field: "OptionExtend",
+                        title: "Option",
+                        width: 150,
                         persistId: "option", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => {
@@ -515,9 +582,13 @@
                         }
                     },
                     {
-                        field: "TerminationDeadline.Name", title: "Opsigelse", width: 100,
+                        field: "TerminationDeadline.Name",
+                        title: "Opsigelse",
+                        width: 100,
                         persistId: "terminationDeadline", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TerminationDeadline ? `${dataItem.TerminationDeadline.Name} md` : "",
+                        template: dataItem => dataItem.TerminationDeadline
+                            ? `${dataItem.TerminationDeadline.Name} md`
+                            : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -527,7 +598,10 @@
                         }
                     },
                     {
-                        field: "IrrevocableTo", title: "Uopsigelig til", format: "{0:dd-MM-yyyy}", width: 150,
+                        field: "IrrevocableTo",
+                        title: "Uopsigelig til",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 150,
                         headerTemplate: '<div style="word-wrap: break-word;">Uopsigelig til</div>',
                         persistId: "irrevocableTo", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
@@ -546,7 +620,10 @@
                         }
                     },
                     {
-                        field: "Terminated", title: "Opsagt", format: "{0:dd-MM-yyyy}", width: 150,
+                        field: "Terminated",
+                        title: "Opsagt",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 150,
                         persistId: "terminated", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
                             if (!dataItem.Terminated) {
@@ -564,7 +641,9 @@
                         }
                     },
                     {
-                        field: "ProcurementStrategy", title: "Udbudsstrategi", width: 150,
+                        field: "ProcurementStrategy",
+                        title: "Udbudsstrategi",
+                        width: 150,
                         persistId: "procurementStrategy", // DON'T YOU DARE RENAME!
                         hidden: true,
                         template: dataItem => dataItem.ProcurementStrategy ? dataItem.ProcurementStrategy.Name : "",
@@ -577,11 +656,15 @@
                         }
                     },
                     {
-                        field: "ProcurementPlanYear", title: "Udbuds plan", width: 90,
+                        field: "ProcurementPlanYear",
+                        title: "Udbuds plan",
+                        width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: dataItem =>
-                            dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}` : "",
+                            dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear
+                            ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
+                            : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -591,7 +674,9 @@
                         }
                     },
                     {
-                        field: "Advices.AlarmDate", title: "Dato for næste advis", width: 90,
+                        field: "Advices.AlarmDate",
+                        title: "Dato for næste advis",
+                        width: 90,
                         persistId: "nextadvis", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Advices.length <= 0) {
@@ -614,7 +699,9 @@
                 field: "ContractSigner.Name",
                 title: "Kontraktunderskriver",
                 persistId: "roleSigner",
-                template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}` : "",
+                template: dataItem => dataItem.ContractSigner
+                    ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}`
+                    : "",
                 width: 130,
                 hidden: true,
                 sortable: true,
@@ -630,46 +717,47 @@
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
-            this._.forEachRight(this.itContractRoles, role => {
-                var roleColumn: IKendoGridColumn<IItContractPlan> = {
-                    field: `role${role.Id}`,
-                    title: role.Name,
-                    persistId: `role${role.Id}`,
-                    template: dataItem => {
-                        var roles = "";
+            this._.forEachRight(this.itContractRoles,
+                role => {
+                    var roleColumn: IKendoGridColumn<IItContractPlan> = {
+                        field: `role${role.Id}`,
+                        title: role.Name,
+                        persistId: `role${role.Id}`,
+                        template: dataItem => {
+                            var roles = "";
 
-                        if (dataItem.roles[role.Id] === undefined)
-                            return roles;
+                            if (dataItem.roles[role.Id] === undefined)
+                                return roles;
 
-                        roles = this.concatRoles(dataItem.roles[role.Id]);
+                            roles = this.concatRoles(dataItem.roles[role.Id]);
 
-                        var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                            var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
-                        return link;
-                    },
-                    excelTemplate: dataItem => {
-                        var roles = "";
+                            return link;
+                        },
+                        excelTemplate: dataItem => {
+                            var roles = "";
 
-                        if (dataItem.roles[role.Id] === undefined)
-                            return roles;
+                            if (dataItem.roles[role.Id] === undefined)
+                                return roles;
 
-                        return this.concatRoles(dataItem.roles[role.Id]);
-                    },
-                    width: 130,
-                    hidden: true,
-                    sortable: false,
-                    filterable: {
-                        cell: {
-                            dataSource: [],
-                            showOperators: false,
-                            operator: "contains"
+                            return this.concatRoles(dataItem.roles[role.Id]);
+                        },
+                        width: 130,
+                        hidden: true,
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
                         }
-                    }
-                };
+                    };
 
-                // insert the generated column at the correct location
-                mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
-            });
+                    // insert the generated column at the correct location
+                    mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
+                });
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
@@ -681,12 +769,13 @@
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
+                this._.forEach(columns,
+                    column => {
+                        if (column.hidden) {
+                            column.tempVisual = true;
+                            e.sender.showColumn(column);
+                        }
+                    });
                 this.$timeout(() => {
                     this.exportFlag = true;
                     e.sender.saveAsExcel();
@@ -695,12 +784,13 @@
                 this.exportFlag = false;
 
                 // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
+                this._.forEach(columns,
+                    column => {
+                        if (column.tempVisual) {
+                            delete column.tempVisual;
+                            e.sender.hideColumn(column);
+                        }
+                    });
 
                 // render templates
                 var sheet = e.workbook.sheets[0];
@@ -760,12 +850,15 @@
         }
 
         private isContractActive(dataItem) {
-            
+
 
             if (!dataItem.Active) {
                 var today = this.moment();
                 var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded) : today;
-                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+                var endDate = dataItem
+                    .ExpirationDate
+                    ? this.moment(dataItem.ExpirationDate)
+                    : this.moment("9999-12-30");
 
                 if (dataItem.Terminated) {
                     var terminationDate = this.moment(dataItem.Terminated);
@@ -842,7 +935,7 @@
             });
         }
 
-       public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
+        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
             return {
                 autoBind: false,
                 dataSource: this.roleSelectorDataSource,

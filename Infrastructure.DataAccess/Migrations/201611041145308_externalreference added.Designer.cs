@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ExternalReference_added : IMigrationMetadata
+    public sealed partial class externalreferenceadded : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ExternalReference_added));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(externalreferenceadded));
         
         string IMigrationMetadata.Id
         {
-            get { return "201611011111383_ExternalReference_added"; }
+            get { return "201611041145308_externalreference added"; }
         }
         
         string IMigrationMetadata.Source
