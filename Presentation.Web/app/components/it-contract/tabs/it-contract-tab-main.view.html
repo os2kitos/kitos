@@ -48,24 +48,6 @@
                                    data-field="contractTypeId">
                     </select-option>
                 </div>
-
-                <!-- ESDH -->
-                <div class="form-group">
-                    <label for="contract-esdh" class="control-label small">ESDH ref.</label>
-                    <div class="input-group">
-                        <input type="text" id="contract-esdh" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.esdh"
-                               data-autosave="{{ autoSaveUrl }}"
-                               data-field="esdh">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.esdh">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
-                </div>
             </div>
 
             <!-- 2nd column -->
