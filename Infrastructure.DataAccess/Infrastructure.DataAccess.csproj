@@ -274,13 +274,9 @@
     <Compile Include="Migrations\201611081216008_objectid made optional.Designer.cs">
       <DependentUpon>201611081216008_objectid made optional.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201611011248088_DefaultUserPreference added to User entity.cs" />
-    <Compile Include="Migrations\201611011248088_DefaultUserPreference added to User entity.Designer.cs">
-      <DependentUpon>201611011248088_DefaultUserPreference added to User entity.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201611021342106_Changed type in dto.User of value defaultUserStart....cs" />
-    <Compile Include="Migrations\201611021342106_Changed type in dto.User of value defaultUserStart....Designer.cs">
-      <DependentUpon>201611021342106_Changed type in dto.User of value defaultUserStart....cs</DependentUpon>
+    <Compile Include="Migrations\201611090824159_DefaultUserStartPreference.cs" />
+    <Compile Include="Migrations\201611090824159_DefaultUserStartPreference.Designer.cs">
+      <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -393,11 +389,8 @@
     <EmbeddedResource Include="Migrations\201611081216008_objectid made optional.resx">
       <DependentUpon>201611081216008_objectid made optional.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201611011248088_DefaultUserPreference added to User entity.resx">
-      <DependentUpon>201611011248088_DefaultUserPreference added to User entity.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201611021342106_Changed type in dto.User of value defaultUserStart....resx">
-      <DependentUpon>201611021342106_Changed type in dto.User of value defaultUserStart....cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201611090824159_DefaultUserStartPreference.resx">
+      <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -674,6 +674,7 @@
     <Content Include="Content\img\Projektbeskrivelse.svg" />
     <Content Include="Content\img\Projektroller.svg" />
     <Content Include="Content\img\Rediger.svg" />
+    <Content Include="Content\img\References.svg" />
     <Content Include="Content\img\Risiko.svg" />
     <Content Include="Content\img\Slet.svg" />
     <Content Include="Content\img\Snitfladedetaljer.svg" />
