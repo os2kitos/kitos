@@ -7,13 +7,13 @@
 </div>
 
 <div class="modal-body">
-    <h5 ng-show="ctrl.vmProjectRights.length || ctrl.vmSystemRights.length || ctrl.vmItContractsRights.length || ctrl.vmOrgUnitRights.length">
+    <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">
         Der vises brugerens tildelte roller i denne organisation.<br>
         Disse roller kan tildeles andre brugere eller slettes helt fra organisationen.
     </h5>
-    <h5 ng-hide="ctrl.vmProjectRights.length || ctrl.vmSystemRights.length || ctrl.vmItContractsRights.length || ctrl.vmOrgUnitRights.length">Brugerens har ikke nogen tildelte roller i denne organisation</h5>
+    <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">Brugerens har ikke nogen tildelte roller i denne organisation</h5>
     <!-- Table containing organization data -->
-    <table class="table table-hover" ng-show="{{ctrl.vmOrgUnitRights.length}}">
+    <table class="table table-hover" ng-show="{{ctrl.vmOrgUnits.length}}">
         <thead>
             <tr>
                 <th>Vælg</th>
@@ -22,15 +22,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in ctrl.vmOrgUnitRights | filter:{UserId:ctrl.userId}">
+            <tr ng-repeat="orgUnit in ctrl.vmOrgUnits">
                 <td><input type="checkbox" /></td>
-                <td>{{ctrl.vmOrgUnits[user.ObjectId -1].Name}}</td>
-                <td>{{ctrl.vmOrgUnitRoles[user.RoleId -1].Name}}</td>
+                <td>{{orgUnit.Object.Name}}</td>
+                <td>{{orgUnit.Role.Name}}</td>
             </tr>
         </tbody>
     </table>
     <!-- Table containing project data -->
-    <table class="table table-hover" ng-show="{{ctrl.vmProjectRights.length}}">
+    <table class="table table-hover" ng-show="{{ctrl.vmProject.length}}">
         <thead>
             <tr>
                 <th>Vælg</th>
@@ -39,15 +39,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in ctrl.vmProjectRights | filter:{UserId:ctrl.userId}">
+            <tr ng-repeat="project in ctrl.vmProject">
                 <td><input type="checkbox" /></td>
-                <td>{{ctrl.vmProject[user.ObjectId -1].Name}}</td>
-                <td>{{ctrl.vmProjectRoles[user.RoleId -1].Name}}</td>
+                <td>{{project.Object.Name}}</td>
+                <td>{{project.Role.Name}}</td>
             </tr>
         </tbody>
     </table>
     <!-- Table containing ItSystem data -->
-    <table class="table table-hover" ng-show="{{ctrl.vmSystemRights.length}}">
+    <table class="table table-hover" ng-show="{{ctrl.vmSystem.length}}">
         <thead>
             <tr>
                 <th>Vælg</th>
@@ -56,15 +56,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in ctrl.vmSystemRights | filter:{UserId:ctrl.userId}">
+            <tr ng-repeat="system in ctrl.vmSystemRights">
                 <td><input type="checkbox" /></td>
-                <td>{{ctrl.vmSystem[user.ObjectId -1].Name}}</td>
-                <td>{{ctrl.vmSystemRoles[user.RoleId -1].Name}}</td>
+                <td>{{system.Object.Name}}</td>
+                <td>{{system.Role.Name}}</td>
             </tr>
         </tbody>
     </table>
     <!-- Table containing ItContract data -->
-    <table class="table table-hover" ng-show="{{ctrl.vmItContractsRights.length}}">
+    <table class="table table-hover" ng-show="ctrl.vmItContracts.length">
         <thead>
             <tr>
                 <th>Vælg</th>
@@ -73,15 +73,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="user in ctrl.vmItContractsRights | filter:{UserId:ctrl.userId}">
+            <tr ng-repeat="it in ctrl.vmItContracts">
                 <td><input type="checkbox" /></td>
-                <td>{{ctrl.vmItContracts[user.ObjectId -1].Name}}</td>
-                <td>{{ctrl.vmItContractsRoles[user.RoleId -1].Name}}</td>
+                <td>{{it.Object.Name}}</td>
+                <td>{{it.Role.Name}}</td>
             </tr>
         </tbody>
     </table>
     <!-- Table containing administrative roller data -->
-    <table class="table table-hover" ng-show="{{ctrl.vm.isGlobalAdmin || ctrl.vm.isLocalAdmin || ctrl.vm.isOrgAdmin || ctrl.vm.isProjectAdmin || ctrl.vm.isSystemAdmin || ctrl.vm.isContractAdmin || ctrl.vm.isReportAdmin}}">
+    <table class="table table-hover" ng-show="{{ctrl.vmHasAdminRoles}}">
         <thead>
             <tr>
                 <th>Vælg</th>
@@ -89,30 +89,30 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-show="{{ctrl.vm.isLocalAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>Lokal administrator</td>
-        </tr>
-        <tr ng-show="{{ctrl.vm.isOrgAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>Organisation administrator</td>
-        </tr>
-        <tr ng-show="{{ctrl.vm.isProjectAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>Projekt administrator</td>
-        </tr>
-        <tr ng-show="{{ctrl.vm.isSystemAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>System administrator</td>
-        </tr>
-        <tr ng-show="{{ctrl.vm.isContractAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>Kontrakt administrator</td>
-        </tr>
-        <tr ng-show="{{ctrl.vm.isReportAdmin}}">
-            <td><input type="checkbox" /></td>
-            <td>Rapport administrator</td>
-        </tr>
+            <tr ng-show="{{ctrl.vm.isLocalAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>Lokal administrator</td>
+            </tr>
+            <tr ng-show="{{ctrl.vm.isOrgAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>Organisation administrator</td>
+            </tr>
+            <tr ng-show="{{ctrl.vm.isProjectAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>Projekt administrator</td>
+            </tr>
+            <tr ng-show="{{ctrl.vm.isSystemAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>System administrator</td>
+            </tr>
+            <tr ng-show="{{ctrl.vm.isContractAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>Kontrakt administrator</td>
+            </tr>
+            <tr ng-show="{{ctrl.vm.isReportAdmin}}">
+                <td><input type="checkbox" /></td>
+                <td>Rapport administrator</td>
+            </tr>
 
         </tbody>
     </table>

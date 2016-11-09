@@ -57,6 +57,10 @@
         GetOrganizationUnitById = () => {
             return this.$http.get<Models.IOrganizationUnit>(`odata/OrganizationUnits`);
         }
+        
+        GetOrganizationUnitDataById = (id: number) => {
+            return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id})`);
+        }
     }
 
     app.service("organizationService", OrganizationService);
