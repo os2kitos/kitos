@@ -16,6 +16,5 @@ namespace Presentation.Web
             app.UseHangfireDashboard();
             app.UseHangfireServer();
         }
-
     }
 }
