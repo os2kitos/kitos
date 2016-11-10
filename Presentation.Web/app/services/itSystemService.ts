@@ -54,6 +54,11 @@
         GetSystemDataById = (id: number) => {
             return this.$http.get(`odata/ItSystemRights?$expand=role,object&$filter=UserId eq (${id})`);
         }
+
+        GetSystemDataByIdFiltered = (id: number) => {
+            return this.$http
+                .get(`odata/ItSystemRights?$expand=role($select=Name),object($select=Id;$expand=ItSystem($select=Id,Name))&$filter=UserId eq (${id})&$select=Id`);
+        }
     }
 
     app.service("ItSystemService", ItSystemService);

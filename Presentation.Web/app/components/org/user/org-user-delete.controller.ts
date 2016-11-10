@@ -129,7 +129,7 @@
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItSystemService"
                                 system: ["ItSystemService", (itSystems) =>
-                                    itSystems.GetSystemDataById($stateParams["id"])
+                                    itSystems.GetSystemDataByIdFiltered($stateParams["id"])
                                         .then(systemResult => systemResult.data.value)
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItContractService"

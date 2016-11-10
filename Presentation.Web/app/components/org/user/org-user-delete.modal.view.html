@@ -56,9 +56,9 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="system in ctrl.vmSystemRights">
+            <tr ng-repeat="system in ctrl.vmSystem">
                 <td><input type="checkbox" /></td>
-                <td>{{system.Object.Name}}</td>
+                <td>{{system.Object.ItSystem.Name}}</td>
                 <td>{{system.Role.Name}}</td>
             </tr>
         </tbody>
