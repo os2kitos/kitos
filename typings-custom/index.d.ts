@@ -1,5 +1,5 @@
-/// <reference path="JSONfn/jsonfn.d.ts" />
-/// <reference path="kendo/2016.2.714/kendo.web.d.ts"/>
+/// <reference path="JSONfn/index.d.ts" />
+/// <reference path="kendo/index.d.ts"/>
 /// <reference path="protractor-http-mock/index.d.ts"/>
 /// <reference path="jquery/index.d.ts"/>
 /// <reference path="angular-animate/index.d.ts" />

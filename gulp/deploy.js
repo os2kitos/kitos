@@ -13,7 +13,7 @@ var rev = require('gulp-rev');
 var less = require('gulp-less');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
-var tsProject = ts.createProject('./Presentation.Web/tsconfig.json');
+var tsProject = ts.createProject('tsconfig.json');
 
 //Synchronously delete the output script file(s)
 gulp.task("clean-js-and-maps", function () {
