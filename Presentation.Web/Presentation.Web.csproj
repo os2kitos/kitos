@@ -25,7 +25,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -691,7 +691,7 @@
     <Content Include="Content\img\Systemforside_white.svg" />
     <Content Include="Content\img\Systemroller.svg" />
     <Content Include="Content\notify\notify.css" />
-    <Content Include="Content\kitos.css" />
+    <None Include="Content\kitos.less" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -1063,6 +1063,7 @@
     <Content Include="app\components\org\user\org-user-delete.modal.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-main.view.html" />
+    <Content Include="Content\less\styles.less" />
     <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
       <SubType>Designer</SubType>
     </None>
@@ -1082,7 +1083,6 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="tsconfig.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -13,28 +13,13 @@
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
         public vm: IDeleteViewModel;
-        public isUserGlobalAdmin = false;
-        public isUserLocalAdmin = false;
-        public isUserOrgAdmin = false;
-        public isUserProjectAdmin = false;
-        public isUserSystemAdmin = false;
-        public isUserContractAdmin = false;
-        public isUserReportAdmin = false;
 
         public vmProject: any;
-        public vmProjectRights: any;
-        public vmProjectRoles: any;
-        public vmSystemRoles: any;
-        public vmSystemRights: any;
         public vmSystem: any;
-        public vmItContractsRoles: any;
-        public vmItContractsRights: any;
         public vmItContracts: any;
-        public vmOrganisationRights: any;
         public vmGetUsers: any;
-        public vmOrgUnitRights: any;
-        public vmOrgUnitRoles: any;
         public vmOrgUnits: any;
+        public vmHasAdminRoles: boolean;
 
         private userId: number;
         private firstName: string;
@@ -50,18 +35,9 @@
             "notify",
             "user",
             "currentUser",
-            "projectRoles",
-            "projectRights",
             "projects",
-            "systemRoles",
-            "systemRights",
             "system",
-            "itContractsRoles",
-            "itContractsRights",
             "itContracts",
-            "getUsers",
-            "orgUnitRoles",
-            "orgUnitRights",
             "orgUnits",
             "_"];
 
@@ -71,18 +47,9 @@
             private notify,
             private user: Models.IUser,
             private currentUser: Services.IUser,
-            public projectRoles,
-            public projectRights,
             public projects,
-            public systemRoles,
-            public systemRights,
             public system,
-            public itContractsRoles,
-            public itContractsRights,
             public itContracts,
-            public getUsers,
-            public orgUnitRoles,
-            public orgUnitRights,
             public orgUnits,
             private _: ILoDashWithMixins) {
 
@@ -91,20 +58,12 @@
             this.lastName = user.LastName;
             this.email = user.Email;
 
-            this.vmProjectRights = projectRights;
-            this.vmProjectRoles = projectRoles;
             this.vmProject = projects;
-            this.vmSystemRights = systemRights;
-            this.vmSystemRoles = systemRoles;
             this.vmSystem = system;
-            this.vmItContractsRights = itContractsRights;
-            this.vmItContractsRoles = itContractsRoles;
             this.vmItContracts = itContracts;
-            this.vmGetUsers = getUsers;
-            this.vmOrgUnitRights = orgUnitRights;
-            this.vmOrgUnitRoles = orgUnitRoles;
             this.vmOrgUnits = orgUnits;
 
+            //tjekker om brugeren har de forskellige administrator rettigheder.
             var userVm: IDeleteViewModel = {
                 isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
                 isOrgAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.OrganizationModuleAdmin }) !== undefined,
@@ -114,6 +73,13 @@
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined
             };
             this.vm = userVm;
+            //tjekker om bruger har nogen admin rolle
+            this.vmHasAdminRoles = userVm.isContractAdmin ||
+                userVm.isLocalAdmin ||
+                userVm.isOrgAdmin ||
+                userVm.isProjectAdmin ||
+                userVm.isReportAdmin ||
+                userVm.isSystemAdmin;
         }
 
         public ok() {
@@ -150,75 +116,30 @@
                                 ],
                                 user: [
                                     "$http", "userService",
-                                    ($http, userService) =>
+                                    ($http: ng.IHttpService, userService) =>
                                         userService.getUser()
                                             .then((currentUser) => $http
                                                 .get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
-                                                .then(result => result.data.value))
+                                                .then(result => result.data))
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItProjectService"
-                                projectRoles: ["ItProjectService", (itProjectRoles) =>
-                                    itProjectRoles.GetAllProjectRoles()
-                                        .then(roleResult => roleResult.data.value)
-                                ],
-
-                                projectRights: ["ItProjectService", (itProjectRights) =>
-                                    itProjectRights.GetProjectRightsById($stateParams["id"])
-                                        .then(rightsResult => rightsResult.data.value)
-                                ],
-
                                 projects: ["ItProjectService", (itProjects) =>
-                                    itProjects.GetAllProjects()
+                                    itProjects.GetProjectDataById($stateParams["id"])
                                         .then(projectResult => projectResult.data.value)
                                 ],
-
-                                systemRoles: ["ItSystemService", (itSystemRoles) =>
-                                    itSystemRoles.GetAllSystemRoles()
-                                        .then(roleResult => roleResult.data.value)
-                                ],
-
-                                systemRights: ["ItSystemService", (itSystemRights) =>
-                                    itSystemRights.GetSystemRightsById($stateParams["id"])
-                                        .then(rightsResult => rightsResult.data.value)
-                                ],
-
+                                //Henter data for de forskellige collections ved brug er servicen "ItSystemService"
                                 system: ["ItSystemService", (itSystems) =>
-                                    itSystems.GetAllSystems()
+                                    itSystems.GetSystemDataByIdFiltered($stateParams["id"])
                                         .then(systemResult => systemResult.data.value)
                                 ],
-
-                                itContractsRoles: ["ItContractsService", (itContractsRoles) =>
-                                    itContractsRoles.GetAllItContractRoles()
-                                        .then(systemResult => systemResult.data.value)
-                                ],
-
-                                itContractsRights: ["ItContractsService", (itContractsRights) =>
-                                    itContractsRights.GetItContractRightsById($stateParams["id"])
-                                        .then(systemResult => systemResult.data.value)
-                                ],
-
+                                //Henter data for de forskellige collections ved brug er servicen "ItContractService"
                                 itContracts: ["ItContractsService", (itContracts) =>
-                                    itContracts.GetAllItContracts()
+                                    itContracts.GetContractDataById($stateParams["id"])
                                         .then(systemResult => systemResult.data.value)
                                 ],
-                                
-                                getUsers: ["UserGetService", (userGet) =>
-                                    userGet.GetAllUsers()
-                                        .then(users => users.data.value)
-                                ],
-
-                                orgUnitRoles: ["organizationService", (orgUnitRoles) =>
-                                    orgUnitRoles.GetAllOrganizationUnitRoles()
-                                        .then(result => result.data.value)
-                                ],
-
-                                orgUnitRights: ["organizationService", (orgUnitRights) =>
-                                    orgUnitRights.GetOrganisationRightsById($stateParams["id"])
-                                        .then(result => result.data.value)
-                                ],
-
+                                //Henter data for de forskellige collections ved brug er servicen "OrganizationService"
                                 orgUnits: ["organizationService", (orgUnits) =>
-                                    orgUnits.GetOrganizationUnitById()
+                                    orgUnits.GetOrganizationUnitDataById($stateParams["id"])
                                         .then(result => result.data.value)
                                 ]
                             }

@@ -32,7 +32,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             // don't overwrite global admin if it already exists
             // cause it'll overwrite UUID
-            var globalAdmin = context.Users.SingleOrDefault(x => x.Email == "support@kitos.dk") ?? context.Users.Add(
+            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == "support@kitos.dk") ?? context.Users.Add(
                 new User
                 {
                     Name = "Global",
@@ -534,7 +534,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
             context.SaveChanges();
 
-            commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
+            //commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
             //SetUserDefaultOrganizationUnit(globalAdmin, commonOrganization);
             //SetUserDefaultOrganizationUnit(user1, commonOrganization);

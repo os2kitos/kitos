@@ -6,13 +6,18 @@
         "noImplicitAny": false,
         "removeComments": false,
         "preserveConstEnums": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "typeRoots": [
+            "./typings-custom"    
+        ]
     },
     "exclude": [
         "node_modules",
         "jspm_packages",
         "bower_components",
-        "typings",
-        "typings-custom"
+        "typings"
+    ],
+    "include": [
+        "./Presentation.Web/**/*"
     ]
 }

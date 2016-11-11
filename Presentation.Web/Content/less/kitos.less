@@ -1,0 +1,838 @@
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-family: Calibri, Candara, Arial, sans-serif !important;
+  background-color: #f2f2f2;
+}
+
+div#page-wrapper {
+  min-width: 1024px;
+  max-width: 1600px;
+  height: 100%;
+  padding: 0;
+  margin: 0 auto;
+}
+
+div#page-content {
+  min-width: 1024px;
+  max-width: 1600px;
+  height: 100%;
+}
+
+div#page-body {
+  height: 100%;
+  padding: 10px 0 20px 0;
+  background-color: white;
+}
+
+.footer {
+  padding: 5px 5px 5px 0;
+  background-color: white;
+}
+
+/************ NAVIGATION BAR TOP **************/
+.navbar-nav {
+  width: 70%;
+}
+
+.navbar-nav > li {
+  width: 20%;
+}
+
+#navbar-top {
+  height: 80px;
+  font-size: 15px;
+  background-color: rgb(55, 96, 146);
+  border: 0;
+}
+#navbar-top .navbar-brand {
+  height: 55px;
+  padding: 0 10px;
+  margin: 15px 5px;
+  font-size: 25px;
+  line-height: 55px;
+  text-align: center;
+}
+
+#navbar-top .navbar-nav li a,
+    #navbar-top .navbar-text {
+  height: 55px;
+  padding: 0 10px;
+  margin: 15px 5px;
+  font-size: 18px;
+  line-height: 55px;
+  text-align: center;
+}
+
+#navbar-top li a {
+  width: 100%;
+}
+
+#navbar-top li.double-line a {
+  padding-top: 18px;
+  line-height: 17px;
+}
+
+#navbar-top .navbar-text-small {
+  font-size: .8em;
+}
+
+#navbar-top .navbar-text-large {
+  font-size: 3em;
+}
+
+#navbar-top .navbar-complex {
+  padding-top: -10px;
+  font-size: .7em;
+  line-height: 25px;
+}
+
+#navbar-top a {
+  padding: 5px;
+  color: white;
+}
+
+#navbar-top a.active,
+        #navbar-top a:hover {
+  color: rgb(55, 96, 146);
+  text-decoration: none;
+  background-color: rgb(219, 229, 241);
+}
+/*********************************************/
+
+#subnav ul {
+  margin: 0;
+  list-style-type: none;
+}
+
+#subnav nav ul li {
+  display: inline-block;
+  margin-left: 10px;
+}
+
+#subnav nav ul li a.btn-tab {
+  color: black;
+  background-color: #e6e6e6;
+}
+
+#subnav nav ul li a.btn-tab-active {
+  background-color: white;
+}
+
+
+
+div.org-node-top {
+  margin-top: 5px;
+}
+
+div.org-node {
+  display: block;
+  width: 100%;
+}
+
+div.org-node a {
+  color: white;
+  text-decoration: none;
+}
+
+div.org-node span.org-node-info {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 0;
+  background: rgb(219, 229, 241);
+}
+
+div.org-node span.org-node-info > a {
+  color: rgb(55, 96, 146);
+}
+
+div.org-node span.org-node-info i {
+  color: rgb(55, 96, 146);
+}
+
+div.org-node.selected > span.org-node-info {
+  background-color: rgb(55, 96, 146);
+}
+
+div.org-node.selected > span.org-node-info > a {
+  color: white;
+}
+
+div.org-node.selected > span.org-node-info i {
+  color: white;
+}
+
+div.org-node.hasWriteAccess span.org-node-info {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 0;
+  background: rgb(177, 207, 243);
+}
+
+div.org-node.selected.hasWriteAccess > span.org-node-info {
+  background: rgb(55, 96, 146);
+}
+
+div.org-node.selected.hasWriteAccess > span.org-node-info > a {
+  color: white;
+}
+
+div.org-node.selected.hasWriteAccess > span.org-node-info i {
+  color: white;
+}
+
+
+div.org-node li {
+  position: relative;
+  padding: 5px 5px;
+  margin: 0;
+  list-style-type: none;
+}
+
+div.org-node li::before, .org-node li::after {
+  position: absolute;
+  right: auto;
+  left: -20px;
+  content: '';
+}
+
+div.org-node li::before {
+  top: 5px;
+  bottom: 50px;
+  width: 1px;
+  height: 100%;
+  border-left: 2px solid #ddd;
+}
+
+div.org-node.selected li::before {
+  border-color: #aaa;
+}
+
+div.org-node li:last-child::before {
+  height: 15px;
+}
+
+div.org-node li::after {
+  top: 20px;
+  width: 20px;
+  height: 15px;
+  border-top: 2px solid #ddd;
+}
+
+div.org-node.selected li::after {
+  border-color: #767676;
+}
+/* TODO: Style these? */
+
+
+
+
+
+
+div.suggest-box {
+  padding: 15px;
+}
+
+input:disabled {
+  cursor: inherit !important;
+}
+
+input.input-cell {
+  height: 30px;
+  padding: 1px 5px 1px 3px !important;
+  margin: 0 !important;
+  font-size: 11px;
+  text-align: right;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+input.input-cell:focus {
+  background: rgba(0, 0, 0, .1);
+  box-shadow: none;
+}
+
+input.input-cell:read-only {
+  cursor: default;
+  background: none;
+}
+
+input.input-cell:focus:read-only {
+  background: none;
+  box-shadow: none;
+}
+
+td.td-very-condensed {
+  padding: 0 !important;
+}
+
+td.border-left {
+  border-left: 2px solid gainsboro;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.white {
+  color: white !important;
+}
+
+.normal-color {
+  color: rgb(90, 90, 90) !important;
+}
+
+.light-blue {
+  color: rgb(184, 202, 226) !important;
+}
+
+.broken-white {
+  color: #f0f0f0 !important;
+}
+
+/* invalid input fields */
+input.ng-invalid:not(.ng-pristine) {
+  background-color: rgba(240, 73, 73, .2) !important;
+}
+
+div.tab-content {
+  padding-top: 20px;
+}
+
+.nav-tabs a {
+  cursor: pointer;
+}
+
+a {
+  cursor: pointer;
+}
+
+div.popover {
+  color: black !important;
+}
+
+.highlight {
+  background-color: rgb(255, 255, 177);
+}
+
+.indent {
+  visibility: hidden;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.faded {
+  opacity: .3;
+}
+
+.no-min-width {
+  min-width: initial;
+}
+
+div.task-usage-root {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  background-color: rgb(242, 242, 242);
+  border: 2px solid rgb(195, 195, 195);
+  border-radius: 5px;
+}
+
+div.task-usage-row {
+  padding: 2px 0;
+}
+
+.dropdown-menu.traffic-light {
+  left: 7px;
+  min-width: initial;
+  padding: 0;
+}
+
+.dropdown-menu.traffic-light a {
+  padding: 5px;
+  margin: 5px;
+}
+
+.dropdown-menu.traffic-light a:hover {
+  border-color: black;
+}
+
+
+a.task-fold {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.task-fold:hover {
+  color: black;
+}
+
+.select-status {
+  display: inline-block;
+  padding: 4px 6px 0 6px;
+  color: transparent !important;
+}
+
+.status-circle {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: gray;
+  border: 2px solid rgb(52, 52, 52);
+  border-radius: 12px;
+}
+
+.select-status:hover .status-circle {
+  border: 2px solid rgb(108, 108, 108);
+}
+
+.status-arrow-down {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-bottom: 5px;
+  margin-left: 2px;
+  border-top: 5px solid rgb(52, 52, 52);
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+}
+
+.select-status:hover .status-arrow-down {
+  border-top: 5px solid rgb(108, 108, 108);
+}
+
+.status-circle.red, .progress-bar-danger {
+  background: rgb(208, 67, 67);
+}
+.traffic-light .status-circle.red:hover {
+  background: rgb(157, 45, 45);
+}
+
+.status-circle.yellow, .progress-bar-warning {
+  background: rgb(254, 232, 34);
+}
+.traffic-light a.status-circle.yellow:hover {
+  background: rgb(204, 183, 0);
+}
+
+.status-circle.green, .progress-bar-success {
+  background: rgb(54, 164, 54);
+}
+.traffic-light  a.status-circle.green:hover {
+  background: rgb(33, 118, 33);
+}
+
+.status-circle.white, .progress-bar-white {
+  background: rgb(255, 255, 255);
+}
+.traffic-light a.status-circle.white:hover {
+  background: rgb(213, 213, 213);
+}
+
+.status-bar {
+  margin-bottom: 0;
+  /*vertical-align: middle;*/
+  /*display: inline-block;*/
+  /*width: 45px;*/
+  /*height: 20px;*/
+  /*border: 1px solid #cccccc;*/
+  border-radius: 0;
+}
+
+
+.status-column {
+  display: inline-block;
+  width: 32%;
+  text-align: center;
+}
+
+
+.supertext {
+  position: absolute;
+  top: -8px;
+}
+
+.subtext {
+  position: absolute;
+  top: 8px;
+  width: 100%;
+}
+.btn-star {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  color: rgb(255, 141, 0);
+}
+
+.btn-star.unstarred {
+  color: rgb(181, 181, 181);
+}
+
+.btn-star:hover, .btn-star:active {
+  color: rgb(188, 104, 0);
+}
+
+.task-table .row {
+  padding: 3px 0;
+}
+
+.col-sm-0 {
+  width: 1%;
+}
+
+body.wait, body.wait * {
+  cursor: wait !important;
+}
+
+.btn-header {
+  width: 100%;
+  padding: 2px;
+  text-align: left;
+}
+
+.org-role-table {
+  table-layout: fixed;
+}
+
+.org-role-table thead > tr th:nth-child(1) {
+  width: 30%;
+}
+
+.org-role-table thead > tr th:nth-child(2) {
+  width: 20%;
+}
+
+.org-role-table thead > tr th:nth-child(3) {
+  width: 20%;
+}
+
+.org-role-table thead > tr th:nth-child(4) {
+  width: 30%;
+}
+
+.form-horizontal.fix-label-padding label.control-label {
+  padding-top: 3px !important;
+}
+
+.org-selector {
+  height: auto !important;
+  padding: 2px;
+  font-size: 12px !important;
+  line-height: 10px !important;
+  color: black;
+}
+
+.relative-position {
+  position: relative;
+}
+
+div.pull-outside-table {
+  position: absolute;
+  top: 8px;
+  right: -50px;
+}
+
+.margin-top {
+  margin-top: 50px;
+}
+
+table.table-fixed {
+  table-layout: fixed;
+}
+
+table.table-no-margin {
+  margin: 0;
+}
+
+.table tbody > tr > td.vert-align {
+  vertical-align: middle;
+}
+
+tr.sub-sum {
+  background-color: rgba(242, 208, 95, .37);
+}
+
+tr.sum {
+  background-color: rgba(142, 197, 245, .37);
+  border-color: gainsboro;
+  border-style: solid;
+  border-width: 2px 0;
+}
+
+tr.super-sum {
+  background-color: rgba(80, 132, 178, .37);
+  border-color: gainsboro;
+  border-style: solid;
+  border-width: 2px 0;
+}
+
+/* remove margins in inline form groups */
+.form-inline .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.btn-order-by {
+  color: inherit;
+  text-align: left;
+  background: none;
+}
+
+.btn-order-by:hover, .btn-order-by:active, .btn-order-by:focus {
+  color: black !important;
+}
+
+.btn-order-by::after {
+  min-width: 20px;
+  font-size: .7em;
+  content: '▼▲';
+  opacity: .5;
+}
+
+.btn-order-by.ordering::after {
+  content: '▲';
+  opacity: 1;
+}
+
+.btn-order-by.ordering.descending::after {
+  content: '▼';
+}
+
+.btn-default {
+  color: black;
+  background-color: white;
+  border-color: #ccc;
+}
+
+.btn-default:hover, .btn-default:focus {
+  color: black;
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
+  color: black;
+  background-color: #ccc;
+  border-color: #ccc;
+}
+
+
+.subtabs {
+  display: inline-block;
+  width: 100%;
+  padding: 20px 5px 2px 5px !important;
+}
+
+.dropdown-menu {
+  font-size: inherit !important;
+}
+
+.nav.nav-tabs > li > a {
+  padding: 8px 9px !important;
+  text-align: center;
+}
+
+.excel-icon {
+  position: absolute;
+  top: -45px;
+  right: 0;
+}
+
+div.searchbox {
+  position: absolute;
+  top: -45px;
+  right: 30px;
+  display: inline-block;
+  width: 300px;
+}
+div.searchbox-wrapper {
+  position: relative;
+  width: 100%;
+}
+.input-xs {
+  height: 26px;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* Textarea resize */
+.resize-vertical {
+  resize: vertical;
+}
+
+/* disabled inputfield */
+.disabled-input {
+  cursor: not-allowed;
+  background-color: #ddd;
+}
+
+
+/*
+    Fixes kendo problem with bootstrap form-control
+    http://docs.telerik.com/kendo-ui/using-kendo-with-twitter-bootstrap#using-the-form-control-bootstrap-css-class-with-kendo-ui-widgets
+*/
+.form-control.k-widget {
+  width: 100%;
+  padding: 0;
+}
+
+/* fixes hover color on nav buttons */
+.nav > li > a.btn-success:hover,
+.nav > li > a.btn-success:focus {
+  text-decoration: none;
+  background-color: #449d44;
+}
+
+.nav > li > a.btn-danger:hover,
+.nav > li > a.btn-danger:focus {
+  text-decoration: none;
+  background-color: #c9302c;
+}
+
+/* Make grid header titles wrap text  */
+.k-grid  .k-grid-header  .k-header  .k-link {
+  height: auto;
+}
+.k-grid  .k-grid-header  .k-header {
+  white-space: normal;
+}
+
+.k-grid td {
+  padding: .2em .3em;
+}
+
+.k-grid select {
+  width: 100%;
+}
+
+/*
+  Make grid content have a minimum height
+  so it shows the spinner when initially loaded
+*/
+.k-grid-content {
+  min-height: 50px!important;
+}
+
+.k-grid-toolbar {
+  padding: .3em;
+}
+
+/* show an ellipsis (...) when content overflow */
+.might-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* expand content to its full length on mouseover */
+.might-overflow:hover {
+  text-overflow: clip;
+  word-break: break-all;
+  white-space: normal;
+}
+
+.k-header {
+  vertical-align: middle!important;
+}
+
+/*
+    Fixes odd uib-tooltip placement
+    https://github.com/angular-ui/bootstrap/issues/4649
+*/
+.nowrap {
+  white-space: nowrap;
+}
+
+.no-top-margin {
+  margin-top: 0;
+}
+
+/* TREE VIEW */
+
+.angular-ui-tree-handle {
+  display: inline-block ;
+  min-height: 20px;
+  padding: 5px 10px;
+  font-weight: normal;
+  line-height: 20px;
+  color: #376092 !important;
+  background: #b1cff3 !important;
+  border: 1px solid #dae2ea;
+}
+
+div.angular-ui-tree-handle.selected {
+  background-color: rgb(55, 96, 146) !important;
+}
+
+div.angular-ui-tree-handle.selected a span {
+  color: white !important;
+}
+
+div.angular-ui-tree-handle.selected {
+  color: white !important;
+}
+
+.angular-ui-tree-handle:hover {
+  color: #438eb9;
+  background: #f4f6f7;
+  border-color: #dce2e8;
+}
+
+.angular-ui-tree-placeholder {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  background: #f0f9ff;
+  border: 2px dashed #bed2db;
+}
+
+tr.angular-ui-tree-empty {
+  height: 100px;
+}
+
+.group-title {
+  color: #fff !important;
+  background-color: #687074 !important;
+}
+
+.tree-node {
+  color: #7c9eb2;
+  background: #f8faff;
+  border: 1px solid #dae2ea;
+}
+
+.nodrop {
+  background-color: #f2dede;
+}
+
+.nonDragable .tree-node-content {
+  cursor: pointer !important;
+}
+
+.tree-node-content {
+  margin: 5px;
+}
+
+.tree-handle {
+  padding: 10px;
+  margin-right: 10px;
+  color: #fff;
+  background: #428bca;
+}
+
+.angular-ui-tree-placeholder {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  background: #f0f9ff;
+  border: 2px dashed #bed2db;
+}
