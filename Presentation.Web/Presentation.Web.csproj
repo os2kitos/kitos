@@ -381,6 +381,7 @@
     <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TsaTypesController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />

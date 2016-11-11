@@ -15,6 +15,7 @@ using Presentation.Web.Controllers.OData;
 using Presentation.Web.Controllers.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
+using Presentation.Web.Infrastructure;
 
 namespace Presentation.Web
 {
@@ -44,6 +45,7 @@ namespace Presentation.Web
             config.EnableCaseInsensitive(true);
             config.EnableUnqualifiedNameCall(true);
             config.Formatters.Remove(config.Formatters.XmlFormatter);
+            config.Filters.Add(new ExceptionLogFilterAttribute());
         }
 
         public static IEdmModel GetModel()
