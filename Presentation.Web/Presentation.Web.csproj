@@ -541,6 +541,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\it-tab-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
@@ -553,6 +554,8 @@
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\It-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
