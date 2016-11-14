@@ -113,41 +113,19 @@
                                    data-field="sensitiveDataTypeId">
                     </select-option>
                 </div>
-
-                <!-- esdh ref -->
+                <!-- archiving -->
                 <div class="form-group">
-                    <label for="esdh" class="control-label small">ESDH ref.</label>
-                    <div class="input-group">
-                        <input id="esdh" type="text" class="form-control input-sm" placeholder="http://"
-                               data-ng-model="usage.esdhRef"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="esdhRef"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.esdhRef">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
-                </div>
-
-                <!-- link ref -->
-                <div class="form-group">
-                    <label for="url" class="control-label small">Mappe/URL ref.</label>
-                    <div class="input-group">
-                        <input id="url" type="text" class="form-control input-sm" placeholder="http://"
-                               data-ng-model="usage.directoryOrUrlRef"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="directoryOrUrlRef"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.directoryOrUrlRef">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
+                    <select-option data-id="archive"
+                                   data-label="Arkivering"
+                                   data-placeholder="Vælg arkivering"
+                                   data-selected-text="{{ usage.archiveTypeName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="usage.archiveTypeId"
+                                   data-options="archiveTypes"
+                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                                   data-field="archiveTypeId">
+                    </select-option>
+                    <span class="help-block small">&nbsp;</span>
                 </div>
             </div>
 
@@ -182,39 +160,8 @@
                            data-field="overviewId">
                 </div>
 
-                <!-- archiving -->
-                <div class="form-group">
-                    <select-option data-id="archive"
-                                   data-label="Arkivering"
-                                   data-placeholder="Vælg arkivering"
-                                   data-selected-text="{{ usage.archiveTypeName }}"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="usage.archiveTypeId"
-                                   data-options="archiveTypes"
-                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                   data-field="archiveTypeId">
-                    </select-option>
-                    <span class="help-block small">&nbsp;</span>
-                </div>
+               
 
-                <!-- CMDB ref -->
-                <div class="form-group">
-                    <label for="cmdb" class="control-label small">CMDB ref.</label>
-                    <div class="input-group">
-                        <input id="cmdb" type="text" class="form-control input-sm" placeholder="http://"
-                               data-ng-model="usage.cmdbRef"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="cmdbRef"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.cmdbRef">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
-                </div>
-            </div>
 
             <!-- full width -->
             <div class="col-xs-12">
