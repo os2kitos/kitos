@@ -53,7 +53,7 @@
                     var created = new Date();
 
                     var data = {
-                        ItSystem_Id: itSystem.id,
+                        ItSystemUsage_Id: itSystem.id,
                         Title: $scope.reference.title,
                         ExternalReferenceId: $scope.reference.externalReferenceId,
                         URL: $scope.reference.url,

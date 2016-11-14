@@ -24,8 +24,8 @@ namespace Core.DomainModel
         public int? Itcontract_Id { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }
 
-        public int? ItSystem_Id { get; set; }
-        public virtual ItSystem.ItSystem ItSystem { get; set; }
+        public int? ItSystemUsage_Id { get; set; }
+        public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
         
         
         public string Title { get; set; }

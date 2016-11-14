@@ -25,7 +25,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
-    <TypeScriptToolsVersion>1.8</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -381,6 +381,7 @@
     <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TsaTypesController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
@@ -541,6 +542,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\it-tab-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
@@ -553,6 +555,8 @@
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\It-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
@@ -566,6 +570,9 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
@@ -688,7 +695,7 @@
     <Content Include="Content\img\Systemforside_white.svg" />
     <Content Include="Content\img\Systemroller.svg" />
     <Content Include="Content\notify\notify.css" />
-    <Content Include="Content\kitos.css" />
+    <None Include="Content\kitos.less" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -1060,6 +1067,7 @@
     <Content Include="app\components\org\user\org-user-delete.modal.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-main.view.html" />
+    <Content Include="Content\less\styles.less" />
     <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
       <SubType>Designer</SubType>
     </None>
@@ -1079,7 +1087,6 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="tsconfig.json" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

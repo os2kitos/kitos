@@ -262,6 +262,8 @@
                     var overrule = $scope.contract.active;
                     var today = new Date();
 
+                    
+                   if (expirationDate) { 
                     if (expirationDate.length > 10) {
                         //ISO format
                         expirationDateObject = new Date(expirationDate);
@@ -270,17 +272,38 @@
                         var splitArray = expirationDate.split("-");
                         expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
                     }
+                    }
+                    
+                    if (concluded) {
+                        if (concluded.length > 10) {
+                            //ISO format
+                            concludedObject = new Date(concluded);
 
-                    if (concluded.length > 10) {
-                        //ISO format
-                        concludedObject = new Date(concluded);
-
-                    } else {
-                        var splitArray = concluded.split("-");
-                        concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                        } else {
+                            var splitArray = concluded.split("-");
+                            concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                        }
                     }
 
-                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
+                    if (concluded && expirationDate) {
+
+                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
+
+                    }
+                    else if (concluded && !expirationDate) {
+
+                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0));
+
+                    }
+                    else if (!concluded && !expirationDate) {
+                        isTodayBetween = true;
+
+                    }
+                    else if (!concluded && expirationDate) {
+
+                        var isTodayBetween = (today < expirationDateObject.setHours(23, 59, 59, 999));
+
+                    }
 
                     var isContractActive = (isTodayBetween || overrule);
 

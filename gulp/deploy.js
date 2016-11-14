@@ -10,13 +10,27 @@ var ts = require('gulp-typescript');
 var htmlreplace = require('gulp-html-replace');
 var debug = require('gulp-debug');
 var rev = require('gulp-rev');
+var less = require('gulp-less');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
-var tsProject = ts.createProject('./Presentation.Web/tsconfig.json');
+var tsProject = ts.createProject('tsconfig.json');
 
 //Synchronously delete the output script file(s)
 gulp.task("clean-js-and-maps", function () {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
+});
+
+// create css bundled file
+gulp.task("css", ["clean-styles"], function () {
+    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
+        .pipe(sourcemaps.init())
+        .pipe(less())
+        .pipe(concat(config.cssBundle))
+        .pipe(gulp.dest(config.cssDest))
+        .pipe(minifyCSS())
+        .pipe(concat(config.cssBundleMin))
+        .pipe(sourcemaps.write(config.maps))
+        .pipe(gulp.dest(config.cssDest));
 });
 
 gulp.task('typescript', function () {
@@ -99,18 +113,6 @@ gulp.task("clean-styles", function () {
 // copy assets
 gulp.task("assets", ["clean-styles"], function () {
     return gulp.src(config.assetsSrc)
-        .pipe(gulp.dest(config.cssDest));
-});
-
-// create css bundled file
-gulp.task("css", ["clean-styles"], function () {
-    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
-        .pipe(sourcemaps.init())
-        .pipe(concat(config.cssBundle))
-        .pipe(gulp.dest(config.cssDest))
-        .pipe(minifyCSS())
-        .pipe(concat(config.cssBundleMin))
-        .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(config.cssDest));
 });
 
