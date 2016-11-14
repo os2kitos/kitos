@@ -1,259 +1,67 @@
 ﻿<!-- it project master sheet -->
-<form role="form" class="container-fluid">
-    <div class="row">
-        <!-- Left side -->
-        <div class="col-md-6">
-            <div class="row">
-                <!-- 1st column -->
-                <div class="col-md-6">
-                    <!-- Name -->
-                    <div class="form-group">
-                        <label for="project-name" class="control-label small">Projekt</label>
-                        <input type="text" id="project-name" class="form-control input-sm" required
-                               data-ng-model="projectEditVm.project.name"
-                               data-field="name"
-                               data-autosave="{{projectEditVm.autosaveUrl}}"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess"
-                               autofocus>
-                    </div>
-                    <!-- ID -->
-                    <div class="form-group">
-                        <label for="project-projectId" class="control-label small">Projekt ID</label>
-                        <input type="text" id="project-projectId" class="form-control input-sm"
-                               data-ng-model="projectEditVm.project.itProjectId"
-                               data-field="itProjectId"
-                               data-autosave="{{projectEditVm.autosaveUrl}}"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess">
-                    </div>
-
-                    <!-- type -->
-                    <div class="form-group">
-                        <select-option data-id="project-type"
-                                       data-label="Type"
-                                       data-placeholder="Vælg projekt type"
-                                       data-selected-text="{{ projectEditVm.project.itProjectTypeName }}"
-                                       data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                       data-ng-model="projectEditVm.project.itProjectTypeId"
-                                       data-options="projectEditVm.projectTypes"
-                                       data-auto-save-url="{{ projectEditVm.autosaveUrl }}"
-                                       data-field="itProjectTypeId">
-                        </select-option>
-                        <span class="help-block small">&nbsp;</span>
-                    </div>
-
-                    <!-- cmdb ref -->
-                    <div class="form-group">
-                        <label for="project-cmdb" class="control-label small">CMDB ref.</label>
-                        <div class="input-group">
-                            <input id="project-cmdb" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="projectEditVm.project.cmdb"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                   data-field="cmdb"
-                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.cmdb">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-                </div>
-
-                <!-- 2nd column -->
-                <div class="col-md-6">
-                    <!-- Object owner -->
-                    <div class="form-group">
-                        <label class="control-label small">Oprettet af</label>
-                        <input type="text" value="{{projectEditVm.project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
-                    </div>
-                    <!-- access modifier -->
-                    <div class="form-group">
-                        <label for="project-access" class="control-label small">Synlighed</label>
-                        <input id="project-access" class="form-control input-sm"
-                               data-ng-model="projectEditVm.project.accessModifier"
-                               data-select-access-modifier=""
-                               data-field="accessModifier"
-                               data-autosave="{{projectEditVm.autosaveUrl}}"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess">
-                    </div>
-
-                    <!-- esdh ref -->
-                    <div class="form-group">
-                        <label for="project-esdh" class="control-label small">ESDH ref.</label>
-                        <div class="input-group">
-                            <input id="project-esdh" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="projectEditVm.project.esdh"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                   data-field="esdh"
-                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.esdh">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-
-                    <!-- link ref -->
-                    <div class="form-group">
-                        <label for="project-url" class="control-label small">Mappe link</label>
-                        <div class="input-group">
-                            <input id="project-url" class="form-control input-sm" type="text" placeholder="http://"
-                                   data-ng-model="projectEditVm.project.folder"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess"
-                                   data-field="folder"
-                                   data-autosave="api/itproject/{{projectEditVm.project.id}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="projectEditVm.project.folder">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-                </div>
-
-                <!-- full width (left side) -->
-                <div class="col-md-12">
-                    <!-- archived -->
-                    <div class="checkbox-inline">
-                        <label>
-                            <input type="checkbox"
-                                   data-ng-model="projectEditVm.project.isArchived"
-                                   data-autosave="{{projectEditVm.autosaveUrl}}"
-                                   data-field="isArchived"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
-                            Inaktiv
-                        </label>
-                    </div>
-
-                    <!-- transversal -->
-                    <div class="checkbox-inline">
-                        <label>
-                            <input type="checkbox"
-                                   data-ng-model="projectEditVm.project.isTransversal"
-                                   data-autosave="{{projectEditVm.autosaveUrl}}"
-                                   data-field="isTransversal"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
-                            Tværgående
-                        </label>
-                    </div>
-
-                    <!-- strategy -->
-                    <div class="checkbox-inline">
-                        <label>
-                            <input type="checkbox"
-                                   data-ng-model="projectEditVm.project.isStrategy"
-                                   data-autosave="{{projectEditVm.autosaveUrl}}"
-                                   data-field="isStrategy"
-                                   data-ng-disabled="!projectEditVm.hasWriteAccess">
-                            Strategisk
-                        </label>
-                    </div>
-
-                    <!-- Parent -->
-                    <div class="form-group">
-                        <label for="project-parent" class="control-label small">Overordnet projekt</label>
-                        <input type="hidden" id="project-parent" class="form-control input-sm"
-                               data-ui-select2="projectEditVm.parentSelectOptions"
-                               data-ng-model="projectEditVm.project.parent"
-                               data-autosave="{{projectEditVm.autosaveUrl}}"
-                               data-field="parentId"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess">
-                    </div>
-                </div>
+<form role="form" class="container-fluid object-wrapper">
+    <!-- Left menu -->
+    <div class="col-xs-2 left-menu-container">
+        <div class="left-menu">
+            <div class="header">
+                <h3>IT Projekt</h3>
             </div>
-        </div>
-
-        <!-- Right side -->
-        <div class="col-md-6">
-            <div class="row">
-                <!-- full width -->
-                <div class="col-md-12">
-                    <!-- background -->
-                    <div class="form-group">
-                        <label for="project-background" class="control-label small">Formål/baggrund</label>
-                        <textarea id="project-background" class="form-control input-sm" rows="7"
-                                  data-ng-model="projectEditVm.project.background"
-                                  data-field="background"
-                                  data-autosave="{{projectEditVm.autosaveUrl}}"
-                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <!-- notes -->
-                    <div class="form-group">
-                        <label for="project-note" class="control-label small">Noter</label>
-                        <textarea id="project-note" class="form-control input-sm" rows="7"
-                                  data-ng-model="projectEditVm.project.note"
-                                  data-field="note"
-                                  data-autosave="{{projectEditVm.autosaveUrl}}"
-                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
-                    </div>
-                </div>
-            </div>
+            <ul>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.main"><img src="/Content/img/Systemforside.svg"></img> Projektforside</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.status-project"><img src="/Content/img/Status-projekt.svg"></img> Status: Projekt</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.status-goal"><img src="/Content/img/Status-maal.svg"></img> Status: Mål</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.phases"><img src="/Content/img/Faser.svg"></img> Faser</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.description"><img src="/Content/img/Projektbeskrivelse.svg"></img> Projektbeskrivelse</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.strategy"><img src="/Content/img/Strategi.svg"></img> Strategi</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.roles"><img src="/Content/img/Projektroller.svg"></img> Projektroller</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.hierarchy"><img src="/Content/img/Hierarki.svg"></img> Hierarki</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.economy"><img src="/Content/img/Oekonomi.svg"></img> Økonomi</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.stakeholders"><img src="/Content/img/Interessenter.svg"></img> Interessenter</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.risk"><img src="/Content/img/Risiko.svg"></img> Risiko</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.communication"><img src="/Content/img/Kommunikation.svg"></img> Kommunikation</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.handover"><img src="/Content/img/Overlevering.svg"></img> Overlevering</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.org"><img src="/Content/img/Organisation.svg"></img> Organisation</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.kle"><img src="/Content/img/KLE.svg"></img> KLE</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.itsys"><img src="/Content/img/ITsystemer.svg"></img> IT Systemer</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-project.edit.references"><img src="/Content/img/References.svg"></img> Referencer</a>
+                </li>
+            </ul>
         </div>
     </div>
+    <div class="col-xs-10 object-content">
+        <ui-view />
+    </div>
 </form>
-
-<!-- sub tab buttons -->
-<ul class="nav nav-tabs">
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.status-project">Status: Projekt</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStatusGoalVisible">
-        <a data-ui-sref="it-project.edit.status-goal">Status: Mål</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.phases">Faser</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.description">Projektbeskrivelse</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStrategyVisible">
-        <a data-ui-sref="it-project.edit.strategy">Strategi</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.roles">Projektroller</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isHierarchyVisible">
-        <a data-ui-sref="it-project.edit.hierarchy">Hierarki</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isEconomyVisible">
-        <a data-ui-sref="it-project.edit.economy">Økonomi</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isStakeholderVisible">
-        <a data-ui-sref="it-project.edit.stakeholders">Interessenter</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isRiskVisible">
-        <a data-ui-sref="it-project.edit.risk">Risiko</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isCommunicationVisible">
-        <a data-ui-sref="it-project.edit.communication">Kommunikation</a>
-    </li>
-    <li data-ui-sref-active="active" data-ng-show="projectEditVm.project.isHandoverVisible">
-        <a data-ui-sref="it-project.edit.handover">Overlevering</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.org">Organisation</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.kle">KLE</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-project.edit.itsys">IT Systemer</a>
-    </li>
-    <li class="pull-right"
-        data-ng-dropdown-multiselect=""
-        data-options="projectEditVm.dropdownData"
-        data-selected-model="projectEditVm.selectedData"
-        data-extra-settings="projectEditVm.selectSettings"
-        data-translation-texts="projectEditVm.selectTranslation">
-    </li>
-</ul>
-
-<!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs"/>

@@ -1,0 +1,147 @@
+﻿<div class="row">
+    <!-- Left side -->
+    <div class="col-xs-6">
+        <div class="row">
+            <!-- 1st column -->
+            <div class="col-xs-6">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="project-name" class="control-label small">Projekt</label>
+                    <input type="text" id="project-name" class="form-control input-sm" required
+                            data-ng-model="project.name"
+                            data-field="name"
+                            data-autosave="{{autosaveUrl}}"
+                            data-ng-disabled="!hasWriteAccess"
+                            autofocus>
+                </div>
+                <!-- ID -->
+                <div class="form-group">
+                    <label for="project-projectId" class="control-label small">Projekt ID</label>
+                    <input type="text" id="project-projectId" class="form-control input-sm"
+                            data-ng-model="project.itProjectId"
+                            data-field="itProjectId"
+                            data-autosave="{{autosaveUrl}}"
+                            data-ng-disabled="!hasWriteAccess">
+                </div>
+
+                <!-- type -->
+                <div class="form-group">
+                    <select-option data-id="project-type"
+                                    data-label="Type"
+                                    data-placeholder="Vælg projekt type"
+                                    data-selected-text="{{ project.itProjectTypeName }}"
+                                    data-ng-disabled="!hasWriteAccess"
+                                    data-ng-model="project.itProjectTypeId"
+                                    data-options="projectTypes"
+                                    data-auto-save-url="{{ autosaveUrl }}"
+                                    data-field="itProjectTypeId">
+                    </select-option>
+                    <span class="help-block small">&nbsp;</span>
+                </div>
+
+                <!-- cmdb ref -->
+                
+            </div>
+
+            <!-- 2nd column -->
+            <div class="col-xs-6">
+                <!-- Object owner -->
+                <div class="form-group">
+                    <label class="control-label small">Oprettet af</label>
+                    <input type="text" value="{{project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
+                </div>
+                <!-- access modifier -->
+                <div class="form-group">
+                    <label for="project-access" class="control-label small">Synlighed</label>
+                    <input id="project-access" class="form-control input-sm"
+                            data-ng-model="project.accessModifier"
+                            data-select-access-modifier=""
+                            data-field="accessModifier"
+                            data-autosave="{{autosaveUrl}}"
+                            data-ng-disabled="!hasWriteAccess">
+                </div>
+
+            </div>
+
+            <!-- full width (left side) -->
+            <div class="col-xs-12">
+                <!-- archived -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.isArchived"
+                                data-autosave="{{autosaveUrl}}"
+                                data-field="isArchived"
+                                data-ng-disabled="!hasWriteAccess">
+                        Inaktiv
+                    </label>
+                </div>
+
+                <!-- transversal -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.isTransversal"
+                                data-autosave="{{autosaveUrl}}"
+                                data-field="isTransversal"
+                                data-ng-disabled="!hasWriteAccess">
+                        Tværgående
+                    </label>
+                </div>
+
+                <!-- strategy -->
+                <div class="checkbox-inline">
+                    <label>
+                        <input type="checkbox"
+                                data-ng-model="project.isStrategy"
+                                data-autosave="{{autosaveUrl}}"
+                                data-field="isStrategy"
+                                data-ng-disabled="!hasWriteAccess">
+                        Strategisk
+                    </label>
+                </div>
+
+                <!-- Parent -->
+                <div class="form-group">
+                    <label for="project-parent" class="control-label small">Overordnet projekt</label>
+                    <input type="hidden" id="project-parent" class="form-control input-sm"
+                            data-ui-select2="parentSelectOptions"
+                            data-ng-model="project.parent"
+                            data-autosave="{{autosaveUrl}}"
+                            data-field="parentId"
+                            data-ng-disabled="!hasWriteAccess">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="col-xs-6">
+        <div class="row">
+            <!-- full width -->
+            <div class="col-xs-12">
+                <!-- background -->
+                <div class="form-group">
+                    <label for="project-background" class="control-label small">Formål/baggrund</label>
+                    <textarea id="project-background" class="form-control input-sm" rows="7"
+                                data-ng-model="project.background"
+                                data-field="background"
+                                data-autosave="{{autosaveUrl}}"
+                                data-ng-disabled="!hasWriteAccess"></textarea>
+                </div>
+            </div>
+
+            <div class="col-xs-12">
+                <!-- notes -->
+                <div class="form-group">
+                    <label for="project-note" class="control-label small">Noter</label>
+                    <textarea id="project-note" class="form-control input-sm" rows="7"
+                                data-ng-model="project.note"
+                                data-field="note"
+                                data-autosave="{{autosaveUrl}}"
+                                data-ng-disabled="!hasWriteAccess"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

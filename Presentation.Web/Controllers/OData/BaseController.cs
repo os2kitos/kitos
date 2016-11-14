@@ -2,6 +2,8 @@
 using System.Web.OData;
 using Core.DomainServices;
 using System.Web.OData.Routing;
+using Ninject;
+using Ninject.Extensions.Logging;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -9,6 +11,9 @@ namespace Presentation.Web.Controllers.OData
     public abstract class BaseController<T> : ODataController where T : class
     {
         protected readonly IGenericRepository<T> Repository;
+
+        [Inject]
+        public ILogger Logger { get; set; }
 
         protected BaseController(IGenericRepository<T> repository)
         {

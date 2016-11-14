@@ -18,7 +18,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("ItSystem");
-
+            
             // Relationships
             this.HasOptional(t => t.Parent)
                 .WithMany(d => d.Children)

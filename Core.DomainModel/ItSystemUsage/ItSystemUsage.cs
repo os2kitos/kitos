@@ -8,7 +8,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization, IHasReferences
     {
         public ItSystemUsage()
         {
@@ -20,6 +20,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
+            ExternalReferences = new List<ExternalReference>();
         }
 
         /// <summary>
@@ -190,6 +191,8 @@ namespace Core.DomainModel.ItSystemUsage
         /// Associated it projects.
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
+
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
         /// <summary>
         /// Determines whether this instance is within a given organizational context.

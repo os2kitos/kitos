@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel;
+using System;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Models
@@ -81,5 +82,6 @@ namespace Presentation.Web.Models
         public string ByEnding { get; set; }
         public bool? Active { get; set; }
         public bool? IsActive { get; set; }
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
     }
 }

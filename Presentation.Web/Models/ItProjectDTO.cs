@@ -95,6 +95,8 @@ namespace Presentation.Web.Models
 
         public virtual GoalStatusDTO GoalStatus { get; set; }
 
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+
         public int? Roi
         {
             get

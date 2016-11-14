@@ -11,6 +11,13 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             ToTable("ItContract");
 
+
+            HasMany(t => t.ExternalReferences)
+                .WithOptional(d => d.ItContract)
+                .HasForeignKey(d => d.Itcontract_Id)
+                .WillCascadeOnDelete(true);
+
+
             HasOptional(t => t.ContractTemplate)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTemplateId);

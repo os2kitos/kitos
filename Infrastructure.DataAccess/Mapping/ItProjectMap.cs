@@ -53,6 +53,12 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItProjectId)
                 .WillCascadeOnDelete(true);
 
+            HasMany(t => t.ExternalReferences)
+                .WithOptional(d => d.ItProject)
+                .HasForeignKey(d => d.ItProject_Id)
+                .WillCascadeOnDelete(true);
+
+
             HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItProject);
 
