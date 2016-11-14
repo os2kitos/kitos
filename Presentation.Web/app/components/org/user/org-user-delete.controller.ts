@@ -20,6 +20,7 @@
         public vmGetUsers: any;
         public vmOrgUnits: any;
         public vmHasAdminRoles: boolean;
+        public vmUsersInOrganization: any;
 
         private userId: number;
         private firstName: string;
@@ -35,6 +36,7 @@
             "notify",
             "user",
             "currentUser",
+            "usersInOrganization",
             "projects",
             "system",
             "itContracts",
@@ -47,6 +49,7 @@
             private notify,
             private user: Models.IUser,
             private currentUser: Services.IUser,
+            private usersInOrganization: Models.IUser,
             public projects,
             public system,
             public itContracts,
@@ -58,6 +61,7 @@
             this.lastName = user.LastName;
             this.email = user.Email;
 
+            this.vmUsersInOrganization = usersInOrganization;
             this.vmProject = projects;
             this.vmSystem = system;
             this.vmItContracts = itContracts;
@@ -80,6 +84,11 @@
                 userVm.isProjectAdmin ||
                 userVm.isReportAdmin ||
                 userVm.isSystemAdmin;
+        }
+
+        public checkBoxTrueValue = (item) => {
+            var data = { selectedItem: item}
+            console.log("testi");
         }
 
         public ok() {
@@ -121,6 +130,13 @@
                                             .then((currentUser) => $http
                                                 .get(`/odata/Users(${$stateParams["id"]})?$expand=OrganizationRights($filter=OrganizationId eq ${currentUser.currentOrganizationId})`)
                                                 .then(result => result.data))
+                                ],
+                                usersInOrganization: [
+                                    "$http", "userService", "UserGetService",
+                                    ($http: ng.IHttpService, userService, userGetService) =>
+                                        userService.getUser()
+                                            .then((currentUser) => userGetService.GetAllUsersFromOrganizationById(`${currentUser.currentOrganizationId}`)
+                                                .then(result => result.data.value))
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItProjectService"
                                 projects: ["ItProjectService", (itProjects) =>
