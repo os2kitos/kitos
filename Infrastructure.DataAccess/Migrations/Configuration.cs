@@ -57,6 +57,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region OPTIONS
 
+
             AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
 
             AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
@@ -120,7 +121,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "Lederen af en organisationsenhed",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 7
             };
 
             var resourcePerson = new OrganizationUnitRole()
@@ -130,7 +132,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 6
             };
 
             var employee = new OrganizationUnitRole()
@@ -140,7 +143,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = false,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 5
             };
 
             var digitalConsultant = new OrganizationUnitRole()
@@ -150,7 +154,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 4
             };
 
             var itConsultant = new OrganizationUnitRole()
@@ -160,7 +165,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 3
             };
 
             var leader = new OrganizationUnitRole()
@@ -170,7 +176,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 2
             };
 
             var director = new OrganizationUnitRole()
@@ -180,7 +187,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Description = "...",
                 HasWriteAccess = false,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 1
             };
 
             try
@@ -205,7 +213,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Projektejer",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 20
                 },
                 new ItProjectRole()
                 {
@@ -213,7 +222,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Projektleder",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 19
                 },
                 new ItProjectRole()
                 {
@@ -221,7 +231,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Delprojektleder",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 18
                 },
                 new ItProjectRole()
                 {
@@ -229,7 +240,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Projektdeltager",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 17
                 },
                 new ItProjectRole()
                 {
@@ -237,15 +249,17 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Teknisk projektleder",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 16
                 },
                 new ItProjectRole()
                 {
                     HasWriteAccess = true,
                     IsLocallyAvailable = true,
-                    Name = "IT konsulnet",
+                    Name = "IT konsulent",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 15
                 },
                 new ItProjectRole()
                 {
@@ -253,7 +267,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Implementeringskonsulent",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 14
                 },
                 new ItProjectRole()
                 {
@@ -261,7 +276,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Proceskonsulent",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 13
                 },
                 new ItProjectRole()
                 {
@@ -269,7 +285,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Juridisk konsulent",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 12
                 },
                 new ItProjectRole()
                 {
@@ -277,7 +294,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "IT arkitekt",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 11
                 },
                 new ItProjectRole()
                 {
@@ -285,7 +303,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Testansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 10
                 },
                 new ItProjectRole()
                 {
@@ -293,7 +312,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Support",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 9
                 },
                 new ItProjectRole()
                 {
@@ -301,7 +321,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Programleder",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 8
                 },
                 new ItProjectRole()
                 {
@@ -309,7 +330,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Styregruppeformand",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 7
                 },
                 new ItProjectRole()
                 {
@@ -317,7 +339,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Styregruppemedlem",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 6
                 },
                 new ItProjectRole()
                 {
@@ -325,7 +348,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Forretningsejer",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 5
                 },
                 new ItProjectRole()
                 {
@@ -333,7 +357,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Forretningsansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 4
                 },
                 new ItProjectRole()
                 {
@@ -341,7 +366,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Gevinstejer",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 3
                 },
                 new ItProjectRole()
                 {
@@ -349,7 +375,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Gevinsansvarlig",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 2
                 },
                 new ItProjectRole()
                 {
@@ -357,7 +384,8 @@ namespace Infrastructure.DataAccess.Migrations
                     IsLocallyAvailable = true,
                     Name = "Rådgiver",
                     ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id
+                    LastChangedByUserId = globalAdmin.Id,
+                    Priority = 1
                 });
             context.SaveChanges();
 
@@ -372,7 +400,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Systemejer",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 9
             };
 
             var systemResponsibleRole = new ItSystemRole()
@@ -382,7 +411,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Systemansvarlig",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 8
             };
 
             var businessOwnerRole = new ItSystemRole()
@@ -392,7 +422,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Forretningsejer",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 7
             };
 
             var superuserResponsibleRole = new ItSystemRole()
@@ -402,7 +433,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Superbrugeransvarlig",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 6
             };
 
             var superuserRole = new ItSystemRole()
@@ -412,7 +444,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Superbruger",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 5
             };
 
             var securityResponsibleRole = new ItSystemRole()
@@ -422,7 +455,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Sikkerhedsansvarlig",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 4
             };
 
             var chanceManagerRole = new ItSystemRole()
@@ -432,7 +466,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Changemanager",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 3
             };
 
             var dataOwnerRole = new ItSystemRole()
@@ -442,7 +477,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Dataejer",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 2
             };
 
             var systemAdminRole = new ItSystemRole()
@@ -452,7 +488,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsLocallyAvailable = true,
                 Name = "Systemadminstrator",
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 1
             };
 
             context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
@@ -469,7 +506,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 6
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
@@ -477,7 +515,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 5
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
@@ -485,7 +524,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 4
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
@@ -493,7 +533,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 3
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
@@ -501,7 +542,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 2
             }, new ItContractRole()
             {
                 HasWriteAccess = true,
@@ -509,7 +551,8 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = false,
                 IsLocallyAvailable = true,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                Priority = 1
             });
             context.SaveChanges();
 
@@ -655,13 +698,18 @@ Kontakt: info@kitos.dk",
         /// <param name="dbSet">The db set to add too</param>
         /// <param name="objectOwner">Object owner of the new entities</param>
         /// <param name="names">The names of the new options</param>
-        private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names)
-            where T : OptionEntity<TReference>, new()
+        private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
-            var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToArray();
+            var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
+            var i = options.Count;
+            options.ForEach(o =>
+            {
+                o.Priority = i;
+                i--;
+            });
             try
             {
-                dbSet.AddOrUpdate(x => x.Name, options);
+                dbSet.AddOrUpdate(x => x.Name, options.ToArray());
             }
             catch
             {
