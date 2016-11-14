@@ -1,5 +1,5 @@
 ﻿<div class="row">
-    <div class="col-md-4">
+    <div class="col-xs-4">
         <!-- Organization tree -->
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -49,10 +49,10 @@
             </div>
         </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-xs-8">
         <div class="row">
             <!-- if no org unit is selected, this is shown -->
-            <div class="col-md-12" data-ng-hide="chosenOrgUnit">
+            <div class="col-xs-12" data-ng-hide="chosenOrgUnit">
                 <h3>Vælg en organisationsenhed</h3>
                 <p>Her kan du få overblik over de organisationsenheder, som du er tilknyttet.</p>
                 <p>
@@ -60,7 +60,7 @@
                 </p>
             </div>
             <!-- if an org unit has been selected -->
-            <div class="col-md-12" data-ng-show="chosenOrgUnit">
+            <div class="col-xs-12" data-ng-show="chosenOrgUnit">
                 <h3>
                     {{ chosenOrgUnit.name
                 }}
@@ -192,11 +192,11 @@
                                         <span data-ng-if="showAllTasks">Vis valgte</span>
                                     </a>
                                 </th>
-                                <th class="col-md-2">
+                                <th class="col-xs-2">
                                     KLE ID
                                     <button data-order-by="showAllTasks && 'taskKey' || 'taskRef.taskKey'" data-paging="pagination"></button>
                                 </th>
-                                <th class="col-md-7">
+                                <th class="col-xs-7">
                                     KLE Navn
                                     <button data-order-by="showAllTasks && 'description' || 'taskRef.description'" data-paging="pagination"></button>
                                 </th>

@@ -1,13 +1,13 @@
 ﻿<div class="row task-usage-row task-foldout-leaf">
     <!-- org unit name -->
-    <div class="col-md-8">
+    <div class="col-xs-8">
         <span class="indent">{{ indent(usage.level) }}</span>
         <span class="glyphicon glyphicon-asterisk invisible"></span>
         {{ usage.orgUnitName }}
     </div>
 
     <!-- status -->
-    <div class="col-md-2">
+    <div class="col-xs-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
             <span data-select-status2="" data-ng-model="usage.technologyStatus" data-can-write="usage.hasWriteAccess"
                    data-autosave="{{usage.updateUrl}}" data-field="technologyStatus"></span>
@@ -36,6 +36,6 @@
     </div>
 
     <!-- it project / it system -->
-    <div class="col-md-1 text-center"></div>
-    <div class="col-md-1 text-center"></div>
+    <div class="col-xs-1 text-center"></div>
+    <div class="col-xs-1 text-center"></div>
 </div>
