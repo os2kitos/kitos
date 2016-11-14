@@ -1,13 +1,18 @@
-﻿﻿<!DOCTYPE html>
-<html>
-<head>
-    <title>Andet</title>
-    <meta charset="utf-8" />
-</head>
-<body>
+﻿﻿<div>
     <h3>Regneark for kontraktindgåelse</h3>
-    Upload ny skabelon:
-    <input class="file form-control" type="file" style="display:inline-block;" file-model="myFile" /><button class="btn btn-default" ng-click="uploadFile()">Upload</button>
-
-</body>
-</html>
+    <div class="form-group">
+        <label for="username" class="col-md-3 control-label">
+            Upload ny skabelon
+        </label>
+        <div class="col-md-8">
+            <input class="file form-control" type="file" file-model="myFile" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="username" class="col-md-3 control-label">
+            <button class="btn btn-default" ng-click="uploadFile()">Upload</button>
+        </label>
+        <div class="col-md-8">
+        </div>
+    </div>
+</div>
