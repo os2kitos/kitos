@@ -13,38 +13,21 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Hangfire
 {
-    using global::Presentation.Web.Controllers.Web;
-
     public class HangfireTestingWorkingconditionExpectedTestPass
     {
-        //public class HomeController
-        //{
-        //    private readonly IBackgroundJobClient _jobClient;
-
-        //    public HomeController() : this(new BackgroundJobClient()) { }
-
-        //    public HomeController(IBackgroundJobClient jobClient)
-        //    {
-        //        _jobClient = jobClient;
-        //    }
-
-        //    public void Create()
-        //    {
-        //        _jobClient.Enqueue(() => WriteToConsole("message"));
-        //    }
-
-        //    public void WriteToConsole(string message)
-        //    {
-        //        Console.WriteLine(message);
-        //    }
-        //}
         [Fact]
-        public void IsHangfireRunning()
+        public void CheckOnOptimizationRequestCreate_BackgroundjobSchedules()
         {
-            var jobClient = Substitute.For<IBackgroundJobClient>();
-            var result = jobClient.Schedule(() => Console.WriteLine("hey there"), TimeSpan.FromMinutes(2));
-            //var result = jobClient.Received();
-            Assert.NotEmpty("s");
+            // Arrange
+            // sets up a mock for the Hangfire scheduling client
+            var backgroundjob = Substitute.For<IBackgroundJobClient>();
+            // Act
+            // Background scheduler creates a task that writes text to the console and will then execute the job in 42 mins
+            backgroundjob.Schedule(() => Console.WriteLine("Test of delayed task"), TimeSpan.FromMinutes(42));
+            // Assert
+            // Assert that the job was created via the Hangfire scheduler
+            backgroundjob.ReceivedWithAnyArgs()
+                .Schedule(() => Console.WriteLine("Test of delayed task"), TimeSpan.FromMinutes(42));
         }
     }
 }
