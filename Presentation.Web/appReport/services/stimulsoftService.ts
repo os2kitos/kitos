@@ -27,6 +27,10 @@
             return new this.$window.Stimulsoft.Report.StiReport();
         }
 
+        public getVariable(): any {
+            return new this.$window.Stimulsoft.Report.Dictionary.StiVariable();
+        }
+
         public getDesignerOptions(): any {
             return new this.$window.Stimulsoft.Designer.StiDesignerOptions();
         }
