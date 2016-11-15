@@ -39,7 +39,8 @@
             "user",
             "gridStateService",
             "itContractRoles",
-            "orgUnits"
+            "orgUnits",
+            "$uibModal"
         ];
 
         constructor(
@@ -56,7 +57,8 @@
             private user,
             private gridStateService: Kitos.Services.IGridStateFactory,
             private itContractRoles: Array<any>,
-            private orgUnits: Array<any>) {
+            private orgUnits: Array<any>,
+            private $modal) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -76,6 +78,55 @@
                     }
                 });
             this.activate();
+        }
+
+        public opretITKontrakt() {
+
+            var self = this;
+
+            var modalInstance = this.$modal.open({
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = "IT Kontrakt";
+                    $scope.checkAvailbleUrl = "api/itProject/";
+
+                    $scope.saveAndProceed = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.go("it-contract.edit.main", { id: contract.id });
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+
+                    $scope.save = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.reload();
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+                }]
+            });
         }
 
         // saves grid state to localStorage
@@ -249,6 +300,12 @@
                     }
                 },
                 toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretITKontrakt",
+                        text: "Opret IT Kontrakt",
+                        template: "<a ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",

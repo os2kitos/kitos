@@ -1,3 +1,6 @@
+/* Disable responsiveness */
+.container { width: @container-desktop !important; }
+
 html {
   height: 100%;
 }
@@ -237,7 +240,7 @@ div.suggest-box {
 }
 
 input:disabled {
-  cursor: inherit !important;
+  cursor: default!important;
 }
 
 input.input-cell {
@@ -671,7 +674,7 @@ div.searchbox-wrapper {
 
 /* disabled inputfield */
 .disabled-input {
-  cursor: not-allowed;
+  cursor: default;
   background-color: #ddd;
 }
 
@@ -835,4 +838,74 @@ tr.angular-ui-tree-empty {
           box-sizing: border-box;
   background: #f0f9ff;
   border: 2px dashed #bed2db;
+}
+
+/********* Left menu  **********/
+
+.object-wrapper {
+  height: 100%;
+  padding-left: 0;
+
+  .left-menu-container {
+    height: 100%;
+    padding-left: 0;
+
+    .left-menu {
+      height: 100%;
+      padding: 15px 0;
+      background-color: #dbe5f0;
+
+      .header {
+        padding: 0 15px;
+
+        h3 {
+          font-size: 14px;
+          font-weight: bold;
+          border-bottom: 1px solid black;
+        }
+      }
+
+      ul {
+        padding: 0;
+        list-style: none;
+
+        li {
+          a {
+            display: block;
+            padding: 7px 15px;
+            color: black;
+
+            i {
+              margin-right: 12px;
+            }
+
+            img {
+              width: 14px;
+              margin-right: 12px;
+            }
+          }
+
+          &.active, &:hover, &:active {
+            cursor: pointer;
+            background-color: #3a6db5;
+
+            a {
+              font-weight: bold;
+              color: white;
+              text-decoration: none;
+            }
+
+            img {
+              filter: invert(1);
+              -webkit-filter: invert(1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .object-content {
+    padding-top: 20px;
+  }
 }

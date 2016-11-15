@@ -1,6 +1,6 @@
 ﻿<div>
     <div class="row task-usage-row">
-        <div class="col-md-8">
+        <div class="col-xs-8">
             <span class="indent">{{ indent(usage.level) }}</span>
             <a class="task-fold" data-ng-click="usage.isOpen = !usage.isOpen">
                 <i class="glyphicon text-muted small"
@@ -9,7 +9,7 @@
             </a>
         </div>
 
-        <div class="col-md-2">
+        <div class="col-xs-2">
             <div class="status-column" data-show-status="usage.calculatedTechStatus" data-ng-if="user.currentConfig.showColumnTechnology"></div>
             <div class="status-column" data-show-status="usage.calculatedUsageStatus" data-ng-if="user.currentConfig.showColumnUsage"></div>
             <div class="status-column">
@@ -31,8 +31,8 @@
             </div>
         </div>
 
-        <div class="col-md-1 text-center"></div>
-        <div class="col-md-1 text-center"></div>
+        <div class="col-xs-1 text-center"></div>
+        <div class="col-xs-1 text-center"></div>
     </div>
 
     <div data-ng-show="usage.isOpen">

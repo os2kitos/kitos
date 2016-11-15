@@ -4,51 +4,51 @@
 <div class="modal-body">
     <form name="createUser.form" novalidate="novalidate" class="form-horizontal">
         <div class="form-group">
-            <label for="email" class="col-md-3 control-label">
+            <label for="email" class="col-xs-3 control-label">
                 Email-adresse
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="email" name="email" id="email" data-ng-model="ctrl.vm.email" class="form-control" data-ng-required="true" data-unique-org-user data-unique-email autofocus data-ng-disabled="ctrl.busy">
                 <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': ctrl.createForm.name.$invalid && ctrl.createForm.name.$dirty, 'glyphicon-ok': ctrl.createForm.name.$valid }"></span>
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
-            <label for="repeatEmail" class="col-md-3 control-label">
+            <label for="repeatEmail" class="col-xs-3 control-label">
                 Gentag email-adresse
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="email" name="repeatEmail" id="repeatEmail" data-ng-model="ctrl.repeatEmail" class="form-control" data-match="ctrl.vm.email" data-ng-required="true" data-ng-disabled="ctrl.busy">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
-            <label for="name" class="col-md-3 control-label">
+            <label for="name" class="col-xs-3 control-label">
                 Fornavn
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" name="name" id="name" data-ng-model="ctrl.vm.name" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
-            <label for="lastName" class="col-md-3 control-label">
+            <label for="lastName" class="col-xs-3 control-label">
                 Efternavn
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" name="lastName" id="lastName" data-ng-model="ctrl.vm.lastName" class="form-control" data-ng-required="true" data-ng-disabled="ctrl.busy">
             </div>
         </div>
         <div class="form-group" data-ng-hide="emailExists">
-            <label for="phoneNumber" class="col-md-3 control-label">
+            <label for="phoneNumber" class="col-xs-3 control-label">
                 Telefon
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" name="phoneNumber" id="phoneNumber" data-ng-model="ctrl.vm.phoneNumber" class="form-control" data-ng-required="false" data-ng-disabled="ctrl.busy" />
             </div>
         </div>
         <div class="form-group" data-ng-hide="userExists">
-            <label for="roller" class="col-md-3 control-label">
+            <label for="roller" class="col-xs-3 control-label">
                 Roller
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isLocalAdmin">Lokal admin</label>
                 </div>
@@ -70,12 +70,12 @@
             </div>
         </div>
         <div class="form-group">
-            <p class="help-block col-md-offset-3" data-ng-hide="emailExists">
+            <p class="help-block col-xs-offset-3" data-ng-hide="emailExists">
                 En ny bruger vil blive oprettet i systemet.
             </p>
-            <span class="help-block col-md-offset-3" data-ng-show="emailExists && !userExists">Brugeren findes allerede.</span>
-            <span class="help-block col-md-offset-3" data-ng-show="userExists">Brugeren er allerede tilknyttet.</span>
-            <span class="help-block col-md-offset-3" data-ng-show="ctrl.createUser.form.email.$error.lookup">Der skete en fejl ved tjek om E-Mail er i brug!</span>
+            <span class="help-block col-xs-offset-3" data-ng-show="emailExists && !userExists">Brugeren findes allerede.</span>
+            <span class="help-block col-xs-offset-3" data-ng-show="userExists">Brugeren er allerede tilknyttet.</span>
+            <span class="help-block col-xs-offset-3" data-ng-show="ctrl.createUser.form.email.$error.lookup">Der skete en fejl ved tjek om E-Mail er i brug!</span>
         </div>
     </form>
 </div>
