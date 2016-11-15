@@ -13,11 +13,11 @@
     
     <div>
 
-        <select ng-model="selectedUser" ng-options="user.Name for user in ctrl.vmUsersInOrganization | orderBy:orderByValue" ng-change="ctrl.setSelectedUser(selectedUser)">
-            <option>
-        <!--<select ng-model="selectedUser" ng-change="ctrl.setSelectedUser(selectedUser)">
-            <option ng-repeat="user in ctrl.vmUsersInOrganization">-->
-                
+        <!--<select ng-model="selectedUser" ng-options="user.Name for user in ctrl.vmUsersInOrganization | orderBy:orderByValue" ng-change="ctrl.setSelectedUser(selectedUser)">
+            <option>-->
+        <select ng-model="selectedUser" ng-change="ctrl.setSelectedUser(selectedUser)">
+            <option ng-repeat="user in ctrl.vmUsersInOrganization" value="{{user}}">
+                {{user.Name}} {{user.LastName}}
             </option>
         </select>
     </div>
@@ -36,7 +36,7 @@
         <tbody>
         <tr ng-repeat="orgUnit in ctrl.vmOrgUnits">
             <!--ng-true-value doesn't accept dynamically allocated values-->
-            <td><input type="checkbox" ng-model="orgUnitCheck" ng-change="ctrl.checkBoxTrueValue(orgUnit)" /></td>
+            <td><input type="checkbox" ng-model="orgUnitCheck" ng-click="ctrl.checkBoxTrueValue(orgUnitCheck)" /></td>
             <td>{{orgUnit.Object.Name}}</td>
             <td>{{orgUnit.Role.Name}}</td>
             <td>{{selectedUser}}</td>
@@ -58,7 +58,7 @@
                 <td><input type="checkbox" /></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
-                <td>{{selectedUser.Name}}</td>
+                <td>{{selectedUser}}</td>
             </tr>
         </tbody>
     </table>
