@@ -73,8 +73,8 @@
                         // show loadingbar when export to excel is clicked
                         // hidden again in method exportToExcel callback
                         $(".k-grid-excel").click(() => {
-                                kendo.ui.progress(this.mainGrid.element, true);
-                            });
+                            kendo.ui.progress(this.mainGrid.element, true);
+                        });
                     }
                 });
             this.activate();
@@ -217,7 +217,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -311,25 +311,25 @@
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
+                        "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                            '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
+                        '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                            '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
+                        '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                            "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                        "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -475,6 +475,39 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+                        field: "AssociatedSystemUsages",
+                        title: "Antal systemer",
+                        width: 50,
+                        persistId: "numOfItSystems", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedSystemUsages.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
+                    },
+                    {
+                        field: "AssociatedInterfaceUsages",
+                        title: "Antal udstillede snitflader",
+                        width: 50,
+                        persistId: "numOfItInterfacesExhibit", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedInterfaceExposures.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
+                    },
+                    {
+                        field: "AssociatedInterfaceExposures",
+                        title: "Antal anvendte snitflader",
+                        width: 50,
+                        persistId: "numOfItInterfacesUsages", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedInterfaceUsages.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "Esdh",
@@ -720,8 +753,8 @@
                         attributes: { "class": "text-center" },
                         template: dataItem =>
                             dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
-                            : "",
+                                ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
+                                : "",
                         filterable: {
                             cell: {
                                 dataSource: [],

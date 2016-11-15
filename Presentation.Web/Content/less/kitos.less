@@ -50,6 +50,7 @@ div#page-body {
   font-size: 15px;
   background-color: rgb(55, 96, 146);
   border: 0;
+    margin-bottom: 0;
 }
 #navbar-top .navbar-brand {
   height: 55px;
@@ -60,18 +61,25 @@ div#page-body {
   text-align: center;
 }
 
-#navbar-top .navbar-nav li a,
-    #navbar-top .navbar-text {
-  height: 55px;
+#navbar-top .navbar-nav li a {
+  height: 80px;
   padding: 0 10px;
-  margin: 15px 5px;
   font-size: 18px;
-  line-height: 55px;
+  line-height: 80px;
   text-align: center;
 }
 
+#navbar-top .navbar-text {
+    height: 55px;
+    padding: 0 10px;
+    margin: 15px 5px;
+    font-size: 18px;
+    line-height: 55px;
+    text-align: center;
+}
+
 #navbar-top li a {
-  width: 100%;
+    width: 100%;
 }
 
 #navbar-top li.double-line a {
@@ -106,26 +114,39 @@ div#page-body {
 }
 /*********************************************/
 
-#subnav ul {
-  margin: 0;
-  list-style-type: none;
+/* SUBNAV */
+#subnav {
+    font-size: 15px;
+    color: rgb(55, 96, 146);
+    background-color: rgb(219, 229, 241);
+    text-align: center;
+    
+    ul {
+        margin: 0;
+        list-style-type: none;
+        li {
+          display: inline-block;
+          margin-left: 10px;
+            a {
+                line-height: 35px;
+                height: 35px;
+                padding: 0 10px;
+                color: rgb(55, 96, 146);
+                text-decoration: none;
+                
+                &.btn-tab {
+                    
+                }
+            
+                &.btn-tab-active {
+                  font-weight: bold;
+                }
+            }
+        }
+    }
 }
 
-#subnav nav ul li {
-  display: inline-block;
-  margin-left: 10px;
-}
-
-#subnav nav ul li a.btn-tab {
-  color: black;
-  background-color: #e6e6e6;
-}
-
-#subnav nav ul li a.btn-tab-active {
-  background-color: white;
-}
-
-
+/***/
 
 div.org-node-top {
   margin-top: 5px;

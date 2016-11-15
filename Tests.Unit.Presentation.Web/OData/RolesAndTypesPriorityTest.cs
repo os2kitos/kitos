@@ -1,34 +1,32 @@
-﻿using System;
-using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using Ninject.Extensions.Logging;
-using Presentation.Web.Infrastructure;
-using Xunit;
 using NSubstitute;
-using NSubstitute.ReturnsExtensions;
 using Presentation.Web.Controllers.OData.OptionControllers;
+using Xunit;
 
-namespace Tests.Unit.Presentation.Web.RolesAndTypesPriorityTest
+namespace Tests.Unit.Presentation.Web.OData
 {
     public class RolesAndTypesPriorityTest
     {
-        private readonly IGenericRepository<ItProjectRole> _itProjectRoleRepository;
-        private readonly IAuthenticationService _iAuthenticationService;
-        private readonly ItProjectRolesController _itProjectRolesController;
+        private readonly IGenericRepository<ItProjectType> _itProjectTypeMockRepository;
+        private readonly IAuthenticationService _iAuthenticationServiceMock;
+        private readonly ItProjectTypesController _itProjectTypesMockController;
+        private ItProjectType MockProjectType { get; set; } = new ItProjectType();
 
         public RolesAndTypesPriorityTest()
         {
-            _itProjectRoleRepository = Substitute.For<IGenericRepository<ItProjectRole>>();
-            _iAuthenticationService = Substitute.For<IAuthenticationService>();
-            _itProjectRolesController = new ItProjectRolesController(_itProjectRoleRepository, _iAuthenticationService);
+            _itProjectTypeMockRepository = Substitute.For<IGenericRepository<ItProjectType>>();
+            _iAuthenticationServiceMock = Substitute.For<IAuthenticationService>();
+            _itProjectTypesMockController = new ItProjectTypesController(_itProjectTypeMockRepository, _iAuthenticationServiceMock);
         }
 
         [Fact]
         public void Priority_should_increment_by_one()
         {
             //Arrange
+            // Get project type
+            //_itProjectTypesMockController.GetByOrganizationKey(1).Returns(MockProjectType);
             //Act
             //Assert
         }
