@@ -97,6 +97,12 @@ module Kitos.Reports {
 
                     this.stiReport.load(reportDef);
 
+                    var odata = this.stimulsoftService.getODataDatabase();
+                    odata.name = "Kitos";
+                    odata.alias = "Kitos";
+                    odata.connectionString = window.location.origin + "/odata";
+                    this.stiReport.dictionary.databases.add(odata);
+
                     // Add default variables to report
                     var currentOrgName = this.stimulsoftService.getVariable();
                     currentOrgName.name = "CurrentOrganizationName";
