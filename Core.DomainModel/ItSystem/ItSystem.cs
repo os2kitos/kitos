@@ -6,7 +6,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IHasReferences
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>
     {
         public ItSystem()
         {
@@ -16,7 +16,6 @@ namespace Core.DomainModel.ItSystem
             this.TaskRefs = new List<TaskRef>();
             this.Wishes = new List<Wish>();
             this.Usages = new List<ItSystemUsage.ItSystemUsage>();
-            ExternalReferences = new List<ExternalReference>();
         }
 
         /// <summary>
@@ -40,8 +39,7 @@ namespace Core.DomainModel.ItSystem
         /// Exhibited interfaces.
         /// </value>
         public virtual ICollection<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-
-        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        
 
         /// <summary>
         /// Gets or sets interfaces that can use this instance.

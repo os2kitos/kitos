@@ -65,7 +65,6 @@
 
         }
 
-        //TODO Not done!
         public ok() {
 
             if (this.optionId === 0) {

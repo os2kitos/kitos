@@ -1,16 +1,16 @@
-﻿<div class="col-md-12 task-usage-root" data-ng-if="!usage.hasDelegations">
+﻿<div class="col-xs-12 task-usage-root" data-ng-if="!usage.hasDelegations">
     <!-- org unit name -->
-    <div class="col-md-3">
+    <div class="col-xs-3">
         <span class="glyphicon glyphicon-asterisk small invisible"></span>
         {{ usage.orgUnitName }}
     </div>
 
     <!-- task description -->
-    <div class="col-md-1">{{ usage.taskRefTaskKey }}</div>
-    <div class="col-md-4">{{ usage.taskRefDescription }}</div>
+    <div class="col-xs-1">{{ usage.taskRefTaskKey }}</div>
+    <div class="col-xs-4">{{ usage.taskRefDescription }}</div>
 
     <!-- statuses -->
-    <div class="col-md-2">
+    <div class="col-xs-2">
         <div class="status-column" data-ng-if="user.currentConfig.showColumnTechnology">
             <span data-select-status2="" data-ng-model="usage.technologyStatus" data-can-write="usage.hasWriteAccess"
                     data-autosave="{{usage.updateUrl}}" data-field="technologyStatus"></span>
@@ -38,12 +38,12 @@
     </div>
 
     <!-- extra info -->
-    <div class="col-md-1 text-center">
+    <div class="col-xs-1 text-center">
         <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{usage.projects | joinBy:', ':'name'}}" tooltip-class="nowrap">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         </span>
     </div>
-    <div class="col-md-1 text-center">
+    <div class="col-xs-1 text-center">
         <span data-ng-if="usage.systems.length > 0" class="text-success" data-uib-tooltip="{{usage.systems | joinBy:', ':'itSystemName'}}" tooltip-class="nowrap">
             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
         </span>
@@ -51,9 +51,9 @@
 </div>
 
 <div data-ng-if="usage.hasDelegations">
-    <div class="col-md-12 task-usage-root">
+    <div class="col-xs-12 task-usage-root">
         <!-- org unit name -->
-        <div class="col-md-3">
+        <div class="col-xs-3">
             <a class="task-fold" data-ng-click="usage.isOpen = !usage.isOpen">
                 <i class="glyphicon small"
                    data-ng-class="{'glyphicon-chevron-down': usage.isOpen, 'glyphicon-chevron-right': !usage.isOpen}"></i>
@@ -62,11 +62,11 @@
         </div>
 
         <!-- task description -->
-        <div class="col-md-1">{{ usage.taskRefTaskKey }}</div>
-        <div class="col-md-4">{{ usage.taskRefDescription }}</div>
+        <div class="col-xs-1">{{ usage.taskRefTaskKey }}</div>
+        <div class="col-xs-4">{{ usage.taskRefDescription }}</div>
 
         <!-- statuses -->
-        <div class="col-md-2">
+        <div class="col-xs-2">
             <div class="status-column" data-show-status="usage.calculatedTechStatus" data-ng-if="user.currentConfig.showColumnTechnology"></div>
             <div class="status-column" data-show-status="usage.calculatedUsageStatus" data-ng-if="user.currentConfig.showColumnUsage"></div>
 
@@ -89,12 +89,12 @@
         </div>
 
         <!-- extra info -->
-        <div class="col-md-1 text-center">
+        <div class="col-xs-1 text-center">
             <span data-ng-if="usage.projects.length > 0" class="text-success" data-uib-tooltip="{{ usage.projects | joinBy:', ':'name' }}" data-tooltip-class="nowrap">
                 <span class="glyphicon glyphicon-ok"></span>
             </span>
         </div>
-        <div class="col-md-1 text-center">
+        <div class="col-xs-1 text-center">
             <span data-ng-if="usage.systemUsages.length > 0" class="text-success" data-uib-tooltip="{{ usage.systemUsages | joinBy:', ':'itSystemName' }}" data-tooltip-class="nowrap">
                 <span class="glyphicon glyphicon-ok"></span>
             </span>

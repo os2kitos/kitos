@@ -7,38 +7,38 @@
     <div class="modal-body">
         
         <div class="form-group">
-            <label for="documentTitle" class="col-md-4 control-label small">
+            <label for="documentTitle" class="col-xs-4 control-label small">
                 Dokumenttitel
             </label>
-            <div class="col-md-7">
+            <div class="col-xs-7">
                 <input type="text" id="documentTitle" ng-model="reference.title" class="form-control input-sm" required />
             </div>
-                <div class="col-md-1">
+                <div class="col-xs-1">
                     <input type="radio" ng-model="reference.display" value="1" checked>
                     </div>
                 
         </div>
 
         <div class="form-group">
-            <label for="DokomentID" class="col-md-4 control-label small">
+            <label for="DokomentID" class="col-xs-4 control-label small">
                 Evt. DokomentID/sagsnr./Anden Reference
             </label>
-            <div class="col-md-7">
+            <div class="col-xs-7">
                 <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" class="form-inline form-control input-sm" input-sm" />
             </div>
-                <div class="col-md-1">
+                <div class="col-xs-1">
                     <input type="radio" class="form-inline" ng-model="reference.display" value="2">
                 
               </div>
         </div>
         <div class="form-group">
-            <label class="col-md-4 control-label small">
+            <label class="col-xs-4 control-label small">
                 URL, hvis dokumenttitel skal virke som link
             </label>
-            <div class="col-md-7">
+            <div class="col-xs-7">
                 <input type="text" id="DokomentID" ng-model="reference.url" class="form-control form-inline input-sm" />
             </div>
-            <div class="col-md-1">
+            <div class="col-xs-1">
                 <input type="radio" ng-model="reference.display" value="3">
             </div>
             <br/>

@@ -278,6 +278,10 @@
     <Compile Include="Migrations\201611090824159_DefaultUserStartPreference.Designer.cs">
       <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.cs" />
+    <Compile Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.Designer.cs">
+      <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -391,6 +395,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611090824159_DefaultUserStartPreference.resx">
       <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.resx">
+      <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
