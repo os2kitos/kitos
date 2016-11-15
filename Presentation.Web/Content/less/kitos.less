@@ -128,8 +128,8 @@ div#page-body {
           display: inline-block;
           margin-left: 10px;
             a {
-                line-height: 35px;
-                height: 35px;
+                line-height: 40px;
+                height: 40px;
                 padding: 0 10px;
                 color: rgb(55, 96, 146);
                 text-decoration: none;
@@ -147,6 +147,22 @@ div#page-body {
 }
 
 /***/
+
+/* SUBNAV BUTTONS */
+
+#subnav-buttons {
+    ul {
+        display: inline-block;
+        float: right;
+        list-style-type: none;
+
+        li {
+            padding: 10px;
+        }
+    }
+}
+
+/**/
 
 div.org-node-top {
   margin-top: 5px;
@@ -925,8 +941,22 @@ tr.angular-ui-tree-empty {
       }
     }
   }
-
-  .object-content {
-    padding-top: 20px;
-  }
 }
+
+/********* Object frontpages  **********/
+
+.object-section-container {
+    margin-bottom: 25px;
+
+    h3 {
+        border-bottom: 1px solid black;
+        margin: 0;
+    }
+
+    & > div {
+        background-color: #f3f3f3;
+        padding-top: 15px;
+    }
+}
+
+/*********/

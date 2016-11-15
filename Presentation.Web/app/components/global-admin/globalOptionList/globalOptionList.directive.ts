@@ -90,7 +90,6 @@
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretType",
                         text: "Opret type",
                         template: "<a ng-click='ctrl.createOption()' class='btn btn-success pull-right'>#: text #</a>"
@@ -146,8 +145,8 @@
                     },
                     {
                         title: "Prioritet",
-                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-plus' aria-hidden='true'></i></button>` +
-                        `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-minus' aria-hidden='true'></i></button>`,
+                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-arrow-up' aria-hidden='true'></i></button>` +
+                        `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-arrow-down' aria-hidden='true'></i></button>`,
                         width: 100,
                         attributes: { "class": "text-center" },
                         persistId: "command"
