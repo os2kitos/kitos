@@ -4,50 +4,50 @@
     <div>
         <!-- Default organizationunit -->
         <div class="form-group">
-            <label class="col-md-3 control-label">Primær organisationsenhed</label>
-            <div class="col-md-8">
+            <label class="col-xs-3 control-label">Primær organisationsenhed</label>
+            <div class="col-xs-8">
                 <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit=""></div>
             </div>
         </div>
         <!-- User name -->
         <div class="form-group">
-            <label for="username" class="col-md-3 control-label">
+            <label for="username" class="col-xs-3 control-label">
                 Fornavn
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)"/>
             </div>
         </div>
         <!-- User lastname -->
         <div class="form-group">
-            <label for="lastname" class="col-md-3 control-label">
+            <label for="lastname" class="col-xs-3 control-label">
                 Efternavn
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)"/>
             </div>
         </div>
         <!-- User phonenumber -->
         <div class="form-group">
-            <label for="phone" class="col-md-3 control-label">
+            <label for="phone" class="col-xs-3 control-label">
                 Telefon
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)"/>
             </div>
         </div>
         <!-- User email -->
         <div class="form-group">
-            <label for="usermail" class="col-md-3 control-label">
+            <label for="usermail" class="col-xs-3 control-label">
                 Email
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)"/>
             </div>
         </div>
         <div>
             <!-- User startpage preferences -->
-            <label class="col-md-3 control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
+            <label class="col-xs-3 control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
                 Primær start enhed:
             </label>
             <label class="radio-inline">

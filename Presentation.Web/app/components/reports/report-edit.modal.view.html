@@ -4,10 +4,10 @@
 <div class="modal-body">
     <form name="editReport" class="form-horizontal">
         <div class="form-group" ng-class="{ 'has-error': editReport.name.$touched && editReport.name.$invalid }">
-            <label for="name" class="col-md-3 control-label">
+            <label for="name" class="col-xs-3 control-label">
                 Navn
             </label>    
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <input type="text" name="name" id="name" data-ng-model="vm.name" class="form-control" ng-required="true" ng-maxlength="80" autocomplete="false"
                     ng-minlength="5" data-disabled-on-busy autofocus>
                 <div ng-messages="editReport.name.$error" ng-if="editReport.name.$touched" style="color:maroon" role="alert">
@@ -19,10 +19,10 @@
 
         </div>
         <div class="form-group" ng-class="{ 'has-error': editReport.description.$touched && editReport.description.$invalid }">
-            <label for="description" class="col-md-3 control-label">
+            <label for="description" class="col-xs-3 control-label">
                 Beskrivelse
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <textarea name="description" id="description" data-ng-model="vm.description" class="form-control" ng-required="true"
                     ng-maxlength="1024" ng-minlength="10" data-disabled-on-busy rows="8"></textarea>
                 <div ng-messages="editReport.description.$error" ng-if="editReport.description.$touched" style="color:maroon" role="alert">
@@ -34,10 +34,10 @@
 
         </div>
         <div class="form-group">
-            <label for="categoryType" class="col-md-3 control-label">
+            <label for="categoryType" class="col-xs-3 control-label">
                 Kategori
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <select name="categoryType" id="categoryType" data-disabled-on-busy ng-model="vm.selectedCategory" ng-options="cat.Name for cat in vm.categories"
                     class="form-control">
                     <option value="">-- Vælg kategori --</option>
@@ -45,10 +45,10 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="accessModifier" class="col-md-3 control-label">
+            <label for="accessModifier" class="col-xs-3 control-label">
                 Synlighed
             </label>
-            <div class="col-md-8">
+            <div class="col-xs-8">
                 <label class="radio-inline">
                     <input type="radio" data-ng-model="vm.accessModifier" value="Local"> Lokal
                 </label>
