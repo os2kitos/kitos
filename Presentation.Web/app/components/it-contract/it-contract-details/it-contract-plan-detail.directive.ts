@@ -36,13 +36,6 @@
                         dir: "asc"
                     }
                 },
-                pageable: {
-                    numeric: false,
-                    previousNext: false,
-                    messages: {
-                        display: `Antal ${scope.detailType}: {2}`
-                    }
-                },
                 noRecords: true,
                 messages: {
                     noRecords: `Kontrakten ${scope.action} ingen ${scope.detailType}.`

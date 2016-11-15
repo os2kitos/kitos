@@ -90,7 +90,6 @@
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretType",
                         text: "Opret type",
                         template: "<a ng-click='ctrl.createOption()' class='btn btn-success pull-right'>#: text #</a>"

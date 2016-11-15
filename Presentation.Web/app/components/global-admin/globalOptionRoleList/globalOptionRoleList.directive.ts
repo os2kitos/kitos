@@ -90,7 +90,6 @@
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
-                        //TODO ng-show='hasWriteAccess'
                         name: "opretRolle",
                         text: "Opret rolle",
                         template: "<a ng-click='ctrl.createOption()' class='btn btn-success pull-right'>#: text #</a>"
