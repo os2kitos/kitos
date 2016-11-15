@@ -12,9 +12,12 @@
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
     
     <div>
-        <select ng-model="selectedUser">
-            <option ng-repeat="user in ctrl.vmUsersInOrganization">
-                {{user.Name}} {{user.LastName}}
+
+        <select ng-model="selectedUser" ng-options="user.Name for user in ctrl.vmUsersInOrganization | orderBy:orderByValue" ng-change="ctrl.setSelectedUser(selectedUser)">
+            <option>
+        <!--<select ng-model="selectedUser" ng-change="ctrl.setSelectedUser(selectedUser)">
+            <option ng-repeat="user in ctrl.vmUsersInOrganization">-->
+                
             </option>
         </select>
     </div>
@@ -33,10 +36,10 @@
         <tbody>
         <tr ng-repeat="orgUnit in ctrl.vmOrgUnits">
             <!--ng-true-value doesn't accept dynamically allocated values-->
-            <td><input type="checkbox" ng-model="chkValue" ng-change="ctrl.checkBoxTrueValue({{selectedUser}})" /></td>
+            <td><input type="checkbox" ng-model="orgUnitCheck" ng-change="ctrl.checkBoxTrueValue(orgUnit)" /></td>
             <td>{{orgUnit.Object.Name}}</td>
             <td>{{orgUnit.Role.Name}}</td>
-            <td>{{ctrl.checkBoxTrueValue}}</td>
+            <td>{{selectedUser}}</td>
         </tr>
         </tbody>
     </table>
@@ -55,7 +58,7 @@
                 <td><input type="checkbox" /></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
-                <td>{{selectedUser}}</td>
+                <td>{{selectedUser.Name}}</td>
             </tr>
         </tbody>
     </table>

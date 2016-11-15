@@ -21,6 +21,7 @@
         public vmOrgUnits: any;
         public vmHasAdminRoles: boolean;
         public vmUsersInOrganization: any;
+        public selecterUserId: any;
 
         private userId: number;
         private firstName: string;
@@ -87,8 +88,14 @@
         }
 
         public checkBoxTrueValue = (item) => {
-            var data = { selectedItem: item}
-            console.log("testi");
+            var data = { selectedItem: item }
+            console.log("");
+            console.log(data.selectedItem);
+        }
+
+        public setSelectedUser = (item) => {
+            var data = { selectedItem: item }
+            console.log(data.selectedItem);
         }
 
         public ok() {
