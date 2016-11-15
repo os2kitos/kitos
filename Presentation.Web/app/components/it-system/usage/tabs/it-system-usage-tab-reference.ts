@@ -27,7 +27,10 @@
                         });
                     reload();
                 };
-
+                $scope.isValidUrl = function (url) {
+                    var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                    return regexp.test(url);
+                };
                 $scope.edit = function (refId) {
                     $state.go(".edit", { refId: refId, orgId: itSystemUsage.organizationId });
                 };

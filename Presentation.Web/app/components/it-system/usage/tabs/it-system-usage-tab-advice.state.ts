@@ -1,6 +1,6 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
-        $stateProvider.state('it-contract.edit.advice-generic', {
+        $stateProvider.state('it-system.usage.advice', {
             url: '/advice/:type',
             templateUrl: 'app/components/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
@@ -15,7 +15,7 @@
                 }],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
                     
-                    return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
+                    return $http.get('api/itProject/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
                 }]

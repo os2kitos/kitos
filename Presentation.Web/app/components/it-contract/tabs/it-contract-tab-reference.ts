@@ -31,6 +31,11 @@
                     $state.go(".edit", { refId: refId, orgId: contract.organizationId });
                 };
 
+                $scope.isValidUrl = function (url) {
+                    var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                    return regexp.test(url);    
+                };
+
                 function reload() {
                     $state.go(".", null, { reload: true });
                 };
