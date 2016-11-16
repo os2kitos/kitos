@@ -98,7 +98,28 @@ div#page-body {
 #navbar-top .navbar-complex {
   padding-top: -10px;
   font-size: .7em;
-  line-height: 25px;
+  line-height: 55px;
+}
+
+#navbar-top .dropdown-menu {
+    background-color: #dbe5f1;
+    border-radius: 0;
+    border: 3px solid #376092;
+    padding: 0;
+    margin-top: 17px;
+
+    li {
+        a {
+            padding: 10px 20px;
+            color: #376092 !important;
+            font-size: 14px;
+
+            &:hover { 
+                background-color: #376092;
+                color: white !important;
+            }
+        }
+    }
 }
 
 #navbar-top a {
@@ -120,16 +141,17 @@ div#page-body {
     color: rgb(55, 96, 146);
     background-color: rgb(219, 229, 241);
     text-align: center;
+    min-height: 40px;
+    position: relative;
     
     ul {
         margin: 0;
         list-style-type: none;
         li {
           display: inline-block;
-          margin-left: 10px;
             a {
-                line-height: 35px;
-                height: 35px;
+                line-height: 40px;
+                height: 40px;
                 padding: 0 10px;
                 color: rgb(55, 96, 146);
                 text-decoration: none;
@@ -143,10 +165,33 @@ div#page-body {
                 }
             }
         }
+
+        &.icons {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding-right: 10px;
+        }
     }
 }
 
 /***/
+
+/* SUBNAV BUTTONS */
+
+#subnav-buttons {
+    ul {
+        display: inline-block;
+        float: right;
+        list-style-type: none;
+
+        li {
+            padding: 10px;
+        }
+    }
+}
+
+/**/
 
 div.org-node-top {
   margin-top: 5px;
@@ -925,8 +970,22 @@ tr.angular-ui-tree-empty {
       }
     }
   }
-
-  .object-content {
-    padding-top: 20px;
-  }
 }
+
+/********* Object frontpages  **********/
+
+.object-section-container {
+    margin-bottom: 25px;
+
+    h4 {
+        border-bottom: 1px solid black;
+        margin: 0;
+    }
+
+    & > div {
+        background-color: #f3f3f3;
+        padding-top: 15px;
+    }
+}
+
+/*********/

@@ -16,7 +16,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystemUsage_Id)
                 .WillCascadeOnDelete(true);
 
-            
+            HasOptional(t => t.Reference);
+
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 

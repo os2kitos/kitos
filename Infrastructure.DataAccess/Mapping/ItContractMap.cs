@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess.Mapping
             // Table & Column Mappings
             ToTable("ItContract");
 
-
+            HasOptional(t => t.Reference);
             HasMany(t => t.ExternalReferences)
                 .WithOptional(d => d.ItContract)
                 .HasForeignKey(d => d.Itcontract_Id)
