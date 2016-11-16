@@ -83,5 +83,7 @@ namespace Presentation.Web.Models
         public bool? Active { get; set; }
         public bool? IsActive { get; set; }
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
     }
 }

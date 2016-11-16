@@ -190,6 +190,9 @@ namespace Core.DomainModel.ItProject
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
+        public int? ReferenceId { get; set; }
+        public virtual ExternalReference Reference { get; set; }
+
         #endregion
 
         #region Overview

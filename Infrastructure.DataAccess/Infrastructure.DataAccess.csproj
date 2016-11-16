@@ -282,6 +282,14 @@
     <Compile Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.Designer.cs">
       <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611141201425_Hangfire create database.cs" />
+    <Compile Include="Migrations\201611141201425_Hangfire create database.Designer.cs">
+      <DependentUpon>201611141201425_Hangfire create database.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611161024144_reference added to Objects.cs" />
+    <Compile Include="Migrations\201611161024144_reference added to Objects.Designer.cs">
+      <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -398,6 +406,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.resx">
       <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611141201425_Hangfire create database.resx">
+      <DependentUpon>201611141201425_Hangfire create database.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161024144_reference added to Objects.resx">
+      <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
