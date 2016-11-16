@@ -604,6 +604,7 @@
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\reports\report-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\general-role-entity.ts" />
+    <TypeScriptCompile Include="app\models\IReference.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
     <TypeScriptCompile Include="app\models\role-entity.ts" />

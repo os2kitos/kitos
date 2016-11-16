@@ -89,5 +89,8 @@
         /** Gets or sets the it projects that were cloned from this it project. */
         Clones: IItProject[];
         GoalStatus: IGoalStatus;
+
+        ReferenceId: number;
+        Reference: IReference;
     }
 }

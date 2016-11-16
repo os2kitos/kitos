@@ -12,20 +12,12 @@
         ["$scope", "$http", "$timeout", "$state", "$stateParams","project","$confirm","notify","$",
             function ($scope, $http, $timeout, $state, $stateParams,project,$confirm,notify,$) {
                 console.log(project);
-
-                //$scope.objectId = project.id;
-
-                //$scope.objectReference = 'it-project.edit.references.create';
                 
-                
-               // $scope.references = project.externalReferences;
+              //  $scope.chosenReference = project.ReferenceId;
 
-                $scope.deleteReference = function (event) {
+
+                $scope.deleteReference = function (id) {
                     var msg = notify.addInfoMessage("Sletter...");
-
-                    event.preventDefault();
-                    var dataItem = $scope.mainGrid.dataItem($(event.currentTarget).closest("tr"));
-                    var id = dataItem["id"];
                     
                     $http.delete('api/Reference/' + id + '?organizationId=' + project.organizationId).success(() => {
                         msg.toSuccessMessage("Slettet!");
@@ -35,16 +27,35 @@
                     reload();
                 };
 
-                $scope.isValidUrl = function (url) {
-                    console.log(url);
-                    var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                    return regexp.test(url);
+                $scope.setChosenReference = function (id) {
+
+                    var data = {
+                        referenceId: id
+                    };
+
+                    var msg = notify.addInfoMessage("Opdaterer felt...", false);
+
+                    $http.patch("api/itProject/" + project.id + "?organizationId=" + project.organizationId, data)
+                        .success(function (result) {
+                         //   $scope.chosenReference = id;
+                            msg.toSuccessMessage("Feltet er opdateret!");
+                            reload();
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Prøv igen.");
+                        });
                 };
 
-                $scope.edit = function (event) {
-                    event.preventDefault();
-                    var dataItem = $scope.mainGrid.dataItem($(event.currentTarget).closest("tr"));
-                    $state.go(".edit", { refId: dataItem["id"], orgId: project.organizationId });
+                $scope.isValidUrl = function (url) {
+                    if (url) { 
+                    var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                    return regexp.test(url.toLowerCase());
+                    }
+                    return false;
+                };
+
+                $scope.edit = function (id) {
+                    $state.go(".edit", { refId: id, orgId: project.organizationId });
                 };
 
                 function reload() {
@@ -52,7 +63,7 @@
                 };
 
                 $scope.mainGridOptions  = {
-                dataSource: {
+                    dataSource: {
                         data: project.externalReferences,
                         pageSize: 10
                     },
@@ -67,7 +78,7 @@
                         title: "Dokumenttitel",
                         template: function (data) {
                             if ($scope.isValidUrl(data.url)) {
-                                return "<a href=\"" + data.url + "\">" + data.title + "</a>"; 
+                                return "<a href=\"" + data.url + "\">" + data.title + "</a>";
                             } else {
                                 return data.title;
                             }
@@ -80,17 +91,27 @@
                         field: "created",
                         title: "Oprettet",
                         template: "#= kendo.toString(kendo.parseDate(created, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
-                        
+
                     }, {
                         field: "objectOwner.fullName",
                         title: "Oprettet af",
                         width: 150
                     }, {
                         title: "Rediger",
-                        command: [
-                            { text: "Redigér", click: $scope.edit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon"} as any,
-                            { text: "Slet", click: $scope.deleteReference, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon"} as any,
-                        ]
+                        template: dataItem => {
+                            var HTML = "<button type='button' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
+                                + " <button type='button' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+
+                            if ($scope.isValidUrl(dataItem.url)) {
+                                if (dataItem.id === project.referenceId) {
+                                    HTML = HTML + "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Valgt</span></a>";
+                                } else { 
+                                    HTML = HTML +  "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Vælg</span></a>";
+                                }
+                            }
+
+                            return HTML;
+                        }
                     }],
                     toolbar: [
                         {
