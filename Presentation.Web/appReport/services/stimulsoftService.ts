@@ -31,6 +31,10 @@
             return new this.$window.Stimulsoft.Report.Dictionary.StiVariable();
         }
 
+        public getODataDatabase(): any {
+            return new this.$window.Stimulsoft.Report.Dictionary.StiODataDatabase();
+        }
+
         public getDesignerOptions(): any {
             return new this.$window.Stimulsoft.Designer.StiDesignerOptions();
         }
