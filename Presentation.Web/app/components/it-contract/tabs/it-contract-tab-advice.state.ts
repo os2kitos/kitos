@@ -1,12 +1,12 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-contract.edit.advice-generic', {
-            url: '/advice/:id/:type',
-            templateUrl: 'app/components/it-contract/tabs/it-contract-tab-advice.view.html',
+            url: '/advice/:type',
+            templateUrl: 'app/components/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
+            controllerAs: 'Vm',
             resolve: {
-                
-                itContractRoles: ['$http', function ($http) {
+                Roles: ['$http', function ($http) {
                   
                     return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
                         .then(function (result) {
@@ -14,15 +14,12 @@
                         });
                 }],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                    if ($stateParams.id != undefined) { 
+                    
                     return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
-                    }
-                    return null;
                 }]
             }
         });
     }]);
-
 })(angular, app);

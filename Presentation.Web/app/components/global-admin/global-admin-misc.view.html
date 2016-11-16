@@ -1,18 +1,10 @@
-﻿﻿<div>
+﻿﻿<div class="container">
     <h3>Regneark for kontraktindgåelse</h3>
     <div class="form-group">
-        <label for="username" class="col-md-3 control-label">
+        <label>
             Upload ny skabelon
         </label>
-        <div class="col-md-8">
-            <input class="file form-control" type="file" file-model="myFile" />
-        </div>
+        <input class="file form-control" type="file" file-model="myFile" />
     </div>
-    <div class="form-group">
-        <label for="username" class="col-md-3 control-label">
-            <button class="btn btn-default" ng-click="uploadFile()">Upload</button>
-        </label>
-        <div class="col-md-8">
-        </div>
-    </div>
+    <button class="btn btn-default" ng-click="uploadFile()">Upload</button>
 </div>

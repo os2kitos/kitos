@@ -1,7 +1,7 @@
 ﻿<div class="form-group row" data-ng-init="open = false">
-    <div class="col-md-10 col-md-offset-2">
+    <div class="col-xs-10 col-xs-offset-2">
         <div class="form-group">
-            <div class="col-md-7">
+            <div class="col-xs-7">
                 <a class="btn btn-xs btn-default" data-ng-click="open = !open">
                     {{open && "Skjul" || "Foreslå ny"}}
                 </a>
@@ -11,15 +11,15 @@
                         Alle foreslag skal godkendes af en global administrator før de bliver tilgengængelige til brug.
                     </p>
 
-                    <label class="control-label col-md-2">
+                    <label class="control-label col-xs-2">
                         Forslag: 
                     </label>
 
-                    <div class="col-md-8">
+                    <div class="col-xs-8">
                         <input type="text" data-ng-model="suggestion" class="form-control input-sm" />
                     </div>
                     
-                    <input type="submit" class="btn btn-success btn-sm col-md-2" value="Send foreslag" data-ng-disabled="!suggestion" data-ng-click="suggest()" />
+                    <input type="submit" class="btn btn-success btn-sm col-xs-2" value="Send foreslag" data-ng-disabled="!suggestion" data-ng-click="suggest()" />
 
                 </div>
             </div>

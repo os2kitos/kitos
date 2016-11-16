@@ -1,10 +1,10 @@
-﻿<nav>
-    <ul class="nav nav-tabs">
-        <li role="presentation" data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
-            <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}" class="btn btn-tab">{{link.text}}</a>
-        </li>
-        <li role="presentation" data-ng-repeat="btn in page.subnav.buttons" data-ng-if="!btn.showWhen || $state.includes(btn.showWhen)">
-            <a class="btn btn-sm" data-ng-class="btn.style" data-ng-click="btn.func()"><i class="glyphicon" data-ng-class="btn.icon"></i> {{ btn.text }}</a>
-        </li>
-    </ul>
-</nav>
+﻿<ul>
+    <li data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
+        <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}">{{link.text}}</a>
+    </li>
+</ul>
+<ul class="icons">
+    <li><a><i class="fa fa-bell"></i></a></li>
+    <li><a><i class="fa fa-bar-chart"></i></a></li>
+    <li><a><i class="fa fa-question"></i></a></li>
+</ul>

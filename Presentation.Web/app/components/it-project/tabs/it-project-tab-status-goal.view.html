@@ -1,11 +1,11 @@
 ﻿<div>
     <form class="form-horizontal fix-label-padding">
         <div class="row">
-            <div class="col-md-5">
+            <div class="col-xs-5">
                 <!-- Status traffic light -->
                 <div class="form-group">
-                    <label class="col-md-5 control-label small" for="statusGoal">Status mål (samlet):</label>
-                    <div class="col-md-7">
+                    <label class="col-xs-5 control-label small" for="statusGoal">Status mål (samlet):</label>
+                    <div class="col-xs-7">
                         <span id="statusGoal"
                               data-select-status2=""
                               data-ng-model="goalStatus.status"
@@ -17,8 +17,8 @@
 
                 <!-- Date for status update -->
                 <div class="form-group">
-                    <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-4">
+                    <label class="col-xs-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                    <div class="col-xs-4">
                         <input type="text" class="form-control" id="statusDate"
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
@@ -31,11 +31,11 @@
 
 
             </div>
-            <div class="col-md-7">
+            <div class="col-xs-7">
                 <!-- Notes to status of project -->
                 <div class="form-group">
-                    <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på mål:</label>
-                    <div class="col-md-10">
+                    <label class="col-xs-2 control-label small" for="note">Bemærkning til samlet status på mål:</label>
+                    <div class="col-xs-10">
                         <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
                             data-field="statusNote"
                             data-autosave="{{goalStatus.updateUrl}}"

@@ -1,3 +1,6 @@
+/* Disable responsiveness */
+.container { width: @container-desktop !important; }
+
 html {
   height: 100%;
 }
@@ -47,6 +50,7 @@ div#page-body {
   font-size: 15px;
   background-color: rgb(55, 96, 146);
   border: 0;
+    margin-bottom: 0;
 }
 #navbar-top .navbar-brand {
   height: 55px;
@@ -57,18 +61,25 @@ div#page-body {
   text-align: center;
 }
 
-#navbar-top .navbar-nav li a,
-    #navbar-top .navbar-text {
-  height: 55px;
+#navbar-top .navbar-nav li a {
+  height: 80px;
   padding: 0 10px;
-  margin: 15px 5px;
   font-size: 18px;
-  line-height: 55px;
+  line-height: 80px;
   text-align: center;
 }
 
+#navbar-top .navbar-text {
+    height: 55px;
+    padding: 0 10px;
+    margin: 15px 5px;
+    font-size: 18px;
+    line-height: 55px;
+    text-align: center;
+}
+
 #navbar-top li a {
-  width: 100%;
+    width: 100%;
 }
 
 #navbar-top li.double-line a {
@@ -87,7 +98,28 @@ div#page-body {
 #navbar-top .navbar-complex {
   padding-top: -10px;
   font-size: .7em;
-  line-height: 25px;
+  line-height: 55px;
+}
+
+#navbar-top .dropdown-menu {
+    background-color: #dbe5f1;
+    border-radius: 0;
+    border: 3px solid #376092;
+    padding: 0;
+    margin-top: 17px;
+
+    li {
+        a {
+            padding: 10px 20px;
+            color: #376092 !important;
+            font-size: 14px;
+
+            &:hover { 
+                background-color: #376092;
+                color: white !important;
+            }
+        }
+    }
 }
 
 #navbar-top a {
@@ -103,26 +135,63 @@ div#page-body {
 }
 /*********************************************/
 
-#subnav ul {
-  margin: 0;
-  list-style-type: none;
+/* SUBNAV */
+#subnav {
+    font-size: 15px;
+    color: rgb(55, 96, 146);
+    background-color: rgb(219, 229, 241);
+    text-align: center;
+    min-height: 40px;
+    position: relative;
+    
+    ul {
+        margin: 0;
+        list-style-type: none;
+        li {
+          display: inline-block;
+            a {
+                line-height: 40px;
+                height: 40px;
+                padding: 0 10px;
+                color: rgb(55, 96, 146);
+                text-decoration: none;
+                
+                &.btn-tab {
+                    
+                }
+            
+                &.btn-tab-active {
+                  font-weight: bold;
+                }
+            }
+        }
+
+        &.icons {
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding-right: 10px;
+        }
+    }
 }
 
-#subnav nav ul li {
-  display: inline-block;
-  margin-left: 10px;
+/***/
+
+/* SUBNAV BUTTONS */
+
+#subnav-buttons {
+    ul {
+        display: inline-block;
+        float: right;
+        list-style-type: none;
+
+        li {
+            padding: 10px;
+        }
+    }
 }
 
-#subnav nav ul li a.btn-tab {
-  color: black;
-  background-color: #e6e6e6;
-}
-
-#subnav nav ul li a.btn-tab-active {
-  background-color: white;
-}
-
-
+/**/
 
 div.org-node-top {
   margin-top: 5px;
@@ -237,7 +306,7 @@ div.suggest-box {
 }
 
 input:disabled {
-  cursor: inherit !important;
+  cursor: default!important;
 }
 
 input.input-cell {
@@ -671,7 +740,7 @@ div.searchbox-wrapper {
 
 /* disabled inputfield */
 .disabled-input {
-  cursor: not-allowed;
+  cursor: default;
   background-color: #ddd;
 }
 
@@ -836,3 +905,87 @@ tr.angular-ui-tree-empty {
   background: #f0f9ff;
   border: 2px dashed #bed2db;
 }
+
+/********* Left menu  **********/
+
+.object-wrapper {
+  height: 100%;
+  padding-left: 0;
+
+  .left-menu-container {
+    height: 100%;
+    padding-left: 0;
+
+    .left-menu {
+      height: 100%;
+      padding: 15px 0;
+      background-color: #dbe5f0;
+
+      .header {
+        padding: 0 15px;
+
+        h3 {
+          font-size: 14px;
+          font-weight: bold;
+          border-bottom: 1px solid black;
+        }
+      }
+
+      ul {
+        padding: 0;
+        list-style: none;
+
+        li {
+          a {
+            display: block;
+            padding: 7px 15px;
+            color: black;
+
+            i {
+              margin-right: 12px;
+            }
+
+            img {
+              width: 14px;
+              margin-right: 12px;
+            }
+          }
+
+          &.active, &:hover, &:active {
+            cursor: pointer;
+            background-color: #3a6db5;
+
+            a {
+              font-weight: bold;
+              color: white;
+              text-decoration: none;
+            }
+
+            img {
+              filter: invert(1);
+              -webkit-filter: invert(1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/********* Object frontpages  **********/
+
+.object-section-container {
+    margin-bottom: 25px;
+
+    h4 {
+        border-bottom: 1px solid black;
+        margin: 0;
+    }
+
+    & > div {
+        background-color: #f3f3f3;
+        padding-top: 15px;
+    }
+}
+
+/*********/

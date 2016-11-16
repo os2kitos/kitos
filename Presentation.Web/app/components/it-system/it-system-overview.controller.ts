@@ -232,7 +232,10 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-
+        public isValidUrl(Url) {
+            var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return regexp.test(Url.toLowerCase());
+        };
         private activate() {
             // overview grid options
             var mainGridOptions: IKendoGridOptions<IItSystemUsageOverview> = {
@@ -242,7 +245,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -511,18 +514,18 @@
                         sortable: false
                     },
                     {
-                        field: "EsdhRef", title: "ESDH ref", width: 150,
-                        persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.EsdhRef ? `<a target="_blank" href="${dataItem.EsdhRef}"><i class="fa fa-link"></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.EsdhRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                        field: "ReferenceId", title: "Reference", width: 150,
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (this.isValidUrl(reference.URL)) {
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
                             }
+                            return "";
                         }
                     },
                     {

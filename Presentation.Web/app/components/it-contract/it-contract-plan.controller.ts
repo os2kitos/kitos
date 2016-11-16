@@ -39,7 +39,8 @@
             "user",
             "gridStateService",
             "itContractRoles",
-            "orgUnits"
+            "orgUnits",
+            "$uibModal"
         ];
 
         constructor(
@@ -56,7 +57,8 @@
             private user,
             private gridStateService: Kitos.Services.IGridStateFactory,
             private itContractRoles: Array<any>,
-            private orgUnits: Array<any>) {
+            private orgUnits: Array<any>,
+            private $modal) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -71,11 +73,60 @@
                         // show loadingbar when export to excel is clicked
                         // hidden again in method exportToExcel callback
                         $(".k-grid-excel").click(() => {
-                                kendo.ui.progress(this.mainGrid.element, true);
-                            });
+                            kendo.ui.progress(this.mainGrid.element, true);
+                        });
                     }
                 });
             this.activate();
+        }
+
+        public opretITKontrakt() {
+
+            var self = this;
+
+            var modalInstance = this.$modal.open({
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = "IT Kontrakt";
+                    $scope.checkAvailbleUrl = "api/itProject/";
+
+                    $scope.saveAndProceed = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.go("it-contract.edit.main", { id: contract.id });
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+
+                    $scope.save = () => {
+
+                        var orgId = self.user.currentOrganizationId;
+                        var msg = self.notify.addInfoMessage("Opretter kontrakt...", false);
+
+                        self.$http.post("api/itcontract", { organizationId: orgId, name: $scope.formData.name })
+                            .success((result: any) => {
+                                msg.toSuccessMessage("En ny kontrakt er oprettet!");
+                                var contract = result.response;
+                                $modalInstance.close(contract.id);
+                                self.$state.reload();
+                            })
+                            .error(() => {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
+                            });
+                    };
+                }]
+            });
         }
 
         // saves grid state to localStorage
@@ -166,7 +217,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -249,30 +300,36 @@
                     }
                 },
                 toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretITKontrakt",
+                        text: "Opret IT Kontrakt",
+                        template: "<a ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
+                        "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                            '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
+                        '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                            '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
+                        '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                            "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                        "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -418,6 +475,39 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+                        field: "AssociatedSystemUsages",
+                        title: "Antal systemer",
+                        width: 50,
+                        persistId: "numOfItSystems", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedSystemUsages.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
+                    },
+                    {
+                        field: "AssociatedInterfaceUsages",
+                        title: "Antal udstillede snitflader",
+                        width: 50,
+                        persistId: "numOfItInterfacesExhibit", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedInterfaceExposures.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
+                    },
+                    {
+                        field: "AssociatedInterfaceExposures",
+                        title: "Antal anvendte snitflader",
+                        width: 50,
+                        persistId: "numOfItInterfacesUsages", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            return dataItem.AssociatedInterfaceUsages.length.toString();
+                        },
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "Esdh",
@@ -663,8 +753,8 @@
                         attributes: { "class": "text-center" },
                         template: dataItem =>
                             dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear
-                            ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
-                            : "",
+                                ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
+                                : "",
                         filterable: {
                             cell: {
                                 dataSource: [],

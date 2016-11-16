@@ -1,22 +1,22 @@
-﻿<div class="searchbox-wrapper">
+﻿<div class="searchbox-wrapper" style="margin-top: 45px;">
     <a class="excel-icon" data-ng-href="{{csvUrl}}">
         <img src="../../Images/excel.png" alt="Hent excelark" width="25">
     </a>
 </div>
 
-<div class="col-md-12">
-    <div class="col-md-3">
+<div class="col-xs-12">
+    <div class="col-xs-3">
         <div data-ng-model="orgUnitId" data-ng-change="loadUsages()" data-select-org-unit=""></div>
     </div>
-    <div class="col-md-1">
+    <div class="col-xs-1">
         KLE ID
         <button data-order-by="'taskRef.taskKey'" data-paging="pagination"></button>
     </div>
-    <div class="col-md-4">
+    <div class="col-xs-4">
         KLE Navn
         <button data-order-by="'taskRef.description'" data-paging="pagination"></button>
     </div>
-    <div class="col-md-2">
+    <div class="col-xs-2">
         <div class="supertext" data-ng-show="user.currentConfig.showColumnTechnology || user.currentConfig.showColumnUsage">
             Digitaliseringsgrad
         </div>
@@ -26,15 +26,15 @@
         </div>
 
     </div>
-    <div class="col-md-1 text-center">IT Projekt</div>
-    <div class="col-md-1 text-center">IT System</div>
+    <div class="col-xs-1 text-center">IT Projekt</div>
+    <div class="col-xs-1 text-center">IT System</div>
 </div>
 
 <div data-ng-repeat="usage in taskUsages">
     <div data-ng-include="'app/components/org/overview/org-overview-usage.view.html'"></div>
 </div>
 
-<div class="col-md-12">
+<div class="col-xs-12">
     <span data-pagination-buttons="pagination" data-pagination-total-count="totalCount"></span>
 </div>
 
