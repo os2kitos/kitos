@@ -12,10 +12,7 @@
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
     
     <div>
-
-        <!--<select ng-model="selectedUser" ng-options="user.Name for user in ctrl.vmUsersInOrganization | orderBy:orderByValue" ng-change="ctrl.setSelectedUser(selectedUser)">
-            <option>-->
-        <select ng-model="selectedUser" ng-change="ctrl.setSelectedUser(selectedUser)">
+        <select ng-model="selectedUser" ng-click="ctrl.setSelectedUser(selectedUser)" >
             <option ng-repeat="user in ctrl.vmUsersInOrganization" value="{{user}}">
                 {{user.Name}} {{user.LastName}}
             </option>
@@ -34,12 +31,12 @@
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="orgUnit in ctrl.vmOrgUnits">
+        <tr ng-repeat="orgUnit in ctrl.vmOrgUnits" >
             <!--ng-true-value doesn't accept dynamically allocated values-->
-            <td><input type="checkbox" ng-model="orgUnitCheck" ng-click="ctrl.checkBoxTrueValue(orgUnitCheck)" /></td>
+            <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.orgUpdate('Organisation', orgUnit, orgUnitModel, selectedUser)" ng-click="ctrl.checkBoxChecked(orgUnitModel[orgUnit.Id])" value="{{orgUnitModel[orgUnit.Id]}}" /></td>
             <td>{{orgUnit.Object.Name}}</td>
             <td>{{orgUnit.Role.Name}}</td>
-            <td>{{selectedUser}}</td>
+            <td ng-hide="!orgUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
         </tr>
         </tbody>
     </table>
@@ -58,7 +55,7 @@
                 <td><input type="checkbox" /></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -77,7 +74,7 @@
                 <td><input type="checkbox" /></td>
                 <td>{{system.Object.ItSystem.Name}}</td>
                 <td>{{system.Role.Name}}</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -96,7 +93,7 @@
                 <td><input type="checkbox" /></td>
                 <td>{{it.Object.Name}}</td>
                 <td>{{it.Role.Name}}</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -113,32 +110,32 @@
             <tr ng-show="{{ctrl.vm.isLocalAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>Lokal administrator</td>
-                <td>{{localAdminCheck}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isOrgAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>Organisation administrator</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isProjectAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>Projekt administrator</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isSystemAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>System administrator</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isContractAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>Kontrakt administrator</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isReportAdmin}}">
                 <td><input type="checkbox" /></td>
                 <td>Rapport administrator</td>
-                <td>{{selectedUser}}</td>
+                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
 
         </tbody>

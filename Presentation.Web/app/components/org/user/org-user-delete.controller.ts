@@ -10,9 +10,42 @@
         isReportAdmin: boolean;
     }
 
+    class UserRole {
+        modul: any;
+        rightId: any;
+        user: any;
+    }
+
+    class Map<T> {
+        private items: { [key: string]: T };
+
+        constructor() {
+            this.items = {};
+        }
+
+        add(key: string, value: T): void {
+            this.items[key] = value;
+        }
+
+        has(key: string): boolean {
+            return key in this.items;
+        }
+
+        get(key: string): T {
+            return this.items[key];
+        }
+
+        del(key: string): void {
+            delete this.items[key];
+        }
+    }
+
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
         public vm: IDeleteViewModel;
+
+        //public roles: UserRole[] = new Array<UserRole>();
+        public roles: Map<UserRole> = new Map<UserRole>();
 
         public vmProject: any;
         public vmSystem: any;
@@ -21,13 +54,13 @@
         public vmOrgUnits: any;
         public vmHasAdminRoles: boolean;
         public vmUsersInOrganization: any;
-        public vmFullName: any;
-        public selecterUserId: any;
+        public selecterUser: any;
 
         private userId: number;
         private firstName: string;
         private lastName: string;
         private email: string;
+        private itemSelected: boolean;
         private originalVm;
 
         // injecter resolve request i ctoren
@@ -68,6 +101,7 @@
             this.vmSystem = system;
             this.vmItContracts = itContracts;
             this.vmOrgUnits = orgUnits;
+            this.itemSelected = false;
 
             //tjekker om brugeren har de forskellige administrator rettigheder.
             var userVm: IDeleteViewModel = {
@@ -86,19 +120,51 @@
                 userVm.isProjectAdmin ||
                 userVm.isReportAdmin ||
                 userVm.isSystemAdmin;
+
+
+            //let payload = {
+            //    UserId: 4
+            //}
+            //this.$http.patch(`/odata/OrganizationUnitRights(2)`, payload);
+
         }
 
         public checkBoxTrueValue = (item) => {
-            var data = { selectedItem: item }
-            //console.log(item);
+            if (item == null) {
+            } else {
+                this.itemSelected = item;
+            }
+            console.log("IsTrue " + item);
+
+        }
+
+        public checkBoxChecked = (item) => {
+            console.log("checked " + item);
+        }
+
+        public orgUpdate = (module, object, isChecked, selectedUser) => {
+            console.log("from assignee" + module + object.Object.Name + isChecked + selectedUser);
+            if (isChecked) {
+                var userRoles: UserRole = {
+                    modul: module,
+                    rightId: object.Id,
+                    user: selectedUser.Name + " " + selectedUser.LastName
+                    }
+                this.roles.add(object.Id, userRoles);
+            }
+            if (!isChecked) {
+                this.roles.del(object.Id);
+            }
+            console.log(this.roles);
         }
 
         public setSelectedUser = (item) => {
-            //var data = { selectedItem: item }
-            //console.log(data.selectedItem);
-            //var fullName = item.Name;
-            //console.log(fullName);
-            //this.vmFullName = 
+            if (item == null) {
+
+            } else {
+                var data = JSON.parse(item);
+                this.selecterUser = data;
+            }
         }
 
         public ok() {

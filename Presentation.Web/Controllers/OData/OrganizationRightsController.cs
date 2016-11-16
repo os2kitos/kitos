@@ -10,13 +10,13 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationRightsController : BaseController<OrganizationRight>
+    public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
 
         public OrganizationRightsController(IGenericRepository<OrganizationRight> repository, IUserService userService, IAuthenticationService authService)
-            : base(repository)
+            : base(repository, authService)
         {
             _userService = userService;
             _authService = authService;
