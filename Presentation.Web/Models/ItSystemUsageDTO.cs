@@ -57,5 +57,7 @@ namespace Presentation.Web.Models
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
     }
 }

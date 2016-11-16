@@ -97,6 +97,9 @@ namespace Presentation.Web.Models
 
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
 
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
+
         public int? Roi
         {
             get

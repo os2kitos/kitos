@@ -51,5 +51,8 @@
         ItInterfaceExhibitUsages: Array<ItSystemUsage.IItInterfaceExhibitUsage>;
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
+
+        ReferenceId: number;
+        Reference: IReference;
     }
 }
