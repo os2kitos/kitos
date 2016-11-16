@@ -20,17 +20,23 @@ namespace Core.ApplicationServices
                 Organization = organization,
                 User = user,
                 Role = organizationRole,
-                LastChangedByUser = kitosUser
+                LastChangedByUser = kitosUser,
+                ObjectOwner = kitosUser
             });
             _organizationRights.Save();
 
             return result;
         }
-        
+
         private void RemoveOrganizationRoleServiceFromUser(User user, Organization organization, OrganizationRole organizationRole)
         {
             _organizationRights.DeleteByKey(organization.Id, organizationRole, user.Id);
             _organizationRights.Save();
+        }
+
+        public OrganizationRight MakeUser(User user, Organization organization, User kitosUser)
+        {
+            return AddOrganizationRoleToUser(user, organization, kitosUser, OrganizationRole.User);
         }
 
         public OrganizationRight MakeLocalAdmin(User user, Organization organization, User kitosUser)
