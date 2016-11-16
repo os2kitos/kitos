@@ -1,0 +1,121 @@
+﻿<form role="form">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Advis {{type}}
+        </div>
+        <table class="table table-condensed small">
+            <thead>
+                <tr>
+                    <th>{{Vm.test}}</th>
+                    <th>Sendt</th>
+                    <th>Advis navn</th>
+                    <th class="col-md-2">Dato</th>
+                    <th>Modtager</th>
+                    <th>Cc</th>
+                    <th>Emne</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="advice in advices">
+                    <!-- active -->
+                    <td>
+                        <input type="checkbox"
+                               class="checkbox advice-active"
+                               data-ng-model="advice.isActive"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{advice.updateUrl}}"
+                               data-field="isActive">
+                    </td>
+
+                    <!-- mail sent indicator -->
+                    <td class="vert-align">
+                        {{ advice.sentDate | date }}
+                    </td>
+
+                    <!-- name -->
+                    <td>
+                        <input type="text"
+                               class="form-control input-sm advice-name"
+                               data-ng-model="advice.name"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{advice.updateUrl}}"
+                               data-field="name">
+                    </td>
+
+                    <!-- date -->
+                    <td>
+                        <input type="text"
+                               class="form-control advice-date"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="advice.alarmDate"
+                               data-autosave="{{advice.updateUrl}}"
+                               data-field="alarmDate">
+                    </td>
+
+                    <!-- receiver -->
+                    <td>
+                        <select class="form-control input-sm advice-receiver"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg modtager rolle"
+                                data-ng-model="advice.receiverId"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-field="receiverId"
+                                data-autosave="{{advice.updateUrl}}">
+                            <option value=""></option>
+                            <option data-ng-repeat="itContractRole in itContractRoles" value="{{itContractRole.id}}">{{itContractRole.name}}</option>
+                        </select>
+                    </td>
+
+                    <!-- cc -->
+                    <td>
+                        <select class="form-control input-sm advice-role"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg cc rolle"
+                                data-ng-model="advice.carbonCopyReceiverId"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-field="carbonCopyReceiverId"
+                                data-autosave="{{advice.updateUrl}}">
+                            <option value=""></option>
+                            <option data-ng-repeat="itContractRole in itContractRoles" value="{{itContractRole.id}}">{{itContractRole.name}}</option>
+                        </select>
+                    </td>
+
+                    <!-- subject -->
+                    <td>
+                        <input type="text"
+                               class="form-control input-sm advice-subject"
+                               data-ng-model="advice.subject"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{advice.updateUrl}}"
+                               data-field="subject">
+                    </td>
+
+                    <!-- delete button -->
+                    <td>
+                        <div class="pull-right" data-ng-hide="!hasWriteAccess">
+                            <a class="btn btn-link btn-xs delete-advice"
+                               data-confirmed-click="advice.delete()"
+                               data-confirm-click="Er du sikker på at du vil slette?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot data-ng-show="hasWriteAccess">
+                <tr>
+                    <td colspan="7">
+                        <div class="pull-right">
+                            <button id="add-advice" class="btn btn-success btn-sm" data-ng-click="newAdvice()">
+                                <i class="glyphicon glyphicon-plus small"></i> Ny
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</form>

@@ -194,6 +194,9 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
+        public int? ReferenceId { get; set; }
+        public virtual ExternalReference Reference { get; set; }
+
         /// <summary>
         /// Determines whether this instance is within a given organizational context.
         /// </summary>
