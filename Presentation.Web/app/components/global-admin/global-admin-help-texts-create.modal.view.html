@@ -1,0 +1,19 @@
+﻿<div class="modal-header">
+    <h3>Opret hjælpetekst</h3>
+</div>
+<div class="modal-body">
+    <form name="createUser.form" novalidate="novalidate" class="form-horizontal">
+        <div class="form-group">
+            <label for="title" class="col-xs-3 control-label">
+                Titel
+            </label>
+            <div class="col-xs-8">
+                <input type="text" name="title" id="title" data-ng-model="ctrl.vm.title" class="form-control" data-ng-required="true" autofocus data-ng-disabled="ctrl.busy">
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" data-ng-click="ctrl.create()" data-ng-disabled="!ctrl.vm.title || ctrl.busy" data-disabled-on-busy="">Opret hjælpetekst</button>
+    <button class="btn btn-warning" data-ng-click="ctrl.cancel()" data-ng-disabled="ctrl.busy" data-disabled-on-busy="">Annuller</button>
+</div>
