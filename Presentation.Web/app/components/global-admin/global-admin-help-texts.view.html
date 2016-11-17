@@ -1,0 +1,19 @@
+﻿<div class="container">
+    <div class="row">
+        <div class="col-xs-3">
+            <br/><br/><br/>
+            <div class="list-group">
+                <a data-ng-repeat="helpText in helpTextsCtrl.helpTexts" data-ng-class="{active: helpTextsCtrl.selectedHelpText === helpText}" class="list-group-item" data-ng-click="helpTextsCtrl.selectHelpText(helpText)">{{ helpText.Title }}</a>
+            </div>
+        </div>
+        <div class="col-xs-9">
+            <button class="btn btn-primary pull-right" data-ng-click="helpTextsCtrl.create()">Opret</button>
+            <h3 data-ng-bind="helpTextsCtrl.selectedHelpText.Title"></h3>
+            <div class="form-group">
+                <textarea ui-tinymce="helpTextsCtrl.tinymceOptions" data-ng-model="helpTextsCtrl.selectedHelpText.Description"></textarea>
+            </div>
+            <button class="btn btn-primary pull-right" data-ng-click="helpTextsCtrl.save()">Gem</button>
+            <help-text data-id="1"></help-text>
+        </div>
+    </div>
+</div>
