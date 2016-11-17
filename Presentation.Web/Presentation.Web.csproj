@@ -317,6 +317,7 @@
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
+    <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
@@ -551,6 +552,7 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
@@ -568,6 +570,7 @@
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\It-advice.controller.ts" />
@@ -604,6 +607,7 @@
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\reports\report-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\general-role-entity.ts" />
+    <TypeScriptCompile Include="app\models\help-text.ts" />
     <TypeScriptCompile Include="app\models\IReference.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
@@ -632,6 +636,7 @@
     <TypeScriptCompile Include="app\components\global-admin\globalOptionList\globalOptionList.directive.ts" />
     <TypeScriptCompile Include="app\components\global-admin\globalOptionRoleList\globalOptionRoleList.directive.ts" />
     <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
+    <TypeScriptCompile Include="app\shared\helpText\helpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
@@ -641,6 +646,7 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
     <Content Include="app\components\reports\report-edit.modal.view.html" />
+    <Content Include="app\shared\helpText\helpText.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />

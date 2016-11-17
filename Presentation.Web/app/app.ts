@@ -11,7 +11,8 @@ var app = angular.module("app", [
     "angular-confirm",
     "ui.bootstrap.tpls",
     "ngMessages",
-    "ui.tree"]);
+    "ui.tree",
+    "ui.tinymce"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
