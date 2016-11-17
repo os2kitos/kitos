@@ -7,7 +7,6 @@
                 templateUrl: "app/shared/selectMultipleOption/selectMultipleOption.view.html",
                 scope: {
                     id: "@",
-                    label: "@",
                     placeholder: "@",
                     options: "&",
                     selectedIds: "=ngModel",
