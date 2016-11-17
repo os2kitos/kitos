@@ -1071,6 +1071,7 @@
     <Content Include="Content\less\styles.less" />
     <Content Include="Content\less\kitos.less" />
     <Content Include="Content\less\variables.less" />
+    <None Include="Properties\PublishProfiles\DeployToProd.pubxml" />
     <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
       <SubType>Designer</SubType>
     </None>
