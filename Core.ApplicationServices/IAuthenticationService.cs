@@ -17,5 +17,6 @@ namespace Core.ApplicationServices
         bool IsLocalAdmin(int userId);
         bool HasReadAccessOutsideContext(int userId);
         int GetCurrentOrganizationId(int userId);
+        bool CanExecute(int userId, Feature feature);
     }
 }

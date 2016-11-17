@@ -30,6 +30,7 @@ namespace Tests.Unit.Presentation.Web.OData
         private IGenericRepository<ItContract> _itContractRepository;
         private IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private AuthenticationService _authenticationService;
+        private IFeatureChecker _featureChecker;
 
         public AuthenticationServiceTest()
         {
@@ -41,7 +42,8 @@ namespace Tests.Unit.Presentation.Web.OData
             _itContractRepository = Substitute.For<IGenericRepository<ItContract>>();
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
-            _authenticationService = new AuthenticationService(_userRepository);
+            _featureChecker = Substitute.For<IFeatureChecker>();
+            _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<ItContract> contracts = new EnumerableQuery<ItContract>(new List<ItContract>
             {
                 new ItContract {OrganizationId = 1,Name = "Contract belongs to org 1"}, new ItContract { OrganizationId = 2, Name = "Contract belongs to org 2" }

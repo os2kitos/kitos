@@ -398,12 +398,18 @@
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => {
+                        template: dataItem => {
                             // handles null cases
-                            if (!dataItem || !dataItem.LastChanged) {
+                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
                                 return "";
                             }
-
+                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                        },
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                                return "";
+                            }
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
                         },
                         attributes: { "class": "text-center" },
