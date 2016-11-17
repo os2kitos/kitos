@@ -98,6 +98,9 @@ namespace Core.DomainModel.ItContract
             return base.HasUserWriteAccess(user);
         }
 
+        public int? ReferenceId { get; set; }
+        public virtual ExternalReference Reference { get; set; }
+
         #region Master
 
         /// <summary>

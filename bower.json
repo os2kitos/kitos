@@ -35,7 +35,8 @@
     "select2-bootstrap-css": "^1.4.6",
     "angular-confirm-modal": "^1.2.6",
     "angular-messages": "1.4.7",
-    "angular-ui-select2": "^0.0.5"
+    "angular-ui-select2": "^0.0.5",
+    "angular-ui-tinymce": "^0.0.17"
   },
   "resolutions": {
     "angular": "1.4.7",

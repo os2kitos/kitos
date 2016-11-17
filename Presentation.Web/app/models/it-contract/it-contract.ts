@@ -125,5 +125,8 @@
 
         /** Whether the contract is active or not */
         IsActive: boolean;
+
+        ReferenceId: number;
+        Reference: IReference;
     }
 }
