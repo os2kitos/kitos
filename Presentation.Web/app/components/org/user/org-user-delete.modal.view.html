@@ -19,7 +19,6 @@
         </select>
     </div>
 
-
     <!-- Table containing organization data -->
     <table class="table table-hover" ng-show="{{ctrl.vmOrgUnits.length}}">
         <thead>
@@ -33,10 +32,10 @@
         <tbody>
         <tr ng-repeat="orgUnit in ctrl.vmOrgUnits" >
             <!--ng-true-value doesn't accept dynamically allocated values-->
-            <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.orgUpdate('Organisation', orgUnit, orgUnitModel, selectedUser)" ng-click="ctrl.checkBoxChecked(orgUnitModel[orgUnit.Id])" value="{{orgUnitModel[orgUnit.Id]}}" /></td>
+            <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.collectionUpdate('Organisation', orgUnit, orgUnitModel, selectedUser)" /></td>
             <td>{{orgUnit.Object.Name}}</td>
             <td>{{orgUnit.Role.Name}}</td>
-            <td ng-hide="!orgUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+            <td ng-show="orgUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
         </tr>
         </tbody>
     </table>
@@ -52,10 +51,10 @@
         </thead>
         <tbody>
             <tr ng-repeat="project in ctrl.vmProject">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="projUnitModel" ng-change="ctrl.collectionUpdate('Project', project, projUnitModel, selectedUser)"/></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="projUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -71,10 +70,10 @@
         </thead>
         <tbody>
             <tr ng-repeat="system in ctrl.vmSystem">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="systemUnitModel" ng-change="ctrl.collectionUpdate('System', system, systemUnitModel, selectedUser)" /></td>
                 <td>{{system.Object.ItSystem.Name}}</td>
                 <td>{{system.Role.Name}}</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="systemUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -89,11 +88,11 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="it in ctrl.vmItContracts">
-                <td><input type="checkbox" /></td>
-                <td>{{it.Object.Name}}</td>
-                <td>{{it.Role.Name}}</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+            <tr ng-repeat="Contract in ctrl.vmItContracts">
+                <td><input type="checkbox" ng-model="ContractUnitModel" ng-change="ctrl.collectionUpdate('Contract', Contract, ContractUnitModel, selectedUser)" /></td>
+                <td>{{Contract.Object.Name}}</td>
+                <td>{{Contract.Role.Name}}</td>
+                <td ng-show="ContractUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
         </tbody>
     </table>
@@ -108,34 +107,34 @@
         </thead>
         <tbody>
             <tr ng-show="{{ctrl.vm.isLocalAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isLocalAdminModel" ng-change="ctrl.collectionAdminUpdate('LocalAdmin', isLocalAdminModel, selectedUser)"/></td>
                 <td>Lokal administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isLocalAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isOrgAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isOrgAdminModel" ng-change="ctrl.collectionAdminUpdate('OrganizationModuleAdmin', isOrgAdminModel, selectedUser)"/></td>
                 <td>Organisation administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isOrgAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isProjectAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isProjectAdminModel" ng-change="ctrl.collectionAdminUpdate('ProjectModuleAdmin', isProjectAdminModel, selectedUser)"/></td>
                 <td>Projekt administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isProjectAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isSystemAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isSystemAdminModel" ng-change="ctrl.collectionAdminUpdate('SystemModuleAdmin', isSystemAdminModel, selectedUser)"/></td>
                 <td>System administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isSystemAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isContractAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isContractAdminModel" ng-change="ctrl.collectionAdminUpdate('ContractModuleAdmin', isContractAdminModel, selectedUser)"/></td>
                 <td>Kontrakt administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isContractAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
             <tr ng-show="{{ctrl.vm.isReportAdmin}}">
-                <td><input type="checkbox" /></td>
+                <td><input type="checkbox" ng-model="isReportAdminModel" ng-change="ctrl.collectionAdminUpdate('ReportModuleAdmin', isReportAdminModel, selectedUser)"/></td>
                 <td>Rapport administrator</td>
-                <td>{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-show="isReportAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
             </tr>
 
         </tbody>
@@ -143,8 +142,7 @@
 </div>
 
 <div class="modal-footer">
-    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.assign()" data-disabled-on-busy>Slet valgte</button>
-    <button type="submit" class="btn btn-primary" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
-    <button type="submit" class="btn btn-primary" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og fjern</button>
+    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
+    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
     <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
 </div>

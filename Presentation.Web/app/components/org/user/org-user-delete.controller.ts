@@ -11,13 +11,14 @@
     }
 
     class UserRole {
-        modul: any;
-        rightId: any;
-        user: any;
+        public modul: any;
+        public rightId: any;
+        public user: any;
+        public userId: number;
     }
 
     class Map<T> {
-        private items: { [key: string]: T };
+        public items: { [key: string]: T };
 
         constructor() {
             this.items = {};
@@ -43,10 +44,12 @@
     //Controller til at vise en brugers roller i en organisation
     class DeleteOrganizationUserController {
         public vm: IDeleteViewModel;
-
-        //public roles: UserRole[] = new Array<UserRole>();
-        public roles: Map<UserRole> = new Map<UserRole>();
-
+        
+        public orgRoles: Map<UserRole> = new Map<UserRole>();
+        public projectRoles: Map<UserRole> = new Map<UserRole>();
+        public systemRoles: Map<UserRole> = new Map<UserRole>();
+        public contractRoles: Map<UserRole> = new Map<UserRole>();
+        
         public vmProject: any;
         public vmSystem: any;
         public vmItContracts: any;
@@ -55,6 +58,13 @@
         public vmHasAdminRoles: boolean;
         public vmUsersInOrganization: any;
         public selecterUser: any;
+        public isLocalAdminRoles: any;
+        public isOrgAdminRoles: any;
+        public isProjectAdminRoles: any;
+        public isSystemAdminRoles: any;
+        public isContractAdminRoles: any;
+        public isReportAdminRoles: any;
+
 
         private userId: number;
         private firstName: string;
@@ -68,6 +78,7 @@
             "$uibModalInstance",
             "$http",
             "$q",
+            "$state",
             "notify",
             "user",
             "currentUser",
@@ -81,6 +92,7 @@
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $http: IHttpServiceWithCustomConfig,
             private $q: ng.IQService,
+            private $state: ng.ui.IStateService,
             private notify,
             private user: Models.IUser,
             private currentUser: Services.IUser,
@@ -120,42 +132,56 @@
                 userVm.isProjectAdmin ||
                 userVm.isReportAdmin ||
                 userVm.isSystemAdmin;
-
-
-            //let payload = {
-            //    UserId: 4
-            //}
-            //this.$http.patch(`/odata/OrganizationUnitRights(2)`, payload);
-
+            console.log(user.OrganizationRights);
         }
+
 
         public checkBoxTrueValue = (item) => {
             if (item == null) {
             } else {
                 this.itemSelected = item;
             }
-            console.log("IsTrue " + item);
-
         }
 
-        public checkBoxChecked = (item) => {
-            console.log("checked " + item);
-        }
-
-        public orgUpdate = (module, object, isChecked, selectedUser) => {
-            console.log("from assignee" + module + object.Object.Name + isChecked + selectedUser);
-            if (isChecked) {
-                var userRoles: UserRole = {
-                    modul: module,
-                    rightId: object.Id,
-                    user: selectedUser.Name + " " + selectedUser.LastName
+        public collectionUpdate = (module, object, isChecked, selectedUser) => {
+            if (selectedUser == null) {
+            } else {
+                if (isChecked) {
+                    var data = JSON.parse(selectedUser);
+                    var userRoles: UserRole = {
+                        modul: module,
+                        rightId: object.Id,
+                        user: data.Name + " " + data.LastName,
+                        userId: data.Id
                     }
-                this.roles.add(object.Id, userRoles);
+                    if (module === "Organisation") {
+                        this.orgRoles.add(object.Id, userRoles);
+                    }
+                    if (module === "Project") {
+                        this.projectRoles.add(object.Id, userRoles);
+                    }
+                    if (module === "System") {
+                        this.systemRoles.add(object.Id, userRoles);
+                    }
+                    if (module === "Contract") {
+                        this.contractRoles.add(object.Id, userRoles);
+                    }
+                }
+                if (!isChecked) {
+                    if (module === "Organisation") {
+                        this.orgRoles.del(object.Id);
+                    }
+                    if (module === "Project") {
+                        this.projectRoles.del(object.Id);
+                    }
+                    if (module === "System") {
+                        this.systemRoles.del(object.Id);
+                    }
+                    if (module === "Contract") {
+                        this.contractRoles.del(object.Id);
+                    }
+                } 
             }
-            if (!isChecked) {
-                this.roles.del(object.Id);
-            }
-            console.log(this.roles);
         }
 
         public setSelectedUser = (item) => {
@@ -166,13 +192,178 @@
                 this.selecterUser = data;
             }
         }
+        
+        public collectionAdminUpdate = (module, isChecked, selectedUser) => {
+            if ("LocalAdmin" === module) {
+                if (isChecked) {
+                    var localAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isLocalAdminRoles = localAdmin;
+                } else {
+                    this.isLocalAdminRoles = null;
+                }
+            }
+            if ("OrganizationModuleAdmin" === module) {
+                if (isChecked) {
+                    var orgAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isOrgAdminRoles = orgAdmin;
+                } else {
+                    this.isOrgAdminRoles = null;
+                }
+            }
+            if ("ProjectModuleAdmin" === module) {
+                if (isChecked) {
+                    var projectAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isProjectAdminRoles = projectAdmin;
+                } else {
+                    this.isProjectAdminRoles = null;
+                }
+            }
+            if ("SystemModuleAdmin" === module) {
+                if (isChecked) {
+                    var systemAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isSystemAdminRoles = systemAdmin;
+                } else {
+                    this.isSystemAdminRoles = null;
+                }
+            }
+            if ("ContractModuleAdmin" === module) {
+                if (isChecked) {
+                    var contractAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isSystemAdminRoles = contractAdmin;
+                } else {
+                    this.isSystemAdminRoles = null;
+                }
+            }
+            if ("ReportModuleAdmin" === module) {
+                if (isChecked) {
+                    var reportAdmin = {
+                        modul: module,
+                        rightId: this.user.Id,
+                        userId: selectedUser.Id
+                    };
+                    this.isSystemAdminRoles = reportAdmin;
+                } else {
+                    this.isSystemAdminRoles = null;
+                }
+            }
+        }
+
+        public patchData() {
+            var orgRoles = this.orgRoles;
+            var projRoles = this.projectRoles;
+            var sysRoles = this.systemRoles;
+            var contRoles = this.contractRoles;
+
+            if (orgRoles != null) {
+                _.each(orgRoles.items,
+                    (value, key) => {
+                        let payload = {
+                            UserId: value.userId
+                        }
+                        this.$http.patch(`/odata/OrganizationUnitRights(${value.rightId})`, payload);
+                    });
+            }
+
+            if (projRoles != null) {
+                _.each(projRoles.items,
+                    (value, key) => {
+                        let payload = {
+                            UserId: value.userId
+                        }
+                        this.$http.patch(`/odata/ItProjectRights(${value.rightId})`, payload);
+                    });
+            }
+
+            if (sysRoles != null) {
+                _.each(sysRoles.items,
+                    (value, key) => {
+                        let payload = {
+                            UserId: value.userId
+                        }
+                        this.$http.patch(`/odata/ItSystemRights(${value.rightId})`, payload);
+                    });
+            }
+
+            if (contRoles != null) {
+                _.each(contRoles.items,
+                    (value, key) => {
+                        let payload = {
+                            UserId: value.userId
+                        }
+                        this.$http.patch(`/odata/ItContractRights(${value.rightId})`, payload);
+                    });
+            }
+        }
+
+        public patchAdminData() {
+            if (this.isLocalAdminRoles != null) {
+                    let payload = {
+                        UserId: this.isLocalAdminRoles.userId
+                    }
+                    this.$http.patch(`/odata/OrganizationRights$filter=UserId eq ${this.isLocalAdminRoles.rightId} and Role eq ${this.isLocalAdminRoles.modul}`, payload);
+            } 
+            if (this.isOrgAdminRoles != null) {
+                let payload = {
+                    UserId: this.isOrgAdminRoles.userId
+                }
+                this.$http.patch(`/odata/OrganizationRights$filter=UserId eq ${this.isOrgAdminRoles.rightId} and Role eq ${this.isOrgAdminRoles.modul}`, payload);
+            } 
+            if (this.isProjectAdminRoles != null) {
+                let payload = {
+                    UserId: this.isProjectAdminRoles.userId
+                }
+                this.$http.patch(`/odata/OrganizationRights$filter=UserId eq ${this.isProjectAdminRoles.rightId} and Role eq ${this.isProjectAdminRoles.modul}`, payload);
+            } 
+            if (this.isSystemAdminRoles != null) {
+                let payload = {
+                    UserId: this.isSystemAdminRoles.userId
+                }
+                this.$http.patch(`/odata/OrganizationRights$filter=UserId eq ${this.isSystemAdminRoles.rightId} and Role eq ${this.isSystemAdminRoles.modul}`, payload);
+            } 
+            if (this.isContractAdminRoles != null) {
+                let payload = {
+                    UserId: this.isContractAdminRoles.userId
+                }
+                this.$http.patch(`/odata/OrganizationRights$filter=UserId eq ${this.isContractAdminRoles.rightId} and Role eq ${this.isContractAdminRoles.modul}`, payload);
+            } 
+            if (this.isReportAdminRoles != null) {
+                let payload = {
+                    UserId: this.isReportAdminRoles.userId
+                }
+                this.$http.patch(`/odata/OrganizationRights?$filter=UserId eq ${this.isReportAdminRoles.rightId} and Role eq ${this.isReportAdminRoles.modul}`, payload);
+            } 
+        }
 
         public ok() {
+            this.patchData();
+            this.patchAdminData();
             this.$uibModalInstance.close();
         }
 
         public assign() {
-            this.$uibModalInstance.dismiss();
+            this.patchData();
+            this.patchAdminData();
+            this.$uibModalInstance.close(this.$state.reload());
         }
 
         public cancel() {
