@@ -3,32 +3,31 @@
 
     export class CreateOrganizationController {
         public title: string;
-        public org;
 
         public static $inject: string[] = [
-            "$rootScope", "$scope", "$http", "notify", "organizationService", "userService"
+            "$rootScope", "$scope", "$http", "notify", "userService"
         ];
 
         constructor(private $rootScope,
             private $scope,
             private $http,
             private notify,
-            private organizationService: Services.OrganizationService,
             private userService: Services.IUserService,
-            private currentUser: Services.IUser) {
+            private currentUser: Services.IUser,
+            private org) {
 
             $rootScope.page.title = "Ny organisation";
             this.title = "Opret organisation";
             this.org = {};
-            this.org.accessModifier = 0;
-            this.org.typeId = 2; // set type to interessefællesskab by default
+            this.org.AccessModifier = "0";
+            this.org.TypeId = 2; // set type to interessefællesskab by default
+            this.org.Cvr = null;
 
             this.userService.getUser().then((user: Services.IUser) => {
                 this.currentUser = user;
             }).catch((error) => {
-                //this.notify.addErrorMessage("User not found!");
+                this.notify.addErrorMessage("Brugeren blev ikke fundet!");
             });
-
         }
 
         public dismiss() {
@@ -36,32 +35,26 @@
         }
 
         public submit() {
+            const payload = {
+                Id: this.currentUser.currentOrganizationId,
+                ObjectOwnerId: this.currentUser.id,
+                Name: this.org.Name,
+                TypeId: this.org.TypeId,
+                AccessModifier: this.org.AccessModifier,
+                Cvr: this.org.Cvr
+            }
+            this.$http.post("odata/Organizations", payload).success((organization) => {
+                if (this.org.TypeId === 2) {
+                    this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet med ${this.currentUser.fullName} som lokal admin.`);
+                } else {
+                    this.notify.addSuccessMessage(`Organisationen ${organization.Name} er blevet oprettet!`);
+                }
 
-            var payload = this.org;
-            this.$http.post("api/organization", payload)
-                .success((result) => {
-
-                    if (this.org.typeId === 2) {
-                        this.assignRoles(result.response.id);
-                        this.notify
-                            .addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet med ${
-                            this.currentUser.fullName} som lokal admin.`);
-                    } else {
-                        this.notify.addSuccessMessage(`Organisationen ${result.response.name} er blevet oprettet!`);
-                    }
-
-                    this.$scope.$close(true);
-                })
-                .error((result) => {
-                    this.notify.addErrorMessage(`Organisationen ${this.org.name} kunne ikke oprettes!`);
-                });
+                this.$scope.$close(true);
+            }).error((result) => {
+                this.notify.addErrorMessage(`Organisationen ${this.org.Name} kunne ikke oprettes!`);
+            });
         }
-
-        public assignRoles(orgId: number) {
-            this.organizationService.addRole(orgId, this.currentUser, Models.OrganizationRole.LocalAdmin);
-            this.organizationService.addRole(orgId, this.currentUser, Models.OrganizationRole.User);
-        }
-
     }
 
     angular
