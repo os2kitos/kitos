@@ -18,7 +18,8 @@
             { state: "global-admin.project", text: "IT Projekt" },
             { state: "global-admin.system", text: "IT System" },
             { state: "global-admin.contract", text: "IT Kontrakt" },
-            { state: "global-admin.misc", text: "Andet" }
+            { state: "global-admin.misc", text: "Andet" },
+            { state: "global-admin.help-texts", text: "Hjælpetekster" }
         ];
 
         $rootScope.page.title = "Global admin";
