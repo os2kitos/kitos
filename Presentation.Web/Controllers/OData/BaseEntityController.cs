@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController<T> where T : Entity
+    public abstract class BaseEntityController<T> : BaseController <T> where T : Entity
     {
         private readonly IAuthenticationService _authService;
 
