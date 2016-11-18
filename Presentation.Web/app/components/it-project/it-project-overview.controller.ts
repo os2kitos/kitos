@@ -442,7 +442,6 @@
                             }
                             return "";
                         },
-
                         excelTemplate: dataItem => dataItem && dataItem.Reference.Title || "",
                         attributes: { "class": "text-center" },
                         filterable: {
