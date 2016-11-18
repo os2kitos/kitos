@@ -7,13 +7,20 @@
             </div>
         </div>
         <div class="col-xs-9">
-            <button class="btn btn-primary pull-right" data-ng-click="helpTextsCtrl.create()">Opret</button>
-            <h3 data-ng-bind="helpTextsCtrl.selectedHelpText.Title"></h3>
-            <div class="form-group">
-                <textarea ui-tinymce="helpTextsCtrl.tinymceOptions" data-ng-model="helpTextsCtrl.selectedHelpText.Description"></textarea>
+            <button class="btn btn-primary pull-right" ui-sref="global-admin.help-texts.create">Opret</button>
+            <div data-ng-show="helpTextsCtrl.selectedHelpText">
+                <h3 data-ng-bind="helpTextsCtrl.selectedHelpText.Title"></h3>
+                <div class="form-group">
+                    <textarea ui-tinymce="helpTextsCtrl.tinymceOptions" data-ng-model="helpTextsCtrl.selectedHelpText.Description"></textarea>
+                </div>
+                <div class="pull-right">
+                    <button class="btn btn-primary" data-ng-click="helpTextsCtrl.delete()">Slet</button> <button class="btn btn-primary" data-ng-click="helpTextsCtrl.save()">Gem</button>
+                </div>
+                <help-text data-id="1"></help-text>
             </div>
-            <button class="btn btn-primary pull-right" data-ng-click="helpTextsCtrl.save()">Gem</button>
-            <help-text data-id="1"></help-text>
+        </div>
+        <div class="col-xs-12 well text-center" data-ng-hide="helpTextsCtrl.selectedHelpText">
+            <h4>Ingen hjælpetekster oprettet.</h4>
         </div>
     </div>
 </div>

@@ -552,6 +552,7 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
@@ -647,6 +648,7 @@
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
     <Content Include="app\components\reports\report-edit.modal.view.html" />
     <Content Include="app\shared\helpText\helpText.view.html" />
+    <Content Include="app\shared\helpText\helpTextModal.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
