@@ -3,6 +3,7 @@
 
     interface ICreateViewModel {
         title: string;
+        key: string;
     }
 
     class CreateHelpTextController {
@@ -34,7 +35,8 @@
         public create() {
             this.busy = true;
             var payload = {
-                Title: this.vm.title
+                Title: this.vm.title,
+                Key: this.vm.key
             };
 
             var msg = this.notify.addInfoMessage("Opretter hjælpetekst", false);

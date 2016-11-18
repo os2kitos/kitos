@@ -6,7 +6,7 @@
             return {
                 templateUrl: "app/shared/helpText/helpText.view.html",
                 scope: {
-                    id: "@",
+                    key: "@",
                 },
                 controller: [
                     '$scope', '$http', '$uibModal', function ($scope, $http, $uibModal) {
@@ -17,10 +17,10 @@
                             windowClass: "modal fade in",
                             templateUrl: "app/shared/helpText/helpTextModal.view.html",
                             controller: ["$scope", "$uibModalInstance", "notify", function ($scope, $modalInstance, nofity) {
-                                $http.get("odata/HelpTexts(" + parent.id + ")")
+                                $http.get("odata/HelpTexts?$filter=Key eq '" + parent.key + "'")
                                     .success((result: any) => {
-                                        $scope.title = result.Title;
-                                        $scope.description = result.Description;
+                                        $scope.title = result.value[0].Title;
+                                        $scope.description = result.value[0].Description;
                                     })
                             }]
                         });

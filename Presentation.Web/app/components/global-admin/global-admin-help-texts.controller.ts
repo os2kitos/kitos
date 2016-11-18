@@ -12,7 +12,8 @@
             this.selectDefaultHelpText();
             this.tinymceOptions = {
                 plugins: 'link image code',
-                toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code'
+                skin: 'lightgray',
+                theme: 'modern'
             };
         }
 
@@ -21,7 +22,6 @@
         }
 
         private selectDefaultHelpText() {
-            console.log(this.helpTexts.length);
             if (this.helpTexts.length > 0) {
                 this.selectedHelpText = this.helpTexts[0];
             } else {
