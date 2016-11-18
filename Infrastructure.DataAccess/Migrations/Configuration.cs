@@ -701,12 +701,12 @@ Kontakt: info@kitos.dk",
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
-            var i = options.Count;
-            options.ForEach(o =>
-            {
-                o.Priority = i;
-                i--;
-            });
+            //var i = options.Count;
+            //options.ForEach(o =>
+            //{
+            //    o.Priority = i;
+            //    i--;
+            //});
             try
             {
                 dbSet.AddOrUpdate(x => x.Name, options.ToArray());
@@ -715,6 +715,12 @@ Kontakt: info@kitos.dk",
             {
                 // we don't really care about duplicates
                 // just do nothing
+            }
+            var i = dbSet.Count();
+            foreach (var option in dbSet)
+            {
+                option.Priority = i;
+                i--;
             }
         }
 
