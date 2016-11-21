@@ -20,12 +20,12 @@
                     }],
                     businessTypes: [
                         '$http', function ($http) {
-                            return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true");
+                            return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc");
                         }
                     ],
                     appTypeOptions: [
                         '$http', function ($http) {
-                            return $http.get("odata/LocalItSystemTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function (result) {
+                            return $http.get("odata/LocalItSystemTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
                                 return result.data.value;
                             });
                         }

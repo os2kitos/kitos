@@ -245,7 +245,7 @@
                     ],
                         localItProjectRoles: [
                             "$http",
-                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(result => result.data.value)
                     ],
 

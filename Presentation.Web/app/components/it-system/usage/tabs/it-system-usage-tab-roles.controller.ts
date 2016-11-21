@@ -12,7 +12,7 @@
                         });
                 }],
                 localItSystemRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                         .then(function (result) {
                             return result.data.value;
                         });
