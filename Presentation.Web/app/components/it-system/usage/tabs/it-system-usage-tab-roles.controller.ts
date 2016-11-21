@@ -170,13 +170,13 @@
         $scope.rightSort = function (right) {
             switch ($scope.rightSortBy) {
                 case "roleName":
-                    return right.role.Name;
+                    return right.role.Priority;
                 case "userName":
                     return right.user.name;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.Name;
+                    return right.role.Priority;
             }
         };
 
