@@ -3,7 +3,10 @@
         <div class="col-xs-3">
             <br/><br/><br/>
             <div class="list-group">
-                <a data-ng-repeat="helpText in helpTextsCtrl.helpTexts" data-ng-class="{active: helpTextsCtrl.selectedHelpText === helpText}" class="list-group-item" data-ng-click="helpTextsCtrl.selectHelpText(helpText)">{{ helpText.Title }}</a>
+                <a data-ng-repeat="helpText in helpTextsCtrl.helpTexts" data-ng-class="{active: helpTextsCtrl.selectedHelpText === helpText}" class="list-group-item" data-ng-click="helpTextsCtrl.selectHelpText(helpText)">
+                    <strong>{{ helpText.Title }}</strong> <br/>
+                    <i>{{ helpText.Key }}</i>
+                </a>
             </div>
         </div>
         <div class="col-xs-9">
@@ -16,7 +19,7 @@
                 <div class="pull-right">
                     <button class="btn btn-primary" data-ng-click="helpTextsCtrl.delete()">Slet</button> <button class="btn btn-primary" data-ng-click="helpTextsCtrl.save()">Gem</button>
                 </div>
-                <help-text data-id="1"></help-text>
+                <help-text data-key="it_kontrakt"></help-text>
             </div>
         </div>
         <div class="col-xs-12 well text-center" data-ng-hide="helpTextsCtrl.selectedHelpText">
