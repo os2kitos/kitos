@@ -67,7 +67,10 @@ module.exports = {
     // font bundle
     fontSrc: [
         bower("/bootstrap/dist/fonts/*.*"),
-        bower("/font-awesome/fonts/*.*"),
+        bower("/font-awesome/fonts/*.*")
+    ],
+
+    tinyMCEFontSrc: [
         bower("/tinymce/skins/lightgray/fonts/*.*")
     ],
 
@@ -85,6 +88,7 @@ module.exports = {
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
+    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 
