@@ -16,6 +16,7 @@ using Presentation.Web.Controllers.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
+using Core.DomainModel.Advice;
 
 namespace Presentation.Web
 {
@@ -364,6 +365,18 @@ namespace Presentation.Web
 
             var config = builder.EntitySet<Config>(nameof(ConfigsController).Replace("Controller", string.Empty));
             config.EntityType.HasKey(x => x.Id);
+
+
+            var advis = builder.EntitySet<Advis>(nameof(AdvisController).Replace("Controller", string.Empty));
+            advis.EntityType.HasKey(x => x.Id);
+            // var GetByObjectId = users.EntityType.Collection.Function("GetByObjectId").Returns<Icolle>();
+            
+            var GetByObjectId = builder.Function("GetByObjectID");
+            GetByObjectId.Parameter<int>("id");
+            GetByObjectId.Parameter<int>("type");
+            GetByObjectId.ReturnsCollectionFromEntitySet<Advis>("Advis");
+            
+
 
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");

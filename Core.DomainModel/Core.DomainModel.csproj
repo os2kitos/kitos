@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\Advis.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />

@@ -314,7 +314,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
-    <Compile Include="Controllers\OData\BaseAdviceController.cs" />
+    <Compile Include="Controllers\OData\AdvisController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
