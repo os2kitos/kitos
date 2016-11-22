@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Hangfire;
 using System;
@@ -13,23 +14,23 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class AdvisController : BaseEntityController<Advis>
+    public class AdvisController : BaseEntityController<AdviceSent>
     {
 
         IAuthenticationService _authService;
-        public AdvisController(IGenericRepository<Advis> repository, IAuthenticationService authService)
+        public AdvisController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
             _authService = authService;
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(Advis advis)
+        public override IHttpActionResult Post(AdviceSent advis)
         {
 
             var response = base.Post(advis);
 
-            if (response.GetType() == typeof(System.Web.OData.Results.CreatedODataResult<Advis>)) {
+            if (response.GetType() == typeof(System.Web.OData.Results.CreatedODataResult<AdviceSent>)) {
                 var server = new BackgroundJobServer();
 
                 RecurringJob.AddOrUpdate(
@@ -42,11 +43,11 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public override IHttpActionResult Patch(int key, Delta<Advis> delta)
+        public override IHttpActionResult Patch(int key, Delta<AdviceSent> delta)
         {
             var response = base.Patch(key, delta);
 
-            if (response.GetType() == typeof(System.Web.OData.Results.UpdatedODataResult<Advis>))
+            if (response.GetType() == typeof(System.Web.OData.Results.UpdatedODataResult<AdviceSent>))
             {
                 //TODO UPDATE HANGFIRE SCHEDULE
             }
@@ -61,12 +62,12 @@ namespace Presentation.Web.Controllers.OData
             if (UserId == 0)
                 return Unauthorized();
 
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advis));
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AdviceSent));
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-                return Ok(Repository.AsQueryable().Where(x=> x.ObjectId == id && x.ObjectType == (ObjectType)type));
+                return Ok(Repository.AsQueryable().Where(x=> x.ObjectId == id && x.Type == (ObjectType)type));
 
-            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.ObjectType == (ObjectType)type));
+            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.Type == (ObjectType)type));
         }
 
         [EnableQuery]

@@ -73,7 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advice\Advis.cs" />
+    <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
@@ -163,7 +163,7 @@
     <Compile Include="ItContract\ItContractRight.cs" />
     <Compile Include="ItContract\ItContractRole.cs" />
     <Compile Include="ItContract\PurchaseFormType.cs" />
-    <Compile Include="ItContract\Advice.cs" />
+    <Compile Include="Advice\Advice.cs" />
     <Compile Include="ItProject\Communication.cs" />
     <Compile Include="ItProject\Goal.cs" />
     <Compile Include="ItProject\GoalStatus.cs" />

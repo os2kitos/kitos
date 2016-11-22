@@ -10,6 +10,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Advice;
 
 namespace Infrastructure.DataAccess
 {

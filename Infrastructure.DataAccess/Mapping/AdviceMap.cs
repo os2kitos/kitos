@@ -1,4 +1,5 @@
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Advice;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -10,10 +11,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("Advice");
 
             // Relationships
-            this.HasRequired(t => t.ItContract)
+           /* this.HasRequired(t => t.ItContract)
                 .WithMany(t => t.Advices)
                 .HasForeignKey(d => d.ItContractId);
-
+                */
             this.HasOptional(t => t.Receiver)
                 .WithMany(d => d.ReceiverFor)
                 .HasForeignKey(t => t.ReceiverId);

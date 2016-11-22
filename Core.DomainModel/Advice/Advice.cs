@@ -1,12 +1,23 @@
+using Core.DomainModel.ItContract;
 using System;
 
-namespace Core.DomainModel.ItContract
+namespace Core.DomainModel.Advice
 {
+    public enum ObjectType
+    {
+        Contract,
+        Itsytem
+    }
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
     public class Advice : Entity, IContextAware, IContractModule
     {
+
+        public int? ObjectId { get; set; }
+        public virtual Entity Object {get; set;}
+        public ObjectType Type { get; set; }
+       
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.
         /// </summary>
@@ -93,21 +104,7 @@ namespace Core.DomainModel.ItContract
         /// The email subject.
         /// </value>
         public string Subject { get; set; }
-
-        /// <summary>
-        /// Gets or sets it contract identifier.
-        /// </summary>
-        /// <value>
-        /// It contract identifier.
-        /// </value>
-        public int ItContractId { get; set; }
-        /// <summary>
-        /// Gets or sets it contract.
-        /// </summary>
-        /// <value>
-        /// It contract.
-        /// </value>
-        public virtual ItContract ItContract { get; set; }
+        
 
         /// <summary>
         /// Determines whether a user has write access to this instance.
@@ -118,13 +115,18 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItContract != null && ItContract.HasUserWriteAccess(user))
+            if (Object != null && Object.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);
         }
 
-        /// <summary>
+        public bool IsInContext(int organizationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*/// <summary>
         /// Determines whether this instance is within a given organizational context.
         /// </summary>
         /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
@@ -133,10 +135,10 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public bool IsInContext(int organizationId)
         {
-            if (ItContract != null)
-                return ItContract.IsInContext(organizationId);
+            if (Object != null)
+                return Object.IsInContext(organizationId);
 
             return false;
-        }
+        }*/
     }
 }
