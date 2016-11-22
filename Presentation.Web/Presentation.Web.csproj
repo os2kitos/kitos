@@ -678,6 +678,8 @@
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
     <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
     <Content Include="Content\css\app.min.css" />
+    <Content Include="Content\css\fonts\tinymce-small.svg" />
+    <Content Include="Content\css\fonts\tinymce.svg" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -723,6 +725,12 @@
     <Content Include="Content\img\Systemroller.svg" />
     <Content Include="Content\img\VisIOverblik.svg" />
     <Content Include="Content\notify\notify.css" />
+    <Content Include="Content\css\fonts\tinymce-small.eot" />
+    <Content Include="Content\css\fonts\tinymce-small.ttf" />
+    <Content Include="Content\css\fonts\tinymce-small.woff" />
+    <Content Include="Content\css\fonts\tinymce.eot" />
+    <Content Include="Content\css\fonts\tinymce.ttf" />
+    <Content Include="Content\css\fonts\tinymce.woff" />
     <None Include="Content\kitos.less" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
@@ -1114,6 +1122,8 @@
     </None>
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
+    <Content Include="Scripts\skins\lightgray\content.min.css" />
+    <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
