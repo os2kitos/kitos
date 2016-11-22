@@ -721,6 +721,7 @@
     <Content Include="Content\img\Systemforside.svg" />
     <Content Include="Content\img\Systemforside_white.svg" />
     <Content Include="Content\img\Systemroller.svg" />
+    <Content Include="Content\img\VisIOverblik.svg" />
     <Content Include="Content\notify\notify.css" />
     <None Include="Content\kitos.less" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
