@@ -176,9 +176,7 @@
 
                     this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
                         this.saveUser(user, orgAndDefaultUnit);
-
                         this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
-
                         this._loadUserDeferred.resolve(this._user);
                         this._loadUserDeferred = null;
                     }, () => {
@@ -257,11 +255,16 @@
 
             // first, if the user is only member of one organization, just use that
             if (orgsAndDefaultUnits.$values.length == 1) {
+                // toggles the option to change current organization if the user has multiple to choose from
+                this.$rootScope.userHasOrgChoices = false;
                 var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
                 this.setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
                 deferred.resolve(firstOrgAndDefaultUnit);
                 return deferred.promise;
             }
+
+            // toggles the option to change current organization if the user has multiple to choose from
+            this.$rootScope.userHasOrgChoices = true;
 
             // else, try to get previous selected organization id from the local storage
             var storedOrgId = this.getSavedOrgId();
@@ -318,6 +321,13 @@
             });
 
             return deferred.promise;
+        }
+
+        // change organization by clearing the saved org id from local storage
+        // passing null as the argument for loadUser causes a re-auth
+        changeOrganization = () => {
+            this.clearSavedOrgId();
+            return this.loadUser(null);
         }
 
         // updates the users default org unit in the current organization
