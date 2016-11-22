@@ -723,6 +723,7 @@
     <Content Include="Content\img\Systemforside.svg" />
     <Content Include="Content\img\Systemforside_white.svg" />
     <Content Include="Content\img\Systemroller.svg" />
+    <Content Include="Content\img\VisIOverblik.svg" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\css\fonts\tinymce-small.eot" />
     <Content Include="Content\css\fonts\tinymce-small.ttf" />

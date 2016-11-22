@@ -9,7 +9,7 @@
                     key: "@",
                 },
                 controller: [
-                    '$scope', '$http', '$uibModal', function ($scope, $http, $uibModal) {
+                    '$scope', '$http', '$uibModal', '$sce', function ($scope, $http, $uibModal, $sce) {
                         var parent = $scope;
 
                         $http.get("odata/HelpTexts?$filter=Key eq '" + $scope.key + "'")
@@ -25,7 +25,7 @@
                                     $http.get("odata/HelpTexts?$filter=Key eq '" + parent.key + "'")
                                         .success((result: any) => {
                                             $scope.title = result.value[0].Title;
-                                            $scope.description = result.value[0].Description;
+                                            $scope.description = $sce.trustAsHtml(result.value[0].Description);
                                         })
                                 }]
                             });
