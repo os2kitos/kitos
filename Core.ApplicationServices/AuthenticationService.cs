@@ -194,11 +194,8 @@ namespace Core.ApplicationServices
             }
             else // the entity is not aware of its context
             {
-                // check if user is object owner
-                if (entity.ObjectOwnerId == user.Id)
+                if (entity.HasUserWriteAccess(user))
                 {
-                    // the entity is unaware of its context,
-                    // so our only option is to allow the object owner write access
                     return true;
                 }
             }

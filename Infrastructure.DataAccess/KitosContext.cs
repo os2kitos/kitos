@@ -25,6 +25,7 @@ namespace Infrastructure.DataAccess
         {
             //Disabled by MEMA 23/11-2016 to speed up debug sessions
             //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            Database.Log = null;
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
