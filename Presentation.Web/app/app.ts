@@ -74,6 +74,13 @@ app.run([
             });
         };
 
+        // changeOrganization function for top navigation bar
+        $rootScope.changeOrganization = () => {
+            userService.changeOrganization().then((user) => {
+                $state.go(user.defaultUserStartPreference, null, { reload: true });
+            });
+        };
+
         // when changing states, we might need to authorize the user
         $rootScope.$on("$stateChangeStart", (event, toState: Kitos.AuthRoles, toParams, fromState, fromParams) => {
 
