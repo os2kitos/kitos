@@ -290,6 +290,14 @@
     <Compile Include="Migrations\201611161024144_reference added to Objects.Designer.cs">
       <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611161337177_Added HelpText.cs" />
+    <Compile Include="Migrations\201611161337177_Added HelpText.Designer.cs">
+      <DependentUpon>201611161337177_Added HelpText.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611181029318_Added Key to HelpText.cs" />
+    <Compile Include="Migrations\201611181029318_Added Key to HelpText.Designer.cs">
+      <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -412,6 +420,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611161024144_reference added to Objects.resx">
       <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161337177_Added HelpText.resx">
+      <DependentUpon>201611161337177_Added HelpText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611181029318_Added Key to HelpText.resx">
+      <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

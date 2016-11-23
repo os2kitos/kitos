@@ -124,6 +124,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
+        public DbSet<HelpText> HelpTexts { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

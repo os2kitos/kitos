@@ -115,7 +115,7 @@
                                 msg.toSuccessMessage('Et nyt system er oprettet!');
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
-                                if (systemId) { 
+                                if (systemId) {
                                     self.$state.go('it-system.edit.main', { id: systemId });
                                 }
                             }).error(function () {
@@ -140,7 +140,7 @@
                                 if (systemId) {
                                     self.$state.reload();
                                 }
-                               
+
                             }).error(function () {
                                 msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
                             });
@@ -526,6 +526,14 @@
                                 }
                             }
                             return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
                         }
                     },
                     {

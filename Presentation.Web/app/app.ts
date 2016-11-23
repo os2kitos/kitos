@@ -11,7 +11,8 @@ var app = angular.module("app", [
     "angular-confirm",
     "ui.bootstrap.tpls",
     "ngMessages",
-    "ui.tree"]);
+    "ui.tree",
+    "ui.tinymce"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
@@ -70,6 +71,13 @@ app.run([
         $rootScope.logout = () => {
             userService.logout().then(() => {
                 $state.go("index");
+            });
+        };
+
+        // changeOrganization function for top navigation bar
+        $rootScope.changeOrganization = () => {
+            userService.changeOrganization().then((user) => {
+                $state.go(user.defaultUserStartPreference, null, { reload: true });
             });
         };
 

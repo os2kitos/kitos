@@ -16,7 +16,6 @@
     "url": "https://github.com/os2kitos/kitos/issues"
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
-  "dependencies": {},
   "devDependencies": {
     "bower": "^1.7.2",
     "browser-sync": "^2.13.0",
@@ -30,11 +29,13 @@
     "gulp-concat": "^2.6.0",
     "gulp-debug": "^2.1.2",
     "gulp-eslint": "^3.0.1",
+    "gulp-file": "^0.3.0",
     "gulp-html-replace": "^1.6.1",
     "gulp-less": "^3.1.0",
     "gulp-load-plugins": "^1.2.4",
     "gulp-minify-css": "^1.2.4",
     "gulp-open": "^2.0.0",
+    "gulp-rename": "^1.2.2",
     "gulp-rev": "^7.1.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-tslint": "^6.1.2",

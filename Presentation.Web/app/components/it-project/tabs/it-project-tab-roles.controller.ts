@@ -90,13 +90,13 @@
         public rightSort(right): string {
             switch (this.rightSortBy) {
                 case "roleName":
-                    return right.role.Name;
+                    return right.role.Priority;
                 case "userName":
                     return right.user.fullName;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.Name;
+                    return right.role.Priority;
             }
         }
 
@@ -245,7 +245,7 @@
                     ],
                         localItProjectRoles: [
                             "$http",
-                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(result => result.data.value)
                     ],
 

@@ -67,10 +67,8 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NotImplemented);
         }
 
-        // TODO how do we check access here?
         public virtual IHttpActionResult Post(T entity)
         {
-            
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -78,6 +76,13 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Unauthorized();
             }
+
+            //Check if user is allowed to set accessmodifier to public
+            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
+            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
+            //{
+            //    return Unauthorized();
+            //}
 
             try
             {
@@ -111,6 +116,13 @@ namespace Presentation.Web.Controllers.OData
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity))
                 return StatusCode(HttpStatusCode.Forbidden);
+
+            //Check if user is allowed to set accessmodifier to public
+            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
+            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
+            //{
+            //    return Unauthorized();
+            //}
 
             // check model state
             if (!ModelState.IsValid)

@@ -117,7 +117,7 @@
                         ],
                         projectTypes: [
                             "$http", $http => {
-                                return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                                return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.value);
                             }
                         ],

@@ -391,6 +391,9 @@ namespace Presentation.Web
             var reportCategoryTypes = builder.EntitySet<ReportCategoryType>(nameof(ReportCategoryTypesController).Replace("Controller", string.Empty));
             reportCategoryTypes.EntityType.HasKey(x => x.Id);
 
+            var helpTexts = builder.EntitySet<HelpText>(nameof(HelpTextsController).Replace("Controller", string.Empty));
+            helpTexts.EntityType.HasKey(x => x.Id);
+
             return builder.GetEdmModel();
         }
     }

@@ -9,7 +9,12 @@ module.exports = {
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
-        bower("/jsonfn-bower/jsonfn.min.js")
+        bower("/jsonfn-bower/jsonfn.min.js"),
+        bower("/tinymce/tinymce.js"),
+        bower("/tinymce/plugins/image/plugin.min.js"),
+        bower("/tinymce/plugins/code/plugin.min.js"),
+        bower("/tinymce/plugins/link/plugin.min.js"),
+        bower("/tinymce/themes/modern/theme.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
 
@@ -17,7 +22,9 @@ module.exports = {
         bower("/select2/select2.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
         bower("/angular-loading-bar/build/loading-bar.min.css"),
-        bower("/angular-ui-tree/dist/angular-ui-tree.min.css")
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.css"),
+        bower("/tinymce/skins/lightgray/skin.min.css"),
+        bower("/tinymce/skins/lightgray/content.min.css")
     ],
 
     // angular script bundle
@@ -34,7 +41,8 @@ module.exports = {
         bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
         bower("/angular-confirm-modal/angular-confirm.min.js"),
         bower("/angular-messages/angular-messages.min.js"),
-        bower("/angular-ui-tree/dist/angular-ui-tree.min.js")
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
+        bower("/angular-ui-tinymce/src/tinymce.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
@@ -62,6 +70,10 @@ module.exports = {
         bower("/font-awesome/fonts/*.*")
     ],
 
+    tinyMCEFontSrc: [
+        bower("/tinymce/skins/lightgray/fonts/*.*")
+    ],
+
     // assets
     assetsSrc: [
         bower("/select2/*.png"),
@@ -76,6 +88,7 @@ module.exports = {
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
+    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 

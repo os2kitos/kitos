@@ -193,6 +193,12 @@ namespace Infrastructure.DataAccess.Migrations
 
             try
             {
+                var count = context.OrganizationUnitRoles.Count();
+                foreach (var organizationUnitRole in context.OrganizationUnitRoles)
+                {
+                    organizationUnitRole.Priority = count;
+                    count--;
+                }
                 context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
                 context.SaveChanges();
             }
@@ -387,6 +393,14 @@ namespace Infrastructure.DataAccess.Migrations
                     LastChangedByUserId = globalAdmin.Id,
                     Priority = 1
                 });
+
+            var itProjectRolesCount = context.ItProjectRoles.Count();
+            foreach (var role in context.ItProjectRoles)
+            {
+                role.Priority = itProjectRolesCount;
+                itProjectRolesCount--;
+            }
+
             context.SaveChanges();
 
             #endregion
@@ -493,6 +507,14 @@ namespace Infrastructure.DataAccess.Migrations
             };
 
             context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
+
+            var itSystemRolesCount = context.ItSystemRoles.Count();
+            foreach (var role in context.ItSystemRoles)
+            {
+                role.Priority = itSystemRolesCount;
+                itSystemRolesCount--;
+            }
+
             context.SaveChanges();
 
             #endregion
@@ -554,6 +576,14 @@ namespace Infrastructure.DataAccess.Migrations
                 LastChangedByUserId = globalAdmin.Id,
                 Priority = 1
             });
+
+            var itContractRolesCount = context.ItContractRoles.Count();
+            foreach (var role in context.ItContractRoles)
+            {
+                role.Priority = itContractRolesCount;
+                itContractRolesCount--;
+            }
+
             context.SaveChanges();
 
             #endregion
@@ -701,12 +731,6 @@ Kontakt: info@kitos.dk",
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
-            var i = options.Count;
-            options.ForEach(o =>
-            {
-                o.Priority = i;
-                i--;
-            });
             try
             {
                 dbSet.AddOrUpdate(x => x.Name, options.ToArray());
@@ -715,6 +739,12 @@ Kontakt: info@kitos.dk",
             {
                 // we don't really care about duplicates
                 // just do nothing
+            }
+            var i = dbSet.Count();
+            foreach (var option in dbSet)
+            {
+                option.Priority = i;
+                i--;
             }
         }
 

@@ -14,9 +14,12 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<User> _userRepository;
 
-        public AuthenticationService(IGenericRepository<User> userRepository)
+        public readonly IFeatureChecker _featureChecker;
+
+        public AuthenticationService(IGenericRepository<User> userRepository, IFeatureChecker featureChecker)
         {
             _userRepository = userRepository;
+            _featureChecker = featureChecker;
         }
 
         public bool IsGlobalAdmin(int userId)
@@ -191,11 +194,8 @@ namespace Core.ApplicationServices
             }
             else // the entity is not aware of its context
             {
-                // check if user is object owner
-                if (entity.ObjectOwnerId == user.Id)
+                if (entity.HasUserWriteAccess(user))
                 {
-                    // the entity is unaware of its context,
-                    // so our only option is to allow the object owner write access
                     return true;
                 }
             }
@@ -213,6 +213,12 @@ namespace Core.ApplicationServices
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
             return loggedIntoOrganizationId;
+        }
+
+        public bool CanExecute(int userId, Feature feature)
+        {
+            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            return _featureChecker.CanExecute(user, feature);
         }
 
         // ReSharper disable once UnusedParameter.Local

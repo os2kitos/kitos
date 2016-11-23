@@ -13,7 +13,7 @@
                 ],
                 projectTypes: [
                     "$http", $http => {
-                        return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                        return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then((result) => result.data.value);
                     }
                 ],
