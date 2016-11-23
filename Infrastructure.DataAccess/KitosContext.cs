@@ -23,7 +23,8 @@ namespace Infrastructure.DataAccess
         public KitosContext()
             : base("Name=KitosContext")
         {
-            Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            //Disabled by MEMA 23/11-2016 to speed up debug sessions
+            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
