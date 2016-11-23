@@ -9,5 +9,6 @@ namespace Core.DomainModel.AdviceSent
     
     public class AdviceSent : Advice.Advice
     {
+        public DateTime AdviceSentDate {get; set;}
     }
 }

@@ -1,3 +1,4 @@
+
 using Core.DomainModel.ItContract;
 using System;
 
@@ -11,7 +12,7 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IContextAware, IContractModule
+    public class Advice : Entity, IContextAware
     {
 
         public int? ObjectId { get; set; }
@@ -54,7 +55,7 @@ namespace Core.DomainModel.Advice
         /// The sent date.
         /// </value>
         public DateTime? SentDate { get; set; }
-
+       
         /// <summary>
         /// Gets or sets the receiver contract role identifier.
         /// </summary>
@@ -74,7 +75,7 @@ namespace Core.DomainModel.Advice
         /// <value>
         /// The receiver.
         /// </value>
-        public ItContractRole Receiver { get; set; }
+        public IRoleEntity Receiver { get; set; }
 
         /// <summary>
         /// Gets or sets the carbon copy receiver contract role identifier.
@@ -95,7 +96,7 @@ namespace Core.DomainModel.Advice
         /// <value>
         /// The carbon copy receiver.
         /// </value>
-        public ItContractRole CarbonCopyReceiver { get; set; }
+        public IRoleEntity CarbonCopyReceiver { get; set; }
 
         /// <summary>
         /// Gets or sets the subject of the email.

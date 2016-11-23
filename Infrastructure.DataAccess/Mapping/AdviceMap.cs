@@ -15,13 +15,14 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.Advices)
                 .HasForeignKey(d => d.ItContractId);
                 */
-            this.HasOptional(t => t.Receiver)
+          /*  this.HasOptional(t => t.Receiver)
                 .WithMany(d => d.ReceiverFor)
                 .HasForeignKey(t => t.ReceiverId);
 
             this.HasOptional(t => t.CarbonCopyReceiver)
                 .WithMany(d => d.CarbonCopyReceiverFor)
                 .HasForeignKey(t => t.CarbonCopyReceiverId);
-        }
+    */    
+    }
     }
 }
