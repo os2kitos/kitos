@@ -484,6 +484,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedSystemUsages.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -495,6 +496,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedInterfaceExposures.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -506,6 +508,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedInterfaceUsages.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
