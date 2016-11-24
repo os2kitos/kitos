@@ -40,13 +40,13 @@ function runProtractor(done) {
     var params = process.argv;
     var args = params.length > 3 ? [params[3], params[4]] : [];
 
-    gutil.log('arguments: ' + args);
+    gutil.log('e2e arguments: ' + args);
 
     var singleSpec = 'Presentation.Web/Tests/it-contract/Edit/Tabs/it-contract-tab-payment-model.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
       .pipe(protractor({
           configFile: 'protractor.local.conf.js',
-          args: args,
+          //args: args,
           'autoStartStopServer': true,
           'debug': false
       }))
