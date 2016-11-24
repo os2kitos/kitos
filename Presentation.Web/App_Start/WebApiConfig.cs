@@ -356,6 +356,9 @@ namespace Presentation.Web
             var LocalTsaType = builder.EntitySet<LocalTsaType>(nameof(LocalTsaTypesController).Replace("Controller", string.Empty));
             LocalTsaType.EntityType.HasKey(x => x.Id);
 
+            var LocalOrganizationUnitRole = builder.EntitySet<LocalOrganizationUnitRole>(nameof(LocalOrganizationUnitRolesController).Replace("Controller", string.Empty));
+            LocalOrganizationUnitRole.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
 

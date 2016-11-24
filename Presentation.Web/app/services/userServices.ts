@@ -104,7 +104,7 @@
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
-                defaultUserStartPreference: user.defaultUserStartPreference,
+                defaultUserStartPreference: user.defaultUserStartPreference || "index",
 
                 isGlobalAdmin: user.isGlobalAdmin,
                 isLocalAdmin: isLocalAdmin,

@@ -57,44 +57,41 @@
         };
 
         public resetDescription() {
-            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, { Description: null});
+            this.$http.patch(`${this.optionsUrl}(${this.optionId})`, { Description: null });
             this.$uibModalInstance.close();
         };
     }
 
     angular.module("app").config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
-        $stateProvider
-            //.state("local-config.org.edit-org-roles", {
-            //url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-organisation-roles",
-            //onEnter: [
-            //    "$state", "$stateParams", "$uibModal",
-            //    ($state: ng.ui.IStateService,
-            //        $stateParams: ng.ui.IStateParamsService,
-            //        $uibModal: ng.ui.bootstrap.IModalService) => {
-            //        $uibModal.open({
-            //            templateUrl: "app/components/local-config/local-config-option-edit.modal.view.html",
-            //            // fade in instead of slide from top, fixes strange cursor placement in IE
-            //            // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-            //            windowClass: "modal fade in",
-            //            controller: LocalOptionsController,
-            //            controllerAs: "vm"
-            //        })
-            //            .result.then(() => {
-            //                // OK
-            //                // GOTO parent state and reload
-            //                $state.go("^", null, { reload: true });
-            //            },
-            //            () => {
-            //                // Cancel
-            //                // GOTO parent state
-            //                $state.go("^");
-            //            });
-            //    }
-            //]})
-        .state("local-config.project.edit-project-roles", {
+        $stateProvider.state("local-config.current-org.edit-current-org-roles", {
+            url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-organisation-roles",
+            onEnter: ["$state", "$stateParams", "$uibModal",
+                ($state: ng.ui.IStateService,
+                    $stateParams: ng.ui.IStateParamsService,
+                    $uibModal: ng.ui.bootstrap.IModalService) => {
+                    $uibModal.open({
+                        templateUrl: "app/components/local-config/local-config-option-edit.modal.view.html",
+                        // fade in instead of slide from top, fixes strange cursor placement in IE
+                        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                        windowClass: "modal fade in",
+                        controller: LocalOptionsController,
+                        controllerAs: "vm"
+                    })
+                        .result.then(() => {
+                            // OK
+                            // GOTO parent state and reload
+                            $state.go("^", null, { reload: true });
+                        },
+                        () => {
+                            // Cancel
+                            // GOTO parent state
+                            $state.go("^");
+                        });
+                }
+            ]
+        }).state("local-config.project.edit-project-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-roles",
-            onEnter: [
-                "$state", "$stateParams", "$uibModal",
+            onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
@@ -120,8 +117,7 @@
             ]
         }).state("local-config.system.edit-system-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-system-roles",
-            onEnter: [
-                "$state", "$stateParams", "$uibModal",
+            onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
@@ -147,8 +143,7 @@
             ]
         }).state("local-config.contract.edit-contract-roles", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-contract-roles",
-            onEnter: [
-                "$state", "$stateParams", "$uibModal",
+            onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
@@ -174,8 +169,7 @@
             ]
         }).state("local-config.project.edit-project-types", {
             url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-project-types",
-            onEnter: [
-                "$state", "$stateParams", "$uibModal",
+            onEnter: ["$state", "$stateParams", "$uibModal",
                 ($state: ng.ui.IStateService,
                     $stateParams: ng.ui.IStateParamsService,
                     $uibModal: ng.ui.bootstrap.IModalService) => {
