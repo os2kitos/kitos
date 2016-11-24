@@ -17,7 +17,7 @@
             <div class="panel-body">
                 <script type="text/ng-template" id="nodes_renderer.html">
                     <div ui-tree-handle data-ng-click="chooseOrgUnit(node, $event)" class="tree-node tree-node-content"
-                          ng-class="{
+                         ng-class="{
                                       'selected': node == chosenOrgUnit,
                                       'hasWriteAccess': node.hasWriteAccess
                                     }">
@@ -62,8 +62,7 @@
             <!-- if an org unit has been selected -->
             <div class="col-xs-12" data-ng-show="chosenOrgUnit">
                 <h3>
-                    {{ chosenOrgUnit.name
-                }}
+                    {{ chosenOrgUnit.name }}
                     <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
                     <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
 
@@ -106,7 +105,7 @@
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.objectId].name }}</td>
-                                <td>{{ orgRoles[right.roleId].name }}</td>
+                                <td>{{ orgRoles[right.roleId].Name }}</td>
                                 <td>{{ right.user.fullName }}</td>
                                 <td class="relative-position">
                                     {{ right.user.email }}
@@ -130,9 +129,9 @@
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-show="orgRoles[right.roleId].isActive == false" disabled="true" value="{{orgRoles[right.roleId].id}}">{{orgRoles[right.roleId].name}} {{orgRoles[right.roleId].isActive == true ? "" : "(Inaktiv rolle)"}}</option>
-                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.id}}">
-                                            {{orgRole.name}} ({{orgRole.hasWriteAccess && "skriv" || "læs" }})
+                                        <option data-ng-show="orgRoles[right.roleId].IsEnabled == false" disabled="true" value="{{orgRoles[right.roleId].Id}}">{{orgRoles[right.roleId].Name}} {{orgRoles[right.roleId].IsEnabled == true ? "" : "(Inaktiv rolle)"}}</option>
+                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.Id}}">
+                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -157,7 +156,7 @@
                                             data-ng-model="newRole"
                                             data-placeholder="Vælg en organisationsrolle"
                                             data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.id }}">{{ orgRole.name }} ({{ orgRole.hasWriteAccess && "skriv" || "læs" }})</option>
+                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.Id }}">{{ orgRole.Name }} ({{ orgRole.HasWriteAccess && "skriv" || "læs" }})</option>
                                     </select>
                                 </td>
                                 <td colspan="2" class="form-group">

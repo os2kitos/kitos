@@ -127,6 +127,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
+        public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

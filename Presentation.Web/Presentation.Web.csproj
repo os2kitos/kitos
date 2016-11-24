@@ -337,6 +337,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalMethodTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentFrequencyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentModelTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPriceRegulationTypesController.cs" />
@@ -625,6 +626,7 @@
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
     <TypeScriptCompile Include="app\services\itProjectService.ts" />
     <TypeScriptCompile Include="app\services\itSystemService.ts" />
+    <TypeScriptCompile Include="app\services\NavigationService.ts" />
     <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
     <TypeScriptCompile Include="app\services\uploadFileService.ts" />

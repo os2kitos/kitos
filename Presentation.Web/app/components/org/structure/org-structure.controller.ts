@@ -13,13 +13,12 @@
                             });
                         }
                     ],
-                    orgUnitRoles: [
-                        "$http", function ($http: ng.IHttpService) {
-                            return $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRole/?nonsuggestions").then((result) => {
-                                return result.data.response;
+                    orgUnitRoles: ['$http', function ($http) {
+                        return $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            .then(function (result) {
+                                return result.data.value;
                             });
-                        }
-                    ],
+                    }],
                     user: [
                         "userService", function (userService) {
                             return userService.getUser();
@@ -49,10 +48,10 @@
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = _.filter(orgUnitRoles, { isActive: true });
+            $scope.activeOrgRoles = orgUnitRoles;
             $scope.orgRoles = {};
-            _.each(orgUnitRoles, function (orgRole: { id }) {
-                $scope.orgRoles[orgRole.id] = orgRole;
+            _.each(orgUnitRoles, function (orgRole: { Id }) {
+                $scope.orgRoles[orgRole.Id] = orgRole;
             });
 
 
@@ -170,10 +169,10 @@
             }
 
             // don't show users in subunits if showChildren is false
-            $scope.toggleChildren = function() {
+            $scope.toggleChildren = function () {
                 const node = $scope.chosenOrgUnit;
                 _.each(node.orgRights,
-                    function(right: { show; }) {
+                    function (right: { show; }) {
                         right.show = $scope.showChildren || belongsToChosenNode(node, right);
                     });
             };
@@ -297,7 +296,7 @@
                     case "orgUnitName":
                         return $scope.orgUnits[right.objectId].name;
                     case "roleName":
-                        return $scope.orgRoles[right.roleId].name;
+                        return $scope.orgRoles[right.roleId].Priority;
                     case "userName":
                         return right.user.name;
                     case "userEmail":
@@ -643,7 +642,7 @@
                     return !angular.isUndefined(destNodesScope.$parentNodesScope);
 
                 },
-                dropped : function (e) {
+                dropped: function (e) {
                     var parent = e.dest.nodesScope.$nodeScope;
 
                     var sourceId = e.source.nodeScope.$modelValue.id;
