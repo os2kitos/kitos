@@ -15,8 +15,7 @@ namespace Core.DomainModel.Advice
     public class Advice : Entity, IContextAware
     {
 
-        public int? ObjectId { get; set; }
-        public virtual Entity Object {get; set;}
+        public int? RelationId { get; set; }
         public ObjectType Type { get; set; }
        
         /// <summary>
@@ -97,7 +96,14 @@ namespace Core.DomainModel.Advice
         /// The carbon copy receiver.
         /// </value>
         public IRoleEntity CarbonCopyReceiver { get; set; }
-
+        /// <summary>
+        /// Gets or sets the body of the email.
+        /// </summary>
+        /// <value>
+        /// The email body.
+        /// </value>
+        public string Body { get; set; }
+        
         /// <summary>
         /// Gets or sets the subject of the email.
         /// </summary>
@@ -116,9 +122,9 @@ namespace Core.DomainModel.Advice
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (Object != null && Object.HasUserWriteAccess(user))
+           /* if (Object != null && Object.HasUserWriteAccess(user))
                 return true;
-
+                */
             return base.HasUserWriteAccess(user);
         }
 

@@ -314,6 +314,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
+    <Compile Include="Controllers\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\OData\AdvisController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
@@ -1274,6 +1275,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\AdviceSent\" />
     <Folder Include="Views\Advis\" />
     <Folder Include="Views\BaseRole\" />
     <Folder Include="Views\Reference\" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Core.DomainModel.AdviceSent
 {
     
-    public class AdviceSent : Advice.Advice
+    public class AdviceSent : Entity
     {
         public DateTime AdviceSentDate {get; set;}
     }

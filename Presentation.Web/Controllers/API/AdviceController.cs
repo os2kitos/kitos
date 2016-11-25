@@ -9,5 +9,6 @@ namespace Presentation.Web.Controllers.API
         public AdviceController(IGenericRepository<Advice> repository) : base(repository)
         {
         }
+
     }
 }

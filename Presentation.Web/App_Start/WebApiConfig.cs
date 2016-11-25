@@ -368,14 +368,17 @@ namespace Presentation.Web
             config.EntityType.HasKey(x => x.Id);
 
 
-            var advis = builder.EntitySet<AdviceSent>(nameof(AdvisController).Replace("Controller", string.Empty));
-            advis.EntityType.HasKey(x => x.Id);
+            var Advice = builder.EntitySet<Advice>(nameof(AdvisController).Replace("Controller", string.Empty));
+            Advice.EntityType.HasKey(x => x.Id);
+
+            var adviceSent = builder.EntitySet<AdviceSent>(nameof(AdviceSentController).Replace("Controller", string.Empty));
+            adviceSent.EntityType.HasKey(x => x.Id);
             // var GetByObjectId = users.EntityType.Collection.Function("GetByObjectId").Returns<Icolle>();
-            
-            var GetByObjectId = builder.Function("GetByObjectID");
-            GetByObjectId.Parameter<int>("id");
-            GetByObjectId.Parameter<int>("type");
-            GetByObjectId.ReturnsCollectionFromEntitySet<AdviceSent>("Advis");
+
+            var GetAdvicesByObjectID = builder.Function("GetAdvicesByObjectID");
+            GetAdvicesByObjectID.Parameter<int>("id");
+            GetAdvicesByObjectID.Parameter<int>("type");
+            GetAdvicesByObjectID.ReturnsCollectionFromEntitySet<Advice>("Advice");
             
 
 

@@ -298,6 +298,14 @@
     <Compile Include="Migrations\201611181029318_Added Key to HelpText.Designer.cs">
       <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611250911210_updated advice object to be more generic.cs" />
+    <Compile Include="Migrations\201611250911210_updated advice object to be more generic.Designer.cs">
+      <DependentUpon>201611250911210_updated advice object to be more generic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611251226036_mailBody added to advice.cs" />
+    <Compile Include="Migrations\201611251226036_mailBody added to advice.Designer.cs">
+      <DependentUpon>201611251226036_mailBody added to advice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -426,6 +434,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611181029318_Added Key to HelpText.resx">
       <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611250911210_updated advice object to be more generic.resx">
+      <DependentUpon>201611250911210_updated advice object to be more generic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611251226036_mailBody added to advice.resx">
+      <DependentUpon>201611251226036_mailBody added to advice.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

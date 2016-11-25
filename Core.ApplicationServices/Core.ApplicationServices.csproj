@@ -73,7 +73,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdviceService.cs" />
     <Compile Include="FeatureChecker.cs" />
+    <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />

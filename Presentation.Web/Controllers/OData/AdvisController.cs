@@ -1,12 +1,9 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Hangfire;
 using System;
-using System.Linq;
-using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using System.Web.OData;
@@ -14,40 +11,47 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class AdvisController : BaseEntityController<AdviceSent>
+    public class AdvisController : BaseEntityController<Advice>
     {
 
         IAuthenticationService _authService;
-        public AdvisController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService)
+        IAdviceService _adviceService;
+        public AdvisController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
             _authService = authService;
+            _adviceService = adviceService;
         }
 
         [EnableQuery]
-        public override IHttpActionResult Post(AdviceSent advis)
+        public override IHttpActionResult Post(Advice advice)
         {
 
-            var response = base.Post(advis);
+            var response = base.Post(advice);
 
-            if (response.GetType() == typeof(System.Web.OData.Results.CreatedODataResult<AdviceSent>)) {
+            if (response.GetType() == typeof(System.Web.OData.Results.CreatedODataResult<Advice>)) {
                 var server = new BackgroundJobServer();
-
-                RecurringJob.AddOrUpdate(
-                () => Console.WriteLine("Recurring!"),
-                Cron.Daily);
-                //TODO CREATE HANGFIRE SCHEDULE
+                try
+                {
+                    RecurringJob.AddOrUpdate(
+                    () => _adviceService.sendAdvice(advice),
+                    Cron.Monthly);
+                }
+                catch (Exception e) {
+                    //todo log error
+                    return InternalServerError(e);
+                }
             }
 
             return response;
         }
 
         [EnableQuery]
-        public override IHttpActionResult Patch(int key, Delta<AdviceSent> delta)
+        public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
             var response = base.Patch(key, delta);
 
-            if (response.GetType() == typeof(System.Web.OData.Results.UpdatedODataResult<AdviceSent>))
+            if (response.GetType() == typeof(System.Web.OData.Results.UpdatedODataResult<Advice>))
             {
                 //TODO UPDATE HANGFIRE SCHEDULE
             }
@@ -56,18 +60,18 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("GetByObjectID(id={id},type={type})")]
+        [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
         public IHttpActionResult GetByObjectID(int id,int type)
         {
             if (UserId == 0)
                 return Unauthorized();
 
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AdviceSent));
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-                return Ok(Repository.AsQueryable().Where(x=> x.ObjectId == id && x.Type == (ObjectType)type));
+                return Ok(Repository.AsQueryable());//.Where(x=> x.ObjectId == id && x.Type == (ObjectType)type));
 
-            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.Type == (ObjectType)type));
+            return Ok(Repository.AsQueryable());//.Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.Type == (ObjectType)type));
         }
 
         [EnableQuery]
