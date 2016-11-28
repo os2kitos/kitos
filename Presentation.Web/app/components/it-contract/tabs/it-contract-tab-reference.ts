@@ -18,7 +18,6 @@
 
                 $scope.deleteReference = function (referenceId) {
                     var msg = notify.addInfoMessage("Sletter...");
-                    
                     $http.delete('api/Reference/' + referenceId + '?organizationId=' + contract.organizationId).success(() => {
                         msg.toSuccessMessage("Slettet!");
                     }).error(() => {
@@ -105,9 +104,9 @@
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === contract.referenceId) {
-                                    HTML = HTML + "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Valgt</span></a>";
+                                    HTML = HTML + "<a data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></a>";//valgt
                                 } else {
-                                    HTML = HTML + "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Vælg</span></a>";
+                                    HTML = HTML + "<a data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></a>";//vælg
                                 }
                             }
 

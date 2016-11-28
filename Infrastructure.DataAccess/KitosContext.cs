@@ -23,7 +23,9 @@ namespace Infrastructure.DataAccess
         public KitosContext()
             : base("Name=KitosContext")
         {
-            Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            //Disabled by MEMA 23/11-2016 to speed up debug sessions
+            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            Database.Log = null;
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
@@ -125,6 +127,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
+        public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

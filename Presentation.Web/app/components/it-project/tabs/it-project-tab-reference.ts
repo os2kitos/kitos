@@ -11,14 +11,9 @@
     app.controller("project.EditReference",
         ["$scope", "$http", "$timeout", "$state", "$stateParams","project","$confirm","notify","$",
             function ($scope, $http, $timeout, $state, $stateParams,project,$confirm,notify,$) {
-                console.log(project);
-                
               //  $scope.chosenReference = project.ReferenceId;
-
-
                 $scope.deleteReference = function (id) {
                     var msg = notify.addInfoMessage("Sletter...");
-                    
                     $http.delete('api/Reference/' + id + '?organizationId=' + project.organizationId).success(() => {
                         msg.toSuccessMessage("Slettet!");
                     }).error(() => {
@@ -47,7 +42,7 @@
                 };
 
                 $scope.isValidUrl = function (url) {
-                    if (url) { 
+                    if (url) {
                     var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
                     return regexp.test(url.toLowerCase());
                     }
@@ -104,9 +99,10 @@
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === project.referenceId) {
-                                    HTML = HTML + "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Valgt</span></a>";
-                                } else { 
-                                    HTML = HTML +  "<a  href='\\#' class='k-button' data-ng-click='setChosenReference(" + dataItem.id + ")'><span>Vælg</span></a>";
+                                    HTML = HTML + "<a data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></a>";//valgt
+                                } else {
+                                    HTML = HTML + "<a data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></a>";//vælg
+
                                 }
                             }
 

@@ -16,7 +16,6 @@
                     var type: { Id } = _.find(projectTypes, function(t: { Id; Name; }) {
                         return t.Name == "Fælleskommunal"; // TODO hardcoded literal... find better solution!
                     });
-                    console.log(projectTypes);
                     var typeId = type.Id;
                     var orgId = project.organizationId;
                     return $http.get("api/itproject/?orgId=" + orgId + "&typeId=" + typeId).then(function(result) {
