@@ -69,7 +69,7 @@
                     },
                     sortable: true,
                     pageable: {
-                        refresh: true,
+                        refresh: false,
                         pageSizes: true,
                         buttonCount: 5
                     },

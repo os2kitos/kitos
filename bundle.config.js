@@ -10,7 +10,7 @@ module.exports = {
         bower("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
         bower("/jsonfn-bower/jsonfn.min.js"),
-        bower("/tinymce/tinymce.min.js"),
+        bower("/tinymce/tinymce.js"),
         bower("/tinymce/plugins/image/plugin.min.js"),
         bower("/tinymce/plugins/code/plugin.min.js"),
         bower("/tinymce/plugins/link/plugin.min.js"),
@@ -70,6 +70,10 @@ module.exports = {
         bower("/font-awesome/fonts/*.*")
     ],
 
+    tinyMCEFontSrc: [
+        bower("/tinymce/skins/lightgray/fonts/*.*")
+    ],
+
     // assets
     assetsSrc: [
         bower("/select2/*.png"),
@@ -84,6 +88,7 @@ module.exports = {
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
+    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 

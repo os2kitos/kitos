@@ -7,35 +7,35 @@
             resolve: {
                 tsas: [
                     '$http', function($http) {
-                        return $http.get('odata/LocalTsaTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
+                        return $http.get('odata/LocalTsaTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                             return result.data.value;
                         });
                     }
                 ],
                 interfaces: [
                     '$http', function($http) {
-                        return $http.get('odata/LocalInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
+                        return $http.get('odata/LocalInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                             return result.data.value;
                         });
                     }
                 ],
                 interfaceTypes: [
                     '$http', function($http) {
-                        return $http.get('odata/LocalItInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
+                        return $http.get('odata/LocalItInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                             return result.data.value;
                         });
                     }
                 ],
                 methods: [
                     '$http', function($http) {
-                        return $http.get('odata/LocalMethodTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
+                        return $http.get('odata/LocalMethodTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                             return result.data.value;
                         });
                     }
                 ],
                 dataTypes: [
                     '$http', function($http) {
-                        return $http.get('odata/LocalDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true').then(function (result) {
+                        return $http.get('odata/LocalDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                             return result.data.value;
                         });
                     }

@@ -17,7 +17,7 @@
                     ],
                     goalTypes: [
                         "$http", function($http) {
-                            return $http.get("odata/LocalGoalTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true").then(function(result) {
+                            return $http.get("odata/LocalGoalTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function(result) {
                                 return result.data.value;
                             });
                         }

@@ -9,10 +9,12 @@ var runSequence = require('run-sequence');
 var ts = require('gulp-typescript');
 var htmlreplace = require('gulp-html-replace');
 var debug = require('gulp-debug');
+var rename = require('gulp-rename');
 var rev = require('gulp-rev');
 var less = require('gulp-less');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
+var file = file = require('gulp-file');
 var tsProject = ts.createProject('tsconfig.json');
 
 //Synchronously delete the output script file(s)
@@ -122,13 +124,26 @@ gulp.task("fonts", ["clean-styles"], function () {
         .pipe(gulp.dest(config.fontDest));
 });
 
+// copy tinyMCE fonts
+gulp.task("tinyMCEFonts", ["clean-styles"], function () {
+    return gulp.src(config.tinyMCEFontSrc)
+        .pipe(gulp.dest(config.tinyMCEFontDest));
+});
+
+gulp.task("tinyMCEFix", ["clean-styles"], function () {
+    return file("content.min.css", "//Dummy file from gulp", { src: true })
+    .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"))
+    .pipe(rename("skin.min.css"))
+    .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"));
+});
+
 // restore all bower packages
 gulp.task("bower-restore", function () {
     return bower(paths.bowerComponents);
 });
 
 // bundle, minify and copy styles, fonts and assets
-gulp.task("styles", ["css", "assets", "fonts"]);
+gulp.task("styles", ["css", "assets", "fonts", "tinyMCEFonts", "tinyMCEFix"]);
 
 // run bundle tasks
 gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);

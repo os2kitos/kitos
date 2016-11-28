@@ -7,7 +7,7 @@
             resolve: {
                 businessTypes: [
                     '$http', function ($http) {
-                        return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                        return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then(function (result) {
                                 return result.data.value;
                             });
@@ -15,7 +15,7 @@
                 ],
                 archiveTypes: [
                     '$http', function ($http) {
-                        return $http.get('odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true')
+                        return $http.get('odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc')
                             .then(function (result) {
                                 return result.data.value;
                             });
@@ -23,7 +23,7 @@
                 ],
                 sensitiveDataTypes: [
                     '$http', function ($http) {
-                        return $http.get('odata/LocalSensitiveDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true')
+                        return $http.get('odata/LocalSensitiveDataTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc')
                             .then(function (result) {
                                 return result.data.value;
                             });

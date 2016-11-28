@@ -504,6 +504,14 @@
                                 }
                             }
                             return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
                         }
                     },
                     {

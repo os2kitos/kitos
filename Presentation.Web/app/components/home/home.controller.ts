@@ -36,8 +36,10 @@
                         userService.getUser()
                             .then(data => {
                                 if (data.isAuth === true) {
-                                    if (data.defaultUserStartPreference !== "NULL") { $state.go(data.defaultUserStartPreference); } else {
+                                    if (data.defaultUserStartPreference == null) {
                                         $state.go("index");
+                                    } else {
+                                        $state.go(data.defaultUserStartPreference);
                                     }
                                 };
                             });

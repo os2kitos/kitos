@@ -12,7 +12,7 @@
                         });
                 }],
                 localItSystemRoles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true")
+                    return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -170,13 +170,13 @@
         $scope.rightSort = function (right) {
             switch ($scope.rightSortBy) {
                 case "roleName":
-                    return right.role.Name;
+                    return right.role.Priority;
                 case "userName":
                     return right.user.name;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.Name;
+                    return right.role.Priority;
             }
         };
 
