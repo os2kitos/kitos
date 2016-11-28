@@ -34,6 +34,20 @@
         GetOrganizationUnitDataById = (id: number) => {
             return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id})`);
         }
+
+        GetOrganizationData = (userId: number, organizationId: number) => {
+            return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
+        }
+
+        //GetOrganizationAdminData = (userId: number, organizationId: number) => {
+        //    return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
+        //}
+
+        DeleteOrganizationAdminData = (user: any, adminRole: string, module: string) => {
+            var localRight = user.OrganizationRights.filter(x => x.Role === adminRole);
+            var localId = localRight[0].Id;
+            return this.$http.delete(`/odata/${module}(${localId})`);
+        }
     }
 
     app.service("organizationService", OrganizationService);

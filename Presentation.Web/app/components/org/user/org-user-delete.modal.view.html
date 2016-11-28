@@ -5,15 +5,15 @@
     <h3 align="center">Slet bruger fra organisation</h3>
     <h5> {{ctrl.firstName}} {{ctrl.lastName}} - {{ctrl.email}}</h5></div>
 <div class="modal-body">
-    <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">
+    <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
         Der vises brugerens tildelte roller i denne organisation.<br>
         Disse roller kan tildeles andre brugere eller slettes helt fra organisationen.
     </h5>
-    <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmHasAdminRoles">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
+    <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
     
     <div>
         <select ng-model="selectedUser" ng-click="ctrl.setSelectedUser(selectedUser)" >
-            <option ng-repeat="user in ctrl.vmUsersInOrganization" value="{{user}}">
+            <option ng-repeat="user in ctrl.vmUsersInOrganization | orderBy: user.LastName" value="{{user}}">
                 {{user.Name}} {{user.LastName}}
             </option>
         </select>
@@ -27,16 +27,20 @@
                 <th>Organisation</th>
                 <th>Rolle</th>
                 <th>Allokere til</th>
+                <th>Slet</th>
             </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="orgUnit in ctrl.vmOrgUnits" >
-            <!--ng-true-value doesn't accept dynamically allocated values-->
-            <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.collectionUpdate('Organisation', orgUnit, orgUnitModel, selectedUser)" /></td>
-            <td>{{orgUnit.Object.Name}}</td>
-            <td>{{orgUnit.Role.Name}}</td>
-            <td ng-show="orgUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-        </tr>
+            <tr ng-repeat="orgUnit in ctrl.vmOrgUnits | orderBy: 'Rolle'">
+            <!--<tr ng-repeat="orgUnit in ctrl.vmOrgRoles.items | orderBy: 'Role.Name'">-->  
+                <!--ng-true-value doesn't accept dynamically allocated values-->
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="orgUnitModel" ng-change="ctrl.collectionUpdate('OrganizationUnitRights', orgUnit, orgUnitModel, selectedUser)" /></td>
+                <td>{{orgUnit.Object.Name}}</td>
+                <td>{{orgUnit.Role.Name}}</td>
+                <td ng-show="orgUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-hide="orgUnitModel"> </td>
+                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('OrganizationUnitRights', orgUnit)"></button></td>
+            </tr>
         </tbody>
     </table>
     <!-- Table containing project data -->
@@ -47,14 +51,17 @@
                 <th>Projektnavn</th>
                 <th>Rolle</th>
                 <th>Allokere til</th>
+                <th>Slet</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="project in ctrl.vmProject">
-                <td><input type="checkbox" ng-model="projUnitModel" ng-change="ctrl.collectionUpdate('Project', project, projUnitModel, selectedUser)"/></td>
+            <tr ng-repeat="project in ctrl.vmProject | orderBy: 'project.Role.Name'">
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="projUnitModel" ng-change="ctrl.collectionUpdate('ItProjectRights', project, projUnitModel, selectedUser)"/></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
                 <td ng-show="projUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-hide="projUnitModel"> </td>
+                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('ItProjectRights', project)"></button></td>
             </tr>
         </tbody>
     </table>
@@ -66,14 +73,17 @@
                 <th>Systemnavn</th>
                 <th>Rolle</th>
                 <th>Allokere til</th>
+                <th>Slet</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="system in ctrl.vmSystem">
-                <td><input type="checkbox" ng-model="systemUnitModel" ng-change="ctrl.collectionUpdate('System', system, systemUnitModel, selectedUser)" /></td>
+            <tr ng-repeat="system in ctrl.vmSystem | orderBy: 'Rolle'">
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="systemUnitModel" ng-change="ctrl.collectionUpdate('ItSystemRights', system, systemUnitModel, selectedUser)" /></td>
                 <td>{{system.Object.ItSystem.Name}}</td>
                 <td>{{system.Role.Name}}</td>
                 <td ng-show="systemUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-hide="systemUnitModel"> </td>
+                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('ItSystemRights', system)"></button></td>
             </tr>
         </tbody>
     </table>
@@ -85,64 +95,45 @@
                 <th>Kontraktnavn</th>
                 <th>Rolle</th>
                 <th>Allokere til</th>
+                <th>Slet</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="Contract in ctrl.vmItContracts">
-                <td><input type="checkbox" ng-model="ContractUnitModel" ng-change="ctrl.collectionUpdate('Contract', Contract, ContractUnitModel, selectedUser)" /></td>
+            <tr ng-repeat="Contract in ctrl.vmItContracts | orderBy: 'Rolle'">
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="ContractUnitModel" ng-change="ctrl.collectionUpdate('ItContractRights', Contract, ContractUnitModel, selectedUser)" /></td>
                 <td>{{Contract.Object.Name}}</td>
                 <td>{{Contract.Role.Name}}</td>
                 <td ng-show="ContractUnitModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-hide="ContractUnitModel"> </td>
+                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('ItContractRights', Contract)"></button></td>
             </tr>
         </tbody>
     </table>
     <!-- Table containing administrative roller data -->
-    <table class="table table-hover" ng-show="{{ctrl.vmHasAdminRoles}}">
+    <table class="table table-hover" ng-show="{{ctrl.vmOrgAdmin.length}}">
         <thead>
             <tr>
                 <th>Vælg</th>
                 <th>Adminstrative rettigheder</th>
                 <th>Allokere til</th>
+                <th>Slet</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-show="{{ctrl.vm.isLocalAdmin}}">
-                <td><input type="checkbox" ng-model="isLocalAdminModel" ng-change="ctrl.collectionAdminUpdate('LocalAdmin', isLocalAdminModel, selectedUser)"/></td>
-                <td>Lokal administrator</td>
-                <td ng-show="isLocalAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+            <tr ng-repeat="admin in ctrl.vmOrgAdmin">
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="adminModel" ng-change="ctrl.collectionAdminUpdate('OrganizationRights', admin, adminModel, selectedUser)" /></td>
+                <td>{{admin.Role}}</td>
+                <td ng-show="adminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
+                <td ng-hide="adminModel"> </td>
+                <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('OrganizationRights', admin)"></button></td>
             </tr>
-            <tr ng-show="{{ctrl.vm.isOrgAdmin}}">
-                <td><input type="checkbox" ng-model="isOrgAdminModel" ng-change="ctrl.collectionAdminUpdate('OrganizationModuleAdmin', isOrgAdminModel, selectedUser)"/></td>
-                <td>Organisation administrator</td>
-                <td ng-show="isOrgAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-            </tr>
-            <tr ng-show="{{ctrl.vm.isProjectAdmin}}">
-                <td><input type="checkbox" ng-model="isProjectAdminModel" ng-change="ctrl.collectionAdminUpdate('ProjectModuleAdmin', isProjectAdminModel, selectedUser)"/></td>
-                <td>Projekt administrator</td>
-                <td ng-show="isProjectAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-            </tr>
-            <tr ng-show="{{ctrl.vm.isSystemAdmin}}">
-                <td><input type="checkbox" ng-model="isSystemAdminModel" ng-change="ctrl.collectionAdminUpdate('SystemModuleAdmin', isSystemAdminModel, selectedUser)"/></td>
-                <td>System administrator</td>
-                <td ng-show="isSystemAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-            </tr>
-            <tr ng-show="{{ctrl.vm.isContractAdmin}}">
-                <td><input type="checkbox" ng-model="isContractAdminModel" ng-change="ctrl.collectionAdminUpdate('ContractModuleAdmin', isContractAdminModel, selectedUser)"/></td>
-                <td>Kontrakt administrator</td>
-                <td ng-show="isContractAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-            </tr>
-            <tr ng-show="{{ctrl.vm.isReportAdmin}}">
-                <td><input type="checkbox" ng-model="isReportAdminModel" ng-change="ctrl.collectionAdminUpdate('ReportModuleAdmin', isReportAdminModel, selectedUser)"/></td>
-                <td>Rapport administrator</td>
-                <td ng-show="isReportAdminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
-            </tr>
-
         </tbody>
     </table>
 </div>
 
 <div class="modal-footer">
-    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
-    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
+    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
+    <button type="submit" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
+    <button type="submit" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
     <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
 </div>
