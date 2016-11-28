@@ -66,6 +66,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{F9AC0D
 		Assets\BrowserStack.svg = Assets\BrowserStack.svg
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Core", "Tests.Unit.Core.ApplicationServices\Tests.Unit.Core.csproj", "{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,5 +120,6 @@ Global
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 		{8E3F47CB-D523-461B-A4EE-10CC6650DE8C} = {098F0368-603B-4AF3-80A4-569EAB468147}
 		{F9AC0D85-511A-4B8A-A7B0-02763A1BC618} = {098F0368-603B-4AF3-80A4-569EAB468147}
+		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 	EndGlobalSection
 EndGlobal
