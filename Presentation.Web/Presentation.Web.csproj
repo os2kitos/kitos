@@ -618,6 +618,7 @@
     <TypeScriptCompile Include="app\models\help-text.ts" />
     <TypeScriptCompile Include="app\models\IReference.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-status-update.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
     <TypeScriptCompile Include="app\models\role-entity.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
