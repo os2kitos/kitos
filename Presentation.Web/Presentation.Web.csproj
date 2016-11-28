@@ -565,6 +565,9 @@
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
     <Content Include="app\components\it-reference-modal.view.html" />
     <Content Include="app\components\it-reference.view.html" />
@@ -584,6 +587,8 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference.ts" />
@@ -734,6 +739,7 @@
     <Content Include="Content\css\fonts\tinymce.ttf" />
     <Content Include="Content\css\fonts\tinymce.woff" />
     <None Include="Content\kitos.less" />
+    <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
