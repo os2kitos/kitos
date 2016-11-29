@@ -7,11 +7,15 @@ using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class OrganizationUnitRightsController : BaseController<OrganizationUnitRight>
+    using Core.ApplicationServices;
+
+    public class OrganizationUnitRightsController : BaseEntityController<OrganizationUnitRight>
     {
-        public OrganizationUnitRightsController(IGenericRepository<OrganizationUnitRight> repository)
-            : base(repository)
+        private readonly IAuthenticationService _authService;
+        public OrganizationUnitRightsController(IGenericRepository<OrganizationUnitRight> repository, IAuthenticationService authService)
+            : base(repository, authService)
         {
+            _authService = authService;
         }
 
         // GET /Organizations(1)/ItContracts(1)/Rights

@@ -4,13 +4,14 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.ItContract;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItContractRightsController : BaseController<ItContractRight>
+    public class ItContractRightsController : BaseEntityController<ItContractRight>
     {
-        public ItContractRightsController(IGenericRepository<ItContractRight> repository)
-            : base(repository)
+        public ItContractRightsController(IGenericRepository<ItContractRight> repository, IAuthenticationService authService)
+            : base(repository, authService)
         {
         }
 

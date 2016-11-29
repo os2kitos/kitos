@@ -28,8 +28,8 @@
             return this.$http.get(`odata/ItContractRights?$filter=UserId eq (${id})`);
         }
 
-        GetContractDataById = (id: number) => {
-            return this.$http.get(`odata/ItContractRights?$expand=role,object&$filter=UserId eq (${id})`);
+        GetContractDataById = (id: number, orgId: number) => {
+            return this.$http.get(`odata/ItContractRights?$expand=role,object&$filter=UserId eq (${id}) AND Object/OrganizationId eq (${orgId})`);
         }
     }
 

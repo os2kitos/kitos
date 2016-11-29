@@ -55,9 +55,9 @@
             return this.$http.get(`odata/ItSystemRights?$expand=role,object&$filter=UserId eq (${id})`);
         }
 
-        GetSystemDataByIdFiltered = (id: number) => {
+        GetSystemDataByIdFiltered = (id: number, orgId: number) => {
             return this.$http
-                .get(`odata/ItSystemRights?$expand=role($select=Name),object($select=Id;$expand=ItSystem($select=Id,Name))&$filter=UserId eq (${id})&$select=Id`);
+                .get(`odata/ItSystemRights?$expand=role($select=Name),object($select=Id;$expand=ItSystem($select=Id,Name))&$filter=Object/OrganizationId eq (${orgId}) AND UserId eq (${id})&$select=Id`);
         }
     }
 

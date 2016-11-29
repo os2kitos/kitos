@@ -12,6 +12,10 @@
         GetAllUsers = () => {
             return this.$http.get<Models.IUser>(`odata/Users`);
         }
+
+        GetAllUsersFromOrganizationById = (id : number) => {
+            return this.$http.get<Models.IUser>(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq (${id}))`);
+        }
     }
 
     app.service("UserGetService", UserGetService);

@@ -52,8 +52,8 @@
             return this.$http.get<IProjectRightsModel>(`odata/ItProjectRights?$filter=UserId eq (${id})`);
         }
 
-        GetProjectDataById = (id: number) => {
-            return this.$http.get(`odata/ItProjectRights?$expand=role,object&$filter=UserId eq (${id})`);
+        GetProjectDataById = (id: number, orgId: number) => {
+            return this.$http.get(`odata/ItProjectRights?$expand=role,object&$filter=UserId eq (${id}) AND Object/OrganizationId eq (${orgId})`);
         }
     }
 
