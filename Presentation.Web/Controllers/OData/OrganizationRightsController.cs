@@ -38,12 +38,12 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!_authService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
-
             entity.OrganizationId = orgKey;
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
+
+            if (!_authService.HasWriteAccess(UserId, entity))
+                return StatusCode(HttpStatusCode.Forbidden);
 
             try
             {
