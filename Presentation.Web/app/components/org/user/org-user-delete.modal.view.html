@@ -3,10 +3,12 @@
         &times;
     </button>
     <h3 align="center">Slet bruger fra organisation</h3>
-    <h5> {{ctrl.firstName}} {{ctrl.lastName}} - {{ctrl.email}}</h5></div>
+    <h5> Roller for {{ctrl.firstName}} {{ctrl.lastName}}, {{ctrl.email}}
+    </h5></div>
 <div class="modal-body">
     <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
-        Der vises brugerens tildelte roller i denne organisation.<br>
+        Du vil gerne fjerne {{ctrl.firstName}} {{ctrl.lastName}} fra {{ctrl.curOrganization}} , vi har fundet roller for vedkommende.
+        Her ses brugerens tildelte roller.<br>
         Disse roller kan tildeles andre brugere eller slettes helt fra organisationen.
     </h5>
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
@@ -121,7 +123,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="admin in ctrl.vmOrgAdmin">
-                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="adminModel" ng-change="ctrl.collectionAdminUpdate('OrganizationRights', admin, adminModel, selectedUser)" /></td>
+                <td><input type="checkbox" ng-disabled="ctrl.isUserSelected" ng-model="adminModel" ng-change="ctrl.collectionUpdate('OrganizationRights', admin, adminModel, selectedUser)" /></td>
                 <td>{{admin.Role}}</td>
                 <td ng-show="adminModel">{{ctrl.selecterUser.Name}} {{ctrl.selecterUser.LastName}}</td>
                 <td ng-hide="adminModel"> </td>

@@ -31,12 +31,12 @@
         constructor(private $http: IHttpServiceWithCustomConfig) {
         }
         
-        GetOrganizationUnitDataById = (id: number) => {
-            return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id})`);
+        GetOrganizationUnitDataById = (id: number, orgId: number) => {
+            return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id} )AND Object/OrganizationId eq (${orgId})`);
         }
 
         GetOrganizationData = (userId: number, organizationId: number) => {
-            return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
+            return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND Object/OrganizationId eq (${organizationId})`);
         }
 
         //GetOrganizationAdminData = (userId: number, organizationId: number) => {

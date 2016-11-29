@@ -308,7 +308,7 @@
             var entityId = dataItem["Id"];
             this.$state.go("organization.user.delete", { id: entityId });
             //this.mainGrid.dataSource.remove(dataItem);
-            //this.mainGrid.dataSource.sync();
+            this.mainGrid.dataSource.sync();
         }
 
         private exportFlag = false;
