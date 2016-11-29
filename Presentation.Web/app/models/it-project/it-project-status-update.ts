@@ -1,9 +1,9 @@
 ﻿module Kitos.Models.ItProject {
     export interface IItProjectStatusUpdate extends IEntity {
-        CombinedStatus: TrafficLight;
-        TimeStatus: TrafficLight;
-        QualityStatus: TrafficLight;
-        ResourcesStatus: TrafficLight;
+        CombinedStatus: String;
+        TimeStatus: String;
+        QualityStatus: String;
+        ResourcesStatus: String;
         IsCombined: Boolean;
         Created: Date;
         IsFinal: Boolean;
