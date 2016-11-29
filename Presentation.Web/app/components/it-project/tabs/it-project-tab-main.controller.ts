@@ -44,6 +44,7 @@
                 $scope.projectTypes = projectTypes;
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.autosaveUrl = `api/itproject/${project.id}`;
+                $scope.moment = moment;
 
                 init();
 
@@ -61,12 +62,12 @@
                     $scope.splittedStatusUpdates = _.filter($scope.allStatusUpdates, function (s: any) { return !s.IsCombined; });
                 }
 
-                $scope.onSelectStatusMethod = function() {
-                if ($scope.showCombinedChart.val) {
-                    $scope.currentStatusUpdate = ($scope.combinedStatusUpdates.length > 0) ? $scope.combinedStatusUpdates[0] : null;
-                } else {
-                    $scope.currentStatusUpdate = ($scope.splittedStatusUpdates.length > 0) ? $scope.splittedStatusUpdates[0] : null;
+                $scope.onSelectStatusMethod = function (showCombined) {
+                    if (showCombined) {
+                        $scope.currentStatusUpdate = ($scope.combinedStatusUpdates.length > 0) ? $scope.combinedStatusUpdates[0] : null;
+                    } else {
+                        $scope.currentStatusUpdate = ($scope.splittedStatusUpdates.length > 0) ? $scope.splittedStatusUpdates[0] : null;
+                    }
                 }
-            }
             }]);
 })(angular, app);
