@@ -239,7 +239,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItProjectStatuses,Reference,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc)`;
+                                var urlParameters = `?$expand=ItProjectStatuses,Reference,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc;$top=1)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -532,34 +532,122 @@
                         filterable: false
                     },
                     {
-                        field: "ItProjectStatus", title: "Status projekt", width: 100,
+                        field: "ItProjectStatus", title: "Status: Samlet", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].CombinedStatus}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].CombinedStatus && dataItem.ItProjectStatusUpdates[0].CombinedStatus.toString() || "",
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                if (latestStatus.IsCombined) {
+                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
+                                } else {
+                                    /* If no combined status exists, take the lowest status from the splitted status */
+                                    if (latestStatus.TimeStatus === "Red" || latestStatus.QualityStatus === "Red" || latestStatus.ResourcesStatus === "Red") {
+                                        return "<span data-square-traffic-light='Red'></span>";
+                                    } else if (latestStatus.TimeStatus === "Yellow" || latestStatus.QualityStatus === "Yellow" || latestStatus.ResourcesStatus === "Yellow") {
+                                        return "<span data-square-traffic-light='Yellow'></span>";
+                                    } else if (latestStatus.TimeStatus === "Green" || latestStatus.QualityStatus === "Green" || latestStatus.ResourcesStatus === "Green") {
+                                        return "<span data-square-traffic-light='Green'></span>";
+                                    } else {
+                                        return "<span data-square-traffic-light='White'></span>";
+                                    }
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                if (latestStatus.IsCombined) {
+                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
+                                } else {
+                                    /* If no combined status exists, take the lowest status from the splitted status */
+                                    if (latestStatus.TimeStatus === "Red" || latestStatus.QualityStatus === "Red" || latestStatus.ResourcesStatus === "Red") {
+                                        return "<span data-square-traffic-light='Red'></span>";
+                                    } else if (latestStatus.TimeStatus === "Yellow" || latestStatus.QualityStatus === "Yellow" || latestStatus.ResourcesStatus === "Yellow") {
+                                        return "<span data-square-traffic-light='Yellow'></span>";
+                                    } else if (latestStatus.TimeStatus === "Green" || latestStatus.QualityStatus === "Green" || latestStatus.ResourcesStatus === "Green") {
+                                        return "<span data-square-traffic-light='Green'></span>";
+                                    } else {
+                                        return "<span data-square-traffic-light='White'></span>";
+                                    }
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "ItProjectTimeStatus", title: "Status tid", width: 100,
+                        field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].TimeStatus}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].TimeStatus && dataItem.ItProjectStatusUpdates[0].TimeStatus.toString() || "",
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "ItProjectQualityStatus", title: "Status kvalitet", width: 100,
+                        field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].QualityStatus}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].QualityStatus && dataItem.ItProjectStatusUpdates[0].QualityStatus.toString() || "",
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: false,
                         sortable: false
                     },
                     {
-                        field: "ItProjectResourcesStatus", title: "Status ressourcer", width: 100,
+                        field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].ResourcesStatus}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].ResourcesStatus && dataItem.ItProjectStatusUpdates[0].ResourcesStatus.toString() || "",
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: false,
                         sortable: false
                     },

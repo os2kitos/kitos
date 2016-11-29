@@ -38,6 +38,11 @@
                     <label class="control-label small">Bemærkning</label>
                     <p class="small" data-ng-bind="projectStatusVm.currentStatusUpdate.Note"></p>
                 </div>
+                <div class="form-group">
+                    <label class="control-label small">Afsluttende</label>
+                    <p class="small" data-ng-if="projectStatusVm.currentStatusUpdate.IsFinal">Ja</p>
+                    <p class="small" data-ng-if="!projectStatusVm.currentStatusUpdate.IsFinal">Nej</p>
+                </div>
             </div>
         </div>
         <div class="row" data-ng-if="!projectStatusVm.currentStatusUpdate">
