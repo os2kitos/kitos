@@ -1,11 +1,11 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-project.edit.status-project.history-modal', {
+        $stateProvider.state('it-project.edit.main.status-history-modal', {
             url: '/history',
             onEnter: ['$state', '$stateParams', '$uibModal', 'project', 'user', 'statusUpdates',
                 function ($state, $stateParams, $modal, project, user, statusUpdates) {
                     $modal.open({
-                        templateUrl: "app/components/it-project/tabs/it-project-tab-status-project-history-modal.view.html",
+                        templateUrl: "app/components/it-project/tabs/it-project-tab-main-status-history-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",
