@@ -16,6 +16,11 @@
         public milestonesActivities: Array<any>;
         public pagination: IPaginationSettings;
         public totalCount: number;
+        public currentStatusUpdate: any;
+        public showCombinedChart: any;
+        public allStatusUpdates: any;
+        public combinedStatusUpdates: any;
+        public splittedStatusUpdates: any;
 
         public static $inject: Array<string> = [
             "$scope",
@@ -24,7 +29,9 @@
             "notify",
             "project",
             "usersWithRoles",
-            "user"
+            "user",
+            "statusUpdates",
+            "moment"
         ];
 
         constructor(
@@ -34,7 +41,9 @@
             private notify,
             public project,
             private usersWithRoles,
-            private user) {
+            private user,
+            private statusUpdates,
+            private moment) {
 
             this.project.updateUrl = `api/itproject/${project.id}`;
 
@@ -66,6 +75,37 @@
             };
 
             this.$scope.$watchCollection(() => this.pagination, this.loadStatues);
+
+            this.allStatusUpdates = statusUpdates;
+
+            this.combinedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return s.IsCombined; });
+            this.splittedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return !s.IsCombined; });
+
+            if (this.splittedStatusUpdates.length > 0) {
+                this.currentStatusUpdate = this.splittedStatusUpdates[0];
+
+                if (this.currentStatusUpdate.Id == this.allStatusUpdates[0].Id) {
+                    this.showCombinedChart = "false";
+                } else {
+                    this.currentStatusUpdate = this.combinedStatusUpdates[0];
+                    this.showCombinedChart = "true";
+                }
+                
+            } else if (this.combinedStatusUpdates.length > 0) {
+                this.currentStatusUpdate = this.combinedStatusUpdates[0];
+                this.showCombinedChart = "true";
+            } else {
+                this.currentStatusUpdate = null;
+                this.showCombinedChart = "false";
+            }
+        }
+
+        private onSelectStatusMethod = () => {
+            if (this.showCombinedChart == "true") {
+                this.currentStatusUpdate = (this.combinedStatusUpdates.length > 0) ? this.combinedStatusUpdates[0] : null;
+            } else {
+                this.currentStatusUpdate = (this.splittedStatusUpdates.length > 0) ? this.splittedStatusUpdates[0] : null;
+            }
         }
 
         getPhaseName = (num: number): string => {
@@ -202,6 +242,13 @@
                                         return users;
                                     });
                             })
+                        ],
+                        statusUpdates: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`odata/ItProjects(${$stateParams.id})?$expand=ItProjectStatusUpdates($orderby=Created desc;$expand=ObjectOwner($select=Name,LastName))`)
+                                .then(result => {
+                                    return result.data.ItProjectStatusUpdates;
+                                })
                         ]
                     }
                 });

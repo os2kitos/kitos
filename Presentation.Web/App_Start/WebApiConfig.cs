@@ -383,6 +383,9 @@ namespace Presentation.Web
             var helpTexts = builder.EntitySet<HelpText>(nameof(HelpTextsController).Replace("Controller", string.Empty));
             helpTexts.EntityType.HasKey(x => x.Id);
 
+            var itProjectStatusUpdates = builder.EntitySet<ItProjectStatusUpdate>(nameof(ItProjectStatusUpdatesController).Replace("Controller", string.Empty));
+            itProjectStatusUpdates.EntityType.HasKey(x => x.Id);
+
             return builder.GetEdmModel();
         }
     }

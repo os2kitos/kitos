@@ -62,9 +62,6 @@
         ItSystemUsages: ItSystemUsage.IItSystemUsage[];
         EconomyYears: IEconomyYear[];
 
-
-        /** Traffic-light dropdown for overall statusr */
-        StatusProject: TrafficLight;
         /** Date-for-status-update field */
         StatusDate: Date;
         /** Notes on collected status on project */
@@ -92,5 +89,10 @@
 
         ReferenceId: number;
         Reference: IReference;
+
+        /** Status updates */
+        ItProjectStatusUpdates: IItProjectStatusUpdate[];
+
+        CurrentStatusUpdate: any;
     }
 }

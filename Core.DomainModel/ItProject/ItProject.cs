@@ -206,11 +206,6 @@ namespace Core.DomainModel.ItProject
         #region Status project tab
 
         /// <summary>
-        ///     Traffic-light dropdown for overall status
-        /// </summary>
-        public TrafficLight StatusProject { get; set; }
-
-        /// <summary>
         ///     Date-for-status-update field
         /// </summary>
         public DateTime? StatusDate { get; set; }
@@ -236,7 +231,8 @@ namespace Core.DomainModel.ItProject
         ///     The "milestones and tasks" table.
         /// </summary>
         public virtual ICollection<ItProjectStatus> ItProjectStatuses { get; set; }
-        
+        public virtual ICollection<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
+
         #endregion
     }
 }

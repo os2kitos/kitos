@@ -62,6 +62,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
         public DbSet<ItProjectStatus> ItProjectStatuses { get; set; }
+        public DbSet<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
         public DbSet<ItProjectOrgUnitUsage> ItProjectOrgUnitUsages { get; set; }

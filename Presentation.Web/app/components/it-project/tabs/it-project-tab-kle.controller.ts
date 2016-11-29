@@ -38,7 +38,7 @@
                     $scope.pagination.skip = 0;
                     loadTasks();
                 });
-                $scope.$watchCollection("pagination", loadTasks);
+                $scope.$FwCollection("pagination", loadTasks);
 
                 //change between show all tasks and only show active tasks
                 $scope.changeTaskView = function () {
