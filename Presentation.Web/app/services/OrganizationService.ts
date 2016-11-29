@@ -36,7 +36,7 @@
         }
 
         GetOrganizationData = (userId: number, organizationId: number) => {
-            return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND Object/OrganizationId eq (${organizationId})`);
+            return this.$http.get(`odata/OrganizationRights?$expand=Organization&$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
         }
 
         //GetOrganizationAdminData = (userId: number, organizationId: number) => {

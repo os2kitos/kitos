@@ -103,8 +103,7 @@
             this.firstName = user.Name;
             this.lastName = user.LastName;
             this.email = user.Email;
-            this.curOrganization = orgUnits[0].Object.Name;
-
+            
             this.initCollections(orgUnits, this.vmOrgRoles);
             this.initCollections(projects, this.vmProjectRoles);
             this.initCollections(system, this.vmSystemRoles);
@@ -119,10 +118,7 @@
             this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
             this.itemSelected = false;
             this.isUserSelected = true;
-
-            //if ((orgUnits.length && projects.length && system.length && itContracts.length && orgAdmin.length) === 0) {
-            //    this.deleteUser();
-            //}
+            this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;
         }
 
         public initCollections = (collection, output) => {
@@ -306,7 +302,7 @@
             this.deleteAllUserRoles(this.vmProject, "ItProjectRights");
             this.deleteAllUserRoles(this.vmSystem, "ItSystemRights");
             this.deleteAllUserRoles(this.vmItContracts, "ItContractRights");
-            this.deleteAllUserRoles(this.vmOrgAdmin, "OrganizationRights");
+            this.deleteAllUserRoles(this.orgAdmin, "OrganizationRights");
             this.$uibModalInstance.close();
             this.notify.addSuccessMessage("Brugeren og dennes roller er slettet fra organisationen");
         }
@@ -353,15 +349,15 @@
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItProjectService"
                                 projects: [
-                                    "$http", "ItProjectService", "UserGetService",
+                                    "$http", "ItProjectService", "userService",
                                     ($http: ng.IHttpService, itProjects, userService) =>
-                                    userService.getUser()
-                                        .then((currentUser) => itProjects.GetProjectDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
-                                            .then(projectResult => projectResult.data.value))
+                                        userService.getUser()
+                                            .then((currentUser) => itProjects.GetProjectDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
+                                                .then(projectResult => projectResult.data.value))
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItSystemService"
                                 system: [
-                                    "$http", "ItSystemService", "UserGetService",
+                                    "$http", "ItSystemService", "userService",
                                     ($http: ng.IHttpService, itSystems, userService) =>
                                     userService.getUser()
                                         .then((currentUser) => itSystems.GetSystemDataByIdFiltered($stateParams["id"], `${currentUser.currentOrganizationId}`)
@@ -369,7 +365,7 @@
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "ItContractService"
                                 itContracts: [
-                                    "$http", "ItContractsService", "UserGetService",
+                                    "$http", "ItContractsService", "userService",
                                     ($http: ng.IHttpService, itContracts, userService) =>
                                         userService.getUser()
                                             .then((currentUser) => itContracts.GetContractDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
@@ -377,10 +373,10 @@
                                 ],
                                 //Henter data for de forskellige collections ved brug er servicen "OrganizationService"
                                 orgUnits: [
-                                    "$http", "organizationService", "UserGetService",
-                                    ($http: ng.IHttpService, orgUnits, userService) =>
+                                    "$http", "organizationService", "userService",
+                                    ($http: ng.IHttpService, organizationService, userService) =>
                                         userService.getUser()
-                                            .then((currentUser) => orgUnits.GetOrganizationUnitDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
+                                            .then((currentUser) => organizationService.GetOrganizationUnitDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
                                                 .then(result => result.data.value))
                                 ],
                                 orgAdmin: ["$http", "userService", "organizationService", 

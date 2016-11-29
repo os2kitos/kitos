@@ -15,7 +15,7 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "notify", "user"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -23,6 +23,7 @@
             private _: ILoDashWithMixins,
             private $: JQueryStatic,
             private $state: ng.ui.IStateService,
+            private $scope,
             private notify,
             private user) {
             this.mainGridOptions = {
@@ -308,7 +309,7 @@
             var entityId = dataItem["Id"];
             this.$state.go("organization.user.delete", { id: entityId });
             //this.mainGrid.dataSource.remove(dataItem);
-            this.mainGrid.dataSource.sync();
+            //this.mainGrid.dataSource.sync();
         }
 
         private exportFlag = false;

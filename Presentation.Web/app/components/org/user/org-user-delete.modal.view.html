@@ -7,7 +7,7 @@
     </h5></div>
 <div class="modal-body">
     <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
-        Du vil gerne fjerne {{ctrl.firstName}} {{ctrl.lastName}} fra {{ctrl.curOrganization}} , vi har fundet roller for vedkommende.
+        Der ønskes at fjerne <b>{{ctrl.firstName}} {{ctrl.lastName}}</b> fra organisationen <b>{{ctrl.curOrganization}}</b>, der er fundet roller for vedkommende.
         Her ses brugerens tildelte roller.<br>
         Disse roller kan tildeles andre brugere eller slettes helt fra organisationen.
     </h5>
@@ -134,8 +134,8 @@
 </div>
 
 <div class="modal-footer">
-    <button type="submit" class="btn btn-danger" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
-    <button type="submit" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
-    <button type="submit" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
+    <button type="submit" ng-disabled="ctrl.isUserSelected" class="btn btn-danger" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
+    <button type="submit" ng-disabled="ctrl.isUserSelected" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
+    <button type="submit" ng-disabled="ctrl.isUserSelected" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
     <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
 </div>
