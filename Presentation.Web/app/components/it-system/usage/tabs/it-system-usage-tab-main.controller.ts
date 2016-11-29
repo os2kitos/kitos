@@ -64,6 +64,8 @@
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.usage = itSystemUsage;
 
+            console.log(itSystemUsage);
+
             $scope.allowClearOption = {
                 allowClear: true
             };
@@ -103,6 +105,8 @@
 
                         results: function (data, page) {
                             var results = [];
+
+                            console.log(data);
 
                             _.each(data.data.response, function (obj: { id; itSystem; cvr; }) {
                                 if (excludeSelf && obj.id == $scope.usageId)
