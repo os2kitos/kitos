@@ -68,5 +68,6 @@
     "e2e:local": "gulp e2e:local",
     "e2e:browserstack": "gulp e2e:browserstack",
     "unit": "gulp unit"
-  }
+  },
+  "dependencies": {}
 }

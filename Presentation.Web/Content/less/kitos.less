@@ -6,7 +6,7 @@ html {
 }
 
 body {
-  height: 100%;
+  min-height: 100%;
   font-family: Calibri, Candara, Arial, sans-serif !important;
   background-color: #f2f2f2;
 }
@@ -14,7 +14,7 @@ body {
 div#page-wrapper {
   min-width: 1024px;
   max-width: 1600px;
-  height: 100%;
+  min-height: 100%;
   padding: 0;
   margin: 0 auto;
 }
@@ -22,11 +22,11 @@ div#page-wrapper {
 div#page-content {
   min-width: 1024px;
   max-width: 1600px;
-  height: 100%;
+  min-height: 100%;
 }
 
 div#page-body {
-  height: 100%;
+  min-height: 100%;
   padding: 10px 0 20px 0;
   background-color: white;
 }
@@ -929,15 +929,15 @@ tr.angular-ui-tree-empty {
 /********* Left menu  **********/
 
 .object-wrapper {
-  height: 100%;
+  min-height: 100%;
   padding-left: 0;
 
   .left-menu-container {
-    height: 100%;
+    min-height: 100%;
     padding-left: 0;
 
     .left-menu {
-      height: 100%;
+      min-height: 100%;
       padding: 15px 0;
       background-color: #dbe5f0;
 
@@ -1022,3 +1022,135 @@ tr.angular-ui-tree-empty {
     opacity:1;
 }
 /*********/
+
+/* SPLITTED CHART */
+
+
+.splitted-chart {
+    height: 200px;
+    margin: 1rem auto;
+    position: relative;
+    width: 200px;
+
+    .cutout {
+        border-radius: 50%;
+        clip: rect(0px, 200px, 200px, 100px);
+        height: 100%;
+        position: absolute;
+        width: 100%;
+
+        .text {
+            border-radius: 50%;
+            clip: rect(0px, 100px, 200px, 0px);
+            height: 100%;
+            position: absolute;
+            width: 100%;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);
+          
+          &.red {
+            background-color: #d9534f;
+            }
+
+            &.yellow {
+                background-color: #fee822;
+            }
+
+            &.green {
+                background-color: #4cae4c;
+            }
+
+            &.white {
+                background-color: white;
+            }
+        }
+    }
+
+    #portion1 {
+        transform: rotate(120deg);
+        .text {
+            transform: rotate(120deg);
+                &:after {
+                content: attr(data-rel);
+                left: 22%;
+                position: absolute;
+                top: 33%;
+                transform: rotate(120deg);
+            }
+        }
+    }
+
+    #portion2 {
+        transform: rotate(240deg);
+        .text {
+            transform: rotate(120deg);
+            &:after {
+                content: attr(data-rel);
+                left: 15%;
+                position: absolute;
+                top: 34%;
+                transform: rotate(0deg);
+            }
+        }
+    }
+
+    #portion3 {
+        transform: rotate(360deg);
+        .text {
+            transform: rotate(120deg);
+            &:after {
+                content: attr(data-rel);
+                left: 15%;
+                position: absolute;
+                top: 27%;
+                transform: rotate(-120deg);
+            }
+        }
+    }
+ } 
+
+/***/
+
+/* COMBINED CHART */
+
+.combined-chart {
+    height: 200px;
+    margin: 1rem auto;
+    position: relative;
+    width: 200px;
+    border-radius: 50%;
+    &.red {
+        background-color: #d9534f;
+    }
+
+    &.yellow {
+        background-color: #fee822;
+    }
+
+    &.green {
+        background-color: #4cae4c;
+    }
+
+    &.white {
+        background-color: white;
+    }
+
+    .chart-content {
+        position: absolute;
+        line-height: 200px;
+        width: 200px;
+        height: 200px;
+        div {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);
+        }
+    }
+} 
+
+
+/**/
