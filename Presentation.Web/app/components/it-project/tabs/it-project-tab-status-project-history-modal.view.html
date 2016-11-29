@@ -24,7 +24,10 @@
             <td><span data-square-traffic-light="{{update.TimeStatus}}"></span></td>
             <td><span data-square-traffic-light="{{update.ResourcesStatus}}"></span></td>
             <td>{{ update.Note }}</td>
-            <td>{{ update.IsFinal }}</td>
+            <td>
+                <span data-ng-if="update.IsFinal">Ja</span>
+                <span data-ng-if="!update.IsFinal">Nej</span>
+            </td>
             <td>{{ update.ObjectOwner.Name }} {{ update.ObjectOwner.LastName }}</td>
         </tr>
     </table>      
