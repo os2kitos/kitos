@@ -12,8 +12,7 @@ var app = angular.module("app", [
     "ui.bootstrap.tpls",
     "ngMessages",
     "ui.tree",
-    "ui.tinymce",
-    "zingchart-angularjs"]);
+    "ui.tinymce"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
