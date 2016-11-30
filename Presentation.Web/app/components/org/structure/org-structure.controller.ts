@@ -13,8 +13,14 @@
                             });
                         }
                     ],
-                    orgUnitRoles: ['$http', function ($http) {
+                    localOrgUnitRoles: ['$http', function ($http) {
                         return $http.get("odata/LocalOrganizationUnitRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            .then(function (result) {
+                                return result.data.value;
+                            });
+                    }],
+                    orgUnitRoles: ['$http', function ($http) {
+                        return $http.get("odata/OrganizationUnitRoles")
                             .then(function (result) {
                                 return result.data.value;
                             });
@@ -30,8 +36,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "orgUnitRoles", "user",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, orgUnitRoles, user) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -48,9 +54,10 @@
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
 
-            $scope.activeOrgRoles = orgUnitRoles;
+            $scope.orgUnitRoles = orgUnitRoles;
+            $scope.activeOrgRoles = localOrgUnitRoles;
             $scope.orgRoles = {};
-            _.each(orgUnitRoles, function (orgRole: { Id }) {
+            _.each(localOrgUnitRoles, function (orgRole: { Id }) {
                 $scope.orgRoles[orgRole.Id] = orgRole;
             });
 
@@ -241,6 +248,11 @@
 
             $scope.updateRight = function (right) {
                 if (!right.roleForSelect || !right.userForSelect) return;
+
+                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect)) {
+                    right.edit = false;
+                    return;
+                }
 
                 //old values
                 var oIdOld = right.objectId;
@@ -670,6 +682,16 @@
                     }
                 }
             };
+
+            $scope.checkIfRoleIsAvailable = function (roleId) {
+                var foundSelectedInOptions = _.find($scope.activeOrgRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+                return (foundSelectedInOptions);
+            }
+
+            $scope.getRoleName = function (roleId) {
+                var role = _.find($scope.orgUnitRoles, function (role: any) { return role.Id === parseInt(roleId, 10) });
+                return role.Name;
+            }
 
             // activate
             loadUnits();

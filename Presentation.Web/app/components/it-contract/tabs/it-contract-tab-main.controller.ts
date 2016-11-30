@@ -4,7 +4,58 @@
             $stateProvider.state('it-contract.edit.main', {
                 url: '/main',
                 templateUrl: 'app/components/it-contract/tabs/it-contract-tab-main.view.html',
-                controller: 'contract.EditMainCtrl'
+                controller: 'contract.EditMainCtrl',
+                resolve: {
+                    contractTypes: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalItContractTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
+                    ],
+                    contractTemplates: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalItContractTemplateTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
+                    ],
+                    purchaseForms: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalPurchaseFormTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
+                    ],
+                    procurementStrategies: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalProcurementStrategyTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
+                    ],
+                    orgUnits: [
+                        '$http', 'contract', function ($http, contract) {
+                            return $http.get('api/organizationunit/?organizationid=' + contract.organizationId).then(function (result) {
+                                return result.data.response;
+                            });
+                        }
+                    ],
+                    contracts: [
+                        '$http', function ($http) {
+                            return $http.get('api/itcontract/').then(function (result) {
+                                return result.data.response;
+                            });
+                        }
+                    ],
+                    agreementElements: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
+                    ]
+                }
             });
         }
     ]);

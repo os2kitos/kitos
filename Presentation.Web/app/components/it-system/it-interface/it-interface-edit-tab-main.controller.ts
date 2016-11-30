@@ -13,20 +13,6 @@
                                 return result.data.response;
                             });
                     }
-                ],
-                hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + interfaceId + '?hasWriteAccess=true&organizationId=' + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
-                ],
-                user: [
-                    'userService', function (userService) {
-                        return userService.getUser();
-                    }
                 ]
             }
         });
@@ -34,15 +20,14 @@
 
     app.controller('system.SystemInterfaceMainCtrl',
         [
-            '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user',
-            function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user) {
+            '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'autofocus', 'user',
+            function ($rootScope, $scope, $http, $state, notify, itInterface, autofocus, user) {
                 $rootScope.page.title = 'Snitflade - Rediger';
                 autofocus();
 
                 itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
                 itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
                 $scope.interface = itInterface;
-                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.select2AllowClearOpt = {
                     allowClear: true
                 };
