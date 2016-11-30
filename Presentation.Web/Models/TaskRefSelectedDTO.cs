@@ -4,6 +4,6 @@
     {
         public TaskRefDTO TaskRef { get; set; }
         public bool IsSelected { get; set; }
-        public bool IsLocked { get; set; }
+        public bool Inherited { get; set; }
     }
 }
