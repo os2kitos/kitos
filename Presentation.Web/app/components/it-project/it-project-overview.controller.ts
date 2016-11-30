@@ -16,6 +16,7 @@
     export interface IItProjectOverview extends Models.ItProject.IItProject {
         CurrentPhaseObj: Models.ItProject.IItProjectPhase;
         roles: Array<any>;
+        Rights: Array<any>;
     }
 
     export class OverviewController implements IOverviewController {
@@ -78,7 +79,6 @@
                     });
                 }
             });
-
             this.activate();
         }
         public opretITProjekt() {
@@ -780,6 +780,28 @@
                             { text: "Mellem", value: 2 },
                             { text: "Høj", value: 3 }
                         ]
+                    },
+                    {
+                        field: "Rights.Role.Name", title: `${this.user.fullName}`, width: 150,
+                        persistId: "usersRoles", // DON'T YOU DARE RENAME!
+                        template: item => {
+                            if (item.Rights.length) {
+                                for (var roles of item.Rights) {
+                                    return roles.Role.Name.toString();
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
+                        hidden: true,
+                        attributes: { "class": "might-overflow" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };
