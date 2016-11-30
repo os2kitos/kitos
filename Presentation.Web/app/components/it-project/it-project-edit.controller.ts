@@ -30,8 +30,7 @@
             "project",
             "projectTypes",
             "user",
-            "hasWriteAccess",
-            "autofocus"
+            "hasWriteAccess"
         ];
 
         constructor(
@@ -41,60 +40,9 @@
             public project,
             public projectTypes,
             private user,
-            public hasWriteAccess,
-            private autofocus) {
-            autofocus();
-
-            if (this.project.parentId) {
-                this.project.parent = {
-                    id: this.project.parentId,
-                    text: this.project.parentName
-                };
-            }
-
+            public hasWriteAccess) {
+            
             this.autosaveUrl = `api/itproject/${this.project.id}`;
-
-            this.parentSelectOptions = this.selectLazyLoading("api/itproject", true, ["overview=true", `orgId=${this.user.currentOrganizationId}`]);
-        }
-
-        private selectLazyLoading(url: string, excludeSelf: boolean, paramAry: Array<string>) {
-            return {
-                minimumInputLength: 1,
-                allowClear: true,
-                placeholder: " ",
-                initSelection: () => {
-                },
-                ajax: {
-                    data: (term) => {
-                        return { query: term };
-                    },
-                    quietMillis: 500,
-                    transport: (queryParams) => {
-                        var extraParams = paramAry ? "&" + paramAry.join("&") : "";
-                        var res = this.$http.get(url + "?q=" + queryParams.data.query + extraParams).then(queryParams.success);
-                        // res.abort = () => null;
-
-                        return res;
-                    },
-
-                    results: (data: {data: IApiResponse<any> }) => {
-                        var results = [];
-
-                        _.each(data.data.response, (obj: { id; name; cvr; }) => {
-                            if (excludeSelf && obj.id == this.project.id)
-                                return; // don't add self to result
-
-                            results.push({
-                                id: obj.id,
-                                text: obj.name ? obj.name : "Unavngiven",
-                                cvr: obj.cvr
-                            });
-                        });
-
-                        return { results: results };
-                    }
-                }
-            };
         }
     }
 

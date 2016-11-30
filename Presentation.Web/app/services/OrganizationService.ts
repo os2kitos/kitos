@@ -30,36 +30,23 @@
 
         constructor(private $http: IHttpServiceWithCustomConfig) {
         }
-
-        public addRole(organizationId: number, user: Services.IUser, role: Models.OrganizationRole): ng.IHttpPromise<Models.IOrganizationRight> {
-            var rightsPayload: Models.IOrganizationRight = {
-                UserId: user.id,
-                ObjectOwner: user,
-                ObjectOwnerId: user.id,
-                Role: role
-            };
-
-            return this.$http.post<Models.IOrganizationRight>(`odata/Organizations(${organizationId})/Rights`, rightsPayload);
-        }
-
-        GetOrganisationRightsById = (id: number) => {
-            return this.$http.get<Models.IOrganizationRight>(`odata/Organizations(${id})/Rights`);
-        }
-
-        GetAllOrganizationUnitRoles = () => {
-            return this.$http.get<IOrgUnitRoleModel>(`odata/OrganizationUnitRoles`);
-        }
-
-        GetOrganizationUnitRightsById = (id: number) => {
-            return this.$http.get<IOrgRightsModel>(`odata/OrganizationUnitRights?$filter=UserId eq (${id})`);
-        }
-
-        GetOrganizationUnitById = () => {
-            return this.$http.get<Models.IOrganizationUnit>(`odata/OrganizationUnits`);
-        }
         
-        GetOrganizationUnitDataById = (id: number) => {
-            return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id})`);
+        GetOrganizationUnitDataById = (id: number, orgId: number) => {
+            return this.$http.get(`odata/OrganizationUnitRights?$expand=role,object&$filter=UserId eq (${id} )AND Object/OrganizationId eq (${orgId})`);
+        }
+
+        GetOrganizationData = (userId: number, organizationId: number) => {
+            return this.$http.get(`odata/OrganizationRights?$expand=Organization&$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
+        }
+
+        //GetOrganizationAdminData = (userId: number, organizationId: number) => {
+        //    return this.$http.get(`odata/OrganizationRights?$filter=UserId eq (${userId}) AND OrganizationId eq (${organizationId})`);
+        //}
+
+        DeleteOrganizationAdminData = (user: any, adminRole: string, module: string) => {
+            var localRight = user.OrganizationRights.filter(x => x.Role === adminRole);
+            var localId = localRight[0].Id;
+            return this.$http.delete(`/odata/${module}(${localId})`);
         }
     }
 

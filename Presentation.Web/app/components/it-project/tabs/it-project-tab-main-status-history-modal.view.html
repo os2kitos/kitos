@@ -1,0 +1,42 @@
+﻿<div class="modal-header">
+    <span>
+        Status historik
+    </span>
+</div>
+<div class="modal-body">
+    <table class="table table-striped table-hover">
+        <tr>
+            <th class="col-xs-2">Projekt</th>
+            <th class="col-xs-2">Dato</th>
+            <th class="col-xs-1">Status Samlet</th>
+            <th class="col-x-1">Status Tid</th>
+            <th class="col-xs-1">Status Kvalitet</th>
+            <th class="col-xs-1">Status Ressourcer</th>
+            <th class="col-xs-2">Bemærkning</th>
+            <th class="col-xs-1">Afsluttende</th>
+            <th class="col-xs-1">Oprettet af</th>
+        </tr>
+        <tr data-ng-repeat="update in statusUpdates">
+            <td>{{ project.name }}</td>
+            <td>{{ moment(update.Created).format("DD-MM-YYYY") }}</td>
+            <td><span data-square-traffic-light="{{update.CombinedStatus}}"></span></td>
+            <td><span data-square-traffic-light="{{update.QualityStatus}}"></span></td>
+            <td><span data-square-traffic-light="{{update.TimeStatus}}"></span></td>
+            <td><span data-square-traffic-light="{{update.ResourcesStatus}}"></span></td>
+            <td>{{ update.Note }}</td>
+            <td>
+                <span data-ng-if="update.IsFinal">Ja</span>
+                <span data-ng-if="!update.IsFinal">Nej</span>
+            </td>
+            <td>{{ update.ObjectOwner.Name }} {{ update.ObjectOwner.LastName }}</td>
+        </tr>
+    </table>      
+</div>
+<div class="modal-footer">
+    <button id="close"
+            type="button"
+            class="btn btn-danger"
+            data-ng-click="dismiss()">
+        Luk
+    </button>
+</div>

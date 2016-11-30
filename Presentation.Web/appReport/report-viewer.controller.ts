@@ -97,11 +97,25 @@ module Kitos.Reports {
 
                     this.stiReport.load(reportDef);
 
-                    var odata = this.stimulsoftService.getODataDatabase();
-                    odata.name = "Kitos";
-                    odata.alias = "Kitos";
-                    odata.connectionString = window.location.origin + "/odata";
-                    this.stiReport.dictionary.databases.add(odata);
+                    var addKitos = true;
+                    var i;
+                    console.log("DB's: " + this.stiReport.dictionary.databases.count);
+                    for (i = 0; i < this.stiReport.dictionary.databases.count; i++) {
+                        console.log("DB name: " + this.stiReport.dictionary.databases.getByIndex(i).name);
+                        if (this.stiReport.dictionary.databases.getByIndex(i).name === "Kitos") {
+                            addKitos = false;
+                            this.stiReport.dictionary.databases.getByIndex(i).connectionString = window.location.origin + "/odata";
+                        }
+                    }
+
+                    if (addKitos) {
+                        var odata = this.stimulsoftService.getODataDatabase();
+                        odata.name = "Kitos";
+                        odata.alias = "Kitos";
+                        odata.connectionString = window.location.origin + "/odata";
+                        this.stiReport.dictionary.databases.add(odata);
+                        this.stiReport.dictionary.synchronize();
+                    }
 
                     // Add default variables to report
                     var currentOrgName = this.stimulsoftService.getVariable();

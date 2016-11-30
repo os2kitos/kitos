@@ -14,7 +14,8 @@ module.exports = {
         bower("/tinymce/plugins/image/plugin.min.js"),
         bower("/tinymce/plugins/code/plugin.min.js"),
         bower("/tinymce/plugins/link/plugin.min.js"),
-        bower("/tinymce/themes/modern/theme.min.js")
+        bower("/tinymce/themes/modern/theme.min.js"),
+        bower("/zingchart/client/zingchart.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
 
@@ -42,7 +43,8 @@ module.exports = {
         bower("/angular-confirm-modal/angular-confirm.min.js"),
         bower("/angular-messages/angular-messages.min.js"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
-        bower("/angular-ui-tinymce/src/tinymce.js")
+        bower("/angular-ui-tinymce/src/tinymce.js"),
+        bower("/ZingChart-AngularJS/src/zingchart-angularjs.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
@@ -94,7 +96,8 @@ module.exports = {
 
     script: script,
     content: content,
-    bower: bower
+    bower: bower,
+    npm: npm
 };
 
 // path helper functions
@@ -108,6 +111,10 @@ function content(file) {
 
 function bower(file) {
     return paths.bowerComponents + "/" + file;
+}
+
+function npm(file) {
+    return paths.npm + "/" + file;
 }
 
 function app(file) {

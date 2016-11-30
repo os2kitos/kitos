@@ -105,6 +105,11 @@
                 return;
             }
 
+            if (!this.checkIfRoleIsAvailable(right.roleForSelect)) {
+                right.edit = false;
+                return;
+            }
+
             // old values
             var rIdOld = right.roleId;
             var uIdOld = right.userId;
@@ -214,6 +219,11 @@
                     },
                     result => this.notify.addErrorMessage("Fejl!")
                 );
+        }
+
+        public checkIfRoleIsAvailable(roleId) {
+            var foundSelectedInOptions = _.find(this.activeItProjectRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+            return (foundSelectedInOptions);
         }
     }
 

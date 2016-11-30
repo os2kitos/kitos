@@ -1,50 +1,5 @@
-﻿<div>
-    <form class="form-horizontal fix-label-padding">
-        <div class="row">
-            <div class="col-xs-5">
-                <!-- Status traffic light -->
-                <div class="form-group">
-                    <label class="col-xs-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
-                    <div class="col-xs-7">
-                        <span id="statusProject"
-                              data-select-status2=""
-                              data-ng-model="projectStatusVm.project.statusProject"
-                              data-can-write="projectEditVm.hasWriteAccess"
-                              data-field="statusProject"
-                              data-autosave="{{projectStatusVm.project.updateUrl}}">
-                        </span>
-                    </div>
-                </div>
-
-                <!-- Date for status update -->
-                <div class="form-group">
-                    <label class="col-xs-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-xs-4">
-                        <input type="text" class="form-control" id="statusDate"
-                               data-kendo-date-picker
-                               data-k-options="projectStatusVm.datepickerOptions"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess"
-                               data-ng-model="projectStatusVm.project.statusDate"
-                               data-autosave="{{projectStatusVm.project.updateUrl}}"
-                               data-field="statusDate">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes to status of project -->
-            <div class="col-xs-7">
-                <div class="form-group">
-                    <label class="col-xs-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
-                    <div class="col-xs-10">
-                        <textarea id="note" class="form-control input-sm" rows="4"
-                                  data-ng-model="projectStatusVm.project.statusNote"
-                                  data-field="statusNote"
-                                  data-autosave="{{projectStatusVm.project.updateUrl}}"
-                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
+﻿<form class="form-horizontal fix-label-padding">
+    <div class="object-section-container">
         <div class="panel panel-default">
             <div class="panel-heading small">
                 Milepæle og opgaver
@@ -163,5 +118,5 @@
                 </tfoot>
             </table>
         </div>
-    </form>
-</div>
+    </div>
+</form>
