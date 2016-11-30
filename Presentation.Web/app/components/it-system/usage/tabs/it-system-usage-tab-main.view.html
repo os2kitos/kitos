@@ -71,17 +71,6 @@
                         data-ng-disabled="true"
                         value="{{usage.objectOwnerFullName}}">
             </div>
-
-            <!-- overview system -->
-            <div class="form-group">
-                <label for="overview" class="control-label small">Overblik</label>
-                <input type="hidden" id="overview" class="form-control input-sm"
-                        data-ui-select2="itSytemUsagesSelectOptions"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="usage.overview"
-                        data-autosave="api/itSystemUsage/{{usageId}}"
-                        data-field="overviewId">
-            </div>
             <!-- note -->
             <div class="form-group">
                 <label for="note" class="control-label small">Note</label>
