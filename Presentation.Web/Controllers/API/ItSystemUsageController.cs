@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
+using AutoMapper.Internal;
+using Castle.Core.Internal;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -99,7 +101,7 @@ namespace Presentation.Web.Controllers.API
                 var roles = _roleRepository.Get().ToList();
 
                 var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
+                var header = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
                 header.Add("Aktiv", "Aktiv");
                 header.Add("IT System", "IT System");
                 header.Add("OrgUnit", "Ansv. organisationsenhed");
@@ -113,7 +115,7 @@ namespace Presentation.Web.Controllers.API
                 list.Add(header);
                 foreach (var usage in dtos)
                 {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
+                    var obj = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
                     obj.Add("Aktiv", usage.MainContractIsActive);
                     obj.Add("IT System", usage.ItSystem.Name);
                     obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
@@ -125,7 +127,7 @@ namespace Presentation.Web.Controllers.API
                     }
                     obj.Add("AppType", usage.ItSystem.AppTypeOptionName);
                     obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    obj.Add("Anvender", usage.ActiveInterfaceUseCount + "(" + usage.InterfaceUseCount+ ")");
+                    obj.Add("Anvender", usage.ActiveInterfaceUseCount + "(" + usage.InterfaceUseCount + ")");
                     obj.Add("Udstiller", usage.InterfaceExhibitCount);
                     obj.Add("Overblik", usage.OverviewItSystemName);
                     list.Add(obj);
@@ -289,7 +291,15 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var task in tasks)
                 {
-                    usage.TaskRefs.Add(task);
+                    if (!usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id))
+                    {
+                        usage.TaskRefs.Add(task);
+                    }
+                    // If the task is contained among the inherited tasks remove it from the list of opt out's
+                    if (usage.TaskRefsOptOut.Any(u => u.Id == task.Id))
+                    {
+                        usage.TaskRefsOptOut.Remove(task);
+                    }
                 }
                 usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
@@ -309,21 +319,28 @@ namespace Presentation.Web.Controllers.API
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
                 if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                var optOut = false;
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
                 {
-                    tasks =
-                        usage.TaskRefs.Where(
-                            x =>
-                                (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) &&
-                                !x.Children.Any())
-                            .ToList();
+                    tasks = usage.TaskRefs.Where(x => (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any()).ToList();
+
+                    if (tasks.IsNullOrEmpty())
+                    {
+                        optOut = true;
+                        tasks = usage.ItSystem.TaskRefs.Where(x => (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any()).ToList();
+                    }
                 }
                 else
                 {
                     // no taskId was specified so get everything
                     tasks = usage.TaskRefs.ToList();
+
+                    if (tasks.IsNullOrEmpty())
+                    {
+                        tasks = usage.ItSystem.TaskRefs.ToList();
+                    }
                 }
 
                 if (!tasks.Any())
@@ -331,7 +348,15 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var task in tasks)
                 {
-                    usage.TaskRefs.Remove(task);
+                    if (!optOut)
+                    {
+                        usage.TaskRefs.Remove(task);
+                    }
+                    // If the task is contained among the inherited tasks add it to the list of opt out's
+                    if (usage.ItSystem.TaskRefs.Any(u => u.Id == task.Id))
+                    {
+                        usage.TaskRefsOptOut.Add(task);
+                    }
                 }
                 usage.LastChanged = DateTime.UtcNow;
                 usage.LastChangedByUser = KitosUser;
@@ -362,14 +387,11 @@ namespace Presentation.Web.Controllers.API
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
-                    var taskQuery1 = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
-                    var taskQuery2 =
-                        Repository.AsQueryable()
-                                  .Where(p => p.Id == id)
-                                  .Select(p => p.ItSystem)
-                                  .SelectMany(s => s.TaskRefs);
-
-                    taskQuery = taskQuery1.Union(taskQuery2);
+                    var usedTasks = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                    var inheritedTasks = Repository.AsQueryable().Where(p => p.Id == id).Select(p => p.ItSystem).SelectMany(s => s.TaskRefs);
+                    var optOuts = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(s => s.TaskRefsOptOut);
+                    taskQuery = usedTasks.Union(inheritedTasks);
+                    taskQuery = taskQuery.Except(optOuts);
                 }
                 else
                 {
@@ -390,8 +412,10 @@ namespace Presentation.Web.Controllers.API
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
                 {
                     TaskRef = Map<TaskRef, TaskRefDTO>(task),
-                    IsSelected = onlySelected || usage.TaskRefs.Any(t => t.Id == task.Id),
-                    IsLocked = usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id)
+                    // a task is selected if it is contained in either usage.TaskRefs or usage.ItSystem.TaskRefs but not in usage.TaskRefsOptOut
+                    IsSelected = (onlySelected || usage.TaskRefs.Any(t => t.Id == task.Id) || usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id)) && !usage.TaskRefsOptOut.Any(t => t.Id == task.Id),
+                    Inherited = usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id)
+
                 }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);

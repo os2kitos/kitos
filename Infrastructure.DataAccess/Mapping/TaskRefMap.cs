@@ -26,6 +26,13 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.HasMany(t => t.ItSystemUsages)
                 .WithMany(t => t.TaskRefs);
+
+            this.HasMany(t => t.ItSystemUsagesOptOut)
+                .WithMany(t => t.TaskRefsOptOut)
+                .Map(t =>
+                {
+                    t.ToTable("TaskRefItSystemUsageOptOut");
+                });
         }
     }
 }
