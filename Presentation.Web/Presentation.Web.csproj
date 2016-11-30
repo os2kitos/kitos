@@ -684,7 +684,9 @@
     <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueOrgUser.directive.ts" />
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
+    <TypeScriptCompile Include="app\shared\typeahead\typeahead.directive.ts" />
     <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
+    <Content Include="app\shared\typeahead\typeahead.view.html" />
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\fonts\tinymce-small.svg" />
     <Content Include="Content\css\fonts\tinymce.svg" />
