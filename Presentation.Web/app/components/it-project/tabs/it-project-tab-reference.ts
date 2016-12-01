@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.references", {
-            url: "/reference/",
+            url: "/reference",
             templateUrl: "app/components/it-reference.view.html",
             controller: "project.EditReference",
             controllerAs: "Vm"

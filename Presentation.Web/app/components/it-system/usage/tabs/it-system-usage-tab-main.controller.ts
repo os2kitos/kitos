@@ -28,47 +28,23 @@
                                 return result.data.value;
                             });
                     }
-                ],
-                itSystemUsage: [
-                    '$http', '$stateParams', function ($http, $stateParams) {
-                        return $http.get('api/itSystemUsage/' + $stateParams.id)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
-                ],
-                hasWriteAccess: [
-                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        return $http.get('api/itSystemUsage/' + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
                 ]
             }
         });
     }]);
 
     app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'hasWriteAccess', 'autofocus',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, hasWriteAccess, autofocus) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, autofocus) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
-
-            $scope.hasWriteAccess = hasWriteAccess;
+            
             $scope.usageId = $stateParams.id;
-            $scope.status = [{ id: true, name: 'Aktiv' }, { id: false, name: 'Inaktiv' }];
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.usage = itSystemUsage;
-
-            console.log(itSystemUsage);
-
-            $scope.allowClearOption = {
-                allowClear: true
-            };
 
             if (itSystemUsage.overviewId) {
                 $scope.usage.overview = {

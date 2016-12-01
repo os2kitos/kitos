@@ -6,18 +6,6 @@
                 templateUrl: 'app/components/it-system/edit/tabs/it-system-edit-tab-main.view.html',
                 controller: 'system.SystemMainCtrl',
                 resolve: {
-                    itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
-                        return $http.get("api/itsystem/" + $stateParams.id)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }],
-                    hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
-                        return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }],
                     businessTypes: [
                         '$http', function ($http) {
                             return $http.get("odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc");
@@ -29,11 +17,6 @@
                                 return result.data.value;
                             });
                         }
-                    ],
-                    user: [
-                        'userService', function (userService) {
-                            return userService.getUser();
-                        }
                     ]
                 }
             });
@@ -42,8 +25,8 @@
 
     app.controller('system.SystemMainCtrl',
         [
-            '$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess', 'businessTypes', 'user', 'autofocus', 'appTypeOptions',
-            function ($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess, businessTypes, user, autofocus, appTypeOptions) {
+            '$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'businessTypes', 'user', 'autofocus', 'appTypeOptions',
+            function ($rootScope, $scope, $http, $state, notify, itSystem, businessTypes, user, autofocus, appTypeOptions) {
                 $rootScope.page.title = 'IT System - Rediger system';
                 autofocus();
 
@@ -57,7 +40,6 @@
 
                 $scope.appTypeOptions = appTypeOptions;
                 $scope.system = itSystem;
-                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.businessTypes = businessTypes.data.value;
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);

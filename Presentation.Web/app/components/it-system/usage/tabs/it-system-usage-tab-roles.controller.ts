@@ -108,8 +108,12 @@
         };
 
         $scope.updateRight = function (right) {
-
             if (!right.roleForSelect || !right.userForSelect) return;
+
+            if (!$scope.checkIfRoleIsAvailable(right.roleForSelect)) {
+                right.edit = false;
+                return;
+            }
 
             // old values
             var rIdOld = right.roleId;
@@ -189,6 +193,11 @@
 
             $scope.rightSortBy = val;
         };
+
+        $scope.checkIfRoleIsAvailable = function (roleId) {
+            var foundSelectedInOptions = _.find($scope.activeItSystemRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+            return (foundSelectedInOptions);
+        }
 
     }]);
 

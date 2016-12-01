@@ -40,11 +40,6 @@
                         });
                     }
                 ],
-                user: [
-                        'userService', function (userService) {
-                            return userService.getUser();
-                        }
-                ],
                 dataRows: [
                     '$http', 'itInterface', function ($http, itInterface) {
                         return $http.get('api/datarow/?interfaceid=' + itInterface.id)
@@ -58,8 +53,8 @@
     }]);
 
     app.controller('system.SystemInterfaceDetailsCtrl', [
-        '$scope', '$http', '$timeout', '$state', 'notify', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'user', 'itInterface', 'dataRows',
-        function ($scope, $http, $timeout, $state, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, user, itInterface, dataRows) {
+        '$scope', '$http', '$timeout', '$state', 'notify', 'user', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itInterface', 'dataRows',
+        function ($scope, $http, $timeout, $state, notify, user, tsas, interfaces, interfaceTypes, methods, dataTypes, itInterface, dataRows) {
 
             $scope.tsas = tsas;
             $scope.interfaces = interfaces;

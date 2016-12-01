@@ -80,6 +80,11 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; }
 
         /// <summary>
+        /// List of inherited IT System tasks not currently used by an ItSystemUsage
+        /// </summary>
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsagesOptOut { get; set; }
+
+        /// <summary>
         /// Determines whether this instance is within a given organizational context.
         /// </summary>
         /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>

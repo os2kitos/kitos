@@ -16,6 +16,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
+            this.TaskRefsOptOut = new List<TaskRef>();
             this.ItInterfaceUsages = new List<ItInterfaceUsage>();
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
@@ -173,6 +174,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// The supported tasks.
         /// </value>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+        /// <summary>
+        /// Gets or sets the tasks that has been opted out from by an organization.
+        /// </summary>
+        public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
         /// <summary>
         /// The local usages of interfaces.
         /// </summary>

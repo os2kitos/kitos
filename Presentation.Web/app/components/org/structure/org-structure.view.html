@@ -105,7 +105,7 @@
                             <!-- show -->
                             <tr data-ng-hide="right.edit">
                                 <td>{{ orgUnits[right.objectId].name }}</td>
-                                <td>{{ orgRoles[right.roleId].Name }}</td>
+                                <td>{{ orgRoles[right.roleId].Name }} <span data-ng-if="!checkIfRoleIsAvailable(orgRoles[right.roleId].Id)">{{ getRoleName(right.roleId) }} (udgået)</span></td>
                                 <td>{{ right.user.fullName }}</td>
                                 <td class="relative-position">
                                     {{ right.user.email }}
@@ -129,7 +129,11 @@
                                 </td>
                                 <td>
                                     <select data-ui-select2="" name="selectRole" data-ng-model="right.roleForSelect" class="form-control input-sm">
-                                        <option data-ng-show="orgRoles[right.roleId].IsEnabled == false" disabled="true" value="{{orgRoles[right.roleId].Id}}">{{orgRoles[right.roleId].Name}} {{orgRoles[right.roleId].IsEnabled == true ? "" : "(Inaktiv rolle)"}}</option>
+                                        <option data-ng-if="!checkIfRoleIsAvailable(orgRoles[right.roleId].Id)"
+                                                disabled="disabled"
+                                                value="{{orgRoles[right.roleId].Id}}">
+                                            {{ getRoleName(right.roleId) }} (udgået)
+                                        </option>
                                         <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.Id}}">
                                             {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
                                         </option>

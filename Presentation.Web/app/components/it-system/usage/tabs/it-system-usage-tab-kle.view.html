@@ -15,10 +15,12 @@
                         <span data-ng-if="showAllTasks">Vis valgte</span>
                     </a>
                 </th>
-                <th class="col-xs-2">KLE ID
+                <th class="col-xs-2">
+                    KLE ID
                     <button data-order-by="'taskKey'" data-paging="pagination"></button>
                 </th>
-                <th class="col-xs-9">KLE Navn
+                <th class="col-xs-9">
+                    KLE Navn
                     <button data-order-by="'description'" data-paging="pagination"></button>
                 </th>
             </tr>
@@ -29,9 +31,12 @@
                 <td>
                     <input type="checkbox"
                            id="{{task.taskRef.id}}"
-                           data-ng-checked="task.isSelected || task.isLocked"
+                           data-ng-checked="task.isSelected"
                            data-ng-click="save(task)"
-                           data-ng-disabled="!hasWriteAccess || task.isLocked" />
+                           data-ng-disabled="!hasWriteAccess" />
+                    <label data-ng-show="{{task.inherited}}" class="kle-align-input-info">
+                        <a uib-tooltip="Denne opgave er nedarvet"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+                    </label>
                 </td>
                 <td>
                     <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}}</label>

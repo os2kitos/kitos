@@ -86,7 +86,7 @@
             return [
                 { Id: 0, Name: "Lokal" },
                 { Id: 1, Name: "Offentlig" }
-            ]
+            ];
         }
 
         private setupGrid() {
@@ -96,7 +96,7 @@
                 transport: {
                     read: {
                         url: function () {
-                            return  baseUrl + "?$expand=CategoryType";
+                            return baseUrl + "?$expand=CategoryType,LastChangedByUser($select=Id,Name,LastName)";
                         },
                         dataType: "json"
                     },
@@ -105,7 +105,7 @@
                             return baseUrl + "(" + data.Id + ")";
                         },
                         beforeSend: function (req) {
-                            req.setRequestHeader("Prefer", "return=representation")
+                            req.setRequestHeader("Prefer", "return=representation");
                         },
                         type: "PATCH",
                         dataType: "json"
@@ -186,12 +186,13 @@
                 dataBinding: (e) => {
                     let isGlobalAdmin = this.user.isGlobalAdmin;
                     let isReportAdmin = this.user.isReportAdmin || this.user.isLocalAdmin;
-                    let currentOrganizationId = this.user.currentOrganizationId
+                    let currentOrganizationId = this.user.currentOrganizationId;
 
-                    this.canCreate = isGlobalAdmin || isReportAdmin
+                    this.canCreate = isGlobalAdmin || isReportAdmin;
 
                     for (let i = 0; i < e.items.length; i++) {
-                        e.items[i].canEdit = isGlobalAdmin || (isReportAdmin && e.items[i].OrganizationId == currentOrganizationId)
+                        e.items[i].canEdit = isGlobalAdmin ||
+                            (isReportAdmin && e.items[i].OrganizationId == currentOrganizationId);
                     }
                 },
                 dataSource: dataSource,
@@ -200,7 +201,8 @@
                 toolbar: [
                     {
                         name: "createReport",
-                        template: `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
+                        template:
+                            `<button type="button" class="btn btn-success" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     }
                 ],
                 pageable: {
@@ -216,23 +218,52 @@
                 groupable: false,
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 150, menu: false,
-                        template: dataItem => dataItem.Id ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>` : ""
+                        field: "Name",
+                        title: "Navn",
+                        width: 150,
+                        menu: false,
+                        template: dataItem => dataItem.Id
+                            ? `<a href='appReport/?id=${dataItem.Id}' target='_blank'>${dataItem.Name}</a>`
+                            : ""
                     } as any,
                     { field: "Description", title: "Beskrivelse", width: "250px", menu: false },
                     {
-                        field: "CategoryTypeId", title: "Category", width: "180px", menu: false,
+                        field: "CategoryTypeId",
+                        title: "Category",
+                        width: "180px",
+                        menu: false,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
                     },
                     {
-                        field: "AccessModifier", title: "Adgang", width: "60px", menu: false,
+                        field: "AccessModifier",
+                        title: "Adgang",
+                        width: "60px",
+                        menu: false,
                         template: dataitem => {
                             switch (dataitem.AccessModifier) {
-                                case "Local": return "Lokal";
-                                case "Public": return "Offentlig";
-                                default: return "";
+                            case "Local":
+                                return "Lokal";
+                            case "Public":
+                                return "Offentlig";
+                            default:
+                                return "";
                             }
                         }
+                    },
+                    {
+                        field: "LastChanged",
+                        title: "Sidst ændret",
+                        width: "60px",
+                        type: "date",
+                        menu: false,
+                        template: dataitem => kendo.toString(kendo.parseDate(dataitem.LastChanged), "d")
+                    },
+                    {
+                        field: "LastChangedByUser",
+                        title: "Sidst ændret af",
+                        width: "150px",
+                        menu: false,
+                        template: dataitem => dataitem.LastChangedByUser.Name + " " + dataitem.LastChangedByUser.LastName
                     },
                     {
                         title: "Handlinger",

@@ -9,7 +9,7 @@
                     id: "@",
                     label: "@",
                     placeholder: "@",
-                    options: "&",
+                    options: "=",
                     selectedId: "=ngModel",
                     selectedText: "@",
                     autoSaveUrl: "@",
@@ -18,17 +18,17 @@
                     disabled: "&ngDisabled",
                 },
                 link: function (scope, element, attr, ctrl) {
-                    //var foundSelectedInOptions = _.find(scope.options(), function(option: any) { return option.Id === scope.selectedId });
-                    //scope.isDeletedSelected = scope.selectedId != null && !foundSelectedInOptions;
-
-                    scope.isDeletedSelected = false;
+                    var foundSelectedInOptions = _.find(scope.options, function(option: any) { return option.Id === scope.selectedId });
+                    if (scope.options && scope.selectedId != null && !foundSelectedInOptions) {
+                        scope.options.splice(0, 0, { Id: scope.selectedId, Name: scope.selectedText + " (udgået)" });
+                    }
 
                     scope.savedId = scope.selectedId;
 
                     scope.optionDescription = null;
 
                     scope.$watch('selectedId', function (value) {
-                        var foundSelectedInOptions = _.find(scope.options(), function (option: any) {
+                        var foundSelectedInOptions = _.find(scope.options, function (option: any) {
                             return option.Id === parseInt(scope.selectedId, 10);
                         });
 

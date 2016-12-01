@@ -20,7 +20,7 @@
         <tbody class="small">
             <tr data-ng-repeat-start="exposure in interfaceExposures">
                 <!-- wished to be used -->
-                <td rowspan="{{exposure.numRows}}">
+                <td rowspan="{{exposure.numRows || 1}}">
                     <input type="checkbox" data-ng-model="exposure.usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
@@ -29,35 +29,35 @@
                 </td>
 
                 <!-- active (depends on contract) -->
-                <td rowspan="{{exposure.numRows}}">
+                <td rowspan="{{exposure.numRows || 1}}">
                     <span data-ng-if="exposure.usage.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
 
                 <!-- name of the system -->
-                <td rowspan="{{exposure.numRows}}">
+                <td rowspan="{{exposure.numRows || 1}}">
                     <a data-ui-sref="it-system.interface-edit.interface-details({ id: exposure.id })">{{ exposure.name }}</a>
                 </td>
 
                 <!-- contract id -->
-                <td rowspan="{{exposure.numRows}}">
+                <td rowspan="{{exposure.numRows || 1}}">
                     <a data-ng-if="exposure.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: exposure.usage.itContractId})">{{exposure.usage.itContract.itContractId}}
                     </a>
                 </td>
 
                 <!-- tsa -->
-                <td rowspan="{{exposure.numRows}}">{{exposure.tsa.name}}
+                <td rowspan="{{exposure.numRows || 1}}">{{exposure.tsa.name}}
                 </td>
 
                 <!-- inteface type -->
-                <td rowspan="{{exposure.numRows}}">{{exposure.interfaceType.name}}</td>
+                <td rowspan="{{exposure.numRows || 1}}">{{exposure.interfaceType.name}}</td>
 
                 <!-- interface (grænseflade) -->
-                <td rowspan="{{exposure.numRows}}">{{exposure.interface.name}}</td>
+                <td rowspan="{{exposure.numRows || 1}}">{{exposure.interface.name}}</td>
 
                 <!-- method -->
-                <td rowspan="{{exposure.numRows}}">{{exposure.method.name}}</td>
+                <td rowspan="{{exposure.numRows || 1}}">{{exposure.method.name}}</td>
 
                 <!-- data -->
                 <td rowspan="1">
@@ -116,7 +116,7 @@
         <tbody class="small">
             <tr data-ng-repeat-start="usage in interfaceUsages">
                 <!-- wished to be used -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <input type="checkbox" data-ng-model="usage.usage.isWishedFor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="isWishedFor"
@@ -125,29 +125,29 @@
                 </td>
 
                 <!-- active (depends on contract) -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <span data-ng-if="usage.usage.itContract.isActive" class="text-success">
                         <i class="glyphicon glyphicon-ok"></i>
                     </span>
                 </td>
 
                 <!-- name of the system -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <a data-ui-sref="it-system.interface-edit.interface-details({ id: usage.id })">{{usage.name}}</a>
                 </td>
 
                 <!-- contract id -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <a data-ng-if="usage.usage.itContractId != null" data-ui-sref="it-contract.edit.systems({id: usage.usage.itContractId})">{{usage.usage.itContract.itContractId}}
                     </a>
                 </td>
 
                 <!-- tsa -->
-                <td rowspan="{{usage.numRows}}">{{usage.tsa.name}}
+                <td rowspan="{{usage.numRows || 1}}">{{usage.tsa.name}}
                 </td>
 
                 <!-- infrastructure -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <input type="hidden" class="form-control input-sm"
                            data-placeholder="Vælg infrastruktur"
                            data-ui-select2="itSystemUsageSelectOptions"
@@ -160,7 +160,7 @@
                 </td>
 
                 <!-- exposed by -->
-                <td rowspan="{{usage.numRows}}">
+                <td rowspan="{{usage.numRows || 1}}">
                     <a data-ui-sref="it-system.edit.interfaces({ id: usage.exhibitedByItSystemId })">{{usage.exhibitedByItSystemName}}</a>
                 </td>
 
