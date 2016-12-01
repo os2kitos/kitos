@@ -486,12 +486,14 @@
             this.gridState.removeLocal();
             this.gridState.removeSession();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :( works with this.loadGridOptions() and this.mainGrid.dataSource.read();
             this.reload();
         };
 
         private reload() {
-            this.$state.go(".", null, { reload: true });
+            //this.$state.go(".", null, { reload: true });
+            this.loadGridOptions();
+            this.mainGrid.dataSource.read();
         }
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
@@ -595,7 +597,6 @@
             } else {
                 template = t => t;
             }
-
             return template;
         }
 
