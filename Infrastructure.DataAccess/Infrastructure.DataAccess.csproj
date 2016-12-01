@@ -310,9 +310,9 @@
     <Compile Include="Migrations\201611281309558_Deleted StatusProject from ItProject.Designer.cs">
       <DependentUpon>201611281309558_Deleted StatusProject from ItProject.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201611300922094_Added taskrefOptOut.cs" />
-    <Compile Include="Migrations\201611300922094_Added taskrefOptOut.Designer.cs">
-      <DependentUpon>201611300922094_Added taskrefOptOut.cs</DependentUpon>
+    <Compile Include="Migrations\201612010831018_Added taskrefOptOut.cs" />
+    <Compile Include="Migrations\201612010831018_Added taskrefOptOut.Designer.cs">
+      <DependentUpon>201612010831018_Added taskrefOptOut.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -452,8 +452,8 @@
     <EmbeddedResource Include="Migrations\201611281309558_Deleted StatusProject from ItProject.resx">
       <DependentUpon>201611281309558_Deleted StatusProject from ItProject.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201611300922094_Added taskrefOptOut.resx">
-      <DependentUpon>201611300922094_Added taskrefOptOut.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201612010831018_Added taskrefOptOut.resx">
+      <DependentUpon>201612010831018_Added taskrefOptOut.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

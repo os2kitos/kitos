@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201611300922094_Added taskrefOptOut"; }
+            get { return "201612010831018_Added taskrefOptOut"; }
         }
         
         string IMigrationMetadata.Source
