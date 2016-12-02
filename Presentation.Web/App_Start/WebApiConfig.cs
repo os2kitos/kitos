@@ -368,7 +368,7 @@ namespace Presentation.Web
             config.EntityType.HasKey(x => x.Id);
 
 
-            var Advice = builder.EntitySet<Advice>(nameof(AdvisController).Replace("Controller", string.Empty));
+            var Advice = builder.EntitySet<Advice>(nameof(Controllers.OData.AdviceController).Replace("Controller", string.Empty));
             Advice.EntityType.HasKey(x => x.Id);
 
             var adviceSent = builder.EntitySet<AdviceSent>(nameof(AdviceSentController).Replace("Controller", string.Empty));

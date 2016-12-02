@@ -4,9 +4,9 @@ using Presentation.Web.Models;
 using Core.DomainModel.Advice;
 namespace Presentation.Web.Controllers.API
 {
-    public class AdviceController : GenericContextAwareApiController<Advice, AdviceDTO>
+    public class AdviceOldController : GenericContextAwareApiController<Advice, AdviceDTO>
     {
-        public AdviceController(IGenericRepository<Advice> repository) : base(repository)
+        public AdviceOldController(IGenericRepository<Advice> repository) : base(repository)
         {
         }
 

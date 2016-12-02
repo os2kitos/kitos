@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
@@ -306,6 +307,18 @@
     <Compile Include="Migrations\201611251226036_mailBody added to advice.Designer.cs">
       <DependentUpon>201611251226036_mailBody added to advice.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201611290926094_Advice to adviceSent Relation created.cs" />
+    <Compile Include="Migrations\201611290926094_Advice to adviceSent Relation created.Designer.cs">
+      <DependentUpon>201611290926094_Advice to adviceSent Relation created.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611290953191_Made typeFields Nullable.cs" />
+    <Compile Include="Migrations\201611290953191_Made typeFields Nullable.Designer.cs">
+      <DependentUpon>201611290953191_Made typeFields Nullable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611301451398_added cascade dekete ti adviceSent.cs" />
+    <Compile Include="Migrations\201611301451398_added cascade dekete ti adviceSent.Designer.cs">
+      <DependentUpon>201611301451398_added cascade dekete ti adviceSent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -313,6 +326,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -440,6 +454,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201611251226036_mailBody added to advice.resx">
       <DependentUpon>201611251226036_mailBody added to advice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611290926094_Advice to adviceSent Relation created.resx">
+      <DependentUpon>201611290926094_Advice to adviceSent Relation created.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611290953191_Made typeFields Nullable.resx">
+      <DependentUpon>201611290953191_Made typeFields Nullable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611301451398_added cascade dekete ti adviceSent.resx">
+      <DependentUpon>201611301451398_added cascade dekete ti adviceSent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

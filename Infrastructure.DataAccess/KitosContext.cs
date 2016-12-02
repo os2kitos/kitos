@@ -10,6 +10,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.AdviceSent;
 
 namespace Infrastructure.DataAccess
 {
@@ -125,6 +126,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
+        public DbSet<AdviceSent> AdviceSent { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

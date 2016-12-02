@@ -1,6 +1,5 @@
-
-using Core.DomainModel.ItContract;
 using System;
+using System.Collections.Generic;
 
 namespace Core.DomainModel.Advice
 {
@@ -9,14 +8,24 @@ namespace Core.DomainModel.Advice
         Contract,
         Itsytem
     }
+    public enum Scheduling
+    {
+        Monthly,
+        Daily
+    }
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
     public class Advice : Entity, IContextAware
     {
+        public Advice() {
+            AdviceSent = new List<AdviceSent.AdviceSent>();
+        }
 
+        public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
         public int? RelationId { get; set; }
-        public ObjectType Type { get; set; }
+        public ObjectType? Type { get; set; }
+        public Scheduling? Scheduling { get; set; }
        
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.

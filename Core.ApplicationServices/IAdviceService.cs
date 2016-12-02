@@ -4,6 +4,6 @@ namespace Core.ApplicationServices
 {
     public interface IAdviceService
     {
-        bool sendAdvice(Advice advice);
+        bool sendAdvice(int id);
     }
 }

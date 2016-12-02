@@ -9,7 +9,9 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Table & Column Mappings
             this.ToTable("Advice");
-
+            this.HasMany(a => a.AdviceSent)
+                .WithRequired(a => a.Advice)
+                .WillCascadeOnDelete(true);
             // Relationships
            /* this.HasRequired(t => t.ItContract)
                 .WithMany(t => t.Advices)
