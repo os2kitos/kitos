@@ -20,9 +20,11 @@ namespace Core.DomainModel.Advice
     {
         public Advice() {
             AdviceSent = new List<AdviceSent.AdviceSent>();
+            AdviceUserRelations = new List<AdviceUserRelation>();
         }
 
         public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
+        public virtual ICollection<AdviceUserRelation> AdviceUserRelations { get; set; }
         public int? RelationId { get; set; }
         public ObjectType? Type { get; set; }
         public Scheduling? Scheduling { get; set; }

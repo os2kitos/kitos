@@ -319,6 +319,10 @@
     <Compile Include="Migrations\201611301451398_added cascade dekete ti adviceSent.Designer.cs">
       <DependentUpon>201611301451398_added cascade dekete ti adviceSent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612021031055_Advis.cs" />
+    <Compile Include="Migrations\201612021031055_Advis.Designer.cs">
+      <DependentUpon>201612021031055_Advis.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -464,6 +468,14 @@
     <EmbeddedResource Include="Migrations\201611301451398_added cascade dekete ti adviceSent.resx">
       <DependentUpon>201611301451398_added cascade dekete ti adviceSent.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612021031055_Advis.resx">
+      <DependentUpon>201612021031055_Advis.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\201612021022441_Added relations between User\" />
+    <Folder Include="Migrations\201612021024036_Added relations between User\" />
+    <Folder Include="Migrations\201612021024454_Added relations between User\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
