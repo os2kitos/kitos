@@ -18,10 +18,10 @@
     ]);
 
     app.controller('system.SystemInterfacesCtrl', [
-        '$scope', '$http', 'notify', 'itSystem', 'userService', 'interfaces', 'user',
-        function ($scope, $http, notify, itSystem, userService, interfaces, user) {
+        '$scope', '$http', 'notify', 'itSystem', 'userService', 'interfaces', 'user', 'hasWriteAccess',
+        function ($scope, $http, notify, itSystem, userService, interfaces, user, hasWriteAccess) {
             $scope.new = {};
-
+            $scope.hasWriteAccess = hasWriteAccess;
             $scope.canUseInterfaces = [];
             _.each(interfaces, pushInterface);
 
