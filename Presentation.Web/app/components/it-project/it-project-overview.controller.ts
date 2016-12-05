@@ -782,26 +782,13 @@
                         ]
                     },
                     {
-                        field: "Rights.Role.Name", title: `${this.user.fullName}`, width: 150,
+                        field: "Rights", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        template: item => {
-                            if (item.Rights.length) {
-                                for (var roles of item.Rights) {
-                                    return roles.Role.Name.toString();
-                                }
-                            } else {
-                                return "";
-                            }
-                        },
+                        //template: item => item.Rights ? item.Rights.every(x => x.Role.Name) : "",
+                        template: () => `<div ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}} </div>`,
                         hidden: true,
-                        attributes: { "class": "might-overflow" },
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        sortable: false,
+                        filterable: false
                     }
                 ]
             };
