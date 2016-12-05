@@ -3,27 +3,17 @@
         $stateProvider.state('it-system.interface-edit.main', {
             url: '/main',
             templateUrl: 'app/components/it-system/it-interface/it-interface-edit-tab-main.view.html',
-            controller: 'system.SystemInterfaceMainCtrl',
-            resolve: {
-                itInterface: [
-                    '$http', '$stateParams', function ($http, $stateParams) {
-                        var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + interfaceId)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }
-                ]
-            }
+            controller: 'system.SystemInterfaceMainCtrl'
         });
     }]);
 
     app.controller('system.SystemInterfaceMainCtrl',
         [
-            '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'autofocus', 'user',
-            function ($rootScope, $scope, $http, $state, notify, itInterface, autofocus, user) {
+            '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'autofocus', 'user', 'hasWriteAccess',
+            function ($rootScope, $scope, $http, $state, notify, itInterface, autofocus, user, hasWriteAccess) {
                 $rootScope.page.title = 'Snitflade - Rediger';
                 autofocus();
+                $scope.hasWriteAccess = hasWriteAccess;
 
                 itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
                 itInterface.updateUrl = 'api/itInterface/' + itInterface.id;

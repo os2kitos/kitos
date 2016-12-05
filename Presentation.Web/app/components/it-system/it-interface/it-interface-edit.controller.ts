@@ -18,6 +18,15 @@
                                 return result.data.response;
                             });
                     }
+                ],
+                itInterface: [
+                    '$http', '$stateParams', function ($http, $stateParams) {
+                        var interfaceId = $stateParams.id;
+                        return $http.get('api/itInterface/' + interfaceId)
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }
                 ]
             }
         });
@@ -25,9 +34,9 @@
 
     app.controller('system.interfaceEditCtrl',
     [
-        '$rootScope', '$scope', 'user', 'hasWriteAccess',
-        function ($rootScope, $scope, user, hasWriteAcess) {
-            $scope.hasWriteAcess = hasWriteAcess;
+        '$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface',
+        function ($rootScope, $scope, user, hasWriteAcess, itInterface) {
+            
         }
     ]);
 })(angular, app);

@@ -56,6 +56,7 @@
         '$scope', '$http', '$timeout', '$state', 'notify', 'user', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itInterface', 'dataRows',
         function ($scope, $http, $timeout, $state, notify, user, tsas, interfaces, interfaceTypes, methods, dataTypes, itInterface, dataRows) {
 
+            $scope.hasWriteAcess = hasWriteAcess;
             $scope.tsas = tsas;
             $scope.interfaces = interfaces;
             $scope.interfaceTypes = interfaceTypes;
