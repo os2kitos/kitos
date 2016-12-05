@@ -33,6 +33,7 @@
     app.controller('system.UsageCtrl', ['$rootScope', '$scope', 'itSystemUsage', 'user', 'hasWriteAccess',
         function ($rootScope, $scope, itSystemUsage, user, hasWriteAccess) {
             $scope.hasWriteAccess = hasWriteAccess;
+            $scope.usage = itSystemUsage;
             $scope.allowClearOption = {
                 allowClear: true
             };

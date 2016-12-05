@@ -39,12 +39,12 @@
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
-            
+
+            $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-            $scope.usage = itSystemUsage;
 
             if (itSystemUsage.overviewId) {
                 $scope.usage.overview = {

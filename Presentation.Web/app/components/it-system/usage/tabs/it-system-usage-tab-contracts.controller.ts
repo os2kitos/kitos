@@ -12,6 +12,8 @@
     app.controller('system.EditContracts', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'notify',
         function ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, notify) {
             var usageId = itSystemUsage.id;
+
+            $scope.usage = itSystemUsage;
             $scope.contracts = itSystemUsage.contracts;
             $scope.mainContractId = itSystemUsage.mainContractId;
 
