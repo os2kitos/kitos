@@ -112,7 +112,17 @@
                         }
                     }
 
+                    function saveTypeahead() {
+                        $timeout(function () {
+                            var payload = {};
+                            payload[attrs.field] = attrs.modelValue;
+
+                            save(payload);
+                        }, 200);
+                    }
+
                     function saveSelect2() {
+                        
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function () {
@@ -190,6 +200,8 @@
                         element.bind('blur', saveDate);
                     } else if (attrs.type === 'checkbox') {
                         element.bind('change', saveCheckbox);
+                    } else if (!angular.isUndefined(attrs.autosaveTypeahead)) {
+                        element.bind('blur', saveTypeahead);
                     } else {
                         element.bind('blur', saveIfNew);
                     }

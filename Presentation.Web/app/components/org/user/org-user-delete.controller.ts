@@ -91,7 +91,7 @@
             private notify,
             private user: any,
             private currentUser: Services.IUser,
-            private usersInOrganization: Models.IUser,
+            private usersInOrganization: any,
             public projects,
             public system,
             public itContracts,
@@ -103,14 +103,14 @@
             this.firstName = user.Name;
             this.lastName = user.LastName;
             this.email = user.Email;
-            
+
             this.initCollections(orgUnits, this.vmOrgRoles);
             this.initCollections(projects, this.vmProjectRoles);
             this.initCollections(system, this.vmSystemRoles);
             this.initCollections(itContracts, this.vmContractRoles);
             this.initCollections(orgAdmin, this.vmAdminRoles);
 
-            this.vmUsersInOrganization = usersInOrganization;
+            this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== user.Id);
             this.vmProject = projects;
             this.vmSystem = system;
             this.vmItContracts = itContracts;
