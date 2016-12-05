@@ -24,7 +24,7 @@
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
-                    serverFiltering: false, //Set to false to fix the filter error "Type" and "Synlighed" 
+                    serverFiltering: true
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
