@@ -102,12 +102,21 @@
                                 userInputString[index] = userString;
                                 index++;
                             }
-                            var result = $http
-                                .get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId
+                            var result;
+                            if ($scope.orgId === undefined) {
+                                result = $http
+                                    .get(`/odata/Users?$filter=OrganizationRights/any() and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${
+                                    userInputString[0]
+                                    }') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`,
+                                    { ignoreLoadingBar: true });
+                            } else {
+                                result = $http
+                                    .get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId
                                     }) and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${
                                     userInputString[0]
                                     }') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[1]}') and contains(concat(concat(concat(concat(Name, ' '), LastName), ' '), Email), '${userInputString[2]}')`,
                                     { ignoreLoadingBar: true });
+                            }
                             return result;
                         };
                     }
