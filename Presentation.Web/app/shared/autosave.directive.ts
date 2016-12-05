@@ -1,21 +1,21 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     'use strict';
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', 'userService', 'moment', function($http, $timeout, notify, userService, moment) {
+        '$http', '$timeout', 'notify', 'userService', 'moment', function ($http, $timeout, notify, userService, moment) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
-                link: function(scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs, ctrl) {
                     var user; // TODO this isn't always ready when needed and will result in an error from time to time... angular 2 support resolve on directives so yeah...
 
-                    userService.getUser().then(function(result) {
+                    userService.getUser().then(function (result) {
                         user = result;
                     });
 
                     var oldValue;
-                    $timeout(function() {
+                    $timeout(function () {
                         oldValue = ctrl.$modelValue; // get initial value
                     });
 
@@ -57,7 +57,7 @@
                     function saveCheckbox() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
-                        $timeout(function() {
+                        $timeout(function () {
                             if (attrs.globalOptionId) {
                                 saveLocalOption();
                             } else {
@@ -112,7 +112,17 @@
                         }
                     }
 
+                    function saveTypeahead() {
+                        $timeout(function () {
+                            var payload = {};
+                            payload[attrs.field] = ctrl.$modelValue;
+
+                            save(payload);
+                        }, 200);
+                    }
+
                     function saveSelect2() {
+
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
                         $timeout(function () {
@@ -141,19 +151,19 @@
                         if (e.added) {
                             id = e.added.id;
                             $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function() {
+                                .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
-                                .error(function() {
+                                .error(function () {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
                             $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function() {
+                                .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
-                                .error(function() {
+                                .error(function () {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         }
@@ -164,12 +174,12 @@
                         if (!attrs.appendurl)
                             attrs.appendurl = '';
 
-                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true})
-                            .success(function() {
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true })
+                            .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
                             })
-                            .error(function(result, status) {
+                            .error(function (result, status) {
                                 if (status === 409) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                 } else {
@@ -190,6 +200,8 @@
                         element.bind('blur', saveDate);
                     } else if (attrs.type === 'checkbox') {
                         element.bind('change', saveCheckbox);
+                    } else if (!angular.isUndefined(attrs.autosaveTypeahead)) {
+                        element.bind('blur', saveTypeahead);
                     } else {
                         element.bind('blur', saveIfNew);
                     }

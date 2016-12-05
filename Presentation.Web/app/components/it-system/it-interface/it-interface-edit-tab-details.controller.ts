@@ -53,9 +53,10 @@
     }]);
 
     app.controller('system.SystemInterfaceDetailsCtrl', [
-        '$scope', '$http', '$timeout', '$state', 'notify', 'user', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itInterface', 'dataRows',
-        function ($scope, $http, $timeout, $state, notify, user, tsas, interfaces, interfaceTypes, methods, dataTypes, itInterface, dataRows) {
+        '$scope', '$http', '$timeout', '$state', 'notify', 'user', 'tsas', 'interfaces', 'interfaceTypes', 'methods', 'dataTypes', 'itInterface', 'dataRows', 'hasWriteAcess',
+        function ($scope, $http, $timeout, $state, notify, user, tsas, interfaces, interfaceTypes, methods, dataTypes, itInterface, dataRows, hasWriteAcess) {
 
+            $scope.hasWriteAcess = hasWriteAcess;
             $scope.tsas = tsas;
             $scope.interfaces = interfaces;
             $scope.interfaceTypes = interfaceTypes;

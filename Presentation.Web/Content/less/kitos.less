@@ -1047,23 +1047,25 @@ tr.angular-ui-tree-empty {
             width: 100%;
             font-size: 14px;
             font-weight: bold;
-            color: white;
-            text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);
           
-          &.red {
-            background-color: #d9534f;
+            &.red {
+                background-color: #d9534f;
+                color: white;
             }
 
             &.yellow {
                 background-color: #fee822;
+                color: black;
             }
 
             &.green {
                 background-color: #4cae4c;
+                color: white;
             }
 
             &.white {
                 background-color: white;
+                color: black;
             }
         }
     }
@@ -1074,9 +1076,9 @@ tr.angular-ui-tree-empty {
             transform: rotate(120deg);
                 &:after {
                 content: attr(data-rel);
-                left: 22%;
+                left: 26%;
                 position: absolute;
-                top: 33%;
+                top: 34%;
                 transform: rotate(120deg);
             }
         }
@@ -1090,7 +1092,7 @@ tr.angular-ui-tree-empty {
                 content: attr(data-rel);
                 left: 15%;
                 position: absolute;
-                top: 34%;
+                top: 35%;
                 transform: rotate(0deg);
             }
         }
@@ -1102,7 +1104,7 @@ tr.angular-ui-tree-empty {
             transform: rotate(120deg);
             &:after {
                 content: attr(data-rel);
-                left: 15%;
+                left: 12%;
                 position: absolute;
                 top: 27%;
                 transform: rotate(-120deg);
@@ -1123,18 +1125,22 @@ tr.angular-ui-tree-empty {
     border-radius: 50%;
     &.red {
         background-color: #d9534f;
+        color: white;
     }
 
     &.yellow {
         background-color: #fee822;
+        color: black !important;
     }
 
     &.green {
         background-color: #4cae4c;
+        color: white;
     }
 
     &.white {
         background-color: white;
+        color: black !important;
     }
 
     .chart-content {
@@ -1146,8 +1152,6 @@ tr.angular-ui-tree-empty {
             text-align: center;
             font-size: 14px;
             font-weight: bold;
-            color: white;
-            text-shadow: 2px 1px 2px rgba(150, 150, 150, 1);
         }
     }
 } 
@@ -1159,4 +1163,35 @@ tr.angular-ui-tree-empty {
 .kle-align-input-info {
     vertical-align: top;
     margin: 2px 0 0;
+}
+
+
+/* TYPEAHEAD */
+
+.typeahead-items{
+    border-radius: 5px;
+    border: 1px solid black;
+    border-top: 0;
+    .item{
+        height: 30px;
+	    width: 100%;
+	    text-align: left;
+	    background: white;
+	    padding: 5px;
+    }
+
+    .item.title{
+	    font-size: 15px;
+	    font-weight: bold;
+    }
+
+    .subtitle{
+	    font-size: 14px;
+	    color: #444;
+    }
+
+    .active{
+	    background-color: #3a6db5;
+	    color:#f2f2f2;
+    }
 }

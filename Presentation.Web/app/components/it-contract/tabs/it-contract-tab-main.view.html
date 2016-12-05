@@ -171,11 +171,16 @@
                 <!-- Extern contract signer -->
                 <div class="form-group">
                     <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
-                    <input type="text" id="contract-ext-signer" class="form-control input-sm"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.supplierContractSigner"
-                           data-autosave="{{ autoSaveUrl }}"
-                           data-field="supplierContractSigner">
+                    <typeahead id="contract-ext-signer"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave-url="{{ autoSaveUrl }}"
+                               data-items="kitosUsers"
+                               data-field-value="Name"
+                               data-ng-model="contract.supplierContractSigner"
+                               data-placeholder="Angiv kontraktunderskriver"
+                               data-display-value="Name"
+                               data-string-model="stringModel"
+                               data-field="supplierContractSigner"/>
                 </div>
 
                 <!-- Responsible org unit -->
