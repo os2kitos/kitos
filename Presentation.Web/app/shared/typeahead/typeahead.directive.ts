@@ -6,34 +6,25 @@
             restrict: 'AEC',
             scope: {
                 items: '=',
-                prompt: '@',
-                title: '@',
-                subtitle: '@',
-                property: '@',
+                placeholder: '@',
+                displayValue: '@',
+                fieldValue: '@',
                 model: '=ngModel',
-                stringValue: '=',
-                onSelect: '&',
+                stringModel: '=',
                 autosaveUrl: '@',
                 field: '@'
             },
             link: function (scope: any, elem, attrs) {
-
                 if (scope.model) {
-                    var selectedItem = _.find(scope.items, { Id: scope.model });
-                    scope.searchInput = selectedItem.Name;
+                    scope.searchInput = scope.model;
                 }
 
                 scope.handleSelection = function (selectedItem) {
-                    scope.model = selectedItem[scope.property];
-                    scope.searchInput = selectedItem[scope.title];
+                    scope.model = selectedItem[scope.fieldValue];
+                    scope.searchInput = selectedItem[scope.displayValue];
                     scope.current = 0;
-                    scope.selected = true;
-                    $timeout(function () {
-                        scope.onSelect();
-                    }, 200);
                 };
                 scope.current = 0;
-                scope.selected = true; // hides the list initially
                 scope.isCurrent = function (index) {
                     return scope.current == index;
                 };
@@ -48,8 +39,8 @@
                 }
 
                 scope.onBlur = function () {
-                    scope.stringValue = scope.searchInput;
-                    if (angular.isUndefined(scope.model) || !scope.model.length) {
+                    scope.stringModel = scope.searchInput;
+                    if (angular.isUndefined(scope.model) || scope.model.length) {
                         $timeout(function () {
                             scope.showItems = false;
                         }, 200);
@@ -58,12 +49,11 @@
 
                 scope.onKeypress = function (keyEvent) {
                     if (keyEvent.which === 38) {
-                        scope.setCurrent(scope.current - 1)
+                        scope.setCurrent(scope.current - 1);
                     } else if (keyEvent.which === 40) {
                         scope.setCurrent(scope.current + 1);
                     } else if (keyEvent.which === 13) {
                         var filteredItems = $filter('filter')(scope.items, scope.searchInput);
-                        console.log(filteredItems)
                         if (filteredItems.length) {
                             scope.handleSelection(filteredItems[scope.current]);
                         }

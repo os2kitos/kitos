@@ -47,6 +47,13 @@
                                 return result.data.value;
                             });
                         }
+                    ],
+                    kitosUsers: [
+                        '$http', function ($http) {
+                            return $http.get('odata/Users').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
                     ]
                 }
             });
@@ -55,12 +62,13 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, agreementElements, hasWriteAccess, user, autofocus) {
+            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, agreementElements, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
+                $scope.kitosUsers = kitosUsers;
                 autofocus();
 
                 $scope.contractTypes = contractTypes;
@@ -233,15 +241,15 @@
                     var today = new Date();
 
 
-                   if (expirationDate) {
-                    if (expirationDate.length > 10) {
-                        //ISO format
-                        expirationDateObject = new Date(expirationDate);
+                    if (expirationDate) {
+                        if (expirationDate.length > 10) {
+                            //ISO format
+                            expirationDateObject = new Date(expirationDate);
 
-                    } else {
-                        var splitArray = expirationDate.split("-");
-                        expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
-                    }
+                        } else {
+                            var splitArray = expirationDate.split("-");
+                            expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                        }
                     }
 
                     if (concluded) {
