@@ -1,9 +1,17 @@
-﻿<input type="text" ng-model="model" placeholder="{{prompt}}" ng-keydown="selected=false" />
-<br />
-
-<div class="items" ng-hide="!model.length || selected">
-    <div class="item" ng-repeat="item in items | filter:model  track by $index" ng-click="handleSelection(item[title])" style="cursor:pointer" ng-class="{active:isCurrent($index)}" ng-mouseenter="setCurrent($index)">
+﻿<input type="text" data-autosave-typeahead="" 
+       data-model-value="{{ model }}" 
+       data-autosave="{{ autosaveUrl }}" 
+       ng-model="searchInput" 
+       placeholder="{{prompt}}" 
+       ng-keydown="onKeypress($event)" 
+       ng-keydown="selected=false" 
+       data-ng-focus="onFocus()" 
+       data-ng-blur="onBlur()" 
+       data-field="{{ field }}"
+       class="typeahead-input form-control input-sm"'/>
+<div class="typeahead-items" data-ng-show="showItems">
+    <div class="item" ng-repeat="item in items | filter:searchInput track by $index" ng-click="handleSelection(item)" style="cursor:pointer" ng-class="{active:isCurrent($index)}" ng-mouseenter="setCurrent($index)">
         <p class="title">{{item[title]}}</p>
-        <p class="subtitle">{{item[subtitle]}}</p>
+        <!--<p class="subtitle">{{item[subtitle]}}</p>-->
     </div>
 </div>

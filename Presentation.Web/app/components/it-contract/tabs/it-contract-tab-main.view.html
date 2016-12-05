@@ -48,6 +48,19 @@
                                    data-field="contractTypeId">
                     </select-option>
                 </div>
+                <div class="form-group">
+                    <typeahead data-autosave-url="{{ autoSaveUrl }}" 
+                               items="contractTypes" 
+                               data-string-value="hej" 
+                               data-string-property="Name" 
+                               data-property="Id" 
+                               data-ng-model="contract.contractTypeId" 
+                               prompt="Vælg kontrakttype" 
+                               title="Name" 
+                               subtitle="Id" 
+                               data-field="contractTypeId" 
+                               on-select="onItemSelected()" />
+                </div>
             </div>
 
             <!-- 2nd column -->
