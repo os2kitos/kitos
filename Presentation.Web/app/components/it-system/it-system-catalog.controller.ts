@@ -37,7 +37,8 @@
             "moment",
             "notify",
             "user",
-            "gridStateService"
+            "gridStateService",
+            "$uibModal"
         ];
 
         constructor(
@@ -52,7 +53,8 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory,
+            private $uibModal) {
             $rootScope.page.title = "IT System - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -135,7 +137,14 @@
                     serverFiltering: true
                 },
                 toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    {
+                        name: "createITSystem",
+                        text: "Opret IT System",
+                        template: "<a ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
+                    {
+                        name: "excel", text: "Eksportér til Excel", className: "pull-right"
+                    },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -436,6 +445,72 @@
                 ]
             };
         }
+
+        public createITSystem() {
+            var self = this;
+
+            var modalInstance = this.$uibModal.open({
+                // fade in instead of slide from top, fixes strange cursor placement in IE
+                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                windowClass: 'modal fade in',
+                templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
+                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = 'IT System';
+                    $scope.checkAvailableUrl = 'api/itSystem/';
+
+                    $scope.saveAndProceed = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId,
+                            taskRefIds: []
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        self.$http.post('api/itsystem', payload)
+                            .success(function (result: any) {
+                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                var systemId = result.response.id;
+                                $modalInstance.close(systemId);
+                                if (systemId) {
+                                    self.$state.go('it-system.edit.main', { id: systemId });
+                                }
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                            });
+                    };
+
+                    $scope.save = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId,
+                            taskRefIds: []
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        self.$http.post('api/itsystem', payload)
+                            .success(function (result: any) {
+                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                var systemId = result.response.id;
+                                $modalInstance.close(systemId);
+                                if (systemId) {
+                                    self.$state.reload();
+                                }
+
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                            });
+                    };
+                }]
+            });
+
+            /*modalInstance.result.then(function (id) {
+                // modal was closed with OK
+                self.$state.go('it-system.edit.interfaces', { id: id });
+            });*/
+        };
 
         // usagedetails grid empty-grid handling
         private detailsBound(e) {

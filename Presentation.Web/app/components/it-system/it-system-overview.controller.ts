@@ -47,8 +47,7 @@
             "systemRoles",
             "user",
             "gridStateService",
-            "orgUnits",
-            "$uibModal"
+            "orgUnits"
         ];
 
         constructor(
@@ -65,8 +64,7 @@
             private systemRoles: Array<any>,
             private user,
             private gridStateService: Services.IGridStateFactory,
-            private orgUnits: Array<any>,
-            private $modal) {
+            private orgUnits: Array<any>) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -87,72 +85,6 @@
 
             this.activate();
         }
-
-        public createITSystem() {
-            var self = this;
-
-            var modalInstance = this.$modal.open({
-                // fade in instead of slide from top, fixes strange cursor placement in IE
-                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                windowClass: 'modal fade in',
-                templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
-                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
-                    $scope.formData = {};
-                    $scope.type = 'IT System';
-                    $scope.checkAvailbleUrl = 'api/itSystem/';
-
-                    $scope.saveAndProceed = function () {
-                        var payload = {
-                            name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: [],
-                        };
-
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
-                            .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
-                                var systemId = result.response.id;
-                                $modalInstance.close(systemId);
-                                if (systemId) {
-                                    self.$state.go('it-system.edit.main', { id: systemId });
-                                }
-                            }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
-                            });
-                    };
-
-                    $scope.save = function () {
-                        var payload = {
-                            name: $scope.formData.name,
-                            belongsToId: self.user.currentOrganizationId,
-                            organizationId: self.user.currentOrganizationId,
-                            taskRefIds: [],
-                        };
-
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
-                            .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
-                                var systemId = result.response.id;
-                                $modalInstance.close(systemId);
-                                if (systemId) {
-                                    self.$state.reload();
-                                }
-
-                            }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
-                            });
-                    };
-                }]
-            });
-
-            /*modalInstance.result.then(function (id) {
-                // modal was closed with OK
-                self.$state.go('it-system.edit.interfaces', { id: id });
-            });*/
-        };
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
@@ -310,11 +242,6 @@
                     }
                 },
                 toolbar: [
-                    {
-                        name: "createITSystem",
-                        text: "Opret IT System",
-                        template: "<a ng-click='systemOverviewVm.createITSystem()' class='btn btn-success pull-right'>#: text #</a>"
-                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
