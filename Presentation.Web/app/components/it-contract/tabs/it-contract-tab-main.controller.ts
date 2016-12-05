@@ -41,13 +41,6 @@
                             });
                         }
                     ],
-                    contracts: [
-                        '$http', function ($http) {
-                            return $http.get('api/itcontract/').then(function (result) {
-                                return result.data.response;
-                            });
-                        }
-                    ],
                     agreementElements: [
                         '$http', function ($http) {
                             return $http.get('odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
@@ -62,8 +55,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'contracts', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, contracts, agreementElements, hasWriteAccess, user, autofocus) {
+            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, agreementElements, hasWriteAccess, user, autofocus) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
@@ -75,7 +68,6 @@
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
-                $scope.contracts = contracts;
                 $scope.agreementElements = agreementElements;
                 $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
                 $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
@@ -240,8 +232,8 @@
                     var overrule = $scope.contract.active;
                     var today = new Date();
 
-                    
-                   if (expirationDate) { 
+
+                   if (expirationDate) {
                     if (expirationDate.length > 10) {
                         //ISO format
                         expirationDateObject = new Date(expirationDate);
@@ -251,7 +243,7 @@
                         expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
                     }
                     }
-                    
+
                     if (concluded) {
                         if (concluded.length > 10) {
                             //ISO format
