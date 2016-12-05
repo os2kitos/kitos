@@ -6,8 +6,8 @@
         data-ng-model="selectedId"
         data-autosave="{{ autoSaveUrl }}"
         data-appendurl="{{ appendurl }}"
-        data-field="{{ field }}"
-        ng-options="selectedId.Id as selectedId.Name for selectedId in options">
+        data-field="{{ field }}">
+    <option data-ng-repeat="option in options()" value="{{ option.Id }}">{{ option.Name }}</option>
     <!-- {{option.HasWriteAccess && "(skriv)"}} {{option.HasReadAccess && "(læs)"}} -->
 </select>
 
