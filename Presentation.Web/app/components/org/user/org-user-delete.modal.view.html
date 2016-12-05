@@ -13,7 +13,7 @@
     </h5>
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
     
-    <div>
+    <div ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
         <label for="selectedUserId">Alloker roller til: &nbsp;</label>
         <select id="selectedUserId" ng-model="selectedUser" ng-click="ctrl.setSelectedUser(selectedUser)" style="-webkit-text-align-last: center; text-align-last: center;">
             <option selected disabled hidden style='display: none' value=''>Vælg bruger</option>
