@@ -1,17 +1,16 @@
-﻿<input type="text" data-autosave-typeahead="" 
-       data-model-value="{{ model }}" 
-       data-autosave="{{ autosaveUrl }}" 
-       ng-model="searchInput" 
-       placeholder="{{prompt}}" 
-       ng-keydown="onKeypress($event)" 
-       ng-keydown="selected=false" 
-       data-ng-focus="onFocus()" 
-       data-ng-blur="onBlur()" 
+﻿<input type="text" data-autosave-typeahead=""
+       data-model-value="{{ model }}"
+       data-autosave="{{ autosaveUrl }}"
+       ng-model="searchInput"
+       placeholder="{{placeholder}}"
+       ng-keydown="onKeypress($event)"
+       data-ng-focus="onFocus()"
+       data-ng-blur="onBlur()"
        data-field="{{ field }}"
-       class="typeahead-input form-control input-sm"'/>
+       class="typeahead-input form-control input-sm" />
+
 <div class="typeahead-items" data-ng-show="showItems">
     <div class="item" ng-repeat="item in items | filter:searchInput track by $index" ng-click="handleSelection(item)" style="cursor:pointer" ng-class="{active:isCurrent($index)}" ng-mouseenter="setCurrent($index)">
-        <p class="title">{{item[title]}}</p>
-        <!--<p class="subtitle">{{item[subtitle]}}</p>-->
+        <p class="title">{{item[displayValue]}}</p>
     </div>
 </div>
