@@ -36,10 +36,13 @@ namespace Presentation.Web.Controllers.OData
                 {
                     result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
                 }
-                return Ok(result);
+            }
+            else
+            {
+                result = result.Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
             }
 
-            return Ok(result.Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)));
+            return Ok(result.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
