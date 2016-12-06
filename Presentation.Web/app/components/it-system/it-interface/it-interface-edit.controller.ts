@@ -33,10 +33,9 @@
     }]);
 
     app.controller('system.interfaceEditCtrl',
-    [
-        '$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface',
-        function ($rootScope, $scope, user, hasWriteAcess, itInterface) {
-            
-        }
-    ]);
+        [
+            '$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface',
+            function ($rootScope, $scope, user, hasWriteAccess, itInterface) {
+            }
+        ]);
 })(angular, app);
