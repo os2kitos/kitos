@@ -25,7 +25,9 @@ namespace Tests.Unit.Presentation.Web.OData
 {
     public class AuthenticationServiceTest
     {
+        private IGenericRepository<Report> _reportRepository;
         private ItContractsController _itContractsController;
+        private ReportsController _reportsController;
         private IGenericRepository<User> _userRepository;
         private IGenericRepository<ItContract> _itContractRepository;
         private IGenericRepository<OrganizationUnit> _organizationUnitRepository;
@@ -39,6 +41,7 @@ namespace Tests.Unit.Presentation.Web.OData
 
         private void SetUp()
         {
+            _reportRepository = Substitute.For<IGenericRepository<Report>>();
             _itContractRepository = Substitute.For<IGenericRepository<ItContract>>();
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
@@ -46,17 +49,91 @@ namespace Tests.Unit.Presentation.Web.OData
             _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<ItContract> contracts = new EnumerableQuery<ItContract>(new List<ItContract>
             {
-                new ItContract {OrganizationId = 1,Name = "Contract belongs to org 1"}, new ItContract { OrganizationId = 2, Name = "Contract belongs to org 2" }
+                new ItContract {OrganizationId = 1,Name = "Contract belongs to org 1"},
+                new ItContract { OrganizationId = 2, Name = "Contract belongs to org 2" }
             });
             _itContractRepository.AsQueryable().Returns(contracts);
+
+            IQueryable<Report> reports = new EnumerableQuery<Report>(new List<Report>
+            {
+                new Report { AccessModifier = AccessModifier.Local, OrganizationId = 1, Name = "Test fra org 1 med Local"},
+                new Report { AccessModifier = AccessModifier.Public, OrganizationId = 1, Name = "Test fra org 1 med Public"},
+                new Report { AccessModifier = AccessModifier.Local, OrganizationId = 2, Name = "Test fra org 2 med Local"},
+            });
+            _reportRepository.AsQueryable().Returns(reports);
 
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
 
             _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository, _authenticationService);
+            _reportsController = new ReportsController(_reportRepository, _authenticationService);
+
 
             var usr = new UserMock(_itContractsController, "1");
             usr.LogOn();
+            var usr1 = new UserMock(_reportsController, "1");
+            usr1.LogOn();
+        }
+
+
+        [Fact]
+        // test AuthenticationService.HasReadAccessOutsideContext true
+        public void hasReadAccessOutsideContext_returns_three_reports()
+        {
+            // Arrange
+            const int orgKey = 1;
+            var user = SetAccess(true, orgKey, isGlobalmin: true, organizationCategory: OrganizationCategory.Municipality);
+            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+
+            // Act
+            var result = _reportsController.Get();
+
+            // Assert
+            Assert.IsType<OkNegotiatedContentResult<IQueryable<Report>>>(result);
+            var okNegotiatedContentResult = result as OkNegotiatedContentResult<IQueryable<Report>>;
+            okNegotiatedContentResult.Should().NotBeNull("List should have three items");
+            Debug.Assert(okNegotiatedContentResult != null, "okNegotiatedContentResult != null");
+            okNegotiatedContentResult.Content.Should().HaveCount(3);
+        }
+
+        [Fact]
+        // test AuthenticationService.HasReadAccessOutsideContext true
+        public void hasReadAccessOutsideContext_returns_two_reports()
+        {
+            // Arrange
+            const int orgKey = 1;
+            var user =SetAccess(true, orgKey, isGlobalmin: false, organizationCategory: OrganizationCategory.Municipality);
+            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+
+            // Act
+            var result = _reportsController.Get();
+
+            // Assert
+            Assert.IsType<OkNegotiatedContentResult<IQueryable<Report>>>(result);
+            var okNegotiatedContentResult = result as OkNegotiatedContentResult<IQueryable<Report>>;
+            okNegotiatedContentResult.Should().NotBeNull("List should have two items");
+            Debug.Assert(okNegotiatedContentResult != null, "okNegotiatedContentResult != null");
+            okNegotiatedContentResult.Content.Should().HaveCount(2);
+        }
+
+        [Fact]
+        // test AuthenticationService.HasReadAccessOutsideContext true
+        public void hasReadAccessOutsideContext_returns_two_reports_differentOrg()
+        {
+            // Arrange
+            const int orgKey = 2;
+            var user = SetAccess(true, orgKey, isGlobalmin: false, organizationCategory: OrganizationCategory.Municipality);
+            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+
+            // Act
+            var result = _reportsController.Get();
+
+            // Assert
+            Assert.IsType<OkNegotiatedContentResult<IQueryable<Report>>>(result);
+            var okNegotiatedContentResult = result as OkNegotiatedContentResult<IQueryable<Report>>;
+            okNegotiatedContentResult.Should().NotBeNull("List should have two items");
+            Debug.Assert(okNegotiatedContentResult != null, "okNegotiatedContentResult != null");
+            okNegotiatedContentResult.Content.Should().HaveCount(2);
         }
 
         [Fact]
@@ -65,8 +142,8 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // Arrange
             const int orgKey = 1;
-            SetAccess(true, orgKey, isGlobalmin: true);
-
+            var user = SetAccess(true, orgKey, isGlobalmin: true);
+            _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
 
 
             // Act
@@ -86,7 +163,8 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // Arrange
             const int orgKey = 1;
-            SetAccess(true, orgKey, isGlobalmin: false);
+            var user = SetAccess(true, orgKey, isGlobalmin: false);
+            _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
 
             IQueryable<ItContract> list = new EnumerableQuery<ItContract>(new List<ItContract>
             {
@@ -113,7 +191,8 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // arrange
             var orgKey = 2;
-            SetAccess(true, orgKey: 1, isGlobalmin: false);
+            var user =SetAccess(true, orgKey: 1, isGlobalmin: false);
+            _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
 
             // act
             var result = _itContractsController.GetItContractsByOrgUnit(orgKey, 2);
@@ -132,7 +211,8 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // arrange
             var orgKey = 1;
-            SetAccess(true, orgKey: 1, isGlobalmin: false);
+            var user = SetAccess(true, orgKey: 1, isGlobalmin: false);
+            _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
 
             // act
             var result = _itContractsController.GetItContractsByOrgUnit(orgKey, 1);
@@ -173,8 +253,6 @@ namespace Tests.Unit.Presentation.Web.OData
             {
                 var user = CreateTestUser(orgKey, isGlobalmin, role, organizationCategory);
                 list.Add(user);
-
-                _itContractsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
             }
 
             _userRepository.Get(Arg.Any<Expression<Func<User, bool>>>())
