@@ -395,7 +395,7 @@
                             () => {
                                 // Cancel
                                 // GOTO parent state
-                                $state.go("^");
+                                $state.go("^", null, { reload: true });
                             });
                     }
                 ]

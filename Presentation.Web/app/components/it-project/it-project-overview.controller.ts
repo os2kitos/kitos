@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewController {
-        mainGrid: IKendoGrid<IItProjectOverview>;
+        mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: kendo.ui.DropDownListOptions;
 
@@ -23,7 +23,7 @@
         private storageKey = "it-project-overview-options";
         private orgUnitStorageKey = "it-project-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        public mainGrid: IKendoGrid<IItProjectOverview>;
+        public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
         public static $inject: Array<string> = [
@@ -232,7 +232,7 @@
         };
 
         private activate() {
-            var mainGridOptions: IKendoGridOptions<IItProjectOverview> = {
+            var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -782,10 +782,11 @@
                         ]
                     },
                     {
-                        field: "Rights", title: `${this.user.fullName}`, width: 150,
+                        field: "usersRoles", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
                         //template: item => item.Rights ? item.Rights.every(x => x.Role.Name) : "",
-                        template: () => `<div ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}} </div>`,
+                        template: () => `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}, </span>`,
+                        attributes: { "class": "might-overflow" },
                         hidden: true,
                         sortable: false,
                         filterable: false
