@@ -6,6 +6,7 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Ninject.Infrastructure.Language;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -27,10 +28,21 @@ namespace Presentation.Web.Controllers.OData
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-                return Ok(Repository.AsQueryable());
+            var result = Repository.AsQueryable().ToEnumerable();
 
-            return Ok(Repository.AsQueryable().Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)));
+            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            {
+                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !_authService.IsGlobalAdmin(UserId))
+                {
+                    result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
+                }
+            }
+            else
+            {
+                result = result.Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
+            }
+
+            return Ok(result.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
