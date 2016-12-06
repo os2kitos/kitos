@@ -17,10 +17,9 @@
         </thead>
 
         <!-- contract signer -->
-        <tbody>
-
+        <!--<tbody>-->
             <!-- show -->
-            <tr data-ng-hide="contractSigner.edit">
+            <!--<tr data-ng-hide="contractSigner.edit">
                 <td>Kontraktunderskriver</td>
                 <td>
                     <span data-ng-if="contractSigner.signer">{{ contractSigner.signer.fullName }}</span>
@@ -41,10 +40,10 @@
                         </a>
                     </div>
                 </td>
-            </tr>
+            </tr>-->
 
             <!-- edit -->
-            <tr data-ng-show="contractSigner.edit">
+            <!--<tr data-ng-show="contractSigner.edit">
                 <td>Kontraktunderskriver</td>
                 <td colspan="2" class="relative-position">
                     <input id="contract-signer-user"
@@ -61,7 +60,7 @@
                     </div>
                 </td>
             </tr>
-        </tbody>
+        </tbody>-->
 
         <!-- for each right -->
         <tbody data-ng-repeat="right in rights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
