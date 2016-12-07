@@ -102,8 +102,10 @@ namespace Core.ApplicationServices
                 }
                 if (user.DefaultOrganization.Type.Category == OrganizationCategory.Municipality)
                 {
-                    // organizations of type OrganizationCategory.Municipality have read access to other organizations
-                    return true;
+                    // organizations of type OrganizationCategory.Municipality have read access
+                    // to other organizations unless AccessModifier is set to local
+                    return (awareEntity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
+                    
                 }
             }
 

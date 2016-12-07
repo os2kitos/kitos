@@ -57,6 +57,8 @@
         public selecterUser: any;
         public isUserSelected: boolean;
         public curOrganization: string;
+        public dirty: boolean;
+        public disabled: boolean;
 
         private userId: number;
         private firstName: string;
@@ -119,6 +121,7 @@
             this.itemSelected = false;
             this.isUserSelected = true;
             this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;
+            this.disabled = true;
         }
 
         public initCollections = (collection, output) => {
@@ -127,10 +130,16 @@
             }
         }
 
+        public disableBtns(val) {
+            this.disabled = val;
+        }
+
         public collectionUpdate = (module, object, isChecked, selectedUser) => {
+            this.disableBtns(this.isUserSelected);
             if (selectedUser == null) {
             } else {
                 if (isChecked) {
+                    this.dirty = false;
                     var data = JSON.parse(selectedUser);
                     var userRoles: UserRole = {
                         modul: module,
@@ -171,7 +180,7 @@
                     if (module === "OrganizationRights") {
                         this.adminRoles.del(object.Id);
                     }
-                } 
+                }
             }
         }
 
@@ -182,6 +191,7 @@
                 var data = JSON.parse(item);
                 this.selecterUser = data;
                 this.isUserSelected = false;
+                this.disableBtns(this.isUserSelected);
             }
         }
         
@@ -291,6 +301,7 @@
         public assign() {
             this.patchData();
             this.notify.addSuccessMessage("Brugerens roller er ændret");
+            this.disableBtns(true);
         }
 
         public cancel() {
@@ -395,7 +406,7 @@
                             () => {
                                 // Cancel
                                 // GOTO parent state
-                                $state.go("^");
+                                $state.go("^", null, { reload: true });
                             });
                     }
                 ]

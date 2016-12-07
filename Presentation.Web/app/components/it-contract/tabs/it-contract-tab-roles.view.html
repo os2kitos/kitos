@@ -8,17 +8,19 @@
         <thead>
             <tr>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Kontraktrolle</button></th>
+                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('roleName')">Kontraktrolle</button>
+                </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button></th>
+                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userName')">Navn</button>
+                </th>
                 <th>
-                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button></th>
+                    <button class="btn btn-link btn-header" data-ng-click="rightSortChange('userEmail')">Email</button>
+                </th>
             </tr>
         </thead>
 
         <!-- contract signer -->
         <tbody>
-
             <!-- show -->
             <tr data-ng-hide="contractSigner.edit">
                 <td>Kontraktunderskriver</td>
@@ -70,15 +72,16 @@
             <tr data-ng-hide="right.edit">
                 <td>{{ right.role.Name }} <span data-ng-if="!checkIfRoleIsAvailable(right.role.Id)">(udgået)</span> <a uib-tooltip="{{ right.role.Description }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
                 <td>{{ right.user.fullName }}</td>
-                <td>{{ right.user.email }}
+                <td>
+                    {{ right.user.email }}
                     <div data-ng-show="hasWriteAccess" class="pull-right">
                         <a class="btn btn-info btn-xs edit-right"
                            data-ng-click="right.edit = true">
                             <i class="glyphicon glyphicon-pencil"></i>
                         </a>
                         <a class="btn btn-danger btn-xs delete-right"
-                            data-confirmed-click="deleteRight(right)"
-                            data-confirm-click="Er du sikker på at du vil slette?">
+                           data-confirmed-click="deleteRight(right)"
+                           data-confirm-click="Er du sikker på at du vil slette?">
                             <i class="glyphicon glyphicon-trash"></i>
                         </a>
                     </div>
