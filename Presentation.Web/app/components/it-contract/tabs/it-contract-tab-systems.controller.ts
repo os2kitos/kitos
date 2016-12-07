@@ -24,6 +24,13 @@
                                 return result.data.response;
                             });
                         }
+                    ],
+                    agreementElements: [
+                        '$http', function ($http) {
+                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
+                                return result.data.value;
+                            });
+                        }
                     ]
                 }
             });
@@ -31,11 +38,16 @@
     ]);
 
     app.controller('contract.EditSystemsCtrl', [
-        '$scope', '$http', '$state', 'notify', 'user', 'contract', 'exhibitedInterfaces', 'usedInterfaces',
-        function($scope, $http, $state, notify, user, contract, exhibitedInterfaces, usedInterfaces) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'contract', 'exhibitedInterfaces', 'usedInterfaces', 'agreementElements',
+        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements) {
 
+            $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
             $scope.exhibitedInterfaces = exhibitedInterfaces;
             $scope.usedInterfaces = usedInterfaces;
+
+            $scope.agreementElements = agreementElements;
+            $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
+            $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
 
             $scope.deleteExhibit = function(exhibitId, usageId) {
                 $http({
