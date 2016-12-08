@@ -170,7 +170,7 @@
 
                 var isSystemActive = (isTodayBetween || overrule);
 
-                $scope.usage.isActive = isSystemActive;
+                $scope.usage.itSystem.isActive = isSystemActive;
             }
         }
     ]);
