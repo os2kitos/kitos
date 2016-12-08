@@ -88,5 +88,10 @@ namespace Presentation.Web.Models
         ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
         /// </value>
         public bool IsUsed { get; set; }
+        public bool? Active { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? Concluded { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+
     }
 }

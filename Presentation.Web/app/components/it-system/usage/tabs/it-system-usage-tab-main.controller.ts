@@ -34,17 +34,31 @@
     }]);
 
     app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage',
-        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, autofocus) {
+        'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess',
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
-
+            $scope.autoSaveUrl = 'api/itsystem/' + $stateParams.id;
+            $scope.autosaveUrl2 = 'api/itsystem/' + $scope.usage.id;
             $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
+            $scope.hasWriteAccess = hasWriteAccess;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
+
+            var today = new Date();
+
+            if (!itSystemUsage.active) {
+                if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
+                    $scope.displayActive = true;
+                } else {
+                    $scope.displayActive = false;
+                }
+            } else {
+                $scope.displayActive = false;
+            }
 
             if (itSystemUsage.overviewId) {
                 $scope.usage.overview = {
@@ -52,6 +66,10 @@
                     text: itSystemUsage.overviewItSystemName
                 };
             }
+            $scope.datepickerOptions = {
+                format: "dd-MM-yyyy",
+                parseFormats: ["yyyy-MM-dd"]
+            };
 
             $scope.orgUnits = itSystemUsage.usedBy;
 
@@ -82,8 +100,6 @@
                         results: function (data, page) {
                             var results = [];
 
-                            console.log(data);
-
                             _.each(data.data.response, function (obj: { id; itSystem; cvr; }) {
                                 if (excludeSelf && obj.id == $scope.usageId)
                                     return; // don't add self to result
@@ -99,6 +115,62 @@
                         }
                     }
                 };
+            }
+
+            $scope.checkSystemValidity = function () {
+                var expirationDateObject, concludedObject;
+                var expirationDate = $scope.usage.itSystem.expirationDate;
+                var concluded = $scope.usage.itSystem.concluded;
+                var overrule = $scope.usage.itSystem.active;
+
+                var today = new Date();
+
+
+                if (expirationDate) {
+                    if (expirationDate.length > 10) {
+                        //ISO format
+                        expirationDateObject = new Date(expirationDate);
+
+                    } else {
+                        var splitArray = expirationDate.split("-");
+                        expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                    }
+                }
+
+                if (concluded) {
+                    if (concluded.length > 10) {
+                        //ISO format
+                        concludedObject = new Date(concluded);
+
+                    } else {
+                        var splitArray = concluded.split("-");
+                        concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                    }
+                }
+
+                if (concluded && expirationDate) {
+
+                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
+
+                }
+                else if (concluded && !expirationDate) {
+
+                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0));
+
+                }
+                else if (!concluded && !expirationDate) {
+                    isTodayBetween = true;
+
+                }
+                else if (!concluded && expirationDate) {
+
+                    var isTodayBetween = (today < expirationDateObject.setHours(23, 59, 59, 999));
+
+                }
+
+                var isSystemActive = (isTodayBetween || overrule);
+
+                $scope.usage.itSystem.isActive = isSystemActive;
             }
         }
     ]);
