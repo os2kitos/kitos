@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItContractOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        //roleSelectorOptions: kendo.ui.DropDownListOptions;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -32,7 +32,7 @@
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        private roleSelectorDataSource = this._.clone(this.itContractRoles);
+        //private roleSelectorDataSource = this._.clone(this.itContractRoles);
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -220,10 +220,11 @@
         }
 
         private activate() {
-            var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
-            this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
-            clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
-            this.roleSelectorDataSource = clonedItContractRoles;
+            // TODO anvendes umiddelbart ikke længere
+            //var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
+            //this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
+            //clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
+            //this.roleSelectorDataSource = clonedItContractRoles;
 
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -232,6 +233,7 @@
                     transport: {
                         read: {
                             url: (options) => {
+                                // TODO ContractSigner skal fjernes
                                 var urlParameters = `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
@@ -647,6 +649,7 @@
                 field: "ContractSigner.Name",
                 title: "Kontraktunderskriver",
                 persistId: "roleSigner",
+                // TODO ContractSigner ændres fra User objekt til string så template skal opdateres
                 template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}` : "",
                 width: 200,
                 hidden: true,
@@ -867,25 +870,26 @@
             });
         }
 
-        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
-            return {
-                autoBind: false,
-                dataSource: this.roleSelectorDataSource,
-                dataTextField: "Name",
-                dataValueField: "Id",
-                optionLabel: "Vælg kontraktrolle...",
-                change: e => {
-                    // hide all roles column
-                    this.mainGrid.hideColumn("ContractSigner.Name");
-                    this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
+        // TODO funktionen er ikke anvendt længere
+        //public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
+        //    return {
+        //        autoBind: false,
+        //        dataSource: this.roleSelectorDataSource,
+        //        dataTextField: "Name",
+        //        dataValueField: "Id",
+        //        optionLabel: "Vælg kontraktrolle...",
+        //        change: e => {
+        //            // hide all roles column
+        //            this.mainGrid.hideColumn("ContractSigner.Name");
+        //            this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
 
-                    var selectedId = e.sender.value();
-                    //var gridFieldName = "role" + selectedId;
-                    // show only the selected role column
-                    this.mainGrid.showColumn(selectedId);
-                }
-            }
-        };
+        //            var selectedId = e.sender.value();
+        //            //var gridFieldName = "role" + selectedId;
+        //            // show only the selected role column
+        //            this.mainGrid.showColumn(selectedId);
+        //        }
+        //    }
+        //};
 
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";
