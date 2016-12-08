@@ -41,13 +41,6 @@
                             });
                         }
                     ],
-                    agreementElements: [
-                        '$http', function ($http) {
-                            return $http.get('odata/LocalAgreementElementTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
-                                return result.data.value;
-                            });
-                        }
-                    ],
                     kitosUsers: [
                         '$http', function ($http) {
                             return $http.get('odata/Users').then(function (result) {
@@ -62,8 +55,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'agreementElements', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, agreementElements, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
@@ -76,9 +69,6 @@
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
-                $scope.agreementElements = agreementElements;
-                $scope.selectedAgreementElementIds = _.map(contract.agreementElements, 'id');
-                $scope.selectedAgreementElementNames = _.map(contract.agreementElements, 'name');
 
                 var today = new Date();
 

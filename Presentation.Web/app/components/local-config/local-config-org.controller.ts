@@ -24,7 +24,7 @@
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
-                    serverFiltering: true
+                    serverFiltering: true,
                 } as kendo.data.DataSourceOptions,
                 toolbar: [
                     {
@@ -41,7 +41,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [2, 10, 25, 50, 100, 200],
                     buttonCount: 5
                 },
                 sortable: {
