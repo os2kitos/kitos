@@ -640,6 +640,18 @@ Kontakt: info@kitos.dk",
 
             #endregion
 
+            #region Global Config
+
+            if (!context.GlobalConfigs.Any(x => x.key == "CanGlobalAdminOnlyEditReports"))
+            {
+                var globalConfig = new GlobalConfig { key = "CanGlobalAdminOnlyEditReports", value = "true" };
+                context.GlobalConfigs.AddOrUpdate(globalConfig);
+
+                context.SaveChanges();
+            }
+
+            #endregion
+
             //#region KLE
 
             //var orgUnit = context.Organizations.Single(x => x.Name == "Fælles Kommune").OrgUnits.First();

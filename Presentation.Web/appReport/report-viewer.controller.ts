@@ -11,42 +11,52 @@ module Kitos.Reports {
 
         emptyreport = { "ReportVersion": "2016.1.28", "ReportGuid": "9ad83767ecc3b68cb62c086805556fce", "ReportName": "Report", "ReportAlias": "Report","ReportAuthor":"","ReportDescription":"", "ReportCreated": "/Date(1472651877000+0200)/", "ReportChanged": "/Date(1472651877000+0200)/", "EngineVersion": "EngineV2", "CalculationMode": "Interpretation", "Dictionary": { "Variables": { "0": { "Name": "CurrentOrganizationName", "DialogInfo": { "DateTimeType": "DateAndTime" }, "Alias": "CurrentOrganizationName", "Type": "System.String", "ReadOnly": true } } }, "Pages": { "0": { "Ident": "StiPage", "Name": "Page1", "Guid": "a4875a4e-cd43-da99-360b-a7560ca0b913", "Interaction": { "Ident": "StiInteraction" }, "Border": ";;2;;;;;solid:Black", "Brush": "solid:Transparent", "Components": { "0": { "Ident": "StiText", "Name": "Text1", "MinSize": "0,0", "MaxSize": "0,0", "ClientRectangle": "0.6,4.8,17.4,4.2", "Interaction": { "Ident": "StiInteraction" }, "Text": { "Value": "Rapporten er tom og venter på at blive designet." }, "HorAlignment": "Center", "Font": "Verdana;28;;", "Border": ";;;;;;;solid:Black", "Brush": "solid:Transparent", "TextBrush": "solid:Black", "TextOptions": { "WordWrap": true }, "Type": "Expression" } }, "PageWidth": 21.01, "PageHeight": 29.69, "Watermark": { "TextBrush": "solid:50,0,0,0" }, "Margins": { "Left": 1, "Right": 1, "Top": 1, "Bottom": 1 } } } }
 
-        public static $inject = ["stimulsoftService", "reportService", "$window", "notify", "userService"];
+        public static $inject = ["stimulsoftService", "reportService", "$window", "notify", "userService", "$http", "_"];
         constructor(private stimulsoftService: Kitos.Services.StimulsoftService,
             private reportService: Kitos.Services.ReportService,
             private $window: ng.IWindowService,
             private notify,
-            private userService: Services.IUserService) {
+            private userService: Services.IUserService,
+            private $http,
+            private _) {
             let self = this;
 
 
             this.userService.getUser()
                 .then((user: Services.IUser) => {
-                    self.canDesignReport = user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
-                    // 02/11 MEMA: The translation is far from done. Add back, when translated.
-                    //stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
+                    this.$http.get("odata/GlobalConfigs").then(result => {
+                        var globalConfigs = result.data.value;
 
-                    this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
+                        var canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g:any) {
+                            return g.key === "CanGlobalAdminOnlyEditReports";
+                        });
+                        
+                        self.canDesignReport = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
+                        // 02/11 MEMA: The translation is far from done. Add back, when translated.
+                        //stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
 
-                    // Add the design button event
-                    this.viewer.onDesignReport = function(e) {
-                        this.visible = false;
+                        this.viewer = stimulsoftService.getViewer(this.buildViewerOptions(), "Viewer");
 
-                        // create designer object
-                        this.designer = stimulsoftService.getDesigner(self.buildDesignerOptions(), "designer");
-                        // bind events to designer object
-                        this.designer.onExit = self.designerOnExit;
-                        this.designer.onSaveReport = self.designerSaveReport;
-                        // render designer on dom element
-                        this.designer.renderHtml("reportDesigner");
-                        this.designer.visible = true;
-                        this.designer.report = e.report;
-                    };
+                        // Add the design button event
+                        this.viewer.onDesignReport = function (e) {
+                            this.visible = false;
 
-                    this.viewer.showProcessIndicator();
-                    this.viewer.renderHtml("reportViewer");
-                    this.loadReport(this.getReportId(), user);
-                });
+                            // create designer object
+                            this.designer = stimulsoftService.getDesigner(self.buildDesignerOptions(), "designer");
+                            // bind events to designer object
+                            this.designer.onExit = self.designerOnExit;
+                            this.designer.onSaveReport = self.designerSaveReport;
+                            // render designer on dom element
+                            this.designer.renderHtml("reportDesigner");
+                            this.designer.visible = self.canDesignReport;
+                            this.designer.report = e.report;
+                        };
+
+                        this.viewer.showProcessIndicator();
+                        this.viewer.renderHtml("reportViewer");
+                        this.loadReport(this.getReportId(), user);
+                    });
+                })
         }
 
         getReportId = () => {

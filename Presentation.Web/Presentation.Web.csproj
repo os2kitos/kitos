@@ -317,6 +317,7 @@
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
+    <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />

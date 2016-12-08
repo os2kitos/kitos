@@ -16,7 +16,7 @@
         public title: string;
         public mainGrid: Kitos.IKendoGrid<any>;
         public mainGridOptions: kendo.ui.GridOptions;
-        private canCreate: boolean = true;
+        private canCreate: boolean;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -31,7 +31,8 @@
             "notify",
             "user",
             "reports",
-            "$confirm"
+            "$confirm",
+            "globalConfig"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
@@ -46,9 +47,16 @@
             private notify,
             private user: Services.IUser,
             public reports,
-            private $confirm) {
+            private $confirm,
+            private globalConfigs) {
 
             this.$rootScope.page.title = "Rapport Oversigt";
+
+            var canGlobalAdminOnlyEditReports = _.find(this.globalConfigs, function (g: any) {
+                return g.key === "CanGlobalAdminOnlyEditReports";
+            });
+
+            this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
@@ -184,15 +192,10 @@
             this.mainGridOptions = {
                 autoBind: false,
                 dataBinding: (e) => {
-                    let isGlobalAdmin = this.user.isGlobalAdmin;
-                    let isReportAdmin = this.user.isReportAdmin || this.user.isLocalAdmin;
                     let currentOrganizationId = this.user.currentOrganizationId;
 
-                    this.canCreate = isGlobalAdmin || isReportAdmin;
-
                     for (let i = 0; i < e.items.length; i++) {
-                        e.items[i].canEdit = isGlobalAdmin ||
-                            (isReportAdmin && e.items[i].OrganizationId == currentOrganizationId);
+                        e.items[i].canEdit = (this.canCreate && e.items[i].OrganizationId == currentOrganizationId);
                     }
                 },
                 dataSource: dataSource,
@@ -229,7 +232,7 @@
                     { field: "Description", title: "Beskrivelse", width: "250px", menu: false },
                     {
                         field: "CategoryTypeId",
-                        title: "Category",
+                        title: "Kategori",
                         width: "180px",
                         menu: false,
                         template: dataitem => dataitem.CategoryType ? dataitem.CategoryType.Name : ""
@@ -287,7 +290,10 @@
                     controllerAs: "vm",
                     resolve: {
                         user: ["userService", userService => userService.getUser()],
-                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)]
+                        reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)],
+                        globalConfig: [
+                            "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
+                        ]
                     }
                 });
             }

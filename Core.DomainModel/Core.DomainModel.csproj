@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExternalReference.cs" />
+    <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
