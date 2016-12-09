@@ -195,7 +195,7 @@
                     let currentOrganizationId = this.user.currentOrganizationId;
 
                     for (let i = 0; i < e.items.length; i++) {
-                        e.items[i].canEdit = (this.canCreate && e.items[i].OrganizationId == currentOrganizationId);
+                        e.items[i].canEdit = (this.user.isGlobalAdmin || this.canCreate && e.items[i].OrganizationId == currentOrganizationId);
                     }
                 },
                 dataSource: dataSource,
