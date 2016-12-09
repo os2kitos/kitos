@@ -5,7 +5,7 @@ namespace Core.DomainModel.Reports
         public string Name { get; set; }
         public string Description { get; set; }
         public int? CategoryTypeId { get; set; }
-        public ReportCategoryType CategoryType { get; set; }
+        public virtual ReportCategoryType CategoryType { get; set; }
         public int OrganizationId { get; set; }
         public virtual Organization.Organization Organization { get; set; }
 
