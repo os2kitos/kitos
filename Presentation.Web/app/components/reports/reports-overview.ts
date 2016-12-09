@@ -104,7 +104,7 @@
                 transport: {
                     read: {
                         url: function () {
-                            return baseUrl + "?$expand=CategoryType,LastChangedByUser($select=Id,Name,LastName)";
+                            return baseUrl + "?$expand=CategoryType,Organization,LastChangedByUser($select=Id,Name,LastName)";
                         },
                         dataType: "json"
                     },
@@ -252,6 +252,13 @@
                                 return "";
                             }
                         }
+                    },
+                    {
+                        field: "Organization",
+                        title: "Organisation",
+                        width: "60px",
+                        menu: false,
+                        template: dataitem => dataitem.Organization ? dataitem.Organization.Name : ""
                     },
                     {
                         field: "LastChanged",
