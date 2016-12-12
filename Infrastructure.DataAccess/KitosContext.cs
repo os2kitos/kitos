@@ -94,6 +94,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
+        public DbSet<AccessType> AccessTypes { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<TsaType> TsaTypes { get; set; }
