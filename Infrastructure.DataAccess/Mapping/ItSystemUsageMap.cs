@@ -56,6 +56,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.ItSystemUsage)
                 .HasForeignKey(d => d.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.AccessTypes)
+                .WithMany(t => t.ItSystemUsages);
         }
     }
 }
