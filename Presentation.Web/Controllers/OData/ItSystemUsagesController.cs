@@ -107,35 +107,5 @@ namespace Presentation.Web.Controllers.OData
             Repository.Save();
             return StatusCode(HttpStatusCode.NoContent);
         }
-
-        public IHttpActionResult DeleteRef([FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty)
-        {
-            var itSystemUsage = Repository.GetByKey(key);
-            if (itSystemUsage == null)
-            {
-                return StatusCode(HttpStatusCode.NotFound);
-            }
-
-            switch (navigationProperty)
-            {
-                case "AccessTypes":
-                    var accessTypeId = Convert.ToInt32(relatedKey);
-                    var accessType = _accessTypeRepository.GetByKey(accessTypeId);
-
-                    if (accessType == null)
-                    {
-                        return NotFound();
-                    }
-                    itSystemUsage.AccessTypes.Remove(accessType);
-                    break;
-                default:
-                    return StatusCode(HttpStatusCode.NotImplemented);
-
-            }
-            Repository.Save();
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
     }
 }
