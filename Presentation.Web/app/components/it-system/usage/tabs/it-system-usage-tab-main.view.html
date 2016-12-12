@@ -89,7 +89,7 @@
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="usage.itSystem.concluded"
+                       data-ng-model="usage.concluded"
                        data-autosave="{{ autosaveUrl2 }}"
                        data-ng-blur="checkSystemValidity()"
                        data-field="concluded">
@@ -99,7 +99,7 @@
                 <input type="text" class="form-control" id="agreement-expiration"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
-                       data-ng-model="usage.itSystem.expirationDate"
+                       data-ng-model="usage.expirationDate"
                        data-ng-blur="checkSystemValidity()"
                        data-autosave="{{ autosaveUrl2 }}"
                        data-field="expirationDate">
@@ -107,15 +107,15 @@
             <div class="checkbox">
                 <label>
                     <input type="checkbox" id="system-int-signed"
-                           data-ng-model="usage.itSystem.active"
+                           data-ng-model="usage.active"
                            data-ng-disabled="!hasWriteAccess"
                            data-autosave="{{ autoSaveUrl }}"
                            data-field="active"
                            data-ng-change="checkSystemValidity()">
                     Gyldig &emsp;
                 </label>
-                <span class="fa fa-file text-success" data-ng-hide="!usage.itSystem.isActive" aria-hidden="true"></span>
-                <span class="fa fa-file-o text-muted" data-ng-hide="usage.itSystem.isActive" aria-hidden="true"></span>
+                <span class="fa fa-file text-success" data-ng-hide="!usage.isActive" aria-hidden="true"></span>
+                <span class="fa fa-file-o text-muted" data-ng-hide="usage.isActive" aria-hidden="true"></span>
             </div>
         </div>
     </div>
