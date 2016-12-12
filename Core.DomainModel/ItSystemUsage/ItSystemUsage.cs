@@ -16,6 +16,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
+            this.AccessTypes = new List<AccessType>();
             this.TaskRefsOptOut = new List<TaskRef>();
             this.ItInterfaceUsages = new List<ItInterfaceUsage>();
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
@@ -201,6 +202,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }
+        public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         /// <summary>
         /// Determines whether this instance is within a given organizational context.

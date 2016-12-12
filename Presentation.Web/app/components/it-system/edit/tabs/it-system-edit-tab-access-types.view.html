@@ -1,0 +1,54 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        <i class="glyphicon glyphicon-tasks"></i>
+        Adgangsstyringer
+    </div>
+    <div class="panel-body">
+        <form class="form-inline">
+            <label>Navn</label>
+            <div class="row">
+                <div class="col-xs-4">
+                    <div class="form-group">
+                        <input type="text" data-ng-model="accessTypeName" class="form-control input-sm" />
+                    </div>
+                </div>
+                <div class="col-xs-2">
+                    <button type="submit" data-ng-click="add()" data-ng-disabled="!accessTypeName" class="btn">Tilføj</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <!--<th>
+                    
+                </th>-->
+                <th class="col-xs-2">
+                    Navn
+                </th>
+                <th class="col-xs-2">
+                    Slet
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-ng-repeat="accessType in accessTypes">
+                <!-- selected -->
+                <!--<td>
+                    <input type="checkbox"
+                           id="{{task.taskRef.id}}"
+                           data-ng-checked="task.isSelected"
+                           data-ng-click="save(task)"
+                           data-ng-disabled="!hasWriteAccess" />
+                </td>-->
+                <td>
+                    {{accessType.Name}}
+                </td>
+                <td>
+                    <a data-ng-click="remove(accessType.Id)"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
