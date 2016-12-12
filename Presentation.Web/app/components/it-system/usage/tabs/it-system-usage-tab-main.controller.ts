@@ -38,15 +38,16 @@
         function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
-            autofocus();
-            $scope.autoSaveUrl = 'api/itsystem/' + $stateParams.id;
-            $scope.autosaveUrl2 = 'api/itsystem/' + $scope.usage.id;
+            $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
+            $scope.autosaveUrl2 = 'api/itsystemusage/' + $scope.usage.id;
             $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
+
+            autofocus();
 
             var today = new Date();
 
@@ -117,11 +118,11 @@
                 };
             }
 
-            $scope.checkSystemValidity = function () {
+            $scope.checkSystemValidity = () => {
                 var expirationDateObject, concludedObject;
-                var expirationDate = $scope.usage.itSystem.expirationDate;
-                var concluded = $scope.usage.itSystem.concluded;
-                var overrule = $scope.usage.itSystem.active;
+                var expirationDate = $scope.usage.expirationDate;
+                var concluded = $scope.usage.concluded;
+                var overrule = $scope.usage.active;
 
                 var today = new Date();
 
@@ -170,7 +171,7 @@
 
                 var isSystemActive = (isTodayBetween || overrule);
 
-                $scope.usage.itSystem.isActive = isSystemActive;
+                $scope.usage.isActive = isSystemActive;
             }
         }
     ]);
