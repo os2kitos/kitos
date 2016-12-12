@@ -55,7 +55,7 @@
                         return o.Id === id;
                     });
                 }).error(function () {
-                    msg.toErrorMessage("Kan ikke slettes, da den er i brug.");
+                    msg.toErrorMessage("Fejl!");
                 });
             }
         }

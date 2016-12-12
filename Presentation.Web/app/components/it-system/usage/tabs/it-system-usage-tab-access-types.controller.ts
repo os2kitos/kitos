@@ -1,20 +1,13 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-system.usage.access-types', {
-            url: '/access-types',
+            url: '/contracts',
             templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-access-types.view.html',
             controller: 'system.UsageAccessTypes',
             resolve: {
                 accessTypes: [
-                    '$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                        return $http.get("odata/ItSystems(" + itSystemUsage.itSystemId + ")?$select=Id&$expand=AccessTypes").then(function (result) {
-                            return result.data.AccessTypes;
-                        });
-                    }
-                ],
-                activeAccessTypes: [
-                    '$http', 'itSystemUsage', function ($http, itSystemUsage) {
-                        return $http.get("odata/ItSystemUsages(" + itSystemUsage.id + ")?$select=Id&$expand=AccessTypes").then(function (result) {
+                    '$http', 'itSystem', function ($http, itSystem) {
+                        return $http.get("odata/ItSystems(" + itSystem.id + ")?$select=Id&$expand=AccessTypes").then(function (result) {
                             return result.data.AccessTypes;
                         });
                     }
@@ -23,39 +16,46 @@
         });
     }]);
 
-    app.controller('system.UsageAccessTypes', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes',
-        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes, activeAccessTypes) {
+    app.controller('system.UsageAccessTypes', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes',
+        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes) {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
 
             $scope.accessTypes = accessTypes;
 
-            $scope.isActive = function (accessTypeId) {
-                return _.find(activeAccessTypes, { Id: accessTypeId });
-            }
+            console.log(accessTypes);
 
-            $scope.toggle = function (accessType, e) {
-                if (e.currentTarget.checked) {
+            $scope.add = function () {
+                if ($scope.accessTypeName) {
                     var payload: any = {};
-                    payload["@odata.id"] = window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")";
+                    payload.Name = $scope.accessTypeName;
+                    payload.ItSystemId = usageId;
 
                     var msg = notify.addInfoMessage("Opdaterer ...", false);
 
-                    return $http.post("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref", payload).success(function (result) {
-                        msg.toSuccessMessage("Feltet er opdateret!");
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl!");
-                    });
-                } else {
-                    var msg = notify.addInfoMessage("Opdaterer ...", false);
-
-                    return $http.delete("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref?$id=" + window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")").success(function (result) {
-                        msg.toSuccessMessage("Feltet er opdateret!");
+                    return $http.post("odata/AccessTypes", payload).success(function (result) {
+                        msg.toSuccessMessage("Feltet er oprettet!");
+                        $scope.accessTypes.push(result);
+                        $scope.accessTypeName = "";
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");
                     });
                 }
+            }
+
+            $scope.remove = function (id) {
+                var msg = notify.addInfoMessage("Opdaterer ...", false);
+
+                return $http.delete("odata/AccessTypes(" + id + ")").success(function (result) {
+                    msg.toSuccessMessage("Feltet er slettet!");
+
+                    _.remove($scope.accessTypes, function (o: any) {
+                        return o.Id === id;
+                    });
+                }).error(function () {
+                    msg.toErrorMessage("Fejl!");
+                });
             }
         }]);
 })(angular, app);
