@@ -120,9 +120,9 @@
 
             $scope.checkSystemValidity = () => {
                 var expirationDateObject, concludedObject;
-                var expirationDate = $scope.usage.itSystem.expirationDate;
-                var concluded = $scope.usage.itSystem.concluded;
-                var overrule = $scope.usage.itSystem.active;
+                var expirationDate = $scope.usage.expirationDate;
+                var concluded = $scope.usage.concluded;
+                var overrule = $scope.usage.active;
 
                 var today = new Date();
 
@@ -171,7 +171,7 @@
 
                 var isSystemActive = (isTodayBetween || overrule);
 
-                $scope.usage.itSystem.isActive = isSystemActive;
+                $scope.usage.isActive = isSystemActive;
             }
         }
     ]);
