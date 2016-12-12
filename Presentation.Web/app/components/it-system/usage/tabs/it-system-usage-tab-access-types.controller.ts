@@ -6,8 +6,15 @@
             controller: 'system.UsageAccessTypes',
             resolve: {
                 accessTypes: [
-                    '$http', 'itSystem', function ($http, itSystem) {
-                        return $http.get("odata/ItSystems(" + itSystem.id + ")?$select=Id&$expand=AccessTypes").then(function (result) {
+                    '$http', 'itSystemUsage', function ($http, itSystemUsage) {
+                        return $http.get("odata/ItSystems(" + itSystemUsage.itSystemId + ")?$select=Id&$expand=AccessTypes").then(function (result) {
+                            return result.data.AccessTypes;
+                        });
+                    }
+                ],
+                activeAccessTypes: [
+                    '$http', 'itSystemUsage', function ($http, itSystemUsage) {
+                        return $http.get("odata/ItSystemUsages(" + itSystemUsage.id + ")?$select=Id&$expand=AccessTypes").then(function (result) {
                             return result.data.AccessTypes;
                         });
                     }
@@ -16,32 +23,31 @@
         });
     }]);
 
-    app.controller('system.UsageAccessTypes', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes',
-        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes) {
+    app.controller('system.UsageAccessTypes', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes',
+        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes, activeAccessTypes) {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
 
             $scope.accessTypes = accessTypes;
 
-            console.log(accessTypes);
+            console.log(activeAccessTypes);
 
-            $scope.add = function () {
-                if ($scope.accessTypeName) {
-                    var payload: any = {};
-                    payload.Name = $scope.accessTypeName;
-                    payload.ItSystemId = usageId;
+            $scope.isActive = function (accessTypeId) {
+                return _.find(activeAccessTypes, { Id: accessTypeId });
+            }
 
-                    var msg = notify.addInfoMessage("Opdaterer ...", false);
+            $scope.add = function (accessType) {
+                var payload: any = {};
+                payload["@odata.id"] = "https://localhost:44300/odata/AccessTypes(" + accessType.Id + ")";
 
-                    return $http.post("odata/AccessTypes", payload).success(function (result) {
-                        msg.toSuccessMessage("Feltet er oprettet!");
-                        $scope.accessTypes.push(result);
-                        $scope.accessTypeName = "";
-                    }).error(function () {
-                        msg.toErrorMessage("Fejl!");
-                    });
-                }
+                var msg = notify.addInfoMessage("Opdaterer ...", false);
+
+                return $http.post("odata/ItSystemUsages(" + itSystemUsage.id  + ")/AccessTypes/$ref", payload).success(function (result) {
+                    msg.toSuccessMessage("Feltet er opdateret!");
+                }).error(function () {
+                    msg.toErrorMessage("Fejl!");
+                });
             }
 
             $scope.remove = function (id) {
