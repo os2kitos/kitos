@@ -21,10 +21,10 @@
     <table class="table table-condensed">
         <thead>
             <tr>
-                <th>
+                <th class="col-xs-1">
 
                 </th>
-                <th class="col-xs-2">
+                <th class="col-xs-9">
                     Navn
                 </th>
                 <th class="col-xs-2">
@@ -37,9 +37,9 @@
                 <!-- selected -->
                 <td>
                     <input type="checkbox"
-                           id="{{task.taskRef.id}}"
-                           data-ng-checked="task.isSelected"
-                           data-ng-click="save(task)"
+                           id="{{accessType.Id}}"
+                           data-ng-checked="isActive(accessType.Id)"
+                           data-ng-click="add(accessType)"
                            data-ng-disabled="!hasWriteAccess" />
                 </td>
                 <td>
