@@ -2,6 +2,8 @@
 
 namespace Presentation.Web.Models
 {
+    using System;
+
     public class ItSystemUsageDTO
     {
         public int Id { get; set; }
@@ -59,5 +61,13 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
+
+        public bool? Active { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public DateTime Concluded { get; set; }
+
+        public DateTime ExpirationDate { get; set; }
     }
 }

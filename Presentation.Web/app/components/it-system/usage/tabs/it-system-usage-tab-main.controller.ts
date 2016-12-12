@@ -39,8 +39,8 @@
             $rootScope.page.title = 'IT System - Anvendelse';
 
             autofocus();
-            $scope.autoSaveUrl = 'api/itsystem/' + $stateParams.id;
-            $scope.autosaveUrl2 = 'api/itsystem/' + $scope.usage.id;
+            $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
+            $scope.autosaveUrl2 = 'api/itsystemusage/' + $scope.usage.id;
             $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
             $scope.hasWriteAccess = hasWriteAccess;
