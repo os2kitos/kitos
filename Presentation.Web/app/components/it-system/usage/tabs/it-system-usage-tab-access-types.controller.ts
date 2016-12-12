@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-system.usage.access-types', {
-            url: '/contracts',
+            url: '/access-types',
             templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-access-types.view.html',
             controller: 'system.UsageAccessTypes',
             resolve: {
@@ -31,37 +31,31 @@
 
             $scope.accessTypes = accessTypes;
 
-            console.log(activeAccessTypes);
-
             $scope.isActive = function (accessTypeId) {
                 return _.find(activeAccessTypes, { Id: accessTypeId });
             }
 
-            $scope.add = function (accessType) {
-                var payload: any = {};
-                payload["@odata.id"] = "https://localhost:44300/odata/AccessTypes(" + accessType.Id + ")";
+            $scope.toggle = function (accessType, e) {
+                if (e.currentTarget.checked) {
+                    var payload: any = {};
+                    payload["@odata.id"] = window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")";
 
-                var msg = notify.addInfoMessage("Opdaterer ...", false);
+                    var msg = notify.addInfoMessage("Opdaterer ...", false);
 
-                return $http.post("odata/ItSystemUsages(" + itSystemUsage.id  + ")/AccessTypes/$ref", payload).success(function (result) {
-                    msg.toSuccessMessage("Feltet er opdateret!");
-                }).error(function () {
-                    msg.toErrorMessage("Fejl!");
-                });
-            }
-
-            $scope.remove = function (id) {
-                var msg = notify.addInfoMessage("Opdaterer ...", false);
-
-                return $http.delete("odata/AccessTypes(" + id + ")").success(function (result) {
-                    msg.toSuccessMessage("Feltet er slettet!");
-
-                    _.remove($scope.accessTypes, function (o: any) {
-                        return o.Id === id;
+                    return $http.post("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref", payload).success(function (result) {
+                        msg.toSuccessMessage("Feltet er opdateret!");
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl!");
                     });
-                }).error(function () {
-                    msg.toErrorMessage("Fejl!");
-                });
+                } else {
+                    var msg = notify.addInfoMessage("Opdaterer ...", false);
+
+                    return $http.delete("odata/ItSystemUsages(" + itSystemUsage.id + ")/AccessTypes/$ref?$id=" + window.location.origin + "/odata/AccessTypes(" + accessType.Id + ")").success(function (result) {
+                        msg.toSuccessMessage("Feltet er opdateret!");
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl!");
+                    });
+                }
             }
         }]);
 })(angular, app);
