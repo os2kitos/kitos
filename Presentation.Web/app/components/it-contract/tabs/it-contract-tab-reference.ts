@@ -8,8 +8,12 @@
     }]);
 
     app.controller("contract.EditReference",
-        ["$scope", "$http", "$timeout", "$state", "$stateParams","contract","$confirm","notify",
-            function ($scope, $http, $timeout, $state, $stateParams,contract,$confirm,notify) {
+        ["$scope", "$http", "$timeout", "$state", "$stateParams", "contract", "$confirm", "notify", "hasWriteAccess",
+            function ($scope, $http, $timeout, $state, $stateParams, contract, $confirm, notify, hasWriteAccess) {
+                $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
+                $scope.contract = contract;
+                $scope.hasWriteAccess = hasWriteAccess;
+                console.log(contract.folder);
 
                 $scope.objectId = contract.id;
                 $scope.objectReference = 'it-contract.edit.references.create';

@@ -24,17 +24,6 @@
                            data-field="itContractId">
                 </div>
 
-                <!-- Parent -->
-                <div class="form-group">
-                    <label for="contract-parent" class="control-label small">Overordnet kontrakt</label>
-                    <input type="hidden" id="contract-parent" class="form-control input-sm"
-                           data-ui-select2="itContractsSelectOptions"
-                           data-ng-model="contract.parent"
-                           data-autosave="{{ autoSaveUrl }}"
-                           data-field="parentId"
-                           data-ng-disabled="!hasWriteAccess">
-                </div>
-
                 <!-- Type -->
                 <div class="form-group">
                     <select-option data-id="contract-type"
@@ -46,6 +35,19 @@
                                    data-options="contractTypes"
                                    data-auto-save-url="{{ autoSaveUrl }}"
                                    data-field="contractTypeId">
+                    </select-option>
+                </div>
+                <!-- Contract template -->
+                <div class="form-group">
+                    <select-option data-id="contract-template"
+                                   data-label="Kontraktskabelon"
+                                   data-placeholder="Vælg kontraktskabelon"
+                                   data-selected-text="{{ contract.contractTemplateName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.contractTemplateId"
+                                   data-options="contractTemplates"
+                                   data-auto-save-url="{{ autoSaveUrl }}"
+                                   data-field="contractTemplateId">
                     </select-option>
                 </div>
             </div>
@@ -101,41 +103,10 @@
                         <option data-ng-repeat="procurementPlan in procurementPlans" value="{{procurementPlan.id}}">{{procurementPlan.half + ' | ' + procurementPlan.year}}</option>
                     </select>
                 </div>
-
-                <!-- Contract template -->
-                <div class="form-group">
-                    <select-option data-id="contract-template"
-                                   data-label="Kontraktskabelon"
-                                   data-placeholder="Vælg kontraktskabelon"
-                                   data-selected-text="{{ contract.contractTemplateName }}"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="contract.contractTemplateId"
-                                   data-options="contractTemplates"
-                                   data-auto-save-url="{{ autoSaveUrl }}"
-                                   data-field="contractTemplateId">
-                    </select-option>
-                </div>
             </div>
 
             <div class="col-xs-12">
-                <!-- Folder -->
-                <div class="form-group">
-                    <label for="contract-folder" class="control-label small">Mappe</label>
-                    <div class="input-group">
-                        <input type="text" id="contract-folder" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.folder"
-                               data-autosave="{{ autoSaveUrl }}"
-                               data-field="folder">
-                        <span class="input-group-btn">
-                            <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.folder">
-                                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                    <span class="help-block small">Skal starte med http://</span>
-                </div>
-
+               
                 <!-- Note -->
                 <div class="form-group">
                     <label for="contract-note" class="control-label small">Bemærkning</label>
@@ -151,8 +122,11 @@
 
     <!-- Right side -->
     <div class="col-xs-6">
+       
+
         <div class="row">
-            <div class="col-xs-12">
+            <!-- 3rd column -->
+            <div class="col-xs-6">
                 <!-- Supplier -->
                 <div class="form-group">
                     <label for="contract-supplier" class="control-label small">Leverandør</label>
@@ -162,12 +136,6 @@
                            data-autosave="{{ autoSaveUrl }}" data-field="supplierId"
                            data-ng-disabled="!hasWriteAccess">
                 </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- 3rd column -->
-            <div class="col-xs-6">
                 <!-- Extern contract signer -->
                 <div class="form-group">
                     <label for="contract-ext-signer" class="control-label small">Leverandørs kontraktunderskriver</label>
@@ -189,36 +157,9 @@
                                data-placeholder="Angiv kontraktunderskriver"
                                data-display-value="Name"
                                data-string-model="stringModel"
-                               data-field="supplierContractSigner" />
+                               data-field="supplierContractSigner"/>
                 </div>-->
-                <!-- Responsible org unit -->
-                <div class="form-group">
-                    <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
-                    <div id="contract-orgunit"
-                         data-ng-model="contract.responsibleOrganizationUnitId"
-                         data-ng-disabled="!hasWriteAccess"
-                         data-select-org-unit=""
-                         data-allow-clear="true"
-                         data-autosave="{{ autoSaveUrl }}"
-                         data-field="responsibleOrganizationUnitId">
-                    </div>
-                </div>
-
                 <!-- Intern contract signer -->
-                <div class="form-group">
-                    <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                    <input id="contract-int-signer"
-                           data-select-user
-                           data-ng-disabled="!hasWriteAccess"
-                           data-org-id="{{ contract.organizationId }}"
-                           data-user-model="contractSigner.userForSelect"
-                           data-allow-clear="true"
-                           data-on-select="contractSigner.update()">
-                </div>
-            </div>
-
-            <!-- 4th column -->
-            <div class="col-xs-6">
                 <!-- Extern contract is signed -->
                 <div class="checkbox">
                     <label>
@@ -242,7 +183,32 @@
                            data-autosave="{{ autoSaveUrl }}"
                            data-field="supplierSignedDate">
                 </div>
+            </div>
 
+            <!-- 4th column -->
+            <div class="col-xs-6">
+                <div class="form-group">
+                    <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
+                    <input id="contract-int-signer"
+                           data-select-user
+                           data-ng-disabled="!hasWriteAccess"
+                           data-org-id="{{ contract.organizationId }}"
+                           data-user-model="contractSigner.userForSelect"
+                           data-allow-clear="true"
+                           data-on-select="contractSigner.update()">
+                </div>
+                <!-- Responsible org unit -->
+                <div class="form-group">
+                    <label for="contract-orgunit" class="control-label small">Ansvarlig enhed</label>
+                    <div id="contract-orgunit"
+                         data-ng-model="contract.responsibleOrganizationUnitId"
+                         data-ng-disabled="!hasWriteAccess"
+                         data-select-org-unit=""
+                         data-allow-clear="true"
+                         data-autosave="{{ autoSaveUrl }}"
+                         data-field="responsibleOrganizationUnitId">
+                    </div>
+                </div>
                 <!-- Intern contract is signed -->
                 <div class="checkbox">
                     <label>
