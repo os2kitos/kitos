@@ -32,9 +32,6 @@ namespace Core.ApplicationServices
 
                 try
                 {
-                    //get user containing the email
-                    var reciever = _userRepository.GetByKey(advice.ReceiverId);
-
                     //Setup mail
                     var message = new MailMessage()
                     {
@@ -43,6 +40,8 @@ namespace Core.ApplicationServices
                         BodyEncoding = Encoding.UTF8
                     };
 
+                    message.From = new MailAddress("no_reply@kitos.dk");
+
                     //Add recivers for Email
                     foreach (var r in advice.Reciepients) {
                         if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER) { 
@@ -50,6 +49,14 @@ namespace Core.ApplicationServices
                         }
                         if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER) {
                         message.CC.Add(r.Name);
+                        }
+                        if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
+                        {
+                            message.CC.Add(r.Name);
+                        }
+                        if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
+                        {
+                            message.CC.Add(r.Name);
                         }
                     }
 

@@ -56,46 +56,54 @@
 
                         var url = "Odata/advice";
 
-                        var selectedRoles = $scope.selectedRecievers.split(','); //+ ", " + $scope.externalTo;
-                        var selectedCCRoles = $scope.selectedCC.split(',');//$scope.externalCC + ", " +
-                        var writtenEmail = $scope.externalTo.split(',');
-                        var writtenCCEmail = $scope.externalCC.split(',');
+                       /* var selectedRoles = $scope.selectedRecievers; //+ ", " + $scope.externalTo;
+                        var selectedCCRoles = $scope.selectedCC;//$scope.externalCC + ", " +*/
+                        var writtenEmail = $scope.externalTo;
+                        var writtenCCEmail = $scope.externalCC;
 
-                        for (var i = 0; i < selectedRoles.length; i++){
+
+                        for (var i = 0; i < $scope.selectedRecievers.length; i++){
                             payload.Reciepients.push(
                                 {
-                                    Name: selectedRoles[i],
+                                    Name: $scope.selectedRecievers[i],
                                     RecpientType: "ROLE",
                                     RecieverType: "RECIEVER"
                                 }
                             );
                         }
-                        for (var i = 0; i < selectedCCRoles.length; i++) {
+
+                        if ($scope.selectedCC != undefined) {
+                        for (var i = 0; i < $scope.selectedCC.length; i++) {
                             payload.Reciepients.push(
                                 {
-                                    Name: selectedCCRoles[i],
+                                    Name: $scope.selectedCC[i],
                                     RecieverType: "CC",
                                     RecpientType: "ROLE"
                                 }
                             );
+                            }
                         }
-                        for (var i = 0; i < writtenEmail.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    Name: writtenEmail[i],
-                                    RecpientType: "USER",
-                                    RecieverType: "RECIEVER"
-                                }
-                            );
+                        if (writtenEmail != undefined) {
+                            for (var i = 0; i < writtenEmail.split(',').length; i++) {
+                                payload.Reciepients.push(
+                                    {
+                                        Name: writtenEmail.split(',')[i],
+                                        RecpientType: "USER",
+                                        RecieverType: "RECIEVER"
+                                    }
+                                );
+                            }
                         }
-                        for (var i = 0; i < writtenCCEmail.length; i++) {
-                            payload.Reciepients.push(
-                                {
-                                    Name: writtenCCEmail[i],
-                                    RecieverType: "CC",
-                                    RecpientType: "USER"
-                                }
-                            );
+                        if (writtenCCEmail != undefined) {
+                            for (var i = 0; i < writtenCCEmail.split(',').length; i++) {
+                                payload.Reciepients.push(
+                                    {
+                                        Name: writtenCCEmail.split(',')[i],
+                                        RecieverType: "CC",
+                                        RecpientType: "USER"
+                                    }
+                                );
+                            }
                         }
                         
 
@@ -113,16 +121,6 @@
                         }).error(function () {
                             //msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
                             });
-
-                        console.log("ACTION: " + action);
-                        console.log("Mail content");
-                        console.log("selectedRecievers: " + $scope.selectedRecievers);
-                        console.log("externalTo: " + $scope.externalTo);
-                        console.log("selectedCC: " + $scope.selectedCC);
-                        console.log("externalCC: " + $scope.externalCC);
-                        console.log("gatherede reciepients: " + $scope.externalCC+", " + $scope.selectedCC+ ", " + $scope.selectedRecievers+", " + $scope.externalTo);
-                        console.log("formData.subject: " + $scope.formData.subject);
-                        console.log("emailBody: " + $scope.emailBody);
                     };
                 }],
                 resolve: {
