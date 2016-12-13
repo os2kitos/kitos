@@ -639,13 +639,8 @@
 
                         },
                         hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq"
-                            }
-                        }
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "ExpirationDate",
