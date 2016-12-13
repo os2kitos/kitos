@@ -212,24 +212,22 @@
                         <input type="number"
                                min="0"
                                data-ng-model="durationYears"
-                               data-ng-disabled="!hasWriteAccess || contract.durationOngoing"
+                               data-ng-disabled="!hasWriteAccess || durationOngoing"
                                data-ng-blur="saveDurationYears()" />
                         <label>År</label>
                         <input type="number"
                                min="0"
                                max="11"
                                data-ng-model="durationMonths"
-                               data-ng-disabled="!hasWriteAccess || contract.durationOngoing"
+                               data-ng-disabled="!hasWriteAccess || durationOngoing"
                                data-ng-blur="saveDurationMonths()" />
                         <label>Måneder</label>
                         <input type="checkbox"
-                               value=""
-                               data-ng-checked="contract.durationOngoing"
+                               data-ng-checked="durationOngoing"
                                data-ng-click="saveOngoingStatus()"
-                               data-ng-model="contract.durationOngoing"
+                               data-ng-model="durationOngoing"
                                data-ng-disabled="!hasWriteAccess" />
                         <label>Løbende</label>
-
                     </div>
                 </div>
             </div>
@@ -280,9 +278,6 @@
         </div>
     </div>
 </div>
-</
-</div
->
 
 
 <div class="col-xs-3">

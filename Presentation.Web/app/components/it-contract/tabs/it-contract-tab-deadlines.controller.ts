@@ -68,17 +68,15 @@
             };
 
             $scope.saveOngoingStatus = () => {
-                if ($scope.durationOngoing) {
-                    let payload = {
-                        "DurationOngoing": $scope.durationOngoing
-                    }
-                    var msg = notify.addInfoMessage("Gemmer...", false);
-                    $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
-                        msg.toSuccessMessage("Varigheden blev gemt.");
-                    }).error(() => {
-                        msg.toSuccessMessage("Varigheden blev ikke gemt.");
-                    });
+                let payload = {
+                    "DurationOngoing": $scope.durationOngoing
                 }
+                var msg = notify.addInfoMessage("Gemmer...", false);
+                $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
+                    msg.toSuccessMessage("Varigheden blev gemt.");
+                }).error(() => {
+                    msg.toSuccessMessage("Varigheden blev ikke gemt.");
+                });
             }
 
             function saveDuration(payload) {
