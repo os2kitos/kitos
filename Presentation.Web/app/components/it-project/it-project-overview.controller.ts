@@ -782,10 +782,11 @@
                         ]
                     },
                     {
-                        field: "usersRoles", title: `${this.user.fullName}`, width: 150,
+                        // filtering doesn't allow to sort on an array of values, it needs a single value for each row...
+                        field: "Rights.Role", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        //template: item => item.Rights ? item.Rights.every(x => x.Role.Name) : "",
-                        template: () => `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}, </span>`,
+                        template: () => `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}{{$last ? '' : ', '}}</span>`,
+                        
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         sortable: false,

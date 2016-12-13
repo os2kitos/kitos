@@ -11,14 +11,29 @@
         public selectedCategory: any
         reportId: number
 
-        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "notify", "reportService", "_"];
+        public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "$scope", "$state", "$window", "notify", "reportService", "_", "user", "globalConfigs"];
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $stateParams: ng.ui.IStateParamsService,
             private $http: ng.IHttpService,
             private $scope,
+            private $state,
+            private $window,
             private notify,
             private reportService: Services.ReportService,
-            private _: ILoDashWithMixins) {
+            private _: ILoDashWithMixins,
+            private user,
+            private globalConfigs) {
+
+            var canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g: any) {
+                return g.key === "CanGlobalAdminOnlyEditReports";
+            });
+
+            var hasPermission = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
+
+            if (!hasPermission) {
+                $state.go("^");
+                $window.location.reload();
+            }
 
             this.init($stateParams["id"])
         }
@@ -94,13 +109,27 @@
             $stateProvider.state("reports.overview.report-edit", {
                 url: "/{id:int}/edit",
                 onEnter: [
-                    "$state", "$stateParams", "$uibModal",
-                    ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService) => {
-                        $uibModal.open({
+                    "$state", "$stateParams", "$uibModal", "$rootScope",
+                    ($state: ng.ui.IStateService, $stateParams: ng.ui.IStateParamsService, $uibModal: ng.ui.bootstrap.IModalService, $rootScope) => {
+                        $rootScope = $uibModal.open({
                             templateUrl: "app/components/reports/report-edit.modal.view.html",
                             // fade in instead of slide from top, fixes strange cursor placement in IE
                             // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                             windowClass: "modal fade in",
+                            resolve: {
+                                user: [
+                                    'userService', function (userService) {
+                                        return userService.getUser();
+                                    }
+                                ],
+                                globalConfigs: [
+                                    '$http', function ($http) {
+                                        return $http.get('odata/GlobalConfigs').then(function (result) {
+                                            return result.data.value;
+                                        });
+                                    }
+                                ],
+                            },
                             controller: EditReportController,
                             controllerAs: "vm",
                         }).result.then(() => {

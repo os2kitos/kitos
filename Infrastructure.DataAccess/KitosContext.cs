@@ -36,6 +36,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
+        public DbSet<GlobalConfig> GlobalConfigs { get; set; }
         public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
         public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
@@ -93,6 +94,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
+        public DbSet<AccessType> AccessTypes { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<TsaType> TsaTypes { get; set; }

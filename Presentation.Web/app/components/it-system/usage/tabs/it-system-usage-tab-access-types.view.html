@@ -1,0 +1,22 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        Adgangsstyringer
+    </div>
+    <table class="table table-condensed">
+        <tbody>
+            <tr data-ng-repeat="accessType in accessTypes">
+                <!-- selected -->
+                <td class="col-xs-1">
+                    <input type="checkbox"
+                           id="{{accessType.Id}}"
+                           data-ng-checked="isActive(accessType.Id)"
+                           data-ng-click="toggle(accessType, $event)"
+                           data-ng-disabled="!hasWriteAccess" />
+                </td>
+                <td class="col-xs-9">
+                    <label for="{{accessType.Id}}">{{accessType.Name}}</label>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

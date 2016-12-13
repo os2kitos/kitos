@@ -368,6 +368,12 @@ namespace Presentation.Web
             var config = builder.EntitySet<Config>(nameof(ConfigsController).Replace("Controller", string.Empty));
             config.EntityType.HasKey(x => x.Id);
 
+            var globalConfig = builder.EntitySet<GlobalConfig>(nameof(GlobalConfigsController).Replace("Controller", string.Empty));
+            globalConfig.EntityType.HasKey(x => x.Id);
+
+            var accessType = builder.EntitySet<AccessType>(nameof(AccessTypesController).Replace("Controller", string.Empty));
+            accessType.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");

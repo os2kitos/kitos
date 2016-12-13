@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Web.Http;
@@ -9,18 +10,21 @@ using Core.DomainServices;
 using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Core.DomainModel.ItSystem;
 
 namespace Presentation.Web.Controllers.OData
 {
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<AccessType> _accessTypeRepository;
         private readonly IAuthenticationService _authService;
 
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository )
             : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
+            _accessTypeRepository = accessTypeRepository;
             _authService = authService;
         }
 
@@ -74,5 +78,64 @@ namespace Presentation.Web.Controllers.OData
 
             return Ok(systemUsages);
         }
+
+        [AcceptVerbs("POST", "PUT")]
+        public IHttpActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
+        {
+            var itSystemUsage = Repository.GetByKey(key);
+            if (itSystemUsage == null)
+            {
+                return NotFound();
+            }
+            switch (navigationProperty)
+            {
+                case "AccessTypes":
+                    var relatedKey = GetKeyFromUri<int>(Request, link);
+                    var accessType = _accessTypeRepository.GetByKey(relatedKey);
+                    if (accessType == null)
+                    {
+                        return NotFound();
+                    }
+
+                    itSystemUsage.AccessTypes.Add(accessType);
+                    break;
+
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+            }
+
+            Repository.Save();
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        public IHttpActionResult DeleteRef([FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty)
+        {
+            var itSystemUsage = Repository.GetByKey(key);
+            if (itSystemUsage == null)
+            {
+                return StatusCode(HttpStatusCode.NotFound);
+            }
+
+            switch (navigationProperty)
+            {
+                case "AccessTypes":
+                    var accessTypeId = Convert.ToInt32(relatedKey);
+                    var accessType = _accessTypeRepository.GetByKey(accessTypeId);
+
+                    if (accessType == null)
+                    {
+                        return NotFound();
+                    }
+                    itSystemUsage.AccessTypes.Remove(accessType);
+                    break;
+                default:
+                    return StatusCode(HttpStatusCode.NotImplemented);
+
+            }
+            Repository.Save();
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
     }
 }
