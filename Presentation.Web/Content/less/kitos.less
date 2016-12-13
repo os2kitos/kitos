@@ -207,6 +207,7 @@ div#page-body {
 
         li {
             padding: 10px;
+            float: right;
         }
     }
 }
@@ -1023,138 +1024,143 @@ tr.angular-ui-tree-empty {
 }
 /*********/
 
-/* SPLITTED CHART */
+/* PROJECT TRIANGLE */
 
+#splitted-triangle-wrapper {
+  position: relative;
+  width: 200px;
+  display: inline-block;
+  margin-top: 10px;
 
-.splitted-chart {
-    height: 200px;
-    margin: 1rem auto;
-    position: relative;
-    width: 200px;
-
-    .cutout {
-        border-radius: 50%;
-        clip: rect(0px, 200px, 200px, 100px);
-        height: 100%;
-        position: absolute;
-        width: 100%;
-
-        .text {
-            border-radius: 50%;
-            clip: rect(0px, 100px, 200px, 0px);
-            height: 100%;
-            position: absolute;
-            width: 100%;
-            font-size: 14px;
-            font-weight: bold;
-          
-            &.red {
-                background-color: #d9534f;
-                color: white;
-            }
-
-            &.yellow {
-                background-color: #fee822;
-                color: black;
-            }
-
-            &.green {
-                background-color: #4cae4c;
-                color: white;
-            }
-
-            &.white {
-                background-color: white;
-                color: black !important;
-            }
-        }
+    #text1 {
+      font-weight: bold;
+      font-size: 17px;
+      z-index: 100;
+      left: 48%;
+      top: 35%;
+      position: absolute;
+      text-align: center;
     }
 
-    #portion1 {
-        transform: rotate(120deg);
-        .text {
-            transform: rotate(120deg);
-                &:after {
-                content: attr(data-rel);
-                left: 26%;
-                position: absolute;
-                top: 34%;
-                transform: rotate(120deg);
-            }
-        }
+    #text2 {
+        font-weight: bold;
+      font-size: 17px;
+      z-index: 100;
+      top: 75%;
+      left: 25%;
+      position: absolute;
     }
 
-    #portion2 {
-        transform: rotate(240deg);
-        .text {
-            transform: rotate(120deg);
-            &:after {
-                content: attr(data-rel);
-                left: 15%;
-                position: absolute;
-                top: 35%;
-                transform: rotate(0deg);
-            }
-        }
+    #text3 {
+        font-weight: bold;
+      font-size: 17px;
+      z-index: 100;
+      top: 75%;
+      right: 25%;
+      position: absolute;
+      text-align: center;
     }
 
-    #portion3 {
-        transform: rotate(360deg);
-        .text {
-            transform: rotate(120deg);
-            &:after {
-                content: attr(data-rel);
-                left: 12%;
-                position: absolute;
-                top: 27%;
-                transform: rotate(-120deg);
-            }
-        }
-    }
- } 
-
-/***/
-
-/* COMBINED CHART */
-
-.combined-chart {
-    height: 200px;
-    margin: 1rem auto;
-    position: relative;
-    width: 200px;
-    border-radius: 50%;
-    &.red {
-        background-color: #d9534f;
-        color: white;
+    #part1 {
+      width: 0;
+      height: 0;
+      border-left: 99px solid transparent;
+      border-right: 100px solid transparent;
+      border-bottom: 173px solid black;
     }
 
-    &.yellow {
-        background-color: #fee822;
-        color: black !important;
+    #part2_1 {
+      position: relative;
+      top: 86px;
+      right: 100px;
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 50px solid transparent;
+      border-bottom: 87px solid black;
     }
 
-    &.green {
-        background-color: #4cae4c;
-        color: white;
+    #part3 {
+      position: relative;
+      top: 0px;
+      right: 100px;
+      width: 0;
+      height: 0;
+      border-left: 50px solid transparent;
+      border-right: 150px solid transparent;
+      border-bottom: 87px solid black;
     }
 
-    &.white {
-        background-color: white;
-        color: black !important;
+    #part2_2 {
+      position: relative;
+      top: 27px;
+      left: 50px;
+      width: 0;
+      height: 0;
+      border-left: 0 solid transparent;
+      border-right: 100px solid transparent;
+      border-bottom: 60px solid black;
     }
 
-    .chart-content {
-        position: absolute;
-        line-height: 200px;
-        width: 200px;
-        height: 200px;
-        div {
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-        }
+    .red {
+      border-bottom-color: #d9534f !important;
     }
-} 
+
+    .yellow {
+      border-bottom-color: #fee822 !important;
+    }
+
+    .green {
+      border-bottom-color: #4cae4c !important;
+    }
+
+    .white {
+      border-bottom-color: white !important;
+    }
+}
+
+#combined-triangle-wrapper {
+  position: relative;
+  width: 200px;
+  display: inline-block;
+  margin-top: 10px;
+
+  .text {
+      z-index: 100;
+      left: 48%;
+      top: 58%;
+      position: absolute;
+      text-align: center;
+      color: black !important;
+      font-size: 17px;
+      font-weight: bold;
+    }
+
+  #part1 {
+      width: 0;
+      height: 0;
+      border-left: 99px solid transparent;
+      border-right: 100px solid transparent;
+      border-bottom: 173px solid black;
+    }
+
+  .red {
+      border-bottom-color: #d9534f !important;
+    }
+
+    .yellow {
+      border-bottom-color: #fee822 !important;
+    }
+
+    .green {
+      border-bottom-color: #4cae4c !important;
+    }
+
+   .white {
+      border-bottom-color: white !important;
+    }
+}
+
 
 
 /**/

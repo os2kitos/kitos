@@ -166,16 +166,32 @@
                 <button class="btn btn-primary btn-block" data-ng-if="currentStatusUpdate" ui-sref="it-project.edit.main.status-history-modal">Historik</button>
             </div>
         </div>
-        <div class="col-xs-4" data-ng-if="currentStatusUpdate">
-            <div class="splitted-chart" data-ng-if="!showCombinedChart.val">
-                <div id="portion1" class="cutout"><div class="text {{ currentStatusUpdate.TimeStatus | lowercase }}" data-rel="Tid"></div></div>
-                <div id="portion2" class="cutout"><div class="text {{ currentStatusUpdate.QualityStatus | lowercase }}" data-rel="Kvalitet"></div></div>
-                <div id="portion3" class="cutout"><div class="text {{ currentStatusUpdate.ResourcesStatus | lowercase }}" data-rel="Ressourcer"></div></div>
+        <div class="col-xs-4 text-center" data-ng-if="currentStatusUpdate">
+            <div id="splitted-triangle-wrapper" data-ng-if="!showCombinedChart.val">
+                <div id="text1">
+                    T
+                </div>
+                <div id="text2">
+                    R
+                </div>
+                <div id="text3">
+                    K
+                </div>
+                <div id="part1" class="{{ currentStatusUpdate.TimeStatus | lowercase }}">
+                    <div id="part2_1" class="{{ currentStatusUpdate.QualityStatus | lowercase }}">
+                    </div>
+                    <div id="part3" class="{{ currentStatusUpdate.ResourcesStatus | lowercase }}">
+                        <div id="part2_2" class="{{ currentStatusUpdate.QualityStatus | lowercase }}">
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="combined-chart {{ currentStatusUpdate.CombinedStatus | lowercase }}" data-ng-if="showCombinedChart.val">
-                <div class="chart-content">
-                    <div>Samlet</div>
+            <div id="combined-triangle-wrapper" data-ng-if="showCombinedChart.val">
+                <div id="part1" class="{{ currentStatusUpdate.CombinedStatus | lowercase }}">
+                    <div class="text">
+                        S
+                    </div>
                 </div>
             </div>
         </div>
