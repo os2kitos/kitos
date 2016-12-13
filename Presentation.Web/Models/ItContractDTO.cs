@@ -21,7 +21,8 @@ namespace Presentation.Web.Models
         public DateTime? OperationalAcceptanceTestExpected { get; set; }
         public DateTime? OperationalAcceptanceTestApproved { get; set; }
         public DateTime? Concluded { get; set; }
-        public int Duration { get; set; }
+        public int? DurationYears { get; set; }
+        public int? DurationMonths { get; set; }
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public DateTime? OperationRemunerationBegun { get; set; }

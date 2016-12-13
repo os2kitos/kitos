@@ -318,6 +318,10 @@
     <Compile Include="Migrations\201612080839538_AddedActiveToITSystem.Designer.cs">
       <DependentUpon>201612080839538_AddedActiveToITSystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612121121178_temp.cs" />
+    <Compile Include="Migrations\201612121121178_temp.Designer.cs">
+      <DependentUpon>201612121121178_temp.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -461,6 +465,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612080839538_AddedActiveToITSystem.resx">
       <DependentUpon>201612080839538_AddedActiveToITSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612121121178_temp.resx">
+      <DependentUpon>201612121121178_temp.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -5,8 +5,8 @@
             templateUrl: 'app/components/it-contract/tabs/it-contract-tab-deadlines.view.html',
             controller: 'contract.DeadlinesCtrl',
             resolve: {
-                optionExtensions: ['$http', function($http) {
-                    return $http.get('odata/LocalOptionExtendTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function(result) {
+                optionExtensions: ['$http', function ($http) {
+                    return $http.get('odata/LocalOptionExtendTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc').then(function (result) {
                         return result.data.value;
                     });
                 }],
@@ -43,13 +43,53 @@
             $scope.paymentMilestones = paymentMilestones;
             $scope.handoverTrialTypes = handoverTrialTypes;
             $scope.handoverTrials = handoverTrials;
+            $scope.durationYears = contract.durationYears;
+            $scope.durationMonths = contract.durationMonths;
+            $scope.saveDurationYears = () => {
+                if ($scope.contract.durationYears !== $scope.durationYears) {
+                    const payload = {
+                        "DurationYears": $scope.durationYears || 0
+                    }
+                    saveDuration(payload);
+                }
+                cleanUp();
+            };
+
+            $scope.saveDurationMonths = () => {
+                if ($scope.contract.durationMonths !== $scope.durationMonths) {
+                    const payload = {
+                        "DurationMonths": $scope.durationMonths || 0
+                    }
+                    saveDuration(payload);
+                }
+                cleanUp();
+            };
+
+            function saveDuration(payload) {
+                var msg = notify.addInfoMessage("Gemmer...", false);
+                $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
+                    msg.toSuccessMessage("Varigheden blev gemt.");
+                }).error(() => {
+                    msg.toSuccessMessage("Varigheden blev ikke gemt.");
+                });
+            }
+
+            function cleanUp() {
+                if ($scope.durationYears === 0) {
+                    $scope.durationYears = "";
+                }
+
+                if ($scope.durationMonths === 0) {
+                    $scope.durationMonths = "";
+                }
+            }
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.saveMilestone = function(paymentMilestone) {
+            $scope.saveMilestone = function (paymentMilestone) {
                 paymentMilestone.itContractId = contract.id;
 
                 var approvedDate = moment(paymentMilestone.approved, "DD-MM-YYYY");
@@ -68,31 +108,31 @@
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.post('api/paymentMilestone', paymentMilestone)
-                    .success(function(result) {
+                    .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
                         $scope.paymentMilestones.push(obj);
                         delete $scope.paymentMilestone; // clear input fields
                         $scope.milestoneForm.$setPristine();
                     })
-                    .error(function() {
+                    .error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                     });
             };
 
-            $scope.deleteMilestone = function(id) {
+            $scope.deleteMilestone = function (id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
                 $http.delete('api/paymentMilestone/' + id + '?organizationId=' + user.currentOrganizationId)
-                    .success(function() {
+                    .success(function () {
                         msg.toSuccessMessage("Slettet");
                         reload();
                     })
-                    .error(function() {
+                    .error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke slette!");
                     });
             };
 
-            $scope.saveTrial = function(handoverTrial) {
+            $scope.saveTrial = function (handoverTrial) {
                 handoverTrial.itContractId = contract.id;
 
                 var approvedDate = moment(handoverTrial.approved, "DD-MM-YYYY");
@@ -111,14 +151,14 @@
 
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.post('api/handoverTrial', handoverTrial)
-                    .success(function(result) {
+                    .success(function (result) {
                         msg.toSuccessMessage("Gemt");
                         var obj = result.response;
                         $scope.handoverTrials.push(obj);
                         delete $scope.handoverTrial; // clear input fields
                         $scope.trialForm.$setPristine();
                     })
-                    .error(function() {
+                    .error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
                     });
             };
@@ -126,11 +166,11 @@
             $scope.deleteTrial = function (id) {
                 var msg = notify.addInfoMessage("Sletter...", false);
                 $http.delete('api/handoverTrial/' + id + '?organizationId=' + user.currentOrganizationId)
-                    .success(function() {
+                    .success(function () {
                         msg.toSuccessMessage("Slettet");
                         reload();
                     })
-                    .error(function() {
+                    .error(function () {
                         msg.toErrorMessage("Fejl! Kunne ikke slette!");
                     });
             };
@@ -147,5 +187,8 @@
                     }, 1);
                 });
             };
+
+            cleanUp();
+
         }]);
 })(angular, app);

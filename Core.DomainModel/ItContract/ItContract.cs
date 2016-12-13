@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>,IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContextAware, IContractModule, IHasOrganization
     {
         public ItContract()
         {
@@ -46,7 +46,8 @@ namespace Core.DomainModel.ItContract
                     var startDate = Concluded ?? today;
                     var endDate = DateTime.MaxValue;
 
-                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue) {
+                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
+                    {
                         endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
 
@@ -70,7 +71,7 @@ namespace Core.DomainModel.ItContract
             }
         }
 
-      
+
         /// <summary>
         ///     Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -110,7 +111,7 @@ namespace Core.DomainModel.ItContract
         ///     The name.
         /// </value>
         public string Name { get; set; }
-        
+
         /// <summary>
         ///     Gets or sets Active.
         /// </summary>
@@ -433,12 +434,20 @@ namespace Core.DomainModel.ItContract
         public DateTime? Concluded { get; set; }
 
         /// <summary>
-        ///     Gets or sets the duration. (varighed)
+        ///     Gets or sets the duration in years. (varighed)
         /// </summary>
         /// <value>
-        ///     The duration.
+        ///     The duration in years.
         /// </value>
-        public int? Duration { get; set; }
+        public int? DurationYears { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the duration in months. (varighed)
+        /// </summary>
+        /// <value>
+        ///     The duration in months.
+        /// </value>
+        public int? DurationMonths { get; set; }
 
         /// <summary>
         ///     Gets or sets the irrevocable to. (uopsigelig til)
@@ -500,7 +509,7 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<HandoverTrial> HandoverTrials { get; set; }
 
         /// <summary>
-        ///     
+        ///
         /// </summary>
         /// <value>
         ///     (løbende)
@@ -508,7 +517,7 @@ namespace Core.DomainModel.ItContract
         public string Running { get; set; }
 
         /// <summary>
-        ///     
+        ///
         /// </summary>
         /// <value>
         ///     (indtil udgangen af)

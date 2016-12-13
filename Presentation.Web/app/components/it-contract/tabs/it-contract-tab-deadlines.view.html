@@ -16,13 +16,13 @@
                         <td>
                             <div class="form-group">
                                 <select-option data-id="contract-handover-trial"
-                                         data-placeholder="Vælg overtagelsesprøve"
-                                         data-selected-text="{{ ht.handoverTrialTypeName }}"
-                                         data-ng-disabled="!hasWriteAccess"
-                                         data-ng-model="ht.handoverTrialTypeId"
-                                         data-options="handoverTrialTypes"
-                                         data-auto-save-url="api/handoverTrial/{{ ht.id }}"
-                                         data-field="handoverTrialTypeId">
+                                               data-placeholder="Vælg overtagelsesprøve"
+                                               data-selected-text="{{ ht.handoverTrialTypeName }}"
+                                               data-ng-disabled="!hasWriteAccess"
+                                               data-ng-model="ht.handoverTrialTypeId"
+                                               data-options="handoverTrialTypes"
+                                               data-auto-save-url="api/handoverTrial/{{ ht.id }}"
+                                               data-field="handoverTrialTypeId">
                                 </select-option>
                             </div>
                         </td>
@@ -61,9 +61,9 @@
                         <td>
                             <div class="form-group">
                                 <select-option data-id="handover-trial"
-                                        data-placeholder="Vælg overtagelsesprøve"
-                                        data-ng-model="handoverTrial.handoverTrialTypeId"
-                                        data-options="handoverTrialTypes">
+                                               data-placeholder="Vælg overtagelsesprøve"
+                                               data-ng-model="handoverTrial.handoverTrialTypeId"
+                                               data-options="handoverTrialTypes">
                                 </select-option>
                             </div>
                         </td>
@@ -207,26 +207,23 @@
             </div-->
             <div class="form-group">
                 <label for="agreement-duration" class="control-label small">Varighed</label>
-                <select id="agreement-duration"
-                        class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg varighed"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="contract.duration"
-                        data-autosave="{{autosaveUrl}}"
-                        data-field="duration">
-                    <option value=""></option>
-                    <option value="3">3 md</option>
-                    <option value="6">6 md</option>
-                    <option value="9">9 md</option>
-                    <option value="12">12 md</option>
-                    <option value="18">18 md</option>
-                    <option value="24">24 md</option>
-                    <option value="36">36 md</option>
-                    <option value="48">48 md</option>
-                    <option value="60">60 md</option>
-                    <option value="72">72 md</option>
-                </select>
+                <div>
+                    <div class="contractDurationLayout">
+                        <input type="number"
+                               min="0"
+                               data-ng-model="durationYears"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-blur="saveDurationYears()" />
+                        <label>År</label>
+                        <input type="number"
+                               min="0"
+                               max="11"
+                               data-ng-model="durationMonths"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-blur="saveDurationMonths()" />
+                        <label>Måneder</label>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <select-option data-id="agreement-option-extend"
