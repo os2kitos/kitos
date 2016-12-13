@@ -5,13 +5,18 @@ namespace Core.DomainModel.Advice
 {
     public enum ObjectType
     {
-        Contract,
-        Itsytem
+        itContract,
+        itSytem
     }
     public enum Scheduling
     {
-        Monthly,
-        Daily
+       Immediate,
+       Hour,
+       Day,
+       Week,
+       Month,
+       Year
+
     }
     /// <summary>
     /// Contains info about Advices on a contract.
@@ -20,13 +25,14 @@ namespace Core.DomainModel.Advice
     {
         public Advice() {
             AdviceSent = new List<AdviceSent.AdviceSent>();
-            AdviceUserRelations = new List<AdviceUserRelation>();
+            Reciepients = new List<AdviceUserRelation>();
         }
 
         public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
-        public virtual ICollection<AdviceUserRelation> AdviceUserRelations { get; set; }
+        public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
         public ObjectType? Type { get; set; }
+
         public Scheduling? Scheduling { get; set; }
        
         /// <summary>

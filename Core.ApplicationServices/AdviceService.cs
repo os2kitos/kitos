@@ -43,13 +43,14 @@ namespace Core.ApplicationServices
                         BodyEncoding = Encoding.UTF8
                     };
 
-                    //Add reciver for Email
-                    message.To.Add(reciever.Email);
-
-                    if (advice.CarbonCopyReceiver != null)
-                    {
-                        //Add CC('s)
-                        message.CC.Add(reciever.Email);
+                    //Add recivers for Email
+                    foreach (var r in advice.Reciepients) {
+                        if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER) { 
+                        message.To.Add(r.Name);
+                        }
+                        if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER) {
+                        message.CC.Add(r.Name);
+                        }
                     }
 
                     //Send Mail.

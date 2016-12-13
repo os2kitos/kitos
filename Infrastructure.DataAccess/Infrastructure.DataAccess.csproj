@@ -323,6 +323,14 @@
     <Compile Include="Migrations\201612021031055_Advis.Designer.cs">
       <DependentUpon>201612021031055_Advis.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612121328286_Upgraded AdviceUserRelation.cs" />
+    <Compile Include="Migrations\201612121328286_Upgraded AdviceUserRelation.Designer.cs">
+      <DependentUpon>201612121328286_Upgraded AdviceUserRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612121454338_misc changes to advis.cs" />
+    <Compile Include="Migrations\201612121454338_misc changes to advis.Designer.cs">
+      <DependentUpon>201612121454338_misc changes to advis.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -470,6 +478,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612021031055_Advis.resx">
       <DependentUpon>201612021031055_Advis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612121328286_Upgraded AdviceUserRelation.resx">
+      <DependentUpon>201612121328286_Upgraded AdviceUserRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612121454338_misc changes to advis.resx">
+      <DependentUpon>201612121454338_misc changes to advis.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

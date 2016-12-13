@@ -37,9 +37,38 @@ namespace Presentation.Web.Controllers.OData
                 
                 try
                 {
-                    RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                    
+                   switch (advice.Scheduling) {
+                            case Scheduling.Immediate:
+                            var jobId = BackgroundJob.Enqueue(
+                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id));
+                                break;
+                            case Scheduling.Hour:
+                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    Cron.Hourly);
+                                break;
+                            case Scheduling.Day:
+                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    Cron.Daily);
+                                break;
+                            case Scheduling.Week:
+                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    Cron.Weekly);
+                                break;
+                            case Scheduling.Month:
+                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Monthly);
+                                break;
+                            case Scheduling.Year:
+                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    Cron.Yearly);
+                                break;
+                        }
                 }
                 catch (Exception e) {
                     //todo log error

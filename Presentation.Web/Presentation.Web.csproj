@@ -563,6 +563,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\it-advice-modal-view.html" />
     <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
@@ -660,7 +661,9 @@
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
+    <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
+    <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />

@@ -16,7 +16,16 @@
                     return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
-                }]
+                }],
+                object: ['contract', function (contract) {
+                        return contract;
+                }],
+                users: ['UserGetService', function (UserGetService) {
+                    return UserGetService.GetAllUsers();
+                }],
+            type: [ function () {
+                return "itContract";
+            }]
             }
         });
     }]);
