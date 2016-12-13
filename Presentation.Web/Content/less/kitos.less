@@ -1223,15 +1223,20 @@ tr.angular-ui-tree-empty {
 /* Contract duration */
 .contractDurationLayout {
     display: inline;
+    vertical-align: central;
 }
 
-.contractDurationLayout input {
+.contractDurationLayout input[type="number"] {
     width: 35px;
+    text-align: center;
 }
 
 .contractDurationLayout label {
-    vertical-align: central;
-    padding-right: 5px;
-    padding-left: 5px;
+    padding-right: 2px;
+}
+
+.contractDurationLayout input[type="checkbox"] {
+    vertical-align: sub;
+    margin-left: 20px;
 }
 /**/

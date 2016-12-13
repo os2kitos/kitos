@@ -450,6 +450,14 @@ namespace Core.DomainModel.ItContract
         public int? DurationMonths { get; set; }
 
         /// <summary>
+        ///     Gets or sets the ongoing status. (løbende)
+        /// </summary>
+        /// <value>
+        ///     Is the duration ongoing.
+        /// </value>
+        public bool DurationOngoing { get; set; }
+
+        /// <summary>
         ///     Gets or sets the irrevocable to. (uopsigelig til)
         /// </summary>
         /// <value>

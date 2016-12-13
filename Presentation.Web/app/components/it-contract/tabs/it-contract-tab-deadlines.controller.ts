@@ -45,6 +45,8 @@
             $scope.handoverTrials = handoverTrials;
             $scope.durationYears = contract.durationYears;
             $scope.durationMonths = contract.durationMonths;
+            $scope.durationOngoing = contract.durationOngoing;
+
             $scope.saveDurationYears = () => {
                 if ($scope.contract.durationYears !== $scope.durationYears) {
                     const payload = {
@@ -64,6 +66,20 @@
                 }
                 cleanUp();
             };
+
+            $scope.saveOngoingStatus = () => {
+                if ($scope.durationOngoing) {
+                    let payload = {
+                        "DurationOngoing": $scope.durationOngoing
+                    }
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
+                        msg.toSuccessMessage("Varigheden blev gemt.");
+                    }).error(() => {
+                        msg.toSuccessMessage("Varigheden blev ikke gemt.");
+                    });
+                }
+            }
 
             function saveDuration(payload) {
                 var msg = notify.addInfoMessage("Gemmer...", false);

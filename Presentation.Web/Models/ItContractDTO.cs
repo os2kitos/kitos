@@ -23,6 +23,7 @@ namespace Presentation.Web.Models
         public DateTime? Concluded { get; set; }
         public int? DurationYears { get; set; }
         public int? DurationMonths { get; set; }
+        public bool DurationOngoing { get; set; }
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public DateTime? OperationRemunerationBegun { get; set; }

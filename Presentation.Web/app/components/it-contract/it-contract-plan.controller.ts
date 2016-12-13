@@ -619,6 +619,10 @@
                         persistId: "duration", // DON'T YOU DARE RENAME!
                         template: (dataItem) => {
 
+                            if (dataItem.DurationOngoing) {
+                                return "Løbende";
+                            }
+
                             let years = dataItem.DurationYears || 0;
                             let months = dataItem.DurationMonths || 0;
 
