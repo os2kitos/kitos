@@ -21,9 +21,15 @@
                 },
                 selectable: true,
                 change: onChange,
-                    columns: [{
+                columns: [{
                         field: "SentDate",
-                        title: "Sidst sendt"
+                        title: "Sidst sendt",
+                        template: x => {
+                            if (x.SentDate != null) {
+                                return kendo.toString(new Date(x.SentDate), "d");
+                            }
+                            return "";
+                        }
                         },
                         {
                             field: "Id",
@@ -35,7 +41,13 @@
                         },
                         {
                             field: "AlarmDate",
-                            title: "Dato"
+                            title: "Dato",
+                            template: x => {
+                                if (x.AlarmDate != null) {
+                                    return kendo.toString(new Date(x.AlarmDate), "d");
+                                }
+                                return "";
+                            }
                         },
                         {
                             field: "Reciepients",
@@ -152,6 +164,7 @@
                         payload.Scheduling = $scope.repitionPattern;
                         payload.AlarmDate = dateString2Date($scope.formData.date);
                         payload.StopDate = dateString2Date($scope.formData.stopDate);
+                        payload.Name = $scope.formData.Name;
 
                         console.log(dateString2Date($scope.formData.date));
                         console.log(payload);
@@ -188,6 +201,7 @@
                     function createPayload() {
 
                         var payload = {
+                            Name: $scope.formData.Name,
                             Subject: $scope.formData.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
