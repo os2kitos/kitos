@@ -1,6 +1,9 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Ninject;
 using System;
@@ -20,8 +23,16 @@ namespace Core.ApplicationServices
         public IGenericRepository<Advice> _adviceRepository { get; set; }
         [Inject]
         public IGenericRepository<AdviceSent> _adviceSentRepository { get; set; }
+        [Inject]
+        public IGenericRepository<ItContractRight> _ItContractRights { get; set; }
+        [Inject]
+        public IGenericRepository<ItProjectRight> _ItprojectRights { get; set; }
+        [Inject]
+        public IGenericRepository<ItSystemRight> _ItSystemRights { get; set; }
 
-      public AdviceService() {}
+
+
+        public AdviceService() {}
 
         public bool sendAdvice(int id) {
 
@@ -52,16 +63,51 @@ namespace Core.ApplicationServices
                         }
                         if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
                         {
-                            message.CC.Add(r.Name);
+
+                            switch (advice.Type)
+                            {
+                                case ObjectType.itContract:
+
+                                    var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
+                                   && I.Role.Name == r.Name);
+                                    if (result != null)
+                                    {
+                                        if (result.User != null)
+                                        {
+                                            message.CC.Add(result.User.Email);
+                                        }
+                                    }
+                                        break;
+                            }
+
+                            
                         }
                         if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
                         {
-                            message.CC.Add(r.Name);
+                            switch (advice.Type)
+                            {
+                                case ObjectType.itContract:
+
+                                    var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
+                                    && I.Role.Name == r.Name);
+                                    if (result != null)
+                                    { 
+                                        if (result.User != null) { 
+                                             message.To.Add(result.User.Email);
+                                        }
+                                    }
+                                    break;
+                            }
                         }
                     }
 
                     //Send Mail.
                     _mailClient.Send(message);
+                    advice.SentDate = DateTime.Now;
+
+                    _adviceRepository.Update(advice);
+                    _adviceRepository.Save();
+
 
                     _adviceSentRepository.Insert(new AdviceSent() {
                         AdviceId = id,

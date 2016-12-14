@@ -331,6 +331,10 @@
     <Compile Include="Migrations\201612121454338_misc changes to advis.Designer.cs">
       <DependentUpon>201612121454338_misc changes to advis.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612130937599_stopdate addedto advice.cs" />
+    <Compile Include="Migrations\201612130937599_stopdate addedto advice.Designer.cs">
+      <DependentUpon>201612130937599_stopdate addedto advice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -484,6 +488,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612121454338_misc changes to advis.resx">
       <DependentUpon>201612121454338_misc changes to advis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612130937599_stopdate addedto advice.resx">
+      <DependentUpon>201612130937599_stopdate addedto advice.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

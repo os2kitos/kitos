@@ -64,6 +64,15 @@ namespace Core.DomainModel.Advice
         /// </value>
         public DateTime? AlarmDate { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the stop date.
+        /// </summary>
+        /// <value>
+        /// The stop date.
+        /// </value>
+        public DateTime? StopDate { get; set; }
+
         /// <summary>
         /// Gets or sets the sent date.
         /// </summary>

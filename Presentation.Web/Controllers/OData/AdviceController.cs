@@ -34,37 +34,37 @@ namespace Presentation.Web.Controllers.OData
             if (response.GetType() == typeof(CreatedODataResult<Advice>)) {
                 
                 var createdRepsonse = (CreatedODataResult<Advice>)response ;
-                
+                var name = "Advice: " + createdRepsonse.Entity.Id;
+
                 try
                 {
-                    
                    switch (advice.Scheduling) {
                             case Scheduling.Immediate:
                             var jobId = BackgroundJob.Enqueue(
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id));
                                 break;
                             case Scheduling.Hour:
-                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                                RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Hourly);
                                 break;
                             case Scheduling.Day:
-                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                                RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Daily);
                                 break;
                             case Scheduling.Week:
-                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                                RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Weekly);
                                 break;
                             case Scheduling.Month:
-                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                                RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Monthly);
                                 break;
                             case Scheduling.Year:
-                                RecurringJob.AddOrUpdate("Advice: " + createdRepsonse.Entity.Id,
+                                RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     Cron.Yearly);
                                 break;
