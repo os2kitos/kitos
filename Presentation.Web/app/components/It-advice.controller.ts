@@ -66,6 +66,9 @@
                         {
                             field: "Subject",
                             title: "Emne"
+                        },
+                        {
+                            template: "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH')\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>"
                         }
                 ],
                     toolbar: [
@@ -126,24 +129,21 @@
                 templateUrl: "app/components/it-advice-modal-view.html",
                 controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
+                    if (action === 'POST') { 
                     $scope.externalCC = currentUser.email;
-                    $scope.type = type;
+                    //$scope.type = type; obsolete
                    // $scope.recieverUsers = users.data.value; For user mails in suggestions
                     $scope.recieverRoles = roles.data.value;
-
-                    $scope.tinymceOptions = {
-                        plugins: 'link image code',
-                        skin: 'lightgray',
-                        theme: 'modern',
-                        toolbar: "bold italic | example | code | preview | link | searchreplace"
-                    };
-
                     $scope.emailBody = "<a href='" + $window.location.href.replace("advice/" + type, "main") +"'>"+"Link til " + type +"</a>";
+                    }
+                    if (action === 'PATCH') {
 
-                    $scope.datepickerOptions = {
-                        format: "dd-MM-yyyy",
-                        parseFormats: ["yyyy-MM-dd"]
-                    };
+                        $scope.formDataSubject = 1;
+
+
+
+                    }
+
 
                     $scope.save = () => {
                         var url = "Odata/advice";
@@ -160,16 +160,27 @@
                         httpCall(payload, action, url);
                     };
 
+                    $scope.send = () => {
+                        var url = "Odata/advice";
+                        var payload = createPayload();
+                        httpCall(payload, action, url);
+                    };
+
+                    $scope.tinymceOptions = {
+                        plugins: 'link image code',
+                        skin: 'lightgray',
+                        theme: 'modern',
+                        toolbar: "bold italic | example | code | preview | link | searchreplace"
+                    };
+
+                    $scope.datepickerOptions = {
+                        format: "dd-MM-yyyy",
+                        parseFormats: ["yyyy-MM-dd"]
+                    };
                     function dateString2Date(dateString) {
                         var dt = dateString.split('-');
                         return new Date(dt[2]+"/"+dt[1]+"/"+dt[0]);
                     }
-
-                    $scope.send = () => {
-                        var url = "Odata/advice";
-                        var payload = createPayload();
-                        httpCall(payload,action,url);
-                    };
 
                     function httpCall(payload, action, url) {
                         $http({
