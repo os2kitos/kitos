@@ -18,11 +18,14 @@ namespace Presentation.Web.Controllers.OData
 
         IAuthenticationService _authService;
         IAdviceService _adviceService;
+        IGenericRepository<Advice> _repository;
+
         public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
             _authService = authService;
             _adviceService = adviceService;
+            _repository = repository;
         }
 
         [EnableQuery]
@@ -35,6 +38,19 @@ namespace Presentation.Web.Controllers.OData
                 
                 var createdRepsonse = (CreatedODataResult<Advice>)response ;
                 var name = "Advice: " + createdRepsonse.Entity.Id;
+
+                advice = createdRepsonse.Entity;
+                advice.JobId = name;
+
+                try
+                {
+                    _repository.Update(advice);
+                    _repository.Save();
+                }
+                catch (Exception e) {
+                    //todo log error
+                    return InternalServerError(e);
+                }
 
                 try
                 {
@@ -55,7 +71,7 @@ namespace Presentation.Web.Controllers.OData
 
                              var month = advice.AlarmDate.Value.Month;
                              var day = advice.AlarmDate.Value.Day;
-                             cron = "0 8 * " + day + " *";
+                             cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
@@ -87,7 +103,6 @@ namespace Presentation.Web.Controllers.OData
                                 RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
                     cron);
-
                             break;
                         }
                 }
