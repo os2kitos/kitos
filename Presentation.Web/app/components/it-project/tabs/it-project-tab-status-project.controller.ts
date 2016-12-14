@@ -31,7 +31,8 @@
             "project",
             "usersWithRoles",
             "user",
-            "statusUpdates"
+            "statusUpdates",
+            "moment"
         ];
 
         constructor(
@@ -42,7 +43,8 @@
             public project,
             private usersWithRoles,
             private user,
-            public statusUpdates) {
+            public statusUpdates,
+            public moment) {
 
             this.project.updateUrl = `api/itproject/${project.id}`;
 

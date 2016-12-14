@@ -8,7 +8,7 @@
             </div>
             <div class="form-group" data-ng-if="projectStatusVm.currentStatusUpdate">
                 <label class="control-label small">Dato for sidste status</label>
-                <p class="small" data-ng-bind="moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
+                <p class="small" data-ng-bind="projectStatusVm.moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary btn-block" ui-sref="it-project.edit.status-project.status-update-modal">Opret ny status</button>
