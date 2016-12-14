@@ -330,9 +330,9 @@
     <Compile Include="Migrations\201612121307579_Added AccessType.Designer.cs">
       <DependentUpon>201612121307579_Added AccessType.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201612121401597_temp.cs" />
-    <Compile Include="Migrations\201612121401597_temp.Designer.cs">
-      <DependentUpon>201612121401597_temp.cs</DependentUpon>
+    <Compile Include="Migrations\201612130917183_ITContract duration.cs" />
+    <Compile Include="Migrations\201612130917183_ITContract duration.Designer.cs">
+      <DependentUpon>201612130917183_ITContract duration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -487,8 +487,8 @@
     <EmbeddedResource Include="Migrations\201612121307579_Added AccessType.resx">
       <DependentUpon>201612121307579_Added AccessType.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612121401597_temp.resx">
-      <DependentUpon>201612121401597_temp.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201612130917183_ITContract duration.resx">
+      <DependentUpon>201612130917183_ITContract duration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

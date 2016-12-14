@@ -145,6 +145,13 @@ namespace Core.ApplicationServices
                 return true;
             }
 
+            //Check if user is allowed to set accessmodifier to public
+            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
+            if (accessModifier == AccessModifier.Public && !CanExecute(userId, Feature.CanSetAccessModifierToPublic))
+            {
+                return false;
+            }
+
             // check if user is in context
             if (entity is IContextAware) // TODO I don't like this impl
             {

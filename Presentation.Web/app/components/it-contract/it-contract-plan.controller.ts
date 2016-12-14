@@ -274,7 +274,7 @@
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
                                 Terminated: { type: "date" },
-                                Duration: { type: "number" }
+                                Duration: { type: "string" }
                             }
                         },
                         parse: response => {
@@ -620,40 +620,30 @@
                         title: "Varighed",
                         width: 115,
                         persistId: "duration", // DON'T YOU DARE RENAME!
-                        //template: dataItem => dataItem.Duration ? `${dataItem.Duration} md` : "",
-                        template: dataItem => {
-                            const concluded = this.moment(dataItem.Concluded);
-                            const expirationDate = this.moment(dataItem.ExpirationDate);
+                        template: (dataItem) => {
 
-                            //console.log("Test: " + dataItem.Concluded + " " + dataItem.ExpirationDate);
+                            if (dataItem.DurationOngoing) {
+                                return "Løbende";
+                            }
 
-                            if (!dataItem.Concluded || !dataItem.ExpirationDate)
-                                return "";
+                            let years = dataItem.DurationYears || 0;
+                            let months = dataItem.DurationMonths || 0;
 
-                            const years = expirationDate.diff(concluded, "years");
-                            const months = expirationDate.diff(concluded, "months");
-                            const numMonths = Math.abs((years * 12) - months);
+                            if (years > 0 && months > 0)
+                                return `${years} år og ${months} måneder`;
 
-                            //console.log(`years: ${years}`);
-                            //console.log(`months: ${months}`);
-                            //console.log(`numMonths: ${numMonths}`);
-
-                            if (years === 0)
+                            if (years < 1 && months > 0)
                                 return `${months} måneder`;
 
-                            if (years > 0 && numMonths === 0)
+                            if (years > 0 && months < 1)
                                 return `${years} år`;
 
-                            return `${years} år ${numMonths} måneder`;
+                            return "Ikke angivet";
+
                         },
                         hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq"
-                            }
-                        }
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "ExpirationDate",

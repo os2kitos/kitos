@@ -76,9 +76,13 @@
         OperationalAcceptanceTestApproved: Date;
         /** When the contract began. (indgået) */
         Concluded: Date;
-        /** Gets or sets the duration. (varighed) */
-        Duration: number;
+        /** Gets or sets the duration in years. (varighed) */
+        DurationYears: number;
+        /** Gets or sets the duration in months. (varighed) */
+        DurationMonths: number;
         /** Gets or sets the irrevocable to. (uopsigelig til) */
+        DurationOngoing: boolean;
+        /** Gets or sets the ongoing status. (løbende) */
         IrrevocableTo: Date;
         /** When the contract expires. (udløbet) */
         ExpirationDate: Date;
