@@ -6,6 +6,7 @@ using Core.DomainModel.Organization;
 namespace Core.DomainModel.ItSystemUsage
 {
     using System;
+    using System.ComponentModel.DataAnnotations.Schema;
 
     using ItSystem = Core.DomainModel.ItSystem.ItSystem;
 
@@ -303,5 +304,22 @@ namespace Core.DomainModel.ItSystemUsage
         {
             public virtual ICollection<ItSystem> References { get; set; } = new HashSet<ItSystem>();
         }
+
+        public bool? ArchiveDuty { get; set; }
+
+        public bool? Archived { get; set; }
+
+        public bool? ReportedToDPA { get; set; }
+
+        public string DocketNo { get; set; }
+
+        [Column(TypeName = "date")]
+        public DateTime? ArchivedDate { get; set; }
+
+        public string ArchiveNotes { get; set; }
+
+        public int? ArchiveLocationId { get; set; }
+
+        public virtual ArchiveLocation ArchiveLocation { get; set; }
     }
 }

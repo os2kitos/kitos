@@ -37,18 +37,26 @@
                 </select-option>
             </div>
             <!-- archiving -->
-            <div class="form-group">
+            <!--<div class="form-group">
                 <select-option data-id="archive"
-                                data-label="Arkivering"
-                                data-placeholder="Vælg arkivering"
-                                data-selected-text="{{ usage.archiveTypeName }}"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.archiveTypeId"
-                                data-options="archiveTypes"
-                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                data-field="archiveTypeId">
+                               data-label="Arkivering"
+                               data-placeholder="Vælg arkivering"
+                               data-selected-text="{{ usage.archiveTypeName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.archiveTypeId"
+                               data-options="archiveTypes"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="archiveTypeId">
                 </select-option>
                 <span class="help-block small">&nbsp;</span>
+            </div>-->
+            <!-- note -->
+            <div class="form-group">
+                <label for="note" class="control-label small">Note</label>
+                <textarea id="note" class="form-control input-sm" rows="5"
+                          data-ng-model="usage.note"
+                          data-ng-disabled="!hasWriteAccess"
+                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
             </div>
         </div>
 
@@ -70,14 +78,6 @@
                 <input type="text" id="usage-owner" class="form-control input-sm"
                        data-ng-disabled="true"
                        value="{{usage.objectOwnerFullName}}">
-            </div>
-            <!-- note -->
-            <div class="form-group">
-                <label for="note" class="control-label small">Note</label>
-                <textarea id="note" class="form-control input-sm" rows="5"
-                          data-ng-model="usage.note"
-                          data-ng-disabled="!hasWriteAccess"
-                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
             </div>
             <div class="form-group">
                 <label for="agreement-concluded" class="control-label small">

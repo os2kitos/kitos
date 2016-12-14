@@ -258,6 +258,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
@@ -320,6 +321,7 @@
     <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTypesController.cs" />
@@ -349,6 +351,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
     <Compile Include="Controllers\OData\BaseEntityController.cs" />
@@ -597,6 +600,7 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-edit-modal.controller.ts" />
@@ -742,6 +746,7 @@
     <Content Include="Content\css\fonts\tinymce.eot" />
     <Content Include="Content\css\fonts\tinymce.ttf" />
     <Content Include="Content\css\fonts\tinymce.woff" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.view.html" />
     <None Include="Content\kitos.less" />
     <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />

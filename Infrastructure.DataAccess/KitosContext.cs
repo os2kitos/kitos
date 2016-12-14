@@ -32,6 +32,7 @@ namespace Infrastructure.DataAccess
         public DbSet<Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
+        public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
