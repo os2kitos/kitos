@@ -5,6 +5,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Hangfire;
 using Ninject;
 using System;
 using System.Linq;
@@ -40,88 +41,99 @@ namespace Core.ApplicationServices
 
             if (advice != null)
             {
-
-                try
-                {
-                    //Setup mail
-                    var message = new MailMessage()
-                    {
-                        Body = advice.Body,
-                        Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                        BodyEncoding = Encoding.UTF8
-                    };
-
-                    message.From = new MailAddress("no_reply@kitos.dk");
-
-                    //Add recivers for Email
-                    foreach (var r in advice.Reciepients) {
-                        if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER) { 
-                        message.To.Add(r.Name);
-                        }
-                        if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER) {
-                        message.CC.Add(r.Name);
-                        }
-                        if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
-                        {
-
-                            switch (advice.Type)
-                            {
-                                case ObjectType.itContract:
-
-                                    var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
-                                   && I.Role.Name == r.Name);
-                                    if (result != null)
-                                    {
-                                        if (result.User != null)
-                                        {
-                                            message.CC.Add(result.User.Email);
-                                        }
-                                    }
-                                        break;
-                            }
-
-                            
-                        }
-                        if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
-                        {
-                            switch (advice.Type)
-                            {
-                                case ObjectType.itContract:
-
-                                    var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
-                                    && I.Role.Name == r.Name);
-                                    if (result != null)
-                                    { 
-                                        if (result.User != null) { 
-                                             message.To.Add(result.User.Email);
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                    }
-
-                    //Send Mail.
-                    _mailClient.Send(message);
-                    advice.SentDate = DateTime.Now;
-
-                    _adviceRepository.Update(advice);
-                    _adviceRepository.Save();
-
-
-                    _adviceSentRepository.Insert(new AdviceSent() {
-                        AdviceId = id,
-                        AdviceSentDate = DateTime.Now
-                    });
-
-                    _adviceSentRepository.Save();
-
-                    return true;
-                }
-                catch (Exception e)
-                {
-                    //todo log exception
+                if (advice.StopDate < DateTime.Now) {
+                    RecurringJob.RemoveIfExists("SomeIdExtractedFromadvice");
                     return false;
+                }
+                if (advice.AlarmDate > DateTime.Now)
+                {
+                    try
+                    {
+                        //Setup mail
+                        var message = new MailMessage()
+                        {
+                            Body = advice.Body,
+                            Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
+                            BodyEncoding = Encoding.UTF8
+                        };
+
+                        message.From = new MailAddress("no_reply@kitos.dk");
+
+                        //Add recivers for Email
+                        foreach (var r in advice.Reciepients)
+                        {
+                            if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
+                            {
+                                message.To.Add(r.Name);
+                            }
+                            if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
+                            {
+                                message.CC.Add(r.Name);
+                            }
+                            if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
+                            {
+
+                                switch (advice.Type)
+                                {
+                                    case ObjectType.itContract:
+
+                                        var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
+                                       && I.Role.Name == r.Name);
+                                        if (result != null)
+                                        {
+                                            if (result.User != null)
+                                            {
+                                                message.CC.Add(result.User.Email);
+                                            }
+                                        }
+                                        break;
+                                }
+
+
+                            }
+                            if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
+                            {
+                                switch (advice.Type)
+                                {
+                                    case ObjectType.itContract:
+
+                                        var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        if (result != null)
+                                        {
+                                            if (result.User != null)
+                                            {
+                                                message.To.Add(result.User.Email);
+                                            }
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+
+                        //Send Mail.
+                        _mailClient.Send(message);
+                        advice.SentDate = DateTime.Now;
+
+                        _adviceRepository.Update(advice);
+                        _adviceRepository.Save();
+
+
+                        _adviceSentRepository.Insert(new AdviceSent()
+                        {
+                            AdviceId = id,
+                            AdviceSentDate = DateTime.Now
+                        });
+
+                        _adviceSentRepository.Save();
+
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        //todo log exception
+                        return false;
+                    }
                 }
             }
 
