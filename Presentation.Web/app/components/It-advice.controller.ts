@@ -151,10 +151,20 @@
                         var payload = createPayload();
                         //setup scheduling
                         payload.Scheduling = $scope.repitionPattern;
-                        payload.AlarmDate = new Date($scope.formData.date);
-                        payload.StopDate = new Date($scope.formData.stopDate);
+                        payload.AlarmDate = dateString2Date($scope.formData.date);
+                        payload.StopDate = dateString2Date($scope.formData.stopDate);
+
+                        console.log(dateString2Date($scope.formData.date));
+                        console.log(payload);
+
+
                         httpCall(payload, action, url);
                     };
+
+                    function dateString2Date(dateString) {
+                        var dt = dateString.split('-');
+                        return new Date(dt[2]+"/"+dt[1]+"/"+dt[0]);
+                    }
 
                     $scope.send = () => {
                         var url = "Odata/advice";

@@ -44,30 +44,51 @@ namespace Presentation.Web.Controllers.OData
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id));
                                 break;
                             case Scheduling.Hour:
-                                RecurringJob.AddOrUpdate(name,
+                            
+                            string cron = "0 * * * *";
+
+                            RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
-                    Cron.Hourly);
+                    cron);
                                 break;
                             case Scheduling.Day:
-                                RecurringJob.AddOrUpdate(name,
+
+                             var month = advice.AlarmDate.Value.Month;
+                             var day = advice.AlarmDate.Value.Day;
+                             cron = "0 8 * " + day + " *";
+
+                            RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
-                    Cron.Daily);
+                    cron);
                                 break;
                             case Scheduling.Week:
-                                RecurringJob.AddOrUpdate(name,
+                            string weekDay = advice.AlarmDate.Value.DayOfWeek.ToString().Substring(0, 3);
+                            cron = "0 8 *  * " + weekDay;
+
+                            RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
-                    Cron.Weekly);
+                    cron);
                                 break;
                             case Scheduling.Month:
-                                RecurringJob.AddOrUpdate(name,
+
+                            day = advice.AlarmDate.Value.Day;
+                            cron = "0 8 " + day + " * *";
+
+                            RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
-                    Cron.Monthly);
+                    cron);
                                 break;
                             case Scheduling.Year:
+
+                             month = advice.AlarmDate.Value.Month;
+                             day = advice.AlarmDate.Value.Day;
+                             cron = "0 8 " + day + " " + month + " *";
+                                
                                 RecurringJob.AddOrUpdate(name,
                     () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
-                    Cron.Yearly);
-                                break;
+                    cron);
+
+                            break;
                         }
                 }
                 catch (Exception e) {
