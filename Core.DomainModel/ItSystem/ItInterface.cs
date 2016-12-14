@@ -96,5 +96,7 @@ namespace Core.DomainModel.ItSystem
         ///     The interface local exposure.
         /// </value>
         public virtual ICollection<ItInterfaceExhibitUsage> InterfaceLocalExposure { get; set; }
+
+        public bool Disabled { get; set; }
     }
 }

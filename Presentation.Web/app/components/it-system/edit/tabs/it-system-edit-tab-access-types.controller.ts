@@ -54,8 +54,11 @@
                     _.remove($scope.accessTypes, function (o:any) {
                         return o.Id === id;
                     });
-                }).error(function () {
-                    msg.toErrorMessage("Kan ikke slettes, da den er i brug.");
+                }).error(function (data, status) {
+                    if (status === 409)
+                        msg.toErrorMessage("Fejl! Kan ikke slettes, da den er i brug.");
+                    else
+                        msg.toErrorMessage('Fejl! Kunne ikke slette!');
                 });
             }
         }

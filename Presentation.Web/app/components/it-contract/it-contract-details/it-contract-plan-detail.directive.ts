@@ -6,6 +6,7 @@
         action: string;
         fieldValue: string;
         odataQuery: string;
+        detailModelType: string;
         mainGrid: IKendoGrid<any>;
         mainGridOptions: IKendoGridOptions<any>;
     }
@@ -16,7 +17,8 @@
             detailType: "@",
             action: "@",
             fieldValue: "@",
-            odataQuery: "@"
+            odataQuery: "@",
+            detailModelType: "@"
         };
 
         public static directiveName = "contractDetails";
@@ -43,6 +45,12 @@
                 columns: [
                     {
                         field: `${scope.fieldValue}`, title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
+                        template: dataItem => {
+                            if (dataItem[scope.detailModelType].Disabled)
+                                return dataItem[scope.detailModelType].Name + " (udgået)";
+                            else
+                                return dataItem[scope.detailModelType].Name;
+                        },
                         persistId: "fieldValue", // DON'T YOU DARE RENAME!
                         hidden: false
                     }

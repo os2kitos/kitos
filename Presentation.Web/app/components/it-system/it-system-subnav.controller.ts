@@ -7,7 +7,8 @@
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();
-                }]
+                }],
+
             },
             controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
                 $rootScope.page.title = 'IT System';
@@ -19,11 +20,12 @@
                     { state: 'it-system.usage', text: 'IT System anvendelse', showWhen: 'it-system.usage' },
                     { state: 'it-system.interface-edit', text: 'Snitflade', showWhen: 'it-system.interface-edit' }
                 ];
+                
                 $rootScope.page.subnav.buttons = [
                    // { func: createInterface, text: 'Opret Snitflade', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: removeUsage, text: 'Fjern anvendelse', style: 'btn-danger', showWhen: 'it-system.usage' },
-                    { func: removeSystem, text: 'Slet IT System', style: 'btn-danger',  showWhen: 'it-system.edit' },
-                    { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger',  showWhen: 'it-system.interface-edit' }
+                    { func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' },
+                    { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                 ];
 
                 function removeSystem() {

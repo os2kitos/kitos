@@ -25,5 +25,6 @@ namespace Presentation.Web.Models
 
         public string ItInterfaceUseItSystemName { get; set; }
         public string ItInterfaceUseItInterfaceName { get; set; }
+        public bool ItInterfaceUseItInterfaceDisabled { get; set; }
     }
 }

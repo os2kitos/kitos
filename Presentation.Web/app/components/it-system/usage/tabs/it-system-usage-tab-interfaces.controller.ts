@@ -112,6 +112,7 @@
             });
             $scope.interfaceExposures = exhibits;
 
+
             // interface usages
             _.each(canUseInterfaces, function(canUseInterface: { id; updateUrl; urlParams; usage; infrastructure; dataRows; }) {
                 canUseInterface.updateUrl = "api/ItInterfaceUsage/";

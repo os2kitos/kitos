@@ -84,6 +84,8 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<AccessType> AccessTypes { get; set; }
 
+        public bool Disabled { get; set; }
+
         /// <summary>
         /// Gets or sets the usages.
         /// </summary>

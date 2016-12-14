@@ -462,7 +462,10 @@
                         template: dataItem => {
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
-                                value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
+                                if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (udgået)";
+                                else
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
                             }
 
                             if (dataItem.AssociatedSystemUsages.length > 1) {

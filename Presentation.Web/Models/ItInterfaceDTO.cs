@@ -45,5 +45,7 @@ namespace Presentation.Web.Models
         ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
         /// </value>
         public bool IsUsed { get; set; }
+
+        public bool Disabled { get; set; }
     }
 }

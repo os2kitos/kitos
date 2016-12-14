@@ -87,6 +87,7 @@
                 $state.go('.', null, { reload: true });
             }
 
+
             function formatAssociatedSystems(associatedSystemUsages) {
 
                 //helper functions
@@ -116,6 +117,7 @@
                 });
 
                 $scope.associatedSystemUsages = associatedSystemUsages;
+
 
                 $scope.newAssociatedSystemUsage = {
                     save: function() {
@@ -192,15 +194,17 @@
                         var results = [];
 
                         // for each interface usages
-                        _.each(data.data.response, function(usage: { itInterfaceId; itSystemId; id; itInterfaceName; }) {
-                            results.push({
-                                // use the id of the interface usage
-                                id: $scope.newAssociatedInterfaceRelation == 'using' ? { intfId: usage.itInterfaceId, sysId: usage.itSystemId } : usage.id,
-                                // use the name of the actual interface
-                                text: usage.itInterfaceName,
-                            });
+                        _.each(data.data.response, function (usage: { itInterfaceId; itSystemId; id; itInterfaceName; itInterfaceDisabled; }) {
+                            if (!usage.itInterfaceDisabled) {
+                                results.push({
+                                    // use the id of the interface usage
+                                    id: $scope.newAssociatedInterfaceRelation == 'using' ? { intfId: usage.itInterfaceId, sysId: usage.itSystemId } : usage.id,
+                                    // use the name of the actual interface
+                                    text: usage.itInterfaceName
+                                });
+                            }
                         });
-
+                        
                         return { results: results };
                     }
                 }
@@ -229,15 +233,17 @@
                         var results = [];
 
                         // for each system usages
-                        _.each(data.data.response, function(usage: { id; itSystem; }) {
-                            results.push({
-                                // the id of the system usage id, that is selected
-                                id: usage.id,
-                                // name of the system is the label for the select2
-                                text: usage.itSystem.name,
-                                // the if the system id that is selected
-                                itSystemId: usage.itSystem.id,
-                            });
+                        _.each(data.data.response, function (usage: { id; itSystem; }) {
+                            if (!usage.itSystem.disabled) {
+                                results.push({
+                                    // the id of the system usage id, that is selected
+                                    id: usage.id,
+                                    // name of the system is the label for the select2
+                                    text: usage.itSystem.name,
+                                    // the if the system id that is selected
+                                    itSystemId: usage.itSystem.id
+                                });
+                            }
                         });
 
                         return { results: results };
