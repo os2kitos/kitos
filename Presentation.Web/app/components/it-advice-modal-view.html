@@ -4,51 +4,52 @@
 
 <form name="createForm">
     <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6">
 
+                <!--Modtager(e)-->
+                <div class="form-group">
+                    <label for="contract-note" class="control-label">Til</label>
+                    <select-multiple-recievers data-id="agreement-elements"
+                                               placeholder="Vælg modtagere"
+                                               data-ng-model="selectedRecievers"
+                                               data-roles="recieverRoles"
+                                               data-users="recieverUsers"
+                                               data-field="elemId">
+                    </select-multiple-recievers>
+                </div>
 
-        <!--Modtager(e)-->
-        <div class="form-group">
-            <label for="contract-note" class="control-label">Til</label>
-            <select-multiple-recievers data-id="agreement-elements"
-                                    placeholder="Vælg modtagere"
-                                    data-ng-model="selectedRecievers"
-                                    data-roles="recieverRoles"
-                                    data-users="recieverUsers"
-                                    data-field="elemId">
-            </select-multiple-recievers>
-            </div>
-            
-            <div class="form-group">
-                <a href="#" ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
-                <div ng-show="collapsed">
-                    <input id="toExternal" type="email" name="toExternal" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
-             
+                <div class="form-group">
+                    <a href="#" ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
+                    <div ng-show="collapsed">
+                        <input id="toExternal" type="email" name="toExternal" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
+
                     </div>
                 </div>
-        <!--CC('ere)-->
-        <div class="form-group">
-            <label for="contract-note" class="control-label small">CC</label>
-            <select-multiple-recievers data-id="agreement-elements"
-                                    data-placeholder="Vælg CC"
-                                    data-ng-model="selectedCC"
-                                    data-roles="recieverRoles"
-                                    data-users="recieverUsers"
-                                    data-field="elemId">
-            </select-multiple-recievers>
-        </div>
-            <div class="form-group">
-                <a href="#" ng-model="CCcollapsed" ng-click="CCcollapsed = !CCcollapsed"><div ng-show="CCcollapsed">Tilføj Email adresse manuelt</div><div ng-show="!CCcollapsed">Minimer</div></a>
-                <div ng-show="!CCcollapsed">
-                    <input id="cc" type="text" placeholder="separer flere adresser med ," class="form-control" data-ng-model="externalCC">
+                <!--CC('ere)-->
+                <div class="form-group">
+                    <label for="contract-note" class="control-label small">CC</label>
+                    <select-multiple-recievers data-id="agreement-elements"
+                                               data-placeholder="Vælg CC"
+                                               data-ng-model="selectedCC"
+                                               data-roles="recieverRoles"
+                                               data-users="recieverUsers"
+                                               data-field="elemId">
+                    </select-multiple-recievers>
                 </div>
-            </div>
+                <div class="form-group">
+                    <a href="#" ng-model="CCcollapsed" ng-click="CCcollapsed = !CCcollapsed"><div ng-show="CCcollapsed">Tilføj Email adresse manuelt</div><div ng-show="!CCcollapsed">Minimer</div></a>
+                    <div ng-show="!CCcollapsed">
+                        <input id="cc" type="text" placeholder="separer flere adresser med ," class="form-control" data-ng-model="externalCC">
+                    </div>
+                </div>
 
                 <div class="form-group has-feedback" data-show-errors>
                     <!--Emne-->
                     <label class="control-label" for="name">Emne</label>
                     <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="formData.subject">
                     <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.subject.$invalid && createForm.subject.$dirty, 'glyphicon-ok': createForm.subject.$valid }"></span>
-    
+
                 </div>
 
 
@@ -63,20 +64,28 @@
                 <div class="form-group md-">
                     <button type="submit" class="btn btn-primary" ng-click="send()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject)">Send</button>
                 </div>
-                
-        <div class="form-group">
-            <label for="contract-supplier" class="control-label">GentageMønster </label>
-            <select class="form-control" data-id="sensitive"
-                    data-ng-model="repitionPattern">
-                <option value="Hour">Time</option>
-                <option value="Day">Dag</option>
-                <option value="Week">Uge</option>
-                <option value="Month">Måned</option>
-                <option value="Year">År</option>
-            </select>
-        </div>
-        
-        <!--Dato-->
+            </div>
+            <div class="col-md-6">
+                <div class="form-group has-feedback" data-show-errors>
+                    <!--Navn-->
+                    <label class="control-label" for="name">Navn</label>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" required data-ng-model="formData.Name">
+                    <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.Name.$invalid && createForm.Name.$dirty, 'glyphicon-ok': createForm.Name.$valid }"></span>
+
+                </div>
+                <div class="form-group">
+                    <label for="contract-supplier" class="control-label">GentageMønster </label>
+                    <select class="form-control" data-id="sensitive"
+                            data-ng-model="repitionPattern">
+                        <option value="Hour">Time</option>
+                        <option value="Day">Dag</option>
+                        <option value="Week">Uge</option>
+                        <option value="Month">Måned</option>
+                        <option value="Year">År</option>
+                    </select>
+                </div>
+
+                <!--Dato-->
                 <div class="form-group">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
@@ -89,9 +98,13 @@
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="formData.stopDate">
                 </div>
+                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject && !!repitionPattern && !!formData.stopDate &&  formData.date)">Gem</button>
+                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
             </div>
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject && !!repitionPattern && !!formData.stopDate &&  formData.date)">Gem</button>
-        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
+        </div>
+            <!--<div class="modal-footer">
+                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject && !!repitionPattern && !!formData.stopDate &&  formData.date)">Gem</button>
+                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
+            </div>-->
     </div>
 </form>
