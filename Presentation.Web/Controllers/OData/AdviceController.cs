@@ -13,6 +13,8 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
+    using System.Net;
+
     public class AdviceController : BaseEntityController<Advice>
     {
 
@@ -157,22 +159,31 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Delete(int key)
         {
-            var response = base.Delete(key);
+            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
+            if (entity == null)
+                return NotFound();
 
-            if (response.GetType() == typeof(StatusCodeResult))
+            if (!_authService.HasWriteAccess(UserId, entity))
+                return StatusCode(HttpStatusCode.Forbidden);
+            try
             {
-                try
-                {
-                    RecurringJob.RemoveIfExists("Advice: " + key);
-                }
-                catch (Exception e) {
-                    return InternalServerError(e);
-                }
+                RecurringJob.RemoveIfExists("Advice: " + key);
             }
-            return response;
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+            try
+            {
+                Repository.DeleteByKey(key);
+                Repository.Save();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+
+            return StatusCode(HttpStatusCode.NoContent);
         }
-
-
-
     }
 }

@@ -22,14 +22,14 @@
                 selectable: true,
                 change: onChange,
                 columns: [{
-                        field: "SentDate",
-                        title: "Sidst sendt",
-                        template: x => {
-                            if (x.SentDate != null) {
-                                return kendo.toString(new Date(x.SentDate), "d");
+                            field: "SentDate",
+                            title: "Sidst sendt",
+                            template: x => {
+                                if (x.SentDate != null) {
+                                    return kendo.toString(new Date(x.SentDate), "d");
+                                }
+                                return "";
                             }
-                            return "";
-                        }
                         },
                         {
                             field: "Id",
@@ -80,7 +80,8 @@
                             title: "Emne"
                         },
                         {
-                            template: "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH')\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>"
+                            template: x => "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH')\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>" +
+                                                `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${x.Id})"></button>`
                         }
                 ],
                     toolbar: [
@@ -112,7 +113,13 @@
             },
                 columns: [{
                     field: "AdviceSentDate",
-                    title: "Afsendt"
+                    title: "Afsendt",
+                    template: x => {
+                        if (x.AdviceSentDate != null) {
+                            return kendo.toString(new Date(x.AdviceSentDate), "g");
+                        }
+                        return "";
+                    }
                 }
                 ],
             };
@@ -130,6 +137,12 @@
                 $("#detailGrid").data("kendoGrid").dataSource.transport.options.read.url = "/Odata/adviceSent?$filter=AdviceId eq " + selectedItem.Id;
                 $("#detailGrid").data("kendoGrid").dataSource.read();
             };
+
+            $scope.deleteAdvice = (id) => {
+                $http.delete(`odata/advice(${id})`)
+                    .then(notify.addSuccessMessage("Advisen er slettet!"));
+                $("#mainGrid").data("kendoGrid").dataSource.read();
+            }
 
             $scope.newAdvice = function (action) {
 
@@ -165,10 +178,7 @@
                         payload.AlarmDate = dateString2Date($scope.formData.date);
                         payload.StopDate = dateString2Date($scope.formData.stopDate);
                         payload.Name = $scope.formData.Name;
-
-                        console.log(dateString2Date($scope.formData.date));
                         console.log(payload);
-
 
                         httpCall(payload, action, url);
                     };

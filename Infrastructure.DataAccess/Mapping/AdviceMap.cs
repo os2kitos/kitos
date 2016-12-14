@@ -12,6 +12,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasMany(a => a.AdviceSent)
                 .WithRequired(a => a.Advice)
                 .WillCascadeOnDelete(true);
+            this.HasMany(a=> a.Reciepients)
+                .WithRequired(ar => ar.Advice)
+                .WillCascadeOnDelete(true);
+            
           
             
 

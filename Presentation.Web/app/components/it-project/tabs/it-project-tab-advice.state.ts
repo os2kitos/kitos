@@ -16,6 +16,15 @@
                     return $http.get('api/itProject/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
+                }],
+                object: ['project', function (project) {
+                    return project;
+                }],
+                users: ['UserGetService', function (UserGetService) {
+                    return UserGetService.GetAllUsers();
+                }],
+                type: [function () {
+                    return "ItProject";
                 }]
             }
         });
