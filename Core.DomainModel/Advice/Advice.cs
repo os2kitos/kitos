@@ -137,7 +137,11 @@ namespace Core.DomainModel.Advice
         /// The email subject.
         /// </value>
         public string Subject { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the job id.
+        /// </summary>
+        public string JobId { get; set; }
 
         /// <summary>
         /// Determines whether a user has write access to this instance.

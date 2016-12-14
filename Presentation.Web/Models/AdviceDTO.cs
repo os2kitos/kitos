@@ -13,5 +13,6 @@ namespace Presentation.Web.Models
         public string Subject { get; set; }
         public int ItContractId { get; set; }
         public DateTime? SentDate { get; set; }
+        public string JobId { get; set; }
     }
 }

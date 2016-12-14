@@ -124,10 +124,9 @@
              
                 windowClass: "modal fade in",
                 templateUrl: "app/components/it-advice-modal-view.html",
-                controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", function ($scope, $modalInstance,users, roles, $window, type, action,object) {
+                controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
-                    //console.log($rootscope);
-                    $scope.externalCC = "Rasmus@live.dk, ";
+                    $scope.externalCC = currentUser.email;
                     $scope.type = type;
                    // $scope.recieverUsers = users.data.value; For user mails in suggestions
                     $scope.recieverRoles = roles.data.value;
@@ -264,8 +263,10 @@
                     }],
                     object: [function () {
                         return $scope.object;
-                    }]
-
+                    }],
+                    currentUser: ["userService",
+                        (userService) => userService.getUser()
+                    ]
                 }
             });
         }
