@@ -619,10 +619,11 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region TEXTS
 
-            context.Texts.AddOrUpdate(x => x.Id,
-                                      new Text()
-                                      {
-                                          Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
+            if (!context.Texts.Any(x => x.Id == 1))
+            {
+                context.Texts.AddOrUpdate(new Text()
+                {
+                    Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
 Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
 KITOS er bygget op omkring flg. moduler:
 1.	IT understøttelse af organisation
@@ -633,10 +634,62 @@ KITOS er bygget op omkring flg. moduler:
 De første kommuner tager KITOS i brug i oktober 2014.
 Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
 Kontakt: info@kitos.dk",
-                                          ObjectOwnerId = globalAdmin.Id,
-                                          LastChangedByUserId = globalAdmin.Id
-                                      },
-                                      new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
+                });
+            }
+
+            if (!context.Texts.Any(x => x.Id == 2))
+            {
+                context.Texts.AddOrUpdate( new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+            }
+
+            if (!context.Texts.Any(x => x.Id == 3))
+            {
+                context.Texts.AddOrUpdate(new Text() {
+                    Value = @"<ul class='list-unstyled'>
+                        <li><a href='/docs/Vejledning til slutbrugeren.pdf' target='_blank'>Vejledning til login og brugerkonto</a></li>
+                        <li><a href='/docs/Vejledning_Masseopret.pdf' target='_blank'>Vejledning til lokale administratorer</a></li>
+                        <li><a href='/docs/Vejledning til roller og rettigheder.pdf' target='_blank'>Vejledning til roller og rettigheder</a></li>
+                        <li><a href='/docs/Vejledning til tabeller på overblik.pdf' target='_blank'>Vejledning til tabeller på overblik</a></li>
+                        <li><a href='/docs/vejledningerOrganisation.pdf' target='_blank'>Vejledning til modulet Organisation</a></li>
+                        <li><a href='/docs/vejledningerITProjekter.pdf' target='_blank'>Vejledning til modulet IT Projekter</a></li>
+                        <li><a href='/docs/vejledningerITSystemer.pdf' target='_blank'>Vejledning til modulet IT Systemer</a></li>
+                        <li><a href='/docs/vejledningerITKontrakter.pdf' target='_blank'>Vejledning til modulet IT Kontrakter</a></li>
+                        <li><a href='/docs/html/index.html' target='_blank'>Kitos kode dokumentation</a></li>
+                        <li><a href='/Content/excel/Kontrakt_Indgåelse_Skabelon.xlsx' target='_blank'>Kontrakt-skabelon</a></li>
+                    </ul>",
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
+                });
+            }
+
+            if (!context.Texts.Any(x => x.Id == 4))
+            {
+                context.Texts.AddOrUpdate(new Text() { Value = "Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+            }
+
+            if (!context.Texts.Any(x => x.Id == 5))
+            {
+                context.Texts.AddOrUpdate(new Text() {
+                    Value = @"<p>Gør følgende for at tilslutte jer KITOS:</p>
+                    <ol>
+                        <li>Læs tilslutningsaftalen <a href='http://os2.eu/dokument/kitos-tilslutningsaftale-publiceret'>her</a>.</li>
+                        <li>
+                            Udfyld og underskriv tilslutningsaftalen og send den til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at tilmelde jer KITOS. Skriv gerne hvornår
+                            I ønsker, at tilslutningen skal træde i kraft.
+                        </li>
+                        <li>Herefter kontakter vi jer, så vi kan få en snak om, hvad der skal ske fremover, og hvordan I bedst muligt tager KITOS i brug i jeres kommune.</li>
+                    </ol>
+                    <p>Ønsker I mere information om tilslutningsprocessen og KITOS generelt:</p>
+                    <ol>
+                        <li>Læs mere om KITOS <a href='http://os2.eu/produkt/os2kitos'>her</a>.</li>
+                        <li>Skriv til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at få besvaret eventuelle spørgsmål. Oplys et telefonnr., hvis I ønsker at blive ringet op.</li>
+                    </ol>",
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
+                });
+            }
 
             #endregion
 

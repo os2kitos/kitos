@@ -20,10 +20,20 @@
         ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
+            $scope.texts = [];
+            $scope.texts["about"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 1));
+            $scope.texts["status"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 2));
+            $scope.texts["guide"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 3));
+            $scope.texts["support"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 4));
+            $scope.texts["join"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 5));
 
-            $scope.about = _.find(texts, (textObj: { id; value; }) => (textObj.id == 1)).value;
+            $scope.tinymceOptions = {
+                plugins: 'link image code',
+                skin: 'lightgray',
+                theme: 'modern'
+            };
 
-            $scope.status = _.find(texts, (textObj: { id; value; }) => (textObj.id == 2)).value;
+            $scope.text = {};
 
             // login
             $scope.submitLogin = () => {
@@ -49,6 +59,24 @@
                             notify.addErrorMessage("Forkert brugernavn eller password!");
                     });
             };
+
+            $scope.save = (text) => {
+                var msg = notify.addInfoMessage("Gemmer...", false);
+
+                var payload = { value: text.value };
+
+                $http({ method: 'PATCH', url: 'api/text/' + text.id + '?organizationId=' + 0, data: payload, ignoreLoadingBar: true })
+                    .success(function () {
+                        msg.toSuccessMessage("Feltet er opdateret.");
+                    })
+                    .error(function (result, status) {
+                        if (status === 409) {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                        } else {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        }
+                    });
+            }
         }
     ]);
 })(angular, app);
