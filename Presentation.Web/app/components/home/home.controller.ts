@@ -16,16 +16,23 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
-            $scope.texts["about"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 1));
-            $scope.texts["status"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 2));
-            $scope.texts["guide"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 3));
-            $scope.texts["support"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 4));
-            $scope.texts["join"] = _.find(texts, (textObj: { id; value; }) => (textObj.id == 5));
+            $scope.texts.about = _.find(texts, (textObj: { id; value; }) => (textObj.id == 1));
+            $scope.texts.status = _.find(texts, (textObj: { id; value; }) => (textObj.id == 2));
+            $scope.texts.guide = _.find(texts, (textObj: { id; value; }) => (textObj.id == 3));
+            $scope.texts.support = _.find(texts, (textObj: { id; value; }) => (textObj.id == 4));
+            $scope.texts.join = _.find(texts, (textObj: { id; value; }) => (textObj.id == 5));
+
+            /* Fix html to enabe alignment etc. */
+            $scope.texts.about.value = $sce.trustAsHtml($scope.texts.about.value);
+            $scope.texts.status.value = $sce.trustAsHtml($scope.texts.status.value);
+            $scope.texts.guide.value = $sce.trustAsHtml($scope.texts.guide.value);
+            $scope.texts.support.value = $sce.trustAsHtml($scope.texts.support.value);
+            $scope.texts.join.value = $sce.trustAsHtml($scope.texts.join.value);
 
             $scope.tinymceOptions = {
                 plugins: 'link image code',
@@ -65,7 +72,7 @@
 
                 var payload = { value: text.value };
 
-                $http({ method: 'PATCH', url: 'api/text/' + text.id + '?organizationId=' + 0, data: payload, ignoreLoadingBar: true })
+                $http({ method: 'PATCH', url: 'api/text/' + text.id + '?organizationId=' + 1, data: payload, ignoreLoadingBar: true })
                     .success(function () {
                         msg.toSuccessMessage("Feltet er opdateret.");
                     })
