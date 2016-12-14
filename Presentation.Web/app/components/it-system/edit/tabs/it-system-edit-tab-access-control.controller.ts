@@ -1,10 +1,10 @@
 ﻿(function (ng, app) {
     app.config([
         '$stateProvider', function ($stateProvider) {
-            $stateProvider.state('it-system.edit.access-types', {
-                url: '/access-types',
-                templateUrl: 'app/components/it-system/edit/tabs/it-system-edit-tab-access-types.view.html',
-                controller: 'system.SystemAccessTypesCtrl',
+            $stateProvider.state('it-system.edit.access-control', {
+                url: '/access-control',
+                templateUrl: 'app/components/it-system/edit/tabs/it-system-edit-tab-access-control.view.html',
+                controller: 'system.SystemAccessControlCtrl',
                 resolve: {
                     accessTypes: [
                         '$http', 'itSystem', function ($http, itSystem) {
@@ -18,7 +18,7 @@
         }
     ]);
 
-    app.controller('system.SystemAccessTypesCtrl', [
+    app.controller('system.SystemAccessControlCtrl', [
         '$scope', '$http', '$state', 'notify', 'itSystem', 'user', "hasWriteAccess", "accessTypes",
         function ($scope, $http, $state, notify, itSystem, user, hasWriteAccess, accessTypes) {
             var systemId = itSystem.id;

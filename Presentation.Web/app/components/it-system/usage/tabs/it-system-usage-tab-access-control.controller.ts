@@ -1,9 +1,9 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.usage.access-types', {
-            url: '/access-types',
-            templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-access-types.view.html',
-            controller: 'system.UsageAccessTypes',
+        $stateProvider.state('it-system.usage.access-control', {
+            url: '/access-control',
+            templateUrl: 'app/components/it-system/usage/tabs/it-system-usage-tab-access-control.view.html',
+            controller: 'system.UsageAccessControl',
             resolve: {
                 accessTypes: [
                     '$http', 'itSystemUsage', function ($http, itSystemUsage) {
@@ -23,7 +23,7 @@
         });
     }]);
 
-    app.controller('system.UsageAccessTypes', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes',
+    app.controller('system.UsageAccessControl', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes',
         function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes, activeAccessTypes) {
             var usageId = itSystemUsage.id;
 
