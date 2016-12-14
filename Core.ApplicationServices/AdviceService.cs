@@ -42,7 +42,7 @@ namespace Core.ApplicationServices
             if (advice != null)
             {
                 if (advice.StopDate < DateTime.Now) {
-                    RecurringJob.RemoveIfExists("SomeIdExtractedFromadvice");
+                    RecurringJob.RemoveIfExists(advice.JobId);
                     return false;
                 }
                 if (advice.AlarmDate > DateTime.Now)
