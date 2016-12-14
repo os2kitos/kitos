@@ -86,12 +86,12 @@
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
-                itSystemBaseUrl = "/odata/ItSystems";
+                itSystemBaseUrl = "/odata/ItSystems?";
             } else {
                 // everyone else are limited to within organizationnal context
-                itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
+                itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems?$filter=Disabled eq false`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
+            var itSystemUrl = itSystemBaseUrl + "&$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
 
             // catalog grid
             this.mainGridOptions = {
@@ -231,8 +231,22 @@
                     {
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref="it-system.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.Disabled)
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (udgået) </a>`;
+                            else
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.Name) {
+                                if (dataItem.Disabled)
+                                    return dataItem.Name + " (udgået)";
+                                else
+                                    return dataItem.Name;
+                            } else {
+                                return ""
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],

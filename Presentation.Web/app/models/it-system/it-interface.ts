@@ -16,6 +16,7 @@
         Method: IMethod;
         DataRows: Array<IDataRow>;
         Note: string;
+        Disabled: boolean;
         /** Gets or sets it systems that can use this instance. */
         CanBeUsedBy: Array<IItInterfaceUse>;
         /** Gets or sets it system that exhibits this interface instance. */

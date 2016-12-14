@@ -10,7 +10,7 @@
         <tbody>
             <tr data-ng-repeat="interface in canUseInterfaces | filter: {show:true}">
                 <td>
-                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: interface.id })">{{ interface.name }}</a>
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: interface.id })">{{ interface.name }} <span data-ng-if="interface.disabled">(udgået)</span></a>
                 </td>
                 <td>
                     <button class="btn btn-danger btn-xs delete-interface"

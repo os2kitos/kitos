@@ -274,7 +274,7 @@
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
                                 Terminated: { type: "date" },
-                                Duration: { type: "number" }
+                                Duration: { type: "string" }
                             }
                         },
                         parse: response => {
@@ -357,17 +357,20 @@
                 columnMenu: {
                     filterable: false
                 },
-                detailTemplate: (dataItem) => `<uib-tabset active="0">
+                detailTemplate: (dataItem) => {
+
+                    return `<uib-tabset active="0">
                     <uib-tab index="0" heading="Systemer">
-                        <contract-details detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name, disabled)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                </uib-tabset>`,
+                </uib-tabset>`
+                },
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -617,40 +620,30 @@
                         title: "Varighed",
                         width: 115,
                         persistId: "duration", // DON'T YOU DARE RENAME!
-                        //template: dataItem => dataItem.Duration ? `${dataItem.Duration} md` : "",
-                        template: dataItem => {
-                            const concluded = this.moment(dataItem.Concluded);
-                            const expirationDate = this.moment(dataItem.ExpirationDate);
+                        template: (dataItem) => {
 
-                            //console.log("Test: " + dataItem.Concluded + " " + dataItem.ExpirationDate);
+                            if (dataItem.DurationOngoing) {
+                                return "Løbende";
+                            }
 
-                            if (!dataItem.Concluded || !dataItem.ExpirationDate)
-                                return "";
+                            let years = dataItem.DurationYears || 0;
+                            let months = dataItem.DurationMonths || 0;
 
-                            const years = expirationDate.diff(concluded, "years");
-                            const months = expirationDate.diff(concluded, "months");
-                            const numMonths = Math.abs((years * 12) - months);
+                            if (years > 0 && months > 0)
+                                return `${years} år og ${months} måneder`;
 
-                            //console.log(`years: ${years}`);
-                            //console.log(`months: ${months}`);
-                            //console.log(`numMonths: ${numMonths}`);
-
-                            if (years === 0)
+                            if (years < 1 && months > 0)
                                 return `${months} måneder`;
 
-                            if (years > 0 && numMonths === 0)
+                            if (years > 0 && months < 1)
                                 return `${years} år`;
 
-                            return `${years} år ${numMonths} måneder`;
+                            return "Ikke angivet";
+
                         },
                         hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq"
-                            }
-                        }
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "ExpirationDate",

@@ -24,6 +24,8 @@
             var projectId = $stateParams.id;
             $scope.systemUsages = usages;
 
+            console.log(usages);
+
             $scope.save = function () {
                 $http.post("api/itproject/" + projectId + "?usageId=" + $scope.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
                     .success(function () {
@@ -74,15 +76,16 @@
 
                         //for each system usages
                         _.each(data.data.response, function (usage: { id; itSystem; }) {
-
-                            results.push({
-                                //the id of the system usage is the id, that is selected
-                                id: usage.id,
-                                //but the name of the system is the label for the select2
-                                text: usage.itSystem.name,
-                                //saving the usage for later use
-                                usage: usage
-                            });
+                            if (!usage.itSystem.disabled) {
+                                results.push({
+                                    //the id of the system usage is the id, that is selected
+                                    id: usage.id,
+                                    //but the name of the system is the label for the select2
+                                    text: usage.itSystem.name,
+                                    //saving the usage for later use
+                                    usage: usage
+                                });
+                            }
                         });
 
                         return { results: results };

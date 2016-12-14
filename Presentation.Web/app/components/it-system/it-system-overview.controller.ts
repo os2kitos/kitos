@@ -338,8 +338,22 @@
                     {
                         field: "ItSystem.Name", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItSystem && dataItem.ItSystem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.ItSystem.Disabled)
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (udgået) </a>`;
+                            else
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
+                                if (dataItem.ItSystem.Disabled) 
+                                    return dataItem.ItSystem.Name + " (udgået)";
+                                else
+                                    return dataItem.ItSystem.Name;
+                            } else {
+                                return ""
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],

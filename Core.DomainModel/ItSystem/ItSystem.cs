@@ -16,6 +16,7 @@ namespace Core.DomainModel.ItSystem
             this.CanUseInterfaces = new List<ItInterfaceUse>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
+            this.AccessTypes = new List<AccessType>();
             this.Wishes = new List<Wish>();
             this.Usages = new List<ItSystemUsage.ItSystemUsage>();
         }
@@ -80,6 +81,10 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<Wish> Wishes { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
+
+        public virtual ICollection<AccessType> AccessTypes { get; set; }
+
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Gets or sets the usages.

@@ -37,7 +37,7 @@
 
                 <!-- name of the system -->
                 <td rowspan="{{exposure.numRows || 1}}">
-                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: exposure.id })">{{ exposure.name }}</a>
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: exposure.id })">{{ exposure.name }} <span data-ng-if="exposure.usage.itInterfaceExhibitItInterfaceDisabled">(udgået)</span></a>
                 </td>
 
                 <!-- contract id -->
@@ -133,7 +133,7 @@
 
                 <!-- name of the system -->
                 <td rowspan="{{usage.numRows || 1}}">
-                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: usage.id })">{{usage.name}}</a>
+                    <a data-ui-sref="it-system.interface-edit.interface-details({ id: usage.id })">{{usage.name}} <span data-ng-if="usage.usage.itInterfaceUseItInterfaceDisabled">(udgået)</span></a>
                 </td>
 
                 <!-- contract id -->
@@ -161,7 +161,7 @@
 
                 <!-- exposed by -->
                 <td rowspan="{{usage.numRows || 1}}">
-                    <a data-ui-sref="it-system.edit.interfaces({ id: usage.exhibitedByItSystemId })">{{usage.exhibitedByItSystemName}}</a>
+                    <a data-ui-sref="it-system.edit.interfaces({ id: usage.exhibitedByItSystemId })">{{usage.exhibitedByItSystemName}} <span data-ng-if="usage.usage.itSystemUsage.itSystemDisabled">(udgået)</span></a>
                 </td>
 
                 <!-- data -->

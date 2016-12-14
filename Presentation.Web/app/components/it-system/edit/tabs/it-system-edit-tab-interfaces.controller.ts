@@ -86,12 +86,14 @@
                         results: function(data, page) {
                             var results = [];
 
-                            _.each(data.data.response, function(obj: { id; name; organizationName; }) {
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.name,
-                                    organizationName: obj.organizationName
-                                });
+                            _.each(data.data.response, function (obj: { id; name; organizationName; disabled; }) {
+                                if (!obj.disabled) {
+                                    results.push({
+                                        id: obj.id,
+                                        text: obj.name,
+                                        organizationName: obj.organizationName
+                                    });
+                                }
                             });
 
                             return { results: results };

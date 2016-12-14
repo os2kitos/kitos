@@ -83,6 +83,7 @@
     <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItProject\ItProjectStatusUpdate.cs" />
+    <Compile Include="ItSystem\AccessType.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
     <Compile Include="LocalOptions\LocalDataType.cs" />

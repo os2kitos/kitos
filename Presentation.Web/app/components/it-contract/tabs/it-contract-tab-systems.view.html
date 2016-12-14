@@ -20,7 +20,7 @@
                 <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
                     <!-- the system -->
                     <td>
-                        <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }}</a>
+                        <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(udgået)</span></a>
                     </td>
 
                     <!-- app type (read only) -->
@@ -86,9 +86,10 @@
             </thead>
             <tbody>
                 <tr data-ng-repeat="exhibit in exhibitedInterfaces">
+                    
                     <!-- the system -->
                     <td>
-                        <a data-ui-sref="it-system.usage.interfaces({ id: exhibit.itSystemUsageId })">{{ exhibit.itInterfaceExhibitItSystemName }}</a>
+                        <a data-ui-sref="it-system.usage.interfaces({ id: exhibit.itSystemUsageId })">{{ exhibit.itInterfaceExhibitItSystemName }} <span data-ng-if="exhibit.itInterfaceExhibitItSystemDisabled">(udgået)</span></a>
                     </td>
 
                     <!-- relation -->
@@ -98,7 +99,7 @@
 
                     <!-- interface -->
                     <td>
-                        <a data-ui-sref="it-system.interface-edit.interface-details({ id: exhibit.itInterfaceExhibitItInterfaceId })">{{ exhibit.itInterfaceExhibitItInterfaceName }}</a>
+                        <a data-ui-sref="it-system.interface-edit.interface-details({ id: exhibit.itInterfaceExhibitItInterfaceId })">{{ exhibit.itInterfaceExhibitItInterfaceName }} <span data-ng-if="exhibit.itInterfaceExhibitItInterfaceDisabled">(udgået)</span></a>
                     </td>
 
                     <td>
@@ -117,7 +118,7 @@
                 <tr data-ng-repeat="used in usedInterfaces">
                     <!-- the system -->
                     <td>
-                        <a data-ui-sref="it-system.usage.interfaces({ id: used.itSystemUsageId })">{{ used.itInterfaceUseItSystemName }}</a>
+                        <a data-ui-sref="it-system.usage.interfaces({ id: used.itSystemUsageId })">{{ used.itInterfaceUseItSystemName }} <span data-ng-if="used.itSystemUsage.itSystemDisabled">(udgået)</span></a>
                     </td>
 
                     <!-- relation -->
@@ -127,7 +128,7 @@
 
                     <!-- interface -->
                     <td>
-                        <a data-ui-sref="it-system.interface-edit.interface-details({ id: used.itInterfaceId })">{{ used.itInterfaceUseItInterfaceName }}</a>
+                        <a data-ui-sref="it-system.interface-edit.interface-details({ id: used.itInterfaceId })">{{ used.itInterfaceUseItInterfaceName }} <span data-ng-if="used.itInterfaceUseItInterfaceDisabled">(udgået)</span></a>
                     </td>
 
                     <td>

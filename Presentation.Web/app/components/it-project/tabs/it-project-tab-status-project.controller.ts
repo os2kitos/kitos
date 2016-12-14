@@ -16,6 +16,12 @@
         public milestonesActivities: Array<any>;
         public pagination: IPaginationSettings;
         public totalCount: number;
+        public methodOptions: any;
+        public allStatusUpdates: any;
+        public currentStatusUpdate: any;
+        public showCombinedChart: any;
+        public combinedStatusUpdates: any;
+        public splittedStatusUpdates: any;
 
         public static $inject: Array<string> = [
             "$scope",
@@ -24,7 +30,9 @@
             "notify",
             "project",
             "usersWithRoles",
-            "user"
+            "user",
+            "statusUpdates",
+            "moment"
         ];
 
         constructor(
@@ -34,7 +42,9 @@
             private notify,
             public project,
             private usersWithRoles,
-            private user) {
+            private user,
+            public statusUpdates,
+            public moment) {
 
             this.project.updateUrl = `api/itproject/${project.id}`;
 
@@ -66,6 +76,31 @@
             };
 
             this.$scope.$watchCollection(() => this.pagination, this.loadStatues);
+
+
+            /* STATUS PROJECT */
+
+            this.methodOptions = [{ label: 'Samlet', val: true }, { label: 'Tid, kvalitet og ressourcer', val: false }];
+
+            this.allStatusUpdates = statusUpdates;
+
+            if (this.allStatusUpdates.length > 0) {
+                this.currentStatusUpdate = this.allStatusUpdates[0];
+                this.showCombinedChart = (this.currentStatusUpdate.IsCombined) ? this.methodOptions[0] : this.methodOptions[1];
+            }
+
+            this.combinedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return s.IsCombined; });
+            this.splittedStatusUpdates = _.filter(this.allStatusUpdates, function (s: any) { return !s.IsCombined; });
+        }
+
+
+
+        private onSelectStatusMethod(showCombined) {
+            if (showCombined) {
+                this.currentStatusUpdate = (this.combinedStatusUpdates.length > 0) ? this.combinedStatusUpdates[0] : null;
+            } else {
+                this.currentStatusUpdate = (this.splittedStatusUpdates.length > 0) ? this.splittedStatusUpdates[0] : null;
+            }
         }
 
         getPhaseName = (num: number): string => {
@@ -202,6 +237,13 @@
                                         return users;
                                     });
                             })
+                        ],
+                        statusUpdates: [
+                            "$http", "$stateParams",
+                            ($http, $stateParams) => $http.get(`odata/ItProjects(${$stateParams.id})?$expand=ItProjectStatusUpdates($orderby=Created desc;$expand=ObjectOwner($select=Name,LastName))`)
+                                .then(result => {
+                                    return result.data.ItProjectStatusUpdates;
+                                })
                         ]
                     }
                 });

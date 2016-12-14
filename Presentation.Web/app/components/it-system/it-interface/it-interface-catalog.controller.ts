@@ -77,13 +77,13 @@
             var itInterfaceBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
-                itInterfaceBaseUrl = "/odata/ItInterfaces";
+                itInterfaceBaseUrl = "/odata/ItInterfaces?";
             } else {
                 // everyone else are limited to within organizationnal context
-                itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
+                itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces?$filter=Disabled eq false`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            var itInterfaceUrl = itInterfaceBaseUrl + "&$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -195,8 +195,24 @@
                     {
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.Disabled) {
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (udgået)</a>`;
+                            } else {
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.Name) {
+                                if (dataItem.Disabled) {
+                                    return dataItem.Name + " (udgået)";
+                                } else {
+                                    return dataItem.Name;
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -278,7 +294,12 @@
                     {
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
+                                return (dataItem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (udgået)" : dataItem.ExhibitedBy.ItSystem.Name;
+                            else
+                                return "";
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
