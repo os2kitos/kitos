@@ -202,7 +202,6 @@
                             var url = '';
                             var payload = createPayload();
                             //setup scheduling
-                            console.log(dateString2Date($scope.startDate) + " Start date: " + $scope.startDate);
                             payload.Scheduling = $scope.repitionPattern;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
@@ -213,7 +212,6 @@
                                 httpCall(payload, action, url);
                             } else if (action == 'PATCH') {
                                 url = "Odata/advice(" + id + ")";
-                                console.log(JSON.stringify(payload));
                                 $http.patch(url, JSON.stringify(payload))
                             }
                           
@@ -238,7 +236,6 @@
                     };
                     function dateString2Date(dateString) {
                         var dt = dateString.split('-');
-                        console.log(dt + "substring: " + dt[2].substring(0, 2));
                         if (action === 'POST') {
                             return new Date(dt[2] + "/" + dt[1] + "/" + dt[0]);
                         }
@@ -274,8 +271,6 @@
                             StopDate: null,
                             JobId: $scope.hiddenForjob
                         };
-
-                        console.log(payload);
 
                         var writtenEmail = $scope.externalTo;
                         var writtenCCEmail = $scope.externalCC;
@@ -330,10 +325,24 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(function (result) {
-                                return result;
-                            });
+                        if (type === "itSystem") {
+                            return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                .then(function (result) {
+                                    return result;
+                                });
+                        }
+                        if (type === "itContract") {
+                            return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                .then(function (result) {
+                                    return result;
+                                });
+                        }
+                        if (type === "itProject") {
+                            return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                .then(function (result) {
+                                    return result;
+                                });
+                        }
                     }],
                     advices: ['$http', '$stateParams', function ($http, $stateParams) {
                         return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
