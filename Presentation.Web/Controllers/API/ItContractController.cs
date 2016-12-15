@@ -253,7 +253,6 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Aktiv", contract.IsActive);
                     obj.Add("It Kontrakt", contract.Name);
                     obj.Add("OrgUnit", contract.ResponsibleOrganizationUnitName);
-                    obj.Add("Underskriver", contract.ContractSignerFullName);
                     foreach (var role in roles)
                     {
                         var roleId = role.Id;

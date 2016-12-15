@@ -42,8 +42,8 @@
                         }
                     ],
                     kitosUsers: [
-                        '$http', function ($http) {
-                            return $http.get('odata/Users').then(function (result) {
+                        '$http', 'user', function ($http, user) {
+                            return $http.get(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${user.currentOrganizationId})&$select=Name, LastName`).then(function (result) {
                                 return result.data.value;
                             });
                         }
