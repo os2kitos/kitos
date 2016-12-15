@@ -79,6 +79,7 @@
                             title: "Emne"
                         },
                         {
+                            template: (dataItem) => "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH'," + dataItem.Id+")\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>"
                             template: x => "<button id=\"add-advice\" class=\"glyphicon glyphicon-pencil\" data-ng-click=\"newAdvice('PATCH')\"></button>" +
                                 `<button id="add-advice" ng-disabled="${x.Scheduling === 'Immediate'}" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${x.Id})"></button>`
                         }
@@ -132,7 +133,6 @@
 
                 var grid = $("#mainGrid").data("kendoGrid");
                 var selectedItem = grid.dataItem(grid.select());
-                console.log(selectedItem);
                 $("#detailGrid").data("kendoGrid").dataSource.transport.options.read.url = "/Odata/adviceSent?$filter=AdviceId eq " + selectedItem.Id;
                 $("#detailGrid").data("kendoGrid").dataSource.read();
             };
@@ -148,40 +148,76 @@
             $scope.newAdvice = function (action) {
 
                 $scope.action = action;
-                
                 var modalInstance = $modal.open({
-             
-                windowClass: "modal fade in",
-                templateUrl: "app/components/it-advice-modal-view.html",
-                controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
-                    if (action === 'POST') { 
-                    $scope.externalCC = currentUser.email;
-                    //$scope.type = type; obsolete
-                   // $scope.recieverUsers = users.data.value; For user mails in suggestions
-                    $scope.recieverRoles = roles.data.value;
-                    $scope.emailBody = "<a href='" + $window.location.href.replace("advice/" + type, "main") +"'>"+"Link til " + type +"</a>";
+                    windowClass: "modal fade in",
+                    templateUrl: "app/components/it-advice-modal-view.html",
+                    controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
+
+                        $scope.recieverRoles = roles.data.value;
+
+                        if (action === 'POST') {
+                            $scope.externalCC = currentUser.email;
+                            $scope.emailBody = "<a href='" + $window.location.href.replace("advice/" + type, "main") + "'>" + "Link til " + type + "</a>";
+                        }
+
+                        if (action === 'PATCH') {
+                            if (id != undefined) {
+
+                                $http({
+                                    method: 'GET',
+                                    url: 'Odata/advice?key=' + id + '&$expand=Reciepients'
+                                }).then(function successCallback(response) {
+
+                                    $scope.subject = response.data.Subject;
+                                    $scope.emailBody = response.data.Body;
+                                    $scope.repitionPattern = response.data.Scheduling;
+                                    $scope.startDate = response.data.AlarmDate;
+                                    $scope.stopDate = response.data.StopDate;
+                                    $scope.selectedRecievers = [];
+                                    $scope.hiddenForjob = response.data.JobId
+                                    //var recivers = [];
+                                    var ccs = [];
+                                    $scope.selectedCC = []; 
+
+                                    for (var i = 0; i < response.data.Reciepients.length; i++){
+                                    if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
+                                        $scope.selectedRecievers.push(response.data.Reciepients[i].Name);
+                                    }else if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'CC') {
+                                        $scope.selectedCC.push(response.data.Reciepients[i].Name);
+                                    } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
+                                       // recivers.push(response.data.Reciepients[i].Name);
+                                        $scope.externalTo = response.data.Reciepients[i].Name;
+                                    } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'CC') {
+                                        ccs.push(response.data.Reciepients[i].Name);
+                                    }
+                                    }
+                                    $scope.externalCC = ccs.join(', ');
+                            }, function errorCallback(response) {
+                                });
+                        }
                     }
-                    if (action === 'PATCH') {
+                    
+                        $scope.save = () => {
 
-                        $scope.formDataSubject = 1;
+                            var url = '';
+                            var payload = createPayload();
+                            //setup scheduling
+                            console.log(dateString2Date($scope.startDate) + " Start date: " + $scope.startDate);
+                            payload.Scheduling = $scope.repitionPattern;
+                            payload.AlarmDate = dateString2Date($scope.startDate);
+                            payload.StopDate = dateString2Date($scope.stopDate);
 
-
-
-                    }
-
-
-                    $scope.save = () => {
-                        var url = "Odata/advice";
-                        var payload = createPayload();
-                        //setup scheduling
-                        payload.Scheduling = $scope.repitionPattern;
-                        payload.AlarmDate = dateString2Date($scope.formData.date);
-                        payload.StopDate = dateString2Date($scope.formData.stopDate);
-                        payload.Name = $scope.formData.Name;
-                        console.log(payload);
-
-                        httpCall(payload, action, url);
+                            if (action == 'POST') {
+                                url = "Odata/advice";
+                                
+                                httpCall(payload, action, url);
+                            } else if (action == 'PATCH') {
+                                url = "Odata/advice(" + id + ")";
+                                console.log(JSON.stringify(payload));
+                                $http.patch(url, JSON.stringify(payload))
+                            }
+                          
                     };
 
                     $scope.send = () => {
@@ -203,14 +239,19 @@
                     };
                     function dateString2Date(dateString) {
                         var dt = dateString.split('-');
-                        return new Date(dt[2]+"/"+dt[1]+"/"+dt[0]);
+                        console.log(dt + "substring: " + dt[2].substring(0, 2));
+                        if (action === 'POST') {
+                            return new Date(dt[2] + "/" + dt[1] + "/" + dt[0]);
+                        }
+                        return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0,2));
                     }
 
                     function httpCall(payload, action, url) {
                         $http({
                             method: action,
                             url: url,
-                            data: payload
+                            data: payload,
+                            type: "application/json"
                         }).success(function () {
                             //msg.toSuccessMessage("Ændringerne er gemt!");
                             $("#mainGrid").data("kendoGrid").dataSource.read();
@@ -225,15 +266,18 @@
                         var payload = {
                             Name: $scope.formData.Name,
                             Subject: $scope.formData.subject,
+                            Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
                             Type: type,
                             Scheduling: 'Immediate',
                             Reciepients: [],
                             AlarmDate: null,
-                            StopDate: null
-
+                            StopDate: null,
+                            JobId: $scope.hiddenForjob
                         };
+
+                        console.log(payload);
 
                         var writtenEmail = $scope.externalTo;
                         var writtenCCEmail = $scope.externalCC;

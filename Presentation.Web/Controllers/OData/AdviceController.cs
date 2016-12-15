@@ -121,14 +121,59 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
             var response = base.Patch(key, delta);
-
+            
             if (response.GetType() == typeof(UpdatedODataResult<Advice>))
             {
                 try
                 {
-                    RecurringJob.AddOrUpdate("Advice: " + key,
-                    () => _adviceService.sendAdvice(key),
-                    Cron.Minutely);
+                    var advice = delta.GetEntity();
+
+                    switch (advice.Scheduling)
+                    {
+                        case Scheduling.Hour:
+
+                            string cron = "0 * * * *";
+
+                            RecurringJob.AddOrUpdate(advice.JobId,
+                    () => _adviceService.sendAdvice(advice.Id),
+                    cron);
+                            break;
+                        case Scheduling.Day:
+                            
+                            cron = "0 8 * * *";
+
+                            RecurringJob.AddOrUpdate(advice.JobId,
+                    () => _adviceService.sendAdvice(advice.Id),
+                    cron);
+                            break;
+                        case Scheduling.Week:
+                            string weekDay = advice.AlarmDate.Value.DayOfWeek.ToString().Substring(0, 3);
+                            cron = "0 8 *  * " + weekDay;
+
+                            RecurringJob.AddOrUpdate(advice.JobId,
+                    () => _adviceService.sendAdvice(advice.Id),
+                    cron);
+                            break;
+                        case Scheduling.Month:
+
+                            var day = advice.AlarmDate.Value.Day;
+                            cron = "0 8 " + day + " * *";
+
+                            RecurringJob.AddOrUpdate(advice.JobId,
+                    () => _adviceService.sendAdvice(advice.Id),
+                    cron);
+                            break;
+                        case Scheduling.Year:
+
+                            var month = advice.AlarmDate.Value.Month;
+                            day = advice.AlarmDate.Value.Day;
+                            cron = "0 8 " + day + " " + month + " *";
+
+                            RecurringJob.AddOrUpdate(advice.JobId,
+                () => _adviceService.sendAdvice(advice.Id),
+                cron);
+                            break;
+                    }
                 }
                 catch (Exception e)
                 {

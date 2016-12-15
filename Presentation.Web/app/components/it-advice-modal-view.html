@@ -47,9 +47,9 @@
                 <div class="form-group has-feedback" data-show-errors>
                     <!--Emne-->
                     <label class="control-label" for="name">Emne</label>
-                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="formData.subject">
-                    <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.subject.$invalid && createForm.subject.$dirty, 'glyphicon-ok': createForm.subject.$valid }"></span>
-
+                    <input type="text" class="form-control" name="subject" id="subject" placeholder="Emne" required data-ng-model="subject">
+                    <!--span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.subject.$invalid && createForm.subject.$dirty, 'glyphicon-ok': createForm.subject.$valid }"></!--span-->
+    
                 </div>
 
 
@@ -62,7 +62,7 @@
 
                 <!--Send Advis-->
                 <div class="form-group md-">
-                    <button type="submit" class="btn btn-primary" ng-click="send()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject)">Send</button>
+                    <button type="submit" class="btn btn-primary" ng-click="send()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject)">Send</button>
                 </div>
             </div>
             <div class="col-md-6">
@@ -89,18 +89,19 @@
                 <div class="form-group">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="formData.date">
+                           data-k-options="datepickerOptions" data-ng-model="startDate">
                 </div>
 
                 <!--Dato-->
                 <div class="form-group">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="formData.stopDate">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate">
                 </div>
-                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!formData.subject && !!repitionPattern && !!formData.stopDate &&  formData.date)">Gem</button>
-                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
             </div>
-        </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject && !!repitionPattern && !!stopDate &&  startDate)">Gem</button>
+        <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
+        <input type="hidden" ng-model="hiddenForjob" />
     </div>
 </form>
