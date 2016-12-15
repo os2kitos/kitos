@@ -1,5 +1,15 @@
 ﻿<div class="row">
-    <!-- Left side -->
+<!-- Style for checkbox contractValid -->
+<style>
+    input[type='checkbox'].tags-checkbox:checked + label > i:first-of-type,
+    input[type='checkbox'].tags-checkbox + label > i:last-of-type {
+        display: none;
+    }
+    input[type='checkbox'].tags-checkbox:checked + label > i:last-of-type {
+        display: inline-block;
+    }
+</style>
+<!-- Left side -->
     <div class="col-xs-6">
         <div class="row">
             <!-- 1st column -->
@@ -110,7 +120,7 @@
                 <!-- Note -->
                 <div class="form-group">
                     <label for="contract-note" class="control-label small">Bemærkning</label>
-                    <textarea id="contract-note" class="form-control input-sm"
+                    <textarea id="contract-note" class="form-control input-sm" rows="4"
                               data-ng-disabled="!hasWriteAccess"
                               data-ng-model="contract.note"
                               data-autosave="{{ autoSaveUrl }}"
@@ -251,18 +261,23 @@
         </div>
 
         <!-- Intern contract is Active regardless of concluded and expirationdate -->
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" id="contract-int-signed"
-                       data-ng-model="contract.active"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-autosave="{{ autoSaveUrl }}"
-                       data-field="active"
-                       data-ng-change="checkContractValidity()">
-                Gyldig &emsp;
+        <div class="checkbox" style="position: absolute; left: 0;">
+            <!--<label>-->
+            <input type="checkbox" id="contractValid"
+                   class="tags-checkbox sr-only"
+                   data-ng-model="contract.active"
+                   data-ng-disabled="!hasWriteAccess"
+                   data-autosave="{{ autoSaveUrl }}"
+                   data-field="active"
+                   data-ng-change="checkContractValidity()"/>
+            <label for="contractValid">
+                <i class='glyphicon glyphicon-unchecked'></i>
+                <i class='glyphicon glyphicon-check'></i>
+                <span class='label-content'>Gyldig</span>
             </label>
-            <span class="fa fa-file text-success" data-ng-hide="!contract.isActive" aria-hidden="true"></span>
-            <span class="fa fa-file-o text-muted" data-ng-hide="contract.isActive" aria-hidden="true"></span>
+            <!--</label>-->
+            <!--<span class="glyphicon glyphicon-check" data-ng-hide="!contract.isActive" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-unchecked" data-ng-hide="contract.isActive" aria-hidden="true"></span>-->
         </div>
 
     </div>
