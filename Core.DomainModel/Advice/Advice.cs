@@ -6,7 +6,8 @@ namespace Core.DomainModel.Advice
     public enum ObjectType
     {
         itContract,
-        itSytem
+        itSystem,
+        itProject
     }
     public enum Scheduling
     {

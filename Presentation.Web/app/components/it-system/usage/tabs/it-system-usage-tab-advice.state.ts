@@ -17,14 +17,14 @@
                         return result.data.response.advices;
                         });
                 }],
-                object: ['itsystemusage', function (itsystem) {
-                    return itsystem;
+                object: ['itSystemUsage', function (itSystemUsage) {
+                    return itSystemUsage;
                 }],
                 users: ['UserGetService', function (UserGetService) {
                     return UserGetService.GetAllUsers();
                 }],
                 type: [function () {
-                    return "ItSystem";
+                    return "itSystem";
                 }]
             }
         });

@@ -343,6 +343,10 @@
     <Compile Include="Migrations\201612141429077_cascade.Designer.cs">
       <DependentUpon>201612141429077_cascade.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612151345021_AdvisEnumUpdate.cs" />
+    <Compile Include="Migrations\201612151345021_AdvisEnumUpdate.Designer.cs">
+      <DependentUpon>201612151345021_AdvisEnumUpdate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -505,6 +509,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612141429077_cascade.resx">
       <DependentUpon>201612141429077_cascade.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612151345021_AdvisEnumUpdate.resx">
+      <DependentUpon>201612151345021_AdvisEnumUpdate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

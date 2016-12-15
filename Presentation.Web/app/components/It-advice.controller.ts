@@ -79,9 +79,8 @@
                             title: "Emne"
                         },
                         {
-                            template: (dataItem) => "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH'," + dataItem.Id+")\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>"
-                            template: x => "<button id=\"add-advice\" class=\"glyphicon glyphicon-pencil\" data-ng-click=\"newAdvice('PATCH')\"></button>" +
-                                `<button id="add-advice" ng-disabled="${x.Scheduling === 'Immediate'}" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${x.Id})"></button>`
+                            template: (dataItem) => `<button id="add-advice" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>` +
+                                `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`
                         }
                 ],
                     toolbar: [
@@ -145,7 +144,7 @@
                 $("#mainGrid").data("kendoGrid").dataSource.read();
             }
 
-            $scope.newAdvice = function (action) {
+            $scope.newAdvice = function (action, id) {
 
                 $scope.action = action;
                 var modalInstance = $modal.open({
@@ -266,7 +265,6 @@
                         var payload = {
                             Name: $scope.formData.Name,
                             Subject: $scope.formData.subject,
-                            Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
                             Type: type,

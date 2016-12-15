@@ -24,7 +24,7 @@
                     return UserGetService.GetAllUsers();
                 }],
                 type: [function () {
-                    return "ItProject";
+                    return "itProject";
                 }]
             }
         });
