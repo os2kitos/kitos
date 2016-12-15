@@ -338,6 +338,10 @@
     <Compile Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.Designer.cs">
       <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612151028139_ContractSigner.cs" />
+    <Compile Include="Migrations\201612151028139_ContractSigner.Designer.cs">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -496,6 +500,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.resx">
       <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612151028139_ContractSigner.resx">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
