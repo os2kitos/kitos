@@ -38,6 +38,12 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [AllowAnonymous]
+        public HttpResponseMessage PostLoginWithToken()
+        {
+            return Created(new LoginResponseDTO());
+        }
+
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
