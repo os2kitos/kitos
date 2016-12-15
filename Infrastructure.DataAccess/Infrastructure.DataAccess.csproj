@@ -339,6 +339,10 @@
     <Compile Include="Migrations\201612141014262_AdvisAddedJobId.Designer.cs">
       <DependentUpon>201612141014262_AdvisAddedJobId.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612141429077_cascade.cs" />
+    <Compile Include="Migrations\201612141429077_cascade.Designer.cs">
+      <DependentUpon>201612141429077_cascade.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -498,6 +502,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612141014262_AdvisAddedJobId.resx">
       <DependentUpon>201612141014262_AdvisAddedJobId.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612141429077_cascade.resx">
+      <DependentUpon>201612141429077_cascade.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

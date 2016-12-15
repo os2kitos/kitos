@@ -20,9 +20,15 @@
                 },
                 selectable: true,
                 change: onChange,
-                    columns: [{
-                        field: "SentDate",
-                        title: "Sidst sendt"
+                columns: [{
+                            field: "SentDate",
+                            title: "Sidst sendt",
+                            template: x => {
+                                if (x.SentDate != null) {
+                                    return kendo.toString(new Date(x.SentDate), "d");
+                                }
+                                return "";
+                            }
                         },
                         {
                             field: "Id",
@@ -34,7 +40,13 @@
                         },
                         {
                             field: "AlarmDate",
-                            title: "Dato"
+                            title: "Dato",
+                            template: x => {
+                                if (x.AlarmDate != null) {
+                                    return kendo.toString(new Date(x.AlarmDate), "d");
+                                }
+                                return "";
+                            }
                         },
                         {
                             field: "Reciepients",
@@ -99,7 +111,13 @@
             },
                 columns: [{
                     field: "AdviceSentDate",
-                    title: "Afsendt"
+                    title: "Afsendt",
+                    template: x => {
+                        if (x.AdviceSentDate != null) {
+                            return kendo.toString(new Date(x.AdviceSentDate), "g");
+                        }
+                        return "";
+                    }
                 }
                 ],
             };
@@ -117,7 +135,14 @@
                 $("#detailGrid").data("kendoGrid").dataSource.read();
             };
 
-            $scope.newAdvice = function (action, id) {
+            $scope.deleteAdvice = (id) => {
+                $http.delete(`odata/advice(${id})`)
+                    .then(notify.addSuccessMessage("Advisen er slettet!"));
+                $("#mainGrid").data("kendoGrid").dataSource.read();
+            }
+
+            $scope.newAdvice = function (action) {
+
                 $scope.action = action;
                 var modalInstance = $modal.open({
 
@@ -235,6 +260,8 @@
                     function createPayload() {
 
                         var payload = {
+                            Name: $scope.formData.Name,
+                            Subject: $scope.formData.subject,
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
