@@ -7,7 +7,7 @@
             controllerAs: 'Vm',
             resolve: {
                 Roles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                         .then(function (result) {
                             return result.data.value;
                         });
