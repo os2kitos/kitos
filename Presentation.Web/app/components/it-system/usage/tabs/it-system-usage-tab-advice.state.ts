@@ -17,8 +17,8 @@
                         return result.data.response.advices;
                         });
                 }],
-                object: ['systems', function (systems) {
-                    return systems;
+                object: ['itsystemusage', function (itsystem) {
+                    return itsystem;
                 }],
                 users: ['UserGetService', function (UserGetService) {
                     return UserGetService.GetAllUsers();

@@ -1,10 +1,9 @@
 ﻿(function (ng, app) {
-    app.controller('object.EditAdviceCtrl', ['$','$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal','Roles','object','users','type',
-        function ($,$scope, $http, $state, $stateParams, $timeout, notify, $modal,roles,object, users, type) {
+    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 
+        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type) {
 
             $scope.type = type;
             $scope.object = object;
-            console.log($stateParams);
 
             $scope.mainGridOptions = {
                 dataSource: {
@@ -80,8 +79,8 @@
                             title: "Emne"
                         },
                         {
-                            template: x => "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('PATCH')\"><i class=\"glyphicon glyphicon-plus small\" > </i>Rediger</button>" +
-                                                `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${x.Id})"></button>`
+                            template: x => "<button id=\"add-advice\" class=\"glyphicon glyphicon-pencil\" data-ng-click=\"newAdvice('PATCH')\"></button>" +
+                                `<button id="add-advice" ng-disabled="${x.Scheduling === 'Immediate'}" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${x.Id})"></button>`
                         }
                 ],
                     toolbar: [
@@ -140,7 +139,9 @@
 
             $scope.deleteAdvice = (id) => {
                 $http.delete(`odata/advice(${id})`)
-                    .then(notify.addSuccessMessage("Advisen er slettet!"));
+                    .then(() => notify.addSuccessMessage("Advisen er slettet!"),
+                    () => notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!"));
+             
                 $("#mainGrid").data("kendoGrid").dataSource.read();
             }
 
