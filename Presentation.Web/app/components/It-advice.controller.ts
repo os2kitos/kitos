@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 
         function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type) {
-
+            console.log(type);
             $scope.type = type;
             $scope.object = object;
 
@@ -53,8 +53,10 @@
                             field: "Reciepients",
                             template: function (dataItem) {
                                 var html = [];
-                                for (var i = 0; i < dataItem.Reciepients.length; i++) {
-                                    if (dataItem.Reciepients[i].RecpientType == 'RECIEVER'){ 
+                                console.log(dataItem.Reciepients);
+                                for (var i = 1; i < dataItem.Reciepients.length; i++) {
+                                    if (dataItem.Reciepients[i].RecieverType == 'RECIEVER') { 
+                                        console.log(dataItem.Reciepients[i].Name);
                                         html.push(dataItem.Reciepients[i].Name);
                                     }
                                 }
@@ -326,7 +328,7 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type === "itSystem") {
+                        if (type === "itSystemUsage") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
@@ -346,9 +348,25 @@
                         }
                     }],
                     advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                        return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
-                            return result.data.response.advices;
-                        });
+                      
+                        switch ($scope.type) { 
+                            case 'ItContract':
+                                return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
+                                    return result.data.response.advices;
+                                });
+                            case 'ItSystemUsage':
+                                return $http.get('api/ItSystemUsage/' + $stateParams.id).then(function (result) {
+                                    return result.data.response.advices;
+                                });
+                            case 'itproject':
+                                return $http.get('api/itproject/' + $stateParams.id).then(function (result) {
+                                    return result.data.response.advices;
+                                });
+                            case 'next object':
+                                return $http.get('api/ItSystemUsage/' + $stateParams.id).then(function (result) {
+                                    return result.data.response.advices;
+                                });
+                    }
                     }],
                     users: ['UserGetService', function (UserGetService) {
                         return UserGetService.GetAllUsers();
