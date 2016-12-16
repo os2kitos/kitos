@@ -220,11 +220,6 @@
         }
 
         private activate() {
-            // TODO anvendes umiddelbart ikke længere
-            //var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
-            //this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
-            //clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
-            //this.roleSelectorDataSource = clonedItContractRoles;
 
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -233,8 +228,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                // TODO ContractSigner skal fjernes
-                                var urlParameters = `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,ContractSigner`;
+                                var urlParameters = `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -647,26 +641,6 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 
-            // add special contract signer role
-            var signerRole: IKendoGridColumn<IItContractOverview> = {
-                field: "ContractSigner.Name",
-                title: "Kontraktunderskriver",
-                persistId: "roleSigner",
-                // TODO ContractSigner ændres fra User objekt til string så template skal opdateres
-                template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}` : "",
-                width: 200,
-                hidden: true,
-                sortable: true,
-                filterable: {
-                    cell: {
-                        dataSource: [],
-                        showOperators: false,
-                        operator: "contains"
-                    }
-                }
-            };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
-
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
@@ -872,27 +846,6 @@
                 change: orgUnitChanged
             });
         }
-
-        // TODO funktionen er ikke anvendt længere
-        //public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
-        //    return {
-        //        autoBind: false,
-        //        dataSource: this.roleSelectorDataSource,
-        //        dataTextField: "Name",
-        //        dataValueField: "Id",
-        //        optionLabel: "Vælg kontraktrolle...",
-        //        change: e => {
-        //            // hide all roles column
-        //            this.mainGrid.hideColumn("ContractSigner.Name");
-        //            this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
-
-        //            var selectedId = e.sender.value();
-        //            //var gridFieldName = "role" + selectedId;
-        //            // show only the selected role column
-        //            this.mainGrid.showColumn(selectedId);
-        //        }
-        //    }
-        //};
 
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";

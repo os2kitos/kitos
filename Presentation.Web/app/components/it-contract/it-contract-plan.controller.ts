@@ -4,7 +4,6 @@
     export interface IOverviewPlanController {
         mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -204,10 +203,6 @@
         }
 
         private activate() {
-            var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
-            this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
-            clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
-            this.roleSelectorDataSource = clonedItContractRoles;
 
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -217,7 +212,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -805,27 +800,6 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
-            // add special contract signer role
-            var signerRole = {
-                field: "ContractSigner.Name",
-                title: "Kontraktunderskriver",
-                persistId: "roleSigner",
-                template: dataItem => dataItem.ContractSigner
-                    ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}`
-                    : "",
-                width: 130,
-                hidden: true,
-                sortable: true,
-                filterable: {
-                    cell: {
-                        dataSource: [],
-                        showOperators: false,
-                        operator: "contains"
-                    }
-                }
-            };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
-
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles,
@@ -1046,25 +1020,6 @@
             });
         }
 
-        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
-            return {
-                autoBind: false,
-                dataSource: this.roleSelectorDataSource,
-                dataTextField: "Name",
-                dataValueField: "Id",
-                optionLabel: "Vælg kontraktrolle...",
-                change: e => {
-                    // hide all roles column
-                    this.mainGrid.hideColumn("ContractSigner.Name");
-                    this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
-
-                    var selectedId = e.sender.value();
-
-                    // show only the selected role column
-                    this.mainGrid.showColumn(selectedId);
-                }
-            }
-        }
     }
 
     angular

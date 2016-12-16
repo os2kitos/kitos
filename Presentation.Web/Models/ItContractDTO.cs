@@ -40,8 +40,7 @@ namespace Presentation.Web.Models
         public string PriceRegulationName { get; set; }
         public int? OptionExtendId { get; set; }
         public string OptionExtendName { get; set; }
-        public int? ContractSignerId { get; set; }
-        public UserDTO ContractSigner { get; set; }
+        public string ContractSigner { get; set; }
 
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
