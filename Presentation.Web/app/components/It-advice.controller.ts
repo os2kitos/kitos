@@ -1,7 +1,6 @@
 ﻿(function (ng, app) {
     app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 
         function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type) {
-            console.log(type);
             $scope.type = type;
             $scope.object = object;
 
@@ -29,7 +28,6 @@
                             field: "SentDate",
                             title: "Sidst sendt",
                             template: x => {
-                                console.log(x);
                                 if (x.SentDate != null) {
                                     return kendo.toString(new Date(x.SentDate), "d");
                                 }
@@ -71,9 +69,12 @@
                             title: "Emne"
                         },
                         {
-                            template: (dataItem) => `<button id="add-advice" ng-show="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
-                                                        <button id="add-advice" ng-hide="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
-                                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`
+                            template: (dataItem) => {
+                                var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
+                                return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
+                                                        <button id="add-advice" ng-hide="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
+                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                            }
                         }
                 ],
                     toolbar: [
