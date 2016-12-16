@@ -6,7 +6,7 @@ namespace Core.DomainModel.Advice
     public enum ObjectType
     {
         itContract,
-        itSystem,
+        itSystemUsage,
         itProject,
         itInterface
     }
