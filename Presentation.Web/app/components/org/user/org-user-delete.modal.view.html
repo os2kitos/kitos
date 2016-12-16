@@ -30,7 +30,7 @@
                 <th class="col-xs-1">Vælg</th>
                 <th class="col-xs-3">Organisation</th>
                 <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Allokere til</th>
+                <th class="col-xs-4">Tildelt</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
@@ -54,7 +54,7 @@
                 <th class="col-xs-1">Vælg</th>
                 <th class="col-xs-3">Projektnavn</th>
                 <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Allokere til</th>
+                <th class="col-xs-4">Tildelt</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
@@ -76,7 +76,7 @@
                 <th class="col-xs-1">Vælg</th>
                 <th class="col-xs-3">Systemnavn</th>
                 <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Allokere til</th>
+                <th class="col-xs-4">Tildelt</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
@@ -98,7 +98,7 @@
                 <th class="col-xs-1">Vælg</th>
                 <th class="col-xs-3">Kontraktnavn</th>
                 <th class="col-xs-3">Rolle</th>
-                <th class="col-xs-4">Allokere til</th>
+                <th class="col-xs-4">Tildelt</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
@@ -119,7 +119,7 @@
             <tr>
                 <th class="col-xs-1">Vælg</th>
                 <th class="col-xs-6">Adminstrative rettigheder</th>
-                <th class="col-xs-4">Allokere til</th>
+                <th class="col-xs-4">Tildelt</th>
                 <th class="col-xs-1">Slet</th>
             </tr>
         </thead>
@@ -136,7 +136,7 @@
 </div>
 <div class="modal-footer">
     <button type="submit" class="btn btn-danger" data-ng-click="ctrl.deleteUser()" data-disabled-on-busy>Slet bruger</button>
-    <button type="submit" ng-disabled="ctrl.disabled" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>
+    <!--<button type="submit" ng-disabled="ctrl.disabled" id="btnOk" class="btn btn-warning" data-ng-click="ctrl.ok()" data-disabled-on-busy>Tildel valgte og returner</button>-->
     <button type="submit" ng-disabled="ctrl.disabled" id="btnAssign" class="btn btn-warning" data-ng-click="ctrl.assign()" data-disabled-on-busy>Tildel valgte</button>
-    <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Annuller</button>
+    <button type="submit" class="btn btn-default" data-ng-click="ctrl.cancel()" data-disabled-on-busy>Luk</button>
 </div>
