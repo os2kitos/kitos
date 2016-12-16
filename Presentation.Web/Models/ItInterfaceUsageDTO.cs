@@ -23,8 +23,7 @@ namespace Presentation.Web.Models
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
 
-        public string ItInterfaceUseItSystemName { get; set; }
-        public string ItInterfaceUseItInterfaceName { get; set; }
-        public bool ItInterfaceUseItInterfaceDisabled { get; set; }
+        public string ItInterfaceItInterfaceName { get; set; }
+        public bool ItInterfaceItInterfaceDisabled { get; set; }
     }
 }

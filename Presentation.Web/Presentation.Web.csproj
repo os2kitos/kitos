@@ -811,7 +811,6 @@
     <Content Include="app\components\it-system\it-interface\it-interface-edit.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-catalog.view.html" />
     <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-details.view.html" />
-    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.view.html" />
     <Content Include="app\components\it-system\it-system-catalog.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.view.html" />
@@ -859,7 +858,6 @@
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-details.po.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.po.ts" />
@@ -983,7 +981,6 @@
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\it-system-edit.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-interfaces.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\edit\tabs\it-system-edit-tab-kle.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\it-interface\it-interface-edit-tab-details.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-system\it-interface\it-interface-edit.e2e.spec.ts" />
@@ -1082,7 +1079,6 @@
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-catalog.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-details.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-system-catalog.controller.ts" />

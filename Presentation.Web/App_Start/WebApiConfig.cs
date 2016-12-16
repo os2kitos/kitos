@@ -220,10 +220,11 @@ namespace Presentation.Web
                 .HasKey(x => x.ItInterfaceExhibitId)
                 .HasKey(x => x.ItSystemUsageId);
 
-            var itInterfaceUse = builder.EntitySet<ItInterfaceUse>(nameof(ItInterfaceUsesEntityController).Replace("Controller", string.Empty));
-            itInterfaceUse.EntityType
-                .HasKey(x => x.ItSystemId)
-                .HasKey(x => x.ItInterfaceId);
+            // Udkommenteret ifm. OS2KITOS-663
+            //var itInterfaceUse = builder.EntitySet<ItInterfaceUse>(nameof(ItInterfaceUsesEntityController).Replace("Controller", string.Empty));
+            //itInterfaceUse.EntityType
+            //    .HasKey(x => x.ItSystemId)
+            //    .HasKey(x => x.ItInterfaceId);
 
             var tsas = builder.EntitySet<TsaType>(nameof(TsaTypesController).Replace("Controller", string.Empty));
             tsas.EntityType.HasKey(x => x.Id);

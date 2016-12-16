@@ -342,6 +342,10 @@
     <Compile Include="Migrations\201612151028139_ContractSigner.Designer.cs">
       <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.cs" />
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.Designer.cs">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -503,6 +507,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612151028139_ContractSigner.resx">
       <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612160925221_InterfaceUses removed.resx">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
