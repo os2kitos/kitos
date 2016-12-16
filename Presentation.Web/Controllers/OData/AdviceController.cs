@@ -135,7 +135,7 @@ namespace Presentation.Web.Controllers.OData
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(advice.Id),
+                    () => _adviceService.sendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Day:
@@ -143,7 +143,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(advice.Id),
+                    () => _adviceService.sendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Week:
@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(advice.Id),
+                    () => _adviceService.sendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Month:
@@ -160,7 +160,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(advice.Id),
+                    () => _adviceService.sendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Year:
@@ -170,7 +170,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " " + month + " *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                () => _adviceService.sendAdvice(advice.Id),
+                () => _adviceService.sendAdvice(key),
                 cron);
                             break;
                     }

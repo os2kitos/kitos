@@ -35,7 +35,7 @@ namespace Core.ApplicationServices
 
         public AdviceService() {}
 
-        public bool sendAdvice(int id) {
+        public bool sendAdvice(int id){
 
             var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
