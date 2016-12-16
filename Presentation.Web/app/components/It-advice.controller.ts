@@ -1,7 +1,6 @@
 ﻿(function (ng, app) {
     app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 
         function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type) {
-            console.log(type);
             $scope.type = type;
             $scope.object = object;
 
@@ -22,18 +21,19 @@
                 change: onChange,
                 columns: [{
                     field: "Name",
-                    title: "Navn"
+                    title: "Navn",
+                    attributes: { "class": "might-overflow" }
                 },
                 {
                             field: "SentDate",
                             title: "Sidst sendt",
                             template: x => {
-                                console.log(x);
                                 if (x.SentDate != null) {
                                     return kendo.toString(new Date(x.SentDate), "d");
                                 }
                                 return "";
-                            }
+                            },
+                            attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Id",
@@ -48,7 +48,8 @@
                                     return kendo.toString(new Date(x.AlarmDate), "d");
                                 }
                                 return "";
-                            }
+                            },
+                            attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Reciepients.Name", title: "Modtager",
@@ -68,9 +69,12 @@
                             title: "Emne"
                         },
                         {
-                            template: (dataItem) => `<button id="add-advice" ng-show="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
-                                                        <button id="add-advice" ng-hide="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
-                                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`
+                            template: (dataItem) => {
+                                var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
+                                return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
+                                                        <button id="add-advice" ng-hide="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
+                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                            }
                         }
                 ],
                     toolbar: [
@@ -132,7 +136,7 @@
                             notify.addSuccessMessage("Advisen er slettet!");
                             $("#mainGrid").data("kendoGrid").dataSource.read();
                         },
-                    () => notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!"));
+                    () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
 
             $scope.newAdvice = function (action, id) {
@@ -167,7 +171,7 @@
                                     $scope.startDate = response.data.AlarmDate;
                                     $scope.stopDate = response.data.StopDate;
                                     $scope.selectedRecievers = [];
-                                    $scope.hiddenForjob = response.data.JobId
+                                    $scope.hiddenForjob = response.data.JobId;
                                     //var recivers = [];
                                     var ccs = [];
                                     $scope.selectedCC = [];
@@ -195,6 +199,7 @@
                             var url = '';
                             var payload = createPayload();
                             //setup scheduling
+                            payload.Name = $scope.name;
                             payload.Scheduling = $scope.repitionPattern;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
@@ -261,18 +266,28 @@
                             data: payload,
                             type: "application/json"
                         }).success(function () {
-                            //msg.toSuccessMessage("Ændringerne er gemt!");
+                            if (action === "POST") {
+                                notify.addSuccessMessage("Advisen er oprettet!");
+                            }
+                            if (action === "PATCH") {
+                                notify.addSuccessMessage("Advisen er opdateret!");
+                            }
                             $("#mainGrid").data("kendoGrid").dataSource.read();
                             $scope.$close(true);
                         }).error(function () {
-                            //msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
+                            if (action === "POST") {
+                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
+                            }
+                            if (action === "PATCH") {
+                                notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
+                            }
                         });
                     }
 
                     function createPayload() {
 
                         var payload = {
-                            Name: $scope.name,
+                            Name: "Straks afsendt",
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
