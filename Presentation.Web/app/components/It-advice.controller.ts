@@ -350,8 +350,8 @@
                                 return $http.get('api/itproject/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
-                            case 'next object':
-                                return $http.get('api/ItSystemUsage/' + $stateParams.id).then(function (result) {
+                            case 'itInterface':
+                                return $http.get('api/itInterface/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
                     }
