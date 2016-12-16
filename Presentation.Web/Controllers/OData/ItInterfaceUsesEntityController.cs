@@ -1,13 +1,14 @@
-﻿using Core.DomainModel.ItSystem;
-using Core.DomainServices;
+﻿// Udkommenteret ifm. OS2KITOS-663
+//using Core.DomainModel.ItSystem;
+//using Core.DomainServices;
 
-namespace Presentation.Web.Controllers.OData.OptionControllers
-{
-    public class ItInterfaceUsesEntityController : BaseController<ItInterfaceUse>
-    {
-        public ItInterfaceUsesEntityController(IGenericRepository<ItInterfaceUse> repository)
-            : base(repository)
-        {
-        }
-    }
-}
+//namespace Presentation.Web.Controllers.OData.OptionControllers
+//{
+//    public class ItInterfaceUsesEntityController : BaseController<ItInterfaceUse>
+//    {
+//        public ItInterfaceUsesEntityController(IGenericRepository<ItInterfaceUse> repository)
+//            : base(repository)
+//        {
+//        }
+//    }
+//}

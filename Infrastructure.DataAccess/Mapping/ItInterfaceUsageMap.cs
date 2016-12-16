@@ -18,9 +18,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
 
-            this.HasRequired(t => t.ItInterfaceUse)
-                .WithMany(t => t.ItInterfaceUsages)
-                .HasForeignKey(d => new {d.ItSystemId, d.ItInterfaceId})
+            this.HasRequired(t => t.ItInterface)
+                .WithMany(t => t.InterfaceLocalUsages)
+                .HasForeignKey(d => d.ItInterfaceId)
                 .WillCascadeOnDelete(false);
 
             this.HasOptional(t => t.ItContract)

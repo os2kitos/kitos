@@ -27,72 +27,72 @@
     }]);
 
     app.controller('system.EditCtrl',
-    [
-        '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_',
-        function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
+        [
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
 
-            $scope.hasWriteAccess = hasWriteAccess;
+                $scope.hasWriteAccess = hasWriteAccess;
 
-            if (user.isGlobalAdmin) {
-                if (!itSystem.disabled) {
-                    var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Deaktivér IT System";
-                    });
+                if (user.isGlobalAdmin) {
+                    if (!itSystem.disabled) {
+                        var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
+                            return o.text === "Deaktivér IT System";
+                        });
 
-                    if (ng.isUndefined(buttonAlreadyExists)) {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
-                        );
+                        if (ng.isUndefined(buttonAlreadyExists)) {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                            );
+                        }
+                    } else {
+                        var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
+                            return o.text === "Aktivér IT System";
+                        });
+
+                        if (ng.isUndefined(buttonAlreadyExists)) {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                            );
+                        }
                     }
-                } else {
-                    var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Aktivér IT System";
-                    });
+                }
 
-                    if (ng.isUndefined(buttonAlreadyExists)) {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
-                        );
+                function disableSystem() {
+                    if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
+                        return;
                     }
+
+                    var payload: any = {};
+                    payload.Disabled = true;
+
+                    var msg = notify.addInfoMessage('Deaktiverer IT System...', false);
+                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                        .success(function (result) {
+                            msg.toSuccessMessage('IT System er deaktiveret!');
+                            $state.reload();
+                        })
+                        .error(function (data, status) {
+                            msg.toErrorMessage('Fejl! Kunne ikke deaktivere IT System!');
+                        });
+                }
+
+                function enableSystem() {
+                    if (!confirm('Er du sikker på du vil aktivere systemet?')) {
+                        return;
+                    }
+                    var payload: any = {};
+                    payload.Disabled = false;
+
+                    var msg = notify.addInfoMessage('Aktiverer IT System...', false);
+                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                        .success(function (result) {
+                            msg.toSuccessMessage('IT System er aktiveret!');
+                            $state.reload();
+                        })
+                        .error(function (data, status) {
+                            msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
+                        });
                 }
             }
-            
-            function disableSystem() {
-                if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
-                    return;
-                }
-
-                var payload: any = {};
-                payload.Disabled = true;
-
-                var msg = notify.addInfoMessage('Deaktiverer IT System...', false);
-                $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
-                    .success(function (result) {
-                        msg.toSuccessMessage('IT System er deaktiveret!');
-                        $state.reload();
-                    })
-                    .error(function (data, status) {
-                        msg.toErrorMessage('Fejl! Kunne ikke deaktivere IT System!');
-                    });
-            }
-
-            function enableSystem() {
-                if (!confirm('Er du sikker på du vil aktivere systemet?')) {
-                    return;
-                }
-                var payload: any = {};
-                payload.Disabled = false;
-
-                var msg = notify.addInfoMessage('Aktiverer IT System...', false);
-                $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
-                    .success(function (result) {
-                        msg.toSuccessMessage('IT System er aktiveret!');
-                        $state.reload();
-                    })
-                    .error(function (data, status) {
-                        msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
-                    });
-            }
-        }
-    ]);
+        ]);
 })(angular, app);

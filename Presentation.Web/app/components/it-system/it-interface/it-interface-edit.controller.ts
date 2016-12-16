@@ -19,6 +19,17 @@
                             });
                     }
                 ],
+                //hasWriteAccess: [
+                //    '$http', '$stateParams', 'user', 'itInterface', function ($http, $stateParams, user, itInterface) {
+                //        var interfaceId = $stateParams.id;
+                //        return $http.get("odata/itInterfaces()").then(function (result) {
+                //                return result.data.response;
+                //            });
+                //    }
+                //],
+                //hasWriteAccess: () => {
+                //    return true;
+                //},
                 itInterface: [
                     '$http', '$stateParams', function ($http, $stateParams) {
                         var interfaceId = $stateParams.id;
@@ -28,13 +39,20 @@
                             });
                     }
                 ]
+                //itInterface: [
+                //    '$http', '$stateParams', function ($http, $stateParams) {
+                //        var interfaceId = $stateParams.id;
+                //        return $http.get("odata/itInterfaces(" + interfaceId + ")")
+                //            .then(function (result) {
+                //                return result.data.value;
+                //            });
+                //    }
+                //]
             }
         });
     }]);
 
-    app.controller('system.interfaceEditCtrl',
-        [
-            '$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface', '$state', 'notify', '$http', '_',
+    app.controller('system.interfaceEditCtrl', ['$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface', '$state', 'notify', '$http', '_',
             function ($rootScope, $scope, user, hasWriteAccess, itInterface, $state, notify, $http, _) {
 
                 if (user.isGlobalAdmin) {

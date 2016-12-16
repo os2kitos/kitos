@@ -27,15 +27,18 @@ namespace Presentation.Web.Controllers.API
             _itInterfaceService = itInterfaceService;
         }
 
-        // DELETE api/ItInterface
+        // Udkommenteret ifm. OS2KITOS-663
+        //DELETE api/ItInterface
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
                 var item = Repository.GetByKey(id);
 
+                // Udkommenteret ifm. OS2KITOS-663
                 // check if the itinterface has any usages, if it does it's may not be deleted
-                if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
+                //if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
+                if (item.ExhibitedBy != null)
                     return Conflict("Cannot delete an itinterface in use!");
 
                 return base.Delete(id, organizationId);
@@ -69,8 +72,8 @@ namespace Presentation.Web.Controllers.API
                          // everyone in the same organization can see normal objects
                          s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
                     );
                 var dtos = Map(interfaces);
                 return Ok(dtos);
@@ -129,8 +132,8 @@ namespace Presentation.Web.Controllers.API
                         // everyone in the same organization can see normal objects
                         x.AccessModifier == AccessModifier.Local &&
                         x.OrganizationId == organizationId
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
                     );
                 var dtos = Map(interfaces);
 
@@ -185,37 +188,39 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <param name="sysId"></param>
         /// <returns>Available interfaces</returns>
-        public HttpResponseMessage GetSearchExclude(string q, int orgId, int sysId)
-        {
-            try
-            {
-                var interfaces = Repository.Get(
-                    s =>
-                        // filter by name
-                        s.Name.Contains(q) &&
-                        // filter (remove) interfaces already used by the system
-                        s.CanBeUsedBy.Count(x => x.ItSystemId == sysId) == 0 &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin &&
-                         s.OrganizationId == orgId ||
-                         // object owner sees his own objects
-                         s.ObjectOwnerId == KitosUser.Id ||
-                         // it's public everyone can see it
-                         s.AccessModifier == AccessModifier.Public ||
-                         // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Local &&
-                         s.OrganizationId == orgId)
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
-                    );
-                var dtos = Map(interfaces);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
+        //
+        // Udkommenteret ifm. OS2KITOS-663
+        //public HttpResponseMessage GetSearchExclude(string q, int orgId, int sysId)
+        //{
+        //    try
+        //    {
+        //        var interfaces = Repository.Get(
+        //            s =>
+        //                // filter by name
+        //                s.Name.Contains(q) &&
+        //                // filter (remove) interfaces already used by the system
+        //                s.CanBeUsedBy.Count(x => x.ItSystemId == sysId) == 0 &&
+        //                // global admin sees all within the context
+        //                (KitosUser.IsGlobalAdmin &&
+        //                 s.OrganizationId == orgId ||
+        //                 // object owner sees his own objects
+        //                 s.ObjectOwnerId == KitosUser.Id ||
+        //                 // it's public everyone can see it
+        //                 s.AccessModifier == AccessModifier.Public ||
+        //                 // everyone in the same organization can see normal objects
+        //                 s.AccessModifier == AccessModifier.Local &&
+        //                 s.OrganizationId == orgId)
+        //                // it systems doesn't have roles so private doesn't make sense
+        //                // only object owners will be albe to see private objects
+        //            );
+        //        var dtos = Map(interfaces);
+        //        return Ok(dtos);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return LogError(e);
+        //    }
+        //}
 
         public override HttpResponseMessage Post(ItInterfaceDTO dto)
         {
@@ -274,7 +279,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetItInterfaceNameUniqueConstraint (string checkitinterfaceid, string checkname, int orgId)
+        public HttpResponseMessage GetItInterfaceNameUniqueConstraint(string checkitinterfaceid, string checkname, int orgId)
         {
             try
             {
