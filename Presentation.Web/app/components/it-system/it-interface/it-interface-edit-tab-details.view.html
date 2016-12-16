@@ -1,10 +1,11 @@
-﻿<div class="panel panel-default">
-    <div class="panel-body">
+﻿<div class="object-section-container">
+    <h4 ng-bind="system.name"></h4>
+    <div class="row">
         <div class="col-xs-6">
-            <div class="form-group">
+            <div class="col-xs-6">
                 <!-- TSA -->
-                <label for="interface-tsa" class="control-label col-xs-2 small">TSA</label>
-                <div class="col-xs-4">
+                <div class="form-group">
+                    <label for="interface-tsa" class="control-label small">TSA</label>
                     <select-option data-id="interface-tsa"
                                    data-placeholder="Vælg TSA"
                                    data-selected-text="{{ system.tsaName }}"
@@ -15,25 +16,10 @@
                                    data-field="tsaId">
                     </select-option>
                 </div>
-                <!-- Interface type -->
-                <label for="interface-type" class="control-label col-xs-2 small">Snitfladetype</label>
-                <div class="col-xs-4">
-                    <select-option data-id="interface-type"
-                                   data-placeholder="Vælg snitfladetype"
-                                   data-selected-text="{{ system.interfaceTypeName }}"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="system.interfaceTypeId"
-                                   data-options="interfaceTypes"
-                                   data-auto-save-url="{{ system.updateUrl }}"
-                                   data-field="interfaceTypeId">
-                    </select-option>
-                </div>
-            </div>
 
-            <!-- Interface  -->
-            <div class="form-group">
-                <label for="interface-interface" class="control-label col-xs-2 small">Grænseflade</label>
-                <div class="col-xs-4">
+                <!-- Interface  -->
+                <div class="form-group">
+                    <label for="interface-interface" class="control-label small">Grænseflade</label>
                     <select-option data-id="interface-interface"
                                    data-placeholder="Vælg grænseflade"
                                    data-selected-text="{{ system.interfaceName }}"
@@ -44,36 +30,49 @@
                                    data-field="interfaceId">
                     </select-option>
                 </div>
-                <!-- MethodType -->
-                <label for="interface-method" class="control-label col-xs-2 small">Metode</label>
-                <div class="col-xs-4">
-                    <select-option data-id="interface-method"
-                                   data-placeholder="Vælg methode"
-                                   data-selected-text="{{ system.methodName }}"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="system.methodId"
-                                   data-options="methods"
-                                   data-auto-save-url="{{ system.updateUrl }}"
-                                   data-field="methodId">
-                    </select-option>
-                </div>
-            </div>
 
-            <div class="form-group">
                 <!-- Exhibited by -->
-                <label for="interface-exposed-by" class="control-label col-xs-2 small">Udstillet af</label>
-                <div class="col-xs-4">
+                <div class="form-group">
+                    <label for="interface-exposed-by" class="control-label small">Udstillet af</label>
                     <input type="hidden" id="interface-exposed-by" class="form-control input-sm"
                            data-ui-select2="itSystemsSelectOptions"
                            data-placeholder="Vælg IT System"
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-change="save()"
                            data-ng-model="exposedByObj">
+                </div>
+            </div>
+            <div class="col-xs-6">
 
+                <!-- Interface type -->
+                <div class="form-group">
+                    <label for="interface-type" class="control-label small">Snitfladetype</label>
+                    <select-option data-id="interface-type"
+                                    data-placeholder="Vælg snitfladetype"
+                                    data-selected-text="{{ system.interfaceTypeName }}"
+                                    data-ng-disabled="!hasWriteAccess"
+                                    data-ng-model="system.interfaceTypeId"
+                                    data-options="interfaceTypes"
+                                    data-auto-save-url="{{ system.updateUrl }}"
+                                    data-field="interfaceTypeId">
+                    </select-option>
+                </div>
+
+                <!-- MethodType -->
+                <div class="form-group">
+                    <label for="interface-method" class="control-label small">Metode</label>
+                    <select-option data-id="interface-method"
+                                    data-placeholder="Vælg methode"
+                                    data-selected-text="{{ system.methodName }}"
+                                    data-ng-disabled="!hasWriteAccess"
+                                    data-ng-model="system.methodId"
+                                    data-options="methods"
+                                    data-auto-save-url="{{ system.updateUrl }}"
+                                    data-field="methodId">
+                    </select-option>
                 </div>
             </div>
         </div>
-
         <div class="col-xs-6">
             <table class="table table-condensed">
                 <thead>
@@ -87,21 +86,21 @@
                     <tr data-ng-repeat="dataRow in dataRows | filter:{show:true}">
                         <td>
                             <input type="text"
-                                   class="form-control input-sm"
-                                   data-ng-model="dataRow.data"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-autosave="{{dataRow.updateUrl}}"
-                                   data-field="data">
+                                    class="form-control input-sm"
+                                    data-ng-model="dataRow.data"
+                                    data-ng-disabled="!hasWriteAccess"
+                                    data-autosave="{{dataRow.updateUrl}}"
+                                    data-field="data">
                         </td>
                         <td class="data-type-selector">
                             <select-option data-id="interface-data-type"
-                                           data-placeholder="Vælg datatype"
-                                           data-selected-text="{{ dataRow.dataTypeName }}"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           data-ng-model="dataRow.dataTypeId"
-                                           data-options="dataTypes"
-                                           data-auto-save-url="{{ dataRow.updateUrl }}"
-                                           data-field="dataTypeId">
+                                            data-placeholder="Vælg datatype"
+                                            data-selected-text="{{ dataRow.dataTypeName }}"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="dataRow.dataTypeId"
+                                            data-options="dataTypes"
+                                            data-auto-save-url="{{ dataRow.updateUrl }}"
+                                            data-field="dataTypeId">
                             </select-option>
                         </td>
                         <td class="text-right">

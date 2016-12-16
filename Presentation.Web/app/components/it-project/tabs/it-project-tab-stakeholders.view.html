@@ -1,132 +1,138 @@
-﻿<form role="form" name="stakeholderForm">
-    <table class="table table-condensed">
-        <thead>
-            <tr class="small">
-                <th>
-                    Interessent
-                </th>
-                <th>
-                    Rolle
-                </th>
-                <th>
-                    Ulemper for interessent
-                </th>
-                <th class="col-xs-3">
-                    Fordele/succeskritier for interessent
-                </th>
-                <th class="col-xs-1">
-                    Betydning (1-5)
-                </th>
-                <th>
-                    Hvordan
-                </th>
-                <th><!-- control --></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr data-ng-repeat="stakeholder in stakeholders | filter:{show:true}">
-                <td>
-                    <input type="text" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="name"
-                           data-ng-model="stakeholder.name"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <input type="text" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="role"
-                           data-ng-model="stakeholder.role"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <input type="text" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="downsides"
-                           data-ng-model="stakeholder.downsides"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <input type="text" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="benefits"
-                           data-ng-model="stakeholder.benefits"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <input type="number" min="1" max="5" step="1" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="significance"
-                           data-ng-model="stakeholder.significance"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <input type="text" class="form-control input-sm"
-                           data-autosave="{{stakeholder.updateUrl}}"
-                           data-field="howToHandle"
-                           data-ng-model="stakeholder.howToHandle"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"/>
-                </td>
-                <td>
-                    <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
-                        <a class="btn btn-danger btn-sm delete-stakeholder"
-                           data-confirmed-click="stakeholder.delete()"
-                           data-confirm-click="Er du sikker på at du vil slette?">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <!-- new row -->
-            <tr data-ng-if="projectEditVm.hasWriteAccess">
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <input type="text" name="name" class="form-control input-sm" required
-                               data-ng-model="new.name">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <input type="text" name="role" class="form-control input-sm" required
-                               data-ng-model="new.role">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <input type="text" name="downsides" class="form-control input-sm" required
-                               data-ng-model="new.downsides">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <input type="text" name="benefits" class="form-control input-sm" required
-                               data-ng-model="new.benefits">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <input type="number" name="significance" min="1" max="5" step="1" class="form-control input-sm" required
-                               data-ng-model="new.significance">
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group" data-show-errors>
-                        <textarea name="handle" class="form-control input-sm" required
-                                  data-ng-model="new.howToHandle">
-                        </textarea>
-                        <span class="help-block">Hvordan (håndteres, inddrages, belønnes etc) interessenten mhp at få succes?</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="pull-right">
-                        <button id="save-stakeholder" class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
-                            Gem
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
-</form>
+﻿<div class="object-section-container">
+    <h4>Økonomi</h4>
+    <div class="row">
+        <div class="col-xs-12">
+            <form role="form" name="stakeholderForm">
+                <table class="table table-condensed">
+                    <thead>
+                        <tr class="small">
+                            <th>
+                                Interessent
+                            </th>
+                            <th>
+                                Rolle
+                            </th>
+                            <th>
+                                Ulemper for interessent
+                            </th>
+                            <th class="col-xs-3">
+                                Fordele/succeskritier for interessent
+                            </th>
+                            <th class="col-xs-1">
+                                Betydning (1-5)
+                            </th>
+                            <th>
+                                Hvordan
+                            </th>
+                            <th><!-- control --></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="stakeholder in stakeholders | filter:{show:true}">
+                            <td>
+                                <input type="text" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="name"
+                                       data-ng-model="stakeholder.name"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="role"
+                                       data-ng-model="stakeholder.role"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="downsides"
+                                       data-ng-model="stakeholder.downsides"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="benefits"
+                                       data-ng-model="stakeholder.benefits"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <input type="number" min="1" max="5" step="1" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="significance"
+                                       data-ng-model="stakeholder.significance"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control input-sm"
+                                       data-autosave="{{stakeholder.updateUrl}}"
+                                       data-field="howToHandle"
+                                       data-ng-model="stakeholder.howToHandle"
+                                       data-ng-disabled="!projectEditVm.hasWriteAccess" />
+                            </td>
+                            <td>
+                                <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
+                                    <a class="btn btn-danger btn-sm delete-stakeholder"
+                                       data-confirmed-click="stakeholder.delete()"
+                                       data-confirm-click="Er du sikker på at du vil slette?">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <!-- new row -->
+                        <tr data-ng-if="projectEditVm.hasWriteAccess">
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <input type="text" name="name" class="form-control input-sm" required
+                                           data-ng-model="new.name">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <input type="text" name="role" class="form-control input-sm" required
+                                           data-ng-model="new.role">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <input type="text" name="downsides" class="form-control input-sm" required
+                                           data-ng-model="new.downsides">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <input type="text" name="benefits" class="form-control input-sm" required
+                                           data-ng-model="new.benefits">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <input type="number" name="significance" min="1" max="5" step="1" class="form-control input-sm" required
+                                           data-ng-model="new.significance">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group" data-show-errors>
+                                    <textarea name="handle" class="form-control input-sm" required
+                                              data-ng-model="new.howToHandle"></textarea>
+                                    <span class="help-block">Hvordan (håndteres, inddrages, belønnes etc) interessenten mhp at få succes?</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="pull-right">
+                                    <button id="save-stakeholder" class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
+                                        Gem
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>

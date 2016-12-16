@@ -24,8 +24,6 @@
             var projectId = $stateParams.id;
             $scope.systemUsages = usages;
 
-            console.log(usages);
-
             $scope.save = function () {
                 $http.post("api/itproject/" + projectId + "?usageId=" + $scope.selectedSystemUsage.id + "&organizationId=" + user.currentOrganizationId)
                     .success(function () {
