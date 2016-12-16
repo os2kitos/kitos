@@ -14,8 +14,7 @@ module.exports = {
         bower("/tinymce/plugins/image/plugin.min.js"),
         bower("/tinymce/plugins/code/plugin.min.js"),
         bower("/tinymce/plugins/link/plugin.min.js"),
-        bower("/tinymce/themes/modern/theme.min.js"),
-        bower("/zingchart/client/zingchart.min.js")
+        bower("/tinymce/themes/modern/theme.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
 

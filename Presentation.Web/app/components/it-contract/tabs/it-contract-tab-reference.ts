@@ -108,9 +108,9 @@
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === contract.referenceId) {
-                                    HTML = HTML + "<a data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></a>";//valgt
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {
-                                    HTML = HTML + "<a data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></a>";//vælg
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
                                 }
                             }
 
@@ -121,7 +121,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/contract/edit/" + contract.id + "/reference//createReference/" + contract.id + "\"'>#=text#</a>"
+                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/contract/edit/" + contract.id + "/reference/createReference/" + contract.id + "\"'>#=text#</a>"
                         }]
                 };
             }]);

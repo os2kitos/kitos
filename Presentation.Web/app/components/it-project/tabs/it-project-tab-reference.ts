@@ -9,8 +9,9 @@
     }]);
 
     app.controller("project.EditReference",
-        ["$scope", "$http", "$timeout", "$state", "$stateParams","project","$confirm","notify","$",
-            function ($scope, $http, $timeout, $state, $stateParams,project,$confirm,notify,$) {
+        ["$scope", "$http", "$timeout", "$state", "$stateParams", "project", "$confirm", "notify", "$", "hasWriteAccess",
+            function ($scope, $http, $timeout, $state, $stateParams, project, $confirm, notify, $, hasWriteAccess) {
+                $scope.hasWriteAccess = hasWriteAccess;
               //  $scope.chosenReference = project.ReferenceId;
                 $scope.deleteReference = function (id) {
                     var msg = notify.addInfoMessage("Sletter...");
@@ -99,9 +100,9 @@
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === project.referenceId) {
-                                    HTML = HTML + "<a data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></a>";//valgt
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {
-                                    HTML = HTML + "<a data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' href='\\#' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></a>";//vælg
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
 
                                 }
                             }
@@ -113,7 +114,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/project/edit/" + project.id + "/reference//createReference/" + project.id +"\"'>#=text#</a>"
+                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/project/edit/" + project.id + "/reference/createReference/" + project.id +"\"'>#=text#</a>"
                         }]
                 };
             }]);
