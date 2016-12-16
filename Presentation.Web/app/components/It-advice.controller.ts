@@ -22,7 +22,8 @@
                 change: onChange,
                 columns: [{
                     field: "Name",
-                    title: "Navn"
+                    title: "Navn",
+                    attributes: { "class": "might-overflow" }
                 },
                 {
                             field: "SentDate",
@@ -33,7 +34,8 @@
                                     return kendo.toString(new Date(x.SentDate), "d");
                                 }
                                 return "";
-                            }
+                            },
+                            attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Id",
@@ -48,7 +50,8 @@
                                     return kendo.toString(new Date(x.AlarmDate), "d");
                                 }
                                 return "";
-                            }
+                            },
+                            attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Reciepients.Name", title: "Modtager",
@@ -132,7 +135,7 @@
                             notify.addSuccessMessage("Advisen er slettet!");
                             $("#mainGrid").data("kendoGrid").dataSource.read();
                         },
-                    () => notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!"));
+                    () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
 
             $scope.newAdvice = function (action, id) {
@@ -158,14 +161,14 @@
                                     method: 'GET',
                                     url: 'Odata/advice?key=' + id + '&$expand=Reciepients'
                                 }).then(function successCallback(response) {
-
+                                    $scope.name = response.data.Name;
                                     $scope.subject = response.data.Subject;
                                     $scope.emailBody = response.data.Body;
                                     $scope.repitionPattern = response.data.Scheduling;
                                     $scope.startDate = response.data.AlarmDate;
                                     $scope.stopDate = response.data.StopDate;
                                     $scope.selectedRecievers = [];
-                                    $scope.hiddenForjob = response.data.JobId
+                                    $scope.hiddenForjob = response.data.JobId;
                                     //var recivers = [];
                                     var ccs = [];
                                     $scope.selectedCC = []; 
@@ -183,7 +186,7 @@
                                     }
                                     }
                                     $scope.externalCC = ccs.join(', ');
-                            }, function errorCallback(response) {
+                                }, function errorCallback(response) {
                                 });
                         }
                     }
@@ -193,17 +196,18 @@
                             var url = '';
                             var payload = createPayload();
                             //setup scheduling
+                            payload.Name = $scope.name;
                             payload.Scheduling = $scope.repitionPattern;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
 
                             if (action == 'POST') {
                                 url = "Odata/advice";
-                                
                                 httpCall(payload, action, url);
+
                             } else if (action == 'PATCH') {
                                 url = "Odata/advice(" + id + ")";
-                                $http.patch(url, JSON.stringify(payload))
+                                $http.patch(url, JSON.stringify(payload));
                             }
                           
                     };
@@ -240,18 +244,28 @@
                             data: payload,
                             type: "application/json"
                         }).success(function () {
-                            //msg.toSuccessMessage("Ændringerne er gemt!");
+                            if (action === "POST") {
+                                notify.addSuccessMessage("Advisen er oprettet!");
+                            }
+                            if (action === "PATCH") {
+                                notify.addSuccessMessage("Advisen er opdateret!");
+                            }
                             $("#mainGrid").data("kendoGrid").dataSource.read();
                             $scope.$close(true);
                         }).error(function () {
-                            //msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
+                            if (action === "POST") {
+                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
+                            }
+                            if (action === "PATCH") {
+                                notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
+                            }
                         });
                     }
 
                     function createPayload() {
 
                         var payload = {
-                            Name: $scope.name,
+                            Name: "Straks afsendt",
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
