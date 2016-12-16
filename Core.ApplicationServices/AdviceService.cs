@@ -45,7 +45,7 @@ namespace Core.ApplicationServices
                     RecurringJob.RemoveIfExists(advice.JobId);
                     return false;
                 }
-                if (advice.AlarmDate > DateTime.Now)
+                if (advice.AlarmDate.Value.Date <= DateTime.Now.Date)
                 {
                     try
                     {

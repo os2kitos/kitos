@@ -251,7 +251,7 @@
                     function createPayload() {
 
                         var payload = {
-                            Name: name,
+                            Name: $scope.name,
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
