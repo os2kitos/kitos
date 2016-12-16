@@ -144,6 +144,7 @@
                     templateUrl: "app/components/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
+                        console.log(roles.data.value);
                         $scope.recieverRoles = roles.data.value;
 
                         if (action === 'POST') {
@@ -159,6 +160,7 @@
                                     url: 'Odata/advice?key=' + id + '&$expand=Reciepients'
                                 }).then(function successCallback(response) {
 
+                                    $scope.name = response.data.Name;
                                     $scope.subject = response.data.Subject;
                                     $scope.emailBody = response.data.Body;
                                     $scope.repitionPattern = response.data.Scheduling;
@@ -168,26 +170,26 @@
                                     $scope.hiddenForjob = response.data.JobId
                                     //var recivers = [];
                                     var ccs = [];
-                                    $scope.selectedCC = []; 
+                                    $scope.selectedCC = [];
 
-                                    for (var i = 0; i < response.data.Reciepients.length; i++){
-                                    if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
-                                        $scope.selectedRecievers.push(response.data.Reciepients[i].Name);
-                                    }else if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'CC') {
-                                        $scope.selectedCC.push(response.data.Reciepients[i].Name);
-                                    } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
-                                       // recivers.push(response.data.Reciepients[i].Name);
-                                        $scope.externalTo = response.data.Reciepients[i].Name;
-                                    } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'CC') {
-                                        ccs.push(response.data.Reciepients[i].Name);
-                                    }
+                                    for (var i = 0; i < response.data.Reciepients.length; i++) {
+                                        if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
+                                            $scope.selectedRecievers.push(response.data.Reciepients[i].Name);
+                                        } else if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'CC') {
+                                            $scope.selectedCC.push(response.data.Reciepients[i].Name);
+                                        } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
+                                            // recivers.push(response.data.Reciepients[i].Name);
+                                            $scope.externalTo = response.data.Reciepients[i].Name;
+                                        } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'CC') {
+                                            ccs.push(response.data.Reciepients[i].Name);
+                                        }
                                     }
                                     $scope.externalCC = ccs.join(', ');
-                            }, function errorCallback(response) {
+                                }, function errorCallback(response) {
                                 });
+                            }
                         }
-                    }
-                    
+
                         $scope.save = () => {
 
                             var url = '';
@@ -199,12 +201,26 @@
 
                             if (action == 'POST') {
                                 url = "Odata/advice";
-                                
+
                                 httpCall(payload, action, url);
                             } else if (action == 'PATCH') {
+
                                 url = "Odata/advice(" + id + ")";
+
+                                $http.delete('/api/AdviceUserRelation/DeleteByAdviceId?adviceId=' + id);
+
+                                for (var i = 0; i < payload.Reciepients.length; i++) {
+                                    payload.Reciepients[i].adviceId = id;
+                                    $http.post('/api/AdviceUserRelation', payload.Reciepients[i]);
+                                } 
+                                payload.Reciepients = undefined; 
+                                console.log("pATCH:");
+                                console.log(payload);
                                 $http.patch(url, JSON.stringify(payload))
-                            }
+
+                                $("#mainGrid").data("kendoGrid").dataSource.read();
+                                $scope.$close(true);
+                                }
                           
                     };
 
@@ -226,12 +242,17 @@
                         parseFormats: ["yyyy-MM-dd"]
                     };
                     function dateString2Date(dateString) {
-                        var dt = dateString.split('-');
-                        if (action === 'POST') {
-                            return new Date(dt[2] + "/" + dt[1] + "/" + dt[0]);
-                        }
+                        //var dt = dateString.reverse;
+                        /*console.log("datestring:" + dateString);
+                        if (action === 'POST') {*/
+
+
+                        console.log(dateString.split("-").reverse().join("-"));
+                        return new Date(dateString.split("").reverse().join(""));
+                        /*}
                         return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0,2));
-                    }
+                        */
+                        }
 
                     function httpCall(payload, action, url) {
                         $http({
@@ -272,7 +293,8 @@
                                     {
                                         Name: $scope.selectedRecievers[i],
                                         RecpientType: "ROLE",
-                                        RecieverType: "RECIEVER"
+                                        RecieverType: "RECIEVER",
+                                        adviceId: undefined
                                     }
                                 );
                             }
@@ -338,7 +360,7 @@
                     advices: ['$http', '$stateParams', function ($http, $stateParams) {
                       
                         switch ($scope.type) { 
-                            case 'ItContract':
+                            case 'itContract':
                                 return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });

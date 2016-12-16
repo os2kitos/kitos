@@ -378,6 +378,9 @@ namespace Presentation.Web
             Mapper.CreateMap<Advice, AdviceDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<AdviceUserRelation, AdviceUserRelationDTO>()
+                  .ReverseMap();
+
             Mapper.CreateMap<HandoverTrial, HandoverTrialDTO>()
                   .ReverseMap();
 
