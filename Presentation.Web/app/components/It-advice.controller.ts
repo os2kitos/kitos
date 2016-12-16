@@ -21,6 +21,10 @@
                 selectable: true,
                 change: onChange,
                 columns: [{
+                    field: "Name",
+                    title: "Navn"
+                },
+                {
                             field: "SentDate",
                             title: "Sidst sendt",
                             template: x => {
@@ -34,10 +38,7 @@
                             field: "Id",
                             hidden: true
                         },
-                        {
-                            field: "Name",
-                            title: "Navn"
-                        },
+                        
                         {
                             field: "AlarmDate",
                             title: "Dato",
@@ -263,8 +264,8 @@
                     function createPayload() {
 
                         var payload = {
-                            Name: $scope.formData.Name,
-                            Subject: $scope.formData.subject,
+                            Name: name,
+                            Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
                             Type: type,
