@@ -34,11 +34,11 @@
 
     app.controller('system.interfaceEditCtrl',
     [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user',
-        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user) {
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user', '$stateParams',
+        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user, $stateParams) {
             $rootScope.page.title = 'Snitflade - Rediger';
             autofocus();
-
+            $scope.stateId = $stateParams.id;
             itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
             itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
             $scope.interface = itInterface;

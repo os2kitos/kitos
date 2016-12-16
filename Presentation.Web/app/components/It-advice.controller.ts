@@ -329,6 +329,7 @@
                 resolve: {
                     Roles: ['$http', function ($http) {
                         if (type === "itSystemUsage") {
+                        if (type === "itSystem" || "itInterface") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
