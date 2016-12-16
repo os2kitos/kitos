@@ -217,46 +217,41 @@
                                 for (var i = 0; i < payload.Reciepients.length; i++) {
                                     payload.Reciepients[i].adviceId = id;
                                     $http.post('/api/AdviceUserRelation', payload.Reciepients[i]);
-                                } 
-                                payload.Reciepients = undefined; 
+                                }
+                                payload.Reciepients = undefined;
                                 console.log("pATCH:");
                                 console.log(payload);
                                 $http.patch(url, JSON.stringify(payload))
 
                                 $("#mainGrid").data("kendoGrid").dataSource.read();
                                 $scope.$close(true);
-                                }
-                          
-                    };
+                            }
 
-                    $scope.send = () => {
-                        var url = "Odata/advice";
-                        var payload = createPayload();
-                        httpCall(payload, action, url);
-                    };
+                        };
 
-                    $scope.tinymceOptions = {
-                        plugins: 'link image code',
-                        skin: 'lightgray',
-                        theme: 'modern',
-                        toolbar: "bold italic | example | code | preview | link | searchreplace"
-                    };
+                        $scope.send = () => {
+                            var url = "Odata/advice";
+                            var payload = createPayload();
+                            httpCall(payload, action, url);
+                        };
 
-                    $scope.datepickerOptions = {
-                        format: "dd-MM-yyyy",
-                        parseFormats: ["yyyy-MM-dd"]
-                    };
-                    function dateString2Date(dateString) {
-                        //var dt = dateString.reverse;
-                        /*console.log("datestring:" + dateString);
-                        if (action === 'POST') {*/
+                        $scope.tinymceOptions = {
+                            plugins: 'link image code',
+                            skin: 'lightgray',
+                            theme: 'modern',
+                            toolbar: "bold italic | example | code | preview | link | searchreplace"
+                        };
 
-
-                        console.log(dateString.split("-").reverse().join("-"));
-                        return new Date(dateString.split("").reverse().join(""));
-                        /*}
-                        return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0,2));
-                        */
+                        $scope.datepickerOptions = {
+                            format: "dd-MM-yyyy",
+                            parseFormats: ["yyyy-MM-dd"]
+                        };
+                        function dateString2Date(dateString) {
+                            var dt = dateString.split('-');
+                            if (dt[2].length > 4) {
+                                return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2));
+                        }
+                        return new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2));
                         }
 
                     function httpCall(payload, action, url) {
