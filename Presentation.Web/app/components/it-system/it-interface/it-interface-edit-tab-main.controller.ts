@@ -17,7 +17,6 @@
 
                 itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
                 itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
-                //itInterface.updateUrl = "odata/itInterfaces(" + itInterface.id + ")";
                 $scope.interface = itInterface;
                 $scope.select2AllowClearOpt = {
                     allowClear: true
