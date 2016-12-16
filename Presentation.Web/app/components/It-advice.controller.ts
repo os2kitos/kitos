@@ -328,8 +328,7 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type === "itSystemUsage") {
-                        if (type === "itSystem" || "itInterface") {
+                        if (type === "itSystemUsage"|| "itInterface") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;

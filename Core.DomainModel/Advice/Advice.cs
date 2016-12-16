@@ -7,7 +7,8 @@ namespace Core.DomainModel.Advice
     {
         itContract,
         itSystemUsage,
-        itProject
+        itProject,
+        itInterface
     }
     public enum Scheduling
     {

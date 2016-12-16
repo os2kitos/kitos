@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-system.interface-edit.interface-advice', {
+        $stateProvider.state('it-system.interface-edit.advice', {
             url: '/advice/:type',
             templateUrl: 'app/components/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
