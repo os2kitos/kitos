@@ -28,6 +28,7 @@
                             field: "SentDate",
                             title: "Sidst sendt",
                             template: x => {
+                                console.log(x);
                                 if (x.SentDate != null) {
                                     return kendo.toString(new Date(x.SentDate), "d");
                                 }
@@ -50,40 +51,26 @@
                             }
                         },
                         {
-                            field: "Reciepients",
-                            template: function (dataItem) {
-                                var html = [];
-                                console.log(dataItem.Reciepients);
-                                for (var i = 1; i < dataItem.Reciepients.length; i++) {
-                                    if (dataItem.Reciepients[i].RecieverType == 'RECIEVER') { 
-                                        console.log(dataItem.Reciepients[i].Name);
-                                        html.push(dataItem.Reciepients[i].Name);
-                                    }
-                                }
-                                return html.join(', ');
-                            },
-                            title: "Modtager"
+                            field: "Reciepients.Name", title: "Modtager",
+                            template: () =>
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                            attributes: { "class": "might-overflow" }
                         },
                         {
-                            field: "Id",
+                            field: "Reciepients.Name",
                             title: "CC",
-                            template: function (dataItem) {
-                                var html = [];
-                                for (var i = 0; i < dataItem.Reciepients.length; i++) {
-                                    if (dataItem.Reciepients[i].RecpientType == 'CC') {
-                                        html.push(dataItem.Reciepients[i].Name);
-                                    }
-                                }
-                                return html.join(', ');
-                            }
+                            template: () =>
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                            attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Subject",
                             title: "Emne"
                         },
                         {
-                            template: (dataItem) => `<button id="add-advice" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>` +
-                                `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`
+                            template: (dataItem) => `<button id="add-advice" ng-show="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
+                                                        <button id="add-advice" ng-hide="${dataItem.Scheduling === 'Immediate'}" ng-disabled="${dataItem.Scheduling === 'Immediate'}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
+                                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`
                         }
                 ],
                     toolbar: [
@@ -141,10 +128,11 @@
 
             $scope.deleteAdvice = (id) => {
                 $http.delete(`odata/advice(${id})`)
-                    .then(() => notify.addSuccessMessage("Advisen er slettet!"),
+                    .then(() => {
+                            notify.addSuccessMessage("Advisen er slettet!");
+                            $("#mainGrid").data("kendoGrid").dataSource.read();
+                        },
                     () => notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!"));
-             
-                $("#mainGrid").data("kendoGrid").dataSource.read();
             }
 
             $scope.newAdvice = function (action, id) {
