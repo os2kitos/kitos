@@ -32,15 +32,25 @@
         });
     }]);
 
-    app.controller('system.interfaceEditCtrl', ['$rootScope', '$scope', 'user', 'hasWriteAccess', 'itInterface', '$state', 'notify', '$http', '_',
-        function ($rootScope, $scope, user, hasWriteAccess, itInterface, $state, notify, $http, _) {
-
+    app.controller('system.interfaceEditCtrl',
+    [
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'itInterface', 'hasWriteAccess', 'autofocus', 'user', '$stateParams', '_',
+        function ($rootScope, $scope, $http, $state, notify, itInterface, hasWriteAccess, autofocus, user, $stateParams, _) {
+            $rootScope.page.title = 'Snitflade - Rediger';
+            autofocus();
+            $scope.stateId = $stateParams.id;
+            itInterface.belongsTo = (!itInterface.belongsToId) ? null : { id: itInterface.belongsToId, text: itInterface.belongsToName };
+            itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
+            $scope.interface = itInterface;
+            $scope.hasWriteAccess = hasWriteAccess;
+            $scope.select2AllowClearOpt = {
+                allowClear: true
+            };
             if (user.isGlobalAdmin) {
                 if (!itInterface.disabled) {
                     var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Deaktivér snitflade";
                     });
-
                     if (ng.isUndefined(buttonAlreadyExists)) {
                         $rootScope.page.subnav.buttons.push(
                             { func: disableInterface, text: 'Deaktivér snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }

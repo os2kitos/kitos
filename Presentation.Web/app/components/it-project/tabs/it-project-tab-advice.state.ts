@@ -1,13 +1,13 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-project.edit.advice-generic', {
-            url: '/advice/:type',
+            url: '/advice',
             templateUrl: 'app/components/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
             controllerAs: 'Vm',
             resolve: {
                 Roles: ['$http', function ($http) {
-                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                    return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -16,6 +16,15 @@
                     return $http.get('api/itProject/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
+                }],
+                object: ['project', function (project) {
+                    return project;
+                }],
+                users: ['UserGetService', function (UserGetService) {
+                    return UserGetService.GetAllUsers();
+                }],
+                type: [function () {
+                    return "itProject";
                 }]
             }
         });
