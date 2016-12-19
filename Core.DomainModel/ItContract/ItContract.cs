@@ -21,17 +21,8 @@ namespace Core.DomainModel.ItContract
             PaymentMilestones = new List<PaymentMilestone>();
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
-          //  Advices = new List<Advice.Advice>();
             ExternalReferences = new List<ExternalReference>();
         }
-
-        /// <summary>
-        ///     Gets or sets the advices.
-        /// </summary>
-        /// <value>
-        ///     The advices.
-        /// </value>
-       // public virtual ICollection<Advice.Advice> Advices { get; set; }
 
         /// <summary>
         ///     Whether the contract is active or not

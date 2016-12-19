@@ -20,7 +20,6 @@
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -212,7 +211,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -776,21 +775,6 @@
                                 operator: "contains"
                             }
                         }
-                    },
-                    {
-                        field: "Advices.AlarmDate",
-                        title: "Dato for næste advis",
-                        width: 90,
-                        persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (dataItem.Advices.length <= 0) {
-                                return "";
-                            }
-                            var date = this._.first(this._.sortBy(dataItem.Advices, ["AlarmDate"])).AlarmDate;
-                            return this.moment(date).format("DD-MM-YYYY");
-                        },
-                        sortable: false,
-                        filterable: false
                     }
                 ]
             };
