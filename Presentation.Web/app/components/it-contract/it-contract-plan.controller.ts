@@ -356,15 +356,16 @@
 
                     return `<uib-tabset active="0">
                     <uib-tab index="0" heading="Systemer">
-                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" data-odata-query="odata/ItInterfaceExhibits?$select=ItInterface&$expand=ItInterface($select=Name, Disabled)&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name, disabled)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" data-odata-query="odata/ItContracts?$select=AssociatedInterfaceUsages&$expand=AssociatedInterfaceUsages($select=ItInterface;$expand=ItInterface($select=Name, Disabled))&$filter=AssociatedInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                </uib-tabset>`
+                </uib-tabset>`;
+
                 },
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,

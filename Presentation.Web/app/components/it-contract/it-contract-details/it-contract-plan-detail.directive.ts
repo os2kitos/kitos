@@ -44,14 +44,22 @@
                 },
                 columns: [
                     {
-                        field: `${scope.fieldValue}`, title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
-                        template: dataItem => {
-                            if (dataItem[scope.detailModelType].Disabled)
-                                return dataItem[scope.detailModelType].Name + " (udgået)";
-                            else
-                                return dataItem[scope.detailModelType].Name;
-                        },
                         persistId: "fieldValue", // DON'T YOU DARE RENAME!
+                        field: `${scope.fieldValue}`,
+                        title: `Kontrakten ${scope.action} følgende ${scope.detailType}`, width: 150,
+                        template: dataItem => {
+
+                            if (angular.isUndefined(dataItem.AssociatedInterfaceUsages)) {
+                                if (dataItem[scope.detailModelType].Disabled)
+                                    return dataItem[scope.detailModelType].Name + " (udgået)";
+                                else
+                                    return dataItem[scope.detailModelType].Name;
+                            } else {
+                                return `<table data-ng-repeat="item in dataItem.AssociatedInterfaceUsages">
+                                            <td>{{item.ItInterface.Name}} <span data-ng-if="item.ItInterface.Disabled"> (udgået) </span></td>
+                                        </table>`;
+                            }
+                        },
                         hidden: false
                     }
                 ]
