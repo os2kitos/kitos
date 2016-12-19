@@ -34,26 +34,22 @@
                 $scope.hasWriteAccess = hasWriteAccess;
 
                 if (user.isGlobalAdmin) {
+                    _.remove($rootScope.page.subnav.buttons, function (o) {
+                        return o.text === "Deaktivér IT System";
+                    });
+
+                    _.remove($rootScope.page.subnav.buttons, function (o) {
+                        return o.text === "Aktivér IT System";
+                    });
+
                     if (!itSystem.disabled) {
-                        var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                            return o.text === "Deaktivér IT System";
-                        });
-
-                        if (ng.isUndefined(buttonAlreadyExists)) {
-                            $rootScope.page.subnav.buttons.push(
-                                { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
-                            );
-                        }
+                        $rootScope.page.subnav.buttons.push(
+                            { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                        );
                     } else {
-                        var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                            return o.text === "Aktivér IT System";
-                        });
-
-                        if (ng.isUndefined(buttonAlreadyExists)) {
-                            $rootScope.page.subnav.buttons.push(
-                                { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
-                            );
-                        }
+                        $rootScope.page.subnav.buttons.push(
+                            { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                        );
                     }
                 }
 
