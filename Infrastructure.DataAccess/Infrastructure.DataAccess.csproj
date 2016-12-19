@@ -347,9 +347,9 @@
     <Compile Include="Migrations\201612160925221_InterfaceUses removed.Designer.cs">
       <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201612191024424_AdvisAdded.cs" />
-    <Compile Include="Migrations\201612191024424_AdvisAdded.Designer.cs">
-      <DependentUpon>201612191024424_AdvisAdded.cs</DependentUpon>
+    <Compile Include="Migrations\201612191146082_Advis.cs" />
+    <Compile Include="Migrations\201612191146082_Advis.Designer.cs">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -517,8 +517,8 @@
     <EmbeddedResource Include="Migrations\201612160925221_InterfaceUses removed.resx">
       <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201612191024424_AdvisAdded.resx">
-      <DependentUpon>201612191024424_AdvisAdded.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201612191146082_Advis.resx">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

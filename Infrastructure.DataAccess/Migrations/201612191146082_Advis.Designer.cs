@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class AdvisAdded : IMigrationMetadata
+    public sealed partial class Advis : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AdvisAdded));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Advis));
         
         string IMigrationMetadata.Id
         {
-            get { return "201612191024424_AdvisAdded"; }
+            get { return "201612191146082_Advis"; }
         }
         
         string IMigrationMetadata.Source
