@@ -20,7 +20,6 @@
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -212,7 +211,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -356,15 +355,16 @@
 
                     return `<uib-tabset active="0">
                     <uib-tab index="0" heading="Systemer">
-                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" data-odata-query="odata/ItInterfaceExhibits?$select=ItInterface&$expand=ItInterface($select=Name, Disabled)&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name, disabled)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" data-odata-query="odata/ItContracts?$select=AssociatedInterfaceUsages&$expand=AssociatedInterfaceUsages($select=ItInterface;$expand=ItInterface($select=Name, Disabled))&$filter=AssociatedInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                </uib-tabset>`
+                </uib-tabset>`;
+
                 },
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
@@ -778,21 +778,6 @@
                                 operator: "contains"
                             }
                         }
-                    },
-                    {
-                        field: "Advices.AlarmDate",
-                        title: "Dato for næste advis",
-                        width: 90,
-                        persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (dataItem.Advices.length <= 0) {
-                                return "";
-                            }
-                            var date = this._.first(this._.sortBy(dataItem.Advices, ["AlarmDate"])).AlarmDate;
-                            return this.moment(date).format("DD-MM-YYYY");
-                        },
-                        sortable: false,
-                        filterable: false
                     }
                 ]
             };

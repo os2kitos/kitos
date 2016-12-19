@@ -369,7 +369,6 @@
     <Compile Include="Controllers\OData\OptionControllers\ItContractTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItInterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
-    <Compile Include="Controllers\OData\ItInterfaceUsesEntityController.cs" />
     <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
     <Compile Include="Controllers\OData\ItInterfacesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItContractRolesController.cs" />
