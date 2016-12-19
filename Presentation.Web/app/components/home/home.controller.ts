@@ -9,16 +9,15 @@
                 resolve: {
                     texts: [
                         "$http", $http => $http.get("api/text/")
-                        .then(result => result.data.response)
+                            .then(result => result.data.response)
                     ]
                 }
             });
         }
     ]);
 
-    app.controller("home.IndexCtrl", [
-        "$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", 
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
 
@@ -36,10 +35,10 @@
                         userService.getUser()
                             .then(data => {
                                 if (data.isAuth === true) {
-                                    if (data.defaultUserStartPreference == null) {
-                                        $state.go("index");
-                                    } else {
+                                    if (navigationService.checkState(data.defaultUserStartPreference)) {
                                         $state.go(data.defaultUserStartPreference);
+                                    } else {
+                                        $state.go("index");
                                     }
                                 };
                             });

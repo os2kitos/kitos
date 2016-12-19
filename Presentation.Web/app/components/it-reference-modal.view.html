@@ -3,9 +3,8 @@
         Opret Ny reference
     </span>
 </div>
-<form name="activityForm"  novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
+<form name="activityForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
     <div class="modal-body">
-        
         <div class="form-group">
             <label for="documentTitle" class="col-xs-4 control-label small">
                 Dokumenttitel
@@ -14,13 +13,12 @@
                 <input type="text" id="documentTitle" ng-model="reference.title" class="form-control input-sm" required />
             </div>
         </div>
-
         <div class="form-group">
             <label for="DokomentID" class="col-xs-4 control-label small">
-                Evt. DokomentID/sagsnr./Anden Reference
+                Evt. DokumentID/sagsnr./Anden Reference
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" class="form-inline form-control input-sm" input-sm" />
+                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" class="form-inline form-control input-sm" />
             </div>
         </div>
         <div class="form-group">
@@ -28,27 +26,25 @@
                 URL, hvis dokumenttitel skal virke som link
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" ng-model="reference.url" class="form-control form-inline input-sm" />
-            </div>
-            <br/>
-        </div>
-        <span class="help-block small">Skal starte med http://</span>
-   <div class="modal-footer">
-        <button id="cancel"
-                type="button"
-                class="btn btn-warning"
-                data-ng-click="dismiss()"
-                data-disabled-on-busy="">
-            Annuller
-        </button>
-         <button id="save"
-                type="submit"
-                class="btn btn-success"
-                data-disabled-on-busy=""
-                data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)"
-                 >
-            Gem
-           </button>
+                <input type="text" id="DokomentID" ng-model="reference.url" class="form-control form-inline input-sm" aria-describedby="helpBlock"/>
+                <span id="helpBlock" class="help-block small">Skal starte med http://</span>
             </div>
         </div>
+        <div class="modal-footer">
+            <button id="cancel"
+                    type="button"
+                    class="btn btn-warning"
+                    data-ng-click="dismiss()"
+                    data-disabled-on-busy="">
+                Annuller
+            </button>
+            <button id="save"
+                    type="submit"
+                    class="btn btn-success"
+                    data-disabled-on-busy=""
+                    data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)">
+                Gem
+            </button>
+        </div>
+    </div>
 </form>

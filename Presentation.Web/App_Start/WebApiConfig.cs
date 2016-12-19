@@ -358,6 +358,9 @@ namespace Presentation.Web
             var LocalTsaType = builder.EntitySet<LocalTsaType>(nameof(LocalTsaTypesController).Replace("Controller", string.Empty));
             LocalTsaType.EntityType.HasKey(x => x.Id);
 
+            var LocalOrganizationUnitRole = builder.EntitySet<LocalOrganizationUnitRole>(nameof(LocalOrganizationUnitRolesController).Replace("Controller", string.Empty));
+            LocalOrganizationUnitRole.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<Risk>("Risks");
             //builder.EntitySet<Stakeholder>("Stakeholders");
 
@@ -396,6 +399,9 @@ namespace Presentation.Web
 
             var helpTexts = builder.EntitySet<HelpText>(nameof(HelpTextsController).Replace("Controller", string.Empty));
             helpTexts.EntityType.HasKey(x => x.Id);
+
+            var itProjectStatusUpdates = builder.EntitySet<ItProjectStatusUpdate>(nameof(ItProjectStatusUpdatesController).Replace("Controller", string.Empty));
+            itProjectStatusUpdates.EntityType.HasKey(x => x.Id);
 
             return builder.GetEdmModel();
         }

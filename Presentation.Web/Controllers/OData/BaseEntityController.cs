@@ -72,6 +72,11 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
+            {
+                (entity as IHasOrganization).OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+            }
+
             if (!_authService.HasWriteAccess(UserId, entity))
             {
                 return Unauthorized();

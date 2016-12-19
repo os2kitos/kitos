@@ -239,7 +239,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItProjectStatuses,Reference,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears`;
+                                var urlParameters = `?$expand=ItProjectStatuses,Reference,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -532,23 +532,36 @@
                         filterable: false
                     },
                     {
-                        field: "StatusProject", title: "Status projekt", width: 100,
+                        field: "ItProjectStatus", title: "Status projekt", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.StatusProject}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.StatusProject.toString() || "",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq"
-                            }
-                        },
-                        values: [
-                            { text: "Hvid", value: 0 },
-                            { text: "Rød", value: 1 },
-                            { text: "Gul", value: 2 },
-                            { text: "Grøn", value: 3 }
-                        ]
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].CombinedStatus}"></span>`,
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].CombinedStatus && dataItem.ItProjectStatusUpdates[0].CombinedStatus.toString() || "",
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectTimeStatus", title: "Status tid", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].TimeStatus}"></span>`,
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].TimeStatus && dataItem.ItProjectStatusUpdates[0].TimeStatus.toString() || "",
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectQualityStatus", title: "Status kvalitet", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].QualityStatus}"></span>`,
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].QualityStatus && dataItem.ItProjectStatusUpdates[0].QualityStatus.toString() || "",
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectResourcesStatus", title: "Status ressourcer", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => `<span data-square-traffic-light="${dataItem.ItProjectStatusUpdates[0].ResourcesStatus}"></span>`,
+                        excelTemplate: dataItem => dataItem && dataItem.ItProjectStatusUpdates[0].ResourcesStatus && dataItem.ItProjectStatusUpdates[0].ResourcesStatus.toString() || "",
+                        filterable: false,
+                        sortable: false
                     },
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,

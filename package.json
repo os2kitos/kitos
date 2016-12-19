@@ -23,7 +23,7 @@
     "del": "^2.2.0",
     "eslint": "^3.4.0",
     "gulp": "^3.9.0",
-    "gulp-angular-protractor": "^0.1.1",
+    "gulp-angular-protractor": "*",
     "gulp-bower": "0.0.13",
     "gulp-codecov.io": "^1.0.1",
     "gulp-concat": "^2.6.0",
@@ -55,8 +55,8 @@
     "karma-teamcity-reporter": "^1.0.0",
     "path": "^0.12.7",
     "phantomjs-prebuilt": "^2.1.7",
-    "protractor": "^4.0.4",
-    "protractor-http-mock": "^0.9.0",
+    "protractor": "~4.0.11",
+    "protractor-http-mock": "~0.9.0",
     "remap-istanbul": "^0.6.4",
     "require-dir": "^0.3.0",
     "run-sequence": "^1.2.2",
@@ -68,5 +68,6 @@
     "e2e:local": "gulp e2e:local",
     "e2e:browserstack": "gulp e2e:browserstack",
     "unit": "gulp unit"
-  }
+  },
+  "dependencies": {}
 }

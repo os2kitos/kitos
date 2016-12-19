@@ -484,6 +484,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedSystemUsages.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -495,6 +496,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedInterfaceExposures.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -506,6 +508,7 @@
                         template: dataItem => {
                             return dataItem.AssociatedInterfaceUsages.length.toString();
                         },
+                        attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
                     },
@@ -619,7 +622,7 @@
                             const concluded = this.moment(dataItem.Concluded);
                             const expirationDate = this.moment(dataItem.ExpirationDate);
 
-                            console.log("Test: " + dataItem.Concluded + " " + dataItem.ExpirationDate);
+                            //console.log("Test: " + dataItem.Concluded + " " + dataItem.ExpirationDate);
 
                             if (!dataItem.Concluded || !dataItem.ExpirationDate)
                                 return "";
@@ -628,9 +631,9 @@
                             const months = expirationDate.diff(concluded, "months");
                             const numMonths = Math.abs((years * 12) - months);
 
-                            console.log(`years: ${years}`);
-                            console.log(`months: ${months}`);
-                            console.log(`numMonths: ${numMonths}`);
+                            //console.log(`years: ${years}`);
+                            //console.log(`months: ${months}`);
+                            //console.log(`numMonths: ${numMonths}`);
 
                             if (years === 0)
                                 return `${months} måneder`;

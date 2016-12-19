@@ -1,50 +1,62 @@
-﻿<div>
-    <form class="form-horizontal fix-label-padding">
-        <div class="row">
-            <div class="col-xs-5">
-                <!-- Status traffic light -->
+﻿<form class="form-horizontal fix-label-padding">
+    <div class="object-section-container">
+        <h4>Status: Projekt</h4>
+        <div class="row" data-ng-if="projectStatusVm.currentStatusUpdate">
+            <div class="col-xs-4">
                 <div class="form-group">
-                    <label class="col-xs-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
-                    <div class="col-xs-7">
-                        <span id="statusProject"
-                              data-select-status2=""
-                              data-ng-model="projectStatusVm.project.statusProject"
-                              data-can-write="projectEditVm.hasWriteAccess"
-                              data-field="statusProject"
-                              data-autosave="{{projectStatusVm.project.updateUrl}}">
-                        </span>
-                    </div>
+                    <label for="statusMethod" class="control-label small">Metode</label>
+                    <select id="statusMethod" data-ng-change="projectStatusVm.onSelectStatusMethod()" data-ng-model="projectStatusVm.showCombinedChart" class="form-control input-sm">
+                        <option value="false">Tid, kvalitet og ressourcer</option>
+                        <option value="true">Samlet</option>
+                    </select>
                 </div>
-
-                <!-- Date for status update -->
                 <div class="form-group">
-                    <label class="col-xs-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-xs-4">
-                        <input type="text" class="form-control" id="statusDate"
-                               data-kendo-date-picker
-                               data-k-options="projectStatusVm.datepickerOptions"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess"
-                               data-ng-model="projectStatusVm.project.statusDate"
-                               data-autosave="{{projectStatusVm.project.updateUrl}}"
-                               data-field="statusDate">
-                    </div>
+                    <label class="control-label small">Dato for sidste status</label>
+                    <p class="small" data-ng-bind="projectStatusVm.moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" ui-sref="it-project.edit.status-project.update-modal">Opret ny status</button>
+                    <button class="btn btn-primary btn-block" ui-sref="it-project.edit.status-project.history-modal">Historik</button>
                 </div>
             </div>
 
-            <!-- Notes to status of project -->
-            <div class="col-xs-7">
-                <div class="form-group">
-                    <label class="col-xs-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
-                    <div class="col-xs-10">
-                        <textarea id="note" class="form-control input-sm" rows="4"
-                                  data-ng-model="projectStatusVm.project.statusNote"
-                                  data-field="statusNote"
-                                  data-autosave="{{projectStatusVm.project.updateUrl}}"
-                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+            <div class="col-xs-4">
+                <div class="splitted-chart" data-ng-if="projectStatusVm.showCombinedChart == 'false'">
+                    <div id="portion1" class="cutout"><div class="text {{ projectStatusVm.currentStatusUpdate.TimeStatus | lowercase }}" data-rel="Tid"></div></div>
+                    <div id="portion2" class="cutout"><div class="text {{ projectStatusVm.currentStatusUpdate.QualityStatus | lowercase }}" data-rel="Kvalitet"></div></div>
+                    <div id="portion3" class="cutout"><div class="text {{ projectStatusVm.currentStatusUpdate.ResourcesStatus | lowercase }}" data-rel="Ressourcer"></div></div>
+                </div>
+
+                <div class="combined-chart {{ projectStatusVm.currentStatusUpdate.CombinedStatus | lowercase }}" data-ng-if="projectStatusVm.showCombinedChart == 'true'">
+                    <div class="chart-content">
+                        <div>Samlet</div>
                     </div>
+                </div>
+            </div>
+            <div class="col-xs-4">
+                <div class="form-group">
+                    <label class="control-label small">Bemærkning</label>
+                    <p class="small" data-ng-bind="projectStatusVm.currentStatusUpdate.Note"></p>
                 </div>
             </div>
         </div>
+        <div class="row" data-ng-if="!projectStatusVm.currentStatusUpdate">
+            <div class="col-xs-4">
+                <div class="form-group" data-ng-if="projectStatusVm.allStatusUpdates.length">
+                    <label for="statusMethod" class="control-label small">Metode</label>
+                    <select id="statusMethod" data-ng-change="projectStatusVm.onSelectStatusMethod()" data-ng-model="projectStatusVm.showCombinedChart" class="form-control input-sm">
+                        <option value="false">Tid, kvalitet og ressourcer</option>
+                        <option value="true">Samlet</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" ui-sref="it-project.edit.status-project.update-modal">Opret ny status</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="object-section-container">
         <div class="panel panel-default">
             <div class="panel-heading small">
                 Milepæle og opgaver
@@ -163,5 +175,5 @@
                 </tfoot>
             </table>
         </div>
-    </form>
-</div>
+    </div>
+</form>

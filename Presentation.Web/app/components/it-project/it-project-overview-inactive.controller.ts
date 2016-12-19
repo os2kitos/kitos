@@ -445,7 +445,7 @@
                         },
                         sortable: false,
                         filterable: false
-                    },
+                    }/*,
                     {
                         field: "StatusProject", title: "Status projekt", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
@@ -464,7 +464,7 @@
                             { text: "Gul", value: 2 },
                             { text: "Grøn", value: 3 }
                         ]
-                    },
+                    }*/,
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "statusdateproj", // DON'T YOU DARE RENAME!

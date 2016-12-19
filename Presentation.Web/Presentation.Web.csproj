@@ -344,6 +344,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalMethodTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentFrequencyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentModelTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPriceRegulationTypesController.cs" />
@@ -573,6 +574,9 @@
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
     <Content Include="app\components\it-reference-modal.view.html" />
     <Content Include="app\components\it-reference.view.html" />
@@ -592,6 +596,8 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference.ts" />
@@ -622,6 +628,7 @@
     <TypeScriptCompile Include="app\models\help-text.ts" />
     <TypeScriptCompile Include="app\models\IReference.ts" />
     <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-status-update.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
     <TypeScriptCompile Include="app\models\role-entity.ts" />
     <TypeScriptCompile Include="app\models\option-entity.ts" />
@@ -635,6 +642,7 @@
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
     <TypeScriptCompile Include="app\services\itProjectService.ts" />
     <TypeScriptCompile Include="app\services\itSystemService.ts" />
+    <TypeScriptCompile Include="app\services\NavigationService.ts" />
     <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
     <TypeScriptCompile Include="app\services\uploadFileService.ts" />
@@ -744,6 +752,7 @@
     <Content Include="Content\css\fonts\tinymce.ttf" />
     <Content Include="Content\css\fonts\tinymce.woff" />
     <None Include="Content\kitos.less" />
+    <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />

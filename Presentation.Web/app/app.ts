@@ -52,8 +52,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
         // init info
         $rootScope.page = {
             title: "Index",
@@ -77,7 +77,11 @@ app.run([
         // changeOrganization function for top navigation bar
         $rootScope.changeOrganization = () => {
             userService.changeOrganization().then((user) => {
-                $state.go(user.defaultUserStartPreference, null, { reload: true });
+                if (navigationService.checkState(user.defaultUserStartPreference)) {
+                    $state.go(user.defaultUserStartPreference, null, { reload: true });
+                } else {
+                    $state.go("index", null, { reload: true });
+                }
             });
         };
 
