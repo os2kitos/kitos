@@ -12,6 +12,7 @@ using Ninject.Web.Common;
 using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
+using Hangfire;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -55,6 +56,8 @@ namespace Presentation.Web
                 kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
 
                 RegisterServices(kernel);
+                //To enable ninject in hangfire
+                GlobalConfiguration.Configuration.UseNinjectActivator(kernel);
                 return kernel;
             }
             catch
@@ -83,6 +86,7 @@ namespace Presentation.Web
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
             kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
+            kernel.Bind<IAdviceService>().To<AdviceService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();

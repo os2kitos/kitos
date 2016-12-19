@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
+using Core.DomainModel.Advice;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(MappingConfig), "Start")]
 
@@ -380,6 +381,9 @@ namespace Presentation.Web
                 .ReverseMap();
 
             Mapper.CreateMap<Advice, AdviceDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<AdviceUserRelation, AdviceUserRelationDTO>()
                   .ReverseMap();
 
             Mapper.CreateMap<HandoverTrial, HandoverTrialDTO>()

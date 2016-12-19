@@ -84,6 +84,10 @@
       <HintPath>..\packages\Hangfire.Core.1.6.6\lib\net45\Hangfire.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Hangfire.Ninject, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Ninject.1.2.0\lib\net45\Hangfire.Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Hangfire.SqlServer, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.SqlServer.1.6.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
       <Private>True</Private>
@@ -262,6 +266,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
@@ -314,6 +319,8 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
+    <Compile Include="Controllers\OData\AdviceSentController.cs" />
+    <Compile Include="Controllers\OData\AdviceController.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
@@ -401,6 +408,7 @@
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
+    <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
@@ -559,6 +567,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\it-advice-modal-view.html" />
     <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
@@ -599,6 +608,7 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-advice.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-advice.state.ts" />
@@ -667,7 +677,9 @@
     <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
+    <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
+    <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
     <Content Include="app\shared\selectOption\selectOption.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
@@ -1287,6 +1299,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\AdviceSent\" />
+    <Folder Include="Views\AdviceUserRelation\" />
+    <Folder Include="Views\Advis\" />
     <Folder Include="Views\BaseRole\" />
     <Folder Include="Views\Reference\" />
     <Folder Include="Views\UploadFile\" />
