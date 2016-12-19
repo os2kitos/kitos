@@ -325,9 +325,6 @@
                         text: "Slet filter",
                         template:
                         "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
-                    },
-                    {
-                        template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
                 excel: {
