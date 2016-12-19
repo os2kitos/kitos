@@ -202,22 +202,29 @@
 
                         // for each interface usages
                         if ($scope.newAssociatedInterfaceRelation == "exhibit") {
-                            _.each(data.data.response, function (usage: { id; itInterfaceName; }) {
-                                results.push({
-                                    // use the id of the interface usage
-                                    id: usage.id,
-                                    // use the name of the actual interface
-                                    text: usage.itInterfaceName
-                                });
+                            // interface exhibit
+                            _.each(data.data.response, function (usage: { id; itInterfaceName; itInterfaceDisabled; }) {
+                                if (!usage.itInterfaceDisabled) {
+                                    results.push({
+                                        // use the id of the interface usage
+                                        id: usage.id,
+                                        // use the name of the actual interface
+                                        text: usage.itInterfaceName
+                                    });
+                                }
                             });
                         } else {
-                            _.each(data.data.value, function (usage: { Id; Name; }) {
-                                results.push({
-                                    // use the id of the interface usage
-                                    id: { intfId: usage.Id, sysId: $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId },
-                                    // use the name of the actual interface
-                                    text: usage.Name
-                                });
+                            // interface usage
+                            _.each(data.data.value, function (usage: { Id; Name; Disabled; }) {
+                                if (!usage.Disabled) {
+                                    results.push({
+                                        // use the id of the interface usage
+                                        id: { intfId: usage.Id, sysId: $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId },
+                                        // use the name of the actual interface
+                                        text: usage.Name
+                                    });
+                                }
+
                             });
                         }
 
