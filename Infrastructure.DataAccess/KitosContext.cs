@@ -10,6 +10,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.AdviceSent;
 
 namespace Infrastructure.DataAccess
 {
@@ -29,7 +30,7 @@ namespace Infrastructure.DataAccess
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
-        public DbSet<Advice> Advices { get; set; }
+        public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
@@ -132,6 +133,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
+        public DbSet<AdviceSent> AdviceSent { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
