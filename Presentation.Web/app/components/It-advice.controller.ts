@@ -42,10 +42,21 @@
                         
                         {
                             field: "AlarmDate",
-                            title: "Dato",
+                            title: "Start dato",
                             template: x => {
                                 if (x.AlarmDate != null) {
                                     return kendo.toString(new Date(x.AlarmDate), "d");
+                                }
+                                return "";
+                            },
+                            attributes: { "class": "might-overflow" }
+                        },
+                        {
+                            field: "StopDate",
+                            title: "Slut dato",
+                            template: x => {
+                                if (x.StopDate != null) {
+                                    return kendo.toString(new Date(x.StopDate), "d");
                                 }
                                 return "";
                             },
@@ -102,8 +113,8 @@
                 },
                 pageSize: 10,
                 serverPaging: true,
-                serverFiltering: true,
-            },
+                serverFiltering: true
+                },
                 columns: [{
                     field: "AdviceSentDate",
                     title: "Afsendt",
@@ -114,7 +125,7 @@
                         return "";
                     }
                 }
-                ],
+                ]
             };
 
             $scope.datepickerOptions = {
@@ -138,7 +149,6 @@
                         },
                     () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
-
             $scope.newAdvice = function (action, id) {
 
                 $scope.action = action;
@@ -148,15 +158,17 @@
                     templateUrl: "app/components/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
-                        console.log(roles.data.value);
                         $scope.recieverRoles = roles.data.value;
 
                         if (action === 'POST') {
+                            $scope.hideSend = false;
                             $scope.externalCC = currentUser.email;
                             $scope.emailBody = "<a href='" + $window.location.href.replace("advice/" + type, "main") + "'>" + "Link til " + type + "</a>";
                         }
 
                         if (action === 'PATCH') {
+                            $scope.hideSend = true;
+
                             if (id != undefined) {
 
                                 $http({
@@ -219,9 +231,12 @@
                                     $http.post('/api/AdviceUserRelation', payload.Reciepients[i]);
                                 }
                                 payload.Reciepients = undefined;
-                                console.log("pATCH:");
-                                console.log(payload);
                                 $http.patch(url, JSON.stringify(payload))
+                                    .then(() => {
+                                        notify.addSuccessMessage("Advisen er opdateret!");
+                                    },
+                                    () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") }}
+                                );
 
                                 $("#mainGrid").data("kendoGrid").dataSource.read();
                                 $scope.$close(true);

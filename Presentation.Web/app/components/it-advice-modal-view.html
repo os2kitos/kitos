@@ -62,7 +62,7 @@
 
                 <!--Send Advis-->
                 <div class="form-group md-">
-                    <button type="submit" class="btn btn-primary" ng-click="send()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject)">Send</button>
+                    <button type="submit" class="btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject)">Send</button>
                 </div>
             </div>
             <div class="col-md-6">
