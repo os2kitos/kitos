@@ -42,14 +42,16 @@
                         return o.text === "Aktivér IT System";
                     });
 
-                    if (!itSystem.disabled) {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
-                        );
-                    } else {
-                        $rootScope.page.subnav.buttons.push(
-                            { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
-                        );
+                    if (itSystem.accessModifier === 1) {
+                        if (!itSystem.disabled) {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                            );
+                        } else {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                            );
+                        }
                     }
                 }
 

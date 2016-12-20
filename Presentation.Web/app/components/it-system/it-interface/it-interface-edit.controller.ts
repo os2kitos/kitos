@@ -46,22 +46,24 @@
             $scope.select2AllowClearOpt = {
                 allowClear: true
             };
+
+           
+
             if (user.isGlobalAdmin) {
-                if (!itInterface.disabled) {
-                    var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Deaktivér snitflade";
-                    });
-                    if (ng.isUndefined(buttonAlreadyExists)) {
+                _.remove($rootScope.page.subnav.buttons, function (o) {
+                    return o.text === "Deaktivér snitflade";
+                });
+
+                _.remove($rootScope.page.subnav.buttons, function (o) {
+                    return o.text === "Aktivér snitflade";
+                });
+
+                if (itInterface.accessModifier === 1) {
+                    if (!itInterface.disabled) {
                         $rootScope.page.subnav.buttons.push(
                             { func: disableInterface, text: 'Deaktivér snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                         );
-                    }
-                } else {
-                    var buttonAlreadyExists = _.find($rootScope.page.subnav.buttons, function (o) {
-                        return o.text === "Aktivér snitflade";
-                    });
-
-                    if (ng.isUndefined(buttonAlreadyExists)) {
+                    } else {
                         $rootScope.page.subnav.buttons.push(
                             { func: enableInterface, text: 'Aktivér snitflade', style: 'btn-success', showWhen: 'it-system.interface-edit' }
                         );
