@@ -52,7 +52,8 @@ namespace Core.ApplicationServices
                         {
                             Body = advice.Body,
                             Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8
+                            BodyEncoding = Encoding.UTF8,
+                            IsBodyHtml = true
                         };
 
                        // message.From = new MailAddress("no_reply@kitos.dk");
@@ -132,9 +133,10 @@ namespace Core.ApplicationServices
                         {
                             Body = advice.Body,
                             Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8
+                            BodyEncoding = Encoding.UTF8,
+                            IsBodyHtml = true
                         };
-                            message.From = new MailAddress("no_reply@kitos.dk");
+                          //  message.From = new MailAddress("no_reply@kitos.dk");
 
                             //Add recivers for Email
                             foreach (var r in advice.Reciepients)
