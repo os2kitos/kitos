@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class AccessType : Entity
+    public class AccessType : Entity, ISystemModule
     {
         public AccessType()
         {
