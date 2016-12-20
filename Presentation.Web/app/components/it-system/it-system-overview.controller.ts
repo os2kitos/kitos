@@ -340,14 +340,14 @@
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (udgået) </a>`;
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Inaktiv) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
-                                if (dataItem.ItSystem.Disabled) 
-                                    return dataItem.ItSystem.Name + " (udgået)";
+                                if (dataItem.ItSystem.Disabled)
+                                    return dataItem.ItSystem.Name + " (Inaktiv)";
                                 else
                                     return dataItem.ItSystem.Name;
                             } else {
