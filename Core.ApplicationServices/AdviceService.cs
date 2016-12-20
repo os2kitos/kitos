@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
         public AdviceService() {}
 
         public bool sendAdvice(int id){
-            Logger.Debug($"Host: {_mailClient._client.Host}, SSL: {_mailClient._client.EnableSsl}");
+
             var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
             if (advice != null)
