@@ -262,23 +262,20 @@
 
         <!-- Intern contract is Active regardless of concluded and expirationdate -->
         <div class="checkbox" style="position: absolute; left: 0;">
-            <!--<label>-->
-            <input type="checkbox" id="contractValid"
+            <input type="checkbox" id="contractIsActive"
                    class="tags-checkbox sr-only"
                    data-ng-model="contract.active"
                    data-ng-disabled="!hasWriteAccess"
                    data-autosave="{{ autoSaveUrl }}"
                    data-field="active"
-                   data-ng-change="checkContractValidity()"/>
-            <label for="contractValid">
-                <i class='glyphicon glyphicon-unchecked'></i>
-                <i class='glyphicon glyphicon-check'></i>
-                <span class='label-content'>Gyldig</span>
+                   data-ng-change="checkContractValidity()"
+                   />
+            <label for="contractIsActive">
+                <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
+                <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
+                <span class='label-content'>Gyldig: </span>
             </label>
-            <!--</label>-->
-            <!--<span class="glyphicon glyphicon-check" data-ng-hide="!contract.isActive" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-unchecked" data-ng-hide="contract.isActive" aria-hidden="true"></span>-->
+            <i ng-show="contract.isActive" class="fa fa-check" aria-hidden="true"></i>
         </div>
-
     </div>
 </div>
