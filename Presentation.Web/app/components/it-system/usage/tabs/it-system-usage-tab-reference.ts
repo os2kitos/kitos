@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-system.usage.references", {
             url: "/reference/",
-            templateUrl: "app/components/it-reference.view.html",
+            templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "it-system-usage.EditReference"
         });
     }]);

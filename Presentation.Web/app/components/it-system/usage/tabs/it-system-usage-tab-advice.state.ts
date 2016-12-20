@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-system.usage.advice', {
             url: '/advice/:type',
-            templateUrl: 'app/components/it-advice.view.html',
+            templateUrl: 'app/components/it-advice/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
             controllerAs: 'Vm',
             resolve: {

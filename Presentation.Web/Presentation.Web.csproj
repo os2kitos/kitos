@@ -572,13 +572,12 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
-    <Content Include="app\components\it-advice-modal-view.html" />
+    <Content Include="app\components\it-advice\it-advice-modal-view.html" />
     <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
-    <Content Include="app\components\it-advice.view.html" />
+    <Content Include="app\components\it-advice\it-advice.view.html" />
     <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
     <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
-    <Content Include="app\components\it-contract\tabs\it-contract-tab-advice.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
@@ -586,8 +585,8 @@
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
-    <Content Include="app\components\it-reference-modal.view.html" />
-    <Content Include="app\components\it-reference.view.html" />
+    <Content Include="app\components\it-reference\it-reference-modal.view.html" />
+    <Content Include="app\components\it-reference\it-reference.view.html" />
     <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
@@ -596,7 +595,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
-    <TypeScriptCompile Include="app\components\It-advice.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\It-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
@@ -891,7 +890,6 @@
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
@@ -1012,7 +1010,6 @@
     <TypeScriptCompile Include="Tests\it-system\usage\tabs\it-system-usage-tab-org.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\it-contract-edit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-economy.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-advice.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-payment-model.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\it-contract\edit\tabs\it-contract-tab-deadlines.e2e.spec.ts" />
@@ -1071,7 +1068,6 @@
     <TypeScriptCompile Include="app\services\taskService.ts" />
     <TypeScriptCompile Include="app\components\home\home.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />

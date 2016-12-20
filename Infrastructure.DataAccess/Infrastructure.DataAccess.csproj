@@ -529,11 +529,7 @@
       <DependentUpon>201612201243216_Archive.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\201612021022441_Added relations between User\" />
-    <Folder Include="Migrations\201612021024036_Added relations between User\" />
-    <Folder Include="Migrations\201612021024454_Added relations between User\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
