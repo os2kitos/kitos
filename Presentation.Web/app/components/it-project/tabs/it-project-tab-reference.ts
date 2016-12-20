@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-project.edit.references", {
             url: "/reference",
-            templateUrl: "app/components/it-reference.view.html",
+            templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "project.EditReference",
             controllerAs: "Vm"
         });

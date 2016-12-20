@@ -2,7 +2,7 @@
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-contract.edit.advice-generic', {
             url: '/advice',
-            templateUrl: 'app/components/it-advice.view.html',
+            templateUrl: 'app/components/it-advice/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
             controllerAs: 'Vm',
             resolve: {

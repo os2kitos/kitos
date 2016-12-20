@@ -155,7 +155,7 @@
                 var modalInstance = $modal.open({
 
                     windowClass: "modal fade in",
-                    templateUrl: "app/components/it-advice-modal-view.html",
+                    templateUrl: "app/components/it-advice/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
                         $scope.recieverRoles = roles.data.value;

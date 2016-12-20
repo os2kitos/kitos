@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-contract.edit.references", {
             url: "/reference/",
-            templateUrl: "app/components/it-reference.view.html",
+            templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "contract.EditReference"
         });
     }]);
@@ -13,7 +13,6 @@
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
-                console.log(contract.folder);
 
                 $scope.objectId = contract.id;
                 $scope.objectReference = 'it-contract.edit.references.create';
@@ -65,7 +64,6 @@
                     $state.go(".", null, { reload: true });
                 };
 
-                //console.log(contract);
                 $scope.mainGridOptions = {
                     dataSource: {
                         data: contract.externalReferences,
