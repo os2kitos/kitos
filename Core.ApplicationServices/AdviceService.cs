@@ -14,6 +14,8 @@ using System.Text;
 
 namespace Core.ApplicationServices
 {
+    using Ninject.Extensions.Logging;
+
     public class AdviceService: IAdviceService
     {
         [Inject]
@@ -30,13 +32,13 @@ namespace Core.ApplicationServices
         public IGenericRepository<ItProjectRight> _ItprojectRights { get; set; }
         [Inject]
         public IGenericRepository<ItSystemRight> _ItSystemRights { get; set; }
-
-
+        [Inject]
+        public ILogger Logger { get; set; }
 
         public AdviceService() {}
 
         public bool sendAdvice(int id){
-
+            Logger.Debug($"Host: {_mailClient._client.Host}, SSL: {_mailClient._client.EnableSsl}");
             var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
             if (advice != null)
@@ -46,7 +48,7 @@ namespace Core.ApplicationServices
                     try
                     {
                         //Setup mail
-                        var message = new MailMessage()
+                        MailMessage message = new MailMessage()
                         {
                             Body = advice.Body,
                             Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
@@ -110,6 +112,7 @@ namespace Core.ApplicationServices
                     catch (Exception e)
                     {
                         //todo log exception
+                        this.Logger?.Error(e, "Error in Advis service");
                         return false;
                     }
                 }
@@ -124,14 +127,13 @@ namespace Core.ApplicationServices
                     {
                         try
                         {
-                            //Setup mail
-                            var message = new MailMessage()
-                            {
-                                Body = advice.Body,
-                                Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                                BodyEncoding = Encoding.UTF8
-                            };
-
+                            //Setup mail//Setup mail
+                        var message = new MailMessage()
+                        {
+                            Body = advice.Body,
+                            Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
+                            BodyEncoding = Encoding.UTF8
+                        };
                             message.From = new MailAddress("no_reply@kitos.dk");
 
                             //Add recivers for Email
@@ -207,6 +209,7 @@ namespace Core.ApplicationServices
                         catch (Exception e)
                         {
                             //todo log exception
+                            this.Logger?.Error(e, "Error in Advis service");
                             return false;
                         }
                     }

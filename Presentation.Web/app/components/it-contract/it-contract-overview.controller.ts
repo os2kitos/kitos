@@ -457,7 +457,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (udgået)";
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Inaktiv)";
                                 else
                                     value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
                             }
