@@ -7,15 +7,11 @@
                 templateUrl: "app/shared/helpText/helpText.view.html",
                 scope: {
                     key: "@",
+                    defaultTitle: "@",
                 },
                 controller: [
                     '$scope', '$http', '$uibModal', '$sce', function ($scope, $http, $uibModal, $sce) {
                         var parent = $scope;
-
-                        $http.get("odata/HelpTexts?$filter=Key eq '" + $scope.key + "'")
-                            .success((result: any) => {
-                                $scope.title = result.value[0].Title;
-                            })
 
                         $scope.showHelpTextModal = function () {
                             var modalInstance = $uibModal.open({
@@ -24,8 +20,13 @@
                                 controller: ["$scope", "$uibModalInstance", "notify", function ($scope, $modalInstance, nofity) {
                                     $http.get("odata/HelpTexts?$filter=Key eq '" + parent.key + "'")
                                         .success((result: any) => {
-                                            $scope.title = result.value[0].Title;
-                                            $scope.description = $sce.trustAsHtml(result.value[0].Description);
+                                            if (result.value.length) {
+                                                $scope.title = result.value[0].Title;
+                                                $scope.description = $sce.trustAsHtml(result.value[0].Description);
+                                            } else {
+                                                $scope.title = parent.defaultTitle;
+                                                $scope.description = "Ingen hjælpetekst defineret.";
+                                            }
                                         })
                                 }]
                             });

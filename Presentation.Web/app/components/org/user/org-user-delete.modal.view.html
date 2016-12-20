@@ -1,7 +1,10 @@
 ﻿<div class="modal-header">
-    <button type="button" class="close" data-ng-click="ctrl.cancel()" data-dismiss="modal">
-        &times;
-    </button>
+    <div class="clearfix">
+        <help-text data-key="org_user_delete_modal" data-default-title="Slet bruger" class="pull-left"></help-text>
+        <button type="button" class="close" data-ng-click="ctrl.cancel()" data-dismiss="modal">
+            &times;
+        </button>
+    </div>
     <h3 align="center">Slet bruger fra organisation</h3>
     <h5> Roller for {{ctrl.firstName}} {{ctrl.lastName}}, {{ctrl.email}}
     </h5></div>
