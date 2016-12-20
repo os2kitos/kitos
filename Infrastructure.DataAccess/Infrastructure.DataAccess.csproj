@@ -88,6 +88,7 @@
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
+    <Compile Include="Mapping\ArchiveLocationMap.cs" />
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
@@ -330,6 +331,10 @@
     <Compile Include="Migrations\201612131514276_Archived.Designer.cs">
       <DependentUpon>201612131514276_Archived.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612201007389_ArchiveLoc.cs" />
+    <Compile Include="Migrations\201612201007389_ArchiveLoc.Designer.cs">
+      <DependentUpon>201612201007389_ArchiveLoc.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -482,6 +487,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612131514276_Archived.resx">
       <DependentUpon>201612131514276_Archived.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612201007389_ArchiveLoc.resx">
+      <DependentUpon>201612201007389_ArchiveLoc.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

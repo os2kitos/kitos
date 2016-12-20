@@ -138,6 +138,9 @@ namespace Presentation.Web
             var dataRow = builder.EntitySet<DataRow>("DataRows"); // no controller yet
             dataRow.EntityType.HasKey(x => x.Id);
 
+            var archiveLocation = builder.EntitySet<ArchiveLocation>(nameof(ArchiveLocationsController).Replace("Controller", string.Empty));
+            archiveLocation.EntityType.HasKey(x => x.Id);
+
             var archiveOption = builder.EntitySet<ArchiveType>(nameof(ArchiveTypesController).Replace("Controller", string.Empty));
             archiveOption.EntityType.HasKey(x => x.Id);
 
@@ -280,6 +283,9 @@ namespace Presentation.Web
 
             var LocalArchiveType = builder.EntitySet<LocalArchiveType>(nameof(LocalArchiveTypesController).Replace("Controller", string.Empty));
             LocalArchiveType.EntityType.HasKey(x => x.Id);
+
+            var LocalArchiveLocation = builder.EntitySet<LocalArchiveLocation>(nameof(LocalArchiveLocationsController).Replace("Controller", string.Empty));
+            LocalArchiveLocation.EntityType.HasKey(x => x.Id);
 
             var LocalBusinessType = builder.EntitySet<LocalBusinessType>(nameof(LocalBusinessTypesController).Replace("Controller", string.Empty));
             LocalBusinessType.EntityType.HasKey(x => x.Id);

@@ -103,6 +103,7 @@ namespace Infrastructure.DataAccess
 
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
         public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
+        public DbSet<LocalArchiveLocation> LocalArchiveLocation { get; set; }
         public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }

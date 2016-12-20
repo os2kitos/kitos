@@ -13,6 +13,14 @@
                             });
                     }
                 ],
+                archiveLocations: [
+                    '$http', function ($http) {
+                        return $http.get('odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc')
+                            .then(function (result) {
+                                return result.data.value;
+                            });
+                    }
+                ],
                 systemUsage: [
                     '$http', '$stateParams', ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
@@ -22,12 +30,13 @@
         });
     }]);
 
-    app.controller('system.EditArchiving', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'itSystemUsageService', 'archiveTypes', 'systemUsage', 'notify',
-        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, archiveTypes, systemUsage, notify) => {
+    app.controller('system.EditArchiving', ['$scope', '$http', '$state', '$stateParams', '$timeout', 'itSystemUsage', 'itSystemUsageService', 'archiveTypes', 'archiveLocations', 'systemUsage', 'notify',
+        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, notify) => {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
             $scope.archiveTypes = archiveTypes;
+            $scope.archiveLocations = archiveLocations;
             $scope.usageId = $stateParams.id;
             $scope.itSystemService = itSystemUsageService;
             $scope.systemUsage = systemUsage;
@@ -49,6 +58,7 @@
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
+            console.log($scope.usage);
         }]);
 
 })(angular, app);

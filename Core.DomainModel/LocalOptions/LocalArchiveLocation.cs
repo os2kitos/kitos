@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.DomainModel.LocalOptions
+﻿namespace Core.DomainModel.LocalOptions
 {
-    using Core.DomainModel.ItSystemUsage;
+    using Core.DomainModel.ItSystem;
+
     public class LocalArchiveLocation : LocalOptionEntity<ArchiveLocation>
     {
     }

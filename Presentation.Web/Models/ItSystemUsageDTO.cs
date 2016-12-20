@@ -20,6 +20,8 @@ namespace Presentation.Web.Models
         public string SensitiveDataTypeName { get; set; }
         public int? ArchiveTypeId { get; set; }
         public string ArchiveTypeName { get; set; }
+        public int? ArchiveLocationId { get; set; }
+        public string ArchiveLocationName { get; set; }
 
         public string ResponsibleOrgUnitName { get; set; }
 

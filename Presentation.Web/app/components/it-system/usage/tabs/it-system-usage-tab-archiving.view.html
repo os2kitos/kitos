@@ -86,18 +86,18 @@
                 <!--<span class="help-block small">&nbsp;</span>-->
             </div>
 
-            <!--<div class="form-group">
-                <select-option data-id="archive"
-                               data-label="Arkivtype"
-                               data-placeholder="Vælg arkivering"
-                               data-selected-text="{{ usage.archiveTypeName }}"
+            <div class="form-group">
+                <select-option data-id="archiveLocation"
+                               data-label="Arkiveringssted"
+                               data-placeholder="Vælg arkiveringssted"
+                               data-selected-text="{{ usage.archiveLocationName }}"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.archiveTypeId"
-                               data-options="archiveTypes"
+                               data-ng-model="usage.archiveLocationId"
+                               data-options="archiveLocations"
                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                               data-field="archiveTypeId">
+                               data-field="archiveLocationId">
                 </select-option>
-            </div>-->
+            </div>
             <!-- ArchivedDate -->
             <div class="form-group">
                 <label for="ArchivedDateId" class="control-label small">Arkiveringsdato</label>

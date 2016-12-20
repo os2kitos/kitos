@@ -11,9 +11,9 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     using Core.DomainModel.LocalOptions;
     using Core.DomainServices;
 
-    public class LocalArchiveLocationController : LocalOptionBaseController<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>
+    public class LocalArchiveLocationsController : LocalOptionBaseController<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>
     {
-        public LocalArchiveLocationController(IGenericRepository<LocalArchiveLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveLocation> optionsRepository)
+        public LocalArchiveLocationsController(IGenericRepository<LocalArchiveLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveLocation> optionsRepository)
             : base(repository, authService, optionsRepository)
         {
         }
