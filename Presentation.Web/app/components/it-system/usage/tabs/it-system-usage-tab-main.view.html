@@ -39,16 +39,24 @@
             <!-- archiving -->
             <div class="form-group">
                 <select-option data-id="archive"
-                                data-label="Arkivering"
-                                data-placeholder="Vælg arkivering"
-                                data-selected-text="{{ usage.archiveTypeName }}"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.archiveTypeId"
-                                data-options="archiveTypes"
-                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                data-field="archiveTypeId">
+                               data-label="Arkivering"
+                               data-placeholder="Vælg arkivering"
+                               data-selected-text="{{ usage.archiveTypeName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.archiveTypeId"
+                               data-options="archiveTypes"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="archiveTypeId">
                 </select-option>
                 <span class="help-block small">&nbsp;</span>
+            </div>
+            <!-- note -->
+            <div class="form-group">
+                <label for="note" class="control-label small">Note</label>
+                <textarea id="note" class="form-control input-sm" rows="5"
+                          data-ng-model="usage.note"
+                          data-ng-disabled="!hasWriteAccess"
+                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
             </div>
         </div>
 
@@ -70,14 +78,6 @@
                 <input type="text" id="usage-owner" class="form-control input-sm"
                        data-ng-disabled="true"
                        value="{{usage.objectOwnerFullName}}">
-            </div>
-            <!-- note -->
-            <div class="form-group">
-                <label for="note" class="control-label small">Note</label>
-                <textarea id="note" class="form-control input-sm" rows="5"
-                          data-ng-model="usage.note"
-                          data-ng-disabled="!hasWriteAccess"
-                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
             </div>
             <div class="form-group">
                 <label for="agreement-concluded" class="control-label small">
@@ -104,18 +104,21 @@
                        data-autosave="{{ autosaveUrl2 }}"
                        data-field="expirationDate">
             </div>
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" id="system-int-signed"
-                           data-ng-model="usage.active"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-autosave="{{ autoSaveUrl }}"
-                           data-field="active"
-                           data-ng-change="checkSystemValidity()">
-                    Gyldig &emsp;
+            <div class="checkbox" style="position: absolute; left: 0;">
+                <input type="checkbox" id="system-int-signed" 
+                       class="tags-checkbox sr-only"
+                       data-ng-model="usage.active"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-autosave="{{ autoSaveUrl }}"
+                       data-field="active"
+                       data-ng-change="checkSystemValidity()"
+                />
+                <label for="system-int-signed">
+                    <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
+                    <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
+                    <span class='label-content'>Gyldig: </span>
                 </label>
-                <span class="fa fa-file text-success" data-ng-hide="!usage.isActive" aria-hidden="true"></span>
-                <span class="fa fa-file-o text-muted" data-ng-hide="usage.isActive" aria-hidden="true"></span>
+                <i ng-show="usage.isActive" class="fa fa-check" aria-hidden="true"></i>
             </div>
         </div>
     </div>
