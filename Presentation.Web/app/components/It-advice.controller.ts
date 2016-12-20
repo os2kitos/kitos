@@ -163,7 +163,7 @@
                         if (action === 'POST') {
                             $scope.hideSend = false;
                             $scope.externalCC = currentUser.email;
-                            $scope.emailBody = "<a href='" + $window.location.href.replace("advice/" + type, "main") + "'>" + "Link til " + type + "</a>";
+                            $scope.emailBody = "<a href='" + $window.location.href.replace("advice" + type, "main") + "'>" + "Link til " + type + "</a>";
                         }
 
                         if (action === 'PATCH') {
