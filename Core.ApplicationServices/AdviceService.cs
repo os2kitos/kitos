@@ -38,7 +38,7 @@ namespace Core.ApplicationServices
         public AdviceService() {}
 
         public bool sendAdvice(int id){
-            Logger.Debug($"Host: {_mailClient._client.Host}, SSL: {_mailClient._client.EnableSsl}");
+
             var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
             if (advice != null)
@@ -52,10 +52,11 @@ namespace Core.ApplicationServices
                         {
                             Body = advice.Body,
                             Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8
+                            BodyEncoding = Encoding.UTF8,
+                            IsBodyHtml = true
                         };
 
-                        message.From = new MailAddress("no_reply@kitos.dk");
+                       // message.From = new MailAddress("no_reply@kitos.dk");
 
                         //Add recivers for Email
                         foreach (var r in advice.Reciepients)
@@ -132,9 +133,10 @@ namespace Core.ApplicationServices
                         {
                             Body = advice.Body,
                             Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8
+                            BodyEncoding = Encoding.UTF8,
+                            IsBodyHtml = true
                         };
-                            message.From = new MailAddress("no_reply@kitos.dk");
+                          //  message.From = new MailAddress("no_reply@kitos.dk");
 
                             //Add recivers for Email
                             foreach (var r in advice.Reciepients)
