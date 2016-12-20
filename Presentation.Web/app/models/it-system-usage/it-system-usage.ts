@@ -28,6 +28,10 @@
         ItSystem: ItSystem;
         ArchiveTypeId: number;
         ArchiveType: ItSystem.IArchiveType;
+
+        ArchiveLocationId: number;
+        ArchiveLocation: ItSystem.IArchiveLocation;
+
         SensitiveDataTypeId: number;
         SensitiveDataType: ItSystem.ISensitiveDataType;
         OverviewId: number;
