@@ -38,27 +38,25 @@
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
             $scope.usageId = $stateParams.id;
-            $scope.itSystemService = itSystemUsageService;
             $scope.systemUsage = systemUsage;
 
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
-                $scope.itSystemService.patchSystem($scope.usageId, payload);
+                itSystemUsageService.patchSystem($scope.usageId, payload);
             }
 
             $scope.patchDate = (field, value) => {
                 var date = value.split("-").reverse().join("-");
                 var payload = {};
                 payload[field] = date;
-                $scope.itSystemService.patchSystem($scope.usageId, payload);
+                itSystemUsageService.patchSystem($scope.usageId, payload);
             }
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
             };
-            console.log($scope.usage);
         }]);
 
 })(angular, app);

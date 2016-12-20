@@ -66,7 +66,7 @@
                 <input type="text" id="DocketNo" class="form-control input-sm"
                        data-ng-disabled="!hasWriteAccess"
                        data-ng-model="systemUsage.DocketNo"
-                       ng-change="patch('DocketNo', systemUsage.DocketNo)"
+                       ng-blur="patch('DocketNo', systemUsage.DocketNo)"
                        data-field="DocketNo">
             </div>
         </div>
@@ -115,7 +115,7 @@
                 <input type="text" id="ArchiveNotes" class="form-control input-sm"
                        data-ng-disabled="!hasWriteAccess"
                        data-ng-model="systemUsage.ArchiveNotes"
-                       ng-change="patch('ArchiveNotes', systemUsage.ArchiveNotes)"
+                       ng-blur="patch('ArchiveNotes', systemUsage.ArchiveNotes)"
                        data-field="ArchiveNotes">
             </div>
         </div>
