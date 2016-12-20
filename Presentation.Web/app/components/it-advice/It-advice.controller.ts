@@ -389,8 +389,8 @@
                                 return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
-                            case 'ItSystemUsage':
-                                return $http.get('api/ItSystemUsage/' + $stateParams.id).then(function (result) {
+                            case 'itSystemUsage':
+                                return $http.get('api/itsystemusage/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
                             case 'itproject':
