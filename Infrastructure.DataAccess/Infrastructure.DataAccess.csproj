@@ -352,6 +352,10 @@
     <Compile Include="Migrations\201612191146082_Advis.Designer.cs">
       <DependentUpon>201612191146082_Advis.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612201243216_Archive.cs" />
+    <Compile Include="Migrations\201612201243216_Archive.Designer.cs">
+      <DependentUpon>201612201243216_Archive.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -520,6 +524,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612191146082_Advis.resx">
       <DependentUpon>201612191146082_Advis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612201243216_Archive.resx">
+      <DependentUpon>201612201243216_Archive.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
