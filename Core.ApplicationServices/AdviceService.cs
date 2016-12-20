@@ -14,6 +14,8 @@ using System.Text;
 
 namespace Core.ApplicationServices
 {
+    using Ninject.Extensions.Logging;
+
     public class AdviceService: IAdviceService
     {
         [Inject]
@@ -31,7 +33,8 @@ namespace Core.ApplicationServices
         [Inject]
         public IGenericRepository<ItSystemRight> _ItSystemRights { get; set; }
 
-
+        [Inject]
+        public ILogger Logger { get; set; }
 
         public AdviceService() {}
 
@@ -110,6 +113,7 @@ namespace Core.ApplicationServices
                     catch (Exception e)
                     {
                         //todo log exception
+                        this.Logger?.Error(e, "Error in Advis service");
                         return false;
                     }
                 }
@@ -207,6 +211,7 @@ namespace Core.ApplicationServices
                         catch (Exception e)
                         {
                             //todo log exception
+                            this.Logger?.Error(e, "Error in Advis service");
                             return false;
                         }
                     }
