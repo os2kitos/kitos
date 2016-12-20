@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
@@ -6,6 +8,7 @@ using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -39,9 +42,26 @@ namespace Presentation.Web.Controllers.API
         }
 
         [AllowAnonymous]
-        public HttpResponseMessage PostLoginWithToken()
+        public HttpResponseMessage PostLoginWithToken(string token)
         {
-            return Created(new LoginResponseDTO());
+            var principal = new TokenValidator().Validate(token);
+            if (!principal.Identity.IsAuthenticated)
+            {
+                Logger.Info($"Uservalidation: Could not validate token.");
+                return Unauthorized();
+            }
+
+            if (principal.Claims.Any(c => c.Type.ToLower() == "email" || c.Type.ToLower() == "uuid"))
+            {
+                var emailClaim = principal.Claims.Single(c => c.Type.ToLower() == "email");
+                var uuidClaim = principal.Claims.Single(c => c.Type.ToLower() == "uuid");
+                var user = _userRepository.GetByEmail(emailClaim.Value);
+                FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
+                var response = CreateLoginResponse(user);
+                return Created(response);
+            }
+
+            return Unauthorized();
         }
 
         // POST api/Authorize
