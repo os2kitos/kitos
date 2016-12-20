@@ -55,7 +55,7 @@ namespace Core.ApplicationServices
                             BodyEncoding = Encoding.UTF8
                         };
 
-                        message.From = new MailAddress("no_reply@kitos.dk");
+                       // message.From = new MailAddress("no_reply@kitos.dk");
 
                         //Add recivers for Email
                         foreach (var r in advice.Reciepients)
