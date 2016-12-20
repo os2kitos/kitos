@@ -63,11 +63,17 @@ namespace Core.ApplicationServices
                         {
                             if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
                             {
-                                message.To.Add(r.Name);
+                                if (!string.IsNullOrEmpty(r.Name))
+                                {
+                                    message.To.Add(r.Name);
+                                }
                             }
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
                             {
-                                message.CC.Add(r.Name);
+                                if (!string.IsNullOrEmpty(r.Name))
+                                {
+                                    message.CC.Add(r.Name);
+                                }
                             }
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
                             {
@@ -87,8 +93,6 @@ namespace Core.ApplicationServices
                                         }
                                         break;
                                 }
-
-
                             }
                         }
 
@@ -143,11 +147,17 @@ namespace Core.ApplicationServices
                             {
                                 if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
                                 {
-                                    message.To.Add(r.Name);
+                                    if (!string.IsNullOrEmpty(r.Name))
+                                    {
+                                        message.To.Add(r.Name);
+                                    }
                                 }
                                 if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
                                 {
-                                    message.CC.Add(r.Name);
+                                        if (!string.IsNullOrEmpty(r.Name))
+                                        {
+                                            message.CC.Add(r.Name);
+                                        }
                                 }
                                 if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
                                 {
