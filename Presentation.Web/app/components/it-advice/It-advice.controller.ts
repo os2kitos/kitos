@@ -279,6 +279,8 @@
                         }).success(function () {
                             if (action === "POST") {
                                 notify.addSuccessMessage("Advisen er oprettet!");
+                                $scope.$close(true);
+                                $("#mainGrid").data("kendoGrid").dataSource.read();
                             }
                             if (action === "PATCH") {
                                 notify.addSuccessMessage("Advisen er opdateret!");
@@ -290,10 +292,7 @@
                             if (action === "PATCH") {
                                 notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
                             }
-                        }).then(function () {
-                            $scope.$close(true);
-                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                            });
+                        })
                         }
 
                     function createPayload() {
