@@ -234,12 +234,13 @@
                                 $http.patch(url, JSON.stringify(payload))
                                     .then(() => {
                                         notify.addSuccessMessage("Advisen er opdateret!");
+
+                                        $("#mainGrid").data("kendoGrid").dataSource.read();
+                                        $scope.$close(true);
                                     },
                                     () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") }}
                                 );
 
-                                $("#mainGrid").data("kendoGrid").dataSource.read();
-                                $scope.$close(true);
                             }
 
                         };
@@ -278,21 +279,21 @@
                         }).success(function () {
                             if (action === "POST") {
                                 notify.addSuccessMessage("Advisen er oprettet!");
+                                $scope.$close(true);
+                                $("#mainGrid").data("kendoGrid").dataSource.read();
                             }
                             if (action === "PATCH") {
                                 notify.addSuccessMessage("Advisen er opdateret!");
                             }
-                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                            $scope.$close(true);
                         }).error(function () {
                             if (action === "POST") {
-                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
+                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");                            
                             }
                             if (action === "PATCH") {
                                 notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
                             }
-                        });
-                    }
+                        })
+                        }
 
                     function createPayload() {
 
@@ -363,19 +364,19 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type === "itSystemUsage"|| "itInterface") {
+                        if (type == "itSystemUsage" || type == "itInterface") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
                                 });
                         }
-                        if (type === "itContract") {
+                        if (type == "itContract") {
                             return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
                                 });
                         }
-                        if (type === "itProject") {
+                        if (type == "itProject") {
                             return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
