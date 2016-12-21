@@ -57,6 +57,15 @@
                     controller: EditController,
                     controllerAs: "projectEditVm",
                     resolve: {
+                        user: [
+                            "userService", userService => userService.getUser()
+                        ],
+                        hasWriteAccess: [
+                            "$http", "$stateParams", "user", ($http, $stateParams, user) => {
+                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
+                            }
+                        ],
                         project: [
                             "$http", "$stateParams", ($http: ng.IHttpService, $stateParams) => {
                                 return $http.get("api/itproject/" + $stateParams.id)
@@ -67,15 +76,6 @@
                             "$http", $http => {
                                 return $http.get("odata/LocalItProjectTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                     .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.value);
-                            }
-                        ],
-                        user: [
-                            "userService", userService => userService.getUser()
-                        ],
-                        hasWriteAccess: [
-                            "$http", "$stateParams", "user", ($http, $stateParams, user) => {
-                                return $http.get("api/itproject/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
-                                    .then((result: ng.IHttpPromiseCallbackArg<IApiResponse<any>>) => result.data.response);
                             }
                         ]
                     }

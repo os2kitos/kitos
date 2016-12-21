@@ -1088,7 +1088,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-catalog.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.controller.ts" />

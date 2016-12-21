@@ -46,5 +46,16 @@
             $scope.commonPublicProjects = commonPublicProjects;
 
             $scope.autosaveUrl = "api/itproject/" + project.id;
+
+            $scope.clear = () => {
+                $scope.jointMunicipalProjectId = undefined;
+                $scope.jointMunicipalProjects = undefined;
+            };
+
+            $scope.clearCommon = () => {
+                $scope.commonPublicProjectId = undefined;
+                $scope.commonPublicProjects = undefined;
+            };
+
         }]);
 })(angular, app);
