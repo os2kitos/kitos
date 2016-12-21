@@ -74,16 +74,6 @@
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
             };
-
-            $scope.fakeUpdateDefaultOrgUnit = function () {
-                notify.addSuccessMessage("Feltet er opdateret!");
-            };
-
-            $scope.checkboxSelection = 2;
-
-            $scope.isCheckboxSelected = function (index) {
-                return index === $scope.checkboxSelection;
-            };
         }]);
 
 })(angular, app);
