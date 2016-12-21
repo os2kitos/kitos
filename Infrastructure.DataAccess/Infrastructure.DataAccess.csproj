@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveTypeMap.cs" />
     <Compile Include="Mapping\CommunicationMap.cs" />
@@ -338,6 +339,18 @@
     <Compile Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.Designer.cs">
       <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201612151028139_ContractSigner.cs" />
+    <Compile Include="Migrations\201612151028139_ContractSigner.Designer.cs">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.cs" />
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.Designer.cs">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612191146082_Advis.cs" />
+    <Compile Include="Migrations\201612191146082_Advis.Designer.cs">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -345,6 +358,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -497,6 +511,20 @@
     <EmbeddedResource Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.resx">
       <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612151028139_ContractSigner.resx">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612160925221_InterfaceUses removed.resx">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612191146082_Advis.resx">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\201612021022441_Added relations between User\" />
+    <Folder Include="Migrations\201612021024036_Added relations between User\" />
+    <Folder Include="Migrations\201612021024454_Added relations between User\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />

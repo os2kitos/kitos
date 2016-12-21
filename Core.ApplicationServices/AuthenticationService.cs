@@ -105,13 +105,13 @@ namespace Core.ApplicationServices
                     // organizations of type OrganizationCategory.Municipality have read access
                     // to other organizations unless AccessModifier is set to local
                     return (awareEntity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
-                    
+
                 }
             }
 
             // User is a special case
             if (entity is User)
-                return CheckUserSpecialCase((User) entity, user);
+                return CheckUserSpecialCase((User)entity, user);
 
             return false;
         }
@@ -155,7 +155,7 @@ namespace Core.ApplicationServices
             // check if user is in context
             if (entity is IContextAware) // TODO I don't like this impl
             {
-                var awareEntity = (IContextAware) entity;
+                var awareEntity = (IContextAware)entity;
 
                 // check if user is part of target organization (he's trying to access)
                 if (!awareEntity.IsInContext(loggedIntoOrganizationId))
@@ -165,53 +165,47 @@ namespace Core.ApplicationServices
                     // Then they must switch context and try again.
                     return false;
                 }
-
-                // check if user is local admin in target organization
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
-                {
-                    // local admins have write access to everything within the context
-                    return true;
-                }
-
-                // check if module admin in target organization and target entity is of the correct type
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
-                    return true;
-
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
-                    return true;
-
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
-                    return true;
-
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
-                    return true;
-
-                if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
-                    return true;
-
-                // check if user has a write role on the target entity
-                if (entity.HasUserWriteAccess(user))
-                    return true;
-
-                // check if user is object owner
-                if (entity.ObjectOwnerId == user.Id)
-                {
-                    // object owners have write access to their objects if they're within the context,
-                    // else they'll have to switch to the correct context and try again
-                    return true;
-                }
             }
-            else // the entity is not aware of its context
+
+            // check if user is local admin in target organization
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
             {
-                if (entity.HasUserWriteAccess(user))
-                {
-                    return true;
-                }
+                // local admins have write access to everything within the context
+                return true;
+            }
+
+            // check if module admin in target organization and target entity is of the correct type
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
+                return true;
+
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
+                return true;
+
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
+                return true;
+
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
+                return true;
+
+            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
+                return true;
+
+            // check if user has a write role on the target entity
+            if (entity.HasUserWriteAccess(user))
+                return true;
+
+            // check if user is object owner
+            if (entity.ObjectOwnerId == user.Id)
+            {
+                // object owners have write access to their objects if they're within the context,
+                // else they'll have to switch to the correct context and try again
+                return true;
+
             }
 
             // User is a special case
             if (entity is User)
-                return CheckUserSpecialCase((User) entity, user);
+                return CheckUserSpecialCase((User)entity, user);
 
             // all white-list checks failed, deny access
             return false;

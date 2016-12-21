@@ -4,7 +4,6 @@
     export interface IOverviewPlanController {
         mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -21,7 +20,6 @@
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -204,10 +202,6 @@
         }
 
         private activate() {
-            var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
-            this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
-            clonedItContractRoles.push({ Id: "ContractSigner.Name", Name: "Kontraktunderskriver" });
-            this.roleSelectorDataSource = clonedItContractRoles;
 
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -217,7 +211,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,Advices,ContractSigner,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -330,9 +324,6 @@
                         text: "Slet filter",
                         template:
                         "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
-                    },
-                    {
-                        template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
                 excel: {
@@ -361,15 +352,16 @@
 
                     return `<uib-tabset active="0">
                     <uib-tab index="0" heading="Systemer">
-                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" odata-query="odata/ItSystemUsages?$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="1" heading="Udstillede snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" odata-query="odata/ItInterfaceExhibits?$expand=ItInterfaceExhibitUsage, ItInterface&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="udstiller" field-value="ItInterface.Name" data-odata-query="odata/ItInterfaceExhibits?$select=ItInterface&$expand=ItInterface($select=Name, Disabled)&$filter=ItInterfaceExhibitUsage/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
                     <uib-tab index="2" heading="Anvendte snitflader">
-                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" odata-query="odata/ItInterfaceUsesEntity?$expand=ItInterface($select=name, disabled)&$filter=ItInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
+                        <contract-details detail-model-type="ItInterface" detail-type="snitflader" action="anvender" field-value="ItInterface.Name" data-odata-query="odata/ItContracts?$select=AssociatedInterfaceUsages&$expand=AssociatedInterfaceUsages($select=ItInterface;$expand=ItInterface($select=Name, Disabled))&$filter=AssociatedInterfaceUsages/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>
                     </uib-tab>
-                </uib-tabset>`
+                </uib-tabset>`;
+
                 },
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
@@ -783,48 +775,12 @@
                                 operator: "contains"
                             }
                         }
-                    },
-                    {
-                        field: "Advices.AlarmDate",
-                        title: "Dato for næste advis",
-                        width: 90,
-                        persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (dataItem.Advices.length <= 0) {
-                                return "";
-                            }
-                            var date = this._.first(this._.sortBy(dataItem.Advices, ["AlarmDate"])).AlarmDate;
-                            return this.moment(date).format("DD-MM-YYYY");
-                        },
-                        sortable: false,
-                        filterable: false
                     }
                 ]
             };
 
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
-
-            // add special contract signer role
-            var signerRole = {
-                field: "ContractSigner.Name",
-                title: "Kontraktunderskriver",
-                persistId: "roleSigner",
-                template: dataItem => dataItem.ContractSigner
-                    ? `${dataItem.ContractSigner.Name} ${dataItem.ContractSigner.LastName}`
-                    : "",
-                width: 130,
-                hidden: true,
-                sortable: true,
-                filterable: {
-                    cell: {
-                        dataSource: [],
-                        showOperators: false,
-                        operator: "contains"
-                    }
-                }
-            };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -1046,25 +1002,6 @@
             });
         }
 
-        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
-            return {
-                autoBind: false,
-                dataSource: this.roleSelectorDataSource,
-                dataTextField: "Name",
-                dataValueField: "Id",
-                optionLabel: "Vælg kontraktrolle...",
-                change: e => {
-                    // hide all roles column
-                    this.mainGrid.hideColumn("ContractSigner.Name");
-                    this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
-
-                    var selectedId = e.sender.value();
-
-                    // show only the selected role column
-                    this.mainGrid.showColumn(selectedId);
-                }
-            }
-        }
     }
 
     angular

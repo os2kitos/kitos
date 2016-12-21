@@ -1,7 +1,7 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
-        $stateProvider.state('it-contract.edit.advice', {
-            url: '/advice',
+        $stateProvider.state('it-contract.edit.adviceOLD', {
+            url: '/adviceOld',
             templateUrl: 'app/components/it-contract/tabs/it-contract-tab-advice.view.html',
             controller: 'contract.EditAdviceCtrl',
             resolve: {

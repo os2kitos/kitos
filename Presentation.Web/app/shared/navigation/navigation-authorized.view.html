@@ -20,12 +20,23 @@
 <div class="navbar-right">
     <div class="dropdown-menu-group" uib-dropdown>
         <a id="dropdown-button" class="btn" uib-dropdown-toggle>
-            <div class="pull-right icon-container">
-                <i class="fa fa-user"></i>
-            </div>
             <div class="pull-right names-container text-right">
-                <div>{{ user.fullName | limitToDots:15 }}</div>
-                <div><i>{{ user.currentOrganizationName | limitToDots:15 }}</i></div>
+                <div class="row">
+                    <div class="col-xs-10">
+                        {{ user.fullName | limitToDots:15 }}
+                    </div>
+                    <div class="col-xs-2">
+                        <i class="fa fa-user"></i>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-10">
+                        <i>{{ user.currentOrganizationName | limitToDots:15 }}</i>
+                    </div>
+                    <div class="col-xs-2">
+                        <i class="fa fa-briefcase"></i>
+                    </div>
+                </div>
             </div>
         </a>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="dropdown-button">

@@ -39,43 +39,5 @@
         function ($scope, $http, $stateParams, notify, contract, user, hasWriteAccess) {
             $scope.hasWriteAccess = hasWriteAccess;
 
-            function formatContractSigner(signer) {
-
-                var userForSelect = null;
-
-                $scope.contractSigner = {
-                    edit: false,
-                    signer: signer,
-                    userForSelect: userForSelect,
-                    update: function () {
-                        var selectedUser = $scope.contractSigner.userForSelect;
-
-                        if (selectedUser) {
-                            var msg = notify.addInfoMessage("Gemmer...", false);
-
-                            var signerId = selectedUser ? selectedUser.id : null;
-                            var signerUser = selectedUser ? selectedUser.user : null;
-
-                            $http({
-                                method: 'PATCH',
-                                url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId,
-                                data: {
-                                    contractSignerId: signerId
-                                }
-                            }).success(function (result) {
-                                msg.toSuccessMessage("Kontraktunderskriveren er gemt");
-
-                                formatContractSigner({ id: signerUser.Id, fullName: signerUser.Name + " " + signerUser.LastName });
-
-                            }).error(function () {
-                                msg.toErrorMessage("Fejl!");
-                            });
-                        }
-                    }
-                };
-            }
-
-            formatContractSigner(contract.contractSigner);
-
         }]);
 })(angular, app);

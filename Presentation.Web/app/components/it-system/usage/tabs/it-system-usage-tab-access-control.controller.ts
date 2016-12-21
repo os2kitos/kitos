@@ -23,12 +23,12 @@
         });
     }]);
 
-    app.controller('system.UsageAccessControl', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes',
-        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes, activeAccessTypes) {
+    app.controller('system.UsageAccessControl', ['$scope', '$http', '$state', '$stateParams', 'itSystemUsage', 'notify', 'accessTypes', 'activeAccessTypes', 'hasWriteAccess',
+        function ($scope, $http, $state, $stateParams, itSystemUsage, notify, accessTypes, activeAccessTypes, hasWriteAccess) {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
-
+            $scope.hasWriteAccess = hasWriteAccess;
             $scope.accessTypes = accessTypes;
 
             $scope.isActive = function (accessTypeId) {

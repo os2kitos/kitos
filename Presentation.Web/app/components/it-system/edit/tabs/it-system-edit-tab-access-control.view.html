@@ -8,11 +8,11 @@
             <div class="row">
                 <div class="col-xs-4">
                     <div class="form-group">
-                        <input type="text" data-ng-model="accessTypeName" class="form-control input-sm" />
+                        <input type="text" data-ng-model="accessTypeName" class="form-control input-sm" data-ng-disabled="!hasWriteAccess"/>
                     </div>
                 </div>
                 <div class="col-xs-2">
-                    <button type="submit" data-ng-click="add()" data-ng-disabled="!accessTypeName" class="btn">Tilføj</button>
+                    <button type="submit" data-ng-click="add()" data-ng-disabled="!accessTypeName || !hasWriteAccess" class="btn">Tilføj</button>
                 </div>
             </div>
         </form>
@@ -34,7 +34,7 @@
                     {{accessType.Name}}
                 </td>
                 <td>
-                    <a data-ng-click="remove(accessType.Id)"><i class="fa fa-trash"></i></a>
+                    <button class="btn-link" data-ng-click="remove(accessType.Id)" data-ng-disabled="!hasWriteAccess"><i class="fa fa-trash"></i></button>
                 </td>
             </tr>
         </tbody>

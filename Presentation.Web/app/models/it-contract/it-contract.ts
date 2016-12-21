@@ -17,10 +17,8 @@
         HasSupplierSigned: boolean;
         /** Gets or sets the supplier signed date. */
         SupplierSignedDate: Date;
-        /** Gets or sets the contract signer identifier. */
-        ContractSignerId: number;
         /** Gets or sets the contract signer. */
-        ContractSigner: IUser;
+        ContractSigner: string;
         /** Gets or sets a value indicating whether this contract is signed. */
         IsSigned: boolean;
         /** Gets or sets the signed date. */

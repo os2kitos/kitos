@@ -29,7 +29,6 @@ namespace Core.DomainModel
             ResponsibleForRisks = new List<Risk>();
             ResponsibleForCommunications = new List<Communication>();
             HandoverParticipants = new List<Handover>();
-            SignerForContracts = new Collection<ItContract.ItContract>();
             LockedOutDate = null;
             FailedAttempts = 0;
         }
@@ -110,11 +109,6 @@ namespace Core.DomainModel
         ///     Handovers associated with this user
         /// </summary>
         public virtual ICollection<Handover> HandoverParticipants { get; set; }
-
-        /// <summary>
-        ///     The contracts that the user has been marked as contract signer for
-        /// </summary>
-        public virtual ICollection<ItContract.ItContract> SignerForContracts { get; set; }
 
         public DateTime? LockedOutDate { get; set; }
 

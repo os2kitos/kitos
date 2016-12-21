@@ -233,14 +233,14 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (udgået) </a>`;
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled)
-                                    return dataItem.Name + " (udgået)";
+                                    return dataItem.Name + " (Inaktiv)";
                                 else
                                     return dataItem.Name;
                             } else {

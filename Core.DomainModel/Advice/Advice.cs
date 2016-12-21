@@ -1,12 +1,42 @@
 using System;
+using System.Collections.Generic;
 
-namespace Core.DomainModel.ItContract
+namespace Core.DomainModel.Advice
 {
+    public enum ObjectType
+    {
+        itContract,
+        itSystemUsage,
+        itProject,
+        itInterface
+    }
+    public enum Scheduling
+    {
+       Immediate,
+       Hour,
+       Day,
+       Week,
+       Month,
+       Year
+
+    }
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IContextAware, IContractModule
+    public class Advice : Entity, IContextAware
     {
+        public Advice() {
+            AdviceSent = new List<AdviceSent.AdviceSent>();
+            Reciepients = new List<AdviceUserRelation>();
+        }
+
+        public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
+        public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
+        public int? RelationId { get; set; }
+        public ObjectType? Type { get; set; }
+
+        public Scheduling? Scheduling { get; set; }
+       
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.
         /// </summary>
@@ -36,6 +66,15 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public DateTime? AlarmDate { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the stop date.
+        /// </summary>
+        /// <value>
+        /// The stop date.
+        /// </value>
+        public DateTime? StopDate { get; set; }
+
         /// <summary>
         /// Gets or sets the sent date.
         /// </summary>
@@ -43,7 +82,7 @@ namespace Core.DomainModel.ItContract
         /// The sent date.
         /// </value>
         public DateTime? SentDate { get; set; }
-
+       
         /// <summary>
         /// Gets or sets the receiver contract role identifier.
         /// </summary>
@@ -63,7 +102,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The receiver.
         /// </value>
-        public ItContractRole Receiver { get; set; }
+        public IRoleEntity Receiver { get; set; }
 
         /// <summary>
         /// Gets or sets the carbon copy receiver contract role identifier.
@@ -84,8 +123,15 @@ namespace Core.DomainModel.ItContract
         /// <value>
         /// The carbon copy receiver.
         /// </value>
-        public ItContractRole CarbonCopyReceiver { get; set; }
-
+        public IRoleEntity CarbonCopyReceiver { get; set; }
+        /// <summary>
+        /// Gets or sets the body of the email.
+        /// </summary>
+        /// <value>
+        /// The email body.
+        /// </value>
+        public string Body { get; set; }
+        
         /// <summary>
         /// Gets or sets the subject of the email.
         /// </summary>
@@ -95,19 +141,9 @@ namespace Core.DomainModel.ItContract
         public string Subject { get; set; }
 
         /// <summary>
-        /// Gets or sets it contract identifier.
+        /// Gets or sets the job id.
         /// </summary>
-        /// <value>
-        /// It contract identifier.
-        /// </value>
-        public int ItContractId { get; set; }
-        /// <summary>
-        /// Gets or sets it contract.
-        /// </summary>
-        /// <value>
-        /// It contract.
-        /// </value>
-        public virtual ItContract ItContract { get; set; }
+        public string JobId { get; set; }
 
         /// <summary>
         /// Determines whether a user has write access to this instance.
@@ -118,13 +154,18 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItContract != null && ItContract.HasUserWriteAccess(user))
+           /* if (Object != null && Object.HasUserWriteAccess(user))
                 return true;
-
+                */
             return base.HasUserWriteAccess(user);
         }
 
-        /// <summary>
+        public bool IsInContext(int organizationId)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*/// <summary>
         /// Determines whether this instance is within a given organizational context.
         /// </summary>
         /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
@@ -133,10 +174,10 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public bool IsInContext(int organizationId)
         {
-            if (ItContract != null)
-                return ItContract.IsInContext(organizationId);
+            if (Object != null)
+                return Object.IsInContext(organizationId);
 
             return false;
-        }
+        }*/
     }
 }

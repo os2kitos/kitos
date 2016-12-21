@@ -18,7 +18,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("ItSystem");
-            
+
             // Relationships
             this.HasOptional(t => t.Parent)
                 .WithMany(d => d.Children)
@@ -38,9 +38,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
 
-            this.HasMany(t => t.CanUseInterfaces)
-                .WithRequired(t => t.ItSystem)
-                .HasForeignKey(d => d.ItSystemId);
+            // Udkommenteret ifm. OS2KITOS-663
+            //this.HasMany(t => t.CanUseInterfaces)
+            //    .WithRequired(t => t.ItSystem)
+            //    .HasForeignKey(d => d.ItSystemId);
 
             this.HasMany(t => t.ItInterfaceExhibits)
                 .WithRequired(t => t.ItSystem)

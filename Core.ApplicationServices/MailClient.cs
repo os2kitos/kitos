@@ -5,7 +5,7 @@ namespace Core.ApplicationServices
 {
     public class MailClient : IMailClient
     {
-        private readonly SmtpClient _client;
+        public readonly SmtpClient _client;
 
         /// <summary>
         /// Construct a smtp client with configuration from web.config

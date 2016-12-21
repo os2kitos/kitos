@@ -35,6 +35,7 @@ namespace Presentation.Web
 
             // Convert all dates to UTC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+
         }
     }
 }

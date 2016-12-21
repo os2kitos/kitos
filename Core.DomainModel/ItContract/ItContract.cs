@@ -21,17 +21,8 @@ namespace Core.DomainModel.ItContract
             PaymentMilestones = new List<PaymentMilestone>();
             InternEconomyStreams = new List<EconomyStream>();
             ExternEconomyStreams = new List<EconomyStream>();
-            Advices = new List<Advice>();
             ExternalReferences = new List<ExternalReference>();
         }
-
-        /// <summary>
-        ///     Gets or sets the advices.
-        /// </summary>
-        /// <value>
-        ///     The advices.
-        /// </value>
-        public virtual ICollection<Advice> Advices { get; set; }
 
         /// <summary>
         ///     Whether the contract is active or not
@@ -82,21 +73,6 @@ namespace Core.DomainModel.ItContract
         public bool IsInContext(int organizationId)
         {
             return OrganizationId == organizationId;
-        }
-
-        /// <summary>
-        ///     Determines whether a user has write access to this instance.
-        /// </summary>
-        /// <param name="user">The user.</param>
-        /// <returns>
-        ///     <c>true</c> if user has write access; otherwise, <c>false</c>.
-        /// </returns>
-        public override bool HasUserWriteAccess(User user)
-        {
-            if (ContractSignerId == user.Id)
-                return true;
-
-            return base.HasUserWriteAccess(user);
         }
 
         public int? ReferenceId { get; set; }
@@ -180,20 +156,12 @@ namespace Core.DomainModel.ItContract
         public DateTime? SupplierSignedDate { get; set; }
 
         /// <summary>
-        ///     Gets or sets the contract signer identifier.
-        /// </summary>
-        /// <value>
-        ///     The contract signer identifier.
-        /// </value>
-        public int? ContractSignerId { get; set; }
-
-        /// <summary>
         ///     Gets or sets the contract signer.
         /// </summary>
         /// <value>
         ///     The contract signer.
         /// </value>
-        public virtual User ContractSigner { get; set; }
+        public virtual string ContractSigner { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this contract is signed.

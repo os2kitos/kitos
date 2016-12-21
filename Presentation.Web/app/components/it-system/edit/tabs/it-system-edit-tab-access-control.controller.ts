@@ -55,7 +55,7 @@
                         return o.Id === id;
                     });
                 }).error(function (data, status) {
-                    if (status === 409)
+                    if (status === 500)
                         msg.toErrorMessage("Fejl! Kan ikke slettes, da den er i brug.");
                     else
                         msg.toErrorMessage('Fejl! Kunne ikke slette!');

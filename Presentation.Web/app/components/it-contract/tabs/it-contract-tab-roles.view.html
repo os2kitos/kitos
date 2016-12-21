@@ -19,52 +19,6 @@
             </tr>
         </thead>
 
-        <!-- contract signer -->
-        <tbody>
-            <!-- show -->
-            <tr data-ng-hide="contractSigner.edit">
-                <td>Kontraktunderskriver</td>
-                <td>
-                    <span data-ng-if="contractSigner.signer">{{ contractSigner.signer.fullName }}</span>
-                    <span data-ng-if="!contractSigner.signer" class="text-muted">Ikke valgt</span>
-                </td>
-                <td>
-                    <span data-ng-if="contractSigner.signer">{{ contractSigner.signer.email }}</span>
-                    <span data-ng-if="!contractSigner.signer" class="text-muted"> - </span>
-
-                    <div data-ng-show="hasWriteAccess" class="pull-right">
-                        <a id="edit-contract-signer"
-                           class="btn btn-info btn-xs"
-                           data-ng-click="contractSigner.edit = true">
-                            <i class="glyphicon glyphicon-pencil"></i>
-                        </a>
-                        <a class="btn btn-danger btn-xs faded" data-uib-tooltip="Denne rolle kan ikke fjernes.">
-                            <span class="glyphicon glyphicon-trash"></span>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-
-            <!-- edit -->
-            <tr data-ng-show="contractSigner.edit">
-                <td>Kontraktunderskriver</td>
-                <td colspan="2" class="relative-position">
-                    <input id="contract-signer-user"
-                           data-select-user="foo"
-                           data-org-id="{{ orgId }}"
-                           data-user-model="contractSigner.userForSelect"
-                           data-allow-clear="true" />
-                    <div class="pull-outside-table">
-                        <input id="save-contract-signer"
-                               type="submit"
-                               class="btn btn-success btn-sm"
-                               data-ng-click="contractSigner.update()"
-                               value="Gem" />
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-
         <!-- for each right -->
         <tbody data-ng-repeat="right in rights | filter : { show: true } | orderBy : rightSort : rightSortReverse">
 

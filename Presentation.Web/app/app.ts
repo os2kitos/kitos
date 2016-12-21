@@ -60,6 +60,9 @@ app.run([
             subnav: []
         };
 
+        // hide cancel button on login form unless the user is changing organization
+        $rootScope.changingOrganization = false;
+
         $rootScope.$state = $state;
 
         // this will try to authenticate - to see if the user's already logged in
@@ -70,12 +73,14 @@ app.run([
         // logout function for top navigation bar
         $rootScope.logout = () => {
             userService.logout().then(() => {
+                $rootScope.changingOrganization = false;
                 $state.go("index");
             });
         };
 
         // changeOrganization function for top navigation bar
         $rootScope.changeOrganization = () => {
+            $rootScope.changingOrganization = true;
             userService.changeOrganization().then((user) => {
                 if (navigationService.checkState(user.defaultUserStartPreference)) {
                     $state.go(user.defaultUserStartPreference, null, { reload: true });

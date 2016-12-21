@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItSystem
         public ItSystem()
         {
             this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
-            this.CanUseInterfaces = new List<ItInterfaceUse>();
+            //this.CanUseInterfaces = new List<ItInterfaceUse>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
@@ -42,7 +42,7 @@ namespace Core.DomainModel.ItSystem
         /// Exhibited interfaces.
         /// </value>
         public virtual ICollection<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-        
+
 
         /// <summary>
         /// Gets or sets interfaces that can use this instance.
@@ -50,7 +50,7 @@ namespace Core.DomainModel.ItSystem
         /// <value>
         /// Usable interfaces.
         /// </value>
-        public virtual ICollection<ItInterfaceUse> CanUseInterfaces { get; set; }
+        //public virtual ICollection<ItInterfaceUse> CanUseInterfaces { get; set; }
 
         /// <summary>
         /// Gets or sets the sub (child) it systems.

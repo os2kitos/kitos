@@ -1,33 +1,37 @@
 ﻿(function (ng, app) {
-    'use strict';
+    "use strict";
 
-    app.directive('typeahead', ['$timeout', '_', '$filter', function ($timeout, _, $filter) {
+    app.directive("typeahead", ["$timeout", "_", "$filter", function ($timeout, _, $filter) {
         return {
-            restrict: 'AEC',
+            restrict: "AEC",
             scope: {
-                items: '=',
-                placeholder: '@',
-                displayValue: '@',
-                fieldValue: '@',
-                model: '=ngModel',
-                stringModel: '=',
-                autosaveUrl: '@',
-                field: '@'
+                items: "=",
+                placeholder: "@",
+                displayValue: "@",
+                fieldValue: "@",
+                model: "=ngModel",
+                stringModel: "=",
+                autosaveUrl: "@",
+                field: "@"
             },
+            templateUrl: "app/shared/typeahead/typeahead.view.html",
             link: function (scope: any, elem, attrs) {
                 if (scope.model) {
                     scope.searchInput = scope.model;
                 }
 
                 scope.handleSelection = function (selectedItem) {
-                    scope.model = selectedItem[scope.fieldValue];
-                    scope.searchInput = selectedItem[scope.displayValue];
+                    scope.model = `${selectedItem.Name} ${selectedItem.LastName}`;
+                    scope.searchInput = `${selectedItem.Name} ${selectedItem.LastName}`;
                     scope.current = 0;
                 };
+
                 scope.current = 0;
+
                 scope.isCurrent = function (index) {
-                    return scope.current == index;
+                    return scope.current === index;
                 };
+
                 scope.setCurrent = function (index) {
                     if (scope.items[index]) {
                         scope.current = index;
@@ -39,7 +43,6 @@
                 }
 
                 scope.onBlur = function () {
-                    scope.stringModel = scope.searchInput;
                     if (angular.isUndefined(scope.model) || scope.model.length) {
                         $timeout(function () {
                             scope.showItems = false;
@@ -53,15 +56,14 @@
                     } else if (keyEvent.which === 40) {
                         scope.setCurrent(scope.current + 1);
                     } else if (keyEvent.which === 13) {
-                        var filteredItems = $filter('filter')(scope.items, scope.searchInput);
+                        var filteredItems = $filter("filter")(scope.items, scope.searchInput);
                         if (filteredItems.length) {
                             scope.handleSelection(filteredItems[scope.current]);
                         }
-                        elem.find('.typeahead-input').blur();
+                        elem.find(".typeahead-input").blur();
                     }
                 }
-            },
-            templateUrl: 'app/shared/typeahead/typeahead.view.html'
+            }
         };
     }]);
 })(angular, app);

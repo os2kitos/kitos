@@ -42,7 +42,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
-        public virtual ItInterfaceUse ItInterfaceUse { get; set; } // careful ItInterfaceUse has a composite key
+        public virtual ItInterface ItInterface { get; set; }
 
         /// <summary>
         /// Whether local usage of the interface is wanted or not.

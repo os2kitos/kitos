@@ -197,7 +197,7 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled) {
-                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (udgået)</a>`;
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv)</a>`;
                             } else {
                                 return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                             }
@@ -205,7 +205,7 @@
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled) {
-                                    return dataItem.Name + " (udgået)";
+                                    return dataItem.Name + " (Inaktiv)";
                                 } else {
                                     return dataItem.Name;
                                 }
@@ -296,7 +296,7 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
-                                return (dataItem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (udgået)" : dataItem.ExhibitedBy.ItSystem.Name;
+                                return (dataItem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
                             else
                                 return "";
                         },

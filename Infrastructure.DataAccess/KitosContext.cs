@@ -10,6 +10,7 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.AdviceSent;
 
 namespace Infrastructure.DataAccess
 {
@@ -29,7 +30,7 @@ namespace Infrastructure.DataAccess
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
-        public DbSet<Advice> Advices { get; set; }
+        public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
@@ -52,7 +53,8 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
+        // Udkommenteret ifm. OS2KITOS-663
+        //public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
         public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
@@ -131,6 +133,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
+        public DbSet<AdviceSent> AdviceSent { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -167,7 +170,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
-            modelBuilder.Configurations.Add(new ItInterfaceUseMap());
+            // Udkommenteret ifm. OS2KITOS-663
+            //modelBuilder.Configurations.Add(new ItInterfaceUseMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceTypeMap());

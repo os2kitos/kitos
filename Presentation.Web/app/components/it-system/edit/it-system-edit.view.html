@@ -1,7 +1,7 @@
 ﻿<!-- it system master sheet -->
 <form role="form" class="container-fluid object-wrapper">
     <!-- Left menu -->
-    <div class="col-xs-2 left-menu-container">
+    <div class="col-xs-3 col-lg-2 left-menu-container">
         <div class="left-menu">
             <div class="header">
                 <h3>IT System</h3>
@@ -9,9 +9,6 @@
             <ul>
                 <li data-ui-sref-active="active">
                     <a data-ui-sref="it-system.edit.main"><img src="/Content/img/Systemforside.svg"></img> Systemforside</a>
-                </li>
-                <li data-ui-sref-active="active">
-                    <a data-ui-sref="it-system.edit.interfaces"><img src="/Content/img/Snitflader.svg"></img> Snitflader</a>
                 </li>
                 <li data-ui-sref-active="active">
                     <a data-ui-sref="it-system.edit.kle"><img src="/Content/img/KLE.svg"></img> KLE</a>
@@ -25,7 +22,7 @@
             </ul>
         </div>
     </div>
-    <div class="col-xs-10 object-content">
+    <div class="col-xs-9 col-lg-10 object-content">
         <ui-view />
     </div>
 </form>
