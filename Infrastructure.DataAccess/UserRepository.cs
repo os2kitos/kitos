@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainServices;
 using Core.DomainModel;
 
@@ -19,5 +20,9 @@ namespace Infrastructure.DataAccess
             return _context.Users.SingleOrDefault(u => u.Email == email);
         }
 
+        public User GetByUuid(Guid uuid)
+        {
+            return _context.Users.SingleOrDefault(u => u.Uuid == uuid);
+        }
     }
 }

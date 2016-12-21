@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -15,29 +19,19 @@ namespace Presentation.Web.Infrastructure
         {
             try
             {
-                X509Certificate2 cert;
-                using (var stream = new FileStream(@"C:\temp\syddjurs.pfx", FileMode.Open))
+                var ssoConfig = GetKeyFromConfig();
+                if (ssoConfig == null)
                 {
-                    var buffer = new byte[16*1024];
-                    using (var ms = new MemoryStream())
-                    {
-                        int read;
-                        while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            ms.Write(buffer, 0, read);
-                        }
-
-                        cert = new X509Certificate2(ms.ToArray(), "Miracle42");
-                    }
+                    //TODO log 
+                    return null;
                 }
-
                 var tokenhandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
                 SecurityToken sToken;
                 var tokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidAudience = "memaclient",
-                    ValidIssuer = "https://os2sso-test.miracle.dk",
-                    IssuerSigningKey = new X509SecurityKey(cert)
+                    ValidAudience = ssoConfig.Audience,
+                    ValidIssuer = ssoConfig.Issuer,
+                    IssuerSigningKey = ssoConfig.SigningKey
                 };
                 return tokenhandler.ValidateToken(idToken, tokenValidationParameters, out sToken);
             }
@@ -47,5 +41,40 @@ namespace Presentation.Web.Infrastructure
                 return null;
             }
         }
+
+        private SsoConfig GetKeyFromConfig()
+        {
+            var result = new SsoConfig();
+            var configUrl = ConfigurationManager.AppSettings["SSOGateway"];
+            result.Audience = ConfigurationManager.AppSettings["SSOAudience"];
+            try
+            {
+                using (WebClient wc = new WebClient())
+                {
+                    var json = wc.DownloadString(configUrl);
+                    var openidConfig = JsonConvert.DeserializeObject<dynamic>(json);
+                    result.Issuer = openidConfig.issuer;
+
+                    var jwksuri = (string) openidConfig.jwks_uri;
+                    var jwksjson = wc.DownloadString(jwksuri);
+                    var jwks = JsonConvert.DeserializeObject<dynamic>(jwksjson);
+                    result.SigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(jwks)));
+
+                }
+            }
+            catch (Exception)
+            {
+                //TODO log exception
+                return null;
+            }
+            return result;
+        }
+    }
+
+    internal class SsoConfig
+    {
+        public SecurityKey SigningKey { get; set; }
+        public string Issuer { get; set; }
+        public string Audience { get; set; }
     }
 }

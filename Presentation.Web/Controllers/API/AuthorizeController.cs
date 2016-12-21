@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PostLoginWithToken(string token)
         {
             var principal = new TokenValidator().Validate(token);
-            if (!principal.Identity.IsAuthenticated)
+            if (principal == null || !principal.Identity.IsAuthenticated)
             {
                 Logger.Info($"Uservalidation: Could not validate token.");
                 return Unauthorized();
@@ -55,7 +55,8 @@ namespace Presentation.Web.Controllers.API
             {
                 var emailClaim = principal.Claims.Single(c => c.Type.ToLower() == "email");
                 var uuidClaim = principal.Claims.Single(c => c.Type.ToLower() == "uuid");
-                var user = _userRepository.GetByEmail(emailClaim.Value);
+                var user = _userRepository.GetByUuid(Guid.Parse(uuidClaim.Value)) ?? _userRepository.GetByEmail(emailClaim.Value);
+                //TODO: update user if UUID is not set.
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
                 var response = CreateLoginResponse(user);
                 return Created(response);
