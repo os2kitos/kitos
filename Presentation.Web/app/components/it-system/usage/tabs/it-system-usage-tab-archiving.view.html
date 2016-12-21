@@ -1,18 +1,21 @@
-﻿<div class="object-section-container">
+﻿<div class="clearfix">
+    <help-text data-key="it_system_usage_archiving" data-default-title="Arkivering" class="pull-right"></help-text>
+</div>
+<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
     <div class="row">
-        <!--<h4>Arkivering</h4><br>-->
         <!-- 1st column -->
         <div class="col-xs-6">
             <!-- ArchiveDuty -->
             <div class="form-group">
-                <label for="ArchiveDuty" class="control-label small">Underskrevet</label><br>
+                <label class="control-label small">Underskrevet</label><br>
                 <input type="radio" id="ArchiveDuty"
                        data-ng-model="systemUsage.ArchiveDuty"
                        ng-value="true"
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('ArchiveDuty', true)"
                        data-field="ArchiveDuty">
-                Ja &nbsp;
+                <label class="control-label small" for="ArchiveDuty">Ja</label>
 
                 <input type="radio" id="ArchiveDuty2"
                        data-ng-model="systemUsage.ArchiveDuty"
@@ -20,18 +23,18 @@
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('ArchiveDuty', false)"
                        data-field="ArchiveDuty">
-                Nej
+                <label class="control-label small" for="ArchiveDuty2">Nej</label>
             </div>
             <!-- Archived -->
             <div class="form-group">
-                <label for="Archived" class="control-label small">Arkiveret</label><br>
+                <label class="control-label small">Arkiveret</label><br>
                 <input type="radio" id="Archived"
                        data-ng-model="systemUsage.Archived"
                        ng-value="true"
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('Archived', true)"
                        data-field="Archived">
-                Ja &nbsp;
+                <label class="control-label small" for="Archived">Ja</label>
 
                 <input type="radio" id="Archived2"
                        data-ng-model="systemUsage.Archived"
@@ -39,7 +42,7 @@
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('Archived', false)"
                        data-field="Archived">
-                Nej
+                <label class="control-label small" for="Archived2">Nej</label>
             </div>
             <!-- ReportedToDPA -->
             <div class="form-group">
@@ -50,7 +53,7 @@
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('ReportedToDPA', true)"
                        data-field="ReportedToDPA">
-                Ja &nbsp;
+                <label class="control-label small" for="ReportedToDPA">Ja</label>
 
                 <input type="radio" id="ReportedToDPA2"
                        data-ng-model="systemUsage.ReportedToDPA"
@@ -58,7 +61,7 @@
                        data-ng-disabled="!hasWriteAccess"
                        ng-click="patch('ReportedToDPA', false)"
                        data-field="ReportedToDPA">
-                Nej
+                <label class="control-label small" for="ReportedToDPA22">Nej</label>
             </div>
             <!-- DocketNo -->
             <div class="form-group">
