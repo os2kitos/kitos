@@ -10,7 +10,7 @@
         public busy: boolean;
         public vm: ICreateViewModel;
 
-        public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
+        public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_", "helpTexts"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private $http: IHttpServiceWithCustomConfig,
@@ -18,7 +18,8 @@
             private notify,
             private autofocus,
             private user: Kitos.Services.IUser,
-            private _: _.LoDashStatic) {
+            private _: _.LoDashStatic,
+            private helpTexts) {
             if (!user.currentOrganizationId) {
                 notify.addErrorMessage("Fejl! Kunne ikke oprette hjælpetekst.", true);
                 return;
@@ -33,6 +34,13 @@
         }
 
         public create() {
+            //Check duplicates
+            var key = this.vm.key;
+            if (_.find(this.helpTexts, function (o: Models.IHelpText) { return o.Key === key; })) {
+                this.notify.addErrorMessage("Fejl! Der findes allerede en hjælpetekst med den angivne key.", true);
+                return;
+            }
+
             this.busy = true;
             var payload = {
                 Title: this.vm.title,
@@ -68,7 +76,10 @@
                             controller: CreateHelpTextController,
                             controllerAs: "ctrl",
                             resolve: {
-                                user: ["userService", userService => userService.getUser()]
+                                user: ["userService", userService => userService.getUser()],
+                                helpTexts: [
+                                    "$http", $http => $http.get("/odata/HelpTexts").then(result => result.data.value)
+                                ]
                             }
                         }).result.then(() => {
                             // OK
