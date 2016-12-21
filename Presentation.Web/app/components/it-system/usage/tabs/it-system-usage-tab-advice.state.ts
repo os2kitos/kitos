@@ -13,7 +13,7 @@
                         });
                 }],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itSystem/' + $stateParams.id).then(function (result) {
+                    return $http.get('api/itSystemUsage/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
                 }],
