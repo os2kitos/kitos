@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.edit.references.create', {
-            url: '/createReference/:id',
+            url: 'createReference/:id',
             onEnter: ['$state', '$stateParams', '$uibModal', 'user',
                 function ($state, $stateParams, $modal, user) {
                     $modal.open({
