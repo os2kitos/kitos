@@ -14,7 +14,6 @@
         ["$scope", "_", "hierarchyFlat", "$stateParams", "notify", "contract", "hasWriteAccess", "$http", "user",
             ($scope, _, hierarchyFlat, $stateParams, notify, contract, hasWriteAccess, $http, user) => {
                 $scope.hierarchy = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
-                console.log(contract);
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
