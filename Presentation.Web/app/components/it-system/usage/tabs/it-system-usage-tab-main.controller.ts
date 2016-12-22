@@ -46,7 +46,6 @@
             $scope.businessTypes = businessTypes;
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
-
             autofocus();
 
             var today = new Date();

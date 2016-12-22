@@ -5,7 +5,7 @@
             onEnter: ['$state', '$stateParams', '$uibModal','$http',
                 function ($state, $stateParams, $modal, $http) {
                     $modal.open({
-                        templateUrl: "app/components/it-reference-modal.view.html",
+                        templateUrl: "app/components/it-reference/it-reference-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",

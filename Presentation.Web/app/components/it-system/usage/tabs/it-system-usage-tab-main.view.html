@@ -1,5 +1,8 @@
-﻿<div class="object-section-container">
-    <h4 ng-bind="usage.itSystem.name"></h4>
+﻿<div class="clearfix">
+    <help-text data-key="it_system_usage_main" data-default-title="Systemforside" class="pull-right"></help-text>
+</div>
+<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
     <div class="row">
         <!-- 3rd column -->
         <div class="col-xs-6">
@@ -37,7 +40,7 @@
                 </select-option>
             </div>
             <!-- archiving -->
-            <div class="form-group">
+            <!--<div class="form-group">
                 <select-option data-id="archive"
                                data-label="Arkivering"
                                data-placeholder="Vælg arkivering"
@@ -49,6 +52,14 @@
                                data-field="archiveTypeId">
                 </select-option>
                 <span class="help-block small">&nbsp;</span>
+            </div>-->
+            <!-- note -->
+            <div class="form-group">
+                <label for="note" class="control-label small">Note</label>
+                <textarea id="note" class="form-control input-sm" rows="5"
+                          data-ng-model="usage.note"
+                          data-ng-disabled="!hasWriteAccess"
+                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
             </div>
             <!-- note -->
             <div class="form-group">
@@ -114,8 +125,8 @@
                        data-ng-change="checkSystemValidity()"
                 />
                 <label for="system-int-signed">
-                    <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
-                    <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
+                    <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
+                    <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
                     <span class='label-content'>Gyldig: </span>
                 </label>
                 <i ng-show="usage.isActive" class="fa fa-check" aria-hidden="true"></i>

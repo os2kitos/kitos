@@ -155,7 +155,7 @@
                 var modalInstance = $modal.open({
 
                     windowClass: "modal fade in",
-                    templateUrl: "app/components/it-advice-modal-view.html",
+                    templateUrl: "app/components/it-advice/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
                         $scope.recieverRoles = roles.data.value;
@@ -215,6 +215,7 @@
                             payload.Scheduling = $scope.repitionPattern;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
+                            payload.StopDate.setHours(23,59,59,99);
 
                             if (action == 'POST') {
                                 url = "Odata/advice";
@@ -234,12 +235,13 @@
                                 $http.patch(url, JSON.stringify(payload))
                                     .then(() => {
                                         notify.addSuccessMessage("Advisen er opdateret!");
+
+                                        $("#mainGrid").data("kendoGrid").dataSource.read();
+                                        $scope.$close(true);
                                     },
                                     () => { () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!") }}
                                 );
 
-                                $("#mainGrid").data("kendoGrid").dataSource.read();
-                                $scope.$close(true);
                             }
 
                         };
@@ -248,6 +250,17 @@
                             var url = "Odata/advice";
                             var payload = createPayload();
                             httpCall(payload, action, url);
+                        };
+
+                        $scope.checkErr = function (startDate, endDate) {
+                            $scope.errMessage = '';
+                            $scope.curDate = new Date();
+                            if (startDate > endDate) {
+                                $scope.stopDateErrMessage = '\'Til Dato\' skal være senere end eller samme som \'Fra dato\'!';
+                                return false;
+                            }
+                            $scope.stopDateErrMessage = '';
+                            return true;
                         };
 
                         $scope.tinymceOptions = {
@@ -278,21 +291,21 @@
                         }).success(function () {
                             if (action === "POST") {
                                 notify.addSuccessMessage("Advisen er oprettet!");
+                                $scope.$close(true);
+                                $("#mainGrid").data("kendoGrid").dataSource.read();
                             }
                             if (action === "PATCH") {
                                 notify.addSuccessMessage("Advisen er opdateret!");
                             }
-                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                            $scope.$close(true);
                         }).error(function () {
                             if (action === "POST") {
-                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");
+                                notify.addErrorMessage("Fejl! Kunne ikke oprette modalen!");                            
                             }
                             if (action === "PATCH") {
                                 notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
                             }
-                        });
-                    }
+                        })
+                        }
 
                     function createPayload() {
 
@@ -363,19 +376,19 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type === "itSystemUsage"|| "itInterface") {
+                        if (type == "itSystemUsage" || type == "itInterface") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
                                 });
                         }
-                        if (type === "itContract") {
+                        if (type == "itContract") {
                             return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
                                 });
                         }
-                        if (type === "itProject") {
+                        if (type == "itProject") {
                             return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
@@ -389,8 +402,8 @@
                                 return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
-                            case 'ItSystemUsage':
-                                return $http.get('api/ItSystemUsage/' + $stateParams.id).then(function (result) {
+                            case 'itSystemUsage':
+                                return $http.get('api/itsystemusage/' + $stateParams.id).then(function (result) {
                                     return result.data.response.advices;
                                 });
                             case 'itproject':

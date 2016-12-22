@@ -29,7 +29,7 @@ div#page-content {
 
 div#page-body {
     min-height: 100%;
-    padding: 10px 0 20px 0;
+    padding: 10px 10px 20px 10px;
     background-color: white;
 }
 
@@ -984,6 +984,7 @@ tr.angular-ui-tree-empty {
                 h3 {
                     font-size: 14px;
                     font-weight: bold;
+                    margin-top: 23px;
                     border-bottom: 1px solid black;
                 }
             }
@@ -1029,7 +1030,9 @@ tr.angular-ui-tree-empty {
     }
 
     .object-content {
-        margin-top: 32px;
+        help-text {
+            margin-bottom: 10px;
+        }
     }
 }
 
@@ -1037,6 +1040,7 @@ tr.angular-ui-tree-empty {
 
 .object-section-container {
     margin-bottom: 25px;
+    margin-top: -10px;
 
     h4 {
         border-bottom: 1px solid black;
@@ -1258,5 +1262,18 @@ tr.angular-ui-tree-empty {
 .contractDurationLayout input[type="checkbox"] {
     vertical-align: sub;
     margin-left: 20px;
+}
+/**/
+
+/* Help Texts */
+.help-texts-top {
+    .btn {
+        margin-bottom: 10px
+    }
+}
+
+.help-texts-list {
+    height: 400px;
+    overflow-y: scroll;
 }
 /**/

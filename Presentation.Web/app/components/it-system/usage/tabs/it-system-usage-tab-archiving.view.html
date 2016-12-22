@@ -1,0 +1,126 @@
+﻿<div class="clearfix">
+    <help-text data-key="it_system_usage_archiving" data-default-title="Arkivering" class="pull-right"></help-text>
+</div>
+<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <div class="row">
+        <!-- 1st column -->
+        <div class="col-xs-6">
+            <!-- ArchiveDuty -->
+            <div class="form-group">
+                <label class="control-label small">Arkiveringspligt</label><br>
+                <input type="radio" id="ArchiveDuty"
+                       data-ng-model="systemUsage.ArchiveDuty"
+                       ng-value="true"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('ArchiveDuty', true)"
+                       data-field="ArchiveDuty">
+                <label class="control-label small" for="ArchiveDuty">Ja</label>
+
+                <input type="radio" id="ArchiveDuty2"
+                       data-ng-model="systemUsage.ArchiveDuty"
+                       ng-value="false"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('ArchiveDuty', false)"
+                       data-field="ArchiveDuty">
+                <label class="control-label small" for="ArchiveDuty2">Nej</label>
+            </div>
+            <!-- Archived -->
+            <div class="form-group">
+                <label class="control-label small">Arkiveret</label><br>
+                <input type="radio" id="Archived"
+                       data-ng-model="systemUsage.Archived"
+                       ng-value="true"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('Archived', true)"
+                       data-field="Archived">
+                <label class="control-label small" for="Archived">Ja</label>
+
+                <input type="radio" id="Archived2"
+                       data-ng-model="systemUsage.Archived"
+                       ng-value="false"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('Archived', false)"
+                       data-field="Archived">
+                <label class="control-label small" for="Archived2">Nej</label>
+            </div>
+            <!-- ReportedToDPA -->
+            <div class="form-group">
+                <label for="ReportedToDPA" class="control-label small">Anmeldt til datatilsynet</label><br>
+                <input type="radio" id="ReportedToDPA"
+                       data-ng-model="systemUsage.ReportedToDPA"
+                       ng-value="true"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('ReportedToDPA', true)"
+                       data-field="ReportedToDPA">
+                <label class="control-label small" for="ReportedToDPA">Ja</label>
+
+                <input type="radio" id="ReportedToDPA2"
+                       data-ng-model="systemUsage.ReportedToDPA"
+                       ng-value="false"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patch('ReportedToDPA', false)"
+                       data-field="ReportedToDPA">
+                <label class="control-label small" for="ReportedToDPA22">Nej</label>
+            </div>
+            <!-- DocketNo -->
+            <div class="form-group">
+                <label for="DocketNo" class="control-label small">Journal-/Anmeldelsesnr</label>
+                <input type="text" id="DocketNo" class="form-control input-sm"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="systemUsage.DocketNo"
+                       ng-blur="patch('DocketNo', systemUsage.DocketNo)"
+                       data-field="DocketNo">
+            </div>
+        </div>
+        <!-- 2nd column -->
+        <div class="col-xs-6">
+            <div class="form-group">
+                <select-option data-id="archive"
+                               data-label="Arkivtype"
+                               data-placeholder="Vælg arkivering"
+                               data-selected-text="{{ usage.archiveTypeName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.archiveTypeId"
+                               data-options="archiveTypes"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="archiveTypeId">
+                </select-option>
+                <!--<span class="help-block small">&nbsp;</span>-->
+            </div>
+
+            <div class="form-group">
+                <select-option data-id="archiveLocation"
+                               data-label="Arkiveringssted"
+                               data-placeholder="Vælg arkiveringssted"
+                               data-selected-text="{{ usage.archiveLocationName }}"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.archiveLocationId"
+                               data-options="archiveLocations"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="archiveLocationId">
+                </select-option>
+            </div>
+            <!-- ArchivedDate -->
+            <div class="form-group">
+                <label for="ArchivedDateId" class="control-label small">Arkiveringsdato</label>
+                <input type="text" id="ArchivedDateId" class="form-control"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="systemUsage.ArchivedDate"
+                       ng-change="patchDate('ArchivedDate', systemUsage.ArchivedDate)"
+                       data-field="ArchivedDate">
+            </div>
+            <!-- ArchiveNotes -->
+            <div class="form-group">
+                <label for="ArchiveNotes" class="control-label small">Arkiveringsbemærkninger</label>
+                <input type="text" id="ArchiveNotes" class="form-control input-sm"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="systemUsage.ArchiveNotes"
+                       ng-blur="patch('ArchiveNotes', systemUsage.ArchiveNotes)"
+                       data-field="ArchiveNotes">
+            </div>
+        </div>
+    </div>
+</div>

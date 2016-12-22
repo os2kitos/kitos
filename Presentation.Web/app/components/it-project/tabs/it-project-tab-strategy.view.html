@@ -1,4 +1,10 @@
-﻿<div class="panel-default">
+﻿<div class="clearfix">
+    <div class="form-group pull-right">
+        <help-text data-key="it_project_strategy" data-default-title="IT system - Strategy"></help-text>
+    </div>
+</div>
+
+<div class="panel-default">
     <div class="panel-heading">
         <div class="panel-title">Projektet knytter an til</div>
     </div>
@@ -16,6 +22,7 @@
                     <option value=""></option>
                     <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
                 </select>
+                <button id="jointDropbtn" class="btn pull-right" ng-click="clear()">Nulstil</button>
             </div>
             <div class="form-group">
                 <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
@@ -29,6 +36,7 @@
                     <option value=""></option>
                     <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
                 </select>
+                <button id="commonDropbtn" class="btn pull-right" ng-click="clearCommon()">Nulstil</button>
             </div>
         </form>
     </div>

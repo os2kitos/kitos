@@ -1,7 +1,7 @@
 ﻿<script type="text/ng-template" id="tree_item_template">
     <div class="org-node" data-ng-class="{'selected': node.id == usage.itSystemId}">
         <span class="org-node-info">
-            <a data-ui-sref="it-system.edit.main({ id: node.id })">{{ node.name }}</a>
+            <a data-ui-sref="it-system.edit.main({ id: node.id })">{{ node.name }} <span ng-if="node.disabled">(inaktiv)</span></a>
         </span>
         <ul>
             <li data-ng-repeat="node in node.children">
@@ -11,8 +11,11 @@
     </div>
 </script>
 
+<div class="clearfix">
+    <help-text data-key="it_system_usage_hierarchy" data-default-title="Hierarki" class="pull-right"></help-text>
+</div>
 <div class="object-section-container">
-    <h4 data-ng-bind="usage.name"></h4>
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
     <div class="row">
         <div class="col-xs-12">
             <div data-ng-repeat="node in systems" data-ng-include="'tree_item_template'"></div>

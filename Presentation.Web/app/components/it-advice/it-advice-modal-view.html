@@ -20,7 +20,7 @@
                 </div>
 
                 <div class="form-group">
-                    <a href="#" ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
+                    <a  ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
                     <div ng-show="collapsed">
                         <input id="toExternal" type="email" name="toExternal" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
 
@@ -38,7 +38,7 @@
                     </select-multiple-recievers>
                 </div>
                 <div class="form-group">
-                    <a href="#" ng-model="CCcollapsed" ng-click="CCcollapsed = !CCcollapsed"><div ng-show="CCcollapsed">Tilføj Email adresse manuelt</div><div ng-show="!CCcollapsed">Minimer</div></a>
+                    <a ng-model="CCcollapsed" ng-click="CCcollapsed = !CCcollapsed"><div ng-show="CCcollapsed">Tilføj Email adresse manuelt</div><div ng-show="!CCcollapsed">Minimer</div></a>
                     <div ng-show="!CCcollapsed">
                         <input id="cc" type="text" placeholder="separer flere adresser med ," class="form-control" data-ng-model="externalCC">
                     </div>
@@ -62,15 +62,15 @@
 
                 <!--Send Advis-->
                 <div class="form-group md-">
-                    <button type="submit" class="btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject)">Send</button>
+                    <button type="submit" class="btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject)">Send</button>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group has-feedback" data-show-errors>
                     <!--Navn-->
                     <label class="control-label" for="name">Navn</label>
-                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" required data-ng-model="name">
-                    <span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.Name.$invalid && createForm.Name.$dirty, 'glyphicon-ok': createForm.Name.$valid }"></span>
+                    <input type="text" class="form-control" name="name" id="name" placeholder="Navn" data-ng-model="name">
+                    <!--span class="glyphicon form-control-feedback" data-ng-class="{ 'glyphicon-remove': createForm.Name.$invalid && createForm.Name.$dirty, 'glyphicon-ok': createForm.Name.$valid }"></!--span-->
 
                 </div>
                 <div class="form-group">
@@ -89,19 +89,22 @@
                 <div class="form-group">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErr(startDate,stopDate)'>
+                    <span>{{startDateErrMessage}}</span>
                 </div>
 
                 <!--Dato-->
                 <div class="form-group">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErr(startDate,stopDate)'>
+                    <span>{{stopDateErrMessage}}</span>
                 </div>
+
             </div>
         </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || !!selectedRecievers) && !!subject && !!repitionPattern && !!stopDate &&  startDate)">Gem</button>
+                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !!repitionPattern && !!stopDate &&  startDate && checkErr(startDate,stopDate))">Gem</button>
                 <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
                 <input type="hidden" ng-model="hiddenForjob" />
             </div>

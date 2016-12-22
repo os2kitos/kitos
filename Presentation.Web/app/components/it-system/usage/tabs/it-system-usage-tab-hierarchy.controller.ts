@@ -15,7 +15,6 @@
             ($scope, _, hierarchyFlat, itSystemUsage) => {
                 $scope.systems = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
                 $scope.usage = itSystemUsage;
-
             }
         ]
     );

@@ -1,8 +1,8 @@
 ﻿(function(ng, app) {
     app.config(['$stateProvider', function($stateProvider) {
         $stateProvider.state('it-system.usage.advice', {
-            url: '/advice/:type',
-            templateUrl: 'app/components/it-advice.view.html',
+            url: '/advice',
+            templateUrl: 'app/components/it-advice/it-advice.view.html',
             controller: 'object.EditAdviceCtrl',
             controllerAs: 'Vm',
             resolve: {
@@ -13,7 +13,7 @@
                         });
                 }],
                 advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itSystem/' + $stateParams.id).then(function (result) {
+                    return $http.get('api/itSystemUsage/' + $stateParams.id).then(function (result) {
                         return result.data.response.advices;
                         });
                 }],

@@ -93,7 +93,7 @@
             this.activate();
         }
         public isValidUrl(Url) {
-            var regexp = /(http):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
         };
         public opretITKontrakt() {
@@ -497,7 +497,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (this.isValidUrl(reference.URL)) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }

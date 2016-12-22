@@ -30,7 +30,7 @@ module Kitos.Reports {
                         var canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g:any) {
                             return g.key === "CanGlobalAdminOnlyEditReports";
                         });
-                        
+
                         self.canDesignReport = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
                         // 02/11 MEMA: The translation is far from done. Add back, when translated.
                         //stimulsoftService.setLocalizationFile("./appReport/locales/da-DK.xml")
@@ -109,9 +109,9 @@ module Kitos.Reports {
 
                     var addKitos = true;
                     var i;
-                    console.log("DB's: " + this.stiReport.dictionary.databases.count);
+                    //console.log("DB's: " + this.stiReport.dictionary.databases.count);
                     for (i = 0; i < this.stiReport.dictionary.databases.count; i++) {
-                        console.log("DB name: " + this.stiReport.dictionary.databases.getByIndex(i).name);
+                        //console.log("DB name: " + this.stiReport.dictionary.databases.getByIndex(i).name);
                         if (this.stiReport.dictionary.databases.getByIndex(i).name === "Kitos") {
                             addKitos = false;
                             this.stiReport.dictionary.databases.getByIndex(i).connectionString = window.location.origin + "/odata";

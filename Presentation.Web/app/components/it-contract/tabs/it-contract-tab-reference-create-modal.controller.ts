@@ -1,11 +1,11 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.edit.references.create', {
-            url: '/createReference/:id',
+            url: 'createReference/:id',
             onEnter: ['$state', '$stateParams', '$uibModal', 'user',
                 function ($state, $stateParams, $modal, user) {
                     $modal.open({
-                        templateUrl: "app/components/it-reference-modal.view.html",
+                        templateUrl: "app/components/it-reference/it-reference-modal.view.html",
                         // fade in instead of slide from top, fixes strange cursor placement in IE
                         // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                         windowClass: "modal fade in",

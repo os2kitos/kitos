@@ -205,6 +205,9 @@
                             if (systemHasUsages)
                                 return `<button type="button" class="btn btn-danger col-xs-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
 
+                            if (dataItem.Disabled)
+                                return `<button type="button" class="btn btn-success col-xs-7" disabled>Anvend</button>`
+
                             return `<button type="button" class="btn btn-success col-xs-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
                         },
                         excelTemplate: dataItem => {

@@ -61,13 +61,21 @@
             </div>
             <!-- if an org unit has been selected -->
             <div class="col-xs-12" data-ng-show="chosenOrgUnit">
-                <h3>
-                    {{ chosenOrgUnit.name }}
-                    <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
-                    <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
+                <div class="clearfix">
+                    <div class="pull-left">
+                        <h3>
+                            {{ chosenOrgUnit.name }}
+                            <span class="text-muted" data-ng-show="chosenOrgUnit.localId">({{ chosenOrgUnit.localId }})</span>
+                            <span class="text-muted">({{ chosenOrgUnit.organization.name }})</span>
 
-                </h3>
-                <p class="text-muted">Oprettet af {{ chosenOrgUnit.objectOwnerFullName }}</p>
+                        </h3>
+                        <p class="text-muted">Oprettet af {{ chosenOrgUnit.objectOwnerFullName }}</p>
+                    </div>
+                    <div class="form-group pull-right">
+                        <help-text data-key="organization_structure" data-default-title="Organisationsstruktur"></help-text>
+                    </div>
+                </div>
+                
                 <!-- Organization Roles -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
