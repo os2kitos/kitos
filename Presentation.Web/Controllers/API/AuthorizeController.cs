@@ -51,15 +51,32 @@ namespace Presentation.Web.Controllers.API
                 return Unauthorized();
             }
 
-            if (principal.Claims.Any(c => c.Type.ToLower() == "email" || c.Type.ToLower() == "uuid"))
+            if (principal.Claims.Any(c => c.Type.ToLower() == "ssoemail" || c.Type.ToLower() == "uuid"))
             {
-                var emailClaim = principal.Claims.Single(c => c.Type.ToLower() == "email");
-                var uuidClaim = principal.Claims.Single(c => c.Type.ToLower() == "uuid");
-                var user = _userRepository.GetByUuid(Guid.Parse(uuidClaim.Value)) ?? _userRepository.GetByEmail(emailClaim.Value);
-                //TODO: update user if UUID is not set.
-                FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
-                var response = CreateLoginResponse(user);
-                return Created(response);
+                User user = null;
+                var emailClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "ssoemail");
+                var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "uuid");
+                if (uuidClaim != null)
+                {
+                    user = _userRepository.GetByUuid(Guid.Parse(uuidClaim.Value));
+                }
+                if (user == null && emailClaim != null)
+                {
+                    user = _userRepository.GetByEmail(emailClaim.Value);
+                    //TODO: update user if UUID is not set.
+                    if (user != null && uuidClaim != null)
+                    {
+                        user.Uuid = Guid.Parse(uuidClaim.Value);
+                        _userRepository.Update(user);
+                    }
+                }
+
+                if (user != null)
+                {
+                    FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
+                    var response = CreateLoginResponse(user);
+                    return Created(response);
+                }
             }
 
             return Unauthorized();

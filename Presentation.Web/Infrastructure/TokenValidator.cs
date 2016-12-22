@@ -10,6 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Web;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -58,8 +59,9 @@ namespace Presentation.Web.Infrastructure
                     var jwksuri = (string) openidConfig.jwks_uri;
                     var jwksjson = wc.DownloadString(jwksuri);
                     var jwks = JsonConvert.DeserializeObject<dynamic>(jwksjson);
-                    result.SigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(jwks)));
-
+                    var keys = (JArray) jwks.keys;
+                    var cert = keys.First.Single(t => t.Path.Contains("x5c")).First.First.ToString();
+                    result.SigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(cert)));
                 }
             }
             catch (Exception)
