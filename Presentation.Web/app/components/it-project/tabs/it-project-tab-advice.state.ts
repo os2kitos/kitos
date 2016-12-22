@@ -25,7 +25,14 @@
                 }],
                 type: [function () {
                     return "itProject";
-                }]
+                }],
+                hasWriteAccess: [
+                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                        return $http.get("api/itProject/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }]
             }
         });
     }]);
