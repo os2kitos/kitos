@@ -89,19 +89,22 @@
                 <div class="form-group">
                     <label class="control-label" for="date">Fra dato</label>
                     <input id="date" type="text" name="date" placeholder="Dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErr(startDate,stopDate)'>
+                    <span>{{startDateErrMessage}}</span>
                 </div>
 
                 <!--Dato-->
                 <div class="form-group">
                     <label class="control-label" for="stopDate">Til Dato</label>
                     <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErr(startDate,stopDate)'>
+                    <span>{{stopDateErrMessage}}</span>
                 </div>
+
             </div>
         </div>
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !!repitionPattern && !!stopDate &&  startDate)">Gem</button>
+                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !!repitionPattern && !!stopDate &&  startDate && checkErr(startDate,stopDate))">Gem</button>
                 <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
                 <input type="hidden" ng-model="hiddenForjob" />
             </div>

@@ -215,6 +215,7 @@
                             payload.Scheduling = $scope.repitionPattern;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
+                            payload.StopDate.setHours(23,59,59,99);
 
                             if (action == 'POST') {
                                 url = "Odata/advice";
@@ -249,6 +250,17 @@
                             var url = "Odata/advice";
                             var payload = createPayload();
                             httpCall(payload, action, url);
+                        };
+
+                        $scope.checkErr = function (startDate, endDate) {
+                            $scope.errMessage = '';
+                            $scope.curDate = new Date();
+                            if (startDate > endDate) {
+                                $scope.stopDateErrMessage = '\'Til Dato\' skal være senere end eller samme som \'Fra dato\'!';
+                                return false;
+                            }
+                            $scope.stopDateErrMessage = '';
+                            return true;
                         };
 
                         $scope.tinymceOptions = {
