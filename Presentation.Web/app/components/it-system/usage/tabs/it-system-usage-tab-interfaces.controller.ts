@@ -99,6 +99,8 @@
                 resolveTypes(interfaceExposure);
             });
             $scope.interfaceExposures = exhibits;
+            console.log("$scope.interfaceExposures: " + $scope.interfaceExposures);
+
 
             $scope.itSystemUsageSelectOptions = selectLazyLoading("api/itSystemUsage", ["organizationId=" + itSystemUsage.organizationId]);
             function selectLazyLoading(url, paramAry) {

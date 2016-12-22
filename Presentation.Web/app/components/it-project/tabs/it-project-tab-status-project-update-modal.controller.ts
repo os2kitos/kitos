@@ -78,8 +78,6 @@
                         delete payload.CombinedStatus;
                     }
 
-                    console.log(payload);
-
                     var msg = notify.addInfoMessage("Gemmer ændringer...", false);
                     $http({
                         method: "POST",
