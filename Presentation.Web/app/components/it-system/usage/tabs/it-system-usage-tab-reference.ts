@@ -8,8 +8,8 @@
     }]);
 
     app.controller("it-system-usage.EditReference",
-        ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify",
-            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage,$confirm,notify) {
+        ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify","hasWriteAccess",
+            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage,$confirm,notify,hasWriteAccess) {
 
                 $scope.objectId = itSystemUsage.id;
 
@@ -120,7 +120,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</a>"
+                            template: "<a id=\"addReferenceasdasd\" data-ng-disabled=\"" + !hasWriteAccess +"\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</a>"
                         }]
                 };
             }]);
