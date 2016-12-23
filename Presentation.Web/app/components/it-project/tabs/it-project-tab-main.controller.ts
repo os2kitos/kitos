@@ -3,10 +3,7 @@
         $stateProvider.state("it-project.edit.main", {
             url: "/main",
             templateUrl: "app/components/it-project/tabs/it-project-tab-main.view.html",
-            controller: "project.EditMainCtrl",
-            resolve: {
-               
-            }
+            controller: "project.EditMainCtrl"
         });
     }]);
 

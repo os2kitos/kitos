@@ -62,7 +62,8 @@
             $scope.interfaceTypes = interfaceTypes;
             $scope.methods = methods;
             $scope.dataTypes = dataTypes;
-            let isDisabled = (itInterface.disabled) ?" (Inaktiv)" : "";
+
+            let isDisabled = (itInterface.exhibitedByItSystemDisabled) ? " (Inaktiv)" : "";
             $scope.exposedByObj = !itInterface.exhibitedByItSystemId ? null : { id: itInterface.exhibitedByItSystemId, text: itInterface.exhibitedByItSystemName + isDisabled };
             itInterface.updateUrl = 'api/itInterface/' + itInterface.id;
             $scope.system = itInterface;
