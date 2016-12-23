@@ -131,7 +131,29 @@
         <tbody>
             <tr ng-repeat="admin in ctrl.vmOrgAdmin">
                 <td><input type="checkbox" ng-model="adminModel" ng-change="ctrl.collectionUpdate('OrganizationRights', admin, adminModel)" /></td>
-                <td>{{admin.Role}}</td>
+                <td>
+                    <div ng-show="admin.Role === 'LocalAdmin'">
+                        Lokal admin
+                    </div>
+                    <div ng-show="admin.Role === 'OrganizationModuleAdmin'">
+                        Organisations admin
+                    </div>
+                    <div ng-show="admin.Role === 'ProjectModuleAdmin'">
+                        Projekt admin
+                    </div>
+                    <div ng-show="admin.Role === 'SystemModuleAdmin'">
+                        System admin
+                    </div>
+                    <div ng-show="admin.Role === 'ContractModuleAdmin'">
+                        Kontrakt admin
+                    </div>
+                    <div ng-show="admin.Role === 'ReportModuleAdmin'">
+                        Rapport admin
+                    </div>
+                    <div ng-show="admin.Role === 'GlobalAdmin'">
+                        Global admin
+                    </div>
+                </td>
                 <td ng-show="adminModel">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
                 <td ng-hide="adminModel"> </td>
                 <td><button class="glyphicon glyphicon-trash" ng-click="ctrl.delete('OrganizationRights', admin)"></button></td>
