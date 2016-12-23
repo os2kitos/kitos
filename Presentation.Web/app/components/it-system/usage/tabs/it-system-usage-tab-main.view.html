@@ -25,41 +25,17 @@
                         data-field="localCallName"
                         data-autosave="api/itSystemUsage/{{usageId}}">
             </div>
-
-            <!-- sensitive data -->
             <div class="form-group">
-                <select-option data-id="sensitive"
-                                data-label="Persondata"
-                                data-placeholder="Vælg persondata"
-                                data-selected-text="{{ usage.sensitiveDataTypeName }}"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.sensitiveDataTypeId"
-                                data-options="sensitiveDataTypes"
-                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                data-field="sensitiveDataTypeId">
-                </select-option>
-            </div>
-            <!-- archiving -->
-            <!--<div class="form-group">
-                <select-option data-id="archive"
-                               data-label="Arkivering"
-                               data-placeholder="Vælg arkivering"
-                               data-selected-text="{{ usage.archiveTypeName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.archiveTypeId"
-                               data-options="archiveTypes"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                               data-field="archiveTypeId">
-                </select-option>
-                <span class="help-block small">&nbsp;</span>
-            </div>-->
-            <!-- note -->
-            <div class="form-group">
-                <label for="note" class="control-label small">Note</label>
-                <textarea id="note" class="form-control input-sm" rows="5"
-                          data-ng-model="usage.note"
-                          data-ng-disabled="!hasWriteAccess"
-                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
+                <label for="sensitive" class="control-label">Følsom persondata</label>
+                <select class="form-control input-sm" id="sensitive"
+                        data-ui-select2="Options"
+                        data-placeholder="Vælg persondata"
+                        data-ng-model="usage.sensitiveDataTypeId"
+                        data-ng-change="saveSensitive()"
+                        data-ng-disabled="!hasWriteAccess">
+                    <option value=""></option>
+                    <option data-ng-repeat="sensitiveDataType in sensitiveDataTypes" value="{{sensitiveDataType.Id}}">{{sensitiveDataType.Name}}</option>
+                </select>
             </div>
             <!-- note -->
             <div class="form-group">

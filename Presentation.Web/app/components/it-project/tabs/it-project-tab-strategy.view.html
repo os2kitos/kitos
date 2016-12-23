@@ -10,33 +10,31 @@
     </div>
     <div class="panel-body">
         <form role="form">
+            
             <div class="form-group">
                 <label for="jointDrop" class="control-label">Fælleskommunel digitaliseringsstrategi</label>
-                <select class="form-control input-sm" id="jointDrop"
-                        data-ui-select2="allowClearOption"
+                <select id="jointDrop" class="form-control input-sm"
+                        data-ui-select2="Options"
                         data-placeholder="Vælg fælleskommunel projekt"
+                        data-ng-disabled="!projectEditVm.hasWriteAccess"
                         data-ng-model="jointMunicipalProjectId"
-                        data-autosave="{{ autosaveUrl }}"
-                        data-field="jointMunicipalProjectId"
-                        data-ng-disabled="!projectEditVm.hasWriteAccess">
+                        data-ng-change="savejoint()">
                     <option value=""></option>
                     <option data-ng-repeat="jointMunicipalProject in jointMunicipalProjects" value="{{jointMunicipalProject.id}}">{{jointMunicipalProject.name}}</option>
                 </select>
-                <button id="jointDropbtn" class="btn pull-right" ng-click="clear()">Nulstil</button>
             </div>
+            
             <div class="form-group">
                 <label for="commonDrop" class="control-label">Fællesoffentlig digitaliseringsstrategi</label>
                 <select class="form-control input-sm" id="commonDrop"
-                        data-ui-select2="allowClearOption"
+                        data-ui-select2="Options"
                         data-placeholder="Vælg fællesoffentlig projekt"
                         data-ng-model="commonPublicProjectId"
-                        data-autosave="{{ autosaveUrl }}"
-                        data-field="commonPublicProjectId"
+                        data-ng-change="savecommon()"
                         data-ng-disabled="!projectEditVm.hasWriteAccess">
                     <option value=""></option>
                     <option data-ng-repeat="commonPublicProject in commonPublicProjects" value="{{commonPublicProject.id}}">{{commonPublicProject.name}}</option>
                 </select>
-                <button id="commonDropbtn" class="btn pull-right" ng-click="clearCommon()">Nulstil</button>
             </div>
         </form>
     </div>
