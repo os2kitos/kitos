@@ -25,7 +25,7 @@
                                 return result.data.response;
                             });
                     }
-                ],
+                ]
             }
         });
     }]);
