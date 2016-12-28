@@ -6,7 +6,7 @@
                 <span class="glyphicon glyphicon-list"></span>
                 <h7 class="panel-title">Organisation</h7>
                 <span class="pull-right">
-                    <a ng-if="!dragEnabled" data-ng-click="toggleDrag()">Omstrukturer</a>
+                    <a ng-if="chosenOrgUnit.hasWriteAccess && !dragEnabled" data-ng-click="toggleDrag()">Omstrukturer</a>
                     <a ng-if="dragEnabled" data-ng-click="toggleDrag()">Færdig</a>
                     <span class="pull-right" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
                     <span data-ng-show="chosenOrgUnit.hasWriteAccess">
