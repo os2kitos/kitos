@@ -3,349 +3,352 @@
         <help-text data-key="it_contract_deadlines" data-default-title="IT kontrakt - Aftalefrister"></help-text>
     </div>
 </div>
+<div class="object-section-container">
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">Anskaffelse</div>
+                <form role="form" name="trialForm">
+                    <table class="table table-condensed small">
+                        <thead>
+                            <tr>
+                                <th class="col-xs-4">Overtagelsesprøver</th>
+                                <th class="col-xs-4">Forventet</th>
+                                <th class="col-xs-4">Godkendt</th>
+                                <th><!-- control --></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="ht in handoverTrials">
+                                <td>
+                                    <div class="form-group">
+                                        <select-option data-id="contract-handover-trial"
+                                                       data-placeholder="Vælg overtagelsesprøve"
+                                                       data-selected-text="{{ ht.handoverTrialTypeName }}"
+                                                       data-ng-disabled="!hasWriteAccess"
+                                                       data-ng-model="ht.handoverTrialTypeId"
+                                                       data-options="handoverTrialTypes"
+                                                       data-auto-save-url="api/handoverTrial/{{ ht.id }}"
+                                                       data-field="handoverTrialTypeId">
+                                        </select-option>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control handover-trial-expected-date"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="ht.expected"
+                                           data-autosave="api/handoverTrial/{{ ht.id }}"
+                                           data-field="expected">
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control handover-trial-approved-date"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="ht.approved"
+                                           data-autosave="api/handoverTrial/{{ ht.id }}"
+                                           data-field="approved">
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm handover-trial-delete"
+                                            data-ng-show="hasWriteAccess"
+                                            data-ng-click="deleteTrial(ht.id)">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot data-ng-show="hasWriteAccess">
+                            <tr>
+                                <td>
+                                    <div class="form-group">
+                                        <select-option data-id="handover-trial"
+                                                       data-placeholder="Vælg overtagelsesprøve"
+                                                       data-ng-model="handoverTrial.handoverTrialTypeId"
+                                                       data-options="handoverTrialTypes">
+                                        </select-option>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input id="handover-trial-expected-date"
+                                           type="text"
+                                           class="form-control"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="handoverTrial.expected">
+                                </td>
+                                <td>
+                                    <input id="handover-trial-approved-date"
+                                           type="text"
+                                           class="form-control"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="handoverTrial.approved">
+                                </td>
+                                <td>
+                                    <button id="handover-trial-add"
+                                            class="btn btn-success btn-sm"
+                                            data-ng-click="saveTrial(handoverTrial)">
+                                        Gem
+                                    </button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </form>
 
-<div class="col-xs-6">
-    <div class="panel panel-default">
-        <div class="panel-heading">Anskaffelse</div>
-        <form role="form" name="trialForm">
-            <table class="table table-condensed small">
-                <thead>
-                    <tr>
-                        <th class="col-xs-4">Overtagelsesprøver</th>
-                        <th class="col-xs-4">Forventet</th>
-                        <th class="col-xs-4">Godkendt</th>
-                        <th><!-- control --></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-ng-repeat="ht in handoverTrials">
-                        <td>
-                            <div class="form-group">
-                                <select-option data-id="contract-handover-trial"
-                                               data-placeholder="Vælg overtagelsesprøve"
-                                               data-selected-text="{{ ht.handoverTrialTypeName }}"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               data-ng-model="ht.handoverTrialTypeId"
-                                               data-options="handoverTrialTypes"
-                                               data-auto-save-url="api/handoverTrial/{{ ht.id }}"
-                                               data-field="handoverTrialTypeId">
-                                </select-option>
+                <form role="form" name="milestoneForm">
+                    <table class="table table-condensed small">
+                        <thead>
+                            <tr>
+                                <th class="col-xs-4">Betalingsmilepæle</th>
+                                <th class="col-xs-4">Forventet</th>
+                                <th class="col-xs-4">Godkendt</th>
+                                <th><!-- control --></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in paymentMilestones">
+                                <td>
+                                    <input type="text"
+                                           class="form-control input-sm payment-milestone"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="item.title"
+                                           data-autosave="api/paymentMilestone/{{item.id}}"
+                                           data-field="title">
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control payment-milestone-expected-date"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="item.expected"
+                                           data-autosave="api/paymentMilestone/{{ item.id }}"
+                                           data-field="expected">
+                                </td>
+                                <td>
+                                    <input type="text"
+                                           class="form-control payment-milestone-approved-date"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="item.approved"
+                                           data-autosave="api/paymentMilestone/{{ item.id }}"
+                                           data-field="approved">
+                                </td>
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-danger btn-sm payment-milestone-delete"
+                                            data-ng-show="hasWriteAccess"
+                                            data-ng-click="deleteMilestone(item.id)">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot data-ng-show="hasWriteAccess">
+                            <tr>
+                                <td>
+                                    <input id="payment-milestone"
+                                           type="text"
+                                           class="form-control input-sm"
+                                           data-ng-model="paymentMilestone.title">
+                                </td>
+                                <td>
+                                    <input id="payment-milestone-expected-date"
+                                           type="text"
+                                           class="form-control"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="paymentMilestone.expected">
+                                </td>
+                                <td>
+                                    <input id="payment-milestone-approved-date"
+                                           type="text"
+                                           class="form-control"
+                                           data-kendo-date-picker
+                                           data-k-options="datepickerOptions"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="paymentMilestone.approved">
+                                </td>
+                                <td>
+                                    <button id="payment-milestone-add"
+                                            class="btn btn-success btn-sm"
+                                            data-ng-click="saveMilestone(paymentMilestone)">
+                                        Gem
+                                    </button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-xs-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Aftalefrister</div>
+                <div class="panel-body">
+                    <!--div class="form-group">
+                    <label for="agreement-concluded" class="control-label small">
+                        Gyldig fra
+                    </label>
+                    <input id="agreement-concluded"
+                           type="text"
+                           class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="contract.concluded"
+                           data-autosave="{{autosaveUrl}}"
+                           data-field="concluded">
+                    </div-->
+                    <div class="form-group">
+                        <label for="agreement-duration" class="control-label small">Varighed</label>
+                        <div>
+                            <div id="agreement-duration" class="contractDurationLayout">
+                                <input type="number" id="year"
+                                       min="0"
+                                       data-ng-model="durationYears"
+                                       data-ng-disabled="!hasWriteAccess || durationOngoing"
+                                       data-ng-blur="saveDurationYears()" />
+                                <label for="year" style="font-size:12px">År</label>
+                                <input type="number" id="month"
+                                       min="0"
+                                       max="11"
+                                       data-ng-model="durationMonths"
+                                       data-ng-disabled="!hasWriteAccess || durationOngoing"
+                                       data-ng-blur="saveDurationMonths()" />
+                                <label for="month" style="font-size:12px">Måneder</label>
+                                    <input type="checkbox" id="idl"
+                                           data-ng-checked="durationOngoing"
+                                           data-ng-click="saveOngoingStatus()"
+                                           data-ng-model="durationOngoing"
+                                           data-ng-disabled="!hasWriteAccess" />
+                                    <label for="idl" style="font-size: 12px">Løbende</label>
                             </div>
-                        </td>
-                        <td>
-                            <input type="text"
-                                   class="form-control handover-trial-expected-date"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="ht.expected"
-                                   data-autosave="api/handoverTrial/{{ ht.id }}"
-                                   data-field="expected">
-                        </td>
-                        <td>
-                            <input type="text"
-                                   class="form-control handover-trial-approved-date"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="ht.approved"
-                                   data-autosave="api/handoverTrial/{{ ht.id }}"
-                                   data-field="approved">
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-danger btn-sm handover-trial-delete"
-                                    data-ng-show="hasWriteAccess"
-                                    data-ng-click="deleteTrial(ht.id)">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot data-ng-show="hasWriteAccess">
-                    <tr>
-                        <td>
-                            <div class="form-group">
-                                <select-option data-id="handover-trial"
-                                               data-placeholder="Vælg overtagelsesprøve"
-                                               data-ng-model="handoverTrial.handoverTrialTypeId"
-                                               data-options="handoverTrialTypes">
-                                </select-option>
-                            </div>
-                        </td>
-                        <td>
-                            <input id="handover-trial-expected-date"
-                                   type="text"
-                                   class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="handoverTrial.expected">
-                        </td>
-                        <td>
-                            <input id="handover-trial-approved-date"
-                                   type="text"
-                                   class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="handoverTrial.approved">
-                        </td>
-                        <td>
-                            <button id="handover-trial-add"
-                                    class="btn btn-success btn-sm"
-                                    data-ng-click="saveTrial(handoverTrial)">
-                                Gem
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </form>
-
-        <form role="form" name="milestoneForm">
-            <table class="table table-condensed small">
-                <thead>
-                    <tr>
-                        <th class="col-xs-4">Betalingsmilepæle</th>
-                        <th class="col-xs-4">Forventet</th>
-                        <th class="col-xs-4">Godkendt</th>
-                        <th><!-- control --></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-ng-repeat="item in paymentMilestones">
-                        <td>
-                            <input type="text"
-                                   class="form-control input-sm payment-milestone"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="item.title"
-                                   data-autosave="api/paymentMilestone/{{item.id}}"
-                                   data-field="title">
-                        </td>
-                        <td>
-                            <input type="text"
-                                   class="form-control payment-milestone-expected-date"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="item.expected"
-                                   data-autosave="api/paymentMilestone/{{ item.id }}"
-                                   data-field="expected">
-                        </td>
-                        <td>
-                            <input type="text"
-                                   class="form-control payment-milestone-approved-date"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="item.approved"
-                                   data-autosave="api/paymentMilestone/{{ item.id }}"
-                                   data-field="approved">
-                        </td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-danger btn-sm payment-milestone-delete"
-                                    data-ng-show="hasWriteAccess"
-                                    data-ng-click="deleteMilestone(item.id)">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot data-ng-show="hasWriteAccess">
-                    <tr>
-                        <td>
-                            <input id="payment-milestone"
-                                   type="text"
-                                   class="form-control input-sm"
-                                   data-ng-model="paymentMilestone.title">
-                        </td>
-                        <td>
-                            <input id="payment-milestone-expected-date"
-                                   type="text"
-                                   class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="paymentMilestone.expected">
-                        </td>
-                        <td>
-                            <input id="payment-milestone-approved-date"
-                                   type="text"
-                                   class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="paymentMilestone.approved">
-                        </td>
-                        <td>
-                            <button id="payment-milestone-add"
-                                    class="btn btn-success btn-sm"
-                                    data-ng-click="saveMilestone(paymentMilestone)">
-                                Gem
-                            </button>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </form>
-    </div>
-</div>
-
-<div class="col-xs-3">
-    <div class="panel panel-default">
-        <div class="panel-heading">Aftalefrister</div>
-        <div class="panel-body">
-            <!--div class="form-group">
-                <label for="agreement-concluded" class="control-label small">
-                    Gyldig fra
-                </label>
-                <input id="agreement-concluded"
-                       type="text"
-                       class="form-control"
-                       data-kendo-date-picker
-                       data-k-options="datepickerOptions"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.concluded"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="concluded">
-            </div-->
-            <div class="form-group">
-                <label for="agreement-duration" class="control-label small">Varighed</label>
-                <div>
-                    <div class="contractDurationLayout">
-                        <input type="number"
-                               min="0"
-                               data-ng-model="durationYears"
-                               data-ng-disabled="!hasWriteAccess || durationOngoing"
-                               data-ng-blur="saveDurationYears()" />
-                        <label>År</label>
-                        <input type="number"
-                               min="0"
-                               max="11"
-                               data-ng-model="durationMonths"
-                               data-ng-disabled="!hasWriteAccess || durationOngoing"
-                               data-ng-blur="saveDurationMonths()" />
-                        <label>Måneder</label>
-                        <input type="checkbox"
-                               data-ng-checked="durationOngoing"
-                               data-ng-click="saveOngoingStatus()"
-                               data-ng-model="durationOngoing"
-                               data-ng-disabled="!hasWriteAccess" />
-                        <label>Løbende</label>
+                        </div>
                     </div>
+                    <div class="form-group">
+                        <select-option data-id="agreement-option-extend"
+                                       data-label="Option forlæng"
+                                       data-placeholder="Vælg forlængelse"
+                                       data-selected-text="{{ contract.optionExtendName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="contract.optionExtendId"
+                                       data-options="optionExtensions"
+                                       data-auto-save-url="{{ autosaveUrl }}"
+                                       data-field="optionExtendId">
+                        </select-option>
+                    </div>
+                    <div class="form-group">
+                        <label for="agreement-option-extend-multiplier" class="control-label small">Antal brugte optioner</label>
+                        <input id="agreement-option-extend-multiplier"
+                               type="number"
+                               min="0"
+                               max="3"
+                               class="form-control input-sm"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.extendMultiplier"
+                               data-autosave="{{autosaveUrl}}"
+                               data-field="extendMultiplier">
+                    </div>
+                    <div class="form-group">
+                        <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
+                        <input type="text" class="form-control" id="agreement-irrevocable"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="contract.irrevocableTo"
+                               data-autosave="{{autosaveUrl}}"
+                               data-field="irrevocableTo">
+                    </div>
+                    <!--div class="form-group">
+                    <label for="agreement-expiration" class="control-label small">Gyldig til</label>
+                    <input type="text" class="form-control" id="agreement-expiration"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="contract.expirationDate"
+                           data-autosave="{{autosaveUrl}}"
+                           data-field="expirationDate">
+                    </div-->
                 </div>
             </div>
-            <div class="form-group">
-                <select-option data-id="agreement-option-extend"
-                               data-label="Option forlæng"
-                               data-placeholder="Vælg forlængelse"
-                               data-selected-text="{{ contract.optionExtendName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.optionExtendId"
-                               data-options="optionExtensions"
-                               data-auto-save-url="{{ autosaveUrl }}"
-                               data-field="optionExtendId">
-                </select-option>
-            </div>
-            <div class="form-group">
-                <label for="agreement-option-extend-multiplier" class="control-label small">Antal brugte optioner</label>
-                <input id="agreement-option-extend-multiplier"
-                       type="number"
-                       min="0"
-                       max="3"
-                       class="form-control input-sm"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.extendMultiplier"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="extendMultiplier">
-            </div>
-            <div class="form-group">
-                <label for="agreement-irrevocable" class="control-label small">Uopsigelig til</label>
-                <input type="text" class="form-control" id="agreement-irrevocable"
-                       data-kendo-date-picker
-                       data-k-options="datepickerOptions"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.irrevocableTo"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="irrevocableTo">
-            </div>
-            <!--div class="form-group">
-                <label for="agreement-expiration" class="control-label small">Gyldig til</label>
-                <input type="text" class="form-control" id="agreement-expiration"
-                       data-kendo-date-picker
-                       data-k-options="datepickerOptions"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.expirationDate"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="expirationDate">
-            </div-->
         </div>
-    </div>
-</div>
 
 
-<div class="col-xs-3">
-    <div class="panel panel-default">
-        <div class="panel-heading">Opsigelse</div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
-                <input type="text" class="form-control" id="agreement-terminated"
-                       data-kendo-date-picker
-                       data-k-options="datepickerOptions"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.terminated"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="terminated">
-            </div>
-
-            <div class="form-group">
-                <select-option data-id="agreement-notice"
-                               data-label="Opsigelsesfrist (måneder)"
-                               data-placeholder="Vælg opsigelsesfrist"
-                               data-selected-text="{{ contract.terminationDeadlineName }}"
+        <div class="col-xs-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">Opsigelse</div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="agreement-terminated" class="control-label small">Kontrakten opsagt</label>
+                        <input type="text" class="form-control" id="agreement-terminated"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.terminationDeadlineId"
-                               data-options="terminationDeadlines"
-                               data-auto-save-url="{{ autosaveUrl }}"
-                               data-field="terminationDeadlineId">
-                </select-option>
-            </div>
+                               data-ng-model="contract.terminated"
+                               data-autosave="{{autosaveUrl}}"
+                               data-field="terminated">
+                    </div>
 
-            <div class="form-group">
-                <label for="agreement-running" class="control-label small">Løbende</label>
-                <select id="agreement-running"
-                        class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg varighed"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="contract.running"
-                        data-autosave="{{autosaveUrl}}"
-                        data-field="running">
-                    <option value=""></option>
-                    <option value="calendarYear">Kalenderår</option>
-                    <option value="quater">Kvartal</option>
-                    <option value="month">Måned</option>
-                </select>
-            </div>
+                    <div class="form-group">
+                        <select-option data-id="agreement-notice"
+                                       data-label="Opsigelsesfrist (måneder)"
+                                       data-placeholder="Vælg opsigelsesfrist"
+                                       data-selected-text="{{ contract.terminationDeadlineName }}"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="contract.terminationDeadlineId"
+                                       data-options="terminationDeadlines"
+                                       data-auto-save-url="{{ autosaveUrl }}"
+                                       data-field="terminationDeadlineId">
+                        </select-option>
+                    </div>
 
-            <div class="form-group">
-                <label for="agreement-by-ending" class="control-label small">Inden udgangen af</label>
-                <select id="agreement-by-ending"
-                        class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg varighed"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="contract.byEnding"
-                        data-autosave="{{autosaveUrl}}"
-                        data-field="byEnding">
-                    <option value=""></option>
-                    <option value="calendarYear">Kalenderår</option>
-                    <option value="quater">Kvartal</option>
-                    <option value="month">Måned</option>
-                </select>
+                    <div class="form-group">
+                        <label for="agreement-running" class="control-label small">Løbende</label>
+                        <select id="agreement-running"
+                                class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg varighed"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="contract.running"
+                                data-autosave="{{autosaveUrl}}"
+                                data-field="running">
+                            <option value=""></option>
+                            <option value="calendarYear">Kalenderår</option>
+                            <option value="quater">Kvartal</option>
+                            <option value="month">Måned</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agreement-by-ending" class="control-label small">Inden udgangen af</label>
+                        <select id="agreement-by-ending"
+                                class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Vælg varighed"
+                                data-ng-disabled="!hasWriteAccess"
+                                data-ng-model="contract.byEnding"
+                                data-autosave="{{autosaveUrl}}"
+                                data-field="byEnding">
+                            <option value=""></option>
+                            <option value="calendarYear">Kalenderår</option>
+                            <option value="quater">Kvartal</option>
+                            <option value="month">Måned</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
