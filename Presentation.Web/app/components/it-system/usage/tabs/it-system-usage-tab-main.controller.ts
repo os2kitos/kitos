@@ -75,6 +75,27 @@
 
             $scope.itSytemUsagesSelectOptions = selectLazyLoading('api/itSystemUsage', false, ['organizationId=' + itSystemUsage.organizationId]);
 
+            $scope.Options = {
+                allowClear: true,
+                initSelection: function (element, callback) {
+                    callback({ id: 1, text: 'Text' });
+                }
+            };
+            $scope.saveSensitive = () => {
+                var payload;
+                // if empty the value has been cleared
+                if ($scope.usage.sensitiveDataTypeId === "") {
+                    payload = { "sensitiveDataTypeId": null };
+                } else {
+                    var id = $scope.usage.sensitiveDataTypeId;
+                    payload = { "sensitiveDataTypeId": id };
+                }
+                $http.patch(`api/itSystemUsage/${$scope.usage.id}?organizationId=${itSystemUsage.organizationId}`, payload)
+                    .then(() => {
+                        notify.addSuccessMessage("Feltet er opdateret!");
+                    },
+                    () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+            };
             function selectLazyLoading(url, excludeSelf, paramAry) {
                 return {
                     minimumInputLength: 1,
