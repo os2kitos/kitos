@@ -9,10 +9,10 @@
 
     app.controller("it-system-usage.EditReference",
         ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify","hasWriteAccess",
-            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage,$confirm,notify,hasWriteAccess) {
-
+            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage, $confirm, notify, hasWriteAccess) {
+                console.log(hasWriteAccess);
                 $scope.objectId = itSystemUsage.id;
-
+                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.objectReference = 'it-system.usage.references.create';
                 
                 $scope.references = itSystemUsage.externalReferences;
@@ -120,7 +120,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" data-ng-disabled=\"" + !hasWriteAccess +"\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</a>"
+                            template: "<button id=\"addReferenceasdasd\" data-ng-disabled=\"" + !$scope.hasWriteAccess +"\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</button>"
                         }]
                 };
             }]);
