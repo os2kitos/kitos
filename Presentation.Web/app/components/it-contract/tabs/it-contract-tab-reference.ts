@@ -123,7 +123,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: `<a id="addReference" data-ng-disabled='${!hasWriteAccess}' class="btn btn-success btn-sm" href="\\#/contract/edit/${contract.id}/reference/createReference/${contract.id}">#=text#</a>`
+                            template: `<button id="addReference" data-ng-disabled='${!$scope.hasWriteAccess}' class="btn btn-success btn-sm" href="\\#/contract/edit/${contract.id}/reference/createReference/${contract.id}">#=text#</button>`
                         }]
                 };
             }]);

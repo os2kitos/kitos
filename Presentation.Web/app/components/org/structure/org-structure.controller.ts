@@ -29,7 +29,7 @@
                         "userService", function (userService) {
                             return userService.getUser();
                         }
-                    ],
+                    ]
                 }
             });
         }

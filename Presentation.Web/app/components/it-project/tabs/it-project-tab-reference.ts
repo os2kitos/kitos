@@ -114,7 +114,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" data-ng-disabled=\""+!hasWriteAccess+"\" class=\"btn btn-success btn-sm\" href=\"\\#/project/edit/" + project.id + "/reference/createReference/" + project.id +"\"'>#=text#</a>"
+                            template: "<button id=\"addReferenceasdasd\" data-ng-disabled=\""+!$scope.hasWriteAccess+"\" class=\"btn btn-success btn-sm\" href=\"\\#/project/edit/" + project.id + "/reference/createReference/" + project.id +"\"'>#=text#</button>"
                         }]
                 };
             }]);
