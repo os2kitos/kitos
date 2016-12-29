@@ -37,6 +37,12 @@
             $scope.allowClearOption = {
                 allowClear: true
             };
+
+            if (!$scope.hasWriteAccess) {
+                _.remove($rootScope.page.subnav.buttons, function (o:any) {
+                    return o.text === "Fjern anvendelse";
+                });
+            }
         }
     ]);
 })(angular, app);
