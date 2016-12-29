@@ -430,5 +430,15 @@ namespace Presentation.Web.Controllers.API
         {
             _itSystemUsageService.Delete(entity.Id);
         }
+
+        protected override bool HasWriteAccess(ItSystemUsage obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
+        }
     }
 }

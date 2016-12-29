@@ -13,7 +13,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Organizations`,
+                            url: `/odata/Organizations?$expand=Type`,
                             dataType: "json"
                         }
                     },
@@ -86,40 +86,18 @@
                         }
                     },
                     {
-                        field: "TypeId", title: "Type", width: 230,
+                        field: "Type.Name", title: "Type", width: 230,
                         persistId: "type", // DON'T YOU DARE RENAME!
                         hidden: false,
-                        template: (dataItem) => {
-                            switch (dataItem.TypeId) {
-                                case 1:
-                                    return "Kommune";
-                                case 2:
-                                    return "Interessefællesskab";
-                                case 3:
-                                    return "Virksomhed";
-                                case 4:
-                                    return "Anden offentlig myndighed";
-                            }
-                        },
-                        excelTemplate: (dataItem) => {
-                            switch (dataItem.TypeId) {
-                                case 1:
-                                    return "Kommune";
-                                case 2:
-                                    return "Interessefællesskab";
-                                case 3:
-                                    return "Virksomhed";
-                                case 4:
-                                    return "Anden offentlig myndighed";
-                            }
-                        },
+                        template: (dataItem) => dataItem.Type.Name,
+                        excelTemplate: (dataItem) => dataItem.Type.Name,
                         filterable: {
                             cell: {
                                 template: function (args) {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Kommune", typeId: 1 }, { type: "Interessefællesskab", typeId: 2 }, { type: "Virksomhed", typeId: 3 }, { type: "Anden offentlig myndighed", typeId: 4 }],
+                                        dataSource: [{ type: "Kommune", value: "Kommune" }, { type: "Interessefællesskab", value: "Interessefællesskab" }, { type: "Virksomhed", value: "Virksomhed" }, { type: "Anden offentlig myndighed", value: "Anden offentlig myndighed" }],
                                         dataTextField: "type",
-                                        dataValueField: "typeId",
+                                        dataValueField: "value",
                                         valuePrimitive: true
                                     });
                                 },

@@ -255,7 +255,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "IT System Overblik.xlsx",
+                    fileName: "IT Project inaktive.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -452,15 +452,18 @@
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusTime = latestStatus.TimeStatus;
+                                var statusQuality = latestStatus.QualityStatus;
+                                var statusResources = latestStatus.ResourcesStatus;
                                 if (latestStatus.IsCombined) {
                                     return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
                                 } else {
                                     /* If no combined status exists, take the lowest status from the splitted status */
-                                    if (latestStatus.TimeStatus === "Red" || latestStatus.QualityStatus === "Red" || latestStatus.ResourcesStatus === "Red") {
+                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
                                         return "<span data-square-traffic-light='Red'></span>";
-                                    } else if (latestStatus.TimeStatus === "Yellow" || latestStatus.QualityStatus === "Yellow" || latestStatus.ResourcesStatus === "Yellow") {
+                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
                                         return "<span data-square-traffic-light='Yellow'></span>";
-                                    } else if (latestStatus.TimeStatus === "Green" || latestStatus.QualityStatus === "Green" || latestStatus.ResourcesStatus === "Green") {
+                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
                                         return "<span data-square-traffic-light='Green'></span>";
                                     } else {
                                         return "<span data-square-traffic-light='White'></span>";
@@ -473,15 +476,18 @@
                         excelTemplate: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusTime = latestStatus.TimeStatus;
+                                var statusQuality = latestStatus.QualityStatus;
+                                var statusResources = latestStatus.ResourcesStatus;
                                 if (latestStatus.IsCombined) {
                                     return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
                                 } else {
                                     /* If no combined status exists, take the lowest status from the splitted status */
-                                    if (latestStatus.TimeStatus === "Red" || latestStatus.QualityStatus === "Red" || latestStatus.ResourcesStatus === "Red") {
+                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
                                         return "<span data-square-traffic-light='Red'></span>";
-                                    } else if (latestStatus.TimeStatus === "Yellow" || latestStatus.QualityStatus === "Yellow" || latestStatus.ResourcesStatus === "Yellow") {
+                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
                                         return "<span data-square-traffic-light='Yellow'></span>";
-                                    } else if (latestStatus.TimeStatus === "Green" || latestStatus.QualityStatus === "Green" || latestStatus.ResourcesStatus === "Green") {
+                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
                                         return "<span data-square-traffic-light='Green'></span>";
                                     } else {
                                         return "<span data-square-traffic-light='White'></span>";
