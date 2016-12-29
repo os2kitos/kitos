@@ -156,5 +156,15 @@ namespace Presentation.Web.Controllers.API
 
             return base.Patch(id, organizationId, obj);
         }
+
+        protected override bool HasWriteAccess(Organization obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
+        }
     }
 }
