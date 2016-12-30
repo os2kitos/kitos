@@ -11,8 +11,8 @@
         <!-- Default organizationunit -->
         <div class="form-group">
             <label class="col-xs-3 control-label">Primær organisationsenhed</label>
-            <div class="col-xs-8">
-                <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit=""></div>
+            <div class="col-xs-8 ng-cloak">
+                <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>
             </div>
         </div>
         <!-- User name -->
