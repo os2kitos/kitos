@@ -5,6 +5,7 @@
                 url: '/edit/{id:[0-9]+}',
                 templateUrl: 'app/components/it-contract/it-contract-edit.view.html',
                 controller: 'contract.EditCtrl',
+                controllerAs: "contractEditVm",
                 resolve: {
                     contract: [
                         '$http', '$stateParams', function ($http, $stateParams) {

@@ -38,7 +38,16 @@
                             .then(function (result) {
                                 return result.data.response;
                             });
-                    }]
+                    }],
+                advicename: [
+                    '$http', '$stateParams', function ($http, $stateParams) {
+                        var interfaceId = $stateParams.id;
+                        return $http.get('api/itInterface/' + interfaceId)
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }
+                ]
             }
         });
     }]);

@@ -26,6 +26,13 @@
                 type: [function () {
                     return "itContract";
                 }],
+                advicename: [
+                    '$http', '$stateParams', function ($http, $stateParams) {
+                        return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
+                            return result.data.response;
+                        });
+                    }
+                ],
                 hasWriteAccess: [
                     '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
                         return $http.get("api/itcontract/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)

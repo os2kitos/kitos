@@ -4,97 +4,102 @@
     </div>
 </div>
 
-<!-- Project Roles -->
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <i class="glyphicon glyphicon-user"></i>
-        Projektroller
+<div class="object-section-container">
+    <h4>{{projectEditVm.project.name}}</h4>
+    <!-- Project Roles -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-user"></i>
+            Projektroller
+        </div>
+        <table class="full-width table org-role-table">
+            <thead>
+                <tr>
+                    <th>
+                        <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('roleName')">Projektrolle</button>
+                    </th>
+                    <th>
+                        <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('userName')">Navn</button>
+                    </th>
+                    <th>
+                        <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('userEmail')">Email</button>
+                    </th>
+                </tr>
+            </thead>
+            <!-- for each right -->
+            <tbody data-ng-repeat="right in projectRolesVm.rights | filter : { show: true } | orderBy : projectRolesVm.rightSort : projectRolesVm.rightSortReverse">
+                <!-- show -->
+                <tr data-ng-hide="right.edit">
+                    <td>{{ right.role.Name }} <span data-ng-if="!projectRolesVm.checkIfRoleIsAvailable(right.role.Id)">(udgået)</span> <a uib-tooltip="{{ right.role.Description }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
+                    <td>{{ right.user.fullName }}</td>
+                    <td>
+                        {{ right.user.email }}
+                        <div class="pull-right"
+                             data-ng-show="projectEditVm.hasWriteAccess">
+                            <a class="btn btn-info btn-xs edit-right"
+                               data-ng-click="right.edit = true">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </a>
+                            <a class="btn btn-danger btn-xs delete-right"
+                               data-confirmed-click="projectRolesVm.deleteRight(right)"
+                               data-confirm-click="Er du sikker på at du vil slette?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- edit -->
+                <tr data-ng-show="right.edit">
+                    <td>
+                        <select class="form-control input-sm"
+                                name="selectRole"
+                                data-ui-select2=""
+                                data-ng-model="right.roleForSelect">
+                            <option data-ng-show="!projectRolesVm.checkIfRoleIsAvailable(right.role.Id)"
+                                    disabled="disabled"
+                                    value="{{right.role.Id}}">
+                                {{right.role.Name}} (Inaktiv rolle)
+                            </option>
+                            <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles"
+                                    value="{{projectRole.Id}}">
+                                {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
+                            </option>
+                        </select>
+                    </td>
+                    <td colspan="2" class="relative-position">
+                        <input data-select-user="foo" data-org-id="{{projectRolesVm.orgId}}" data-user-model="right.userForSelect" />
+                        <div class="pull-outside-table">
+                            <input type="submit" class="btn btn-success btn-sm" data-ng-click="projectRolesVm.updateRight(right)" value="Gem" />
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <!-- add-new-right row -->
+            <tbody data-ng-hide="!projectEditVm.hasWriteAccess">
+                <tr>
+                    <td>
+                        <select id="add-right-role"
+                                name="selectRole"
+                                class="form-control input-sm"
+                                data-ui-select2=""
+                                data-ng-model="projectRolesVm.newRole"
+                                data-placeholder="Vælg en projektrolle"
+                                data-ng-change="projectRolesVm.submitRight()">
+                            <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.Id}}">
+                                {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
+                            </option>
+                        </select>
+                    </td>
+                    <td colspan="2" class="form-group">
+                        <input id="add-right-user"
+                               data-select-user="foo"
+                               data-org-id="{{projectRolesVm.orgId}}"
+                               data-user-model="projectRolesVm.selectedUser" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <table class="full-width table org-role-table">
-        <thead>
-            <tr>
-                <th>
-                    <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('roleName')">Projektrolle</button>
-                </th>
-                <th>
-                    <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('userName')">Navn</button>
-                </th>
-                <th>
-                    <button class="btn btn-link btn-header" data-ng-click="projectRolesVm.rightSortChange('userEmail')">Email</button>
-                </th>
-            </tr>
-        </thead>
-        <!-- for each right -->
-        <tbody data-ng-repeat="right in projectRolesVm.rights | filter : { show: true } | orderBy : projectRolesVm.rightSort : projectRolesVm.rightSortReverse">
-            <!-- show -->
-            <tr data-ng-hide="right.edit">
-                <td>{{ right.role.Name }} <span data-ng-if="!projectRolesVm.checkIfRoleIsAvailable(right.role.Id)">(udgået)</span> <a uib-tooltip="{{ right.role.Description }}"><i class="fa fa-info-circle" aria-hidden="true"></i></a></td>
-                <td>{{ right.user.fullName }}</td>
-                <td>
-                    {{ right.user.email }}
-                    <div class="pull-right"
-                         data-ng-show="projectEditVm.hasWriteAccess">
-                        <a class="btn btn-info btn-xs edit-right"
-                           data-ng-click="right.edit = true">
-                            <i class="glyphicon glyphicon-pencil"></i>
-                        </a>
-                        <a class="btn btn-danger btn-xs delete-right"
-                           data-confirmed-click="projectRolesVm.deleteRight(right)"
-                           data-confirm-click="Er du sikker på at du vil slette?">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
-                    </div>
-                </td>
-            </tr>
-
-            <!-- edit -->
-            <tr data-ng-show="right.edit">
-                <td>
-                    <select class="form-control input-sm"
-                            name="selectRole"
-                            data-ui-select2=""
-                            data-ng-model="right.roleForSelect">
-                        <option data-ng-show="!projectRolesVm.checkIfRoleIsAvailable(right.role.Id)"
-                                disabled="disabled"
-                                value="{{right.role.Id}}">{{right.role.Name}} (Inaktiv rolle)</option>
-                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles"
-                                value="{{projectRole.Id}}">
-                            {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
-                        </option>
-                    </select>
-                </td>
-                <td colspan="2" class="relative-position">
-                    <input data-select-user="foo" data-org-id="{{projectRolesVm.orgId}}" data-user-model="right.userForSelect" />
-                    <div class="pull-outside-table">
-                        <input type="submit" class="btn btn-success btn-sm" data-ng-click="projectRolesVm.updateRight(right)" value="Gem" />
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-
-        <!-- add-new-right row -->
-        <tbody data-ng-hide="!projectEditVm.hasWriteAccess">
-            <tr>
-                <td>
-                    <select id="add-right-role"
-                            name="selectRole"
-                            class="form-control input-sm"
-                            data-ui-select2=""
-                            data-ng-model="projectRolesVm.newRole"
-                            data-placeholder="Vælg en projektrolle"
-                            data-ng-change="projectRolesVm.submitRight()">
-                        <option data-ng-repeat="projectRole in projectRolesVm.activeItProjectRoles" value="{{projectRole.Id}}">
-                            {{projectRole.Name}} ({{projectRole.HasWriteAccess && "skriv" || "læs" }})
-                        </option>
-                    </select>
-                </td>
-                <td colspan="2" class="form-group">
-                    <input id="add-right-user"
-                           data-select-user="foo"
-                           data-org-id="{{projectRolesVm.orgId}}"
-                           data-user-model="projectRolesVm.selectedUser" />
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </div>

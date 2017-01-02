@@ -1,9 +1,10 @@
 ﻿(function (ng, app) {
-    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 'hasWriteAccess',
-        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type, hasWriteAccess) {
+    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 'advicename', 'hasWriteAccess',
+        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type, advicename, hasWriteAccess) {
             $scope.type = type;
             $scope.object = object;
             $scope.hasWriteAccess = hasWriteAccess;
+            $scope.advicename = advicename;
             $scope.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -435,6 +436,10 @@
                     }],
                     currentUser: ["userService",
                         (userService) => userService.getUser()
+                    ],
+                    advicename: [ () => {
+                            return $scope.advicename;
+                        }
                     ],
                     hasWriteAccess: [function () {
                         return $scope.hasWriteAccess;
