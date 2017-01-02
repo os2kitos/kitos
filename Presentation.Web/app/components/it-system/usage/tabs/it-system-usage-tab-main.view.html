@@ -67,9 +67,7 @@
                        value="{{usage.objectOwnerFullName}}">
             </div>
             <div class="form-group">
-                <label for="agreement-concluded" class="control-label small">
-                    Dato for ibrugtagning
-                </label>
+                <label for="agreement-concluded" class="control-label small"> Ibrugtagningsdato</label>
                 <input id="agreement-concluded"
                        type="text"
                        class="form-control"
@@ -82,7 +80,7 @@
                        data-field="concluded">
             </div>
             <div class="form-group">
-                <label for="agreement-expiration" class="control-label small">Slutdato for brug</label>
+                <label for="agreement-expiration" class="control-label small">Slutdato for anvendelse</label>
                 <input type="text" class="form-control" id="agreement-expiration"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
@@ -93,7 +91,7 @@
                        data-field="expirationDate">
             </div>
             <div class="checkbox" style="position: absolute; left: 0;">
-                <input type="checkbox" id="system-int-signed" 
+                <input type="checkbox" id="system-int-signed"
                        class="tags-checkbox sr-only"
                        data-ng-model="usage.active"
                        data-ng-disabled="!hasWriteAccess"
