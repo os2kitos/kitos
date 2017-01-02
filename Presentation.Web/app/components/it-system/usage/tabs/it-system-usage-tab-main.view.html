@@ -87,6 +87,7 @@
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-model="usage.expirationDate"
+                       data-ng-disabled="!hasWriteAccess"
                        data-ng-blur="checkSystemValidity()"
                        data-autosave="{{ autosaveUrl2 }}"
                        data-field="expirationDate">

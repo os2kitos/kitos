@@ -196,7 +196,7 @@
                     <div class="form-group">
                         <!-- Intern contract signer -->
                         <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                        <typeahead id="contract-int-signer"
+                        <input type="text" id="contract-int-signer" class="form-control input-sm"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave-url="{{ autoSaveUrl }}"
                                    data-items="kitosUsers"
@@ -249,6 +249,7 @@
                     <input type="text" class="form-control" id="agreement-expiration"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.expirationDate"
                            data-ng-blur="checkContractValidity()"
                            data-autosave="{{ autosaveUrl2 }}"
