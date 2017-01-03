@@ -3,9 +3,6 @@
         <div class="col-xs-4">
             <!-- About -->
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Om KITOS?</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-group" data-ng-if="user.isGlobalAdmin">
                         <textarea ui-tinymce="tinymceOptions" data-ng-model="texts.about.value"></textarea>
@@ -13,16 +10,10 @@
                     <button class="btn" data-ng-if="user.isGlobalAdmin" data-ng-click="save(texts.about)">Gem</button>
                     <div data-ng-bind-html="texts.about.value" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
-                <div class="panel-footer">
-                    <a href="http://os2.eu/produkt/os2kitos" target="_blank">Klik her for at læse mere</a>
-                </div>
             </div>
 
             <!-- Join -->
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Hvordan kommer I med på løsningen?</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-group" data-ng-if="user.isGlobalAdmin">
                         <textarea ui-tinymce="tinymceOptions" data-ng-model="texts.join.value"></textarea>
@@ -35,9 +26,6 @@
 
         <div class="col-xs-4">
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Hjælp og vejledning til KITOS</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-group" data-ng-if="user.isGlobalAdmin">
                         <textarea ui-tinymce="tinymceOptions" data-ng-model="texts.guide.value"></textarea>
@@ -95,9 +83,6 @@
 
             <!-- Support -->
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Support</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-group" data-ng-if="user.isGlobalAdmin">
                         <textarea ui-tinymce="tinymceOptions" data-ng-model="texts.support.value"></textarea>
@@ -105,16 +90,10 @@
                     <button class="btn" data-ng-if="user.isGlobalAdmin" data-ng-click="save(texts.support)">Gem</button>
                     <div data-ng-bind-html="texts.support.value" data-ng-if="!user.isGlobalAdmin"></div>
                 </div>
-                <div class="panel-footer">
-                    <a href="/docs/LokaladministratoreroversigtKitos.pdf" target="_blank">klik her for kontaktinfo på din lokale administrator</a>
-                </div>
             </div>
 
             <!-- Status -->
             <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Driftstatus</h3>
-                </div>
                 <div class="panel-body">
                     <div class="form-group" data-ng-if="user.isGlobalAdmin">
                         <textarea ui-tinymce="tinymceOptions" data-ng-model="texts.status.value"></textarea>
