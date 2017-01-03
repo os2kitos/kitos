@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
-                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !_authService.IsGlobalAdmin(UserId))
+                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !(_authService.IsGlobalAdmin(UserId) || this._authService.IsLocalAdmin(UserId)))
                 {
                     result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
                 }

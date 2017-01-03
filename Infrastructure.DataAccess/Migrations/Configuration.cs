@@ -625,17 +625,19 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 context.Texts.AddOrUpdate(new Text()
                 {
-                    Value = @"KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
+                    Value = @"<h3>Om KITOS?</h3> <p>KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
 Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
 KITOS er bygget op omkring flg. moduler:
-1.	IT understøttelse af organisation
-2.	IT Projekter
-3.	IT Systemer
-4.	IT Kontrakter
+<ol>
+    <li>IT understøttelse af organisation</li>
+    <li>IT Projekter</li>
+    <li>IT Systemer</li>
+    <li>IT Kontrakter</li>
+</ol>
  Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
 De første kommuner tager KITOS i brug i oktober 2014.
 Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
-Kontakt: info@kitos.dk",
+Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her for at læse mere</a></p>",
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
                 });
@@ -643,13 +645,13 @@ Kontakt: info@kitos.dk",
 
             if (!context.Texts.Any(x => x.Id == 2))
             {
-                context.Texts.AddOrUpdate( new Text() { Value = "Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                context.Texts.AddOrUpdate( new Text() { Value = "<h3>Driftstatus</h3> Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
             }
 
             if (!context.Texts.Any(x => x.Id == 3))
             {
                 context.Texts.AddOrUpdate(new Text() {
-                    Value = @"<ul class='list-unstyled'>
+                    Value = @"<h3>Hjælp og vejledning til KITOS</h3> <ul class='list-unstyled'>
                         <li><a href='/docs/Vejledning til slutbrugeren.pdf' target='_blank'>Vejledning til login og brugerkonto</a></li>
                         <li><a href='/docs/Vejledning_Masseopret.pdf' target='_blank'>Vejledning til lokale administratorer</a></li>
                         <li><a href='/docs/Vejledning til roller og rettigheder.pdf' target='_blank'>Vejledning til roller og rettigheder</a></li>
@@ -668,13 +670,13 @@ Kontakt: info@kitos.dk",
 
             if (!context.Texts.Any(x => x.Id == 4))
             {
-                context.Texts.AddOrUpdate(new Text() { Value = "Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                context.Texts.AddOrUpdate(new Text() { Value = "<h3>Support</h3> <p>Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.</p> <p><a href='https://kitostest.miracle.dk/docs/LokaladministratoreroversigtKitos.pdf'>Klik her for kontaktinfo på din lokale administrator</p>", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
             }
 
             if (!context.Texts.Any(x => x.Id == 5))
             {
                 context.Texts.AddOrUpdate(new Text() {
-                    Value = @"<p>Gør følgende for at tilslutte jer KITOS:</p>
+                    Value = @"<h3>Hvordan kommer I med på løsningen?</h3> <p>Gør følgende for at tilslutte jer KITOS:</p>
                     <ol>
                         <li>Læs tilslutningsaftalen <a href='http://os2.eu/dokument/kitos-tilslutningsaftale-publiceret'>her</a>.</li>
                         <li>
