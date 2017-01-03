@@ -618,14 +618,25 @@
                                 return "Løbende";
                             }
 
-                            let years = dataItem.DurationYears || 0;
-                            let months = dataItem.DurationMonths || 0;
+                            const years = dataItem.DurationYears || 0;
+                            const months = dataItem.DurationMonths || 0;
+
+                            if (years === 0 && months === 0) {
+                                return "Ikke angivet";
+                            }
+
+                            if (years > 0 && months > 0 && months < 2)
+                                return `${years} år og ${months} måned`;
 
                             if (years > 0 && months > 0)
                                 return `${years} år og ${months} måneder`;
 
-                            if (years < 1 && months > 0)
+                            if (years < 1 && months > 0 && months > 1)
                                 return `${months} måneder`;
+
+                            if (years < 1 && months < 2) {
+                                return `${months} måned`;
+                            }
 
                             if (years > 0 && months < 1)
                                 return `${years} år`;
