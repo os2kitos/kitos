@@ -116,7 +116,7 @@
             this.vmItContracts = itContracts;
             this.vmOrgUnits = orgUnits;
             this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
-            console.log(this.vmOrgAdmin);
+            //console.log(this.vmOrgAdmin);
             this.itemSelected = false;
             this.isUserSelected = true;
             this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;
@@ -143,7 +143,7 @@
                     rightId: object.Id,
                     objectId: object.ObjectId
                 };
-                
+
                 if (module === "OrganizationUnitRights") {
                     this.orgRoles.add(object.Id, userRoles);
                 }
@@ -187,7 +187,7 @@
                 this.disableBtns(this.isUserSelected);
             }
         }
-        
+
         public patchData() {
             var orgRoles = this.orgRoles;
             var projRoles = this.projectRoles;
@@ -376,7 +376,7 @@
             }
         }
     }
-    
+
     angular
         .module("app")
         .config(["$stateProvider", ($stateProvider: ng.ui.IStateProvider) => {
@@ -441,7 +441,7 @@
                                             .then((currentUser) => organizationService.GetOrganizationUnitDataById($stateParams["id"], `${currentUser.currentOrganizationId}`)
                                                 .then(result => result.data.value))
                                 ],
-                                orgAdmin: ["$http", "userService", "organizationService", 
+                                orgAdmin: ["$http", "userService", "organizationService",
                                     ($http: ng.IHttpService, userService, organizationService) =>
                                         userService.getUser()
                                             .then((currentUser) => organizationService.GetOrganizationData($stateParams["id"], `${currentUser.currentOrganizationId}`)
