@@ -30,6 +30,14 @@
         }
 
         private save() {
+            //Check duplicates
+            var key = this.selectedHelpText.Key;
+            var id = this.selectedHelpText.Id;
+            if (_.find(this.helpTexts, function (o: Models.IHelpText) { return (o.Id != id && o.Key === key); })) {
+                this.notify.addErrorMessage("Fejl! Der findes allerede en hjælpetekst med den angivne key.", true);
+                return;
+            }
+
             var msg = this.notify.addInfoMessage("Gemmer...", false);
             this.$http({ method: 'PATCH', url: "odata/HelpTexts(" + this.selectedHelpText.Id + ")", data: this.selectedHelpText, ignoreLoadingBar: true })
                 .success(function () {

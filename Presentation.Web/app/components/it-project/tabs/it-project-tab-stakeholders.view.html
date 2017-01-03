@@ -5,7 +5,7 @@
 </div>
 
 <div class="object-section-container">
-    <h4>Økonomi</h4>
+    <h4>{{projectEditVm.project.name}}</h4>
     <div class="row">
         <div class="col-xs-12">
             <form role="form" name="stakeholderForm">
@@ -130,7 +130,7 @@
                             </td>
                             <td>
                                 <div class="pull-right">
-                                    <button id="save-stakeholder" class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
+                                    <button id="save-stakeholder" type="submit" class="btn btn-success btn-sm" data-ng-click="saveNewStakeholder()">
                                         Gem
                                     </button>
                                 </div>

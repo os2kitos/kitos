@@ -1,9 +1,10 @@
 ﻿(function (ng, app) {
-    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 
-        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type) {
+    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 'advicename', 'hasWriteAccess',
+        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type, advicename, hasWriteAccess) {
             $scope.type = type;
             $scope.object = object;
-
+            $scope.hasWriteAccess = hasWriteAccess;
+            $scope.advicename = advicename;
             $scope.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -82,9 +83,13 @@
                         {
                             template: (dataItem) => {
                                 var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
-                                return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
-                                                        <button id="add-advice" ng-hide="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
-                                    `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                                if (hasWriteAccess) {
+                                    return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle"></button>
+                                                        <button id="add-advice" ng-hide="${isActive}"  class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
+                                        `<button id="add-advice" class="glyphicon glyphicon-trash"  data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                                } else {
+                                    return 'Ingen rettigheder';
+                                }
                             }
                         }
                 ],
@@ -92,7 +97,7 @@
                         {
                             name: "opretRolle",
                             text: "Opret rolle",
-                            template: "<button id=\"add-advice\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" > </i> Ny</button>"
+                            template: "<button id=\"add-advice\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
                         }
                     ],
                 pageable: {
@@ -151,6 +156,7 @@
             }
             $scope.newAdvice = function (action, id) {
 
+                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
                 var modalInstance = $modal.open({
 
@@ -430,7 +436,14 @@
                     }],
                     currentUser: ["userService",
                         (userService) => userService.getUser()
-                    ]
+                    ],
+                    advicename: [ () => {
+                            return $scope.advicename;
+                        }
+                    ],
+                    hasWriteAccess: [function () {
+                        return $scope.hasWriteAccess;
+                    }]
                 }
             });
         }

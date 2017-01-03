@@ -25,6 +25,7 @@
 
         public static $inject: Array<string> = [
             "$scope",
+            "$rootScope",
             "$http",
             "_",
             "project",
@@ -35,14 +36,20 @@
 
         constructor(
             private $scope: ng.IScope,
+            private $rootScope,
             private $http: ng.IHttpService,
             private _: ILoDashWithMixins,
             public project,
             public projectTypes,
             private user,
             public hasWriteAccess) {
-            
             this.autosaveUrl = `api/itproject/${this.project.id}`;
+
+            if (!hasWriteAccess) {
+                _.remove($rootScope.page.subnav.buttons, function (o:any) {
+                    return o.text === "Slet IT Projekt";
+                });
+            }
         }
     }
 

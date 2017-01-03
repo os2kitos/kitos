@@ -37,25 +37,51 @@
     }]);
 
     app.controller("project.EditStrategyCtrl",
-    ["$scope", "project", "jointMunicipalProjects", "commonPublicProjects",
-        function ($scope, project, jointMunicipalProjects, commonPublicProjects) {
-            $scope.isStrategy = project.isStrategy;
-            $scope.jointMunicipalProjectId = project.jointMunicipalProjectId;
-            $scope.jointMunicipalProjects = jointMunicipalProjects;
-            $scope.commonPublicProjectId = project.commonPublicProjectId;
-            $scope.commonPublicProjects = commonPublicProjects;
+        ["$scope", "$http", "notify", "project", "jointMunicipalProjects", "commonPublicProjects",
+            function($scope, $http, notify, project, jointMunicipalProjects, commonPublicProjects) {
+                $scope.isStrategy = project.isStrategy;
+                $scope.jointMunicipalProjectId = project.jointMunicipalProjectId;
+                $scope.jointMunicipalProjects = jointMunicipalProjects;
+                $scope.commonPublicProjectId = project.commonPublicProjectId;
+                $scope.commonPublicProjects = commonPublicProjects;
 
-            $scope.autosaveUrl = "api/itproject/" + project.id;
+                $scope.Options = {
+                    allowClear: true,
+                    initSelection: function (element, callback) {
+                        callback({ id: 1, text: 'Text' });
+                    }
+                };
 
-            $scope.clear = () => {
-                $scope.jointMunicipalProjectId = undefined;
-                $scope.jointMunicipalProjects = undefined;
-            };
+                $scope.savejoint = () => {
+                    var payload;
+                        // if empty the value has been cleared
+                        if ($scope.jointMunicipalProjectId === "") {
+                            payload = { "JointMunicipalProjectId": null };
+                        } else {
+                            var id = $scope.jointMunicipalProjectId;
+                            payload = { "JointMunicipalProjectId": id };
+                    }
+                        $http.patch(`/odata/ItProjects(${project.id})`, payload)
+                            .then(() => {
+                                    notify.addSuccessMessage("Feltet er opdateret!");
+                                },
+                                () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                };
 
-            $scope.clearCommon = () => {
-                $scope.commonPublicProjectId = undefined;
-                $scope.commonPublicProjects = undefined;
-            };
-
+                $scope.savecommon = () => {
+                    var payload;
+                    // if empty the value has been cleared
+                    if ($scope.commonPublicProjectId === "") {
+                        payload = { "CommonPublicProjectId": null };
+                    } else {
+                        var id = $scope.commonPublicProjectId;
+                        payload = { "CommonPublicProjectId": id };
+                    }
+                    $http.patch(`/odata/ItProjects(${project.id})`, payload)
+                        .then(() => {
+                            notify.addSuccessMessage("Feltet er opdateret!");
+                        },
+                        () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                };
         }]);
 })(angular, app);

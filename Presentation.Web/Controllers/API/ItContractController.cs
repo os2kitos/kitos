@@ -17,7 +17,11 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    using Core.DomainModel;
+    using Core.DomainModel.Organization;
+
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
+
     {
         private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
         private readonly IGenericRepository<ItContractRole> _roleRepository;
@@ -380,6 +384,16 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItContract entity)
         {
             _itContractService.Delete(entity.Id);
+        }
+
+        protected override bool HasWriteAccess(ItContract obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ContractModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

@@ -345,7 +345,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "IT System Overblik.xlsx",
+                    fileName: "IT Project Overblik.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -444,10 +444,9 @@
                             return "";
                         },
                         excelTemplate: dataItem => {
-                            if ((dataItem && dataItem.Reference.Title) === null) {
+                            if ((dataItem && dataItem.Reference) == null) {
                                 return "";
                             } else {
-
                                 return dataItem && dataItem.Reference.Title;
                             }
                         },

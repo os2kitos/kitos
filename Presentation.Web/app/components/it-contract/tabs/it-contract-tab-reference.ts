@@ -13,6 +13,7 @@
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
+                $scope.reference = contract;
 
                 $scope.objectId = contract.id;
                 $scope.objectReference = 'it-contract.edit.references.create';
@@ -101,14 +102,18 @@
                     }, {
                         title: "Rediger",
                         template: dataItem => {
-                            var HTML = "<button type='button' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
-                                + " <button type='button' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+                            var HTML = 'Ingen rettigheder';
 
-                            if ($scope.isValidUrl(dataItem.url)) {
-                                if (dataItem.id === contract.referenceId) {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
-                                } else {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
+                            if (hasWriteAccess) {
+                                HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
+                                    + " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+
+                                if ($scope.isValidUrl(dataItem.url)) {
+                                    if (dataItem.id === contract.referenceId) {
+                                        HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
+                                    } else {
+                                        HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\" data-ng-disabled='" + !$scope.hasWriteAccess +"' tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
+                                    }
                                 }
                             }
 
@@ -119,7 +124,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/contract/edit/" + contract.id + "/reference/createReference/" + contract.id + "\"'>#=text#</a>"
+                            template: `<button id="addReference" data-ng-disabled='${!$scope.hasWriteAccess}' class="btn btn-success btn-sm" href="\\#/contract/edit/${contract.id}/reference/createReference/${contract.id}">#=text#</button>`
                         }]
                 };
             }]);

@@ -5,6 +5,7 @@
                 url: '/edit/{id:[0-9]+}',
                 templateUrl: 'app/components/it-contract/it-contract-edit.view.html',
                 controller: 'contract.EditCtrl',
+                controllerAs: "contractEditVm",
                 resolve: {
                     contract: [
                         '$http', '$stateParams', function ($http, $stateParams) {
@@ -35,9 +36,14 @@
 
     app.controller('contract.EditCtrl',
     [
-        '$scope', '$http', '$stateParams', 'notify', 'contract', 'user', 'hasWriteAccess',
-        function ($scope, $http, $stateParams, notify, contract, user, hasWriteAccess) {
+        '$scope', '$rootScope', '$http', '$stateParams', 'notify', 'contract', 'user', 'hasWriteAccess',
+        function ($scope, $rootScope, $http, $stateParams, notify, contract, user, hasWriteAccess) {
             $scope.hasWriteAccess = hasWriteAccess;
 
+            if (!$scope.hasWriteAccess) {
+                _.remove($rootScope.page.subnav.buttons, function (o: any) {
+                    return o.text === "Slet IT Kontrakt";
+                });
+            }
         }]);
 })(angular, app);

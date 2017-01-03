@@ -42,6 +42,8 @@
                         .error(function (data, status) {
                             if (status === 409)
                                 msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
+                            else if (status === 401)
+                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             else
                                 msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
@@ -58,8 +60,11 @@
                             msg.toSuccessMessage('IT System anvendelsen er slettet!');
                             $state.go('it-system.overview');
                         })
-                        .error(function () {
-                            msg.toErrorMessage('Fejl! Kunne ikke slette IT System anvendelsen!');
+                        .error(function (error, status) {
+                            if (status === 401)
+                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
+                            else
+                                msg.toErrorMessage("Fejl! Kunne ikke slette IT System anvendelsen!");
                         });
                 }
 
@@ -77,6 +82,8 @@
                         .error(function (data, status) {
                             if (status == 409)
                                 msg.toErrorMessage('Fejl! Kan ikke slette snitflade, den er tilknyttet et IT System, som er i lokal anvendelse!');
+                            else if (status === 401)
+                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             else
                                 msg.toErrorMessage('Fejl! Kunne ikke slette Snitfladen!');
                         });

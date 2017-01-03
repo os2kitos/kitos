@@ -327,7 +327,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "IT Kontrakt Overblik.xlsx",
+                    fileName: "IT Kontrakt tid.xlsx",
                     filterable: true,
                     allPages: true
                 },

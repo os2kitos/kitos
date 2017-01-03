@@ -63,7 +63,7 @@
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
-
+                
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
@@ -98,7 +98,7 @@
                     // add 6 months for next iter
                     currentDate.add(6, 'months');
                 }
-
+                
                 var foundPlan: { id } = _.find($scope.procurementPlans, function (plan: { half; year; id; }) {
                     return plan.half == contract.procurementPlanHalf && plan.year == contract.procurementPlanYear;
                 });
@@ -222,6 +222,7 @@
                         }
                     };
                 }
+                console.log($scope.procurementPlans);
 
                 $scope.checkContractValidity = function () {
                     var expirationDateObject, concludedObject;

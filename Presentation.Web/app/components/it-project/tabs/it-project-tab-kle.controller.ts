@@ -38,7 +38,8 @@
                     $scope.pagination.skip = 0;
                     loadTasks();
                 });
-                $scope.$FwCollection("pagination", loadTasks);
+                //Ændrede metoden til $watchCollection fra $FwCollection
+                $scope.$watchCollection("pagination", loadTasks);
 
                 //change between show all tasks and only show active tasks
                 $scope.changeTaskView = function () {

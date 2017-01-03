@@ -25,41 +25,17 @@
                         data-field="localCallName"
                         data-autosave="api/itSystemUsage/{{usageId}}">
             </div>
-
-            <!-- sensitive data -->
             <div class="form-group">
-                <select-option data-id="sensitive"
-                                data-label="Persondata"
-                                data-placeholder="Vælg persondata"
-                                data-selected-text="{{ usage.sensitiveDataTypeName }}"
-                                data-ng-disabled="!hasWriteAccess"
-                                data-ng-model="usage.sensitiveDataTypeId"
-                                data-options="sensitiveDataTypes"
-                                data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                data-field="sensitiveDataTypeId">
-                </select-option>
-            </div>
-            <!-- archiving -->
-            <!--<div class="form-group">
-                <select-option data-id="archive"
-                               data-label="Arkivering"
-                               data-placeholder="Vælg arkivering"
-                               data-selected-text="{{ usage.archiveTypeName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.archiveTypeId"
-                               data-options="archiveTypes"
-                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                               data-field="archiveTypeId">
-                </select-option>
-                <span class="help-block small">&nbsp;</span>
-            </div>-->
-            <!-- note -->
-            <div class="form-group">
-                <label for="note" class="control-label small">Note</label>
-                <textarea id="note" class="form-control input-sm" rows="5"
-                          data-ng-model="usage.note"
-                          data-ng-disabled="!hasWriteAccess"
-                          data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
+                <label for="sensitive" class="control-label">Følsom persondata</label>
+                <select class="form-control input-sm" id="sensitive"
+                        data-ui-select2="Options"
+                        data-placeholder="Vælg persondata"
+                        data-ng-model="usage.sensitiveDataTypeId"
+                        data-ng-change="saveSensitive()"
+                        data-ng-disabled="!hasWriteAccess">
+                    <option value=""></option>
+                    <option data-ng-repeat="sensitiveDataType in sensitiveDataTypes" value="{{sensitiveDataType.Id}}">{{sensitiveDataType.Name}}</option>
+                </select>
             </div>
             <!-- note -->
             <div class="form-group">
@@ -91,9 +67,7 @@
                        value="{{usage.objectOwnerFullName}}">
             </div>
             <div class="form-group">
-                <label for="agreement-concluded" class="control-label small">
-                    Dato for ibrugtagning
-                </label>
+                <label for="agreement-concluded" class="control-label small"> Ibrugtagningsdato</label>
                 <input id="agreement-concluded"
                        type="text"
                        class="form-control"
@@ -106,17 +80,18 @@
                        data-field="concluded">
             </div>
             <div class="form-group">
-                <label for="agreement-expiration" class="control-label small">Slutdato for brug</label>
+                <label for="agreement-expiration" class="control-label small">Slutdato for anvendelse</label>
                 <input type="text" class="form-control" id="agreement-expiration"
                        data-kendo-date-picker
                        data-k-options="datepickerOptions"
                        data-ng-model="usage.expirationDate"
+                       data-ng-disabled="!hasWriteAccess"
                        data-ng-blur="checkSystemValidity()"
                        data-autosave="{{ autosaveUrl2 }}"
                        data-field="expirationDate">
             </div>
             <div class="checkbox" style="position: absolute; left: 0;">
-                <input type="checkbox" id="system-int-signed" 
+                <input type="checkbox" id="system-int-signed"
                        class="tags-checkbox sr-only"
                        data-ng-model="usage.active"
                        data-ng-disabled="!hasWriteAccess"

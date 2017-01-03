@@ -47,9 +47,11 @@
                 allowClear: true
             };
 
-           
-
-            if (user.isGlobalAdmin) {
+            if (!$scope.hasWriteAccess) {
+                _.remove($rootScope.page.subnav.buttons, function (o: any) {
+                    return o.text === "Slet Snitflade";
+                });
+            } else if (user.isGlobalAdmin) {
                 _.remove($rootScope.page.subnav.buttons, function (o) {
                     return o.text === "Deaktivér snitflade";
                 });

@@ -1,24 +1,26 @@
 ﻿<div class="clearfix">
     <help-text data-key="it_reference" data-default-title="Reference" class="pull-right"></help-text>
 </div>
-
-<div class="panel panel-default">
-    <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions"></div>
-</div>
-
-<div class="form-group">
-    <label for="contract-folder" class="control-label small">Mappe</label>
-    <div class="input-group">
-        <input type="text" id="contract-folder" class="form-control input-sm"
-               data-ng-disabled="!hasWriteAccess"
-               data-ng-model="contract.folder"
-               data-autosave="{{ autoSaveUrl }}"
-               data-field="folder">
-        <span class="input-group-btn">
-            <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.folder">
-                <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-            </button>
-        </span>
+<div class="object-section-container">
+    <h4>{{reference.name}}</h4>
+    <div class="panel panel-default">
+        <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions"></div>
     </div>
-    <span class="help-block small">Skal starte med http://</span>
+
+    <div class="form-group">
+        <label for="contract-folder" class="control-label small">Mappe</label>
+        <div class="input-group">
+            <input type="text" id="contract-folder" class="form-control input-sm"
+                   data-ng-disabled="!hasWriteAccess"
+                   data-ng-model="contract.folder"
+                   data-autosave="{{ autoSaveUrl }}"
+                   data-field="folder">
+            <span class="input-group-btn">
+                <button class="btn btn-sm btn-default" type="button" data-href-blank="contract.folder">
+                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+                </button>
+            </span>
+        </div>
+        <span class="help-block small">Skal starte med http://</span>
+    </div>
 </div>

@@ -36,6 +36,7 @@
         function ($scope, $http, notify, contract, itContractRights, itContractRoles, localItContractRoles, user) {
             var contractId = contract.id;
             $scope.orgId = user.currentOrganizationId;
+            $scope.contract = contract;
 
             //normal user roles
             $scope.activeItContractRoles = localItContractRoles;

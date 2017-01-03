@@ -296,7 +296,7 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
-                                return (dataItem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
+                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
                             else
                                 return "";
                         },

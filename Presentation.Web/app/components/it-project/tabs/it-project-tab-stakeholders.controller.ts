@@ -53,8 +53,8 @@
             $scope.saveNewStakeholder = function() {
                 $scope.$broadcast("show-errors-check-validity");
 
-                if ($scope.stakeholderForm.$invalid) { return; }
-
+                if (($scope.new.name == null) || ($scope.new.role == null) || ($scope.new.downsides == null) || ($scope.new.benefits == null) || ($scope.new.significance == null) || ($scope.new.howToHandle == null)) { return; }
+                
                 var row = $scope.new;
 
                 var data = {

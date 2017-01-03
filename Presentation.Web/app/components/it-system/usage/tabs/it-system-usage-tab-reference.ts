@@ -8,13 +8,13 @@
     }]);
 
     app.controller("it-system-usage.EditReference",
-        ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify",
-            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage,$confirm,notify) {
-
+        ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify","hasWriteAccess",
+            function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage, $confirm, notify, hasWriteAccess) {
                 $scope.objectId = itSystemUsage.id;
-
+                $scope.hasWriteAccess = hasWriteAccess;
                 $scope.objectReference = 'it-system.usage.references.create';
-                
+                $scope.reference = itSystemUsage.itSystem;
+
                 $scope.references = itSystemUsage.externalReferences;
 
                 $scope.setChosenReference = function (id) {
@@ -101,14 +101,14 @@
                     }, {
                         title: "Rediger",
                         template: dataItem => {
-                            var HTML = "<button type='button' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
-                                + " <button type='button' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+                            var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
+                                + " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === itSystemUsage.referenceId) {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess +"' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {
-                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
+                                    HTML = HTML + "<button data-uib-tooltip=\"Vis objekt i overblik\"  tooltip-placement='right' data-ng-disabled='" + !$scope.hasWriteAccess +"' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon' src=\"/Content/img/VisIOverblik.svg\"></img></button>";//vælg
 
                                 }
                             }
@@ -120,7 +120,7 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</a>"
+                            template: "<button id=\"addReferenceasdasd\" data-ng-disabled=\"" + !$scope.hasWriteAccess +"\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</button>"
                         }]
                 };
             }]);

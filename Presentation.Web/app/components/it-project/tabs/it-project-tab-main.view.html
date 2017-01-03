@@ -4,7 +4,7 @@
     </div>
 </div>
 
-<div class="object-section-container">
+<div class="object-section-container" ng-cloak>
     <h4 data-ng-bind="project.name"></h4>
     <div class="row">
         <!-- Left side -->
@@ -36,12 +36,13 @@
                     <div class="form-group">
                         <select-option data-id="project-type"
                                        data-label="Type"
+                                       data-ui-select2="Options"
                                        data-placeholder="Vælg projekt type"
                                        data-selected-text="{{ project.itProjectTypeName }}"
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="project.itProjectTypeId"
                                        data-options="projectTypes"
-                                       data-auto-save-url="{{ autosaveUrl }}"
+                                       data-ng-change="saveType()"
                                        data-field="itProjectTypeId">
                         </select-option>
                         <span class="help-block small">&nbsp;</span>
@@ -59,14 +60,14 @@
                         <input type="text" value="{{project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
                     </div>
                     <!-- access modifier -->
-                    <div class="form-group">
-                        <label for="project-access" class="control-label small">Synlighed</label>
+                    <div class="form-group ng-cloak">
+                        <label for="project-access" class="control-label small ng-cloak">Synlighed</label>
                         <input id="project-access" class="form-control input-sm"
                                data-ng-model="project.accessModifier"
                                data-select-access-modifier=""
                                data-field="accessModifier"
                                data-autosave="{{autosaveUrl}}"
-                               data-ng-disabled="!hasWriteAccess">
+                               data-ng-disabled="!global">
                     </div>
 
                 </div>

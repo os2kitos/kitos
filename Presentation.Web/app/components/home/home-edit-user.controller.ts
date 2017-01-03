@@ -65,10 +65,11 @@
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
             };
-
             $scope.updateDefaultOrgUnit = function() {
-                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function(newUser) {
-                    init(newUser);
+                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function (newUser) {
+                    var updatedUser = userService.getUser().then(
+                        (data) => { return data });
+                    //init(newUser);
                     notify.addSuccessMessage("Feltet er opdateret!");
                 }, function() {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");

@@ -21,5 +21,6 @@
         ItSystemUsages: Array<ItSystemUsage.IItSystemUsage>;
         /** Local configuration of KITOS */
         Config: IConfig;
+        Type: OrganizationType;
     }
 }
