@@ -61,7 +61,11 @@
                             this.selectedCategory = this.categories[0];
                         }
                         else {
-                            this.selectedCategory = this._.find(this.categories, 'Id', this.categoryTypeId);
+                            this.selectedCategory = this._.find(this.categories, function (obj: any) {
+                                if (obj.Id === rpt.CategoryTypeId) {
+                                    return obj;
+                                }
+                            });
                         }
                     })
                 }
