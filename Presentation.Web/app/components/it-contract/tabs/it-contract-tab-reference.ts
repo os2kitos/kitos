@@ -13,6 +13,7 @@
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
+                $scope.reference = contract;
 
                 $scope.objectId = contract.id;
                 $scope.objectReference = 'it-contract.edit.references.create';

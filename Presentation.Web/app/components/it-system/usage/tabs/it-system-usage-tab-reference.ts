@@ -10,11 +10,11 @@
     app.controller("it-system-usage.EditReference",
         ["$scope", "$http", "$timeout", "$state", "$stateParams","itSystemUsage","$confirm","notify","hasWriteAccess",
             function ($scope, $http, $timeout, $state, $stateParams, itSystemUsage, $confirm, notify, hasWriteAccess) {
-                console.log(hasWriteAccess);
                 $scope.objectId = itSystemUsage.id;
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.objectReference = 'it-system.usage.references.create';
-                
+                $scope.reference = itSystemUsage.itSystem;
+
                 $scope.references = itSystemUsage.externalReferences;
 
                 $scope.setChosenReference = function (id) {

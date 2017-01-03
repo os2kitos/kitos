@@ -51,6 +51,7 @@
             $scope.autoSaveUrl = "api/itcontract/" + $stateParams.id;
             $scope.exhibitedInterfaces = exhibitedInterfaces;
             $scope.usedInterfaces = usedInterfaces;
+            $scope.contract = contract;
 
             $scope.agreementElements = agreementElements;
             $scope.selectedAgreementElementIds = _.map(contract.agreementElements, "id");

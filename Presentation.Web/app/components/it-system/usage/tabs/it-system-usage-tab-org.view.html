@@ -1,24 +1,28 @@
 ﻿<div class="clearfix">
     <help-text data-key="it_system_usage_org" data-default-title="Organisation" class="pull-right"></help-text>
 </div>
-<div class="panel panel-default">
-    <div class="panel-heading">Organisation</div>
-    <div class="panel-body">
-        <div>
-            <div class="form-group">
-                <label class="control-label">Vælg ansvarlig organisationsenhed i blandt nedenstående</label>
-                <select id="responsible-org"
-                        class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Vælg ansvarlig organisationsenhed"
-                        data-ng-disabled="!hasWriteAccess"
-                        data-ng-model="responsibleOrgUnitId"
-                        data-ng-change="saveResponsible()">
-                    <option value=""></option>
-                    <option data-ng-repeat="orgUnit in selectedOrgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
-                </select>
+
+<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <div class="panel panel-default">
+        <div class="panel-heading">Organisation</div>
+        <div class="panel-body">
+            <div>
+                <div class="form-group">
+                    <label class="control-label">Vælg ansvarlig organisationsenhed i blandt nedenstående</label>
+                    <select id="responsible-org"
+                            class="form-control input-sm"
+                            data-ui-select2="allowClearOption"
+                            data-placeholder="Vælg ansvarlig organisationsenhed"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-ng-model="responsibleOrgUnitId"
+                            data-ng-change="saveResponsible()">
+                        <option value=""></option>
+                        <option data-ng-repeat="orgUnit in selectedOrgUnits" value="{{orgUnit.id}}">{{orgUnit.name}}</option>
+                    </select>
+                </div>
             </div>
+            <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'app/shared/organization-tree-item.html'"></div>
         </div>
-        <div data-ng-repeat="orgUnit in orgUnitsTree" data-ng-include="'app/shared/organization-tree-item.html'"></div>
     </div>
 </div>

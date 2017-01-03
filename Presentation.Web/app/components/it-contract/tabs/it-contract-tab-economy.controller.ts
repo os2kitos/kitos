@@ -18,6 +18,8 @@
 
     app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits', 'user',
         function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user) {
+            $scope.contract = contract;
+
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]

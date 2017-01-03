@@ -3,57 +3,61 @@
         <help-text data-key="it_contract_paymentmodel" data-default-title="IT kontrakt - Betalingsmodel"></help-text>
     </div>
 </div>
+<div class="object-section-container">
 
-<form role="form">
-    <div class="panel panel-default">
-        <div class="panel-heading">Betalingsmodel</div>
-        <div class="panel-body">
-            <div class="form-group">
-                <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
-                <input type="text" class="form-control" id="agreement-operation"
-                       data-kendo-date-picker
-                       data-k-options="datepickerOptions"
-                       data-ng-disabled="!hasWriteAccess"
-                       data-ng-model="contract.operationRemunerationBegun"
-                       data-autosave="{{autosaveUrl}}"
-                       data-field="operationRemunerationBegun">
-            </div>
-            <div class="form-group">
-                <select-option data-id="agreement-freq"
-                               data-label="Betalingsfrekvens"
-                               data-placeholder="Vælg betalingsfrekvens"
-                               data-selected-text="{{ contract.paymentFreqencyName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.paymentFreqencyId"
-                               data-options="paymentFrequencies"
-                               data-auto-save-url="{{ autosaveUrl }}"
-                               data-field="paymentFreqencyId">
-                </select-option>
-            </div>
-            <div class="form-group">
-                <select-option data-id="agreement-payment"
-                               data-label="Betalingsmodel"
-                               data-placeholder="Vælg betalingsmodel"
-                               data-selected-text="{{ contract.paymentModelName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.paymentModelId"
-                               data-options="paymentModels"
-                               data-auto-save-url="{{ autosaveUrl }}"
-                               data-field="paymentModelId">
-                </select-option>
-            </div>
-            <div class="form-group">
-                <select-option data-id="agreement-price"
-                               data-label="Prisregulering"
-                               data-placeholder="Vælg prisregulering"
-                               data-selected-text="{{ contract.priceRegulationName }}"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.priceRegulationId"
-                               data-options="priceRegulations"
-                               data-auto-save-url="{{ autosaveUrl }}"
-                               data-field="priceRegulationId">
-                </select-option>
+    <h4>{{contract.name}}</h4>
+
+    <form role="form">
+        <div class="panel panel-default">
+            <div class="panel-heading">Betalingsmodel</div>
+            <div class="panel-body">
+                <div class="form-group">
+                    <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
+                    <input type="text" class="form-control" id="agreement-operation"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="contract.operationRemunerationBegun"
+                           data-autosave="{{autosaveUrl}}"
+                           data-field="operationRemunerationBegun">
+                </div>
+                <div class="form-group">
+                    <select-option data-id="agreement-freq"
+                                   data-label="Betalingsfrekvens"
+                                   data-placeholder="Vælg betalingsfrekvens"
+                                   data-selected-text="{{ contract.paymentFreqencyName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.paymentFreqencyId"
+                                   data-options="paymentFrequencies"
+                                   data-auto-save-url="{{ autosaveUrl }}"
+                                   data-field="paymentFreqencyId">
+                    </select-option>
+                </div>
+                <div class="form-group">
+                    <select-option data-id="agreement-payment"
+                                   data-label="Betalingsmodel"
+                                   data-placeholder="Vælg betalingsmodel"
+                                   data-selected-text="{{ contract.paymentModelName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.paymentModelId"
+                                   data-options="paymentModels"
+                                   data-auto-save-url="{{ autosaveUrl }}"
+                                   data-field="paymentModelId">
+                    </select-option>
+                </div>
+                <div class="form-group">
+                    <select-option data-id="agreement-price"
+                                   data-label="Prisregulering"
+                                   data-placeholder="Vælg prisregulering"
+                                   data-selected-text="{{ contract.priceRegulationName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.priceRegulationId"
+                                   data-options="priceRegulations"
+                                   data-auto-save-url="{{ autosaveUrl }}"
+                                   data-field="priceRegulationId">
+                    </select-option>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>

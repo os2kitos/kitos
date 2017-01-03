@@ -32,7 +32,14 @@
                             .then(function (result) {
                                 return result.data.response;
                             });
-                    }]
+                    }],
+                advicename: [
+                    '$http', '$stateParams', function ($http, $stateParams) {
+                        return $http.get('api/itProject/' + $stateParams.id).then(function (result) {
+                            return result.data.response;
+                        });
+                    }
+                ]
             }
         });
     }]);
