@@ -84,9 +84,9 @@
                             template: (dataItem) => {
                                 var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
                                 if (hasWriteAccess) {
-                                    return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive} && ${!hasWriteAccess}" class="glyphicon glyphicon-ban-circle" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button>
-                                                        <button id="add-advice" ng-hide="${isActive}" data-ng-disabled="${!hasWriteAccess}" class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
-                                        `<button id="add-advice" class="glyphicon glyphicon-trash" data-ng-disabled="${!hasWriteAccess}" data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                                    return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle"></button>
+                                                        <button id="add-advice" ng-hide="${isActive}"  class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
+                                        `<button id="add-advice" class="glyphicon glyphicon-trash"  data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
                                 } else {
                                     return 'Ingen rettigheder';
                                 }
