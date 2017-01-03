@@ -16,7 +16,7 @@
                 $scope.moment = moment;
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.project = project;
-
+                $scope.global = user.isGlobalAdmin;
                 if ($scope.project.parentId) {
                     $scope.project.parent = {
                         id: $scope.project.parentId,

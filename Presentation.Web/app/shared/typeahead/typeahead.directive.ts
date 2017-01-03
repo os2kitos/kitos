@@ -12,7 +12,8 @@
                 model: "=ngModel",
                 stringModel: "=",
                 autosaveUrl: "@",
-                field: "@"
+                field: "@",
+                userHasWriteAccess: "="
             },
             templateUrl: "app/shared/typeahead/typeahead.view.html",
             link: function (scope: any, elem, attrs) {
