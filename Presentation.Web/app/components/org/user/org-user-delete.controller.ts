@@ -116,7 +116,6 @@
             this.vmItContracts = itContracts;
             this.vmOrgUnits = orgUnits;
             this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
-            //console.log(this.vmOrgAdmin);
             this.itemSelected = false;
             this.isUserSelected = true;
             this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;

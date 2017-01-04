@@ -5,6 +5,7 @@
             $scope.object = object;
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.advicename = advicename;
+
             $scope.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -414,7 +415,7 @@
                             return [];
                         }
                     }],
-                    advices: ['$http', '$stateParams', function ($http, $stateParams) {
+                    /*advices: ['$http', '$stateParams', function ($http, $stateParams) {
                       
                         switch ($scope.type) { 
                             case 'itContract':
@@ -434,7 +435,7 @@
                                     return result.data.response.advices;
                                 });
                     }
-                    }],
+                    }],*/
                     users: ['UserGetService', function (UserGetService) {
                         return UserGetService.GetAllUsers();
                     }],
