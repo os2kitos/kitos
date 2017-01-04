@@ -56,11 +56,12 @@ namespace Core.ApplicationServices
                             IsBodyHtml = true
                         };
 
-                       // message.From = new MailAddress("no_reply@kitos.dk");
+                   
 
                         //Add recivers for Email
                         foreach (var r in advice.Reciepients)
                         {
+                            //add To's
                             if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
                             {
                                 if (!string.IsNullOrEmpty(r.Name))
@@ -68,6 +69,39 @@ namespace Core.ApplicationServices
                                     message.To.Add(r.Name);
                                 }
                             }
+                            if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
+                            {
+                                switch (advice.Type)
+                                {
+                                    case ObjectType.itContract:
+
+                                        var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in itContractRoles) {
+                                                    message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                    case ObjectType.itProject:
+                                        var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in projectRoles)
+                                        {
+                                            message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                    case ObjectType.itSystemUsage:
+
+                                        var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in systemRoles)
+                                        {
+                                            message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                }
+                            }
+
+                            //ADD CCs
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
                             {
                                 if (!string.IsNullOrEmpty(r.Name))
@@ -77,19 +111,41 @@ namespace Core.ApplicationServices
                             }
                             if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
                             {
-
                                 switch (advice.Type)
                                 {
                                     case ObjectType.itContract:
 
-                                        var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
-                                       && I.Role.Name == r.Name);
-                                        if (result != null)
+                                        var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in itContractRoles)
                                         {
-                                            if (result.User != null)
-                                            {
-                                                message.CC.Add(result.User.Email);
-                                            }
+                                            message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                    case ObjectType.itInterface:
+
+                                        var itInterfaceRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in itInterfaceRoles)
+                                        {
+                                            message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                    case ObjectType.itProject:
+                                        var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in projectRoles)
+                                        {
+                                            message.To.Add(t.User.Email);
+                                        }
+                                        break;
+                                    case ObjectType.itSystemUsage:
+
+                                        var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                        && I.Role.Name == r.Name);
+                                        foreach (var t in systemRoles)
+                                        {
+                                            message.To.Add(t.User.Email);
                                         }
                                         break;
                                 }

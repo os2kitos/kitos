@@ -383,7 +383,7 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type == "itSystemUsage" || type == "itInterface") {
+                        if (type == "itSystemUsage") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
@@ -400,6 +400,9 @@
                                 .then(function (result) {
                                     return result;
                                 });
+                        }
+                        if (type == "itInterface") {
+                            return [];
                         }
                     }],
                     advices: ['$http', '$stateParams', function ($http, $stateParams) {
