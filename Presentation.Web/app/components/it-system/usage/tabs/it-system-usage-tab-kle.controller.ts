@@ -13,8 +13,8 @@
     ]);
 
     app.controller('system.EditKle', [
-        '$scope', '$http', '$state', '$stateParams', 'notify', 'user',
-        function ($scope, $http, $state, $stateParams, notify, user) {
+        '$scope', '$http', '$state', '$stateParams', 'notify', 'user', 'hasWriteAccess',
+        function ($scope, $http, $state, $stateParams, notify, user, hasWriteAccess) {
             var usageId = $stateParams.id;
             var baseUrl = 'api/itSystemUsage/' + usageId;
 
@@ -22,6 +22,7 @@
                 skip: 0,
                 take: 50
             };
+            $scope.hasWriteAccess = hasWriteAccess;
 
             $scope.showAllTasks = true;
 
@@ -102,7 +103,7 @@
                     }
                 });
             };
-
+            
             $scope.removeAllTasks = function() {
                 _.each($scope.tasklist, function(task: { isSelected; isLocked; }) {
                     if (task.isSelected && !task.isLocked) {
