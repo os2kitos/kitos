@@ -122,15 +122,6 @@ namespace Core.ApplicationServices
                                             message.To.Add(t.User.Email);
                                         }
                                         break;
-                                    case ObjectType.itInterface:
-
-                                        var itInterfaceRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
-                                        && I.Role.Name == r.Name);
-                                        foreach (var t in itInterfaceRoles)
-                                        {
-                                            message.To.Add(t.User.Email);
-                                        }
-                                        break;
                                     case ObjectType.itProject:
                                         var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                                         && I.Role.Name == r.Name);

@@ -74,7 +74,7 @@
                             title: "CC",
                             template: () =>
                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                            attributes: { "class": "might-overflow" }
+                                    attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Subject",
@@ -158,13 +158,22 @@
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
+                
+
                 var modalInstance = $modal.open({
 
                     windowClass: "modal fade in",
                     templateUrl: "app/components/it-advice/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
-                        $scope.recieverRoles = roles.data.value;
+                        $scope.showRoleFields = true;
+
+                        if (roles.data) {
+                            $scope.recieverRoles = roles.data.value;
+                        } else {
+                            $scope.showRoleFields = false;
+                            $scope.collapsed = false;
+                        }
 
                         if (action === 'POST') {
                             $scope.hideSend = false;
