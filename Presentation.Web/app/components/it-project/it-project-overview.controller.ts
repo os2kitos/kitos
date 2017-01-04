@@ -216,7 +216,7 @@
             this.reload();
         }
         public checkIfRoleIsAvailable(roleId) {
-            return _.find(this.projectRoles, (option: any) => (option.Id === parseInt(roleId, 10)));
+            return !_.find(this.projectRoles, (option: any) => (option.Id === parseInt(roleId, 10)));
         }
 
         public toggleLock(dataItem) {
@@ -801,8 +801,8 @@
                         // filtering doesn't allow to sort on an array of values, it needs a single value for each row...
                         field: "Rights.Role", title: `${this.user.fullName}`, width: 150,
                         persistId: "usersRoles", // DON'T YOU DARE RENAME!
-                        template: () => {
-                            return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="!projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`
+                        template: (dataItem) => {
+                            return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`
                         },
                         
                         attributes: { "class": "might-overflow" },
