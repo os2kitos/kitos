@@ -19,10 +19,10 @@
         <tr data-ng-repeat="update in statusUpdates">
             <td>{{ project.name }}</td>
             <td>{{ moment(update.Created).format("DD-MM-YYYY") }}</td>
-            <td><span data-square-traffic-light="{{update.CombinedStatus}}"></span></td>
-            <td><span data-square-traffic-light="{{update.QualityStatus}}"></span></td>
-            <td><span data-square-traffic-light="{{update.TimeStatus}}"></span></td>
-            <td><span data-square-traffic-light="{{update.ResourcesStatus}}"></span></td>
+            <td><span data-ng-if="update.IsCombined" data-square-traffic-light="{{update.CombinedStatus}}"></span></td>
+            <td><span data-ng-if="!update.IsCombined" data-square-traffic-light="{{update.QualityStatus}}"></span></td>
+            <td><span data-ng-if="!update.IsCombined" data-square-traffic-light="{{update.TimeStatus}}"></span></td>
+            <td><span data-ng-if="!update.IsCombined" data-square-traffic-light="{{update.ResourcesStatus}}"></span></td>
             <td>{{ update.Note }}</td>
             <td>
                 <span data-ng-if="update.IsFinal">Ja</span>
