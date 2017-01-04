@@ -16,8 +16,8 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -42,6 +42,8 @@
 
             $scope.text = {};
 
+
+
             // login
             $scope.submitLogin = () => {
                 if ($scope.loginForm.$invalid) return;
@@ -65,6 +67,11 @@
                         else
                             notify.addErrorMessage("Forkert brugernavn eller password!");
                     });
+            };
+
+            $scope.SSOLogin = () => {
+                notify.addInfoMessage("Should do redirect to OS2SSO...");
+                $auth.signIn();
             };
 
             $scope.save = (text) => {

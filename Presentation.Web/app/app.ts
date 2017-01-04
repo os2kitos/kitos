@@ -12,7 +12,8 @@ var app = angular.module("app", [
     "ui.bootstrap.tpls",
     "ngMessages",
     "ui.tree",
-    "ui.tinymce"]);
+    "ui.tinymce",
+    "oidc-angular"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
@@ -24,6 +25,14 @@ app.config([
         $urlRouterProvider.otherwise("/");
     }
 ]);
+
+app.config(['$authProvider', $authProvider => {
+    $authProvider.configure({
+        basePath: 'https://os2sso-test.miracle.dk',
+        redirectUri: "https://localhost:44311/#/?",
+        clientId: 'kitos_client'
+    });
+}]);
 
 app.config([
     "$httpProvider",
@@ -52,8 +61,14 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService","$auth",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $auth) => {
+
+        $rootScope.$on('oidcauth:loggedIn', function (e) {
+            console.log('[EventCallback]', 'Event', e.name, e);
+            console.log('[EventCallback]', '$auth.isAuthenticated', $auth.isAuthenticated());
+        });
+
         // init info
         $rootScope.page = {
             title: "Index",
@@ -113,5 +128,8 @@ app.run([
             console.log(error);
             $state.go("index");
         });
+
+        
+
     }
 ]);
