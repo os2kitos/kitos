@@ -48,21 +48,29 @@
             $scope.durationOngoing = contract.durationOngoing;
 
             $scope.saveDurationYears = () => {
-                if ($scope.contract.durationYears !== $scope.durationYears) {
+                const years = parseInt($scope.durationYears);
+                if (years > -1) {
                     const payload = {
-                        "DurationYears": $scope.durationYears || 0
+                        "DurationYears": years || 0
                     }
                     saveDuration(payload);
+                } else {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    msg.toErrorMessage("Antallet af år er ikke gyldig.");
                 }
                 cleanUp();
             };
 
             $scope.saveDurationMonths = () => {
-                if ($scope.contract.durationMonths !== $scope.durationMonths) {
+                const months = parseInt($scope.durationMonths);
+                if (months > -1 && months < 12) {
                     const payload = {
-                        "DurationMonths": $scope.durationMonths || 0
+                        "DurationMonths": months || 0
                     }
                     saveDuration(payload);
+                } else {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    msg.toErrorMessage("Antallet af måneder er ikke gyldig.");
                 }
                 cleanUp();
             };
@@ -75,7 +83,7 @@
                 $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
                     msg.toSuccessMessage("Varigheden blev gemt.");
                 }).error(() => {
-                    msg.toSuccessMessage("Varigheden blev ikke gemt.");
+                    msg.toErrorMessage("Varigheden blev ikke gemt.");
                 });
             }
 
@@ -84,16 +92,19 @@
                 $http.patch(`odata/itcontracts(${contract.id})`, payload).success(() => {
                     msg.toSuccessMessage("Varigheden blev gemt.");
                 }).error(() => {
-                    msg.toSuccessMessage("Varigheden blev ikke gemt.");
+                    msg.toErrorMessage("Varigheden blev ikke gemt.");
                 });
             }
 
             function cleanUp() {
-                if ($scope.durationYears === 0) {
+                const years = parseInt($scope.durationYears);
+                const months = parseInt($scope.durationMonths);
+
+                if (years === 0 || years < 0) {
                     $scope.durationYears = "";
                 }
 
-                if ($scope.durationMonths === 0) {
+                if (months === 0 || months < 0 || months > 11) {
                     $scope.durationMonths = "";
                 }
             }

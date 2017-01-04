@@ -130,11 +130,16 @@ gulp.task("tinyMCEFonts", ["clean-styles"], function () {
         .pipe(gulp.dest(config.tinyMCEFontDest));
 });
 
-gulp.task("tinyMCEFix", ["clean-styles"], function () {
+gulp.task("tinyMCEFixCss", ["clean-styles"], function () {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
     .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"))
     .pipe(rename("skin.min.css"))
     .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"));
+});
+
+gulp.task("tinyMCEFixLang", ["clean-styles"], function () {
+    return file("da.js", "//Dummy file from gulp", { src: true })
+    .pipe(gulp.dest(paths.sourceScript + "/langs"));
 });
 
 // restore all bower packages
@@ -143,7 +148,7 @@ gulp.task("bower-restore", function () {
 });
 
 // bundle, minify and copy styles, fonts and assets
-gulp.task("styles", ["css", "assets", "fonts", "tinyMCEFonts", "tinyMCEFix"]);
+gulp.task("styles", ["css", "assets", "fonts", "tinyMCEFonts", "tinyMCEFixCss", "tinyMCEFixLang"]);
 
 // run bundle tasks
 gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
