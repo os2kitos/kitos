@@ -124,7 +124,14 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: `<button id="addReference" data-ng-disabled='${!$scope.hasWriteAccess}' class="btn btn-success btn-sm" href="\\#/contract/edit/${contract.id}/reference/createReference/${contract.id}">#=text#</button>`
+                            template: () => {
+                                if (hasWriteAccess) {
+                                    return `<a id="addReference" class="btn btn-success btn-sm" href="\\#/contract/edit/${contract.id}/reference/createReference/${contract.id}">Tilføj reference</a>`
+                                }
+                                else {
+                                    return "";
+                                }
+                                }
                         }]
                 };
             }]);

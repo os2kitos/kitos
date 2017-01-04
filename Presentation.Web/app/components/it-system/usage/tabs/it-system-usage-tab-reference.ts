@@ -120,8 +120,15 @@
                         {
                             name: "addReference",
                             text: "Tilføj reference",
-                            template: "<button id=\"addReferenceasdasd\" data-ng-disabled=\"" + !$scope.hasWriteAccess +"\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>#=text#</button>"
-                        }]
+                            template: () =>
+                            {
+                                if (hasWriteAccess) {
+                                    return "<a id=\"addReferenceasdasd\" class=\"btn btn-success btn-sm\" href=\"\\#/system/usage/" + itSystemUsage.id + "/reference/createReference/" + itSystemUsage.id + "\"'>Tilføj reference</a>"
+                                } else {
+                                    return "";
+                                }
+                                }
+                            }]
                 };
             }]);
 })(angular, app);

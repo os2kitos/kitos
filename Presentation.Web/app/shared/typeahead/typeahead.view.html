@@ -1,13 +1,14 @@
-﻿<input type="text" data-autosave-typeahead=""
+﻿<input type="text"
        class="typeahead-input form-control input-sm"
-       data-model-value="{{ model }}"
+       data-autosave-typeahead=""
        data-autosave="{{ autosaveUrl }}"
-       data-ng-model="searchInput"
+       data-field="{{ field }}"
+       data-model-value="{{ model }}"
        data-placeholder="{{placeholder}}"
+       data-ng-model="searchInput"
        data-ng-keydown="onKeypress($event)"
        data-ng-focus="onFocus()"
        data-ng-blur="onBlur()"
-       data-field="{{ field }}"
        data-ng-disabled="!userHasWriteAccess" />
 
 <div class="typeahead-items" data-ng-show="showItems">
