@@ -13,7 +13,8 @@
             this.tinymceOptions = {
                 plugins: 'link image code',
                 skin: 'lightgray',
-                theme: 'modern'
+                theme: 'modern',
+                language: 'da'
             };
         }
 
