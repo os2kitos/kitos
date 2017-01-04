@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-md-6">
                 <!--Modtager(e)-->
-                <div class="form-group">
+                <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label">Til</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                placeholder="Vælg modtagere"
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <!--CC('ere)-->
-                <div class="form-group">
+                <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label small">CC</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                data-placeholder="Vælg CC"

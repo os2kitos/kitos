@@ -77,14 +77,14 @@
             var itInterfaceBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
-                itInterfaceBaseUrl = "/odata/ItInterfaces?";
+                itInterfaceBaseUrl = "/odata/ItInterfaces";
             } else {
                 // everyone else are limited to within organizationnal context
                 itInterfaceBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItInterfaces`;
             }
 
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
-
+       
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -96,7 +96,7 @@
                         },
                         parameterMap: (options, type) => {
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
-
+                         
                             if (parameterMap.$filter) {
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
@@ -106,9 +106,7 @@
                                     parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
 
                                 }
-
                             }
-
                             return parameterMap;
                         }
                     },
