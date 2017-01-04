@@ -127,9 +127,8 @@
                         // using timeout to wait for the value to update
                         $timeout(function () {
                             if (attrs.field) {
-
-                                if (angular.isUndefined(user.currentOrganizationId)) {
-                                    notify.addWarningMessage("Brugeren er endnu ikke indlæst. Vent venligts og prøv igen.", false);
+                                if (angular.isUndefined(user)) {
+                                    notify.addWarnMessage("Brugeren er endnu ikke indlæst. Vent venligst og prøv igen.", false);
                                     return;
                                 }
 
