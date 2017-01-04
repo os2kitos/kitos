@@ -4,7 +4,7 @@
     </div>
 </div>
 
-<div class="object-section-container" ng-cloak>
+<div class="object-section-container">
     <h4 data-ng-bind="project.name"></h4>
     <div class="row">
         <!-- Left side -->
@@ -60,8 +60,8 @@
                         <input type="text" value="{{project.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled">
                     </div>
                     <!-- access modifier -->
-                    <div class="form-group ng-cloak">
-                        <label for="project-access" class="control-label small ng-cloak">Synlighed</label>
+                    <div class="form-group">
+                        <label for="project-access" class="control-label small">Synlighed</label>
                         <input id="project-access" class="form-control input-sm"
                                data-ng-model="project.accessModifier"
                                data-select-access-modifier=""

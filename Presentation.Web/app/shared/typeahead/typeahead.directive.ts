@@ -41,15 +41,16 @@
 
                 scope.onFocus = function () {
                     scope.showItems = true;
-                }
+                };
 
                 scope.onBlur = function () {
                     if (angular.isUndefined(scope.model) || scope.model.length) {
+                        scope.model = scope.searchInput;
                         $timeout(function () {
                             scope.showItems = false;
                         }, 200);
                     }
-                }
+                };
 
                 scope.onKeypress = function (keyEvent) {
                     if (keyEvent.which === 38) {
@@ -63,7 +64,8 @@
                         }
                         elem.find(".typeahead-input").blur();
                     }
-                }
+                };
+
             }
         };
     }]);

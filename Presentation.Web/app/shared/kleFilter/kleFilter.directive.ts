@@ -2,15 +2,20 @@
     'use strict';
 
     app.directive('kleFilter', [
-        'taskService', function(taskService) {
+        'taskService', function (taskService) {
             return {
-                scope: {
-                    // the output of filtering tasks
-                    selectedGroup: "=kleFilter"
-                },
-                templateUrl: 'app/shared/kleFilter/kleFilter.view.html',
-                link: function(scope, element, attrs) {
+                restrict: "EA",
+                scope: false,
+                //{
+                //    // the output of filtering tasks
+                //    selectedGroup: "=kleFilter",
+                //    hasWriteAccess: "="
+                //},
 
+                templateUrl: 'app/shared/kleFilter/kleFilter.view.html',
+                replace: true,
+                link: function(scope, element, attrs) {
+                    
                     // loading main groups
                     taskService.getRoots().then(function(roots) {
                         scope.maingroups = roots;
@@ -29,7 +34,7 @@
                             scope.groups = groups;
                         });
                     };
-
+                    
                     scope.groupChanged = function() {
                         if (scope.selectedSubgroup)
                             scope.selectedGroup = scope.selectedSubgroup;
