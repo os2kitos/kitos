@@ -32,6 +32,7 @@
     }
 
     export interface IUserService {
+        reAuthorize(): ng.IPromise<IUser>;
         getUser(): ng.IPromise<IUser>;
         login(email: string, password: string, rememberMe: boolean): ng.IPromise<any>;
         logout(): ng.IHttpPromise<any>;
@@ -157,36 +158,62 @@
             return deferred.promise;
         }
 
+        // the object returned contains the user, user rights and user organizations
         getUser = () => {
+            return this.reAuthorize();
+        }
+
+        reAuthorize = () => {
+            console.log("reAuthorize --> loadUser(null)");
+
             var deferred = this.$q.defer();
             deferred.resolve(this.loadUser(null));
             return deferred.promise;
         }
 
-        loadUser = (payload) => {
+        getOrganizationsIfAuthorized = () => {
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
+        }
+
+        authorizeUser = (userLoginInfo) => {
+            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo);
+        }
+
+        loadUser = (userLoginInfo) => {
+            console.log("loadUser payload: " + userLoginInfo);
+            console.log("_loadUserDeferred: " + this._loadUserDeferred);
+
             if (!this._loadUserDeferred) {
                 this._loadUserDeferred = this.$q.defer();
 
-                // login or re-auth?
-                var httpDeferred = payload ? this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", payload) : this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
+                // login or re-auth? If userLoginInfo is null then re-auth otherwise login
+                var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getOrganizationsIfAuthorized();
 
                 httpDeferred.then(result => {
                     var user = result.data.response.user;
                     var orgsAndDefaultUnits = result.data.response.organizations;
 
-                    this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
+                    //this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
+                    this.determineOrganizationChoice(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
+
                         this.saveUser(user, orgAndDefaultUnit);
                         this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
                         this._loadUserDeferred.resolve(this._user);
                         this._loadUserDeferred = null;
+
                     }, () => {
+
                         this._loadUserDeferred.reject("No organization selected");
                         this._loadUserDeferred = null;
+
                     });
+
                 }, result => {
+
                     this._loadUserDeferred.reject(result.data);
                     this._loadUserDeferred = null;
                     this.clearSavedOrgId();
+
                 });
             }
 
@@ -198,6 +225,9 @@
         }
 
         login = (email: string, password: string, rememberMe: boolean) => {
+            console.log("login");
+            console.log("--------------");
+
             var deferred = this.$q.defer();
 
             if (!email || !password) {
@@ -222,6 +252,7 @@
         }
 
         auth = (adminRoles) => {
+            console.log("auth");
             return this.getUser().then((user: any) => {
                 if (adminRoles) {
                     var hasRequiredRole = this._.some(adminRoles, role => ((role === "GlobalAdmin" && user.isGlobalAdmin) || (role === Models.OrganizationRole.LocalAdmin && user.isLocalAdmin)));
@@ -244,6 +275,135 @@
 
         clearSavedOrgId = () => {
             localStorage.setItem("currentOrgId", null);
+        }
+
+        // determines
+        determineOrganizationChoice = (orgsAndDefaultUnits) => {
+            console.log("--------------");
+            console.log("determineOrganizationChoice");
+            console.log("--------------");
+
+            var deferred = this.$q.defer();
+            const onlyOneOrganization = orgsAndDefaultUnits.$values.length == 1;
+
+            console.log("num of orgs: " + orgsAndDefaultUnits.$values.length);
+            console.log("--------------");
+
+            // the users has previously been logged in so the last chosen organization will be selected
+            if (this.currentlyLoggedIn()) {
+
+                var storedOrgId = this.getSavedOrgId();
+
+                if (storedOrgId) {
+                    deferred.resolve(this.lastChosenOrganization(orgsAndDefaultUnits, storedOrgId));
+                }
+
+                if (!onlyOneOrganization) {
+                    this.$rootScope.userHasOrgChoices = true;
+                }
+
+            } else if (onlyOneOrganization) {
+
+                deferred.resolve(this.chooseOrganization(orgsAndDefaultUnits));
+
+            } else { // the user can choose from multiple organizations
+
+                this.$rootScope.userHasOrgChoices = true;
+                deferred.resolve(this.selectAmongOrganizations(orgsAndDefaultUnits));
+
+            }
+
+            return deferred.promise;
+        }
+
+        currentlyLoggedIn() {
+            console.log("getSavedOrgId: " + this.getSavedOrgId());
+            console.log("--------------");
+
+            return this.getSavedOrgId();
+        }
+
+        chooseOrganization = (orgsAndDefaultUnits) => {
+            console.log("chooseOrganization");
+            console.log("--------------");
+
+            // disable the the option to change the current organization
+            this.$rootScope.userHasOrgChoices = false;
+
+            var firstOrgAndDefaultUnit = orgsAndDefaultUnits.$values[0];
+            this.setSavedOrgId(firstOrgAndDefaultUnit.organization.id);
+
+            return firstOrgAndDefaultUnit;
+        }
+
+        lastChosenOrganization = (orgsAndDefaultUnits, storedOrgId) => {
+            console.log("lastChosenOrganization");
+            console.log("--------------");
+
+            // given the saved org id, find the organization in the list of organization and default org units
+            var foundOrgAndDefaultUnit = this._.find(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
+                return orgAndUnit.organization.id == storedOrgId;
+            });
+
+            if (foundOrgAndDefaultUnit != null) {
+                return foundOrgAndDefaultUnit;
+            }
+
+            // if we get to this point, the stored org id was useless - i.e. it referred to an organization, that the user no longer is a member of.
+            // so clear it
+            this.clearSavedOrgId();
+        }
+
+        selectAmongOrganizations = (orgsAndDefaultUnits) => {
+            console.log("selectAmongOrganizations");
+            console.log("--------------");
+
+            var deferred = this.$q.defer();
+            var modal = this.showOrganizationsModal(orgsAndDefaultUnits);
+
+            modal.result.then((selectedOrgAndUnit) => {
+                this.setSavedOrgId(selectedOrgAndUnit.organization.id);
+                console.log("setSavedOrgId was changed to: " + selectedOrgAndUnit.organization.id);
+
+                deferred.resolve(selectedOrgAndUnit);
+            }, () => {
+                deferred.reject("Modal dismissed");
+            });
+
+            return deferred.promise;
+        }
+
+        showOrganizationsModal = (orgsAndDefaultUnits) => {
+            console.log("showOrganizationsModal");
+            console.log("--------------");
+
+            var modal = this.$uibModal.open({
+                backdrop: "static",
+                templateUrl: "app/components/home/choose-organization.html",
+                controller: ["$scope", "$uibModalInstance", "autofocus", ($modalScope, $modalInstance, autofocus) => {
+                    autofocus();
+
+                    $modalScope.organizations = this._.map(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
+                        return orgAndUnit.organization;
+                    });
+
+                    $modalScope.orgChooser = {
+                        selectedId: null
+                    };
+
+                    $modalScope.ok = () => {
+                        console.log("org chosen");
+                        console.log("--------------");
+
+                        var selectedOrgAndUnit = this._.find(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
+                            return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
+                        });
+                        $modalInstance.close(selectedOrgAndUnit);
+                    };
+                }]
+            });
+
+            return modal;
         }
 
         // resolve which organization context, the user will be working in.
@@ -323,16 +483,18 @@
             return deferred.promise;
         }
 
-        // change organization by clearing the saved org id from local storage
-        // passing null as the argument for loadUser causes a re-auth
+        // change organizational context
         changeOrganization = () => {
-            this.clearSavedOrgId();
-            return this.loadUser(null);
+            const organizations = this.getOrganizationsIfAuthorized();
+            this.selectAmongOrganizations(organizations);
+            //hent
+            //vælge
+            //gemme
         }
 
         // updates the users default org unit in the current organization
         updateDefaultOrgUnit = (newDefaultOrgUnitId) => {
-            var deferred = this.$q.defer();
+            //var deferred = this.$q.defer();
 
             var payload = {
                 orgId: this._user.currentOrganizationId,
@@ -357,3 +519,4 @@
     }
     app.service("userService", UserService);
 }
+

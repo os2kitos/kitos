@@ -66,7 +66,7 @@ app.run([
         $rootScope.$state = $state;
 
         // this will try to authenticate - to see if the user's already logged in
-        userService.getUser();
+        userService.reAuthorize();
 
         uiSelect2Config.dropdownAutoWidth = true;
 
