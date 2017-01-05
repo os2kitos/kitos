@@ -213,14 +213,28 @@ namespace Core.ApplicationServices
                                     {
                                         case ObjectType.itContract:
 
-                                            var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
-                                           && I.Role.Name == r.Name);
-                                            if (result != null)
+                                            var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                            && I.Role.Name == r.Name);
+                                            foreach (var t in itContractRoles)
                                             {
-                                                if (result.User != null)
-                                                {
-                                                    message.CC.Add(result.User.Email);
-                                                }
+                                                message.To.Add(t.User.Email);
+                                            }
+                                            break;
+                                        case ObjectType.itProject:
+                                            var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                            && I.Role.Name == r.Name);
+                                            foreach (var t in projectRoles)
+                                            {
+                                                message.To.Add(t.User.Email);
+                                            }
+                                            break;
+                                        case ObjectType.itSystemUsage:
+
+                                            var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                            && I.Role.Name == r.Name);
+                                            foreach (var t in systemRoles)
+                                            {
+                                                message.To.Add(t.User.Email);
                                             }
                                             break;
                                     }
@@ -233,14 +247,28 @@ namespace Core.ApplicationServices
                                     {
                                         case ObjectType.itContract:
 
-                                            var result = _ItContractRights.AsQueryable().FirstOrDefault(I => I.ObjectId == advice.RelationId
+                                            var itContractRoles = _ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                                             && I.Role.Name == r.Name);
-                                            if (result != null)
+                                            foreach (var t in itContractRoles)
                                             {
-                                                if (result.User != null)
-                                                {
-                                                    message.To.Add(result.User.Email);
-                                                }
+                                                message.To.Add(t.User.Email);
+                                            }
+                                            break;
+                                        case ObjectType.itProject:
+                                            var projectRoles = _ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                            && I.Role.Name == r.Name);
+                                            foreach (var t in projectRoles)
+                                            {
+                                                message.To.Add(t.User.Email);
+                                            }
+                                            break;
+                                        case ObjectType.itSystemUsage:
+
+                                            var systemRoles = _ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                                            && I.Role.Name == r.Name);
+                                            foreach (var t in systemRoles)
+                                            {
+                                                message.To.Add(t.User.Email);
                                             }
                                             break;
                                     }
