@@ -262,6 +262,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
     <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
