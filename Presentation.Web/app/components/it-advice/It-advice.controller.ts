@@ -117,9 +117,7 @@
                             dataType: "json"
                     },
                 },
-                pageSize: 10,
-                serverPaging: true,
-                serverFiltering: true
+                pageSize: 25
                 },
                 columns: [{
                     field: "AdviceSentDate",
@@ -131,7 +129,10 @@
                         return "";
                     }
                 }
-                ]
+                ],
+                scrollable: {
+                    virtual: true
+                }
             };
 
             $scope.datepickerOptions = {
