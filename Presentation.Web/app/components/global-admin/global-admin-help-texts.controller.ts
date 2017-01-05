@@ -1,80 +1,194 @@
 ﻿module Kitos.GlobalAdmin.HelpTexts {
     "use strict";
 
-    export class HelpTextsController {
+    export interface IOverviewController {
+        mainGrid: Kitos.IKendoGrid<Models.IHelpText>;
+        mainGridOptions: kendo.ui.GridOptions;
+    }
 
-        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', 'helpTexts', '$uibModal', '_'];
-        public selectedHelpText;
-        public tinymceOptions;
+    export class HelpTextsController implements IOverviewController {
+        public mainGrid: Kitos.IKendoGrid<Models.IHelpText>;
+        public mainGridOptions: kendo.ui.GridOptions;
 
-        constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private helpTexts, private $uibModal, private _) {
-            $rootScope.page.title = 'Hjælpetekter';
-            this.selectDefaultHelpText();
-            this.tinymceOptions = {
-                plugins: 'link image code',
-                skin: 'lightgray',
-                theme: 'modern',
-                language: 'da'
+        public static $inject: Array<string> = [
+            "$rootScope",
+            "$scope",
+            "$http",
+            "$timeout",
+            "$window",
+            "$state",
+            "$",
+            "_",
+            "notify",
+            "helpTexts",
+            "user",
+            "$uibModal"
+        ];
+
+        constructor(
+            private $rootScope: IRootScope,
+            private $scope: ng.IScope,
+            private $http: ng.IHttpService,
+            private $timeout: ng.ITimeoutService,
+            private $window: ng.IWindowService,
+            private $state: ng.ui.IStateService,
+            private $: JQueryStatic,
+            private _: ILoDashWithMixins,
+            private notify,
+            private helpTexts,
+            private user,
+            private $modal) {
+            this.$rootScope.page.title = "Hjælpetekster - Overblik";
+
+            this.mainGridOptions = {
+                dataSource: {
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: (options) => {
+                                return "/odata/HelpTexts"
+                            },
+                            dataType: "json"
+                        }
+                    },
+                    sort: {
+                        field: "Title",
+                        dir: "asc"
+                    },
+                    pageSize: 100,
+                    serverPaging: true,
+                    serverSorting: true,
+                    serverFiltering: true,
+                },
+                pageable: {
+                    refresh: true,
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
+                },
+                sortable: {
+                    mode: "single"
+                },
+                reorderable: true,
+                resizable: true,
+                filterable: {
+                    mode: "row",
+                    messages: {
+                        isTrue: "✔",
+                        isFalse: "✖"
+                    }
+                },
+                groupable: false,
+                columnMenu: {
+                    filterable: false
+                },
+                toolbar: [
+                    {
+                        //TODO ng-show='hasWriteAccess'
+                        name: "opretHjælpeTekst",
+                        text: "Opret hjælpetekst",
+                        template: "<a ui-sref='global-admin.help-texts.create' class='btn btn-success pull-right'>#: text #</a>"
+                    }
+                ],
+                columns: [
+                    {
+                        field: "Title", title: "Titel", width: 150,
+                        persistId: "title", // DON'T YOU DARE RENAME!
+                        template: dataItem => `<a ui-sref="global-admin.help-texts-edit({id:${dataItem.Id}})">${dataItem.Title}</a>`,
+                        //excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Key", title: "Key", width: 150,
+                        persistId: "key", // DON'T YOU DARE RENAME!
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    }
+                ]
             };
         }
+        //public opretITProjekt() {
+        //    var self = this;
 
-        private selectHelpText = function (helpText) {
-            this.selectedHelpText = helpText;
-        }
+        //    var modalInstance = this.$modal.open({
+        //        // fade in instead of slide from top, fixes strange cursor placement in IE
+        //        // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+        //        windowClass: 'modal fade in',
+        //        templateUrl: 'app/components/it-project/it-project-modal-create.view.html',
+        //        controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+        //            $scope.formData = {};
+        //            $scope.type = 'IT Projekt';
+        //            $scope.checkAvailbleUrl = 'api/itProject/';
 
-        private selectDefaultHelpText() {
-            if (this.helpTexts.length > 0) {
-                this.selectedHelpText = this.helpTexts[0];
-            } else {
-                this.selectedHelpText = null;
-            }
-        }
+        //            $scope.saveAndProceed = function () {
 
-        private save() {
-            //Check duplicates
-            var key = this.selectedHelpText.Key;
-            var id = this.selectedHelpText.Id;
-            if (_.find(this.helpTexts, function (o: Models.IHelpText) { return (o.Id != id && o.Key === key); })) {
-                this.notify.addErrorMessage("Fejl! Der findes allerede en hjælpetekst med den angivne key.", true);
-                return;
-            }
+        //                let orgUnitId = self.user.currentOrganizationUnitId;
+        //                const payload = {
+        //                    name: $scope.formData.name,
+        //                    responsibleOrgUnitId: orgUnitId,
+        //                    organizationId: self.user.currentOrganizationId
+        //                };
 
-            var msg = this.notify.addInfoMessage("Gemmer...", false);
-            this.$http({ method: 'PATCH', url: "odata/HelpTexts(" + this.selectedHelpText.Id + ")", data: this.selectedHelpText, ignoreLoadingBar: true })
-                .success(function () {
-                    msg.toSuccessMessage("Feltet er gemt.");
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
-                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
-                    } else {
-                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                    }
-                });
-        }
+        //                var msg = self.notify.addInfoMessage('Opretter system...', false);
 
-        private delete() {
-            if (!confirm('Er du sikker på at du vil slette hjælpeteksten?')) {
-                return;
-            }
-            var msg = this.notify.addInfoMessage("Sletter...", false);
-            var parent = this;
-            this.$http({ method: 'DELETE', url: "odata/HelpTexts(" + this.selectedHelpText.Id + ")" })
-                .success(function () {
-                    msg.toSuccessMessage("Hjælpeteksten er slettet.");
-                    _.remove(parent.helpTexts, function (obj) {
-                        return obj === parent.selectedHelpText;
-                    });
+        //                self.$http.post("api/itproject", payload)
+        //                    .success((result: any) => {
+        //                        msg.toSuccessMessage("Et nyt projekt er oprettet!");
+        //                        let projectId = result.response.id;
+        //                        $modalInstance.close(projectId);
+        //                        if (orgUnitId) {
+        //                            // add users default org unit to the new project
+        //                            self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+        //                        }
+        //                        self.$state.go("it-project.edit.main", { id: projectId });
+        //                    })
+        //                    .error(() => {
+        //                        msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+        //                    });
+        //            };
 
-                    parent.selectDefaultHelpText();
-                })
-                .error(function (result, status) {
-                    if (status === 409) {
-                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
-                    } else {
-                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                    }
-                });
+        //            $scope.save = function () {
+
+        //                let orgUnitId = self.user.currentOrganizationUnitId;
+        //                const payload = {
+        //                    name: $scope.formData.name,
+        //                    responsibleOrgUnitId: orgUnitId,
+        //                    organizationId: self.user.currentOrganizationId
+        //                };
+
+        //                var msg = self.notify.addInfoMessage('Opretter projekt...', false);
+
+        //                self.$http.post("api/itproject", payload)
+        //                    .success((result: any) => {
+        //                        msg.toSuccessMessage("Et nyt projekt er oprettet!");
+        //                        let projectId = result.response.id;
+        //                        $modalInstance.close(projectId);
+        //                        if (orgUnitId) {
+        //                            // add users default org unit to the new project
+        //                            self.$http.post(`api/itproject/${projectId}?organizationunit=${orgUnitId}&organizationId=${this.user.currentOrganizationId}`, null);
+        //                        }
+        //                        self.$state.reload();
+        //                    })
+        //                    .error(() => {
+        //                        msg.toErrorMessage("Fejl! Kunne ikke oprette nyt projekt!");
+        //                    });
+        //            };
+        //        }]
+        //    });
+        //};
+
+        private reload() {
+            this.$state.go(".", null, { reload: true });
         }
     }
 
@@ -100,5 +214,5 @@
                     }
                 });
             }
-    ]);
+        ]);
 }
