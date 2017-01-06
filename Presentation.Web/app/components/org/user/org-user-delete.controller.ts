@@ -454,7 +454,6 @@
                                     ($http: ng.IHttpService, $sce) => {
                                         return $http.get("odata/HelpTexts?$filter=Key eq 'user_deletion_modal_text'")
                                             .then((result: any) => {
-                                                console.log(result)
                                                 if (result.data.value.length) {
                                                     return $sce.trustAsHtml(result.data.value[0].Description);
                                                 } else {

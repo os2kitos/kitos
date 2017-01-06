@@ -17,6 +17,8 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    using Core.DomainModel.Organization;
+
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
@@ -302,6 +304,15 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
+        }
+        protected override bool HasWriteAccess(ItInterface obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }
