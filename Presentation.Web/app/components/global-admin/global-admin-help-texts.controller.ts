@@ -94,7 +94,6 @@
                         field: "Title", title: "Titel", width: 150,
                         persistId: "title", // DON'T YOU DARE RENAME!
                         template: dataItem => `<a ui-sref="global-admin.help-texts-edit({id:${dataItem.Id}})">${dataItem.Title}</a>`,
-                        //excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         filterable: {
                             cell: {
                                 dataSource: [],

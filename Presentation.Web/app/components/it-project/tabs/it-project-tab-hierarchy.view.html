@@ -1,10 +1,4 @@
-﻿<div class="clearfix">
-    <div class="form-group pull-right">
-        <help-text data-key="it_project_hierarchy" data-default-title="IT system - Hierarki"></help-text>
-    </div>
-</div>
-
-<script type="text/ng-template" id="tree_item_template">
+﻿<script type="text/ng-template" id="tree_item_template">
     <div class="org-node" data-ng-class="{'selected': node.id == project.id}">
         <span class="org-node-info">
             <a data-ui-sref="it-project.edit.main({ id: node.id })">{{ node.name }}</a>
