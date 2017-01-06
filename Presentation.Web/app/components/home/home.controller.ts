@@ -45,7 +45,7 @@
 
             // login
             $scope.submitLogin = () => {
-                console.log("submitLogin");
+                console.log("submitLogin was clicked");
 
                 if ($scope.loginForm.$invalid) return;
 

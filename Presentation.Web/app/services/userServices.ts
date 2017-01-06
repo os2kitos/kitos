@@ -131,6 +131,9 @@
 
             this.$rootScope.user = this._user;
 
+            console.log("saveUser");
+            console.log("--------------");
+
             return this._user;
         }
 
@@ -165,26 +168,42 @@
 
         reAuthorize = () => {
             console.log("reAuthorize --> loadUser(null)");
+            console.log("--------------");
 
             var deferred = this.$q.defer();
+            // loadUser(null) triggers a re-auth
             deferred.resolve(this.loadUser(null));
             return deferred.promise;
         }
 
         getOrganizationsIfAuthorized = () => {
+            console.log("Authorize/GET (Re-Auth)");
+            console.log("--------------");
+
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
         }
 
         authorizeUser = (userLoginInfo) => {
+            console.log("Authorize/POST (Logging in)");
+            console.log("--------------");
+
             return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo);
         }
 
+        saveUserInfo = (user, orgAndDefaultUnit) => {
+            this.saveUser(user, orgAndDefaultUnit);
+            this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
+        }
+
         loadUser = (userLoginInfo) => {
-            console.log("loadUser payload: " + userLoginInfo);
-            console.log("_loadUserDeferred: " + this._loadUserDeferred);
+            console.log("loadUser payload: ", userLoginInfo);
+            console.log("_loadUserDeferred before if: ", this._loadUserDeferred);
+            console.log("--------------");
 
             if (!this._loadUserDeferred) {
                 this._loadUserDeferred = this.$q.defer();
+                console.log("_loadUserDeferred after if: ", this._loadUserDeferred);
+                console.log("--------------");
 
                 // login or re-auth? If userLoginInfo is null then re-auth otherwise login
                 var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getOrganizationsIfAuthorized();
@@ -196,8 +215,8 @@
                     //this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
                     this.determineOrganizationChoice(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
 
-                        this.saveUser(user, orgAndDefaultUnit);
-                        this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
+                        this.saveUserInfo(user, orgAndDefaultUnit);
+
                         this._loadUserDeferred.resolve(this._user);
                         this._loadUserDeferred = null;
 
@@ -220,12 +239,43 @@
             return this._loadUserDeferred.promise;
         }
 
+        //TODO soon obsolete
+        //loadUser = (payload) => {
+        //    if (!this._loadUserDeferred) {
+        //        this._loadUserDeferred = this.$q.defer();
+
+        //        // login or re-auth?
+        //        var httpDeferred = payload ? this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", payload) : this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
+
+        //        httpDeferred.then(result => {
+        //            var user = result.data.response.user;
+        //            var orgsAndDefaultUnits = result.data.response.organizations;
+
+        //            this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
+        //                this.saveUser(user, orgAndDefaultUnit);
+        //                this.setDefaultOrganizationInBackend(orgAndDefaultUnit.organization.id);
+        //                this._loadUserDeferred.resolve(this._user);
+        //                this._loadUserDeferred = null;
+        //            }, () => {
+        //                this._loadUserDeferred.reject("No organization selected");
+        //                this._loadUserDeferred = null;
+        //            });
+        //        }, result => {
+        //            this._loadUserDeferred.reject(result.data);
+        //            this._loadUserDeferred = null;
+        //            this.clearSavedOrgId();
+        //        });
+        //    }
+
+        //    return this._loadUserDeferred.promise;
+        //}
+
         setDefaultOrganizationInBackend = (organizationId) => {
             this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
         }
 
         login = (email: string, password: string, rememberMe: boolean) => {
-            console.log("login");
+            console.log("login called");
             console.log("--------------");
 
             var deferred = this.$q.defer();
@@ -252,7 +302,9 @@
         }
 
         auth = (adminRoles) => {
-            console.log("auth");
+            console.log("auth called");
+            console.log("--------------");
+
             return this.getUser().then((user: any) => {
                 if (adminRoles) {
                     var hasRequiredRole = this._.some(adminRoles, role => ((role === "GlobalAdmin" && user.isGlobalAdmin) || (role === Models.OrganizationRole.LocalAdmin && user.isLocalAdmin)));
@@ -280,8 +332,7 @@
         // determines
         determineOrganizationChoice = (orgsAndDefaultUnits) => {
             console.log("--------------");
-            console.log("determineOrganizationChoice");
-            console.log("--------------");
+            console.log("determineOrganizationChoice called");
 
             var deferred = this.$q.defer();
             const onlyOneOrganization = orgsAndDefaultUnits.$values.length == 1;
@@ -324,7 +375,7 @@
         }
 
         chooseOrganization = (orgsAndDefaultUnits) => {
-            console.log("chooseOrganization");
+            console.log("chooseOrganization called");
             console.log("--------------");
 
             // disable the the option to change the current organization
@@ -337,7 +388,7 @@
         }
 
         lastChosenOrganization = (orgsAndDefaultUnits, storedOrgId) => {
-            console.log("lastChosenOrganization");
+            console.log("lastChosenOrganization called");
             console.log("--------------");
 
             // given the saved org id, find the organization in the list of organization and default org units
@@ -355,7 +406,7 @@
         }
 
         selectAmongOrganizations = (orgsAndDefaultUnits) => {
-            console.log("selectAmongOrganizations");
+            console.log("selectAmongOrganizations called");
             console.log("--------------");
 
             var deferred = this.$q.defer();
@@ -364,6 +415,7 @@
             modal.result.then((selectedOrgAndUnit) => {
                 this.setSavedOrgId(selectedOrgAndUnit.organization.id);
                 console.log("setSavedOrgId was changed to: " + selectedOrgAndUnit.organization.id);
+                console.log("--------------");
 
                 deferred.resolve(selectedOrgAndUnit);
             }, () => {
@@ -374,7 +426,7 @@
         }
 
         showOrganizationsModal = (orgsAndDefaultUnits) => {
-            console.log("showOrganizationsModal");
+            console.log("showOrganizationsModal called");
             console.log("--------------");
 
             var modal = this.$uibModal.open({
@@ -393,7 +445,6 @@
 
                     $modalScope.ok = () => {
                         console.log("org chosen");
-                        console.log("--------------");
 
                         var selectedOrgAndUnit = this._.find(orgsAndDefaultUnits.$values, function (orgAndUnit: { organization }) {
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
@@ -410,6 +461,7 @@
         // when a user logs in, the user is prompted with a select-organization modal.
         // the organization that is selected here, will be saved in local storage, for the next
         // time the user is visiting.
+        // TODO soon obsolete
         resolveOrganization2 = (orgsAndDefaultUnits) => {
             var deferred = this.$q.defer();
 
@@ -485,13 +537,36 @@
 
         // change organizational context
         changeOrganization = () => {
-            const organizations = this.getOrganizationsIfAuthorized();
-            this.selectAmongOrganizations(organizations);
-            //hent
-            //vælge
-            //gemme
-        }
 
+            const deferred = this.$q.defer();
+            let organizatinalContext = null;
+            let organizations = null;
+            let user = null;
+
+            this.getOrganizationsIfAuthorized()
+                .then(result => {
+
+                    organizatinalContext = result.data.response;
+                    organizations = organizatinalContext.organizations;
+
+                    this.selectAmongOrganizations(organizations)
+                        .then((organization) => {
+                            user = organizatinalContext.user;
+                            this.saveUserInfo(user, organization);
+                        });
+
+                    deferred.resolve(organizatinalContext);
+
+                },
+                () => {
+
+                    deferred.reject("fejlfejlfejl");
+
+                });
+
+            return deferred.promise;
+
+        }
         // updates the users default org unit in the current organization
         updateDefaultOrgUnit = (newDefaultOrgUnitId) => {
             //var deferred = this.$q.defer();
