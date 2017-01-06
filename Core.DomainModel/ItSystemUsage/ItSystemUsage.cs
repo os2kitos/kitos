@@ -302,11 +302,7 @@ namespace Core.DomainModel.ItSystemUsage
             return OrganizationId == organizationId;
         }
 
-        public class TerminationDeadlineTypesInSystem : OptionEntity<ItSystem>, IOptionReference<ItSystem>
-        {
-            public virtual ICollection<ItSystem> References { get; set; } = new HashSet<ItSystem>();
-        }
-
+        
         public bool? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }

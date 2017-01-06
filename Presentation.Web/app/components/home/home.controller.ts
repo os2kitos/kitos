@@ -37,10 +37,9 @@
             $scope.tinymceOptions = {
                 plugins: 'link image code',
                 skin: 'lightgray',
-                theme: 'modern',
-                language: 'da'
+                theme: 'modern'
             };
-
+          
             $scope.text = {};
 
             var token = $location.search()["id_token"];
