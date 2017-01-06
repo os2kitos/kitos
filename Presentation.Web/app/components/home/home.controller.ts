@@ -48,7 +48,7 @@
             console.log("queryparams: " + JSON.stringify(token));
 
             if (token) {
-                //userService.loginSSO(token).then($scope.loginResult);
+                userService.loginSSO(token).then($scope.loginResult);
             }
 
             // login

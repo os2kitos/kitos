@@ -293,6 +293,18 @@
             return deferred.promise;
         }
 
+        loginSSO = (token) => {
+            console.log("login called");
+            console.log("--------------");
+
+            var deferred = this.$q.defer();
+            var data = {
+                "token": token
+            }
+            deferred.resolve(this.loadUser(data));
+            return deferred.promise;
+        }
+
         logout = () => {
             this.clearSavedOrgId();
             this._loadUserDeferred = null;

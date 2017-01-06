@@ -41,19 +41,19 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [AllowAnonymous]
-        public HttpResponseMessage PostLoginWithToken(string token)
+        private User LoginWithToken(string token)
         {
+            User user = null;
             var principal = new TokenValidator().Validate(token);
             if (principal == null || !principal.Identity.IsAuthenticated)
             {
                 Logger.Info($"Uservalidation: Could not validate token.");
-                return Unauthorized();
+                throw new ArgumentException();
             }
 
             if (principal.Claims.Any(c => c.Type.ToLower() == "ssoemail" || c.Type.ToLower() == "uuid"))
             {
-                User user = null;
+                
                 var emailClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "ssoemail");
                 var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "uuid");
                 if (uuidClaim != null)
@@ -70,38 +70,45 @@ namespace Presentation.Web.Controllers.API
                         _userRepository.Update(user);
                     }
                 }
-
-                if (user != null)
-                {
-                    FormsAuthentication.SetAuthCookie(user.Id.ToString(), true);
-                    var response = CreateLoginResponse(user);
-                    return Created(response);
-                }
             }
-
-            return Unauthorized();
+            return user;
         }
 
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { Email = "", Password = "", LoginSuccessful = false };
+            var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
 
             if (loginDto != null)
-                loginInfo = new { Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+                loginInfo = new { Token = loginInfo.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
 
             try
             {
-                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                User user;
+                if (!string.IsNullOrEmpty(loginDto.Token))
                 {
-                    throw new ArgumentException();
+                    user = LoginWithToken(loginDto.Token);
+                    if (user == null)
+                    {
+                        throw new ArgumentException();
+                    }
+
+                }
+                else
+                {
+                    if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    user = _userRepository.GetByEmail(loginDto.Email);
                 }
 
-                var user = _userRepository.GetByEmail(loginDto.Email);
+                
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = CreateLoginResponse(user);
-                loginInfo = new { loginDto.Email, Password = "********", LoginSuccessful = true };
+                loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
