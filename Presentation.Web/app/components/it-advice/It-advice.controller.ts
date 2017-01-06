@@ -272,10 +272,17 @@
                         $scope.checkErr = function (startDate, endDate) {
                             $scope.errMessage = '';
                             $scope.curDate = new Date();
-                            if (startDate > endDate) {
-                                $scope.stopDateErrMessage = '\'Til Dato\' skal være senere end eller samme som \'Fra dato\'!';
+
+                            if ($scope.startDate && $scope.stopDate) {
+                                if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
+                                    $scope.stopDateErrMessage = '\'Til Dato\' skal være senere end eller samme som \'Fra dato\'!';
+                                    return false;
+                                }
+                            } else {
+                                $scope.stopDateErrMessage = 'Begge dato felter skal udfyldes!';
                                 return false;
                             }
+
                             $scope.stopDateErrMessage = '';
                             return true;
                         };
