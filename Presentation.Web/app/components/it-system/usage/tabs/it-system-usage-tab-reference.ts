@@ -18,9 +18,10 @@
                 $scope.references = itSystemUsage.externalReferences;
 
                 $scope.setChosenReference = function (id) {
+                    var referenceId = (id === itSystemUsage.referenceId) ? null : id;
 
                     var data = {
-                        referenceId: id
+                        referenceId: referenceId
                     };
 
                     var msg = notify.addInfoMessage("Opdaterer felt...", false);
@@ -101,8 +102,10 @@
                     }, {
                         title: "Rediger",
                         template: dataItem => {
-                            var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil'  aria-hidden='true'></i></button>"
-                                + " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
+                            var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+                            if (dataItem.id != itSystemUsage.referenceId) {
+                                HTML += " <button type='button' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
+                            }
 
                             if ($scope.isValidUrl(dataItem.url)) {
                                 if (dataItem.id === itSystemUsage.referenceId) {
