@@ -214,9 +214,9 @@
 
                     //this.resolveOrganization2(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
                     this.determineOrganizationChoice(orgsAndDefaultUnits).then((orgAndDefaultUnit: any) => {
-
                         this.saveUserInfo(user, orgAndDefaultUnit);
 
+                        console.log("user saved. Resolving this._user");
                         this._loadUserDeferred.resolve(this._user);
                         this._loadUserDeferred = null;
 
@@ -331,7 +331,6 @@
 
         // determines
         determineOrganizationChoice = (orgsAndDefaultUnits) => {
-            console.log("--------------");
             console.log("determineOrganizationChoice called");
 
             var deferred = this.$q.defer();
@@ -414,12 +413,15 @@
 
             modal.result.then((selectedOrgAndUnit) => {
                 this.setSavedOrgId(selectedOrgAndUnit.organization.id);
-                console.log("setSavedOrgId was changed to: " + selectedOrgAndUnit.organization.id);
+                console.log("setSavedOrgId was set to: " + selectedOrgAndUnit.organization.id);
                 console.log("--------------");
 
                 deferred.resolve(selectedOrgAndUnit);
+
             }, () => {
+
                 deferred.reject("Modal dismissed");
+
             });
 
             return deferred.promise;
@@ -450,6 +452,11 @@
                             return orgAndUnit.organization.id == $modalScope.orgChooser.selectedId;
                         });
                         $modalInstance.close(selectedOrgAndUnit);
+                    };
+
+                    $modalScope.cancel = () => {
+
+                        $modalInstance.close();
                     };
                 }]
             });
@@ -537,36 +544,42 @@
 
         // change organizational context
         changeOrganization = () => {
+            console.log("changeOrganization called");
+            console.log("--------------");
+
+            let currentOrgId = this.getSavedOrgId();
+
+            this.clearSavedOrgId();
+
+            let organizatinalContext = null;
+            let selectedOrgAndUnit = null;
 
             const deferred = this.$q.defer();
-            let organizatinalContext = null;
-            let organizations = null;
-            let user = null;
 
-            this.getOrganizationsIfAuthorized()
-                .then(result => {
+            this.getOrganizationsIfAuthorized().then(result => {
 
-                    organizatinalContext = result.data.response;
-                    organizations = organizatinalContext.organizations;
+                organizatinalContext = result.data.response;
 
-                    this.selectAmongOrganizations(organizations)
-                        .then((organization) => {
-                            user = organizatinalContext.user;
-                            this.saveUserInfo(user, organization);
-                        });
+                this.selectAmongOrganizations(organizatinalContext).then((res: any) => {
+                    selectedOrgAndUnit = res.organization;
 
-                    deferred.resolve(organizatinalContext);
+                    this.saveUserInfo(organizatinalContext.user, selectedOrgAndUnit.organization);
+                    deferred.resolve(this._user);
 
-                },
-                () => {
-
-                    deferred.reject("fejlfejlfejl");
+                }, error => {
 
                 });
+
+            }, error => {
+
+                deferred.reject("Could not retrieve organizational context.");
+
+            });
 
             return deferred.promise;
 
         }
+
         // updates the users default org unit in the current organization
         updateDefaultOrgUnit = (newDefaultOrgUnitId) => {
             //var deferred = this.$q.defer();
