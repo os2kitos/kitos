@@ -114,6 +114,7 @@
     <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
     <Compile Include="ItProject\ItProjectStatusUpdate.cs" />
+    <Compile Include="ItSystemUsage\TerminationDeadlineTypesInSystem.cs" />
     <Compile Include="ItSystem\AccessType.cs" />
     <Compile Include="ItSystem\ArchiveLocation.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />

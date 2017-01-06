@@ -40,13 +40,12 @@ namespace Presentation.Web.Controllers.OData
                     continue;
 
                 var itemToAdd = item;
-                item.IsLocallyAvailable = false;
+                itemToAdd.IsLocallyAvailable = false;
 
-                var search = localOptionsResult.Where(x => x.OptionId == item.Id);
+                var localOption = localOptionsResult.FirstOrDefault(x => x.OptionId == item.Id);
 
-                if (search.Any())
+                if (localOption != null)
                 {
-                    var localOption = search.First();
                     itemToAdd.IsLocallyAvailable = localOption.IsActive;
                     if (!IsNullOrEmpty(localOption.Description))
                     {
