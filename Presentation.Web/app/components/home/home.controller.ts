@@ -16,8 +16,8 @@
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth",
-        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth) => {
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth","$location",
+        ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
             $scope.texts = [];
@@ -42,37 +42,47 @@
 
             $scope.text = {};
 
+            var token = $location.search()["id_token"];
 
+            console.log("queryparams: " + JSON.stringify(token));
+
+            if (token) {
+                //userService.loginSSO(token).then($scope.loginResult);
+            }
 
             // login
             $scope.submitLogin = () => {
                 if ($scope.loginForm.$invalid) return;
 
                 userService.login($scope.email, $scope.password, $scope.remember)
-                    .then(() => {
-                        notify.addSuccessMessage("Du er nu logget ind!");
-                        userService.getUser()
-                            .then(data => {
-                                if (data.isAuth === true) {
-                                    if (navigationService.checkState(data.defaultUserStartPreference)) {
-                                        $state.go(data.defaultUserStartPreference);
-                                    } else {
-                                        $state.go("index");
-                                    }
-                                };
-                            });
-                    }, error => {
-                        if (error.response === "User is locked")
-                            notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
-                        else
-                            notify.addErrorMessage("Forkert brugernavn eller password!");
-                    });
+                    .then($scope.loginResult);
             };
 
             $scope.SSOLogin = () => {
                 notify.addInfoMessage("Should do redirect to OS2SSO...");
                 $auth.signIn();
             };
+
+
+            $scope.loginResult = () => {
+                notify.addSuccessMessage("Du er nu logget ind!");
+                userService.getUser()
+                    .then(data => {
+                        if (data.isAuth === true) {
+                            if (navigationService.checkState(data.defaultUserStartPreference)) {
+                                $state.go(data.defaultUserStartPreference);
+                            } else {
+                                $state.go("index");
+                            }
+                        };
+                    });
+            }, error => {
+                if (error.response === "User is locked")
+                    notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
+                else
+                    notify.addErrorMessage("Forkert brugernavn eller password!");
+            }
+
 
             $scope.save = (text) => {
                 var msg = notify.addInfoMessage("Gemmer...", false);
