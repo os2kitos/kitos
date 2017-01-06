@@ -14,6 +14,9 @@
         Her ses brugerens tildelte roller.<br>
         Disse roller kan tildeles andre brugere eller slettes helt fra organisationen.
     </h5>
+
+    <div class="well" ng-bind-html="ctrl.vmText"></div>
+
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
     
     <div ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">

@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
-                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !_authService.IsGlobalAdmin(UserId))
+                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !(_authService.IsGlobalAdmin(UserId) || this._authService.IsLocalAdmin(UserId)))
                 {
                     result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
                 }
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             var entity = result.First();
-            if (!_authService.HasReadAccess(UserId, entity))
+            if (!_authService.HasReadAccess(UserId, entity) && !_authService.HasReadAccessOutsideContext(UserId))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));

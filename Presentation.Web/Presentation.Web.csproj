@@ -274,6 +274,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
     <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
     <Compile Include="App_Start\AuthConfig.cs" />
@@ -581,6 +585,7 @@
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
+    <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
@@ -721,6 +726,7 @@
     <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
     <TypeScriptCompile Include="app\shared\typeahead\typeahead.directive.ts" />
     <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
+    <Content Include="app\shared\tinyMCE_lang_da.js" />
     <Content Include="app\shared\typeahead\typeahead.view.html" />
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\fonts\tinymce-small.svg" />

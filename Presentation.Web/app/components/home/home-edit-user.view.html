@@ -1,17 +1,11 @@
-﻿<div class="clearfix">
-    <div class="form-group pull-right">
-        <help-text data-key="home_edit_user" data-default-title="Profil indstillinger"></help-text>
-    </div>
-</div>
-
-<h2>Profil indstillinger</h2>
+﻿<h2>Profil indstillinger</h2>
 
 <form name="profileForm" class="form-horizontal">
     <div>
         <!-- Default organizationunit -->
         <div class="form-group">
             <label class="col-xs-3 control-label">Primær organisationsenhed</label>
-            <div class="col-xs-8 ng-cloak">
+            <div class="col-xs-8">
                 <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>
             </div>
         </div>

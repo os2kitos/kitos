@@ -1,10 +1,4 @@
-﻿<div class="clearfix">
-    <div class="form-group pull-right">
-        <help-text data-key="it_contract_main" data-default-title="IT kontrakt - Kontraktforside"></help-text>
-    </div>
-</div>
-
-<div class="object-section-container">
+﻿<div class="object-section-container">
     <h4>{{contract.name}}</h4>
     <div class="row">
         <!-- Left side -->
@@ -196,12 +190,13 @@
                     <div class="form-group">
                         <!-- Intern contract signer -->
                         <label for="contract-int-signer" class="control-label small">Kontraktunderskriver</label>
-                        <input type="text" id="contract-int-signer" class="form-control input-sm"
+                        <typeahead id="contract-int-signer"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-autosave-url="{{ autoSaveUrl }}"
                                    data-items="kitosUsers"
                                    data-ng-model="contract.contractSigner"
-                                   data-field="contractSigner" />
+                                   data-field="contractSigner"
+                                   data-user-has-write-access="hasWriteAccess" />
                     </div>
 
                     <!-- Intern contract is signed -->
@@ -267,8 +262,7 @@
                        data-ng-disabled="!hasWriteAccess"
                        data-autosave="{{ autoSaveUrl }}"
                        data-field="active"
-                       data-ng-change="checkContractValidity()"
-                       />
+                       data-ng-change="checkContractValidity()" />
                 <label for="contractIsActive">
                     <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
                     <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>

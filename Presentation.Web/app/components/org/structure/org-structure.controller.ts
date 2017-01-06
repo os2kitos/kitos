@@ -29,6 +29,14 @@
                         "userService", function (userService) {
                             return userService.getUser();
                         }
+                    ],
+                    hasWriteAccess: [
+                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }
                     ]
                 }
             });
@@ -36,8 +44,8 @@
     ]);
 
     app.controller("org.StructureCtrl", [
-        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user",
-        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user) {
+        "$scope", "$http", "$q", "$filter", "$uibModal", "$state", "notify", "orgUnits", "localOrgUnitRoles", "orgUnitRoles", "user", "hasWriteAccess",
+        function ($scope, $http: ng.IHttpService, $q, $filter, $modal, $state, notify, orgUnits, localOrgUnitRoles, orgUnitRoles, user, hasWriteAccess) {
             $scope.orgId = user.currentOrganizationId;
             $scope.pagination = {
                 skip: 0,
@@ -53,6 +61,7 @@
 
             //flattened map of all loaded orgUnits
             $scope.orgUnits = {};
+            $scope.hasWriteAccess = hasWriteAccess;
 
             $scope.orgUnitRoles = orgUnitRoles;
             $scope.activeOrgRoles = localOrgUnitRoles;

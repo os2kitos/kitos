@@ -20,7 +20,7 @@
                 object: [
                     '$http', '$stateParams', function ($http, $stateParams) {
                         var interfaceId = $stateParams.id;
-                        return $http.get('api/itInterface/' + '1')
+                        return $http.get('api/itInterface/' + interfaceId)
                             .then(function (result) {
                                 return result.data.response;
                             });

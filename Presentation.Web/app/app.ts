@@ -81,7 +81,7 @@ app.run([
         $rootScope.$state = $state;
 
         // this will try to authenticate - to see if the user's already logged in
-        userService.getUser();
+        userService.reAuthorize();
 
         uiSelect2Config.dropdownAutoWidth = true;
 
@@ -96,9 +96,9 @@ app.run([
         // changeOrganization function for top navigation bar
         $rootScope.changeOrganization = () => {
             $rootScope.changingOrganization = true;
-            userService.changeOrganization().then((user) => {
-                if (navigationService.checkState(user.defaultUserStartPreference)) {
-                    $state.go(user.defaultUserStartPreference, null, { reload: true });
+            userService.changeOrganization().then((organizationalContext) => {
+                if (navigationService.checkState(organizationalContext.user.defaultUserStartPreference)) {
+                    $state.go(organizationalContext.user.defaultUserStartPreference, null, { reload: true });
                 } else {
                     $state.go("index", null, { reload: true });
                 }

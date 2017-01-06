@@ -10,7 +10,7 @@
         <div class="row">
             <div class="col-md-6">
                 <!--Modtager(e)-->
-                <div class="form-group">
+                <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label">Til</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                placeholder="Vælg modtagere"
@@ -22,15 +22,24 @@
                     </select-multiple-recievers>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <a  ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
                     <div ng-show="collapsed">
                         <input id="toExternal" type="email" name="toExternal" data-ng-disabled="hasWriteAccess" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
 
                     </div>
                 </div>
+
+                <div class="form-group" data-ng-hide="{{showRoleFields}}">
+                    <a ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="collapsed">Tilføj Email adresse manuelt</div><div ng-show="!collapsed">Minimer</div></a>
+                    <div ng-show="!collapsed">
+                        <input id="toExternal" type="email" name="toExternal" data-ng-disabled="hasWriteAccess" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
+
+                    </div>
+                </div>
+
                 <!--CC('ere)-->
-                <div class="form-group">
+                <div class="form-group" data-ng-show="{{showRoleFields}}">
                     <label for="contract-note" class="control-label small">CC</label>
                     <select-multiple-recievers data-id="agreement-elements"
                                                data-placeholder="Vælg CC"
