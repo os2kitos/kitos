@@ -156,12 +156,17 @@
                         },
                     () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
+
+            var modalOpen = false;
+
             $scope.newAdvice = function (action, id) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
-                
 
+                if (modalOpen) {
+                    return;
+                }
                 var modalInstance = $modal.open({
 
                     windowClass: "modal fade in",
@@ -169,6 +174,7 @@
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
                         $scope.showRoleFields = true;
+                        modalOpen = true;
 
                         if (roles.data) {
                             $scope.recieverRoles = roles.data.value;
@@ -397,7 +403,8 @@
                         }
                         return payload;
                     };
-                }],
+                        modalOpen = false;
+                    }],
                 resolve: {
                     Roles: ['$http', function ($http) {
                         if (type == "itSystemUsage") {
