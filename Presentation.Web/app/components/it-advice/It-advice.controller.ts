@@ -5,6 +5,7 @@
             $scope.object = object;
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.advicename = advicename;
+
             $scope.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -74,7 +75,7 @@
                             title: "CC",
                             template: () =>
                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                            attributes: { "class": "might-overflow" }
+                                    attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Subject",
@@ -116,9 +117,7 @@
                             dataType: "json"
                     },
                 },
-                pageSize: 10,
-                serverPaging: true,
-                serverFiltering: true
+                pageSize: 25
                 },
                 columns: [{
                     field: "AdviceSentDate",
@@ -130,7 +129,10 @@
                         return "";
                     }
                 }
-                ]
+                ],
+                scrollable: {
+                    virtual: true
+                }
             };
 
             $scope.datepickerOptions = {
@@ -158,13 +160,22 @@
 
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
+                
+
                 var modalInstance = $modal.open({
 
                     windowClass: "modal fade in",
                     templateUrl: "app/components/it-advice/it-advice-modal-view.html",
                     controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
 
-                        $scope.recieverRoles = roles.data.value;
+                        $scope.showRoleFields = true;
+
+                        if (roles.data) {
+                            $scope.recieverRoles = roles.data.value;
+                        } else {
+                            $scope.showRoleFields = false;
+                            $scope.collapsed = false;
+                        }
 
                         if (action === 'POST') {
                             $scope.hideSend = false;
@@ -383,7 +394,7 @@
                 }],
                 resolve: {
                     Roles: ['$http', function ($http) {
-                        if (type == "itSystemUsage" || type == "itInterface") {
+                        if (type == "itSystemUsage") {
                             return $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                                 .then(function (result) {
                                     return result;
@@ -401,8 +412,11 @@
                                     return result;
                                 });
                         }
+                        if (type == "itInterface") {
+                            return [];
+                        }
                     }],
-                    advices: ['$http', '$stateParams', function ($http, $stateParams) {
+                    /*advices: ['$http', '$stateParams', function ($http, $stateParams) {
                       
                         switch ($scope.type) { 
                             case 'itContract':
@@ -422,7 +436,7 @@
                                     return result.data.response.advices;
                                 });
                     }
-                    }],
+                    }],*/
                     users: ['UserGetService', function (UserGetService) {
                         return UserGetService.GetAllUsers();
                     }],

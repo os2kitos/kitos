@@ -8,6 +8,7 @@
                 scope: {
                     key: "@",
                     defaultTitle: "@",
+                    noButtonLayout: "@"
                 },
                 controller: [
                     '$scope', '$http', '$uibModal', '$sce', function ($scope, $http, $uibModal, $sce) {

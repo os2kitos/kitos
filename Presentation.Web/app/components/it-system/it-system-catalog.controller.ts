@@ -86,13 +86,13 @@
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
-                itSystemBaseUrl = "/odata/ItSystems?";
+                itSystemBaseUrl = "/odata/ItSystems";
             } else {
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
             var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
-
+          
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -115,6 +115,7 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/, "TaskRefs/any(c: $1c/Description$2)");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
+
                                 if (user.isGlobalAdmin) {
                                     parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
                                 }

@@ -127,6 +127,11 @@
                         // using timeout to wait for the value to update
                         $timeout(function () {
                             if (attrs.field) {
+                                if (angular.isUndefined(user)) {
+                                    notify.addWarnMessage("Brugeren er endnu ikke indlæst. Vent venligst og prøv igen.", false);
+                                    return;
+                                }
+
                                 var newValue;
 
                                 var viewValue = ctrl.$viewValue;
