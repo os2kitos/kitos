@@ -43,6 +43,9 @@
             $scope.text = {};
 
             var token = $location.search()["id_token"];
+            $location.search("id_token", null);
+            $location.search("scope", null);
+            $location.search("session_state", null);
 
             console.log("queryparams: " + JSON.stringify(token));
 

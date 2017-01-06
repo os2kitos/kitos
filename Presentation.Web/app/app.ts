@@ -30,6 +30,7 @@ app.config(['$authProvider', $authProvider => {
     $authProvider.configure({
         basePath: 'https://os2sso-test.miracle.dk',
         redirectUri: "https://localhost:44311/#/?",
+        scope: "openid email all_claims",
         clientId: 'kitos_client'
     });
 }]);

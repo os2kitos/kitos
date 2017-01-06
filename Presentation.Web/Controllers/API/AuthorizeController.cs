@@ -1,8 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -51,23 +51,24 @@ namespace Presentation.Web.Controllers.API
                 throw new ArgumentException();
             }
 
-            if (principal.Claims.Any(c => c.Type.ToLower() == "ssoemail" || c.Type.ToLower() == "uuid"))
+            if (principal.Claims.Any(c => c.Type == ClaimTypes.Email || c.Type == ClaimTypes.NameIdentifier))
             {
                 
-                var emailClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "ssoemail");
-                var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type.ToLower() == "uuid");
-                if (uuidClaim != null)
+                var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
+                var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                Guid uuid = Guid.Empty;
+                if (uuidClaim != null && Guid.TryParse(uuidClaim.Value, out uuid))
                 {
-                    user = _userRepository.GetByUuid(Guid.Parse(uuidClaim.Value));
+                    user = _userRepository.GetByUuid(uuid);
                 }
                 if (user == null && emailClaim != null)
                 {
                     user = _userRepository.GetByEmail(emailClaim.Value);
-                    //TODO: update user if UUID is not set.
-                    if (user != null && uuidClaim != null)
+                    if (user != null && uuid != Guid.Empty)
                     {
-                        user.Uuid = Guid.Parse(uuidClaim.Value);
+                        user.Uuid = uuid;
                         _userRepository.Update(user);
+                        _userRepository.Save();
                     }
                 }
             }
