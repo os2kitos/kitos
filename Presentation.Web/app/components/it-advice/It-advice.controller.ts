@@ -291,8 +291,7 @@
                             plugins: 'link image code',
                             skin: 'lightgray',
                             theme: 'modern',
-                            toolbar: "bold italic | example | code | preview | link | searchreplace",
-                            language: 'da'
+                            toolbar: "bold italic | example | code | preview | link | searchreplace"
                         };
 
                         $scope.datepickerOptions = {
