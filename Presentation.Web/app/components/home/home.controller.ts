@@ -45,6 +45,8 @@
 
             // login
             $scope.submitLogin = () => {
+                console.log("submitLogin was clicked");
+
                 if ($scope.loginForm.$invalid) return;
 
                 userService.login($scope.email, $scope.password, $scope.remember)
