@@ -63,6 +63,7 @@
         private lastName: string;
         private email: string;
         private itemSelected: boolean;
+        private vmText: string;
 
         // injecter resolve request i ctoren
         public static $inject: string[] = [
@@ -80,7 +81,8 @@
             "itContracts",
             "orgUnits",
             "orgAdmin",
-            "_"
+            "_",
+            "text"
             ];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
@@ -97,7 +99,8 @@
             public itContracts,
             public orgUnits,
             public orgAdmin,
-            private _: ILoDashWithMixins) {
+            private _: ILoDashWithMixins,
+            private text) {
 
             this.userId = user.Id;
             this.firstName = user.Name;
@@ -120,6 +123,7 @@
             this.isUserSelected = true;
             this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;
             this.disabled = true;
+            this.vmText = text;
         }
 
         public initCollections = (collection, output) => {
@@ -445,6 +449,19 @@
                                         userService.getUser()
                                             .then((currentUser) => organizationService.GetOrganizationData($stateParams["id"], `${currentUser.currentOrganizationId}`)
                                                 .then(result => result.data.value))
+                                ],
+                                text: ["$http", "$sce",
+                                    ($http: ng.IHttpService, $sce) => {
+                                        return $http.get("odata/HelpTexts?$filter=Key eq 'user_deletion_modal_text'")
+                                            .then((result: any) => {
+                                                console.log(result)
+                                                if (result.data.value.length) {
+                                                    return $sce.trustAsHtml(result.data.value[0].Description);
+                                                } else {
+                                                    return "Ingen hjælpetekst defineret.";
+                                                }
+                                        });
+                                    }
                                 ]
                             }
                         })

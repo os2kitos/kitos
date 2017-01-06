@@ -23,7 +23,7 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, IContextAware
+    public class Advice : Entity
     {
         public Advice() {
             AdviceSent = new List<AdviceSent.AdviceSent>();
@@ -159,25 +159,6 @@ namespace Core.DomainModel.Advice
                 */
             return base.HasUserWriteAccess(user);
         }
-
-        public bool IsInContext(int organizationId)
-        {
-            throw new NotImplementedException();
-        }
-
-        /*/// <summary>
-        /// Determines whether this instance is within a given organizational context.
-        /// </summary>
-        /// <param name="organizationId">The organization identifier (context) the user is accessing from.</param>
-        /// <returns>
-        ///   <c>true</c> if this instance is in the organizational context, otherwise <c>false</c>.
-        /// </returns>
-        public bool IsInContext(int organizationId)
-        {
-            if (Object != null)
-                return Object.IsInContext(organizationId);
-
-            return false;
-        }*/
+        
     }
 }
