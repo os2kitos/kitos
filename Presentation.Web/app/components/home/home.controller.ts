@@ -39,35 +39,40 @@
                 skin: 'lightgray',
                 theme: 'modern'
             };
-          
+
             $scope.text = {};
 
             // login
             $scope.submitLogin = () => {
-                console.log("submitLogin was clicked");
-                console.log("--------------");
 
                 if ($scope.loginForm.$invalid) return;
 
-                userService.login($scope.email, $scope.password, $scope.remember)
-                    .then(() => {
-                        notify.addSuccessMessage("Du er nu logget ind!");
-                        userService.getUser()
-                            .then(data => {
-                                if (data.isAuth === true) {
-                                    if (navigationService.checkState(data.defaultUserStartPreference)) {
-                                        $state.go(data.defaultUserStartPreference);
-                                    } else {
-                                        $state.go("index");
-                                    }
-                                };
-                            });
-                    }, error => {
-                        if (error.response === "User is locked")
-                            notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
-                        else
-                            notify.addErrorMessage("Forkert brugernavn eller password!");
-                    });
+                userService.login($scope.email, $scope.password, $scope.remember).then(user => {
+
+                    notify.addSuccessMessage("Du er nu logget ind!");
+
+                    if (user.isAuth === true) {
+
+                        if (navigationService.checkState(user.defaultUserStartPreference)) {
+
+                            $state.go(user.defaultUserStartPreference);
+
+                        } else {
+
+                            $state.go("index");
+                        }
+                    };
+
+                }, error => {
+
+                    if (error.response === "User is locked")
+                        notify.addErrorMessage("Brugeren er låst! Kontakt administrator.");
+                    else if (typeof error.response === "undefined") {
+                        // closes choose-organization modal without displaying a notification to the user if he/she doesn't belong to any organization
+                    }
+                    else
+                        notify.addErrorMessage("Forkert brugernavn eller password!");
+                });
             };
 
             $scope.save = (text) => {
