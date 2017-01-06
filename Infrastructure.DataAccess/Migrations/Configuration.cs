@@ -28,6 +28,9 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
+            //MEMA: 06012017 - Disable seed as it resets settings
+            return;
+
             #region USERS
 
             // don't overwrite global admin if it already exists
