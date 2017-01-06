@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             var entity = result.First();
-            if (!_authService.HasReadAccess(UserId, entity))
+            if (!_authService.HasReadAccess(UserId, entity) && !_authService.HasReadAccessOutsideContext(UserId))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
