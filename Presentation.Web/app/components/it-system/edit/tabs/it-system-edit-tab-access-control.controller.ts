@@ -22,9 +22,8 @@
         '$scope', '$http', '$state', 'notify', 'itSystem', 'user', "hasWriteAccess", "accessTypes",
         function ($scope, $http, $state, notify, itSystem, user, hasWriteAccess, accessTypes) {
             var systemId = itSystem.id;
-
+            $scope.system = itSystem;
             $scope.accessTypes = accessTypes;
-
             $scope.hasWriteAccess = hasWriteAccess;
 
             $scope.add = function () {
