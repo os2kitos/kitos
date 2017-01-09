@@ -4,18 +4,14 @@
     app.directive('kleFilter', [
         'taskService', function (taskService) {
             return {
-                restrict: "EA",
-                scope: false,
-                //{
-                //    // the output of filtering tasks
-                //    selectedGroup: "=kleFilter",
-                //    hasWriteAccess: "="
-                //},
-
+                scope: {
+                    // the output of filtering tasks
+                    selectedGroup: "=kleFilter",
+                    hasWriteAccess: "="
+                },
                 templateUrl: 'app/shared/kleFilter/kleFilter.view.html',
-                replace: true,
-                link: function(scope, element, attrs) {
-                    
+                link: function (scope, element, attrs) {
+
                     // loading main groups
                     taskService.getRoots().then(function(roots) {
                         scope.maingroups = roots;
