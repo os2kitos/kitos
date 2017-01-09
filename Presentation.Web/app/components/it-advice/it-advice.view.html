@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{advicename.name}} <span data-ng-if="object.disabled">(Inaktiv)</span></h4>
+    <h4>{{advicename.name}} <span data-ng-if="object.disabled || object.itSystem.disabled">(Inaktiv)</span></h4>
 
     <div class="col-xs-10">
         <div id="mainGrid" kendo-grid="mainGrid" k-options="mainGridOptions"></div>

@@ -23,28 +23,6 @@
                         text: $scope.project.parentName
                     };
                 }
-                $scope.Options = {
-                    allowClear: true,
-                    initSelection: function (element, callback) {
-                        callback({ id: 1, text: 'Text' });
-                    }
-                };
-
-                $scope.saveType = () => {
-                    var payload;
-                    // if empty the value has been cleared
-                    if ($scope.itProjectTypeId === "") {
-                        payload = { "itProjectTypeId": null };
-                    } else {
-                        var id = $scope.itProjectTypeId;
-                        payload = { "itProjectTypeId": id };
-                    }
-                    $http.patch(`api/itproject/${project.id}?organizationId=${user.currentOrganizationId}`, payload)
-                        .then(() => {
-                            notify.addSuccessMessage("Feltet er opdateret!");
-                        },
-                        () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
-                };
 
                 $scope.selectLazyLoading = function(url, excludeSelf, paramAry) {
                     return {
