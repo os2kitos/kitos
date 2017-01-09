@@ -238,9 +238,6 @@
         }
 
         loginSSO = (token) => {
-            console.log("login called");
-            console.log("--------------");
-
             var deferred = this.$q.defer();
             var data = {
                 "token": token
