@@ -19,7 +19,7 @@
                 }
 
                 subnav.push({ state: 'organization.structure', text: 'Organisation' });
-                subnav.push({ state: 'organization.user', text: 'Bruger' });
+                subnav.push({ state: 'organization.user', text: 'Brugere' });
 
                 $rootScope.page.subnav = subnav;
 
