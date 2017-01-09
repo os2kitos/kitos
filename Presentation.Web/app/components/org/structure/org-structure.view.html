@@ -6,10 +6,10 @@
                 <span class="glyphicon glyphicon-list"></span>
                 <h7 class="panel-title">Organisation</h7>
                 <span class="pull-right">
-                    <a ng-if="chosenOrgUnit.hasWriteAccess && !dragEnabled" data-ng-click="toggleDrag()">Omstrukturer</a>
+                    <a ng-if="hasWriteAccess && !dragEnabled" data-ng-click="toggleDrag()">Omstrukturer</a>
                     <a ng-if="dragEnabled" data-ng-click="toggleDrag()">Færdig</a>
-                    <span class="pull-right" data-ng-hide="true || chosenOrgUnit.hasWriteAccess">Låst</span>
-                    <span data-ng-show="chosenOrgUnit.hasWriteAccess">
+                    <span class="pull-right" data-ng-hide="true || hasWriteAccess">Låst</span>
+                    <span data-ng-show="hasWriteAccess">
                         <a data-ng-click="editUnit(chosenOrgUnit)">Rediger</a>
                     </span>
                 </span>
@@ -117,7 +117,7 @@
                                 <td>{{ right.user.fullName }}</td>
                                 <td class="relative-position">
                                     {{ right.user.email }}
-                                    <div data-ng-show="chosenOrgUnit.hasWriteAccess" class="pull-right">
+                                    <div data-ng-show="hasWriteAccess" class="pull-right">
                                         <a data-ng-click="right.edit = true" class="btn btn-info btn-xs">
                                             <i class="glyphicon glyphicon-pencil"></i>
                                         </a>
@@ -143,7 +143,7 @@
                                             {{ getRoleName(right.roleId) }} (udgået)
                                         </option>
                                         <option data-ng-repeat="orgRole in activeOrgRoles" value="{{orgRole.Id}}">
-                                            {{orgRole.Name}} ({{orgRole.HasWriteAccess && "skriv" || "læs" }})
+                                            {{orgRole.Name}} ({{hasWriteAccess && "skriv" || "læs" }})
                                         </option>
                                     </select>
                                 </td>
@@ -157,7 +157,7 @@
                         </tbody>
 
                         <!-- add-new-right row -->
-                        <tbody data-ng-show="chosenOrgUnit.hasWriteAccess">
+                        <tbody data-ng-show="hasWriteAccess">
                             <tr>
                                 <td>
                                     <input type="text" disabled="disabled" class="form-control input-sm" value="{{ chosenOrgUnit.name }}" />
@@ -168,7 +168,7 @@
                                             data-ng-model="newRole"
                                             data-placeholder="Vælg en organisationsrolle"
                                             data-ng-change="submitRight()">
-                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.Id }}">{{ orgRole.Name }} ({{ orgRole.HasWriteAccess && "skriv" || "læs" }})</option>
+                                        <option data-ng-repeat="orgRole in activeOrgRoles" value="{{ orgRole.Id }}">{{ orgRole.Name }} ({{ hasWriteAccess && "skriv" || "læs" }})</option>
                                     </select>
                                 </td>
                                 <td colspan="2" class="form-group">
@@ -219,7 +219,7 @@
                             <tr data-ng-repeat="task in taskRefUsageList">
                                 <!-- selected -->
                                 <td>
-                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!chosenOrgUnit.hasWriteAccess" />
+                                    <input type="checkbox" id="{{task.taskRef.id}}" data-ng-checked="task.usage" data-ng-click="task.toggleUsage()" data-ng-disabled="!hasWriteAccess" />
                                 </td>
                                 <td>
                                     <label for="{{task.taskRef.id}}">{{task.taskRef.taskKey}}</label>
@@ -231,7 +231,7 @@
                                     <button class="btn btn-link btn-star" data-ng-if="task.usage"
                                             data-ng-class="{'unstarred': !task.usage.starred}"
                                             data-ng-click="task.toggleStar()"
-                                            data-ng-disabled="!chosenOrgUnit.hasWriteAccess"
+                                            data-ng-disabled="!hasWriteAccess"
                                             data-uib-tooltip="Vis under overblik?">
                                         <span class="glyphicon glyphicon-star"></span>
                                     </button>
@@ -247,16 +247,16 @@
                             <tr>
                                 <td colspan="5" class="text-center">
                                     <span>
-                                        <button class="btn btn-success btn-sm" data-confirmed-click="selectTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="chosenOrgUnit.hasWriteAccess">
+                                        <button class="btn btn-success btn-sm" data-confirmed-click="selectTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
                                             Vælg alle sider
                                         </button>
-                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="chosenOrgUnit.hasWriteAccess">
+                                        <button class="btn btn-success btn-sm" data-ng-click="selectAllTasks()" data-ng-if="hasWriteAccess">
                                             Vælg alle
                                         </button>
-                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="chosenOrgUnit.hasWriteAccess">
+                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeAllTasks()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
                                             Fjern alle
                                         </button>
-                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="chosenOrgUnit.hasWriteAccess">
+                                        <button class="btn btn-danger btn-sm" data-confirmed-click="removeTaskGroup()" data-confirm-click="Er du sikker?" data-ng-if="hasWriteAccess">
                                             Fjern alle sider
                                         </button>
                                     </span>
