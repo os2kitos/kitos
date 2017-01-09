@@ -1,5 +1,4 @@
 ﻿module Kitos.Organization.Users {
-    import OrganizationService = Kitos.Services.OrganizationService;
     "use strict";
 
     class UserRole {
