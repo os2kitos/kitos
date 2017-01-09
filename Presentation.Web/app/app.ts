@@ -62,14 +62,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService","$auth",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $auth) => {
-
-        $rootScope.$on('oidcauth:loggedIn', function (e) {
-            console.log('[EventCallback]', 'Event', e.name, e);
-            console.log('[EventCallback]', '$auth.isAuthenticated', $auth.isAuthenticated());
-        });
-
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
         // init info
         $rootScope.page = {
             title: "Index",
