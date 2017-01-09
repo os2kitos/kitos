@@ -16,6 +16,7 @@
         '$scope', '$http', '$state', 'notify', 'itSystem', 'user', "hasWriteAccess",
         function ($scope, $http, $state, notify, itSystem, user, hasWriteAccess) {
             var systemId = itSystem.id;
+            $scope.system = itSystem;
             var baseUrl = 'api/itSystem/' + systemId;
 
             $scope.pagination = {

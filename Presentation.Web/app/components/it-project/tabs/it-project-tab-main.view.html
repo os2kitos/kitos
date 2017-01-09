@@ -30,16 +30,14 @@
                     <div class="form-group">
                         <select-option data-id="project-type"
                                        data-label="Type"
-                                       data-ui-select2="Options"
                                        data-placeholder="Vælg projekt type"
                                        data-selected-text="{{ project.itProjectTypeName }}"
                                        data-ng-disabled="!hasWriteAccess"
                                        data-ng-model="project.itProjectTypeId"
                                        data-options="projectTypes"
-                                       data-ng-change="saveType()"
+                                       data-auto-save-url="{{ autosaveUrl }}"
                                        data-field="itProjectTypeId">
                         </select-option>
-                        <span class="help-block small">&nbsp;</span>
                     </div>
 
                     <!-- cmdb ref -->

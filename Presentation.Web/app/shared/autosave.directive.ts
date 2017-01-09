@@ -128,7 +128,7 @@
                         $timeout(function () {
                             if (attrs.field) {
                                 if (angular.isUndefined(user)) {
-                                    notify.addWarnMessage("Brugeren er endnu ikke indlæst. Vent venligst og prøv igen.", false);
+                                    notify.addWarnMessage("Brugeren er endnu ikke indlæst. Vent venligst og prøv igen.", true);
                                     return;
                                 }
 
