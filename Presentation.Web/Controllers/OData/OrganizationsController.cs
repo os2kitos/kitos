@@ -103,10 +103,17 @@ namespace Presentation.Web.Controllers.OData
 
             var result = base.Post(organization).ExecuteAsync(new CancellationToken());
 
-            if (result.Result.IsSuccessStatusCode && organization.TypeId == 2)
+            if (result.Result.IsSuccessStatusCode)
             {
-                _organizationRoleService.MakeLocalAdmin(user, organization, user);
-                _organizationRoleService.MakeUser(user, organization, user);
+                if (organization.TypeId == 2)
+                {
+                    _organizationRoleService.MakeLocalAdmin(user, organization, user);
+                    _organizationRoleService.MakeUser(user, organization, user);
+                }
+            }
+            else
+            {
+                return StatusCode(result.Result.StatusCode);
             }
 
             return Created(organization);
