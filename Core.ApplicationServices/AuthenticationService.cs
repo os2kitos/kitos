@@ -147,9 +147,20 @@ namespace Core.ApplicationServices
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            if (accessModifier == AccessModifier.Public && !CanExecute(userId, Feature.CanSetAccessModifierToPublic))
+            if (accessModifier == AccessModifier.Public)
             {
-                return false;
+                // special case for organisation
+                if (entity is Organization)
+                {
+                    if (!CanExecute(userId, Feature.CanSetOrganizationAccessModifierToPublic))
+                    {
+                        return false;
+                    }
+                }
+                else if (!CanExecute(userId, Feature.CanSetAccessModifierToPublic))
+                {
+                    return false;
+                }
             }
 
             // check if user is in context
