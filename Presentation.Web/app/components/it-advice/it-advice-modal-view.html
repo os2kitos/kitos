@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="form-group" data-ng-show="{{showRoleFields}}">
-                    <a  ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
+                    <a ng-model="collapsed" ng-click="collapsed = !collapsed"><div ng-show="!collapsed">Tilføj Email adresse manuelt</div><div ng-show="collapsed">Minimer</div></a>
                     <div ng-show="collapsed">
                         <input id="toExternal" type="email" name="toExternal" data-ng-disabled="hasWriteAccess" placeholder="eksempel@1234.dk" class="form-control" data-ng-model="externalTo">
 
@@ -66,17 +66,7 @@
                 </div>
 
 
-                <!--Email body-->
-                <div class="form-group">
-                    <label for="contract-note" class="control-label">Email body</label>
-                    <textarea ui-tinymce="tinymceOptions" data-ng-model="emailBody"></textarea>
 
-                </div>
-
-                <!--Send Advis-->
-                <div class="form-group md-">
-                    <button type="submit" class="btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !hasWriteAccess)">Send</button>
-                </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group has-feedback" data-show-errors>
@@ -115,11 +105,23 @@
                 </div>
 
             </div>
+            
         </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !!repitionPattern && !!stopDate &&  startDate && checkErr(startDate,stopDate) && !hasWriteAccess)">Gem</button>
-                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
-                <input type="hidden" ng-model="hiddenForjob" />
-            </div>
+        <!--Email body-->
+        <div class="form-group">
+            <label for="contract-note" class="control-label">Email body</label>
+            <textarea ui-tinymce="tinymceOptions" data-ng-model="emailBody"></textarea>
+
+        </div>
     </div>
+
+        <div class="modal-footer">
+            <!--Send Advis-->
+            
+                <button type="submit" class="pull-left btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !hasWriteAccess)">Send</button>
+            
+            <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((!!externalTo || selectedRecievers.length > 0) && !!subject && !!repitionPattern && !!stopDate &&  startDate && checkErr(startDate,stopDate) && !hasWriteAccess)">Gem</button>
+            <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
+            <input type="hidden" ng-model="hiddenForjob"/>
+        </div>
 </form>
