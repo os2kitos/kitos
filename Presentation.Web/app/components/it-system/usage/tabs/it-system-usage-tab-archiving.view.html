@@ -106,7 +106,7 @@
                        data-k-options="datepickerOptions"
                        data-ng-disabled="!hasWriteAccess"
                        data-ng-model="systemUsage.ArchivedDate"
-                       ng-change="patchDate('ArchivedDate', systemUsage.ArchivedDate)"
+                       ng-blur="patchDate('ArchivedDate', systemUsage.ArchivedDate)"
                        data-field="ArchivedDate">
             </div>
             <!-- ArchiveNotes -->
