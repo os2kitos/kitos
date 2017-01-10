@@ -155,10 +155,6 @@
 
                 $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract', true, formatContract, ['orgId=' + user.currentOrganizationId]);
 
-                $scope.allowClearOption = {
-                    allowClear: true
-                };
-
                 function formatContract(supplier) {
                     return '<div>' + supplier.text + '</div>';
                 }

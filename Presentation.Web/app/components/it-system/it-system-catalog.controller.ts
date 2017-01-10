@@ -200,19 +200,19 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Usages", title: "Anvend/Fjern anvendelse", width: 100,
+                        field: "Usages", title: "Anvendes", width: 40,
                         persistId: "command", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // true if system is being used by system within current context, else false
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
-
+                            
                             if (systemHasUsages)
-                                return `<button type="button" class="btn btn-danger col-xs-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
+                                return `<div class="text-center"><button type="button" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
-                                return `<button type="button" class="btn btn-success col-xs-7" disabled>Anvend</button>`
+                                return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`
 
-                            return `<button type="button" class="btn btn-success col-xs-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
+                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
