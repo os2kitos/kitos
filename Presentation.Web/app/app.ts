@@ -28,9 +28,11 @@ app.config([
 
 app.config(['$authProvider', $authProvider => {
     $authProvider.configure({
-        basePath: 'https://os2sso-test.miracle.dk',
         redirectUri: location.origin + "/#/?",
-        scope: "openid email all_claims",
+        scope: "openid email",
+        //TODO: Should be fetched from backend (SSOGateway in web.config)
+        basePath: 'https://os2sso-test.miracle.dk',
+        //TODO: Should be fetched from backend (SSOAudience in web.config)
         clientId: 'kitos_client'
     });
 }]);

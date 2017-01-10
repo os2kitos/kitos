@@ -47,10 +47,18 @@
             }
 
             $scope.patchDate = (field, value) => {
-                var date = value.split("-").reverse().join("-");
+                var date;
+                var testDate = new Date(value.split("-").reverse().join("/"));
+                
+                if (isNaN(testDate.valueOf()) || testDate.getFullYear() < 1000 || testDate.getFullYear() > 2099) {
+                    date = null;
+                } else {
+                    date = testDate.getFullYear() + "-" + testDate.getMonth()+1 + "-" + testDate.getDate();
+                }
                 var payload = {};
                 payload[field] = date;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
+                $scope.systemUsage.ArchivedDate = date;
             }
 
             $scope.datepickerOptions = {
