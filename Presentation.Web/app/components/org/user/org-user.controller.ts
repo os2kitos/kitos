@@ -173,13 +173,7 @@
                         template: (dataItem) => `<advis-button data-user="dataItem" data-current-organization-id="${this.user.currentOrganizationId}" data-ng-disabled="${!dataItem.canEdit}"></advis>`,
                         excelTemplate: (dataItem) => dataItem.LastAdvisDate ? dataItem.LastAdvisDate.toDateString() : "",
                         hidden: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
+                        filterable: false
                     },
                     {
                         field: "ObjectOwner.Name", title: "Oprettet af", width: 150,
