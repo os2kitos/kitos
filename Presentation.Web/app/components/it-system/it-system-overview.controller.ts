@@ -455,7 +455,7 @@
                         sortable: false
                     },
                     {
-                        field: "ReferenceId", title: "Reference", width: 150,
+                        field: "Reference.Title", title: "Reference", width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;

@@ -345,9 +345,9 @@
                         text: "Slet filter",
                         template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
-                    {
-                        template: kendo.template(this.$("#role-selector").html())
-                    }
+                    //{
+                    //    template: kendo.template(this.$("#role-selector").html())
+                    //}
                 ],
                 excel: {
                     fileName: "IT Kontrakt Overblik.xlsx",
@@ -491,7 +491,7 @@
                         }
                     },
                     {
-                        field: "ReferenceId", title: "Reference", width: 150,
+                        field: "Reference.Title", title: "Reference", width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
