@@ -28,9 +28,11 @@ app.config([
 
 app.config(['$authProvider', $authProvider => {
     $authProvider.configure({
+        redirectUri: location.origin + "/#/?",
+        scope: "openid email",
+        //TODO: Should be fetched from backend (SSOGateway in web.config)
         basePath: 'https://os2sso-test.miracle.dk',
-        redirectUri: "https://localhost:44311/#/?",
-        scope: "openid email all_claims",
+        //TODO: Should be fetched from backend (SSOAudience in web.config)
         clientId: 'kitos_client'
     });
 }]);
@@ -62,14 +64,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService","$auth",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $auth) => {
-
-        $rootScope.$on('oidcauth:loggedIn', function (e) {
-            console.log('[EventCallback]', 'Event', e.name, e);
-            console.log('[EventCallback]', '$auth.isAuthenticated', $auth.isAuthenticated());
-        });
-
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
         // init info
         $rootScope.page = {
             title: "Index",

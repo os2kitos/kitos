@@ -47,8 +47,6 @@
             $location.search("scope", null);
             $location.search("session_state", null);
 
-            console.log("queryparams: " + JSON.stringify(token));
-
             if (token) {
                 userService.loginSSO(token).then(user => $scope.loginResult(user));
             }
