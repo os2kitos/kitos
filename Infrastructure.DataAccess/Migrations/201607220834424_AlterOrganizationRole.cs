@@ -18,7 +18,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.OrganizationRights", "Role", c => c.Int(nullable: false));
 
             // migrate local admins
-            Sql("UPDATE dbo.OrganizationRights SET Role=5 WHERE RoleId=1");
+            Sql("UPDATE dbo.OrganizationRights SET Role=1 WHERE RoleId=1");
             // migrate "Medarbejder" users roles
             Sql("UPDATE dbo.OrganizationRights SET Role=0 WHERE RoleId=2");
 
