@@ -315,7 +315,7 @@
                         <label for="agreement-running" class="control-label small">Løbende</label>
                         <select id="agreement-running"
                                 class="form-control input-sm"
-                                data-ui-select2="allowClearOption"
+                                data-ui-select2="{ allowClear: true }"
                                 data-placeholder="Vælg varighed"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="contract.running"
@@ -332,7 +332,7 @@
                         <label for="agreement-by-ending" class="control-label small">Inden udgangen af</label>
                         <select id="agreement-by-ending"
                                 class="form-control input-sm"
-                                data-ui-select2="allowClearOption"
+                                data-ui-select2="{ allowClear: true }"
                                 data-placeholder="Vælg varighed"
                                 data-ng-disabled="!hasWriteAccess"
                                 data-ng-model="contract.byEnding"
