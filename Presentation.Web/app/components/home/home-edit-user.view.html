@@ -1,79 +1,76 @@
-﻿<h2>Profil indstillinger</h2>
-
-<form name="profileForm" class="form-horizontal">
-    <div>
-        <!-- Default organizationunit -->
-        <div class="form-group">
-            <label class="col-xs-3 control-label">Primær organisationsenhed</label>
-            <div class="col-xs-8">
-                <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>
-            </div>
-        </div>
-        <!-- User name -->
-        <div class="form-group">
-            <label for="username" class="col-xs-3 control-label">
-                Fornavn
-            </label>
-            <div class="col-xs-8">
-                <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)"/>
-            </div>
-        </div>
-        <!-- User lastname -->
-        <div class="form-group">
-            <label for="lastname" class="col-xs-3 control-label">
-                Efternavn
-            </label>
-            <div class="col-xs-8">
-                <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)"/>
-            </div>
-        </div>
-        <!-- User phonenumber -->
-        <div class="form-group">
-            <label for="phone" class="col-xs-3 control-label">
-                Telefon
-            </label>
-            <div class="col-xs-8">
-                <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)"/>
-            </div>
-        </div>
-        <!-- User email -->
-        <div class="form-group">
-            <label for="usermail" class="col-xs-3 control-label">
-                Email
-            </label>
-            <div class="col-xs-8">
-                <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)"/>
-            </div>
-        </div>
-        <div>
-            <!-- User startpage preferences -->
-            <label class="col-xs-3 control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
-                Primær start enhed:
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioHome" value="index" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Start side
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioOrganisation" value="organization.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Organisation
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioItProjekter" value="it-project.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT Projekter
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioItSystemer" value="it-system.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT Systemer
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioItkontrakter" value="it-contract.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT kontrakter
-            </label>
-            <label class="radio-inline">
-                <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
-                       id="inlineRadioRapporter" value="reports.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Rapporter
-            </label>
+﻿<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <form name="profileForm">
+                <h3>Profilindstillinger</h3>
+                <br/>
+                <!-- Default organizationunit -->
+                <div class="form-group">
+                    <label class="control-label">Primær organisationsenhed</label>
+                    <div data-ng-model="user.defaultOrganizationUnitId" data-ng-change="updateDefaultOrgUnit()" data-select-user-org-unit="user.defaultOrganizationUnitId"></div>
+                </div>
+                <!-- User name -->
+                <div class="form-group">
+                    <label for="username" class="control-label">
+                        Fornavn
+                    </label>
+                    <input type="text" id="username" data-ng-model="user.name" class="form-control" data-ng-blur="patch('name', user.name)" />
+                </div>
+                <!-- User lastname -->
+                <div class="form-group">
+                    <label for="lastname" class="control-label">
+                        Efternavn
+                    </label>
+                    <input type="text" id="lastname" data-ng-model="user.lastName" class="form-control" data-ng-blur="patch('lastName', user.lastName)" />
+                </div>
+                <!-- User phonenumber -->
+                <div class="form-group">
+                    <label for="phone" class="control-label">
+                        Telefon
+                    </label>
+                    <input type="text" id="phone" data-ng-model="user.phoneNumber" class="form-control" data-ng-blur="patch('phoneNumber', user.phoneNumber)" />
+                </div>
+                <!-- User email -->
+                <div class="form-group">
+                    <label for="usermail" class="control-label">
+                        Email
+                    </label>
+                    <input type="text" id="usermail" data-ng-model="user.email" class="form-control" data-ng-blur="patch('email', user.email)" />
+                </div>
+                <div>
+                    <!-- User startpage preferences -->
+                    <label class="control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
+                        Primær start enhed:
+                    </label>
+                    <div>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioHome" value="index" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Start side
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioOrganisation" value="organization.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Organisation
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioItProjekter" value="it-project.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT Projekter
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioItSystemer" value="it-system.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT Systemer
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioItkontrakter" value="it-contract.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> IT kontrakter
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" data-ng-model="user.defaultUserStartPreference" name="inlineRadioOptions"
+                                    id="inlineRadioRapporter" value="reports.overview" data-ng-change="patch('defaultUserStartPreference', user.defaultUserStartPreference)"> Rapporter
+                        </label>
+                    </div>
+                    <br/>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>

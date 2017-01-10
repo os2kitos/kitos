@@ -39,6 +39,9 @@
         '$scope', '$rootScope', '$http', '$stateParams', 'notify', 'contract', 'user', 'hasWriteAccess',
         function ($scope, $rootScope, $http, $stateParams, notify, contract, user, hasWriteAccess) {
             $scope.hasWriteAccess = hasWriteAccess;
+            $scope.allowClearOption = {
+                allowClear: true
+            };
 
             if (!$scope.hasWriteAccess) {
                 _.remove($rootScope.page.subnav.buttons, function (o: any) {

@@ -194,40 +194,43 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Aftalefrister</div>
                 <div class="panel-body">
-                    <!--div class="form-group">
-                    <label for="agreement-concluded" class="control-label small">
-                        Gyldig fra
-                    </label>
-                    <input id="agreement-concluded"
-                           type="text"
-                           class="form-control"
-                           data-kendo-date-picker
-                           data-k-options="datepickerOptions"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="contract.concluded"
-                           data-autosave="{{autosaveUrl}}"
-                           data-field="concluded">
-                    </div-->
-
-                    <div class="form-group">
-                        <label for="agreement-duration" class="control-label small">Varighed</label>
-                        <div id="agreement-duration" class="contractDurationLayout row">
-                            <input type="text" id="year" class="col-xs-1"
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <label for="agreement-duration" class="control-label">Varighed</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-6 col-lg-4">
+                            <input type="text" id="year" class="form-control input-sm"
                                    data-ng-model="durationYears"
                                    data-ng-disabled="!hasWriteAccess || durationOngoing"
                                    data-ng-blur="saveDurationYears()" />
-                            <label class="col-xs-1" for="year">År</label>
-                            <input type="text" id="month" class="col-xs-1"
+                        </div>
+                        <div class="col-xs-6 contractDurationLabelContainer">
+                            <label class="control-label small contractDurationLabel" for="year">År</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-6 col-lg-4">
+                            <input type="text" id="month" class="form-control input-sm"
                                    data-ng-model="durationMonths"
                                    data-ng-disabled="!hasWriteAccess || durationOngoing"
                                    data-ng-blur="saveDurationMonths()" />
-                            <label class="col-xs-2" for="month">Måneder</label>
-                            <input type="checkbox" id="idl" class="col-xs-1"
+                        </div>
+                        <div class="col-xs-6 contractDurationLabelContainer">
+                            <label class="control-label small contractDurationLabel" for="month">Måneder</label>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-xs-1">
+                            <input type="checkbox" id="idl" class=""
                                    data-ng-checked="durationOngoing"
                                    data-ng-click="saveOngoingStatus()"
                                    data-ng-model="durationOngoing"
                                    data-ng-disabled="!hasWriteAccess" />
-                            <label class="col-xs-2" for="idl" style="font-size: 12px; padding-left: 0;">Løbende</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <label class="control-label small" for="idl">Løbende</label>
                         </div>
                     </div>
 
