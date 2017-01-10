@@ -55,6 +55,8 @@
 
                     saveDuration(payload).then(() => {
                         $scope.contract.durationYears = $scope.durationYears;
+                    }, () => {
+                        $scope.durationYears = $scope.contract.durationYears;
                     });
 
                 } else {
@@ -73,6 +75,8 @@
 
                     saveDuration(payload).then(() => {
                         $scope.contract.durationMonths = $scope.durationMonths;
+                    }, () => {
+                        $scope.durationMonths = $scope.contract.durationMonths;
                     });
 
                 } else {
