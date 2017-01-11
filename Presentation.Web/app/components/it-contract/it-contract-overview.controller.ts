@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItContractOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        //roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: kendo.ui.DropDownListOptions;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -32,7 +32,7 @@
         private storageKey = "it-contract-overview-options";
         private orgUnitStorageKey = "it-contract-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
-        //private roleSelectorDataSource = this._.clone(this.itContractRoles);
+        private roleSelectorDataSource;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -221,6 +221,11 @@
 
         private activate() {
 
+            var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
+            this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
+            clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
+            this.roleSelectorDataSource = clonedItContractRoles;
+
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -228,13 +233,17 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline`;
+                                var urlParameters =
+                                    `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` + urlParameters;
+                                    return `/odata/Organizations(${this.user.currentOrganizationId})/ItContracts` +
+                                        urlParameters;
                                 } else {
-                                    return `/odata/Organizations(${this.user.currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` + urlParameters;
+                                    return `/odata/Organizations(${this.user
+                                        .currentOrganizationId})/OrganizationUnits(${orgUnitId})/ItContracts` +
+                                        urlParameters;
                                 }
                             },
                             dataType: "json"
@@ -244,9 +253,12 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
-                                this._.forEach(this.itContractRoles, role => parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
+                                this._.forEach(this.itContractRoles,
+                                    role => parameterMap.$filter = this
+                                        .fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id));
 
-                                parameterMap.$filter = this.fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+                                parameterMap.$filter = this
+                                    .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
                             }
 
                             return parameterMap;
@@ -276,43 +288,51 @@
                         },
                         parse: response => {
                             // iterrate each contract
-                            this._.forEach(response.value, contract => {
-                                // HACK to add economy data to result
-                                var ecoData = <Array<any>>this._.filter(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
-                                contract.Acquisition = this._.sumBy(ecoData, "Acquisition");
-                                contract.Operation = this._.sumBy(ecoData, "Operation");
-                                contract.Other = this._.sumBy(ecoData, "Other");
+                            this._.forEach(response.value,
+                                contract => {
+                                    // HACK to add economy data to result
+                                    var ecoData = <Array<any>>this._
+                                        .filter(this.ecoStreamData, { "ExternPaymentForId": contract.Id });
+                                    contract.Acquisition = this._.sumBy(ecoData, "Acquisition");
+                                    contract.Operation = this._.sumBy(ecoData, "Operation");
+                                    contract.Other = this._.sumBy(ecoData, "Other");
 
-                                var earliestAuditDate = this._.first(this._.sortBy(ecoData, ["AuditDate"], ["desc"]));
-                                if (earliestAuditDate && earliestAuditDate.AuditDate) {
-                                    contract.AuditDate = earliestAuditDate.AuditDate;
-                                }
+                                    var earliestAuditDate = this._
+                                        .first(this._.sortBy(ecoData, ["AuditDate"], ["desc"]));
+                                    if (earliestAuditDate && earliestAuditDate.AuditDate) {
+                                        contract.AuditDate = earliestAuditDate.AuditDate;
+                                    }
 
-                                var totalWhiteStatuses = this._.filter(ecoData, { AuditStatus: "White" }).length;
-                                var totalRedStatuses = this._.filter(ecoData, { AuditStatus: "Red" }).length;
-                                var totalYellowStatuses = this._.filter(ecoData, { AuditStatus: "Yellow" }).length;
-                                var totalGreenStatuses = this._.filter(ecoData, { AuditStatus: "Green" }).length;
+                                    var totalWhiteStatuses = this._.filter(ecoData, { AuditStatus: "White" }).length;
+                                    var totalRedStatuses = this._.filter(ecoData, { AuditStatus: "Red" }).length;
+                                    var totalYellowStatuses = this._.filter(ecoData, { AuditStatus: "Yellow" }).length;
+                                    var totalGreenStatuses = this._.filter(ecoData, { AuditStatus: "Green" }).length;
 
-                                contract.status = {
-                                    max: totalWhiteStatuses + totalRedStatuses + totalYellowStatuses + totalGreenStatuses,
-                                    white: totalWhiteStatuses,
-                                    red: totalRedStatuses,
-                                    yellow: totalYellowStatuses,
-                                    green: totalGreenStatuses
-                                };
+                                    contract.status = {
+                                        max: totalWhiteStatuses +
+                                        totalRedStatuses +
+                                        totalYellowStatuses +
+                                        totalGreenStatuses,
+                                        white: totalWhiteStatuses,
+                                        red: totalRedStatuses,
+                                        yellow: totalYellowStatuses,
+                                        green: totalGreenStatuses
+                                    };
 
-                                // HACK to flattens the Rights on usage so they can be displayed as single columns
-                                contract.roles = [];
-                                // iterrate each right
-                                this._.forEach(contract.Rights, right => {
-                                    // init an role array to hold users assigned to this role
-                                    if (!contract.roles[right.RoleId])
-                                        contract.roles[right.RoleId] = [];
+                                    // HACK to flattens the Rights on usage so they can be displayed as single columns
+                                    contract.roles = [];
+                                    // iterrate each right
+                                    this._.forEach(contract.Rights,
+                                        right => {
+                                            // init an role array to hold users assigned to this role
+                                            if (!contract.roles[right.RoleId])
+                                                contract.roles[right.RoleId] = [];
 
-                                    // push username to the role array
-                                    contract.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
+                                            // push username to the role array
+                                            contract.roles[right.RoleId]
+                                                .push([right.User.Name, right.User.LastName].join(" "));
+                                        });
                                 });
-                            });
                             return response;
                         }
                     }
@@ -322,32 +342,37 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
-                        template: "<a ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                        template:
+                        "<a ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
                     },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
+                        template:
+                        "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewVm.saveGridProfile()">#: text #</button>'
+                        template:
+                        '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewVm.loadGridProfile()" data-ng-disabled="!contractOverviewVm.doesGridProfileExist()">#: text #</button>'
+                        template:
+                        '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewVm.loadGridProfile()" data-ng-disabled="!contractOverviewVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
+                        template:
+                        "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
-                    //{
-                    //    template: kendo.template(this.$("#role-selector").html())
-                    //}
+                    {
+                        template: kendo.template(this.$("#role-selector").html())
+                    }
                 ],
                 excel: {
                     fileName: "IT Kontrakt Overblik.xlsx",
@@ -641,6 +666,25 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 
+            // add special contract signer role
+            var signerRole = {
+                field: "ContractSigner",
+                title: "Kontraktunderskriver",
+                persistId: "roleSigner",
+                template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner}` : "",
+                width: 130,
+                hidden: true,
+                sortable: true,
+                filterable: {
+                    cell: {
+                        dataSource: [],
+                        showOperators: false,
+                        operator: "contains"
+                    }
+                }
+            };
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
+
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
@@ -846,6 +890,25 @@
                 change: orgUnitChanged
             });
         }
+
+        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
+            return {
+                autoBind: false,
+                dataSource: this.roleSelectorDataSource,
+                dataTextField: "Name",
+                dataValueField: "Id",
+                optionLabel: "Vælg kontraktrolle...",
+                change: e => {
+                    // hide all roles column
+                    this.mainGrid.hideColumn("ContractSigner");
+                    this._.forEach(this.itContractRoles, role => this.mainGrid.hideColumn(`role${role.Id}`));
+
+                    var selectedId = e.sender.value();
+                    // show only the selected role column
+                    this.mainGrid.showColumn(selectedId);
+                }
+            }
+        };
 
         private concatRoles(roles: Array<any>): string {
             var concatRoles = "";
