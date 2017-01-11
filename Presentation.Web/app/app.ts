@@ -26,14 +26,14 @@ app.config([
     }
 ]);
 
-app.config(['$authProvider', $authProvider => {
+app.config(["$authProvider", $authProvider => {
     $authProvider.configure({
         redirectUri: location.origin + "/#/?",
         scope: "openid email",
         //TODO: Should be fetched from backend (SSOGateway in web.config)
-        basePath: 'https://os2sso-test.miracle.dk',
+        basePath: "https://os2sso-test.miracle.dk",
         //TODO: Should be fetched from backend (SSOAudience in web.config)
-        clientId: 'kitos_client'
+        clientId: "kitos_client"
     });
 }]);
 
@@ -64,30 +64,30 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $) => {
         // init info
         $rootScope.page = {
             title: "Index",
             subnav: []
-        }; 
+        };
 
-        $(window).resize(function () {
+        $(window).resize(() => {
             $rootScope.positionSubnav();
         });
 
-        $rootScope.positionSubnav = function () {
-            $timeout(function () {
+        $rootScope.positionSubnav = () => {
+            $timeout(() => {
                 if ($rootScope.subnavPositionCenter) {
                     $("#subnav").css("text-align", "center");
-                    $("#subnav").css("padding-left", "0")
+                    $("#subnav").css("padding-left", "0");
                 } else {
-                    var buttonWidth = $("#navbar-top a.active").width();
-                    var distanceFromContainerToButton = $('#navbar-top').offset().left - $('#navbar-top a.active').offset().left;
-                    var ulWidth = $("#subnav ul").width();
-                    var subnavWidth = $("#navbar-top").width();
+                    const buttonWidth = $("#navbar-top a.active").width();
+                    const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
+                    const ulWidth = $("#subnav ul").width();
+                    const subnavWidth = $("#navbar-top").width();
                     $("#subnav").css("text-align", "left");
-                    $("#subnav").css("padding-left", "" + ((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100 + "%");
+                    $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
                 }
 
                 $rootScope.subnavNotPositioned = false;
@@ -150,7 +150,7 @@ app.run([
             });
         });
 
-        $rootScope.$on('$stateChangeSuccess',
+        $rootScope.$on("$stateChangeSuccess",
             function (event, toState, toParams, fromState, fromParams) {
                 $rootScope.subnavNotPositioned = true;
             });
@@ -161,7 +161,7 @@ app.run([
             $state.go("index");
         });
 
-        
+
 
     }
 ]);
