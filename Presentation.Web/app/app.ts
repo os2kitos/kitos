@@ -64,13 +64,35 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout) => {
         // init info
         $rootScope.page = {
             title: "Index",
             subnav: []
-        };
+        }; 
+
+        $(window).resize(function () {
+            $rootScope.positionSubnav();
+        });
+
+        $rootScope.positionSubnav = function () {
+            $timeout(function () {
+                if ($rootScope.subnavPositionCenter) {
+                    $("#subnav").css("text-align", "center");
+                    $("#subnav").css("padding-left", "0")
+                } else {
+                    var buttonWidth = $("#navbar-top a.active").width();
+                    var distanceFromContainerToButton = $('#navbar-top').offset().left - $('#navbar-top a.active').offset().left;
+                    var ulWidth = $("#subnav ul").width();
+                    var subnavWidth = $("#navbar-top").width();
+                    $("#subnav").css("text-align", "left");
+                    $("#subnav").css("padding-left", "" + ((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100 + "%");
+                }
+
+                $rootScope.subnavNotPositioned = false;
+            });
+        }
 
         // hide cancel button on login form unless the user is changing organization
         $rootScope.changingOrganization = false;
@@ -116,6 +138,7 @@ app.run([
                 return;
             }
 
+
             userService.auth(toState.authRoles).then(val => {
                 // authentication OK!
 
@@ -126,6 +149,11 @@ app.run([
                 $state.go("index", { to: toState.name, toParams: toParams });
             });
         });
+
+        $rootScope.$on('$stateChangeSuccess',
+            function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.subnavNotPositioned = true;
+            });
 
         // when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on("$stateChangeError", (event, toState, toParams, fromState, fromParams, error) => {

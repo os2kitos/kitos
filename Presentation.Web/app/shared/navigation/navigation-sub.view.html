@@ -1,4 +1,4 @@
-﻿<ul>
+﻿<ul data-ng-hide="subnavNotPositioned">
     <li data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
         <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}">{{link.text}}</a>
     </li>

@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$uibModal', '$state', 'user', function ($rootScope, $modal, $state, user) {
+            controller: ['$rootScope', '$scope', '$uibModal', '$state', 'user', '$timeout', function ($rootScope, $scope, $modal, $state, user,$timeout) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -27,9 +27,15 @@
                     { func: createUser, text: 'Opret Bruger', style: 'btn-success', icon: 'glyphicon-plus', showWhen: 'organization.user' }
                 ];
 
+                $rootScope.subnavPositionCenter = false;
+
                 function createUser() {
                     $state.go("organization.user.create");
                 };
+
+                $scope.$on('$viewContentLoaded', function () {
+                    $rootScope.positionSubnav();
+                });
             }]
         });
     }]);
