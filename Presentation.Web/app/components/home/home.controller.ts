@@ -37,7 +37,8 @@
             $scope.tinymceOptions = {
                 plugins: 'link image code',
                 skin: 'lightgray',
-                theme: 'modern'
+                theme: 'modern',
+                convert_urls: false
             };
 
             $scope.text = {};

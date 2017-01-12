@@ -40,7 +40,8 @@
             "gridStateService",
             "itContractRoles",
             "orgUnits",
-            "$uibModal"
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -58,7 +59,8 @@
             private gridStateService: Kitos.Services.IGridStateFactory,
             private itContractRoles: Array<any>,
             private orgUnits: Array<any>,
-            private $modal) {
+            private $modal,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -77,6 +79,7 @@
                         });
                     }
                 });
+
             this.activate();
         }
 
@@ -1059,6 +1062,7 @@
 
                     // show only the selected role column
                     this.mainGrid.showColumn(selectedId);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         }
@@ -1076,7 +1080,7 @@
                 resolve: {
                     user: ["userService", userService => userService.getUser()],
                     itContractRoles: [
-                        "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
+                        "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))

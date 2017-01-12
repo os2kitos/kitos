@@ -47,7 +47,8 @@
             "systemRoles",
             "user",
             "gridStateService",
-            "orgUnits"
+            "orgUnits",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -64,7 +65,8 @@
             private systemRoles: Array<any>,
             private user,
             private gridStateService: Services.IGridStateFactory,
-            private orgUnits: Array<any>) {
+            private orgUnits: Array<any>,
+            private needsWidthFixService) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -976,6 +978,7 @@
                     var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
                     this.mainGrid.showColumn(gridFieldName);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };
@@ -1046,7 +1049,7 @@
                     controllerAs: "systemOverviewVm",
                     resolve: {
                         systemRoles: [
-                            "$http", $http => $http.get("odata/ItSystemRoles").then(result => result.data.value)
+                            "$http", $http => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()
