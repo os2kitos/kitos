@@ -9,7 +9,6 @@
 
         public fixWidthOnClick = () => {
             this.$("body").on("click", ".k-item .k-state-default .k-link", () => {
-                console.log("fixWidthOnClick");
                 this.fixWidth();
             });
         }
@@ -17,7 +16,6 @@
         public fixWidth = () => {
             this.$(".k-grid-content table").css("width", "100%");
             this.$(".k-grid-header-wrap table").css("width", "100%");
-            console.log("fixWidth");
         }
     }
 
