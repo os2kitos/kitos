@@ -26,14 +26,14 @@ app.config([
     }
 ]);
 
-app.config(['$authProvider', $authProvider => {
+app.config(["$authProvider", $authProvider => {
     $authProvider.configure({
         redirectUri: location.origin + "/#/?",
         scope: "openid email",
         //TODO: Should be fetched from backend (SSOGateway in web.config)
-        basePath: 'https://os2sso-test.miracle.dk',
+        basePath: "https://os2sso-test.miracle.dk",
         //TODO: Should be fetched from backend (SSOAudience in web.config)
-        clientId: 'kitos_client'
+        clientId: "kitos_client"
     });
 }]);
 
@@ -64,13 +64,37 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
         // init info
         $rootScope.page = {
             title: "Index",
             subnav: []
         };
+
+        $(window).resize(() => {
+            $rootScope.positionSubnav();
+        });
+
+        $rootScope.positionSubnav = () => {
+            $(document).ready(function () {
+                $timeout(() => {
+                    if ($rootScope.subnavPositionCenter) {
+                        $("#subnav").css("text-align", "center");
+                        $("#subnav").css("padding-left", "0");
+                    } else {
+                        const buttonWidth = $("#navbar-top a.active").width();
+                        const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
+                        const ulWidth = $("#subnav ul").width();
+                        const subnavWidth = $("#navbar-top").width();
+                        $("#subnav").css("text-align", "left");
+                        $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
+                    }
+
+                    $rootScope.subnavNotPositioned = false;
+                });
+            });
+        }
 
         // hide cancel button on login form unless the user is changing organization
         $rootScope.changingOrganization = false;
@@ -118,7 +142,6 @@ app.run([
 
             userService.auth(toState.authRoles).then(val => {
                 // authentication OK!
-
             }, () => {
                 event.preventDefault();
 
@@ -127,13 +150,21 @@ app.run([
             });
         });
 
+        $rootScope.$on("$stateChangeSuccess",
+            function (event, toState, toParams, fromState, fromParams) {
+                //Check if state comes from another state with same parent - if so, it shall not hide the subnav while changing
+                if (toState.name.split(".")[0] != fromState.name.split(".")[0])
+                    $rootScope.subnavNotPositioned = true;
+            });
+
         // when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on("$stateChangeError", (event, toState, toParams, fromState, fromParams, error) => {
             console.log(error);
             $state.go("index");
         });
 
-        
-
+        // Fixes the blank spaces problem when deselecting columns (OS2KITOS-607)
+        // When implemented here fixWidthOnClick is shared by IT Project, IT System and IT Contract
+        needsWidthFixService.fixWidthOnClick();
     }
 ]);

@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ["$rootScope", "$http", "$state", "notify", "user", function($rootScope, $http, $state, notify, user) {
+            controller: ["$rootScope", "$http", "$state", "notify", "user", "$scope", "$timeout", function ($rootScope, $http, $state, notify, user, $scope, $timeout) {
                 $rootScope.page.title = "IT Projekt";
                 $rootScope.page.subnav = [
                     { state: "it-project.overview", text: "IT projekter" },
@@ -20,6 +20,7 @@
                 $rootScope.page.subnav.buttons = [
                     { func: remove, text: "Slet IT Projekt", style: "btn-danger", showWhen: "it-project.edit" }
                 ];
+                $rootScope.subnavPositionCenter = false;
 
                 function remove() {
                     if (!confirm("Er du sikker på du vil slette projektet?")) {
@@ -36,6 +37,10 @@
                             msg.toErrorMessage("Fejl! Kunne ikke slette IT Projektet!");
                         });
                 }
+
+                $scope.$on('$viewContentLoaded', function () {
+                    $rootScope.positionSubnav();
+                });
             }]
         });
     }]);

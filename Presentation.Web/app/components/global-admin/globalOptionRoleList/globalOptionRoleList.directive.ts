@@ -137,13 +137,6 @@
                         sortable: false
                     },
                     {
-                        field: "priority",
-                        title: "priority",
-                        persistId: "priority", // DON'T YOU DARE RENAME!
-                        hidden: true,
-                        filterable: false
-                    },
-                    {
                         title: "Prioritet",
                         template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-arrow-up' aria-hidden='true'></i></button>` +
                         `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-arrow-down' aria-hidden='true'></i></button>`,

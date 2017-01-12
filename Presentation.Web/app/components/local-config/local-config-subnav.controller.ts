@@ -29,6 +29,11 @@
 
                     $scope.config = config;
                     $scope.config.autosaveUrl = "odata/Configs(" + config.id + ")";
+                    $rootScope.subnavPositionCenter = true;
+
+                    $scope.$on('$viewContentLoaded', function () {
+                        $rootScope.positionSubnav();
+                    });
                 }]
         });
     }]);

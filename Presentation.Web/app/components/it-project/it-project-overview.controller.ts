@@ -42,7 +42,8 @@
             "gridStateService",
             "orgUnits",
             "economyCalc",
-            "$uibModal"
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -61,7 +62,8 @@
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: any,
             private economyCalc,
-            private $modal) {
+            private $modal,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -79,6 +81,7 @@
                     });
                 }
             });
+
             this.activate();
         }
         public opretITProjekt() {
@@ -432,7 +435,7 @@
                         }
                     },
                     {
-                        field: "ReferenceId", title: "Reference", width: 150,
+                        field: "Reference.Title", title: "Reference", width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
@@ -804,7 +807,7 @@
                         template: (dataItem) => {
                             return `<span data-ng-model="dataItem.usersRoles" value="rights.Role.Name" ng-repeat="rights in dataItem.Rights"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`
                         },
-                        
+
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         sortable: false,
@@ -942,6 +945,7 @@
                     var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
                     this.mainGrid.showColumn(gridFieldName);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };

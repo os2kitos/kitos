@@ -12,7 +12,9 @@
             this.tinymceOptions = {
                 plugins: 'link image code',
                 skin: 'lightgray',
-                theme: 'modern'
+                theme: 'modern',
+                convert_urls: false,
+                height: '400px'
             };
         }
 

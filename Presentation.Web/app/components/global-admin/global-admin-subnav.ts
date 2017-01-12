@@ -9,7 +9,7 @@
         });
     }]);
 
-    app.controller("globalAdminConfig", ["$rootScope", $rootScope => {
+    app.controller("globalAdminConfig", ["$rootScope", "$scope", ($rootScope, $scope) => {
         var subnav = [
             { state: "global-admin.organizations", text: "Organisationer" },
             { state: "global-admin.global-users", text: "Globale administratorer" },
@@ -24,7 +24,11 @@
 
         $rootScope.page.title = "Global admin";
         $rootScope.page.subnav = subnav;
+        $rootScope.subnavPositionCenter = true;
 
+        $scope.$on('$viewContentLoaded', function () {
+            $rootScope.positionSubnav();
+        });
     }]);
 
 })(angular, app);

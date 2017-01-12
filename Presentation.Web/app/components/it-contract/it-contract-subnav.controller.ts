@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', function ($rootScope, $http, $state, $modal, notify, user, $scope) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
                     { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
@@ -19,6 +19,7 @@
                 $rootScope.page.subnav.buttons = [
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
+                $rootScope.subnavPositionCenter = false;
 
                 function remove() {
                     if (!confirm("Er du sikker på du vil slette kontrakten?")) {
@@ -35,6 +36,10 @@
                             msg.toErrorMessage("Fejl! Kunne ikke slette IT Kontrakten!");
                         });
                 }
+
+                $scope.$on('$viewContentLoaded', function () {
+                    $rootScope.positionSubnav();
+                });
             }]
         });
     }]);

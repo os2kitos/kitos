@@ -42,5 +42,21 @@
     </script>
 
     @Scripts.Render("~/Scripts/app")
+
+    <script>
+        $(addCrudControls());
+ 
+        function addCrudControls() {
+            $('.crud').hide();
+            $('.panel').hover(
+                function() {
+                    $(this).find('.crud').show();
+                },
+                function() {
+                    $(this).find('.crud').hide();
+                }
+            );
+        };
+    </script>
 </body>
 </html>

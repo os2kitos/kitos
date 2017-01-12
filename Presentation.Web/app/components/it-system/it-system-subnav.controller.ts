@@ -10,7 +10,7 @@
                 }],
 
             },
-            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', function ($rootScope, $http, $state, $modal, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', '$timeout', function ($rootScope, $http, $state, $modal, notify, user, $scope, $timeout) {
                 $rootScope.page.title = 'IT System';
                 $rootScope.page.subnav = [
                     { state: 'it-system.overview', text: "IT Systemer" },
@@ -27,6 +27,8 @@
                     { func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' },
                     { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                 ];
+
+                $rootScope.subnavPositionCenter = false;
 
                 function removeSystem() {
                     if (!confirm('Er du sikker på du vil slette systemet?')) {
@@ -88,6 +90,10 @@
                                 msg.toErrorMessage('Fejl! Kunne ikke slette Snitfladen!');
                         });
                 }
+
+                $scope.$on('$viewContentLoaded', function () {
+                    $rootScope.positionSubnav();
+                });
             }]
         });
     }]);

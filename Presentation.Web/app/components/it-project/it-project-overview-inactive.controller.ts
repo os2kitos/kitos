@@ -40,7 +40,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "economyCalc"
+            "economyCalc",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -58,7 +59,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: any,
-            private economyCalc) {
+            private economyCalc,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -787,6 +789,7 @@
                     var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
                     this.mainGrid.showColumn(gridFieldName);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };

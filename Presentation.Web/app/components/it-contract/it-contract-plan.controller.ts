@@ -4,6 +4,7 @@
     export interface IOverviewPlanController {
         mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
+        roleSelectorOptions: kendo.ui.DropDownListOptions;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -20,6 +21,7 @@
         private storageKey = "it-contract-plan-options";
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
+        private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
 
@@ -38,7 +40,8 @@
             "gridStateService",
             "itContractRoles",
             "orgUnits",
-            "$uibModal"
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -56,7 +59,8 @@
             private gridStateService: Kitos.Services.IGridStateFactory,
             private itContractRoles: Array<any>,
             private orgUnits: Array<any>,
-            private $modal) {
+            private $modal,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -75,6 +79,7 @@
                         });
                     }
                 });
+
             this.activate();
         }
 
@@ -203,6 +208,11 @@
 
         private activate() {
 
+            var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
+            this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
+            clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
+            this.roleSelectorDataSource = clonedItContractRoles;
+
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -324,6 +334,9 @@
                         text: "Slet filter",
                         template:
                         "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                    },
+                    {
+                        template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
                 excel: {
@@ -793,6 +806,25 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
+            // add special contract signer role
+            var signerRole = {
+                field: "ContractSigner",
+                title: "Kontraktunderskriver",
+                persistId: "roleSigner",
+                template: dataItem => dataItem.ContractSigner ? `${dataItem.ContractSigner}` : "",
+                width: 130,
+                hidden: true,
+                sortable: true,
+                filterable: {
+                    cell: {
+                        dataSource: [],
+                        showOperators: false,
+                        operator: "contains"
+                    }
+                }
+            };
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
+
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles,
@@ -1011,6 +1043,28 @@
                 dataBound: setDefaultOrgUnit,
                 change: orgUnitChanged
             });
+
+        }
+
+        public roleSelectorOptions = (): kendo.ui.DropDownListOptions => {
+            return {
+                autoBind: false,
+                dataSource: this.roleSelectorDataSource,
+                dataTextField: "Name",
+                dataValueField: "Id",
+                optionLabel: "Vælg kontraktrolle...",
+                change: e => {
+                    // hide all roles column
+                    this.mainGrid.hideColumn("ContractSigner");
+                    this._.forEach(this.itContractRoles, role => { this.mainGrid.hideColumn(`role${role.Id}`) });
+
+                    var selectedId = e.sender.value();
+
+                    // show only the selected role column
+                    this.mainGrid.showColumn(selectedId);
+                    this.needsWidthFixService.fixWidth();
+                }
+            }
         }
 
     }
@@ -1026,7 +1080,7 @@
                 resolve: {
                     user: ["userService", userService => userService.getUser()],
                     itContractRoles: [
-                        "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
+                        "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
