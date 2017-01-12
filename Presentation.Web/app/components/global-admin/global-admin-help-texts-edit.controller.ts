@@ -13,7 +13,8 @@
                 plugins: 'link image code',
                 skin: 'lightgray',
                 theme: 'modern',
-                convert_urls: false
+                convert_urls: false,
+                height: '400px'
             };
         }
 
