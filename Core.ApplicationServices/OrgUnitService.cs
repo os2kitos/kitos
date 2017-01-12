@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel;
 using Core.DomainServices;
 using System.Linq;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices
@@ -10,12 +11,18 @@ namespace Core.ApplicationServices
     public class OrgUnitService : IOrgUnitService
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _itSystemUsageOrgUnitUsageRepository;
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
+        private readonly IGenericRepository<ItProject> _itProjectRepository;
+        private readonly IGenericRepository<ItProjectOrgUnitUsage> _itProjectOrgUnitUsageRepository;
 
-        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskUsage> taskUsageRepository)
+        public OrgUnitService(IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskUsage> taskUsageRepository, IGenericRepository<ItSystemUsageOrgUnitUsage> itSystemUsageOrgUnitUsageRepository, IGenericRepository<ItProject> itProjectRepository, IGenericRepository<ItProjectOrgUnitUsage> itProjectOrgUnitUsageRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskUsageRepository = taskUsageRepository;
+            _itSystemUsageOrgUnitUsageRepository = itSystemUsageOrgUnitUsageRepository;
+            _itProjectRepository = itProjectRepository;
+            _itProjectOrgUnitUsageRepository = itProjectOrgUnitUsageRepository;
         }
 
         public OrganizationUnit GetRoot(OrganizationUnit unit)
@@ -93,6 +100,35 @@ namespace Core.ApplicationServices
                 _taskUsageRepository.DeleteByKey(taskUsage.Id);
             }
             _taskUsageRepository.Save();
+
+
+            // Remove OrgUnit from ItSystemUsages
+            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId== id);
+            foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
+            {
+                if (itSystemUsage.ResponsibleItSystemUsage != null)
+                {
+                    throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItSystemUsage: {itSystemUsage.ItSystemUsageId}");
+                }
+                
+                _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
+                
+            }
+            _itSystemUsageOrgUnitUsageRepository.Save();
+
+            // Remove OrgUnit from ItProjects
+            var itProjects = _itProjectRepository.Get(project => project.UsedByOrgUnits.Any(x => x.OrganizationUnitId == id));
+            foreach (var itproject in itProjects)
+            {
+                if (itproject.ResponsibleUsage.OrganizationUnitId == id)
+                {
+                    throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItProject: {itproject.Id}");
+                }
+                var itprojectOrgUnitUsage = itproject.UsedByOrgUnits.Single(x => x.OrganizationUnitId == id);
+                _itProjectOrgUnitUsageRepository.Delete(itprojectOrgUnitUsage);
+            }
+            _itProjectOrgUnitUsageRepository.Save();
+
 
             // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
             // when children are loaded into memory the foreign key is correctly set to null on children when deleted
