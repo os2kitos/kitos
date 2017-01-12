@@ -150,7 +150,9 @@ app.run([
 
         $rootScope.$on("$stateChangeSuccess",
             function (event, toState, toParams, fromState, fromParams) {
-                $rootScope.subnavNotPositioned = true;
+                //Check if state comes from another state with same parent - if so, it shall not hide the subnav while changing
+                if (toState.name.split(".")[0] != fromState.name.split(".")[0])
+                    $rootScope.subnavNotPositioned = true;
             });
 
         // when something goes wrong during state change (e.g a rejected resolve)
