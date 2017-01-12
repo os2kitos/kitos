@@ -687,6 +687,7 @@
     <TypeScriptCompile Include="app\shared\helpText\helpText.directive.ts" />
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
+    <TypeScriptCompile Include="app\services\needsWidthFixService.ts" />
     <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
     <Content Include="appReport\css\report.css" />
     <Content Include="appReport\Index.html" />

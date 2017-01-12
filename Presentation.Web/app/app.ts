@@ -64,8 +64,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
         // init info
         $rootScope.page = {
             title: "Index",
@@ -77,20 +77,22 @@ app.run([
         });
 
         $rootScope.positionSubnav = () => {
-            $timeout(() => {
-                if ($rootScope.subnavPositionCenter) {
-                    $("#subnav").css("text-align", "center");
-                    $("#subnav").css("padding-left", "0");
-                } else {
-                    const buttonWidth = $("#navbar-top a.active").width();
-                    const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
-                    const ulWidth = $("#subnav ul").width();
-                    const subnavWidth = $("#navbar-top").width();
-                    $("#subnav").css("text-align", "left");
-                    $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
-                }
+            $(document).ready(function () {
+                $timeout(() => {
+                    if ($rootScope.subnavPositionCenter) {
+                        $("#subnav").css("text-align", "center");
+                        $("#subnav").css("padding-left", "0");
+                    } else {
+                        const buttonWidth = $("#navbar-top a.active").width();
+                        const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
+                        const ulWidth = $("#subnav ul").width();
+                        const subnavWidth = $("#navbar-top").width();
+                        $("#subnav").css("text-align", "left");
+                        $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
+                    }
 
-                $rootScope.subnavNotPositioned = false;
+                    $rootScope.subnavNotPositioned = false;
+                });
             });
         }
 
@@ -138,10 +140,8 @@ app.run([
                 return;
             }
 
-
             userService.auth(toState.authRoles).then(val => {
                 // authentication OK!
-
             }, () => {
                 event.preventDefault();
 
@@ -163,7 +163,8 @@ app.run([
             $state.go("index");
         });
 
-
-
+        // Fixes the blank spaces problem when deselecting columns (OS2KITOS-607)
+        // When implemented here fixWidthOnClick is shared by IT Project, IT System and IT Contract
+        needsWidthFixService.fixWidthOnClick();
     }
 ]);

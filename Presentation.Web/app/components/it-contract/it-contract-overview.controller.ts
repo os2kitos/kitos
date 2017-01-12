@@ -52,7 +52,8 @@
             "itContractRoles",
             "orgUnits",
             "ecoStreamData",
-            "$uibModal"
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -71,7 +72,8 @@
             private itContractRoles,
             private orgUnits,
             private ecoStreamData,
-            private $modal) {
+            private $modal,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -89,6 +91,8 @@
                     });
                 }
             });
+
+            //this.needsWidthFixService.fixWidthOnClick();
 
             this.activate();
         }
@@ -186,7 +190,7 @@
             // update session
             this.$window.sessionStorage.setItem(this.orgUnitStorageKey, orgUnitId);
             // find the org unit filter row section
-            var orgUnitFilterRow = this.$(".k-filter-row [data-field='ResponsibleOrganizationUnit.Name']");
+            var orgUnitFilterRow = this.$(".k-filter-row[data-field='ResponsibleOrganizationUnit.Name']");
             // find the access modifier kendo widget
             var orgUnitFilterWidget = orgUnitFilterRow.find("input").data("kendoDropDownList");
             orgUnitFilterWidget.select(dataItem => (dataItem.Id == orgUnitId));
@@ -906,6 +910,7 @@
                     var selectedId = e.sender.value();
                     // show only the selected role column
                     this.mainGrid.showColumn(selectedId);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };
@@ -938,7 +943,7 @@
                     controllerAs: "contractOverviewVm",
                     resolve: {
                         itContractRoles: [
-                            "$http", $http => $http.get("/odata/ItContractRoles").then(result => result.data.value)
+                            "$http", $http => $http.get("/odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()
