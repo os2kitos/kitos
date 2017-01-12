@@ -64,8 +64,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
         // init info
         $rootScope.page = {
             title: "Index",
@@ -138,10 +138,8 @@ app.run([
                 return;
             }
 
-
             userService.auth(toState.authRoles).then(val => {
                 // authentication OK!
-
             }, () => {
                 event.preventDefault();
 
@@ -161,7 +159,8 @@ app.run([
             $state.go("index");
         });
 
-
-
+        // Fixes the blank spaces problem when deselecting columns (OS2KITOS-607)
+        // When implemented here fixWidthOnClick is shared by IT Project, IT System and IT Contract
+        needsWidthFixService.fixWidthOnClick();
     }
 ]);

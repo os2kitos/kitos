@@ -106,13 +106,6 @@
                         sortable: false
                     },
                     {
-                        field: "priority",
-                        title: "priority",
-                        persistId: "priority", // DON'T YOU DARE RENAME!
-                        hidden: true,
-                        filterable: false
-                    },
-                    {
                         field: "Name", title: "Navn", width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: (dataItem) => dataItem.Name,
