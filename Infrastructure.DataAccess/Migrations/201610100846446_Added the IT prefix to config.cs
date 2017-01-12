@@ -7,9 +7,9 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            AddColumn("dbo.Config", "ShowItProjectPrefix", c => c.Boolean(nullable: false));
-            AddColumn("dbo.Config", "ShowItSystemPrefix", c => c.Boolean(nullable: false));
-            AddColumn("dbo.Config", "ShowItContractPrefix", c => c.Boolean(nullable: false));
+            AddColumn("dbo.Config", "ShowItProjectPrefix", c => c.Boolean(nullable: false, defaultValue: false));
+            AddColumn("dbo.Config", "ShowItSystemPrefix", c => c.Boolean(nullable: false, defaultValue: false));
+            AddColumn("dbo.Config", "ShowItContractPrefix", c => c.Boolean(nullable: false, defaultValue: false));
         }
         
         public override void Down()

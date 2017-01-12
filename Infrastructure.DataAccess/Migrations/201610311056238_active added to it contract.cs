@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            AddColumn("dbo.ItContract", "Active", c => c.Boolean(nullable: false));
+            AddColumn("dbo.ItContract", "Active", c => c.Boolean(nullable: false, defaultValue: false));
         }
         
         public override void Down()
