@@ -120,7 +120,7 @@ namespace Core.ApplicationServices
             var itProjects = _itProjectRepository.Get(project => project.UsedByOrgUnits.Any(x => x.OrganizationUnitId == id));
             foreach (var itproject in itProjects)
             {
-                if (itproject.ResponsibleUsage.OrganizationUnitId == id)
+                if (itproject.ResponsibleUsage != null && itproject.ResponsibleUsage.OrganizationUnitId == id)
                 {
                     throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItProject: {itproject.Id}");
                 }
