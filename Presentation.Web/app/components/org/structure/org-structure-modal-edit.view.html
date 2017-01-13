@@ -50,23 +50,22 @@
                 </div>
             </div>
         </form>
+    </div>
 
+    <div class="modal-footer text-center">
         <button class="btn btn-primary btn-sm pull-left" data-ng-click="new()" data-ng-disabled="submitting" tabindex="5">
             <i class="glyphicon glyphicon-plus"></i>
             Opret ny underenhed
         </button>
-        <button class="btn btn-danger btn-sm pull-right"
+        <button class="btn btn-danger btn-sm pull-left"
                 data-ng-disabled="submitting"
                 data-confirmed-click="delete()"
                 data-confirm-click="Er du sikker på at du vil slette denne enhed? Dette vil også slette alle underenheder!" data-ng-hide="orgUnit.isRoot" tabindex="6">
             <i class="glyphicon glyphicon-trash"></i>
             Slet enhed
         </button>
-    </div>
-
-    <div class="modal-footer text-center">
-        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()" tabindex="3">Gem</button>
-        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()" tabindex="4">Annuller</button>
+        <button class="btn btn-warning" data-ng-disabled="submitting" data-ng-click="cancel()">Annuller</button>
+        <button class="btn btn-primary" data-ng-disabled="submitting" data-ng-click="patch()">Gem</button>
     </div>
 </div>
 
