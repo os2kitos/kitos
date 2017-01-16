@@ -34,7 +34,14 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !(_authService.IsGlobalAdmin(UserId) || this._authService.IsLocalAdmin(UserId)))
                 {
-                    result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
+                    if (hasOrg)
+                    {
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
+                    }
+                    else
+                    {
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
+                    }
                 }
             }
             else
