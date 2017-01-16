@@ -425,7 +425,7 @@
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Parent
-                            ? `<a data-ui-sref="it-contract.edit.systems({id:${dataItem.Parent.Id}})">${
+                            ? `<a data-ui-sref="it-contract.edit.main({id:${dataItem.Parent.Id}})">${
                             dataItem.Parent.Name}</a>`
                             : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
@@ -443,7 +443,7 @@
                         title: "IT Kontrakt",
                         width: 265,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-contract.edit.systems({id: ${dataItem.Id}})'>${
+                        template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${
                             dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
