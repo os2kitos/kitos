@@ -1,206 +1,209 @@
 ﻿<div class="object-section-container">
     <h4>{{contract.name}}</h4>
-    <div class="col-xs-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                IT Kontrakten gælder flg. IT Systemer
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    IT Kontrakten gælder flg. IT Systemer
+                </div>
+                <table class="table table-condensed table-striped small">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-8">
+                                IT System
+                            </th>
+                            <th class="col-xs-3">
+                                Applikationstype
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
+                            <!-- the system -->
+                            <td>
+                                <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
+                            </td>
+
+                            <!-- app type (read only) -->
+                            <td>
+                                {{ associatedSystemUsage.itSystemAppTypeName }}
+                            </td>
+
+                            <td>
+                                <div class="pull-right" data-ng-show="hasWriteAccess">
+                                    <a class="btn btn-danger btn-xs delete-system-usage"
+                                       data-confirmed-click="associatedSystemUsage.delete()"
+                                       data-confirm-click="Er du sikker på at du vil slette rækken?">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                    </tbody>
+                    <tfoot data-ng-show="hasWriteAccess">
+                        <!-- new row -->
+                        <tr>
+                            <td colspan="3">
+                                <input type="hidden"
+                                       id="new-system-usage"
+                                       class="form-control input-sm"
+                                       data-ui-select2="itSystemUsagesSelectOptions"
+                                       data-ng-model="newAssociatedSystemUsage.selectedSystem"
+                                       data-ng-change="newAssociatedSystemUsage.save()"
+                                       data-placeholder="Vælg IT system">
+                            </td>
+                        </tr>
+                    </tfoot>
+
+
+                </table>
             </div>
-            <table class="table table-condensed table-striped small">
-                <thead>
-                    <tr>
-                        <th class="col-xs-8">
-                            IT System
-                        </th>
-                        <th class="col-xs-3">
-                            Applikationstype
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
+        </div>
 
-                    <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
-                        <!-- the system -->
-                        <td>
-                            <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
-                        </td>
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    IT Kontrakten gælder flg. snitfladerelationer
+                </div>
+                <table class="table table-condensed table-striped small">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-4">
+                                IT System
+                            </th>
 
-                        <!-- app type (read only) -->
-                        <td>
-                            {{ associatedSystemUsage.itSystemAppTypeName }}
-                        </td>
+                            <th class="col-xs-4">
+                                Relation
+                            </th>
 
-                        <td>
-                            <div class="pull-right" data-ng-show="hasWriteAccess">
-                                <a class="btn btn-danger btn-xs delete-system-usage"
-                                   data-confirmed-click="associatedSystemUsage.delete()"
-                                   data-confirm-click="Er du sikker på at du vil slette rækken?">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+                            <th class="col-xs-4">
+                                Snitflade
+                            </th>
 
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="exhibit in exhibitedInterfaces">
 
-                </tbody>
-                <tfoot data-ng-show="hasWriteAccess">
-                    <!-- new row -->
-                    <tr>
-                        <td colspan="3">
-                            <input type="hidden"
-                                   id="new-system-usage"
-                                   class="form-control input-sm"
-                                   data-ui-select2="itSystemUsagesSelectOptions"
-                                   data-ng-model="newAssociatedSystemUsage.selectedSystem"
-                                   data-ng-change="newAssociatedSystemUsage.save()"
-                                   data-placeholder="Vælg IT system">
-                        </td>
-                    </tr>
-                </tfoot>
+                            <!-- the system -->
+                            <td>
+                                <a data-ui-sref="it-system.usage.interfaces({ id: exhibit.itSystemUsageId })">{{ exhibit.itInterfaceExhibitItSystemName }} <span data-ng-if="exhibit.itInterfaceExhibitItSystemDisabled">(Inaktiv)</span></a>
+                            </td>
 
+                            <!-- relation -->
+                            <td>
+                                Udstiller
+                            </td>
 
-            </table>
+                            <!-- interface -->
+                            <td>
+                                <a data-ui-sref="it-system.interface-edit.interface-details({ id: exhibit.itInterfaceExhibitItInterfaceId })">{{ exhibit.itInterfaceExhibitItInterfaceName }} <span data-ng-if="exhibit.itInterfaceExhibitItInterfaceDisabled">(Inaktiv)</span></a>
+                            </td>
+
+                            <td>
+
+                                <div class="pull-right" data-ng-show="hasWriteAccess">
+                                    <a class="btn btn-danger btn-xs delete-interface-exhibit"
+                                       data-confirmed-click="deleteExhibit({{exhibit.itInterfaceExhibitId}}, {{exhibit.itSystemUsageId}})"
+                                       data-confirm-click="Er du sikker på at du vil slette?">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr data-ng-repeat="used in usedInterfaces">
+                            <!-- the system -->
+                            <td>
+                                <a data-ui-sref="it-system.usage.interfaces({ id: used.itSystemUsageId })">{{ used.itSystemUsage.itSystemName }} <span data-ng-if="used.itSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
+                            </td>
+
+                            <!-- relation -->
+                            <td>
+                                Anvender
+                            </td>
+
+                            <!-- interface -->
+                            <td>
+                                <a data-ui-sref="it-system.interface-edit.interface-details({ id: used.itInterfaceId })">{{ used.itInterfaceItInterfaceName }} <span data-ng-if="used.itInterfaceItInterfaceDisabled">(Inaktiv)</span></a>
+                            </td>
+
+                            <td>
+
+                                <div class="pull-right" data-ng-show="hasWriteAccess">
+                                    <a class="btn btn-danger btn-xs delete-interface-usage"
+                                       data-confirmed-click="deleteUsed({{used.itSystemUsageId}}, {{used.itSystemId}}, {{used.itInterfaceId}})"
+                                       data-confirm-click="Er du sikker på at du vil slette?">
+                                        <i class="glyphicon glyphicon-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot data-ng-show="hasWriteAccess">
+                        <!-- new row -->
+                        <tr>
+                            <td>
+                                <input type="hidden"
+                                       id="new-interface-system-usage"
+                                       class="form-control input-sm"
+                                       data-ui-select2="itSystemUsagesSelectOptions"
+                                       data-placeholder="Vælg IT system"
+                                       data-ng-model="newAssociatedInterfaceSelectedSystemUsage">
+                            </td>
+
+                            <td>
+                                <select id="new-interface-usage-type"
+                                        class="form-control input-sm"
+                                        data-ui-select2=""
+                                        data-ng-model="newAssociatedInterfaceRelation"
+                                        data-placeholder="Vælg relation">
+                                    <option value=""></option>
+                                    <option value="exhibit">Udstiller</option>
+                                    <option value="using">Anvender</option>
+                                </select>
+                            </td>
+                            <td colspan="2">
+                                <input type="hidden"
+                                       id="new-interface-interface-usage"
+                                       class="form-control input-sm"
+                                       data-ui-select2="itInterfaceUsagesSelectOptions"
+                                       data-ng-model="newAssociatedInterfaceSelectedInterfaceUsage"
+                                       data-ng-disabled="!newAssociatedInterfaceSelectedSystemUsage || !newAssociatedInterfaceRelation"
+                                       data-placeholder="{{newAssociatedInterface.placeholder}}"
+                                       data-ng-change="newAssociatedInterfaceSave()">
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
     </div>
-
-    <div class="col-xs-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                IT Kontrakten gælder flg. snitfladerelationer
-            </div>
-            <table class="table table-condensed table-striped small">
-                <thead>
-                    <tr>
-                        <th class="col-xs-4">
-                            IT System
-                        </th>
-
-                        <th class="col-xs-4">
-                            Relation
-                        </th>
-
-                        <th class="col-xs-4">
-                            Snitflade
-                        </th>
-
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-ng-repeat="exhibit in exhibitedInterfaces">
-
-                        <!-- the system -->
-                        <td>
-                            <a data-ui-sref="it-system.usage.interfaces({ id: exhibit.itSystemUsageId })">{{ exhibit.itInterfaceExhibitItSystemName }} <span data-ng-if="exhibit.itInterfaceExhibitItSystemDisabled">(Inaktiv)</span></a>
-                        </td>
-
-                        <!-- relation -->
-                        <td>
-                            Udstiller
-                        </td>
-
-                        <!-- interface -->
-                        <td>
-                            <a data-ui-sref="it-system.interface-edit.interface-details({ id: exhibit.itInterfaceExhibitItInterfaceId })">{{ exhibit.itInterfaceExhibitItInterfaceName }} <span data-ng-if="exhibit.itInterfaceExhibitItInterfaceDisabled">(Inaktiv)</span></a>
-                        </td>
-
-                        <td>
-
-                            <div class="pull-right" data-ng-show="hasWriteAccess">
-                                <a class="btn btn-danger btn-xs delete-interface-exhibit"
-                                   data-confirmed-click="deleteExhibit({{exhibit.itInterfaceExhibitId}}, {{exhibit.itSystemUsageId}})"
-                                   data-confirm-click="Er du sikker på at du vil slette?">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tbody>
-                    <tr data-ng-repeat="used in usedInterfaces">
-                        <!-- the system -->
-                        <td>
-                            <a data-ui-sref="it-system.usage.interfaces({ id: used.itSystemUsageId })">{{ used.itSystemUsage.itSystemName }} <span data-ng-if="used.itSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
-                        </td>
-
-                        <!-- relation -->
-                        <td>
-                            Anvender
-                        </td>
-
-                        <!-- interface -->
-                        <td>
-                            <a data-ui-sref="it-system.interface-edit.interface-details({ id: used.itInterfaceId })">{{ used.itInterfaceItInterfaceName }} <span data-ng-if="used.itInterfaceItInterfaceDisabled">(Inaktiv)</span></a>
-                        </td>
-
-                        <td>
-
-                            <div class="pull-right" data-ng-show="hasWriteAccess">
-                                <a class="btn btn-danger btn-xs delete-interface-usage"
-                                   data-confirmed-click="deleteUsed({{used.itSystemUsageId}}, {{used.itSystemId}}, {{used.itInterfaceId}})"
-                                   data-confirm-click="Er du sikker på at du vil slette?">
-                                    <i class="glyphicon glyphicon-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot data-ng-show="hasWriteAccess">
-                    <!-- new row -->
-                    <tr>
-                        <td>
-                            <input type="hidden"
-                                   id="new-interface-system-usage"
-                                   class="form-control input-sm"
-                                   data-ui-select2="itSystemUsagesSelectOptions"
-                                   data-placeholder="Vælg IT system"
-                                   data-ng-model="newAssociatedInterfaceSelectedSystemUsage">
-                        </td>
-
-                        <td>
-                            <select id="new-interface-usage-type"
-                                    class="form-control input-sm"
-                                    data-ui-select2=""
-                                    data-ng-model="newAssociatedInterfaceRelation"
-                                    data-placeholder="Vælg relation">
-                                <option value=""></option>
-                                <option value="exhibit">Udstiller</option>
-                                <option value="using">Anvender</option>
-                            </select>
-                        </td>
-                        <td colspan="2">
-                            <input type="hidden"
-                                   id="new-interface-interface-usage"
-                                   class="form-control input-sm"
-                                   data-ui-select2="itInterfaceUsagesSelectOptions"
-                                   data-ng-model="newAssociatedInterfaceSelectedInterfaceUsage"
-                                   data-ng-disabled="!newAssociatedInterfaceSelectedSystemUsage || !newAssociatedInterfaceRelation"
-                                   data-placeholder="{{newAssociatedInterface.placeholder}}"
-                                   data-ng-change="newAssociatedInterfaceSave()">
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-    <div class="col-xs-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                IT Kontrakten omfatter flg. aftaleelementer
-            </div>
-            <!-- Agreement elements -->
-            <div class="form-group">
-                <select-multiple-option data-id="agreement-elements"
-                                        data-placeholder="Vælg aftaleelementer"
-                                        data-selected-texts="selectedAgreementElementNames"
-                                        data-ng-disabled="!hasWriteAccess"
-                                        data-ng-model="selectedAgreementElementIds"
-                                        data-options="agreementElements"
-                                        data-auto-save-url="{{ autoSaveUrl }}"
-                                        data-field="elemId">
-                </select-multiple-option>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    IT Kontrakten omfatter flg. aftaleelementer
+                </div>
+                <!-- Agreement elements -->
+                <div class="form-group">
+                    <select-multiple-option data-id="agreement-elements"
+                                            data-placeholder="Vælg aftaleelementer"
+                                            data-selected-texts="selectedAgreementElementNames"
+                                            data-ng-disabled="!hasWriteAccess"
+                                            data-ng-model="selectedAgreementElementIds"
+                                            data-options="agreementElements"
+                                            data-auto-save-url="{{ autoSaveUrl }}"
+                                            data-field="elemId">
+                    </select-multiple-option>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
