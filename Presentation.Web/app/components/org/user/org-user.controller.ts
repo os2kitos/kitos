@@ -31,7 +31,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Users?($filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId}))&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
+                            url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
                             dataType: "json"
                         },
                         destroy: {
