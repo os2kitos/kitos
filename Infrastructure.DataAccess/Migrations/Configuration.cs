@@ -29,7 +29,7 @@ namespace Infrastructure.DataAccess.Migrations
         protected override void Seed(KitosContext context)
         {
             //MEMA: 06012017 - Disable seed as it resets settings
-            return;
+            //return;
 
             #region USERS
 
@@ -119,92 +119,173 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ORG ROLES
 
-            var boss = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Chef",
-                Description = "Lederen af en organisationsenhed",
-                HasWriteAccess = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 7
-            };
+            //OrganizationUnitRole boss = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Chef"))
+            //{
+            //    boss = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Chef",
+            //        Description = "Lederen af en organisationsenhed",
+            //        HasWriteAccess = true,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 7
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Chef"))
+            //{
+            //    boss = new OrganizationUnitRole()
+            //    {
+            //        Priority = 7
+            //    };
+            //}
 
-            var resourcePerson = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Ressourceperson",
-                Description = "...",
-                HasWriteAccess = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 6
-            };
+            //OrganizationUnitRole resourcePerson = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Ressourceperson"))
+            //{
+            //    resourcePerson = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Ressourceperson",
+            //        Description = "...",
+            //        HasWriteAccess = true,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 6
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Ressourceperson"))
+            //{
+            //    resourcePerson = new OrganizationUnitRole()
+            //    {
+            //        Priority = 6
+            //    };
+            //}
 
-            var employee = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Medarbejder",
-                Description = "...",
-                HasWriteAccess = false,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 5
-            };
+            //OrganizationUnitRole employee = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Medarbejder"))
+            //{
+            //    employee = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Medarbejder",
+            //        Description = "...",
+            //        HasWriteAccess = false,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 5
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Medarbejder"))
+            //{
+            //    employee = new OrganizationUnitRole()
+            //    {
+            //        Priority = 5
+            //    };
+            //}
 
-            var digitalConsultant = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Digitaliseringskonsulent",
-                Description = "...",
-                HasWriteAccess = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 4
-            };
+            //OrganizationUnitRole digitalConsultant = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Digitaliseringskonsulent"))
+            //{
+            //    digitalConsultant = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Digitaliseringskonsulent",
+            //        Description = "...",
+            //        HasWriteAccess = true,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 4
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Digitaliseringskonsulent"))
+            //{
+            //    digitalConsultant = new OrganizationUnitRole()
+            //    {
+            //        Priority = 4
+            //    };
+            //}
 
-            var itConsultant = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "IT konsulent",
-                Description = "...",
-                HasWriteAccess = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 3
-            };
+            //OrganizationUnitRole itConsultant = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "IT konsulent"))
+            //{
+            //    itConsultant = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "IT konsulent",
+            //        Description = "...",
+            //        HasWriteAccess = true,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 3
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "IT konsulent"))
+            //{
+            //    itConsultant = new OrganizationUnitRole()
+            //    {
+            //        Priority = 3
+            //    };
+            //}
 
-            var leader = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Leder",
-                Description = "...",
-                HasWriteAccess = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 2
-            };
+            //OrganizationUnitRole leader = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Leder"))
+            //{
+            //    leader = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Leder",
+            //        Description = "...",
+            //        HasWriteAccess = true,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 2
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Leder"))
+            //{
+            //    leader = new OrganizationUnitRole()
+            //    {
+            //        Priority = 2
+            //    };
+            //}
 
-            var director = new OrganizationUnitRole()
-            {
-                IsLocallyAvailable = true,
-                Name = "Direktør",
-                Description = "...",
-                HasWriteAccess = false,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 1
-            };
-
+            //OrganizationUnitRole director = null;
+            //if (!context.OrganizationUnitRoles.Any(x => x.Name == "Direktør"))
+            //{
+            //    director = new OrganizationUnitRole()
+            //    {
+            //        IsLocallyAvailable = true,
+            //        Name = "Direktør",
+            //        Description = "...",
+            //        HasWriteAccess = false,
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 1
+            //    };
+            //}
+            //else if (context.OrganizationUnitRoles.Any(x => x.Name == "Direktør"))
+            //{
+            //    director = new OrganizationUnitRole()
+            //    {
+            //        Priority = 2
+            //    };
+            //}
             try
             {
-                var count = context.OrganizationUnitRoles.Count();
+                var maxCount = context.OrganizationUnitRoles.Max(r => r.Priority);
                 foreach (var organizationUnitRole in context.OrganizationUnitRoles)
                 {
-                    organizationUnitRole.Priority = count;
-                    count--;
+                    if (organizationUnitRole.Priority == 0)
+                    {
+                        maxCount++;
+                        organizationUnitRole.Priority = maxCount;
+                    }
+                        
                 }
-                context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
+                context.OrganizationUnitRoles.AddOrUpdate(role => role.Name);
+                //context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
                 context.SaveChanges();
             }
             catch
@@ -217,307 +298,313 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region PROJECT ROLES
 
-            context.ItProjectRoles.AddOrUpdate(r => r.Name,
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Projektejer",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 20
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Projektleder",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 19
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Delprojektleder",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 18
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Projektdeltager",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 17
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Teknisk projektleder",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 16
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "IT konsulent",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 15
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Implementeringskonsulent",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 14
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Proceskonsulent",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 13
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Juridisk konsulent",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 12
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "IT arkitekt",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 11
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Testansvarlig",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 10
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Support",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 9
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Programleder",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 8
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Styregruppeformand",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 7
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Styregruppemedlem",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 6
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Forretningsejer",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 5
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Forretningsansvarlig",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 4
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Gevinstejer",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 3
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Gevinsansvarlig",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 2
-                },
-                new ItProjectRole()
-                {
-                    HasWriteAccess = true,
-                    IsLocallyAvailable = true,
-                    Name = "Rådgiver",
-                    ObjectOwnerId = globalAdmin.Id,
-                    LastChangedByUserId = globalAdmin.Id,
-                    Priority = 1
-                });
+            context.ItProjectRoles.AddOrUpdate(r => r.Name);
+            //,
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Projektejer",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 20
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Projektleder",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 19
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Delprojektleder",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 18
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Projektdeltager",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 17
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Teknisk projektleder",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 16
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "IT konsulent",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 15
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Implementeringskonsulent",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 14
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Proceskonsulent",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 13
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Juridisk konsulent",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 12
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "IT arkitekt",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 11
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Testansvarlig",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 10
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Support",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 9
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Programleder",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 8
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Styregruppeformand",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 7
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Styregruppemedlem",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 6
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Forretningsejer",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 5
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Forretningsansvarlig",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 4
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Gevinstejer",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 3
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Gevinsansvarlig",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 2
+            //    },
+            //    new ItProjectRole()
+            //    {
+            //        HasWriteAccess = true,
+            //        IsLocallyAvailable = true,
+            //        Name = "Rådgiver",
+            //        ObjectOwnerId = globalAdmin.Id,
+            //        LastChangedByUserId = globalAdmin.Id,
+            //        Priority = 1
+                //});
 
-            var itProjectRolesCount = context.ItProjectRoles.Count();
+            var itProjFullMaxCount = context.ItProjectRoles.Max(r => r.Priority);
             foreach (var role in context.ItProjectRoles)
             {
-                role.Priority = itProjectRolesCount;
-                itProjectRolesCount--;
+                if (role.Priority == 0)
+                {
+                    itProjFullMaxCount++;
+                    role.Priority = itProjFullMaxCount;
+                }
             }
 
             context.SaveChanges();
-
             #endregion
 
             #region SYSTEM ROLES
 
-            var systemOwnerRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Systemejer",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 9
-            };
+            //var systemOwnerRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Systemejer",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 9
+            //};
 
-            var systemResponsibleRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Systemansvarlig",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 8
-            };
+            //var systemResponsibleRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Systemansvarlig",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 8
+            //};
 
-            var businessOwnerRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Forretningsejer",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 7
-            };
+            //var businessOwnerRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Forretningsejer",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 7
+            //};
 
-            var superuserResponsibleRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Superbrugeransvarlig",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 6
-            };
+            //var superuserResponsibleRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Superbrugeransvarlig",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 6
+            //};
 
-            var superuserRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Superbruger",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 5
-            };
+            //var superuserRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Superbruger",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 5
+            //};
 
-            var securityResponsibleRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Sikkerhedsansvarlig",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 4
-            };
+            //var securityResponsibleRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Sikkerhedsansvarlig",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 4
+            //};
 
-            var chanceManagerRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Changemanager",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 3
-            };
+            //var chanceManagerRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Changemanager",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 3
+            //};
 
-            var dataOwnerRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Dataejer",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 2
-            };
+            //var dataOwnerRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Dataejer",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 2
+            //};
 
-            var systemAdminRole = new ItSystemRole()
-            {
-                HasReadAccess = true,
-                HasWriteAccess = true,
-                IsLocallyAvailable = true,
-                Name = "Systemadminstrator",
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 1
-            };
+            //var systemAdminRole = new ItSystemRole()
+            //{
+            //    HasReadAccess = true,
+            //    HasWriteAccess = true,
+            //    IsLocallyAvailable = true,
+            //    Name = "Systemadminstrator",
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 1
+            //};
 
-            context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
-
-            var itSystemRolesCount = context.ItSystemRoles.Count();
+            //context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
+            context.ItSystemRoles.AddOrUpdate(x => x.Name);
+            var itSystemRolesMaxPriority = context.ItSystemRoles.Max(r => r.Priority);
             foreach (var role in context.ItSystemRoles)
             {
-                role.Priority = itSystemRolesCount;
-                itSystemRolesCount--;
+                if (role.Priority == 0)
+                {
+                    itSystemRolesMaxPriority++;
+                    role.Priority = itSystemRolesMaxPriority;
+                }
             }
 
             context.SaveChanges();
@@ -526,67 +613,72 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region CONTRACT ROLES
 
-            context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Kontraktejer",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 6
-            }, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Kontraktmanager",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 5
-            }, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Juridisk rådgiver",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 4
-            }, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Konsulent",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 3
-            }, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Fakturamodtager",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 2
-            }, new ItContractRole()
-            {
-                HasWriteAccess = true,
-                Name = "Budgetansvarlig",
-                IsObligatory = false,
-                IsLocallyAvailable = true,
-                ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id,
-                Priority = 1
-            });
+            context.ItContractRoles.AddOrUpdate(x => x.Name);
+            //, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Kontraktejer",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 6
+            //}, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Kontraktmanager",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 5
+            //}, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Juridisk rådgiver",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 4
+            //}, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Konsulent",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 3
+            //}, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Fakturamodtager",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 2
+            //}, new ItContractRole()
+            //{
+            //    HasWriteAccess = true,
+            //    Name = "Budgetansvarlig",
+            //    IsObligatory = false,
+            //    IsLocallyAvailable = true,
+            //    ObjectOwnerId = globalAdmin.Id,
+            //    LastChangedByUserId = globalAdmin.Id,
+            //    Priority = 1
+            //});
 
-            var itContractRolesCount = context.ItContractRoles.Count();
+            var itContractRolesMaxCount = context.ItContractRoles.Max(x => x.Priority);
             foreach (var role in context.ItContractRoles)
             {
-                role.Priority = itContractRolesCount;
-                itContractRolesCount--;
+                if (role.Priority == 0)
+                {
+                    itContractRolesMaxCount++;
+                    role.Priority = itContractRolesMaxCount;
+                }
+                    
             }
 
             context.SaveChanges();
@@ -595,22 +687,22 @@ namespace Infrastructure.DataAccess.Migrations
 
             #region ORGANIZATIONS
 
-            var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
-            var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
-            var company = new OrganizationType { Name = "Virksomhed", Category = OrganizationCategory.Other };
-            var other = new OrganizationType { Name = "Anden offentlig myndighed", Category = OrganizationCategory.Other };
-            context.OrganizationTypes.AddOrUpdate(x => x.Name, muniType, interestType, company, other);
+            //var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
+            //var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
+            //var company = new OrganizationType { Name = "Virksomhed", Category = OrganizationCategory.Other };
+            //var other = new OrganizationType { Name = "Anden offentlig myndighed", Category = OrganizationCategory.Other };
+            //context.OrganizationTypes.AddOrUpdate(x => x.Name, muniType, interestType, company, other);
 
-            context.SaveChanges();
+            //context.SaveChanges();
 
-            var orgType = context.OrganizationTypes.Single(x => x.Name == "Kommune");
+            //var orgType = context.OrganizationTypes.Single(x => x.Name == "Kommune");
 
-            var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
-            //var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
-            //var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
+            //var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
+            ////var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
+            ////var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
 
-            context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
-            context.SaveChanges();
+            //context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
+            //context.SaveChanges();
 
             //commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
 
