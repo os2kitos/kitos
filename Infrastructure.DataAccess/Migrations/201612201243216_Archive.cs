@@ -59,6 +59,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.ItSystemUsage", "ArchiveLocationId", c => c.Int());
             CreateIndex("dbo.ItSystemUsage", "ArchiveLocationId");
             AddForeignKey("dbo.ItSystemUsage", "ArchiveLocationId", "dbo.ArchiveLocations", "Id");
+            Sql("UPDATE [dbo].[ItSystemUsage]\r\nSET ArchiveDuty = 0\r\nWHERE ArchiveTypeId = 4\r\n\r\nUPDATE [dbo].[ItSystemUsage]\r\nSET ArchiveDuty = 1\r\nWHERE ArchiveTypeId = 3\r\n\r\nUPDATE [dbo].[ItSystemUsage]\r\nSET Archived = 0\r\nWHERE ArchiveTypeId = 2\r\n\r\nUPDATE [dbo].[ItSystemUsage]\r\nSET Archived = 1\r\nWHERE ArchiveTypeId = 1");
         }
         
         public override void Down()
