@@ -47,6 +47,9 @@
             $scope.durationOngoing = $scope.contract.durationOngoing;
 
             $scope.saveDurationYears = () => {
+                if ($scope.durationYears === "") {
+                    return;
+                }
                 const years = parseInt($scope.durationYears);
                 if (years > -1) {
                     const payload = {
@@ -67,6 +70,9 @@
             };
 
             $scope.saveDurationMonths = () => {
+                if ($scope.durationMonths === "") {
+                    return;
+                }
                 const months = parseInt($scope.durationMonths);
                 if (months > -1 && months < 12) {
                     const payload = {
@@ -88,11 +94,15 @@
 
             $scope.saveOngoingStatus = () => {
                 let payload = {
+                    "DurationYears": 0,
+                    "DurationMonths": 0,
                     "DurationOngoing": $scope.durationOngoing
                 }
                 var msg = notify.addInfoMessage("Gemmer...", false);
                 $http.patch(`odata/itcontracts(${$scope.contract.id})`, payload).success(() => {
                     msg.toSuccessMessage("Varigheden blev gemt.");
+                    $scope.durationYears = "";
+                    $scope.durationMonths = "";
                 }).error(() => {
                     msg.toErrorMessage("Varigheden blev ikke gemt.");
                 });
