@@ -45,8 +45,8 @@
     ]);
 
     app.controller("contract.EditSystemsCtrl", [
-        "$scope", "$http", "$state", "$stateParams", "notify", "user", "contract", "exhibitedInterfaces", "usedInterfaces", "agreementElements",
-        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements) {
+        "$scope", "$http", "$state", "$stateParams", "notify", "user", "contract", "exhibitedInterfaces", "usedInterfaces", "agreementElements", "_",
+        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements, _) {
 
             $scope.autoSaveUrl = "api/itcontract/" + $stateParams.id;
             $scope.exhibitedInterfaces = exhibitedInterfaces;
@@ -108,7 +108,7 @@
                 }
 
                 //for each row of associated system
-                _.each(associatedSystemUsages, function (systemUsage: { show; delete; }) {
+                _.each(associatedSystemUsages, function (systemUsage: { show; delete; id;}) {
 
                     systemUsage.show = true;
 
@@ -116,6 +116,7 @@
                     systemUsage.delete = function () {
                         deleteAssociatedSystem(systemUsage).success(function () {
                             notify.addSuccessMessage("Rækken er slettet.");
+                            _.remove(contract.associatedSystemUsages, { id: systemUsage.id });
                             systemUsage.show = false;
                         }).error(function () {
                             notify.addErrorMessage("Kunne ikke slette rækken");
@@ -126,7 +127,6 @@
 
                 $scope.associatedSystemUsages = associatedSystemUsages;
 
-
                 $scope.newAssociatedSystemUsage = {
                     save: function () {
                         //post new binding
@@ -135,6 +135,7 @@
                             notify.addSuccessMessage("Rækken er tilføjet.");
 
                             //then reformat and redraw the rows
+                            contract.associatedSystemUsages = result.response;
                             formatAssociatedSystems(result.response);
 
                         }).error(function (result) {

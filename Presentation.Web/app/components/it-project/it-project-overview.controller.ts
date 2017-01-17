@@ -156,8 +156,9 @@
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
-            var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
+            var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
+            var newurl = filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
+            return newurl;
         }
 
         // saves grid state to localStorage
