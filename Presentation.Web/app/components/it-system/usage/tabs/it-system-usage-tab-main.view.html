@@ -23,16 +23,15 @@
                         data-autosave="api/itSystemUsage/{{usageId}}">
             </div>
             <div class="form-group">
-                <label for="sensitive" class="control-label">Følsom persondata</label>
-                <select class="form-control input-sm" id="sensitive"
-                        data-ui-select2="Options"
-                        data-placeholder="Vælg persondata"
-                        data-ng-model="usage.sensitiveDataTypeId"
-                        data-ng-change="saveSensitive()"
-                        data-ng-disabled="!hasWriteAccess">
-                    <option value=""></option>
-                    <option data-ng-repeat="sensitiveDataType in sensitiveDataTypes" value="{{sensitiveDataType.Id}}">{{sensitiveDataType.Name}}</option>
-                </select>
+                <select-option data-id="sensitive"
+                               data-label="Persondata"
+                               data-placeholder="Vælg persondata"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="usage.sensitiveDataTypeId"
+                               data-options="sensitiveDataTypes"
+                               data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                               data-field="sensitiveDataTypeId">
+                </select-option>
             </div>
             <!-- note -->
             <div class="form-group">
@@ -113,10 +112,12 @@
         <div class="col-xs-6">
             <!--AppTypeOption-->
             <div class="form-group">
-                <label for="system-type" class="control-label small">Applikationstype</label>
-                <select id="system-type" class="form-control input-sm" disabled="disabled">
-                    <option value="" selected>{{usage.itSystem.appTypeOptionName}}</option>
-                </select>
+                <select-option data-id="system-app-type"
+                               data-label="Applikationstype"
+                               data-ng-disabled="true"
+                               data-ng-model="usage.itSystem.appTypeOptionId"
+                               data-options="appTypeOptions">
+                </select-option>
             </div>
 
             <!--Name-->
@@ -131,12 +132,14 @@
                 <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
             </div>
 
-            <!--Usage type-->
+            <!--Business type-->
             <div class="form-group">
-                <label for="system-business-type" class="control-label small">Forretningstype</label>
-                <select id="system-business-type" class="form-control input-sm" disabled>
-                    <option value="" selected>{{ usage.itSystem.businessTypeName }}</option>
-                </select>
+                <select-option data-id="system-business-type"
+                               data-label="Forretningstype"
+                               data-ng-disabled="true"
+                               data-ng-model="usage.itSystem.businessTypeId"
+                               data-options="businessTypes">
+                </select-option>
             </div>
         </div>
 
