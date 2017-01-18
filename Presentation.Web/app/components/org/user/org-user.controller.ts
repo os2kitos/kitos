@@ -31,7 +31,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
+                            url: `/odata/Users?$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
                             dataType: "json"
                         },
                         destroy: {
@@ -45,12 +45,12 @@
                             if (operation === "read") {
                                 // get kendo to map parameters to an odata url
                                 const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
-
+                                //parameterMap.$filter = "";
                                 if (parameterMap.$filter) {
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
                                 }
-
+                                //parameterMap =+ `AND OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`;
                                 return parameterMap;
                             }
 
@@ -287,6 +287,9 @@
 
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            if (column == 'ObjectOwner.Name') {
+                return filterUrl.replace(pattern, `$1concat(concat(ObjectOwner/Name, ' '), ObjectOwner/LastName)$2`);
+            }
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
         }
 
