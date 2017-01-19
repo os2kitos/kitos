@@ -19,6 +19,7 @@
         private canCreate: boolean;
         private storageKey = "report-overview-options";
         private gridState = this.gridStateService.getService(this.storageKey);
+        public categoryTypeValues;
 
         static $inject: Array<string> = [
             "$rootScope",
@@ -35,7 +36,8 @@
             "reports",
             "$confirm",
             "globalConfig",
-            "gridStateService"
+            "gridStateService",
+            "reportCategoryTypes"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
@@ -52,8 +54,9 @@
             public reports,
             private $confirm,
             private globalConfigs,
-            private gridStateService: Services.IGridStateFactory) {
-
+            private gridStateService: Services.IGridStateFactory,
+            private reportCategoryTypes) {
+            
             this.$rootScope.page.title = "Rapport Oversigt";
 
             var canGlobalAdminOnlyEditReports = _.find(this.globalConfigs, function (g: any) {
@@ -61,6 +64,12 @@
             });
 
             this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
+
+            this.categoryTypeValues = [];
+            var self = this;
+            this._.each(this.reportCategoryTypes, function (value) {
+                self.categoryTypeValues.push({ text: value.Name, value: value.Id });
+            });
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 this.loadGridOptions();
@@ -204,8 +213,8 @@
                             Id: { editable: false, nullable: true },
                             Name: { editable: true, validation: { required: true } },
                             Description: { editable: true, validation: { required: true } },
-                            CategoryTypeId: { type: "number" },
-                            AccessModifier: { type: "string" }
+                            AccessModifier: { type: "string" },
+                            CategoryTypeId: { type: "number" }
                         }
                     }
                 }
@@ -312,7 +321,7 @@
                         }
                     },
                     {
-                        field: "CategoryType.Name",
+                        field: "CategoryTypeId",
                         persistId: "catTypeId",
                         title: "Kategori",
                         width: "180px",
@@ -321,23 +330,16 @@
                             cell: {
                                 dataSource: [],
                                 showOperators: false,
-                                operator: "contains"
+                                operator: "eq"
                             }
                         },
-                        values: [
-                            { text: "IT Projekt", value: "IT Projekt"},
-                            { text: "IT Kontrakt", value: "IT Kontrakt" },
-                            { text: "IT System", value: "IT System" },
-                            { text: "Organisation", value: "Organisation" },
-                            { text: "Økonomi", value: "Økonomi" }
-                        ]
+                        values: this.categoryTypeValues
                     },
                     {
                         field: "AccessModifier",
                         persistId: "accessModifier",
                         title: "Synlighed",
                         width: "60px",
-                        hidden: true,
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         filterable: {
                             cell: {
@@ -575,6 +577,9 @@
                         reports: ["reportService", (rpt) => rpt.GetAll().then(result => result.data.value)],
                         globalConfig: [
                             "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
+                        ],
+                        reportCategoryTypes: [
+                            "reportService", reportService => reportService.getReportCategories().then(result => result.data.value)
                         ]
                     }
                 });
