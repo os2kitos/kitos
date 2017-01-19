@@ -239,7 +239,7 @@
                     },
                     {
                         field: "AccessModifier",
-                        title: "Adgang",
+                        title: "Synlighed",
                         width: "60px",
                         menu: false,
                         template: dataitem => {
