@@ -19,14 +19,12 @@
                         $state,
                         $window) => {
                         var parent = $scope;
-                        console.log(parent.defaultTitle);
                         if ($state.current.name == "it-project.overview" || $state.current.name == "it-system.overview" || $state.current.name == "it-contract.overview") {
                             $scope.disableAdvisLink = false;
                         }
                         else {
                             $scope.disableAdvisLink = false;
                         }
-                        console.log($state.current.name);
                         $scope.showAdviceModal = () => {
                             var modalInstance = $uibModal.open({
                                 windowClass: "modal fade in",
@@ -35,7 +33,6 @@
                                 controller: ["$scope", "$uibModalInstance", "notify", function ($scope, $modalInstance, nofity) {
                                     var today = moment().format('YYYY-MM-DD');
                                     var stateUrl = "";
-                                    console.log(today);
                                     var moduleTypeFilter = "";
                                     if (parent.defaultTitle == "it-project.overview") {
                                         $scope.title = "IT advis - IT Projekter";
