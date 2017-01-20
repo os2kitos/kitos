@@ -179,26 +179,26 @@ namespace Core.ApplicationServices
             }
 
             // check if user is local admin in target organization
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.LocalAdmin))
+            if (user.IsLocalAdmin)
             {
                 // local admins have write access to everything within the context
                 return true;
             }
 
             // check if module admin in target organization and target entity is of the correct type
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
+            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
                 return true;
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
+            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
                 return true;
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
+            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
                 return true;
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
+            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
                 return true;
 
-            if (user.DefaultOrganization.Rights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
+            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
                 return true;
 
             // check if user has a write role on the target entity
