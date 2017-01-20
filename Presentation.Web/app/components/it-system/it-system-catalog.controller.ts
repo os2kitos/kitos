@@ -587,9 +587,7 @@
         };
 
         private reload() {
-            //this.$state.go(".", null, { reload: true });
-            this.loadGridOptions();
-            this.mainGrid.dataSource.read();
+            this.$state.go(".", null, { reload: true });
         }
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title

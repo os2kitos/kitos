@@ -274,6 +274,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
@@ -591,6 +592,7 @@
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\global-admin\global-admin-report.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
     <Content Include="app\components\it-advice\it-advice-modal-view.html" />

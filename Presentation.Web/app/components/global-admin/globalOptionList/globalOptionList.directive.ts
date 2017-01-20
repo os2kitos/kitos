@@ -112,8 +112,51 @@
                 groupable: false,
                 columnMenu: {
                     filterable: false
-                },
-                columns: [
+                }
+            };
+
+            if (this.dirId === "reportCategoryTypeId") {
+                this.mainGridOptions["columns"] = [
+                    {
+                        field: "Name",
+                        title: "Navn",
+                        width: 230,
+                        persistId: "name", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Name,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Description",
+                        title: "Beskrivelse",
+                        width: 230,
+                        persistId: "description", // DON'T YOU DARE RENAME!
+                        template: (dataItem) => dataItem.Description,
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        name: "editOption",
+                        text: "Redigér",
+                        template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button>",
+                        title: " ",
+                        width: 176
+                    } as any
+                ];
+             } else {
+                this.mainGridOptions["columns"] = [
                     {
                         field: "IsEnabled",
                         title: "Tilgængelig",
@@ -181,9 +224,9 @@
                         template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
                         title: " ",
                         width: 176
-                    } as any,
-                ]
-            };
+                    } as any
+                ];
+            }
         }
 
         public createOption = () => {
