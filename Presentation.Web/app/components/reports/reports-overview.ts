@@ -339,7 +339,7 @@
                         field: "AccessModifier",
                         persistId: "accessModifier",
                         title: "Synlighed",
-                        width: "60px",
+                        width: "150px",
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
                         filterable: {
                             cell: {
@@ -349,11 +349,10 @@
                         }
                     },
                     {
-                        field: "Organization",
+                        field: "Organization.Name",
                         persistId: "org",
                         title: "Organisation",
                         width: "60px",
-                        template: dataitem => dataitem.Organization ? dataitem.Organization.Name : "",
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -372,7 +371,7 @@
                         template: dataitem => kendo.toString(kendo.parseDate(dataitem.LastChanged), "d")
                     },
                     {
-                        field: "LastChangedByUser",
+                        field: "LastChangedByUser.Name",
                         persistId: "lastChangedByUser",
                         title: "Sidst ændret af",
                         width: "150px",
