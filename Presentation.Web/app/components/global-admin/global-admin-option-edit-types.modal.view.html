@@ -16,10 +16,10 @@
 					<div ng-message="minlength" style="margin:5px 0">Navnet er for kort.</div>
 					<div ng-message="maxlength" style="margin:5px 0">Navnet er for lang.</div>
 				</div>
-				<div class="checkbox">
+				<div class="checkbox" data-ng-hide="{{ vm.optionsUrl === '/odata/ReportCategoryTypes' }}">
 					<label>
 						<input type="checkbox" ng-model="vm.isObligatory">
-						Obligatorisk
+						Obligatorisk {{vm.optionType}}
 					</label>
 				</div>
 			</div>
