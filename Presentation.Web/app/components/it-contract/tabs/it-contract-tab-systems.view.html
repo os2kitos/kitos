@@ -23,7 +23,7 @@
                         <tr data-ng-repeat="associatedSystemUsage in associatedSystemUsages | filter:{'show':true}">
                             <!-- the system -->
                             <td>
-                                <a data-ui-sref="it-system.usage.interfaces({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
+                                <a data-ui-sref="it-system.usage.main({ id: associatedSystemUsage.id })">{{ associatedSystemUsage.itSystemName }} <span data-ng-if="associatedSystemUsage.itSystemDisabled">(Inaktiv)</span></a>
                             </td>
 
                             <!-- app type (read only) -->
