@@ -77,7 +77,7 @@ app.run([
         });
 
         $rootScope.positionSubnav = () => {
-            $(document).ready(function () {
+            $(document).load(function () {
                 $timeout(() => {
                     if ($rootScope.subnavPositionCenter) {
                         $("#subnav").css("text-align", "center");

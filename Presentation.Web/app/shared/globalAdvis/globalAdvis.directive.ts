@@ -4,7 +4,7 @@
             return {
                 templateUrl: "app/shared/globalAdvis/it-advice-global.view.html",
                 scope: {
-                    defaultTitle: "@",
+                    stateName: "@"
                 },
                 controller: [
                     '$scope',
@@ -18,13 +18,14 @@
                         $uibModal,
                         $state,
                         $window) => {
+                        $scope.$watch("stateName", function (newValue, oldValue) {
+                            if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview")
+                                $scope.disableAdvisLink = false;
+                            else
+                                $scope.disableAdvisLink = true;
+                        });
                         var parent = $scope;
-                        if ($state.current.name == "it-project.overview" || $state.current.name == "it-system.overview" || $state.current.name == "it-contract.overview") {
-                            $scope.disableAdvisLink = false;
-                        }
-                        else {
-                            $scope.disableAdvisLink = false;
-                        }
+                        
                         $scope.showAdviceModal = () => {
                             var modalInstance = $uibModal.open({
                                 windowClass: "modal fade in",
@@ -34,17 +35,17 @@
                                     var today = moment().format('YYYY-MM-DD');
                                     var stateUrl = "";
                                     var moduleTypeFilter = "";
-                                    if (parent.defaultTitle == "it-project.overview") {
+                                    if (parent.stateName === "it-project.overview") {
                                         $scope.title = "IT advis - IT Projekter";
                                         moduleTypeFilter = "Type eq 'itProject'";
                                         stateUrl = $window.location.href.replace("overview", "edit");
                                     }
-                                    if (parent.defaultTitle == "it-contract.overview") {
+                                    if (parent.stateName === "it-contract.overview") {
                                         $scope.title = "IT advis - IT Kontrakter";
                                         moduleTypeFilter = "Type eq 'itContract'";
                                         stateUrl = $window.location.href.replace("overview", "edit");
                                     }
-                                    if (parent.defaultTitle == "it-system.overview") {
+                                    if (parent.stateName === "it-system.overview") {
                                         $scope.title = "IT advis - IT Systemer";
                                         moduleTypeFilter = "Type eq 'itSystemUsage'";
                                         stateUrl = $window.location.href.replace("overview", "usage");
