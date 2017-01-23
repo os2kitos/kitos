@@ -15,7 +15,7 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -25,7 +25,9 @@
             private $state: ng.ui.IStateService,
             private $scope,
             private notify,
-            private user) {
+            private user,
+            private hasWriteAccess) {
+            this.hasWriteAccess = hasWriteAccess;
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -301,12 +303,14 @@
         }
 
         private onDelete = (e: JQueryEventObject) => {
-            e.preventDefault();
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var entityId = dataItem["Id"];
-            this.$state.go("organization.user.delete", { id: entityId });
-            //this.mainGrid.dataSource.remove(dataItem);
-            //this.mainGrid.dataSource.sync();
+            if (this.hasWriteAccess == true) {
+                e.preventDefault();
+                var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+                var entityId = dataItem["Id"];
+                this.$state.go("organization.user.delete", { id: entityId });
+                //this.mainGrid.dataSource.remove(dataItem);
+                //this.mainGrid.dataSource.sync();
+            }
         }
 
         private exportFlag = false;
@@ -388,6 +392,14 @@
                 resolve: {
                     user: [
                         "userService", userService => userService.getUser()
+                    ],
+                    hasWriteAccess: [
+                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }
                     ]
                 }
             });
