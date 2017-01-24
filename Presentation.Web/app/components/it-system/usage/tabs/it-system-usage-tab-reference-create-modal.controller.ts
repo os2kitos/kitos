@@ -1,7 +1,7 @@
 ﻿(function (ng, app) {
     app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-system.usage.references.create', {
-            url: 'createReference/:id',
+            url: '/createReference/:id',
             onEnter: ['$state', '$stateParams', '$uibModal', 'user',
                 function ($state, $stateParams, $modal, user) {
                     $modal.open({
@@ -43,7 +43,7 @@
     }]);
 
     app.controller("it-system-usage.referenceCreateModalCtrl",
-        ["$scope", "$http","itSystemUsage","notify","user", 
+        ["$scope", "$http","itSystemUsage","notify","user",
             function ($scope, $http, itSystemUsage,notify,user) {
 
                 $scope.dismiss = function () {

@@ -21,5 +21,6 @@
         TaskRefs: Array<ITaskRef>;
         /** Gets or sets the usages. */
         Usages: Array<ItSystemUsage.IItSystemUsage>;
+        Reference: any;
     }
 }

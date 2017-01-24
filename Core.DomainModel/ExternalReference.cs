@@ -17,8 +17,8 @@ namespace Core.DomainModel
     }
     public class ExternalReference : Entity
     {
-        
-        public int? ItProject_Id { get; set; } 
+
+        public int? ItProject_Id { get; set; }
         public virtual ItProject.ItProject ItProject { get; set; }
 
         public int? Itcontract_Id { get; set; }
@@ -26,13 +26,16 @@ namespace Core.DomainModel
 
         public int? ItSystemUsage_Id { get; set; }
         public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
-        
-        
+
+        public int? ItSystem_Id { get; set; }
+        public virtual ItSystem.ItSystem ItSystem { get; set; }
+
+
         public string Title { get; set; }
         public string ExternalReferenceId { get; set; }
         public string URL { get; set; }
-        public Display Display {get;set;}
-        public DateTime Created {get; set;}
+        public Display Display { get; set; }
+        public DateTime Created { get; set; }
 
     }
 }

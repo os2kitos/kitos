@@ -543,6 +543,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",

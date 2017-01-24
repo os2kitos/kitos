@@ -11,15 +11,7 @@ using Microsoft.OData.Core;
 using Microsoft.OData.Core.UriParser;
 using Ninject;
 using Ninject.Extensions.Logging;
-using Microsoft.OData.Core;
-using Microsoft.OData.Core.UriParser;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Web.Http.Routing;
-using System.Web.OData.Extensions;
-using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {

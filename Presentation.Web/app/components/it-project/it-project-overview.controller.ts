@@ -443,7 +443,7 @@
 
                             if (reference != null) {
                                 if (this.isValidUrl(reference.URL)) {
-                                    return "<a style=\"float:left;\"  href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -457,7 +457,7 @@
                                 return dataItem && dataItem.Reference.Title;
                             }
                         },
-                        attributes: { "class": "text-center" },
+                        attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -467,6 +467,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
