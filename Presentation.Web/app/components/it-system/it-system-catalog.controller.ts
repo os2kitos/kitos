@@ -91,8 +91,8 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
-          
+            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -205,7 +205,7 @@
                         template: dataItem => {
                             // true if system is being used by system within current context, else false
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
-                            
+
                             if (systemHasUsages)
                                 return `<div class="text-center"><button type="button" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
@@ -343,25 +343,6 @@
                         sortable: false
                     },
                     {
-                        field: "Url", title: "Link til beskrivelse", width: 125,
-                        persistId: "link", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem.Url) {
-                                return "";
-                            }
-                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
-                        },
-                        excelTemplate: dataItem => dataItem && dataItem.Url || "",
-                        attributes: { "class": "text-center" },
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem =>
@@ -370,22 +351,6 @@
                         filterable: false,
                         sortable: false
                     },
-                    //{
-                    //    field: "", title: "Snitflader: Udstilles globalt", width: 95,
-                    //    persistId: "globalexpsure", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "", title: "Snitflader: Anvendes globalt", width: 95,
-                    //    persistId: "globalusage", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
@@ -447,6 +412,31 @@
                             cell: {
                                 showOperators: false,
                                 operator: "gte"
+                            }
+                        }
+                    },
+                    {
+                        field: "References.Title",
+                        title: "Reference",
+                        width: 150,
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (this.isValidUrl(reference.URL)) {
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
                             }
                         }
                     },
@@ -591,6 +581,11 @@
             this.loadGridOptions();
             this.mainGrid.dataSource.read();
         }
+
+        public isValidUrl(Url) {
+            var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return regexp.test(Url.toLowerCase());
+        };
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {

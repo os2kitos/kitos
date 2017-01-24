@@ -93,5 +93,9 @@ namespace Presentation.Web.Models
         public DateTime? Concluded { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public bool Disabled { get; set; }
+
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
     }
 }

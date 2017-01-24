@@ -463,14 +463,14 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (this.isValidUrl(reference.URL)) {
-                                    return "<a style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
                             }
                             return "";
                         },
-                        attributes: { "class": "text-center" },
+                        attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -480,6 +480,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
@@ -495,6 +496,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "CmdbRef", title: "CMDB ref", width: 150,
                         persistId: "cmdb", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",

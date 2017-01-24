@@ -23,8 +23,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.ParentId)
                 .WillCascadeOnDelete(false);
 
-            HasOptional(t => t.Reference);
-
             HasMany(t => t.UsedByOrgUnits)
                 .WithRequired(t => t.ItProject)
                 .HasForeignKey(d => d.ItProjectId);
@@ -55,11 +53,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItProjectId)
                 .WillCascadeOnDelete(true);
 
+            HasOptional(t => t.Reference);
             HasMany(t => t.ExternalReferences)
                 .WithOptional(d => d.ItProject)
                 .HasForeignKey(d => d.ItProject_Id)
                 .WillCascadeOnDelete(true);
-
 
             HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItProject);

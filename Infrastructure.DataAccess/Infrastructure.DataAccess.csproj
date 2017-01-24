@@ -102,7 +102,6 @@
     <Compile Include="Mapping\BusinessTypeMap.cs" />
     <Compile Include="Mapping\ItSystemTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
-    <Compile Include="Mapping\ItInterfaceUseMap.cs" />
     <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
     <Compile Include="Mapping\ItInterfaceMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
