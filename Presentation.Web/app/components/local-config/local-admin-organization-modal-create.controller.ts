@@ -19,7 +19,7 @@
             $rootScope.page.title = "Ny organisation";
             this.title = "Opret organisation";
             this.org = {};
-            this.org.AccessModifier = "0";
+            this.org.AccessModifier = "1";
             this.org.TypeId = 2; // set type to interessefællesskab by default
             this.org.Cvr = null;
 

@@ -11,7 +11,7 @@
             $rootScope.page.title = 'Ny organisation';
             this.title = 'Opret organisation';
             this.org = {};
-            this.org.accessModifier = 0;
+            this.org.accessModifier = "1";
             this.org.typeId = 1; // set type to municipality by default
         }
 
