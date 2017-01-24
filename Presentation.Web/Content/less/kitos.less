@@ -1215,9 +1215,15 @@ tr.angular-ui-tree-empty {
 /* TYPEAHEAD */
 
 .typeahead-items {
-    border-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
     border: 1px solid black;
     border-top: 0;
+    position: absolute;
+    width: 90%;
+    overflow: auto;
+    max-height: 300px;
+    z-index: 1;
 
     .item {
         height: 30px;
@@ -1392,3 +1398,11 @@ tr.angular-ui-tree-empty {
 }
 
 /**/
+
+/* Global advis */
+.disable-advis-link {
+    a {
+        color: gray !important;
+        pointer-events: none;
+    }
+}

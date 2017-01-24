@@ -15,7 +15,7 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -25,14 +25,20 @@
             private $state: ng.ui.IStateService,
             private $scope,
             private notify,
-            private user) {
+            private user,
+            private hasWriteAccess) {
+            this.hasWriteAccess = hasWriteAccess;
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Users?$filter=OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})&$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
-                            dataType: "json"
+                            url: `/odata/Users`,
+                            dataType: "json",
+                            data: {
+                                $expand: "ObjectOwner, OrganizationRights",
+                                $filter: `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`
+                            }
                         },
                         destroy: {
                             url: (entity) => {
@@ -45,12 +51,11 @@
                             if (operation === "read") {
                                 // get kendo to map parameters to an odata url
                                 const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
-
+                                //parameterMap.$filter = "";
                                 if (parameterMap.$filter) {
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
                                 }
-
                                 return parameterMap;
                             }
 
@@ -287,6 +292,9 @@
 
         private fixNameFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            if (column == 'ObjectOwner.Name') {
+                return filterUrl.replace(pattern, `$1concat(concat(ObjectOwner/Name, ' '), ObjectOwner/LastName)$2`);
+            }
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
         }
 
@@ -298,12 +306,14 @@
         }
 
         private onDelete = (e: JQueryEventObject) => {
-            e.preventDefault();
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var entityId = dataItem["Id"];
-            this.$state.go("organization.user.delete", { id: entityId });
-            //this.mainGrid.dataSource.remove(dataItem);
-            //this.mainGrid.dataSource.sync();
+            if (this.hasWriteAccess == true) {
+                e.preventDefault();
+                var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+                var entityId = dataItem["Id"];
+                this.$state.go("organization.user.delete", { id: entityId });
+                //this.mainGrid.dataSource.remove(dataItem);
+                //this.mainGrid.dataSource.sync();
+            }
         }
 
         private exportFlag = false;
@@ -385,6 +395,14 @@
                 resolve: {
                     user: [
                         "userService", userService => userService.getUser()
+                    ],
+                    hasWriteAccess: [
+                        '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                            return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }
                     ]
                 }
             });

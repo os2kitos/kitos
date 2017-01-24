@@ -1,25 +1,25 @@
-﻿<div class="object-section-container">
-    <script type="text/ng-template" id="tree_item_template">
-        <div class="org-node" data-ng-class="{'selected': node.id == contract.id}">
-            <span class="org-node-info">
-                <a data-ui-sref="it-contract.edit.main({ id: node.id })">{{ node.name }}</a>
-            </span>
-            <ul>
-                <li data-ng-repeat="node in node.children">
-                    <div data-ng-include="'tree_item_template'"></div>
-                </li>
-            </ul>
-        </div>
-    </script>
+﻿<script type="text/ng-template" id="tree_item_template">
+    <div class="org-node" data-ng-class="{'selected': node.id == contract.id}">
+        <span class="org-node-info">
+            <a data-ui-sref="it-contract.edit.main({ id: node.id })">{{ node.name }}</a>
+        </span>
+        <ul>
+            <li data-ng-repeat="node in node.children">
+                <div data-ng-include="'tree_item_template'"></div>
+            </li>
+        </ul>
+    </div>
+</script>
 
-    <div class="object-section-container">
-        <h4 data-ng-bind="contract.name"></h4>
-        <div class="row">
-            <div class="col-xs-12">
-                <div data-ng-repeat="node in hierarchy" data-ng-include="'tree_item_template'"></div>
-            </div>
+<div class="object-section-container">
+    <h4 data-ng-bind="contract.name"></h4>
+    <div class="row">
+        <div class="col-xs-12">
+            <div data-ng-repeat="node in hierarchy" data-ng-include="'tree_item_template'"></div>
         </div>
     </div>
+</div>
+<div class="object-section-container">
     <div class="row">
         <div class="col-xs-6">
             <div class="row">

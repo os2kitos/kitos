@@ -120,7 +120,7 @@
             this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
             this.itemSelected = false;
             this.isUserSelected = true;
-            this.curOrganization = orgAdmin.filter(bar => (bar.Role === "User"))[0].Organization.Name;
+            this.curOrganization = user.currentOrganizationName;
             this.disabled = true;
             this.vmText = text;
         }

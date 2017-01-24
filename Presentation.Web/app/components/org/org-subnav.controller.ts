@@ -7,9 +7,17 @@
             resolve: {
                 user: ['userService', function (userService) {
                     return userService.getUser();
-                }]
+                }],
+                hasWriteAccess: [
+                    '$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                        return $http.get('api/Organization/' + user.currentOrganizationId + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
+                            .then(function (result) {
+                                return result.data.response;
+                            });
+                    }
+                ]
             },
-            controller: ['$rootScope', '$scope', '$uibModal', '$state', 'user', '$timeout', function ($rootScope, $scope, $modal, $state, user,$timeout) {
+            controller: ['$rootScope', '$scope', '$uibModal', '$state', 'user', 'hasWriteAccess', '$timeout', function ($rootScope, $scope, $modal, $state, user, hasWriteAccess,$timeout) {
                 $rootScope.page.title = 'Organisation';
 
                 var subnav = [];
@@ -24,13 +32,14 @@
                 $rootScope.page.subnav = subnav;
 
                 $rootScope.page.subnav.buttons = [
-                    { func: createUser, text: 'Opret Bruger', style: 'btn-success', icon: 'glyphicon-plus', showWhen: 'organization.user' }
+                    { func: createUser, text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
                 ];
-
                 $rootScope.subnavPositionCenter = false;
 
                 function createUser() {
-                    $state.go("organization.user.create");
+                    if (hasWriteAccess == true) {
+                        $state.go("organization.user.create");}
+                    
                 };
 
                 $scope.$on('$viewContentLoaded', function () {

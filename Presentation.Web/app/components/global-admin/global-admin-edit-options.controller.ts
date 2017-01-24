@@ -277,6 +277,30 @@
                     });
                 }
             ]
-        });
+            }).state("global-admin.report.edit-report-types", {
+                url: "/{:optionsUrl}/{id:int}/{:optionType}/edit-report-types",
+                onEnter: ["$state", "$stateParams", "$uibModal",
+                    ($state: ng.ui.IStateService,
+                        $stateParams: ng.ui.IStateParamsService,
+                        $uibModal: ng.ui.bootstrap.IModalService) => {
+                        $uibModal.open({
+                            templateUrl: "app/components/global-admin/global-admin-option-edit-types.modal.view.html",
+                            // fade in instead of slide from top, fixes strange cursor placement in IE
+                            // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                            windowClass: "modal fade in",
+                            controller: OptionsController,
+                            controllerAs: "vm"
+                        }).result.then(() => {
+                            // OK
+                            // GOTO parent state and reload
+                            $state.go("^", null, { reload: true });
+                        }, () => {
+                            // Cancel
+                            // GOTO parent state
+                            $state.go("^");
+                        });
+                    }
+                ]
+            });
     }]);
 }

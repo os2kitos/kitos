@@ -34,6 +34,13 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var entity = Repository.GetByKey(orgKey);
+            if (entity == null)
+                return NotFound();
+
+            if (!_authService.HasWriteAccess(UserId, entity))
+                return Unauthorized();
+
             var userId = 0;
             if (parameters.ContainsKey("userId"))
             {
