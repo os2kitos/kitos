@@ -355,6 +355,10 @@
     <Compile Include="Migrations\201612201243216_Archive.Designer.cs">
       <DependentUpon>201612201243216_Archive.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201701240754224_Added References for IT Systems.cs" />
+    <Compile Include="Migrations\201701240754224_Added References for IT Systems.Designer.cs">
+      <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -526,6 +530,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201612201243216_Archive.resx">
       <DependentUpon>201612201243216_Archive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701240754224_Added References for IT Systems.resx">
+      <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
