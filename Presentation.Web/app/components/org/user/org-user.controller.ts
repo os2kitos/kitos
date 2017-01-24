@@ -10,7 +10,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
     }
-
+    
     class OrganizationUserController {
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
@@ -266,7 +266,7 @@
                     {
                         command: [
                             { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: `k-custom-delete`, iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                         ],
                         title: " ", width: 176,
                         persistId: "command"
@@ -313,6 +313,8 @@
                 this.$state.go("organization.user.delete", { id: entityId });
                 //this.mainGrid.dataSource.remove(dataItem);
                 //this.mainGrid.dataSource.sync();
+            } else {
+                this.notify.addErrorMessage("Brugeren har ikke rettigheder til at ændre i organisationen");
             }
         }
 

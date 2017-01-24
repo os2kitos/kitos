@@ -309,7 +309,6 @@
             this.deleteAllUserRoles(this.vmItContracts, "ItContractRights");
             this.deleteAllUserRoles(this.orgAdmin, "OrganizationRights");
             this.$uibModalInstance.close();
-            this.notify.addSuccessMessage("Brugeren og dennes roller er slettet fra organisationen");
         }
 
         public deleteSelectedRoles() {
@@ -374,7 +373,8 @@
         public deleteAllUserRoles(roles: any, module: string) {
             for (var obj of roles) {
                 var id = obj.Id;
-                this.$http.delete(`/odata/${module}(${id})`);
+                this.$http.delete(`/odata/${module}(${id})`)
+                    .then(this.notify.addSuccessMessage("Brugeren og dennes roller er slettet fra organisationen"));
             }
         }
     }
