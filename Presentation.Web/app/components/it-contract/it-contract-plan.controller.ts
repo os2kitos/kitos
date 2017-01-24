@@ -520,7 +520,9 @@
                         sortable: false,
                         filterable: false
                     },
+                    // TODO Reference skal muligvis indføres som i it-contract-overview
                     {
+                        // TODO Skal muligvis slettes
                         field: "Esdh",
                         title: "ESDH ref",
                         width: 150,
@@ -540,6 +542,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "Folder",
                         title: "Mappe ref",
                         width: 150,

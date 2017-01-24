@@ -33,8 +33,12 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Users?$expand=ObjectOwner,OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`,
-                            dataType: "json"
+                            url: `/odata/Users`,
+                            dataType: "json",
+                            data: {
+                                $expand: "ObjectOwner, OrganizationRights",
+                                $filter: `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`
+                            }
                         },
                         destroy: {
                             url: (entity) => {
@@ -52,7 +56,6 @@
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
                                 }
-                                //parameterMap =+ `AND OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`;
                                 return parameterMap;
                             }
 

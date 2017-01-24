@@ -295,7 +295,6 @@
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />
     <Compile Include="Controllers\API\ItInterfaceController.cs" />
-    <Compile Include="Controllers\API\ItInterfaceUseController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\ItProjectStatusController.cs" />
     <Compile Include="Controllers\API\HandoverTrialController.cs" />
