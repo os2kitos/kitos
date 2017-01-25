@@ -90,9 +90,6 @@ module Kitos.Reports {
                 .then((result) => {
                     this.report = result.data;
 
-                    if (this.report.AccessModifier.toLowerCase() === "local" && this.report.OrganizationId != user.currentOrganizationId && !user.isGlobalAdmin)
-                        return;
-
                     this.stiReport = this.stimulsoftService.getReport();
 
                     var reportDef = this.emptyreport;
@@ -182,7 +179,11 @@ module Kitos.Reports {
 
                     //Assign the report to the viewer
                     this.viewer.report = this.stiReport;
-                });
+                })
+                .catch((result => {
+                    console.log(result);
+                    alert("Ingen adgang til rapporten!");
+                }));
         }
 
 
