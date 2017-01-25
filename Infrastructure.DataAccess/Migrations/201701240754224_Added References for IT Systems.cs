@@ -13,6 +13,10 @@ namespace Infrastructure.DataAccess.Migrations
             CreateIndex("dbo.ExternalReferences", "ItSystem_Id");
             AddForeignKey("dbo.ExternalReferences", "ItSystem_Id", "dbo.ItSystem", "Id");
             AddForeignKey("dbo.ItSystem", "ReferenceId", "dbo.ExternalReferences", "Id");
+            Sql("INSERT INTO [dbo].ExternalReferences \r\n(ItSystem_Id, ExternalReferenceId, ObjectOwnerId, Title, Display, LastChanged, Created)\r\n(SELECT Id, Url, ObjectOwnerId, Title = \'Importeret reference\', Display = 0, LastChanged = GETDATE(), Created = LastChanged FROM [dbo].[ItSystem]\r\nWHERE Url NOT LIKE \'%http%\' AND Url is NOT null AND Url != \'\')");
+            Sql("INSERT INTO [dbo].ExternalReferences \r\n(ItSystem_Id, ExternalReferenceId, ObjectOwnerId, Title, Display, LastChanged, Created)\r\n(SELECT Id, Url, ObjectOwnerId, Title = \'Importeret reference\', Display = 1, LastChanged = GETDATE(), Created = LastChanged FROM [dbo].[ItSystem]\r\nWHERE Url LIKE \'%http%\' AND Url is NOT null AND Url != \'\')");
+            /*** Changed [AccessModifier] to public ('1') ***/
+            Sql("UPDATE [dbo].[Organization]\r\nSET [AccessModifier] = \'1\'");
         }
         
         public override void Down()

@@ -24,6 +24,7 @@
                         });
                     reload();
                 };
+                $scope.referenceName = project.name;
 
                 $scope.setChosenReference = function (id) {
                     var referenceId = (id === project.referenceId) ? null : id;

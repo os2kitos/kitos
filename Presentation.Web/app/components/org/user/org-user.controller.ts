@@ -37,7 +37,6 @@
                             dataType: "json",
                             data: {
                                 $expand: "ObjectOwner, OrganizationRights",
-                                $filter: `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`
                             }
                         },
                         destroy: {
@@ -51,10 +50,12 @@
                             if (operation === "read") {
                                 // get kendo to map parameters to an odata url
                                 const parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, operation);
-                                //parameterMap.$filter = "";
                                 if (parameterMap.$filter) {
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
+                                    parameterMap.$filter = `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId}) and ${parameterMap.$filter}`;
+                                } else {
+                                    parameterMap.$filter = `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`;
                                 }
                                 return parameterMap;
                             }
