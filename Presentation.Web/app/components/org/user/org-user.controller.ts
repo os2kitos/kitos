@@ -91,7 +91,6 @@
                         parse: response => {
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
-                                console.log(response.value);
                                 // set if the user can edit
                                 if (this.user.isGlobalAdmin || this.user.isLocalAdmin) {
                                     usr.canEdit = true;
