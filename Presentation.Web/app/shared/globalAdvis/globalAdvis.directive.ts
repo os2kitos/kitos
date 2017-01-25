@@ -55,7 +55,7 @@
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/advice?$filter=${moduleTypeFilter} AND StopDate gt ${today}`,
+                                                    url: `/Odata/advice?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
                                                     dataType: "json"
                                                 },
                                             },
