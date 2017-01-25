@@ -83,16 +83,22 @@ app.run([
                         $("#subnav").css("text-align", "center");
                         $("#subnav").css("padding-left", "0");
                     } else {
-                        const buttonWidth = $("#navbar-top a.active").width();
-                        const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
-                        const ulWidth = $("#subnav ul").width();
-                        const subnavWidth = $("#navbar-top").width();
-                        $("#subnav").css("text-align", "left");
-                        $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
+                        if (typeof ($("#navbar-top a.active").offset()) === 'undefined') {
+                            $timeout(() => {
+                                $rootScope.positionSubnav();
+                            }, 100);
+                        } else {
+                            const buttonWidth = $("#navbar-top a.active").width();
+                            const distanceFromContainerToButton = $("#navbar-top").offset().left - $("#navbar-top a.active").offset().left;
+                            const ulWidth = $("#subnav ul").width();
+                            const subnavWidth = $("#navbar-top").width();
+                            $("#subnav").css("text-align", "left");
+                            $("#subnav").css("padding-left", `${((distanceFromContainerToButton * (-1)) - (ulWidth / 2) + (buttonWidth / 2)) / subnavWidth * 100}%`);
+                        }
                     }
 
                     $rootScope.subnavNotPositioned = false;
-                });
+                }, 0);
             });
         }
 
