@@ -89,6 +89,10 @@ module Kitos.Reports {
             this.reportService.GetById(id)
                 .then((result) => {
                     this.report = result.data;
+
+                    if (this.report.AccessModifier.toLowerCase() === "local" && this.report.OrganizationId != user.currentOrganizationId && !user.isGlobalAdmin)
+                        return;
+
                     this.stiReport = this.stimulsoftService.getReport();
 
                     var reportDef = this.emptyreport;
