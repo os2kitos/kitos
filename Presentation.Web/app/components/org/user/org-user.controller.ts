@@ -10,7 +10,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
     }
-    
+
     class OrganizationUserController {
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
@@ -36,7 +36,7 @@
                             url: `/odata/Users`,
                             dataType: "json",
                             data: {
-                                $expand: "ObjectOwner, OrganizationRights",
+                                $expand: `ObjectOwner, OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
                             }
                         },
                         destroy: {
