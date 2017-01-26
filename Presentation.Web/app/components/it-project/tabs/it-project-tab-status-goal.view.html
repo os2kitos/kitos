@@ -1,185 +1,189 @@
 ﻿<div class="object-section-container">
     <h4>{{projectEditVm.project.name}}</h4>
-    <div class="row">
-        <div class="col-xs-5">
-            <!-- Status traffic light -->
-            <div class="form-group">
-                <label class="col-xs-5 control-label small" for="statusGoal">Status mål (samlet):</label>
-                <div class="col-xs-7">
-                    <span id="statusGoal"
-                          data-select-status2=""
-                          data-ng-model="goalStatus.status"
-                          data-field="status"
-                          data-autosave="{{goalStatus.updateUrl}}"
-                          data-can-write="projectEditVm.hasWriteAccess"></span>
-                </div>
-            </div>
-
-            <!-- Date for status update -->
-            <div class="form-group">
-                <label class="col-xs-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                <div class="col-xs-4">
-                    <input type="text" class="form-control" id="statusDate"
-                           data-kendo-date-picker
-                           data-k-options="datepickerOptions"
-                           data-ng-disabled="!projectEditVm.hasWriteAccess"
-                           data-ng-model="goalStatus.statusDate"
-                           data-autosave="{{goalStatus.updateUrl}}"
-                           data-field="statusDate">
-                </div>
-            </div>
-        </div>
-        <div class="col-xs-7">
-            <!-- Notes to status of project -->
-            <div class="form-group">
-                <label class="col-xs-2 control-label small" for="note">Bemærkning til samlet status på mål:</label>
-                <div class="col-xs-10">
-                    <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
-                              data-field="statusNote"
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-5">
+                <!-- Status traffic light -->
+                <div class="form-group">
+                    <label class="col-xs-5 control-label small" for="statusGoal">Status mål (samlet):</label>
+                    <div class="col-xs-7">
+                        <span id="statusGoal"
+                              data-select-status2=""
+                              data-ng-model="goalStatus.status"
+                              data-field="status"
                               data-autosave="{{goalStatus.updateUrl}}"
-                              data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                              data-can-write="projectEditVm.hasWriteAccess"></span>
+                    </div>
+                </div>
+
+                <!-- Date for status update -->
+                <div class="form-group">
+                    <label class="col-xs-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
+                    <div class="col-xs-4">
+                        <input type="text" class="form-control" id="statusDate"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!projectEditVm.hasWriteAccess"
+                               data-ng-model="goalStatus.statusDate"
+                               data-autosave="{{goalStatus.updateUrl}}"
+                               data-field="statusDate">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-7">
+                <!-- Notes to status of project -->
+                <div class="form-group">
+                    <label class="col-xs-2 control-label small" for="note">Bemærkning til samlet status på mål:</label>
+                    <div class="col-xs-10">
+                        <textarea id="note" class="form-control input-sm" rows="4" data-ng-model="goalStatus.statusNote"
+                                  data-field="statusNote"
+                                  data-autosave="{{goalStatus.updateUrl}}"
+                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="panel panel-default">
-    <table class="table table-condensed table-striped table-bordered">
-        <thead>
-            <tr class="small">
-                <th rowspan="2">Måltype</th>
-                <th rowspan="2">ID</th>
-                <th rowspan="2">Mål</th>
-                <th rowspan="2">Beskrivelse</th>
-                <th rowspan="2">Målbart</th>
-                <th colspan="3" class="text-center">Delmål 1</th>
-                <th colspan="3" class="text-center">Delmål 2</th>
-                <th colspan="3" class="text-center">Delmål 3</th>
-                <th rowspan="2">Note</th>
-                <th rowspan="2">Status</th>
-                <th rowspan="2"></th>
-            </tr>
-            <tr class="small active">
-                <th>Dato</th>
-                <th>Mål</th>
-                <th>Rea</th>
-                <th>Dato</th>
-                <th>Mål</th>
-                <th>Rea</th>
-                <th>Dato</th>
-                <th>Mål</th>
-                <th>Rea</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr data-ng-repeat="goal in goals | filter:{show:true} | orderBy:'humanReadableId'" class="small">
-                <!-- Goal type -->
-                <td>
-                    {{ getGoalTypeName(goal.goalTypeId) }}
-                </td>
+<div class="object-section-container">
+    <div class="panel panel-default">
+        <table class="table table-condensed table-striped table-bordered">
+            <thead>
+                <tr class="small">
+                    <th rowspan="2">Måltype</th>
+                    <th rowspan="2">ID</th>
+                    <th rowspan="2">Mål</th>
+                    <th rowspan="2">Beskrivelse</th>
+                    <th rowspan="2">Målbart</th>
+                    <th colspan="3" class="text-center">Delmål 1</th>
+                    <th colspan="3" class="text-center">Delmål 2</th>
+                    <th colspan="3" class="text-center">Delmål 3</th>
+                    <th rowspan="2">Note</th>
+                    <th rowspan="2">Status</th>
+                    <th rowspan="2"></th>
+                </tr>
+                <tr class="small active">
+                    <th>Dato</th>
+                    <th>Mål</th>
+                    <th>Rea</th>
+                    <th>Dato</th>
+                    <th>Mål</th>
+                    <th>Rea</th>
+                    <th>Dato</th>
+                    <th>Mål</th>
+                    <th>Rea</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="goal in goals | filter:{show:true} | orderBy:'humanReadableId'" class="small">
+                    <!-- Goal type -->
+                    <td>
+                        {{ getGoalTypeName(goal.goalTypeId) }}
+                    </td>
 
-                <!-- Human readable ID -->
-                <td>
-                    {{goal.humanReadableId}}
-                </td>
+                    <!-- Human readable ID -->
+                    <td>
+                        {{goal.humanReadableId}}
+                    </td>
 
-                <!-- Goal name -->
-                <td>
-                    <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="projectEditVm.hasWriteAccess">
-                        {{goal.name}}
-                    </a>
-                    <span data-ng-hide="projectEditVm.hasWriteAccess">
-                        {{goal.name}}
-                    </span>
-                </td>
-
-                <!-- Description -->
-                <td>
-                    <div data-simple-comment="" data-ng-model="goal.description"></div>
-                </td>
-
-                <!-- Measurable -->
-                <td>
-                    {{ goal.measurable && "Ja" || "Nej" }}
-                </td>
-
-                <!-- Subgoal 1 date -->
-                <td>
-                    <span data-ng-model="goal.subGoalDate1" data-datereader="">
-                    </span>
-                </td>
-
-                <!-- Subgoal 1 name -->
-                <td>
-                    {{goal.subGoal1}}
-                </td>
-                <!-- Subgoal 1 Rea -->
-                <td>
-                    {{goal.subGoalRea1}}
-                </td>
-
-                <!-- Subgoal 2 date -->
-                <td>
-                    <span data-ng-model="goal.subGoalDate2" data-datereader="">
-                    </span>
-                </td>
-
-                <!-- Subgoal 2 name -->
-                <td>
-                    {{goal.subGoal2}}
-                </td>
-                <!-- Subgoal 2 Rea -->
-                <td>
-                    {{goal.subGoalRea2}}
-                </td>
-
-                <!-- Subgoal 3 date -->
-                <td>
-                    <span data-ng-model="goal.subGoalDate3" data-datereader="">
-                    </span>
-                </td>
-
-                <!-- Subgoal 3 name -->
-                <td>
-                    {{goal.subGoal3}}
-                </td>
-                <!-- Subgoal 3 Rea -->
-                <td>
-                    {{goal.subGoalRea3}}
-                </td>
-
-                <!-- Note -->
-                <td>
-                    <div data-simple-comment="" data-ng-model="goal.note"></div>
-                </td>
-
-                <!-- Status -->
-                <td>
-                    <span data-select-status2="" data-ng-model="goal.status"></span>
-                </td>
-                <td>
-                    <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
-                        <a class="btn btn-link btn-xs edit-goal" data-ng-click="goal.edit()">
-                            <i class="glyphicon glyphicon-pencil"></i>
+                    <!-- Goal name -->
+                    <td>
+                        <a class="btn btn-link btn-xs" data-ng-click="goal.edit()" data-ng-show="projectEditVm.hasWriteAccess">
+                            {{goal.name}}
                         </a>
-                        <a class="btn btn-link btn-xs delete-goal"
-                            data-confirmed-click="goal.delete()"
-                            data-confirm-click="Er du sikker på at du vil slette?">
-                            <i class="glyphicon glyphicon-trash"></i>
-                        </a>
-                    </div>
-                </td>
+                        <span data-ng-hide="projectEditVm.hasWriteAccess">
+                            {{goal.name}}
+                        </span>
+                    </td>
 
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="17">
-                    <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
-                        <button id="add-goal" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-goal.modal({goalId: ''})">Tilføj mål</button>
-                    </div>
-                </td>
-            </tr>
-        </tfoot>
-    </table>
+                    <!-- Description -->
+                    <td>
+                        <div data-simple-comment="" data-ng-model="goal.description"></div>
+                    </td>
+
+                    <!-- Measurable -->
+                    <td>
+                        {{ goal.measurable && "Ja" || "Nej" }}
+                    </td>
+
+                    <!-- Subgoal 1 date -->
+                    <td>
+                        <span data-ng-model="goal.subGoalDate1" data-datereader="">
+                        </span>
+                    </td>
+
+                    <!-- Subgoal 1 name -->
+                    <td>
+                        {{goal.subGoal1}}
+                    </td>
+                    <!-- Subgoal 1 Rea -->
+                    <td>
+                        {{goal.subGoalRea1}}
+                    </td>
+
+                    <!-- Subgoal 2 date -->
+                    <td>
+                        <span data-ng-model="goal.subGoalDate2" data-datereader="">
+                        </span>
+                    </td>
+
+                    <!-- Subgoal 2 name -->
+                    <td>
+                        {{goal.subGoal2}}
+                    </td>
+                    <!-- Subgoal 2 Rea -->
+                    <td>
+                        {{goal.subGoalRea2}}
+                    </td>
+
+                    <!-- Subgoal 3 date -->
+                    <td>
+                        <span data-ng-model="goal.subGoalDate3" data-datereader="">
+                        </span>
+                    </td>
+
+                    <!-- Subgoal 3 name -->
+                    <td>
+                        {{goal.subGoal3}}
+                    </td>
+                    <!-- Subgoal 3 Rea -->
+                    <td>
+                        {{goal.subGoalRea3}}
+                    </td>
+
+                    <!-- Note -->
+                    <td>
+                        <div data-simple-comment="" data-ng-model="goal.note"></div>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <span data-select-status2="" data-ng-model="goal.status"></span>
+                    </td>
+                    <td>
+                        <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
+                            <a class="btn btn-link btn-xs edit-goal" data-ng-click="goal.edit()">
+                                <i class="glyphicon glyphicon-pencil"></i>
+                            </a>
+                            <a class="btn btn-link btn-xs delete-goal"
+                               data-confirmed-click="goal.delete()"
+                               data-confirm-click="Er du sikker på at du vil slette?">
+                                <i class="glyphicon glyphicon-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="17">
+                        <div class="pull-right" data-ng-hide="!projectEditVm.hasWriteAccess">
+                            <button id="add-goal" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-goal.modal({goalId: ''})">Tilføj mål</button>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>

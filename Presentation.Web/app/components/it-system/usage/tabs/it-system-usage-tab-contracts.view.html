@@ -71,35 +71,37 @@
         </table>
     </div>
 
-    <div>
-        <form class="form-horizontal">
-            <div class="form-group">
-                <label class="col-xs-4 control-label">
-                    Hvilken kontrakt skal afgøre om IT systemet er aktivt:
-                </label>
-                <div class="col-xs-3">
-                    <select id="contract-selector"
-                            class="form-control input-sm"
-                            data-ui-select2="allowClearOption"
-                            data-placeholder="Ingen kontrakt"
-                            data-ng-model="mainContractId"
-                            data-ng-change="saveMainContract()"
-                            data-ng-disabled="!hasWriteAccess">
-                        <option value=""></option>
-                        <option data-ng-repeat="contract in contracts" value="{{contract.id}}">{{contract.name}}</option>
-                    </select>
+    <div class="object-section-container">
+        <div class="panel panel-default">
+            <form class="form-horizontal">
+                <div class="form-group row">
+                    <label class="col-xs-4 control-label">
+                        Hvilken kontrakt skal afgøre om IT systemet er aktivt:
+                    </label>
+                    <div class="col-xs-3">
+                        <select id="contract-selector"
+                                class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Ingen kontrakt"
+                                data-ng-model="mainContractId"
+                                data-ng-change="saveMainContract()"
+                                data-ng-disabled="!hasWriteAccess">
+                            <option value=""></option>
+                            <option data-ng-repeat="contract in contracts" value="{{contract.id}}">{{contract.name}}</option>
+                        </select>
 
+                    </div>
+                    <div class="col-xs-4">
+                        IT systemet har nu status som:
+                        <strong class="text-success" data-ng-show="usage.mainContractIsActive">
+                            Aktivt
+                        </strong>
+                        <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
+                            Inaktivt
+                        </strong>
+                    </div>
                 </div>
-                <div class="col-xs-4">
-                    IT systemet har nu status som:
-                    <strong class="text-success" data-ng-show="usage.mainContractIsActive">
-                        Aktivt
-                    </strong>
-                    <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
-                        Inaktivt
-                    </strong>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
