@@ -813,9 +813,8 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
-            this.loadGridOptions();
-            this.mainGrid.dataSource.read();
         }
 
         private getTemplateMethod(column) {

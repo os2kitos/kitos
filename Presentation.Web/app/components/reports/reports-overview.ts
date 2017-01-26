@@ -37,7 +37,8 @@
             "$confirm",
             "globalConfig",
             "gridStateService",
-            "reportCategoryTypes"
+            "reportCategoryTypes",
+            "needsWidthFixService"
         ];
 
         constructor(private $rootScope: Kitos.IRootScope,
@@ -55,7 +56,8 @@
             private $confirm,
             private globalConfigs,
             private gridStateService: Services.IGridStateFactory,
-            private reportCategoryTypes) {
+            private reportCategoryTypes,
+            private needsWidthFixService) {
             
             this.$rootScope.page.title = "Rapport Oversigt";
 
@@ -485,9 +487,8 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
-            this.loadGridOptions();
-            this.mainGrid.dataSource.read();
         }
 
         private getTemplateMethod(column) {

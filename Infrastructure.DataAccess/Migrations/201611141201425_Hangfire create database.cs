@@ -7,7 +7,7 @@ namespace Infrastructure.DataAccess.Migrations
     {
         public override void Up()
         {
-            Sql(@"CREATE DATABASE kitos_HangfireDB", true);
+            Sql(@"IF NOT EXISTS(SELECT name FROM master.dbo.sysdatabases WHERE name = N'kitos_HangfireDB') CREATE DATABASE kitos_HangfireDB", true);
         }
         
         public override void Down()
