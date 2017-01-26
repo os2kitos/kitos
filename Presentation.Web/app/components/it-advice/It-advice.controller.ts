@@ -84,10 +84,11 @@
                         {
                             template: (dataItem) => {
                                 var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
+                                console.log(dataItem);
+                                var canDelete = dataItem.AdviceSent.length === 0;
                                 if (hasWriteAccess) {
-                                    return `<button id="add-advice" ng-show="${isActive}" ng-disabled="${isActive}" class="glyphicon glyphicon-ban-circle"></button>
-                                                        <button id="add-advice" ng-hide="${isActive}"  class="glyphicon glyphicon-pencil" data-ng-click="newAdvice('PATCH',${dataItem.Id})"></button> ` +
-                                        `<button id="add-advice" class="glyphicon glyphicon-trash"  data-ng-click="deleteAdvice(${dataItem.Id})"></button>`;
+                                    return `<button class="btn-link" ng-disabled="${isActive}" data-ng-click="newAdvice('PATCH',${dataItem.Id})"><i class="glyphicon glyphicon-pencil"></i></button>
+                                            <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
                                 } else {
                                     return 'Ingen rettigheder';
                                 }
@@ -98,7 +99,7 @@
                         {
                             name: "opretRolle",
                             text: "Opret rolle",
-                            template: "<button id=\"add-advice\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
+                            template: "<button data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
                         }
                     ],
                 pageable: {
