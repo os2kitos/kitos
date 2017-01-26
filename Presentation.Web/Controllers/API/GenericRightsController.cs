@@ -122,16 +122,21 @@ namespace Presentation.Web.Controllers.API
 
         private bool HasWriteAccess(int objectId, User user, int organizationId)
         {
+            
             if (user.IsGlobalAdmin)
                 return true;
 
             var obj = _objectRepository.GetByKey(objectId);
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
-                return true;
 
-            return obj.HasUserWriteAccess(user);
+            return AuthenticationService.HasWriteAccess(user.Id, obj);
+
+
+            //// local admin have write access if the obj is in context
+            //if (obj.IsInContext(organizationId) &&
+            //    user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
+            //    return true;
+
+            //return obj.HasUserWriteAccess(user);
         }
     }
 }
