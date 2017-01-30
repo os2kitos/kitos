@@ -1,4 +1,4 @@
-﻿module Kitos.Models.Organization {
+﻿module Kitos.Models {
     export interface IOrganizationUnitRight {
         UserId: number;
         RoleId: number;

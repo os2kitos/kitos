@@ -9,6 +9,8 @@
         LastAdvisDate?: Date;
         /** The admin rights of the user */
         OrganizationRights?: IOrganizationRight[];
+
+        OrganizationUnitRights?: IOrganizationUnitRight;
         /** Passwords reset request issued for the user */
         PasswordResetRequests?: IPasswordResetRequest[];
         /** Wishes created by this user */
