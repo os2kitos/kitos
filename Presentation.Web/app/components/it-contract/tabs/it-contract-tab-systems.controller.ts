@@ -45,8 +45,8 @@
     ]);
 
     app.controller("contract.EditSystemsCtrl", [
-        "$scope", "$http", "$state", "$stateParams", "notify", "user", "contract", "exhibitedInterfaces", "usedInterfaces", "agreementElements", "_",
-        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements, _) {
+        "$scope", "$http", "$state", "$stateParams", "notify", "user", "contract", "exhibitedInterfaces", "usedInterfaces", "agreementElements", "_", "$filter",
+        function ($scope, $http, $state, $stateParams, notify, user, contract, exhibitedInterfaces, usedInterfaces, agreementElements, _, $filter) {
 
             $scope.autoSaveUrl = "api/itcontract/" + $stateParams.id;
             $scope.exhibitedInterfaces = exhibitedInterfaces;
@@ -211,7 +211,7 @@
                                         // use the id of the interface usage
                                         id: usage.id,
                                         // use the name of the actual interface
-                                        text: usage.itInterfaceName
+                                        text: $filter('limitToDots')(usage.itInterfaceName, 30) 
                                     });
                                 }
                             });
@@ -223,7 +223,7 @@
                                         // use the id of the interface usage
                                         id: { intfId: usage.Id, sysId: $scope.newAssociatedInterfaceSelectedSystemUsage.itSystemId },
                                         // use the name of the actual interface
-                                        text: usage.Name
+                                        text: $filter('limitToDots')(usage.Name, 30)
                                     });
                                 }
 
@@ -264,7 +264,7 @@
                                     // the id of the system usage id, that is selected
                                     id: usage.id,
                                     // name of the system is the label for the select2
-                                    text: usage.itSystem.name,
+                                    text: $filter('limitToDots')(usage.itSystem.name, 30),
                                     // the if the system id that is selected
                                     itSystemId: usage.itSystem.id
                                 });

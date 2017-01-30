@@ -38,7 +38,8 @@
             "notify",
             "user",
             "gridStateService",
-            "$uibModal"
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -54,7 +55,8 @@
             private notify,
             private user,
             private gridStateService: Services.IGridStateFactory,
-            private $uibModal) {
+            private $uibModal,
+            private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -225,7 +227,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
+                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "hej",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -669,9 +671,8 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
-            this.loadGridOptions();
-            this.mainGrid.dataSource.read();
         }
 
         private getTemplateMethod(column) {

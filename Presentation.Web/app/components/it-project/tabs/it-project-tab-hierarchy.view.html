@@ -13,9 +13,11 @@
 
 <div class="object-section-container">
     <h4 data-ng-bind="project.name"></h4>
-    <div class="row">
-        <div class="col-xs-12">
-            <div data-ng-repeat="node in hierarchy" data-ng-include="'tree_item_template'"></div>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-12">
+                <div data-ng-repeat="node in hierarchy" data-ng-include="'tree_item_template'"></div>
+            </div>
         </div>
     </div>
 </div>
