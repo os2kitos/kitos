@@ -13,6 +13,7 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
+    using Core.DomainModel.AdviceSent;
     using System.Net;
 
     public class AdviceController : BaseEntityController<Advice>
@@ -21,13 +22,15 @@ namespace Presentation.Web.Controllers.OData
         IAuthenticationService _authService;
         IAdviceService _adviceService;
         IGenericRepository<Advice> _repository;
+        IGenericRepository<AdviceSent> _sentRepository;
 
-        public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService)
+        public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
             : base(repository, authService)
         {
             _authService = authService;
             _adviceService = adviceService;
             _repository = repository;
+            _sentRepository = sentRepository;
         }
 
         [EnableQuery]
@@ -208,8 +211,16 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
+            var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
+
+            if (anySents) {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
+
             if (!_authService.HasWriteAccess(UserId, entity))
                 return StatusCode(HttpStatusCode.Forbidden);
+
+
             try
             {
                 RecurringJob.RemoveIfExists("Advice: " + key);
