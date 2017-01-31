@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             var entity = result.First();
-            if (!_authService.HasReadAccess(UserId, entity) && !_authService.HasReadAccessOutsideContext(UserId))
+            if (!_authService.HasReadAccess(UserId, entity))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.OData
 
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
 
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
             return Ok(result);
