@@ -3,7 +3,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectStatusUpdate: Entity, IContextAware, IHasOrganization
+    public class ItProjectStatusUpdate: Entity, IContextAware, IHasOrganization, IProjectModule
     {
         public ItProjectStatusUpdate()
         {
