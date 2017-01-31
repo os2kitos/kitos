@@ -958,10 +958,7 @@
                         ecoStreamData: [
                             "$http", "user", "notify", ($http, user, notify) =>
                                 $http.get(`/odata/ExternEconomyStreams(Organization=${user.currentOrganizationId})`)
-                                    .then(function successCallback(result) { result.data.value; },
-                                    function errorCallback(result) {
-                                        $stateProvider.transitionTo("home", { q: "updated search term" });
-                                    })
+                                    .then(result => result.data.value, () => $stateProvider.transitionTo("home", { q: "updated search term" }))
                         ]
                     }
                 });
