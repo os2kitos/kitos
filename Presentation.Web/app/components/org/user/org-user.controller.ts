@@ -36,7 +36,7 @@
                             url: `/odata/Users`,
                             dataType: "json",
                             data: {
-                                $expand: `ObjectOwner, OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
+                                $expand: `ObjectOwner,OrganizationUnitRights($expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
                             }
                         },
                         destroy: {
@@ -196,11 +196,14 @@
                         }
                     },
                     {
-                        field: "OrganizationRights.Role", title: "Roller", width: 150,
+                        field: "OrganizationUnitRights.Role", title: "Roller", width: 150,
                         persistId: "role", // DON'T YOU DARE RENAME!
                         attributes: { "class": "might-overflow" },
-                        template: this.roleTemplate,
-                        excelTemplate: this.roleTemplate,
+                        template: (dataItem) => {
+                            this.curOrgCheck = dataItem.OrganizationUnitRights.ObjectId == this.user.currentOrganizationId;
+                            console.log(dataItem);
+                            return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights | filter: { ObjectId: '${this.user.currentOrganizationId}' }"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
+                            },
                         hidden: true,
                         filterable: {
                             cell: {
@@ -385,6 +388,7 @@
 
             return template;
         }
+        public curOrgCheck: boolean;
     }
 
     angular

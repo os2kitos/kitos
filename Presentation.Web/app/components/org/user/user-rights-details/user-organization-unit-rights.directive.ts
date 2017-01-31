@@ -8,7 +8,7 @@
         mainGridOptions: IKendoGridOptions<IGridModel>;
     }
 
-    interface IGridModel extends Models.Organization.IOrganizationUnitRight {
+    interface IGridModel extends Models.IOrganizationUnitRight {
 
     }
 
