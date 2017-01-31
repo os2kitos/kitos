@@ -201,7 +201,6 @@
                         attributes: { "class": "might-overflow" },
                         template: (dataItem) => {
                             this.curOrgCheck = dataItem.OrganizationUnitRights.ObjectId == this.user.currentOrganizationId;
-                            console.log(dataItem);
                             return `<span data-ng-model="dataItem.OrganizationUnitRights" value="rights.Role.Name" ng-repeat="rights in dataItem.OrganizationUnitRights | filter: { ObjectId: '${this.user.currentOrganizationId}' }"> {{rights.Role.Name}}<span data-ng-if="projectOverviewVm.checkIfRoleIsAvailable(rights.Role.Id)">(udgået)</span>{{$last ? '' : ', '}}</span>`;
                             },
                         hidden: true,
