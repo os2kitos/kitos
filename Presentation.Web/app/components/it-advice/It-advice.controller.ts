@@ -193,8 +193,11 @@
                                 $scope.hideSend = true;
 
                                 if (id != undefined) {
-                                    $http.get('Odata/advice?key=' + id + '&$expand=Reciepients')
-                                        .then(response => {
+
+                                    $http({
+                                        method: 'GET',
+                                        url: 'Odata/advice?key=' + id + '&$expand=Reciepients'
+                                    }).then(function successCallback(response) {
 
                                         $scope.name = response.data.Name;
                                         $scope.subject = response.data.Subject;
@@ -219,6 +222,7 @@
                                             }
                                         }
                                         $scope.externalCC = ccs.join(', ');
+                                    }, function errorCallback(response) {
                                     });
                                 }
                             }
@@ -333,6 +337,7 @@
                             }
 
                             function createPayload() {
+
                                 var payload = {
                                     Name: "Straks afsendt",
                                     Subject: $scope.subject,
