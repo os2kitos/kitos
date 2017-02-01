@@ -66,6 +66,9 @@ WHERE [RoleId] = 7
 UPDATE [dbo].[Organization]
 SET [AccessModifier] = '1'
 
+UPDATE [dbo].[Advice] 
+SET [StopDate] = [AlarmDate]
+
 /*-----------------------------------------------------------------*/
 /*Migrate helptext*/
 /*SET IDENTITY_INSERT [kitos_old].[dbo].[HelpTexts] ON skal klades seperat*/
