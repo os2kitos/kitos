@@ -193,11 +193,8 @@
                                 $scope.hideSend = true;
 
                                 if (id != undefined) {
-
-                                    $http({
-                                        method: 'GET',
-                                        url: 'Odata/advice?key=' + id + '&$expand=Reciepients'
-                                    }).then(function successCallback(response) {
+                                    $http.get('Odata/advice?key=' + id + '&$expand=Reciepients')
+                                        .then(response => {
 
                                         $scope.name = response.data.Name;
                                         $scope.subject = response.data.Subject;
@@ -207,7 +204,6 @@
                                         $scope.stopDate = response.data.StopDate;
                                         $scope.selectedRecievers = [];
                                         $scope.hiddenForjob = response.data.JobId;
-                                        //var recivers = [];
                                         var ccs = [];
                                         $scope.selectedCC = [];
 
@@ -217,14 +213,12 @@
                                             } else if (response.data.Reciepients[i].RecpientType == 'ROLE' && response.data.Reciepients[i].RecieverType == 'CC') {
                                                 $scope.selectedCC.push(response.data.Reciepients[i].Name);
                                             } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'RECIEVER') {
-                                                // recivers.push(response.data.Reciepients[i].Name);
                                                 $scope.externalTo = response.data.Reciepients[i].Name;
                                             } else if (response.data.Reciepients[i].RecpientType == 'USER' && response.data.Reciepients[i].RecieverType == 'CC') {
                                                 ccs.push(response.data.Reciepients[i].Name);
                                             }
                                         }
                                         $scope.externalCC = ccs.join(', ');
-                                    }, function errorCallback(response) {
                                     });
                                 }
                             }
@@ -339,7 +333,6 @@
                             }
 
                             function createPayload() {
-
                                 var payload = {
                                     Name: "Straks afsendt",
                                     Subject: $scope.subject,
@@ -430,27 +423,6 @@
                                     return [];
                                 }
                             }],
-                            /*advices: ['$http', '$stateParams', function ($http, $stateParams) {
-                              
-                                switch ($scope.type) { 
-                                    case 'itContract':
-                                        return $http.get('api/itcontract/' + $stateParams.id).then(function (result) {
-                                            return result.data.response.advices;
-                                        });
-                                    case 'itSystemUsage':
-                                        return $http.get('api/itsystemusage/' + $stateParams.id).then(function (result) {
-                                            return result.data.response.advices;
-                                        });
-                                    case 'itproject':
-                                        return $http.get('api/itproject/' + $stateParams.id).then(function (result) {
-                                            return result.data.response.advices;
-                                        });
-                                    case 'itInterface':
-                                        return $http.get('api/itInterface/' + $stateParams.id).then(function (result) {
-                                            return result.data.response.advices;
-                                        });
-                            }
-                            }],*/
                             users: ['UserGetService', function (UserGetService) {
                                 return UserGetService.GetAllUsers();
                             }],
