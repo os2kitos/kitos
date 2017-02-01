@@ -1,8 +1,8 @@
-# Technical documentation of OS2KITOS
+# Technical documentation of OS2KITOS 2.0
 
-Here follows a short documentation of the development setup for OS2KITOS.
+Here follows a short documentation of the development setup for OS2KITOS 2.0.
 
-OS2KITOS consists of two major parts. The backend WebAPI and OData API written in C# and .NET and an [AngularJS 1.x](https://angularjs.org/) frontend written in [Typescript](http://www.typescriptlang.org/).
+OS2KITOS consists of two major parts. The backend WebAPI and OData API written in C# and .NET and an [AngularJS 1.4.7](https://angularjs.org/) frontend written in [TypeScript](http://www.typescriptlang.org/).
 
 # Frontend
 
@@ -10,47 +10,21 @@ Dependencies for the frontend application is managed with the [Node.js](https://
 Before using the application install Node.js 4.x or above.
 
 ## Install dependencies
-Install Node.js modules and bower dependencies with
-
 ```
-npm install -g bower gulp
+npm install -g bower gulp typings
+```
+This installs `bower`, `gulp` and `typings` globally. This is not nessesary but assumed in the rest of the documentation.
+```
 npm install
-bower install
 ```
-
-This installs `bower` and `gulp` globally. This is not nessesary but assumed in the rest of the documentation.
-
-## Testing
-
-The frontend is integration tested with [Protractor](https://angular.github.io/protractor/#/) and unit tested with [Karma](https://karma-runner.github.io/). Tests are written in [Jasmine](http://jasmine.github.io/) with some additional expection libraries.
-
-### Unit testing
-Run unit tests locally with
-
-    gulp localCover
-
-Tests are run in a headless browser and displays coverage when the tests are done in a browser. See `gulp/test.js` for details on the available `gulp` tasks. Local testing does not create source maps for the typescript files. This is only done when running the task `gulp codecov`.
-
-### Integration testing
-Run integration tests locally with
-
-   start gulp webdriver
-   gulp locale2e
-
-The first command opens a new `cmd` window. Minimize this and return to the first window to run the tests. This creates the selenium tunnel that Protractor needs.
-
-To specify what suite to test add the attributes `--suite name` like: `gulp locale2e --suite mySuite`.
-
-**Note on first install**: The standalone webdriver must be installed before the above commands can run:
-
-    node_modules\.bin\webdriver-manager update --standalone
-
-Suites are specified in `paths.config.js`.
-
-Protractor configuration is split in a local and CI configuration file: `protractor.local.conf.js` and `protractor.conf.js`. The former one only runs tests in Chrome. The latter one runs tests on the [Browserstack](https://www.browserstack.com/) webservice.
+Install Node.js modules. (Bower dependencies are installed through a postinstall script)
+```
+typings install
+```
+Install typings used by TypeScript
 
 ## Deployment
-There are `gulp` tasks to handle minification and concatination of all compiled typescript files and library dependencies. The main task is `gulp deploy`. This task is automatically runs on build when using Visual Studio 2015 by means of the Task Runner Explorer.
+There are `gulp` tasks to handle minification and concatination of all compiled TypeScript files and library dependencies. The main task is `gulp deploy`. This task is automatically runs on build when using Visual Studio 2015 by means of the Task Runner Explorer.
 
 What files to bundle is managed in `bundle.config.js`.
 
@@ -72,6 +46,4 @@ Note that these files must be updated with the right paths when there are versio
 There is only a small amount of unit tests for the excisting backend. The goal is to rewrite all endpoints to OData controllers. The considerations of this change are not yet done, why no tests are written.
 
 # CI
-The project is setup with a Continious Integration Server at [AppVeyor](http://www.appveyor.com/). The server is triggered on commits to all branches and on pull requests. When the build is done it reports coverage to the [codecov.io](https://codecov.io/) webservice.
-
-Configuration of AppVeyor is done with `appveyor.yml`. Do note that it is possible to configure settings on the AppVeyor webservice, but one should only use the `appveyor.yml` to persist changes.
+TeamCity
