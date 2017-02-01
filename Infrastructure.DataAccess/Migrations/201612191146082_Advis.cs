@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.Advice", "StopDate", c => c.DateTime(precision: 7, storeType: "datetime2"));
             AddColumn("dbo.Advice", "Body", c => c.String());
             AddColumn("dbo.Advice", "JobId", c => c.String());
-            Sql("SELECT * FROM [dbo].[Advice]\r\n\r\nUPDATE [dbo].[Advice]\r\nSET Type = 1, RelationId = ItContractId, JobId = \'Advice: \' + CONVERT(varchar(10), Id);\r\n\r\nINSERT INTO [dbo].[AdviceUserRelations]\r\n(RecieverType, Name, RecpientType, LastChanged, LastChangedByUserId, AdviceId)\r\nSELECT 1, u.Email, 3, a.LastChanged, a.LastChangedByUserId, a.Id FROM [dbo].[User] u, [dbo].[Advice] a\r\nWHERE u.Id = a.ReceiverId\r\n\r\nINSERT INTO [dbo].[AdviceUserRelations]\r\n(RecieverType, Name, RecpientType, LastChanged, LastChangedByUserId, AdviceId)\r\nSELECT 1, u.Email, 2, a.LastChanged, a.LastChangedByUserId, a.Id FROM [dbo].[User] u, [dbo].[Advice] a\r\nWHERE u.Id = a.CarbonCopyReceiverId");
+            Sql("SELECT * FROM [dbo].[Advice]\r\n\r\nUPDATE [dbo].[Advice]\r\nSET Type = 0, RelationId = ItContractId, JobId = \'Advice: \' + CONVERT(varchar(10), Id);\r\n\r\nINSERT INTO [dbo].[AdviceUserRelations]\r\n(RecieverType, Name, RecpientType, LastChanged, LastChangedByUserId, AdviceId)\r\nSELECT 1, u.Email, 3, a.LastChanged, a.LastChangedByUserId, a.Id FROM [dbo].[User] u, [dbo].[Advice] a\r\nWHERE u.Id = a.ReceiverId\r\n\r\nINSERT INTO [dbo].[AdviceUserRelations]\r\n(RecieverType, Name, RecpientType, LastChanged, LastChangedByUserId, AdviceId)\r\nSELECT 1, u.Email, 2, a.LastChanged, a.LastChangedByUserId, a.Id FROM [dbo].[User] u, [dbo].[Advice] a\r\nWHERE u.Id = a.CarbonCopyReceiverId");
             DropColumn("dbo.Advice", "ItContractId");
         }
         
