@@ -535,7 +535,9 @@
       <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Migrations\SQLScripts\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
