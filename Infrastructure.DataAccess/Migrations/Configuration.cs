@@ -20,6 +20,9 @@ namespace Infrastructure.DataAccess.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+
+            // New timeout in seconds
+            this.CommandTimeout = 60 * 5;
         }
 
         /// <summary>
