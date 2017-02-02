@@ -253,6 +253,7 @@
                         this.$http.patch(`/odata/OrganizationRights(${value.rightId})`, payload)
                             .then(() => this.adminRoles.del(value.rightId));
                         this.vmOrgAdmin = this.vmOrgAdmin.filter(bar => (bar.Id !== value.rightId));
+                        this.orgAdmin = this.orgAdmin.filter(orgRoleRelation => (orgRoleRelation.Id !== value.rightId));
                     });
             }
         }

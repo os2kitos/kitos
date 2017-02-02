@@ -1324,12 +1324,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\AdviceSent\" />
-    <Folder Include="Views\AdviceUserRelation\" />
-    <Folder Include="Views\Advis\" />
-    <Folder Include="Views\BaseRole\" />
-    <Folder Include="Views\Reference\" />
-    <Folder Include="Views\UploadFile\" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
