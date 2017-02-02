@@ -227,7 +227,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet IT System", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "hej",
+                        template: dataItem => dataItem.Parent ? dataItem.Parent.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
