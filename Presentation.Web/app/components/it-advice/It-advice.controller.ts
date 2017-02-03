@@ -83,8 +83,7 @@
                         },
                         {
                             template: (dataItem) => {
-                                var isActive = (kendo.toString(new Date(dataItem.StopDate), "d") < kendo.toString(new Date(), "d") || dataItem.Scheduling === 'Immediate');
-                                console.log(dataItem);
+                                var isActive = moment().isAfter(moment(dataItem.StopDate)) || dataItem.Scheduling === 'Immediate';
                                 var canDelete = dataItem.AdviceSent.length === 0;
                                 if (hasWriteAccess) {
                                     return `<button class="btn-link" ng-disabled="${isActive}" data-ng-click="newAdvice('PATCH',${dataItem.Id})"><i class="glyphicon glyphicon-pencil"></i></button>
