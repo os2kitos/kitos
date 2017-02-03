@@ -69,6 +69,8 @@ SET [AccessModifier] = '1'
 UPDATE [dbo].[Advice] 
 SET [StopDate] = [AlarmDate]
 
+GO
+
 /*-----------------------------------------------------------------*/
 /*Migrate helptext*/
 /*SET IDENTITY_INSERT [kitos_old].[dbo].[HelpTexts] ON skal klades seperat*/
@@ -92,7 +94,12 @@ SELECT [Id]
 	  
 SET IDENTITY_INSERT [dbo].[HelpTexts] OFF
 
+GO
+
 /*Migrate rapport*/
+ALTER TABLE [dbo].[Reports] NOCHECK CONSTRAINT "FK_dbo.Reports_dbo.User_LastChangedByUserId"
+ALTER TABLE [dbo].[Reports] NOCHECK CONSTRAINT "FK_dbo.Reports_dbo.User_ObjectOwnerId"
+
 SET IDENTITY_INSERT [dbo].[Reports] ON
 
 INSERT INTO [dbo].[Reports]([Id]
@@ -117,6 +124,11 @@ SELECT [Id]
       ,[LastChangedByUserId] FROM [kitos_old].[dbo].[Reports]
 
 SET IDENTITY_INSERT [dbo].[Reports] OFF
+
+ALTER TABLE [dbo].[Reports] CHECK CONSTRAINT "FK_dbo.Reports_dbo.User_LastChangedByUserId"
+ALTER TABLE [dbo].[Reports] NOCHECK CONSTRAINT "FK_dbo.Reports_dbo.User_ObjectOwnerId"
+
+GO
 
 /*Migrate rapport types check database, same data        no need        */
 --SET IDENTITY_INSERT [dbo].[ReportCategoryTypes] ON
@@ -205,6 +217,8 @@ SELECT 29
 ALTER TABLE [dbo].[ItSystem] CHECK CONSTRAINT "FK_dbo.ItSystem_dbo.BusinessTypes_BusinessTypeId"
 
 SET IDENTITY_INSERT [dbo].[BusinessTypes] OFF
+
+GO
 
 /*-----------------------------------------------------------------*/
 /*Indsætter beskrivivelse i system roller fra preprod i opdateret db*/
@@ -295,6 +309,8 @@ SET Description = OLD.[Description]
 FROM [kitos_old].[dbo].[PurchaseFormTypes] OLD
 WHERE [dbo].[PurchaseFormTypes].Id = OLD.Id
 
+GO
+
 /*-----------------------------------------------------------------*/
 /*Indsætter beskrivivelse i betalingstyper fra preprod i opdateret db*/
 
@@ -331,6 +347,8 @@ SELECT [Id]
 
 SET IDENTITY_INSERT [dbo].[PaymentModelTypes] OFF
 
+GO
+
 /*-----------------------------------------------------------------*/
 /*Indsætter beskrivivelse i indkøbsstrategi fra preprod i opdateret db*/
 UPDATE [dbo].[ProcurementStrategyTypes]
@@ -344,6 +362,8 @@ UPDATE [dbo].[HandoverTrialTypes]
 SET Description = OLD.[Description]
 FROM [kitos_old].[dbo].[HandoverTrialTypes] OLD
 WHERE [dbo].[HandoverTrialTypes].Id = OLD.Id
+
+GO
 
 /*-----------------------------------------------------------------*/
 ALTER TABLE [kitos_old].[dbo].[ItSystemUsage] NOCHECK CONSTRAINT "FK_dbo.ItSystemUsage_dbo.ArchiveLocations_ArchiveLocationId"
@@ -383,7 +403,9 @@ SELECT [Id]
       ,[LastChanged]
       ,[LastChangedByUserId] FROM [kitos_old].[dbo].[ArchiveLocations]
 
-	  SET IDENTITY_INSERT [dbo].[ArchiveLocations] OFF
+SET IDENTITY_INSERT [dbo].[ArchiveLocations] OFF
+
+GO
 
 /*Opretter advis sendt*/
 INSERT INTO [dbo].[AdviceSents]([AdviceSentDate]
@@ -398,3 +420,5 @@ SELECT [SentDate]
 	  ,1
 FROM [dbo].[Advice]
 WHERE [SentDate] IS NOT NULL
+
+GO
