@@ -422,3 +422,318 @@ FROM [dbo].[Advice]
 WHERE [SentDate] IS NOT NULL
 
 GO
+
+---------------------------------------------------
+/*[AdviceUserRelations]*/
+
+DELETE [dbo].[AdviceUserRelations]
+
+GO
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Kontraktejer'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 1 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Kontraktejer'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 1 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Kontraktmanager'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 2 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Kontraktmanager'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 2 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Juridisk rådgiver'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 3 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Juridisk rådgiver'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 3 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Konsulent'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 4 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Konsulent'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 4 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Fakturamodtager'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 5 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Fakturamodtager'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 5 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Budgetansvarlig'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 6 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Budgetansvarlig'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 6 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Medunderskriver'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 7 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Medunderskriver'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 7 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Arkivansvarlig'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 8 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Arkivansvarlig'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 8 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Projektleder på udbud'
+	  ,3
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [ReceiverId] = 9 AND [ReceiverId] IS NOT NULL
+
+INSERT INTO [dbo].[AdviceUserRelations]([Name]
+      ,[RecieverType]
+      ,[RecpientType]
+      ,[AdviceId]
+      ,[ObjectOwnerId]
+      ,[LastChanged]
+      ,[LastChangedByUserId])
+SELECT 'Projektleder på udbud'
+	  ,2
+	  ,0
+	  ,[Id]
+	  ,[ObjectOwnerId]
+	  ,[LastChanged]
+      ,[LastChangedByUserId]
+FROM [dbo].[Advice]
+WHERE [CarbonCopyReceiverId] = 9 AND [ReceiverId] IS NOT NULL
+
+GO
