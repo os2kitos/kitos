@@ -1,4 +1,5 @@
 /*Projekt roller dublikerede*/
+USE kitos
 /*IT konsulent*/
 UPDATE [dbo].[ItProjectRights]
 SET [RoleId] = 23

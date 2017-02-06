@@ -1,4 +1,5 @@
 /*Sets all local sample space to active*/
+USE kitos
 DECLARE @uId int
 
 DECLARE cursorName CURSOR
