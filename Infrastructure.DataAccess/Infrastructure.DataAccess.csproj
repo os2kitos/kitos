@@ -542,6 +542,7 @@
     <Content Include="Migrations\SQLScripts\3.LokaleUdfaldsrum.sql" />
     <Content Include="Migrations\SQLScripts\4.CleanUp.sql" />
     <Content Include="Migrations\SQLScripts\5.dbFix.sql" />
+    <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
