@@ -541,8 +541,8 @@
     <Content Include="Migrations\SQLScripts\2.udfaldsrum.sql" />
     <Content Include="Migrations\SQLScripts\3.LokaleUdfaldsrum.sql" />
     <Content Include="Migrations\SQLScripts\4.CleanUp.sql" />
-    <Content Include="Migrations\SQLScripts\5.dbFix.sql" />
-    <Content Include="Migrations\SQLScripts\6.PriorityFix.sql" />
+    <Content Include="Migrations\SQLScripts\6.dbFix.sql" />
+    <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
     <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
