@@ -13,12 +13,12 @@ environment:
   NODEJS_VERSION: "4"
 services:
 - iis
-- mysql57
+- mssql2014
 cache:
   - node_modules -> package.json
   - bower_components -> bower.json
 configuration:
-  - AppVeyor
+  - Debug
 install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm install
