@@ -1,4 +1,5 @@
 /*Oprydning af valgmuligheder i udfaldsrum*/
+USE kitos
 DELETE [dbo].[ItContractTemplateTypes]
 WHERE Id = 11
 

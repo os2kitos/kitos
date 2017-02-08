@@ -1,4 +1,5 @@
 /*Udfaldsrum*/
+USE kitos
 /*Org Roles*/
 UPDATE [dbo].[OrganizationUnitRoles]
 SET [IsEnabled] = 1, [IsLocallyAvailable] = 1
@@ -118,5 +119,6 @@ SET [IsEnabled] = 1, [IsLocallyAvailable] = 1
 UPDATE [kitos_old].[dbo].[ItContract]
 SET [ContractTemplateId] = 1
 WHERE [ContractTemplateId] = 11
+
 
 

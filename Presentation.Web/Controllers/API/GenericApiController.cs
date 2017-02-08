@@ -31,7 +31,29 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var query = Page(GetAllQuery(), paging);
+                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
+                var result = GetAllQuery();
+
+                if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
+                {
+                    if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(TModel)) && !AuthenticationService.IsGlobalAdmin(KitosUser.Id))
+                    {
+                        if (hasOrg)
+                        {
+                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id));
+                        }
+                        else
+                        {
+                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
+                        }
+                    }
+                }
+                else
+                {
+                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id)).AsQueryable();
+                }
+
+                var query = Page(result, paging);
                 var dtos = Map(query);
                 return Ok(dtos);
             }
@@ -47,6 +69,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
+
+                if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
 
                 if (item == null) return NotFound();
 
@@ -94,6 +121,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Map<TDto, TModel>(dto);
+
+                if(!AuthenticationService.HasWriteAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
