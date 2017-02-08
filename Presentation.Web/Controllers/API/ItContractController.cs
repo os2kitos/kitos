@@ -101,6 +101,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
+                if(!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
+                {
+                    return Unauthorized();
+                }
                 var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
                 var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
                 return Ok(dtos);
@@ -187,6 +191,10 @@ namespace Presentation.Web.Controllers.API
                 if (itContract == null)
                     return NotFound();
 
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, itContract))
+                {
+                    return Unauthorized();
+                }
                 // this trick will put the first object in the result as well as the children
                 var children = new [] { itContract }.SelectNestedChildren(x => x.Children);
                 // gets parents only
