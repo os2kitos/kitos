@@ -46,7 +46,7 @@ deploy:
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
 after_deploy:
-  - node_modules\.bin\gulp e2e:browserstack
+  - node_modules\.bin\gulp e2e:local
 on_success:
   # Post coverage reports to Codecov.io
   - node_modules\.bin\gulp codecov
