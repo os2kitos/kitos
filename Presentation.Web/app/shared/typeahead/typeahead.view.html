@@ -13,6 +13,6 @@
 
 <div class="typeahead-items" data-ng-show="showItems">
     <div class="item" ng-repeat="item in items | filter:searchInput track by $index" ng-click="handleSelection(item)" style="cursor:pointer" ng-class="{active:isCurrent($index)}" ng-mouseenter="setCurrent($index)">
-        <p class="title">{{item.Name}} {{item.LastName}} </p>
+        <p class="title">{{item.User.Name}} {{item.User.LastName}} </p>
     </div>
 </div>

@@ -42,9 +42,9 @@
                         }
                     ],
                     kitosUsers: [
-                        '$http', 'user', function ($http, user) {
-                            return $http.get(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${user.currentOrganizationId})&$select=Name, LastName, Email`).then(function (result) {
-                                return result.data.value;
+                        '$http', 'user', '_', function ($http, user, _) {
+                            return $http.get(`odata/organizationRights?$filter=OrganizationId eq ${user.currentOrganizationId}&$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
+                                return _.uniqBy(result.data.value, "User.Id");
                             });
                         }
                     ]

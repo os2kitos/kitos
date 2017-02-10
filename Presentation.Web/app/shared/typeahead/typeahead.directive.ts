@@ -22,8 +22,8 @@
                 }
 
                 scope.handleSelection = function (selectedItem) {
-                    scope.model = `${selectedItem.Name} ${selectedItem.LastName}`;
-                    scope.searchInput = `${selectedItem.Name} ${selectedItem.LastName}`;
+                    scope.model = `${selectedItem.User.Name} ${selectedItem.User.LastName}`;
+                    scope.searchInput = `${selectedItem.User.Name} ${selectedItem.User.LastName}`;
                     scope.current = 0;
                 };
 
