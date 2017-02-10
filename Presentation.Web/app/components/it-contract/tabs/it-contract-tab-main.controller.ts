@@ -44,7 +44,19 @@
                     kitosUsers: [
                         '$http', 'user', '_', function ($http, user, _) {
                             return $http.get(`odata/organizationRights?$filter=OrganizationId eq ${user.currentOrganizationId}&$expand=User($select=Name,LastName,Email,Id)&$select=User`).then(function (result) {
-                                return _.uniqBy(result.data.value, "User.Id");
+                                let uniqueUsers = _.uniqBy(result.data.value, "User.Id");
+
+                                let results = [];
+                                _.forEach(uniqueUsers, data => {
+                                    results.push({
+                                        Name: data.User.Name,
+                                        LastName: data.User.LastName,
+                                        Email: data.User.Email,
+                                        Id: data.User.Id
+                                    });
+                                });
+
+                                return results;
                             });
                         }
                     ]
