@@ -1,6 +1,6 @@
 version: 2.0.{build}
 environment:
-  TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\AppVeyor\Tests.Unit.Presentation.Web.dll
+  TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\Debug\Tests.Unit.Presentation.Web.dll
   COVERAGE_FILTER_CORE_APPLICATIONSERVICES: +[Core.ApplicationServices]*
   COVERAGE_FILTER_CORE_DOMAINMODEL: +[Core.DomainModel]*
   COVERAGE_FILTER_CORE_DOMAINSERVICES: +[Core.DomainServices]*
