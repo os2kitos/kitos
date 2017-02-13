@@ -55,7 +55,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-success" data-ng-disabled="form.$invalid || form.$pristine" data-disabled-on-busy="">Gem</button>
+        <button type="submit" class="btn btn-success" data-ng-disabled="form.$invalid || form.$pristine || ctrl.buttonDisabled" data-disabled-on-busy="">Gem</button>
         <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
     </div>
 </form>

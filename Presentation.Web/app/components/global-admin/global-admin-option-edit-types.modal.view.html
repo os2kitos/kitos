@@ -41,6 +41,6 @@
 	</form>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary" data-ng-click="vm.ok()" data-ng-disabled="editOption.$invalid || editOption.$pristine" data-disabled-on-busy>Gem</button>
+	<button class="btn btn-primary" data-ng-click="vm.ok()" data-ng-disabled="editOption.$invalid || editOption.$pristine || vm.buttonDisabled" data-disabled-on-busy>Gem</button>
 	<button class="btn btn-warning" data-ng-click="vm.cancel()" data-disabled-on-busy>Annuller</button>
 </div>

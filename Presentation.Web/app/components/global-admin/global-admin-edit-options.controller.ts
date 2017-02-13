@@ -8,6 +8,7 @@
         public isObligatory: boolean;
         public hasWriteAccess: boolean;
         public description: string;
+        public buttonDisabled: boolean;
 
         public static $inject: string[] = ["$uibModalInstance", "$stateParams", "$http", "notify", "_"];
 
@@ -25,6 +26,7 @@
             this.optionId = this.$stateParams["id"];
             this.optionType = this.$stateParams["optionType"];
             this.initModal(this.optionId, this.optionsUrl);
+            this.buttonDisabled = false;
         }
 
         private initModal = (optionId: number, optionsUrl: string) => {
@@ -66,7 +68,7 @@
         }
 
         public ok() {
-
+            this.buttonDisabled = true;
             if (this.optionId === 0) {
                 const payload = this.createPayload(this.optionType);
                 this.$http.post(`${this.optionsUrl}`, payload)

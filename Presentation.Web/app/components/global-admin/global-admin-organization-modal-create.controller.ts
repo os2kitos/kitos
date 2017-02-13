@@ -4,6 +4,7 @@
     export class CreateOrganizationController {
         public title: string;
         public org;
+        public buttonDisabled: boolean;
 
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify'];
 
@@ -13,6 +14,7 @@
             this.org = {};
             this.org.accessModifier = "1";
             this.org.typeId = 1; // set type to municipality by default
+            this.buttonDisabled = false;
         }
 
         public dismiss() {
@@ -20,6 +22,7 @@
         }
 
         public submit() {
+            this.buttonDisabled = true;
             var payload = this.org;
             this.$http.post('api/organization', payload)
                 .success((result) => {
