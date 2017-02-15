@@ -79,7 +79,7 @@
                     title: "Dokumenttitel",
                     template: function (data) {
                         if ($scope.isValidUrl(data.Url)) {
-                            return "<a href=\"" + data.Url + "\">" + data.Title + "</a>";
+                            return "<a href=\"" + data.url + "\" target=\"_blank\" >" + data.title + "</a>";
                         } else {
                             return data.Title;
                         }
