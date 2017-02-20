@@ -1,6 +1,6 @@
-version: 1.0.{build}
+version: 2.0.{build}
 environment:
-  TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\AppVeyor\Tests.Unit.Presentation.Web.dll
+  TEST_ASSEMBLIES: Tests.Unit.Presentation.Web\bin\Debug\Tests.Unit.Presentation.Web.dll
   COVERAGE_FILTER_CORE_APPLICATIONSERVICES: +[Core.ApplicationServices]*
   COVERAGE_FILTER_CORE_DOMAINMODEL: +[Core.DomainModel]*
   COVERAGE_FILTER_CORE_DOMAINSERVICES: +[Core.DomainServices]*
@@ -13,12 +13,12 @@ environment:
   NODEJS_VERSION: "4"
 services:
 - iis
-- mysql57
+- mssql2014
 cache:
   - node_modules -> package.json
   - bower_components -> bower.json
 configuration:
-  - AppVeyor
+  - Debug
 install:
   - ps: install-Product node $env:NODEJS_VERSION
   - npm install
@@ -46,7 +46,7 @@ deploy:
   Presentation.Web.certificate: localhost
   Presentation.Web.remove_files: true
 after_deploy:
-  - node_modules\.bin\gulp e2e
+  #- node_modules\.bin\gulp e2e:local
 on_success:
   # Post coverage reports to Codecov.io
   - node_modules\.bin\gulp codecov

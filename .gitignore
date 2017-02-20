@@ -186,6 +186,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+._.DS_Store
 
 # deploy folder
 deploy/
