@@ -7,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// It contract economy stream.
     /// </summary>
     /// TODO Refactor into a base class and extern & intern derived classes
-    public class EconomyStream : Entity, IContextAware, IContractModule
+    public class EconomyStream : Entity, IContextAware, IContractModule, IHasAccessModifier
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -123,5 +123,7 @@ namespace Core.DomainModel.ItContract
 
             return false;
         }
+
+        public AccessModifier AccessModifier { get; set; }
     }
 }

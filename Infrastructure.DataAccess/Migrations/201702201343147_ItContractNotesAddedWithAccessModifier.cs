@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class NotesItContract : DbMigration
+    public partial class ItContractNotesAddedWithAccessModifier : DbMigration
     {
         public override void Up()
         {
@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
                     {
                         Id = c.Int(nullable: false),
                         Note = c.String(),
-                        BoolPrivate = c.Boolean(nullable: false),
+                        AccessModifier = c.Int(nullable: false),
                         ObjectOwnerId = c.Int(nullable: false),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         LastChangedByUserId = c.Int(nullable: false),
@@ -26,6 +26,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
+            AddColumn("dbo.EconomyStream", "AccessModifier", c => c.Int(nullable: false));
         }
         
         public override void Down()
@@ -36,6 +37,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ItContractNotes", new[] { "LastChangedByUserId" });
             DropIndex("dbo.ItContractNotes", new[] { "ObjectOwnerId" });
             DropIndex("dbo.ItContractNotes", new[] { "Id" });
+            DropColumn("dbo.EconomyStream", "AccessModifier");
             DropTable("dbo.ItContractNotes");
         }
     }

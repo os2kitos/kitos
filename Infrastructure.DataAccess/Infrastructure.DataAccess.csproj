@@ -360,9 +360,9 @@
     <Compile Include="Migrations\201701240754224_Added References for IT Systems.Designer.cs">
       <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702131107113_NotesItContract.cs" />
-    <Compile Include="Migrations\201702131107113_NotesItContract.Designer.cs">
-      <DependentUpon>201702131107113_NotesItContract.cs</DependentUpon>
+    <Compile Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.cs" />
+    <Compile Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.Designer.cs">
+      <DependentUpon>201702201343147_ItContractNotesAddedWithAccessModifier.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -539,8 +539,8 @@
     <EmbeddedResource Include="Migrations\201701240754224_Added References for IT Systems.resx">
       <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702131107113_NotesItContract.resx">
-      <DependentUpon>201702131107113_NotesItContract.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.resx">
+      <DependentUpon>201702201343147_ItContractNotesAddedWithAccessModifier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

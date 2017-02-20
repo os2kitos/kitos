@@ -12,18 +12,13 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// The it contract notes class.
     /// </summary>
-    public class ItContractNotes : Entity, IContextAware, IContractModule
+    public class ItContractNotes : Entity, IContextAware, IContractModule, IHasAccessModifier
     {
         /// <summary>
         /// Gets or sets the note of a contract.
         /// </summary>
         public string Note { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether class is private or public.
-        /// </summary>
-        public bool BoolPrivate { get; set; }
-
+        
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -54,5 +49,7 @@ namespace Core.DomainModel.ItContract
         }
         
         public virtual ItContract ItContract { get; set; }
+
+        public AccessModifier AccessModifier { get; set; }
     }
 }
