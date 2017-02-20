@@ -163,12 +163,12 @@ namespace Core.ApplicationServices
                 }
             }
 
-            // check if user is in context
+            // check if entity is in context
             if (entity is IContextAware) // TODO I don't like this impl
             {
                 var awareEntity = (IContextAware)entity;
 
-                // check if user is part of target organization (he's trying to access)
+                // check if entity is part of target organization (he's trying to access)
                 if (!awareEntity.IsInContext(loggedIntoOrganizationId))
                 {
                     // Users are not allowd to access objects outside their current context,
