@@ -90,6 +90,14 @@ namespace Core.ApplicationServices
                 return true;
             }
 
+            // check if user is object owner
+            if (entity.ObjectOwnerId == user.Id)
+            {
+                // object owners have write access to their objects if they're within the context,
+                // else they'll have to switch to the correct context and try again
+                return true;
+            }
+
             if (entity is IContextAware) // TODO I don't like this impl
             {
                 var awareEntity = entity as IContextAware;
