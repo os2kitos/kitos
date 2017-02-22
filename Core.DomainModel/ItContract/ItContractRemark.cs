@@ -1,24 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Core.DomainModel.ItContract
+﻿namespace Core.DomainModel.ItContract
 {
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-
     /// <summary>
     /// The it contract notes class.
     /// </summary>
-    public class ItContractNotes : Entity, IContextAware, IContractModule, IHasAccessModifier
+    public class ItContractRemark : Entity, IHasAccessModifier, IContextAware, IContractModule
     {
+
+        public virtual ItContract ItContract { get; set; }
+        public int ItContractId { get; set; }
+        public AccessModifier AccessModifier { get; set; }
         /// <summary>
-        /// Gets or sets the note of a contract.
+        /// Gets or sets the remark of a contract.
         /// </summary>
-        public string Note { get; set; }
-        
+        public string Remark { get; set; }
+
+        public ItContractRemark()
+        {
+            // Default "Synlighed" must be local
+            AccessModifier = AccessModifier.Local;
+        }
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -28,6 +29,7 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
+            // If the user has write access to the contract the user should also have write access to the remark
             if (ItContract != null && ItContract.HasUserWriteAccess(user))
                 return true;
 
@@ -43,13 +45,10 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public bool IsInContext(int organizationId)
         {
-            if (this.ItContract != null) return this.ItContract.IsInContext(organizationId);
+            if (ItContract != null)
+                return ItContract.IsInContext(organizationId);
 
             return false;
         }
-        
-        public virtual ItContract ItContract { get; set; }
-
-        public AccessModifier AccessModifier { get; set; }
     }
 }

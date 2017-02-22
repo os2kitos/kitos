@@ -275,6 +275,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-remarks.controller.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
@@ -348,6 +349,7 @@
     <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\ItContractRemarksController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
@@ -591,6 +593,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-remarks.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
     <Content Include="app\components\it-advice\it-advice-modal-view.html" />

@@ -1,13 +1,13 @@
 ﻿(function (ng, app) {
-    app.config(['$stateProvider', function ($stateProvider) {
-        $stateProvider.state('it-contract.edit.economy', {
-            url: '/economy',
-            templateUrl: 'app/components/it-contract/tabs/it-contract-tab-economy.view.html',
-            controller: 'contract.EditEconomyCtrl',
+    app.config(["$stateProvider", function ($stateProvider) {
+        $stateProvider.state("it-contract.edit.economy", {
+            url: "/economy",
+            templateUrl: "app/components/it-contract/tabs/it-contract-tab-economy.view.html",
+            controller: "contract.EditEconomyCtrl",
             resolve: {
-                orgUnits: ['$http', 'userService', function ($http, userService) {
+                orgUnits: ["$http", "userService", function ($http, userService) {
                     return userService.getUser().then(function (user) {
-                        return $http.get('api/organizationunit/?organizationid=' + user.currentOrganizationId).then(function (result) {
+                        return $http.get("api/organizationunit/?organizationid=" + user.currentOrganizationId).then(function (result) {
                             return result.data.response;
                         });
                     });
@@ -16,10 +16,11 @@
         });
     }]);
 
-    app.controller('contract.EditEconomyCtrl', ['$scope', '$http', '$timeout', '$state', '$stateParams', 'notify', 'contract', 'orgUnits', 'user',
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user) {
+    app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "contract", "orgUnits", "user", "hasWriteAccess",
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, hasWriteAccess) {
+            $scope.autosaveUrl = `api/itcontract/${contract.id}`;
             $scope.contract = contract;
-
+            $scope.userMayEdit = user.isGlobalAdmin || user.isLocalAdmin || user.isContractAdmin || hasWriteAccess;
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy",
                 parseFormats: ["yyyy-MM-dd"]
@@ -39,7 +40,6 @@
                 pushStream(stream, internEconomyStreams);
             });
 
-
             function pushStream(stream, collection) {
                 stream.show = true;
                 stream.updateUrl = baseUrl + "/" + stream.id;
@@ -47,7 +47,7 @@
                 stream.delete = function () {
                     var msg = notify.addInfoMessage("Sletter række...");
 
-                    $http.delete(this.updateUrl + '?organizationId=' + user.currentOrganizationId).success(function () {
+                    $http.delete(this.updateUrl + "?organizationId=" + user.currentOrganizationId).success(function () {
                         stream.show = false;
 
                         msg.toSuccessMessage("Rækken er slettet!");

@@ -1,6 +1,21 @@
 ﻿<div class="object-section-container">
     <h4>{{contract.name}}</h4>
+    <div class="row" style="background-color: white">
+        <div class="col-xs-3">
+            <!-- access modifier -->
+            <div class="form-group">
+                <label for="contract-access" class="control-label small">Synlighed</label>
+                <input id="contract-access" class="form-control input-sm"
+                       data-ng-model="contract.accessModifier"
+                       data-select-access-modifier=""
+                       data-field="accessModifier"
+                       data-autosave="{{autosaveUrl}}"
+                       data-ng-disabled="!userMayEdit">
+            </div>
+        </div>
+    </div>
     <div class="panel panel-default">
+
         <div class="panel-heading">Ekstern betaling</div>
         <table class="table table-condensed small">
             <thead>
@@ -32,7 +47,7 @@
                              data-allow-clear="true"></div>
                     </td>
 
-                    <!-- EAN #  -->
+                    <!-- EAN # -->
                     <td>
                         {{stream.ean}}
                     </td>

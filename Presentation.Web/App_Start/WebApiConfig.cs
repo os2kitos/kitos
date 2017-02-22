@@ -117,6 +117,9 @@ namespace Presentation.Web
             var itContractRoles = builder.EntitySet<ItContractRole>(nameof(ItContractRolesController).Replace("Controller", string.Empty));
             itContractRoles.EntityType.HasKey(x => x.Id);
 
+            var itContractRemarks = builder.EntitySet<ItContractRemark>(nameof(ItContractRemarksController).Replace("Controller", string.Empty));
+            itContractRemarks.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<ItProjectStatus>("ItProjectStatuses");
 
             var itProjectRights = builder.EntitySet<ItProjectRight>(nameof(ItProjectRightsController).Replace("Controller", string.Empty));
@@ -126,7 +129,7 @@ namespace Presentation.Web
             itProjectRoles.EntityType.HasKey(x => x.Id);
 
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
-            itProjectOrgUnitUsage.EntityType.HasKey(x => new {x.ItProjectId, x.OrganizationUnitId});
+            itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
             var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace("Controller", string.Empty));
             itProject.EntityType.HasKey(x => x.Id);
@@ -389,7 +392,7 @@ namespace Presentation.Web
             GetAdvicesByObjectID.Parameter<int>("id");
             GetAdvicesByObjectID.Parameter<int>("type");
             GetAdvicesByObjectID.ReturnsCollectionFromEntitySet<Advice>("Advice");
-            
+
 
 
             var globalConfig = builder.EntitySet<GlobalConfig>(nameof(GlobalConfigsController).Replace("Controller", string.Empty));

@@ -571,6 +571,6 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-        public virtual ItContractNotes ItContractNoteses { get; set; }
+        public virtual ItContractRemark Remark { get; set; }
     }
 }

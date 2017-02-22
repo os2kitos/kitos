@@ -94,7 +94,7 @@
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
-    <Compile Include="Mapping\ItContractNotesMap.cs" />
+    <Compile Include="Mapping\ItContractRemarkMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
@@ -360,10 +360,6 @@
     <Compile Include="Migrations\201701240754224_Added References for IT Systems.Designer.cs">
       <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.cs" />
-    <Compile Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.Designer.cs">
-      <DependentUpon>201702201343147_ItContractNotesAddedWithAccessModifier.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -538,9 +534,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201701240754224_Added References for IT Systems.resx">
       <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201702201343147_ItContractNotesAddedWithAccessModifier.resx">
-      <DependentUpon>201702201343147_ItContractNotesAddedWithAccessModifier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

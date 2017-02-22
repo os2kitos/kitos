@@ -1,0 +1,31 @@
+﻿<div class="object-section-container">
+    <h4>{{contract.name}}</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-3">
+                <!-- access modifier -->
+                <div class="form-group">
+                    <label for="contract-access" class="control-label small">Synlighed</label>
+                    <input id="contract-access" class="form-control input-sm"
+                           data-ng-model="contract.accessModifier"
+                           data-select-access-modifier=""
+                           data-field="accessModifier"
+                           data-autosave="{{autosaveUrl}}"
+                           data-ng-disabled="!userMayEdit">
+                </div>
+            </div>
+
+            <div class="col-xs-12">
+                <!-- Remark -->
+                <div class="form-group">
+                    <label for="contract-remark" class="control-label small">Bemærkning</label>
+                    <textarea id="contract-remark" class="form-control input-sm" rows="4"
+                              data-ng-disabled="!hasWriteAccess"
+                              data-ng-model="remark"
+                              data-autosave="{{ autoSaveUrl }}"
+                              data-field="remark"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

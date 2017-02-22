@@ -95,6 +95,14 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public string Note { get; set; }
 
+        public AccessModifier AccessModifier { get; set; }
+
+        public EconomyStream()
+        {
+            // Default "Synlighed" must be local
+            AccessModifier = AccessModifier.Local;
+        }
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -124,6 +132,5 @@ namespace Core.DomainModel.ItContract
             return false;
         }
 
-        public AccessModifier AccessModifier { get; set; }
     }
 }
