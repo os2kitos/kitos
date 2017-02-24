@@ -16,6 +16,7 @@
                     appendurl: "@",
                     field: "@",
                     disabled: "&ngDisabled",
+                    required: "@"
                 },
                 link: function (scope, element, attr, ctrl) {
                     var foundSelectedInOptions = _.find(scope.options, function(option: any) { return option.Id == scope.selectedId });

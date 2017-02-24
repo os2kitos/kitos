@@ -6,6 +6,7 @@ using System.Web;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using System.Security.Cryptography;
 
 namespace Core.ApplicationServices
 {
@@ -19,6 +20,8 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
+        private readonly SHA256Managed _crypt;
+        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -37,6 +40,7 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
+            _crypt = new SHA256Managed();
         }
 
         public User AddUser(User user, bool sendMailOnCreation, int orgId)
@@ -126,7 +130,13 @@ namespace Core.ApplicationServices
         private PasswordResetRequest GenerateResetRequest(User user)
         {
             var now = DateTime.UtcNow;
-            var hash = _cryptoService.Encrypt(now + user.Email);
+
+            byte[] randomNumber = new byte[8];
+            rngCsp.GetBytes(randomNumber);
+
+            byte[] encrypted = _crypt.ComputeHash(randomNumber);
+
+            var hash = HttpServerUtility.UrlTokenEncode(encrypted);
 
             var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
 
