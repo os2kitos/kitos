@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Web.Http;
+using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.ApplicationServices;
@@ -18,7 +19,8 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
-        [ODataRoute("ItContracts({int contractKey})/Remark")]
+        //GET /ItContractRemarks
+        [ODataRoute("ItContractRemarks({contractKey})")]
         public IHttpActionResult GetRemark(int contractKey)
         {
             var remark = _repository.GetByKey(contractKey);
@@ -34,7 +36,20 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.Forbidden);
+        }
 
+        //POST /ItContractRemarks
+        [ODataRoute("ItContractRemarks")]
+        public IHttpActionResult PostRemark(ItContractRemark remark)
+        {
+            return base.Post(remark);
+        }
+
+        //PATCH /ItContractRemarks
+        [ODataRoute("ItContractRemarks({contractKey})")]
+        public IHttpActionResult PatchRemark(int contractKey, Delta<ItContractRemark> delta)
+        {
+            return base.Patch(contractKey, delta);
         }
     }
 }

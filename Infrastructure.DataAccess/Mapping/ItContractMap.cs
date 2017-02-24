@@ -17,7 +17,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.Itcontract_Id)
                 .WillCascadeOnDelete(true);
 
-
             HasOptional(t => t.ContractTemplate)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTemplateId);
@@ -58,10 +57,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
-
-            HasOptional(t => t.Remark)
-                .WithRequired(ad => ad.ItContract)
-                .WillCascadeOnDelete(true);
         }
     }
 }

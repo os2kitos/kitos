@@ -6,7 +6,9 @@
     {
         public ItContractRemarkMap()
         {
-            this.ToTable("ItContractRemarks");
+            ToTable("ItContractRemarks");
+
+            HasRequired(c => c.ItContract).WithRequiredDependent(r => r.Remark);
         }
     }
 }

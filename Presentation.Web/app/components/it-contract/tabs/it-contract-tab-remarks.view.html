@@ -7,10 +7,8 @@
                 <div class="form-group">
                     <label for="contract-access" class="control-label small">Synlighed</label>
                     <input id="contract-access" class="form-control input-sm"
-                           data-ng-model="contract.accessModifier"
+                           data-ng-model="remarkVisibility"
                            data-select-access-modifier=""
-                           data-field="accessModifier"
-                           data-autosave="{{autosaveUrl}}"
                            data-ng-disabled="!userMayEdit">
                 </div>
             </div>
@@ -21,10 +19,9 @@
                     <label for="contract-remark" class="control-label small">Bemærkning</label>
                     <textarea id="contract-remark" class="form-control input-sm" rows="4"
                               data-ng-disabled="!hasWriteAccess"
-                              data-ng-model="remark"
-                              data-autosave="{{ autoSaveUrl }}"
-                              data-field="remark"></textarea>
+                              data-ng-model="remark"></textarea>
                 </div>
+                <button class="btn btn-success btn-sm" ng-click="saveRemark()">GEM</button>
             </div>
         </div>
     </div>
