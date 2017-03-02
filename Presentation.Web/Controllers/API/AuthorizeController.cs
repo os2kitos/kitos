@@ -172,7 +172,7 @@ namespace Presentation.Web.Controllers.API
             // creating DTOs
             var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
             {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationSimpleDTO>(org),
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             });
 
