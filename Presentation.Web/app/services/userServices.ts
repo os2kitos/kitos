@@ -171,7 +171,13 @@
             return deferred.promise;
         }
 
-        getOrganizationsIfAuthorized = () => {
+        getOrganizations = () => {
+            //returns the organizational context for the user whos credentials have been authorized
+            //triggers a re-auth like reAuthorize
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
+        }
+
+        getCurrentOrganizationIfAuthorized = () => {
             //returns the organizational context for the user whos credentials have been authorized
             //triggers a re-auth like reAuthorize
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
@@ -262,7 +268,7 @@
 
                 this._loadUserDeferred = this.$q.defer();
                 // login or re-auth? If userLoginInfo is null then re-auth otherwise login
-                var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getOrganizationsIfAuthorized();
+                var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getCurrentOrganizationIfAuthorized();
 
                 httpDeferred.then(result => {
 
@@ -435,7 +441,7 @@
 
             const deferred = this.$q.defer();
 
-            this.getOrganizationsIfAuthorized().then(result => {
+            this.getOrganizations().then(result => {
 
                 organizationalContext = result.data.response;
 
