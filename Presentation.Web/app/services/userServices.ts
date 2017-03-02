@@ -174,7 +174,7 @@
         getOrganizations = () => {
             //returns the organizational context for the user whos credentials have been authorized
             //triggers a re-auth like reAuthorize
-            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize");
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize/GetOrganizations");
         }
 
         getCurrentOrganizationIfAuthorized = () => {
@@ -446,7 +446,6 @@
                 organizationalContext = result.data.response;
 
                 organizations = organizationalContext.organizations;
-
                 user = organizationalContext.user;
 
                 this.chooseOrganization(organizations).then((orgAndDefaultUnit: any) => {

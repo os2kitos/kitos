@@ -41,6 +41,12 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+        [Route("api/authorize/GetOrganizations")]
+        public HttpResponseMessage GetOrganizations()
+        {
+            var user = KitosUser;
+            return Ok(CreateLoginResponse(user, _organizationService.GetOrganizations(user)));
+        }
 
         private User LoginWithToken(string token)
         {
