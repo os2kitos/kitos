@@ -94,23 +94,38 @@
 
                         //Function to get up to 3 inputs from user and then making the call through Odata and getting the result from either/and firstname, lastname and email.
                         function userSearchParameters(queryParams) {
-                            var userInputString1: string = "", userInputString2: string = "", userInputString3: string = "";
-                            var userInputString = [userInputString1, userInputString2, userInputString3];
                             var userStrings = queryParams.split(' ', 3);
                             var index: number = 0;
+
+                            var urlAddition: string = "?$filter=";
+
+                            if ($scope.orgId === undefined)
+                                urlAddition += 'OrganizationRights/any()';
+
                             for (let userString of userStrings) {
-                                userInputString[index] = userString;
+                                if ($scope.orgId === undefined) {
+                                    if (userString) {
+                                        urlAddition += ` and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userString}'))`;
+                                    }
+                                } else {
+                                    if (userString) {
+                                        if (index != 0)
+                                            urlAddition += ' and ';
+                                        urlAddition += `contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userString}'))`;
+                                    }
+                                }
                                 index++;
                             }
                             var result;
                             if ($scope.orgId === undefined) {
                                 result = $http
-                                    .get(`/odata/Users?$filter=OrganizationRights/any() and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[0]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[1]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[2]}'))`,
+                                    .get(`/odata/Users` + urlAddition,
                                     { ignoreLoadingBar: true });
                             } else {
                                 result = $http
-                                    .get(`/odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq ${$scope.orgId
-                                    }) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[0]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[1]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[2]}'))`,
+                                    .get(`/odata/Organizations(${$scope.orgId})/Users` + urlAddition,
+
+                                    //.get(`/odata/Organizations(${$scope.orgId})/Users?$filter=contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[0]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[1]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[2]}'))`,
                                     { ignoreLoadingBar: true });
                             }
                             return result;
