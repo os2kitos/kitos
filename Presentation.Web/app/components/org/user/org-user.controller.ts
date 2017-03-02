@@ -33,7 +33,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Users`,
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Users`,
                             dataType: "json",
                             data: {
                                 $expand: `ObjectOwner,OrganizationUnitRights($expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
@@ -53,9 +53,6 @@
                                 if (parameterMap.$filter) {
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "Name");
                                     parameterMap.$filter = this.fixNameFilter(parameterMap.$filter, "ObjectOwner.Name");
-                                    parameterMap.$filter = `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId}) and ${parameterMap.$filter}`;
-                                } else {
-                                    parameterMap.$filter = `OrganizationRights/any(x: x/OrganizationId eq ${this.user.currentOrganizationId})`;
                                 }
                                 return parameterMap;
                             }
