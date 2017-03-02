@@ -11,7 +11,6 @@ var htmlreplace = require('gulp-html-replace');
 var debug = require('gulp-debug');
 var rename = require('gulp-rename');
 var file = file = require('gulp-file');
-var rev = require('gulp-rev');
 var less = require('gulp-less');
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
@@ -50,14 +49,6 @@ gulp.task("clean-script-bundles", function () {
     ]);
 });
 
-gulp.task("replace-report-js", function () {
-    var manifest = require("../" + paths.sourceScript + "/rev-manifest.json");
-    var revFileName = manifest["appReport-bundle.min.js"];
-    return gulp.src(paths.sourceAppReport + "/Index.html")
-        .pipe(htmlreplace({ "js": "../Scripts/" + revFileName }))
-        .pipe(gulp.dest(paths.sourceAppReport))
-});
-
 gulp.task("clean-scripts", ["clean-script-bundles", "clean-js-and-maps"]);
 
 // create external library bundled file
@@ -94,13 +85,8 @@ gulp.task("appReport-bundle", function () {
         .pipe(sourcemaps.init())
         .pipe(concat(config.appReportBundle))
         .pipe(uglify())
-        .pipe(rev())
         .pipe(sourcemaps.write(config.maps))
         .pipe(gulp.dest(paths.sourceScript))
-        .pipe(rev.manifest({
-            merge: true // merge with the existing manifest (if one exists) 
-        }))
-        .pipe(gulp.dest(paths.sourceScript));
 });
 
 // delete style output folders
@@ -160,5 +146,5 @@ gulp.task("deploy", function (callback) {
 
 // bundle and deploy scripts and styles
 gulp.task("deploy-prod", function (callback) {
-    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "replace-report-js", "styles", "clean-js-and-maps", callback)
+    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback)
 });

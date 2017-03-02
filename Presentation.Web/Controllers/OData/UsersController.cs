@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.OData
 
         //GET /Organizations(1)/Users
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/GetUsers")]
+        [ODataRoute("Organizations({orgKey})/Users")]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

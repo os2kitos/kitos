@@ -52,7 +52,7 @@ module.exports = {
     angularBundle: "angular-bundle.min.js",
 
     // app script bundle
-    appSrc: paths.appTypeScriptOut,
+    appSrc: paths.allJavaScriptNoTests,
     appBundle: "app-bundle.min.js",
 
     // app script bundle
@@ -121,11 +121,11 @@ function npm(file) {
 }
 
 function app(file) {
-    return "Presentation.Web/typescriptOutput/app/" + file;
+    return "Presentation.Web/app/" + file;
 }
 
 function appReport(file) {
-    return "Presentation.Web/typescriptOutput/appReport/" + file;
+    return "Presentation.Web/appReport/" + file;
 }
 
 

@@ -163,7 +163,7 @@ namespace Presentation.Web
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
             var removeUserAction = organizations.EntityType.Action("RemoveUser");
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
-            var userFunction = organizations.EntityType.Function("GetUsers").ReturnsCollectionFromEntitySet<User>("Users");
+            var userFunction = organizations.EntityType.Function("Users").ReturnsCollectionFromEntitySet<User>("Users");
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.EntityType.HasKey(x => x.Id);
