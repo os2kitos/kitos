@@ -9,5 +9,7 @@ namespace Presentation.Web.Models
         public string Name { get; set; }
 
         public ConfigDTO Config { get; set; }
+
+        public OrgUnitSimpleDTO Root { get; set; }
     }
 }

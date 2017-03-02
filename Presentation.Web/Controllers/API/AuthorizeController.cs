@@ -18,7 +18,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-
         public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
         {
             _userRepository = userRepository;
@@ -176,11 +175,14 @@ namespace Presentation.Web.Controllers.API
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             });
 
-            return new LoginResponseDTO()
+
+            var response = new LoginResponseDTO()
             {
                 User = userDto,
                 Organizations = orgsDto
             };
+
+            return response;
         }
     }
 }

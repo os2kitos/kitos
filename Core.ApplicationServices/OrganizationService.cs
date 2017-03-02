@@ -25,7 +25,7 @@ namespace Core.ApplicationServices
         public IEnumerable<Organization> GetOrganizations(User user)
         {
             if (user.IsGlobalAdmin) return _orgRepository.Get();
-            return _orgRepository.Get(o => o.Rights.Count(r => r.OrganizationId == o.Id && r.UserId == user.Id) > 0);
+            return _orgRepository.Get(o => o.Rights.Any(r => r.OrganizationId == o.Id && r.UserId == user.Id));
         }
 
         //returns the default org unit for that user inside that organization
