@@ -10,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -27,10 +28,11 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
-            Logger.Debug($"GetLogin called for {KitosUser}");
+            var user = KitosUser;
+            Logger.Debug($"GetLogin called for {user}");
             try
             {
-                var response = CreateLoginResponse(KitosUser);
+                var response = CreateLoginResponse(user, new List<Organization> { user.DefaultOrganization });
 
                 return Ok(response);
             }
@@ -107,7 +109,7 @@ namespace Presentation.Web.Controllers.API
 
                 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-                var response = CreateLoginResponse(user);
+                var response = CreateLoginResponse(user, _organizationService.GetOrganizations(user));
                 loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
@@ -159,12 +161,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         // helper function
-        private LoginResponseDTO CreateLoginResponse(User user)
+        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
         {
             var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-            // getting all the organizations that the user is member of
-            var organizations = _organizationService.GetOrganizations(user).ToList();
             // getting the default org units (one or null for each organization)
             var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
 

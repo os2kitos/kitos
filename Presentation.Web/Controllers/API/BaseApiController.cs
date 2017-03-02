@@ -12,6 +12,7 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
+using System.Runtime.Caching;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -151,18 +152,13 @@ namespace Presentation.Web.Controllers.API
                         return UserRepository.Get(u => u.Uuid == uuid).First();
                     }
 
-                    //var user = MemoryCache.Default.Get(User.Identity.Name) as User;
-                    //if (user == null)
-                    //{
-                    var id = Convert.ToUInt32(User.Identity.Name);
-                    var user = UserRepository.Get(u => u.Id == id);
-                    var firstUser = user.FirstOrDefault();
-                    if (firstUser == null)
-                        throw new SecurityException();
-                    //  MemoryCache.Default.Add(User.Identity.Name, user, DateTimeOffset.UtcNow.AddHours(1));
-                    //}
+                    var id = Convert.ToInt32(User.Identity.Name);
+                    var user = UserRepository.GetByKey(id);
 
-                    return firstUser;
+                    if (user == null)
+                        throw new SecurityException();
+
+                    return user;
                 }
                 catch (Exception exp)
                 {
