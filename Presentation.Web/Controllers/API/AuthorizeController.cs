@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API
             Logger.Debug($"GetLogin called for {user}");
             try
             {
-                var response = CreateLoginResponse(user, new List<Organization> { user.DefaultOrganization });
+                var response = Map<User, UserDTO>(user);
 
                 return Ok(response);
             }
@@ -41,11 +41,28 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
         [Route("api/authorize/GetOrganizations")]
         public HttpResponseMessage GetOrganizations()
         {
             var user = KitosUser;
-            return Ok(CreateLoginResponse(user, _organizationService.GetOrganizations(user)));
+            var orgs = _organizationService.GetOrganizations(user);
+            var dtos = AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            return Ok(dtos);
+        }
+
+        [Route("api/authorize/GetOrganization({orgId})")]
+        public HttpResponseMessage GetOrganization(int orgId)
+        {
+            var user = KitosUser;
+            var org = _organizationService.GetOrganizations(user).Single(o=>o.Id == orgId);
+            var defaultUnit = _organizationService.GetDefaultUnit(org, user);
+            var dto = new OrganizationAndDefaultUnitDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+            };
+            return Ok(dto);
         }
 
         private User LoginWithToken(string token)
@@ -115,7 +132,7 @@ namespace Presentation.Web.Controllers.API
 
                 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-                var response = CreateLoginResponse(user, _organizationService.GetOrganizations(user));
+                var response = Map<User, UserDTO>(user);
                 loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
@@ -177,7 +194,7 @@ namespace Presentation.Web.Controllers.API
             // creating DTOs
             var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
             {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationSimpleDTO>(org),
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             });
 

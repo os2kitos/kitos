@@ -181,8 +181,7 @@ namespace Presentation.Web
                 .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
                 .ReverseMap();
 
-            Mapper.CreateMap<Organization, OrganizationSimpleDTO>()
-                .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()));
+            Mapper.CreateMap<Organization, OrganizationSimpleDTO>();
 
             Mapper.CreateMap<OrganizationUnit, OrgUnitDTO>()
                   .ReverseMap()

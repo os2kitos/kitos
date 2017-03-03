@@ -13,7 +13,7 @@ namespace Presentation.Web.Models
 
     public class OrganizationAndDefaultUnitDTO
     {
-        public OrganizationSimpleDTO Organization { get; set; }
+        public OrganizationDTO Organization { get; set; }
         public OrgUnitSimpleDTO DefaultOrgUnit { get; set; }
     }
 
