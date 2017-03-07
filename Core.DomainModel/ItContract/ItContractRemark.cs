@@ -7,7 +7,6 @@
     {
 
         public virtual ItContract ItContract { get; set; }
-        public int ItContractId { get; set; }
         public AccessModifier AccessModifier { get; set; }
         /// <summary>
         /// Gets or sets the remark of a contract.

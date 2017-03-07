@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if(!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
                 {
                     return Unauthorized();
                 }
@@ -133,10 +133,10 @@ namespace Presentation.Web.Controllers.API
                 var usage = _usageRepository.GetByKey(systemUsageId);
                 if (usage == null) return NotFound();
 
-                if (_itContractItSystemUsageRepository.GetByKey(new object[] {id, systemUsageId}) != null)
+                if (_itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId }) != null)
                     return Conflict("The IT system usage is already associated with the contract");
 
-                contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage {ItContractId = id, ItSystemUsageId = systemUsageId});
+                contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContractId = id, ItSystemUsageId = systemUsageId });
                 contract.LastChanged = DateTime.UtcNow;
                 contract.LastChangedByUser = KitosUser;
 
@@ -196,7 +196,7 @@ namespace Presentation.Web.Controllers.API
                     return Unauthorized();
                 }
                 // this trick will put the first object in the result as well as the children
-                var children = new [] { itContract }.SelectNestedChildren(x => x.Children);
+                var children = new[] { itContract }.SelectNestedChildren(x => x.Children);
                 // gets parents only
                 var parents = itContract.SelectNestedParents(x => x.Parent);
                 // put it all in one result
@@ -211,6 +211,11 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
+            if (KitosUser.DefaultOrganizationId != organizationId)
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 //Get contracts within organization
@@ -298,6 +303,11 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
+            if (KitosUser.DefaultOrganizationId != organizationId)
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 //Get contracts within organization

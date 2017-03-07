@@ -3,16 +3,18 @@
     <div class="row" style="background-color: white">
         <div class="col-xs-3">
             <!-- access modifier -->
-            <div class="form-group">
-                <label for="contract-access" class="control-label small">Synlighed</label>
-                <input id="contract-access" class="form-control input-sm"
-                       data-ng-model="contract.accessModifier"
-                       data-select-access-modifier=""
-                       data-field="accessModifier"
-                       data-autosave="{{autosaveUrl}}"
-                       data-ng-disabled="!userMayEdit">
-            </div>
+            <label for="economyStream-visibility" class="control-label small">Synlighed</label>
+            <form class="form-inline">
+                <div class="form-group">
+                    <div id="economyStream-visibility" class="btn-group"
+                         data-ng-model="visibility">
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="0" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Lokal</label>
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="1" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Offentlig</label>
+                    </div>
+                </div>
+            </form>
         </div>
+
     </div>
     <div class="panel panel-default">
 

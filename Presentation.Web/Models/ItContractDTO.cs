@@ -65,9 +65,6 @@ namespace Presentation.Web.Models
         public IEnumerable<ItInterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
         public IEnumerable<ItInterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
 
-        public IEnumerable<EconomyStreamDTO> InternEconomyStreams { get; set; }
-        public IEnumerable<EconomyStreamDTO> ExternEconomyStreams { get; set; }
-
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }

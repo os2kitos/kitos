@@ -17,6 +17,7 @@ namespace Core.ApplicationServices
         CanSetOrganizationTypeVirksomhed,
         CanSetOrganizationTypeAndenOffentligMyndighed,
         CanSetOrganizationAccessModifierToPublic,
+        CanSetContractElementsAccessModifierToPublic
     }
 
     public class FeatureChecker : IFeatureChecker
@@ -56,6 +57,7 @@ namespace Core.ApplicationServices
                 {Feature.CanSetOrganizationTypeAndenOffentligMyndighed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetOrganizationAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
+                {Feature.CanSetContractElementsAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin} }
             };
         }
 

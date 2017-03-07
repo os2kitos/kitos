@@ -361,9 +361,7 @@ namespace Presentation.Web
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
-                  .ForMember(contract => contract.InternEconomyStreams, opt => opt.Ignore())
-                  .ForMember(contract => contract.ExternEconomyStreams, opt => opt.Ignore());
+                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore());
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItContract, ItContractOverviewDTO>();
