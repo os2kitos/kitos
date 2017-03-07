@@ -205,6 +205,22 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/Advice")]
+        public IHttpActionResult GetByOrganization(int orgKey)
+        {
+            if (UserId == 0)
+                return Unauthorized();
+
+            var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (orgKey != currentOrgId)
+                return Unauthorized();
+
+            var result = _adviceService.GetAdvicesForOrg(orgKey);
+
+            return Ok(result.AsQueryable());
+        }
+
+        [EnableQuery]
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);

@@ -14,7 +14,9 @@ using System.Text;
 
 namespace Core.ApplicationServices
 {
+    using DomainModel.ItSystemUsage;
     using Ninject.Extensions.Logging;
+    using System.Collections.Generic;
 
     public class AdviceService: IAdviceService
     {
@@ -34,7 +36,14 @@ namespace Core.ApplicationServices
         public IGenericRepository<ItSystemRight> _ItSystemRights { get; set; }
         [Inject]
         public ILogger Logger { get; set; }
-
+        [Inject]
+        public IGenericRepository<ItContract> _itContractRepository { get; set; }
+        [Inject]
+        public IGenericRepository<ItInterface> _itInterfaceRepository { get; set; }
+        [Inject]
+        public IGenericRepository<ItProject> _itProjectRepository { get; set; }
+        [Inject]
+        public IGenericRepository<ItSystemUsage> _itSystemUsageRepository { get; set; }
         public AdviceService() {}
 
         public bool sendAdvice(int id){
@@ -304,6 +313,12 @@ namespace Core.ApplicationServices
             }
 
             return false;
+        }
+
+        public IEnumerable<Advice> GetAdvicesForOrg(int orgKey)
+        {
+            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey}");
+            return result;
         }
     }
 }
