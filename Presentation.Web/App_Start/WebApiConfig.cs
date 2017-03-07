@@ -162,6 +162,7 @@ namespace Presentation.Web
             var organizations = builder.EntitySet<Organization>(nameof(OrganizationsController).Replace("Controller", string.Empty));
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
+            var adviceFunction = organizations.EntityType.Function("Advice").ReturnsCollectionFromEntitySet<Advice>("Advice");
             var removeUserAction = organizations.EntityType.Action("RemoveUser");
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
             var userFunction = organizations.EntityType.Function("Users").ReturnsCollectionFromEntitySet<User>("Users");
