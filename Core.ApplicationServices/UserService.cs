@@ -76,7 +76,7 @@ namespace Core.ApplicationServices
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
-            var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse af KITOS profil " + _mailSuffix;
+            var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " +
                           org.Name + ".</p>" +
@@ -84,7 +84,8 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                          "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                          "<p>Bemærk at denne mail ikke kan besvares.</p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -108,7 +109,8 @@ namespace Core.ApplicationServices
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                              "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                              "<p>Bemærk at denne mail ikke kan besvares.</p>";
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
 
