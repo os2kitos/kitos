@@ -8,8 +8,8 @@
                 <div class="form-group">
                     <div id="economyStream-visibility" class="btn-group"
                          data-ng-model="visibility">
-                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="0" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Lokal</label>
-                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="1" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Offentlig</label>
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="0" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Lokal</label>
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="1" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Offentlig</label>
                     </div>
                 </div>
             </form>

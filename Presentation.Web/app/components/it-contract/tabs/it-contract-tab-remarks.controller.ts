@@ -29,10 +29,12 @@
         function ($scope, $http, $stateParams, notify, contract, hasWriteAccess, user, getRemark) {
 
             $scope.itContractRemark = getRemark;
-
             if ($scope.itContractRemark !== null) {
                 $scope.remark = $scope.itContractRemark.Remark;
                 $scope.accessModifier = $scope.itContractRemark.AccessModifier;
+            } else {
+                $scope.accessModifier = "Local";
+                $scope.remark = "";
             }
 
             $scope.saveRemark = function () {
