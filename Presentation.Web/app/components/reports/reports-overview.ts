@@ -160,38 +160,40 @@
                     parameterMap: (data, type) => {
                         // Call the default OData V4 parameterMap.
                         var result = kendo.data.transports["odata-v4"].parameterMap(data, type);
+                        if (result) {
 
-                        if (result.$filter) {
-                            // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
-                            result.$filter = result.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
-                        }
+                            if (result.$filter) {
+                                // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
+                                result.$filter = result.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
+                            }
 
-                        if (type == "read") {
-                            result.$count = true;
-                        }
+                            if (type == "read") {
+                                result.$count = true;
+                            }
 
-                        if (type === "update") {
-                            let model: any = data;
-                            let patch = {
-                                Name: model.Name,
-                                Description: model.Description,
-                                CategoryTypeId: model.CategoryTypeId,
-                                AccessModifier: model.AccessModifier
+                            if (type === "update") {
+                                let model: any = data;
+                                let patch = {
+                                    Name: model.Name,
+                                    Description: model.Description,
+                                    CategoryTypeId: model.CategoryTypeId,
+                                    AccessModifier: model.AccessModifier
 
-                            };
-                            return JSON.stringify(patch);
-                        }
+                                };
+                                return JSON.stringify(patch);
+                            }
 
-                        if (type === "create") {
-                            let model: any = data;
-                            let patch = {
-                                Id: 0,
-                                Name: model.Name,
-                                Description: model.Description,
-                                CategoryTypeId: model.CategoryTypeId,
-                                AccessModifier: model.AccessModifier
-                            };
-                            return JSON.stringify(patch);
+                            if (type === "create") {
+                                let model: any = data;
+                                let patch = {
+                                    Id: 0,
+                                    Name: model.Name,
+                                    Description: model.Description,
+                                    CategoryTypeId: model.CategoryTypeId,
+                                    AccessModifier: model.AccessModifier
+                                };
+                                return JSON.stringify(patch);
+                            }
                         }
                         return result;
                     }
