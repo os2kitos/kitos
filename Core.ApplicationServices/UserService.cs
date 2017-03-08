@@ -6,6 +6,7 @@ using System.Web;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using System.Security.Cryptography;
 
 namespace Core.ApplicationServices
 {
@@ -19,6 +20,8 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
+        private readonly SHA256Managed _crypt;
+        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -37,6 +40,7 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
+            _crypt = new SHA256Managed();
         }
 
         public User AddUser(User user, bool sendMailOnCreation, int orgId)
@@ -80,8 +84,7 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='" + _baseUrl +
-                          "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                          "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -126,7 +129,13 @@ namespace Core.ApplicationServices
         private PasswordResetRequest GenerateResetRequest(User user)
         {
             var now = DateTime.UtcNow;
-            var hash = _cryptoService.Encrypt(now + user.Email);
+
+            byte[] randomNumber = new byte[8];
+            rngCsp.GetBytes(randomNumber);
+
+            byte[] encrypted = _crypt.ComputeHash(randomNumber);
+
+            var hash = HttpServerUtility.UrlTokenEncode(encrypted);
 
             var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
 

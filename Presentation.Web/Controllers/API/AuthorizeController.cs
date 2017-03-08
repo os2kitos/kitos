@@ -10,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -18,7 +19,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-
         public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
         {
             _userRepository = userRepository;
@@ -28,10 +28,11 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
-            Logger.Debug($"GetLogin called for {KitosUser}");
+            var user = KitosUser;
+            Logger.Debug($"GetLogin called for {user}");
             try
             {
-                var response = CreateLoginResponse(KitosUser);
+                var response = Map<User, UserDTO>(user);
 
                 return Ok(response);
             }
@@ -39,6 +40,29 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [Route("api/authorize/GetOrganizations")]
+        public HttpResponseMessage GetOrganizations()
+        {
+            var user = KitosUser;
+            var orgs = _organizationService.GetOrganizations(user);
+            var dtos = AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            return Ok(dtos);
+        }
+
+        [Route("api/authorize/GetOrganization({orgId})")]
+        public HttpResponseMessage GetOrganization(int orgId)
+        {
+            var user = KitosUser;
+            var org = _organizationService.GetOrganizations(user).Single(o=>o.Id == orgId);
+            var defaultUnit = _organizationService.GetDefaultUnit(org, user);
+            var dto = new OrganizationAndDefaultUnitDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+            };
+            return Ok(dto);
         }
 
         private User LoginWithToken(string token)
@@ -108,7 +132,7 @@ namespace Presentation.Web.Controllers.API
 
                 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-                var response = CreateLoginResponse(user);
+                var response = Map<User, UserDTO>(user);
                 loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
@@ -160,12 +184,10 @@ namespace Presentation.Web.Controllers.API
         }
 
         // helper function
-        private LoginResponseDTO CreateLoginResponse(User user)
+        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
         {
             var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-            // getting all the organizations that the user is member of
-            var organizations = _organizationService.GetOrganizations(user).ToList();
             // getting the default org units (one or null for each organization)
             var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
 
@@ -176,11 +198,14 @@ namespace Presentation.Web.Controllers.API
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             });
 
-            return new LoginResponseDTO()
+
+            var response = new LoginResponseDTO()
             {
                 User = userDto,
                 Organizations = orgsDto
             };
+
+            return response;
         }
     }
 }

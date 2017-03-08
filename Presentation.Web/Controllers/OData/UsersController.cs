@@ -107,6 +107,19 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
+        //GET /Organizations(1)/Users
+        [EnableQuery]
+        [ODataRoute("Organizations({orgKey})/Users")]
+        public IHttpActionResult GetByOrganization(int orgKey)
+        {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationRights.Any(r=> r.OrganizationId == orgKey));
+            return Ok(result);
+        }
+
         private bool EmailExists(string email)
         {
             var matchingEmails = Repository.Get(x => x.Email == email);

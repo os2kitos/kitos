@@ -25,7 +25,6 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
-    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
@@ -435,6 +434,7 @@
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />

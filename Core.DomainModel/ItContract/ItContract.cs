@@ -37,9 +37,9 @@ namespace Core.DomainModel.ItContract
                     var startDate = Concluded ?? today;
                     var endDate = DateTime.MaxValue;
 
-                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
+                    if (ExpirationDate.HasValue && ExpirationDate.Value.Date != DateTime.MaxValue.Date)
                     {
-                        endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
+                        endDate = new DateTime(ExpirationDate.Value.Year, ExpirationDate.Value.Month, ExpirationDate.Value.Day, 23, 59, 59);
                     }
 
                     if (Terminated.HasValue)

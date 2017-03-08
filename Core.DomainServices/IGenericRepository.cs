@@ -21,6 +21,8 @@ namespace Core.DomainServices
         void Patch(TModel item);
         IQueryable<TModel> AsQueryable();
 
+        IEnumerable<TModel> SQL(string sql);
+
         TModel Create();
     }
 }

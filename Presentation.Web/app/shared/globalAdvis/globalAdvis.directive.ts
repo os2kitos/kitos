@@ -4,7 +4,8 @@
             return {
                 templateUrl: "app/shared/globalAdvis/it-advice-global.view.html",
                 scope: {
-                    stateName: "@"
+                    stateName: "@",
+                    user : "="
                 },
                 controller: [
                     '$scope',
@@ -55,7 +56,7 @@
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/advice?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
+                                                    url: `/Odata/Organizations(${$scope.user.currentOrganizationId})/Advice?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
                                                     dataType: "json"
                                                 },
                                             },

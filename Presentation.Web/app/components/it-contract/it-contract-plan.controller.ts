@@ -362,7 +362,7 @@
                     filterable: false
                 },
                 detailTemplate: (dataItem) => {
-
+                    //These might be candidates for refactoring. They are quite expensive
                     return `<uib-tabset active="0">
                     <uib-tab index="0" heading="Systemer">
                         <contract-details detail-model-type="ItSystem" detail-type="systemer" action="anvender" field-value="ItSystem.Name" data-odata-query="odata/ItSystemUsages?$select=ItSystem&$expand=ItSystem($select=name, disabled)&$filter=Contracts/any(x: x/ItContractId eq ${dataItem.Id})"></contract-details>

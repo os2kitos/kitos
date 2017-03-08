@@ -5,17 +5,15 @@
             templateUrl: "app/components/it-reference/it-reference.view.html",
             controller: "system.EditReference",
             resolve: {
-                theSystem: ["$http", "itSystem", ($http, itSystem) => $http.get(`odata/ItSystems(${itSystem.id})?$expand=ExternalReferences`).then(result => result.data)],
-                objectOwner: ["$http", "theSystem", ($http, theSystem) => $http.get(`odata/Users(${theSystem.ObjectOwnerId})`).then(result => result.data)]
+                theSystem: ["$http", "itSystem", ($http, itSystem) => $http.get(`odata/ItSystems(${itSystem.id})?$expand=ExternalReferences($expand=ObjectOwner)`).then(result => result.data)]
             }
         });
     }]);
 
-    app.controller("system.EditReference", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess", "theSystem", "objectOwner",
-        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, theSystem, objectOwner) {
+    app.controller("system.EditReference", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess", "theSystem",
+        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, theSystem) {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.referenceName = theSystem.Name;
-            $scope.objectOwnerFullName = objectOwner.Name + " " + objectOwner.LastName;
 
             $scope.setChosenReference = function (id) {
                 var referenceId = (id === theSystem.ReferenceId) ? null : id;
@@ -94,18 +92,16 @@
                     template: "#= kendo.toString(kendo.parseDate(Created, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
 
                 }, {
-                    field: "objectOwner",
+                    field: "ObjectOwner.Name",
                     title: "Oprettet af",
-                    template: () => {
-                        return $scope.objectOwnerFullName;
-                    },
+                    template: (dataItem) => dataItem.ObjectOwner ? `${dataItem.ObjectOwner.Name} ${dataItem.ObjectOwner.LastName}` : "",
                     width: 150
                 }, {
                     title: "Rediger",
                     template: dataItem => {
                         var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         if (dataItem.Id != theSystem.ReferenceId) {
-                            HTML += " <button type='button' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
+                            HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
                         }
 
                         if ($scope.isValidUrl(dataItem.URL)) {

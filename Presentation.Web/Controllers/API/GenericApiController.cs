@@ -122,11 +122,6 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Map<TDto, TModel>(dto);
 
-                if(!AuthenticationService.HasWriteAccess(KitosUser.Id, item))
-                {
-                    return Unauthorized();
-                }
-
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 

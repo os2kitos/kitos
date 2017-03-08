@@ -26,6 +26,7 @@ namespace Presentation.Web
         public static void Register(HttpConfiguration config)
         {
             config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
+            config.MapHttpAttributeRoutes();
             var apiCfg = config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
@@ -164,8 +165,10 @@ namespace Presentation.Web
             var organizations = builder.EntitySet<Organization>(nameof(OrganizationsController).Replace("Controller", string.Empty));
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
+            var adviceFunction = organizations.EntityType.Function("Advice").ReturnsCollectionFromEntitySet<Advice>("Advice");
             var removeUserAction = organizations.EntityType.Action("RemoveUser");
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
+            var userFunction = organizations.EntityType.Function("Users").ReturnsCollectionFromEntitySet<User>("Users");
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.EntityType.HasKey(x => x.Id);
