@@ -17,12 +17,7 @@
                                 return result.data.value;
                             });
                         }
-                    ], itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
-                        return $http.get("api/itsystem/" + $stateParams.id)
-                            .then(function (result) {
-                                return result.data.response;
-                            });
-                    }]
+                    ]
                 }
             });
         }
