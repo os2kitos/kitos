@@ -10,7 +10,7 @@ using Ninject.Infrastructure.Language;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController <T> where T : Entity
+    public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
     {
         private readonly IAuthenticationService _authService;
 
@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
 
-            var result = Repository.AsQueryable().ToEnumerable();
+            var result = Repository.AsQueryable();
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
@@ -46,10 +46,10 @@ namespace Presentation.Web.Controllers.OData
             }
             else
             {
-                result = result.Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                result = result.Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
             }
 
-            return Ok(result.AsQueryable());
+            return Ok(result);
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]

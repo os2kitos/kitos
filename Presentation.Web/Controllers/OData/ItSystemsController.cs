@@ -19,11 +19,11 @@ namespace Presentation.Web.Controllers.OData
         {
             _authService = authService;
         }
-
-        [EnableQuery(MaxExpansionDepth = 5)]
+        
         [ODataRoute("ItSystems")]
         public override IHttpActionResult Get()
         {
+            var test = base.Get();
             return base.Get();
             //if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
             //    return base.Get();

@@ -6,7 +6,7 @@ namespace Core.DomainModel
     /// Base entity class.
     /// Every domain model should extend this.
     /// </summary>
-    public abstract class Entity
+    public abstract class Entity : IEntity
     {
         protected Entity()
         {
