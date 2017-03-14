@@ -743,6 +743,9 @@
         }
 
         private isContractActive(dataItem) {
+            console.log(dataItem);
+
+            if (!dataItem.Active) {
             var today = this.moment();
             var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
             var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
@@ -755,9 +758,11 @@
                 // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
                 return today >= startDate && today <= terminationDate;
             }
-
+        
             // indgået-dato <= dags dato <= udløbs-dato
             return today >= startDate && today <= endDate;
+            }
+            return dataItem.Active;
         }
 
         //// show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
