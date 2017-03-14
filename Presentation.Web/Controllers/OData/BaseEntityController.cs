@@ -96,6 +96,9 @@ namespace Presentation.Web.Controllers.OData
                 (entity as IHasOrganization).OrganizationId = _authService.GetCurrentOrganizationId(UserId);
             }
 
+            entity.ObjectOwnerId = UserId;
+            entity.LastChangedByUserId = UserId;
+
             if (!_authService.HasWriteAccess(UserId, entity))
             {
                 return Unauthorized();
@@ -103,13 +106,6 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                entity.ObjectOwnerId = UserId;
-                entity.LastChangedByUserId = UserId;
-                var entityWithOrganization = entity as IHasOrganization;
-                if (entityWithOrganization != null)
-                {
-                    entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
-                }
                 entity = Repository.Insert(entity);
                 Repository.Save();
             }
