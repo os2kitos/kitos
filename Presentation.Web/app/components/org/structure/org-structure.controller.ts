@@ -171,14 +171,19 @@
                 //get org rights on the org unit and subtree
                 $http.get<Kitos.API.Models.IApiWrapper<any>>("api/organizationUnitRight/" + node.id + "?paged&take=" + $scope.rightsPagination.take + "&skip=" + $scope.rightsPagination.skip).then((result) => {
                     var paginationHeader = JSON.parse(result.headers("X-Pagination"));
-                    $scope.totalRightsCount = paginationHeader.TotalCount;
+                    $scope.totalRightsCountCopy = paginationHeader.TotalCount;
                     node.orgRights = result.data.response;
 
+                    var count = 0;
                     _.each(node.orgRights, function (right: { userForSelect; roleForSelect; user; roleId; show; objectId; }) {
                         right.userForSelect = { id: right.user.id, text: right.user.fullName };
                         right.roleForSelect = right.roleId;
-                        right.show = belongsToChosenNode(node, right);
+                        right.show = $scope.showChildren || belongsToChosenNode(node, right);
+                        if (right.show)
+                            count++;
                     });
+                    
+                    $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
                 });
 
                 $scope.chosenOrgUnit = node;
@@ -187,10 +192,20 @@
             // don't show users in subunits if showChildren is false
             $scope.toggleChildren = function () {
                 const node = $scope.chosenOrgUnit;
+                var count = 0;
                 _.each(node.orgRights,
                     function (right: { show; }) {
                         right.show = $scope.showChildren || belongsToChosenNode(node, right);
+                        if (right.show)
+                            count++;
                     });
+
+                $scope.totalRightsCount = ($scope.showChildren) ? $scope.totalRightsCountCopy : count;
+
+                if (!$scope.showChildren && $scope.totalRightsCount === 0 && $scope.rightsPagination.skip > 0) {
+                    $scope.rightsPagination.skip = 0;
+                    loadRights($scope.chosenOrgUnit);
+                }
             };
 
             function belongsToChosenNode(node, right) {
