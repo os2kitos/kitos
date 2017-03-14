@@ -96,7 +96,7 @@ namespace Core.DomainModel.ItProject
         {
             // delegate to ItProject
             if (ItProject != null)
-                ItProject.IsInContext(organizationId);
+                return ItProject.IsInContext(organizationId);
             
             return false;
         }
