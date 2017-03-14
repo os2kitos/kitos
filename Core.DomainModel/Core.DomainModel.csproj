@@ -107,6 +107,7 @@
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
+    <Compile Include="IEntity.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />

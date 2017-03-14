@@ -5,15 +5,15 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
+using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericApiController<TModel, TDto> : BaseApiController
-        where TModel : Entity
+        where TModel : class, IEntity
     {
         protected readonly IGenericRepository<TModel> Repository;
 
@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API
                 }
                 else
                 {
-                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id)).AsQueryable();
+                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id));
                 }
 
                 var query = Page(result, paging);

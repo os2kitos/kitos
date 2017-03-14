@@ -79,7 +79,7 @@ namespace Core.ApplicationServices
         /// <param name="userId">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
-        public bool HasReadAccess(int userId, Entity entity)
+        public bool HasReadAccess(int userId, IEntity entity)
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
@@ -140,7 +140,7 @@ namespace Core.ApplicationServices
         /// <param name="userId">The user.</param>
         /// <param name="entity">The instance the user want read access to.</param>
         /// <returns>Returns true if the user have write access to the given instance, else false.</returns>
-        public bool HasWriteAccess(int userId, Entity entity)
+        public bool HasWriteAccess(int userId, IEntity entity)
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             AssertUserIsNotNull(user);
