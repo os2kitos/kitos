@@ -77,7 +77,7 @@
                         field: "title",
                         title: "Dokumenttitel",
                         template: function (data) {
-                            if ($scope.isValidUrl(data.url)) {
+                            if (data.url) {
                                 return "<a href=\"" + data.url + "\">" + data.title + "</a>";
                             } else {
                                 return data.title;
@@ -104,7 +104,7 @@
                                 HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess +"' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.id + ")'><i class='fa fa-trash-o'  aria-hidden='true'></i></button>";
                             }
 
-                            if ($scope.isValidUrl(dataItem.url)) {
+                            if (dataItem.url) {
                                 if (dataItem.id === project.referenceId) {
                                     HTML = HTML + "<button data-ng-disabled='" + !$scope.hasWriteAccess +"' data-uib-tooltip=\"Vises i overblik\" tooltip-placement='right' class='btn btn-link' data-ng-click='setChosenReference(" + dataItem.id + ")'><img class='referenceIcon chosen' src=\"/Content/img/VisIOverblik.svg\"/></button>";//valgt
                                 } else {

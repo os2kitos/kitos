@@ -462,7 +462,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (this.isValidUrl(reference.URL)) {
+                                if (reference.URL) {
                                     return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
