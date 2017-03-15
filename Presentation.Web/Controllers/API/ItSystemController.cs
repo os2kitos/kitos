@@ -439,8 +439,9 @@ namespace Presentation.Web.Controllers.API
             obj.TryGetValue("name", out nameToken);
             if (nameToken != null)
             {
-                var orgId = Repository.GetByKey(id).OrganizationId;
-                if (!IsAvailable(nameToken.Value<string>(), orgId))
+                string name = nameToken.Value<string>();
+                var system = Repository.Get(x => x.Name == name && x.OrganizationId == organizationId && x.Id != id);
+                if (system.Any())
                     return Conflict("Name is already taken!");
             }
 
@@ -461,7 +462,7 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsAvailable(string name, int orgId)
         {
-            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
+            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId );
             return !system.Any();
         }
 

@@ -54,7 +54,7 @@
                                     data-autosave="{{risk.updateUrl}}"
                                     data-ng-disabled="!projectEditVm.hasWriteAccess"
                                     data-ng-model="risk.responsibleUserId">
-                                <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                                <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
                             </select>
                         </td>
                         <td>
@@ -99,7 +99,7 @@
                                         data-ui-select2=""
                                         data-ng-disabled="!projectEditVm.hasWriteAccess"
                                         data-ng-model="newRisk.responsibleUserId">
-                                    <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                                    <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
                                 </select>
                             </div>
                         </td>

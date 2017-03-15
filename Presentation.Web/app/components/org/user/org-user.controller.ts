@@ -79,9 +79,6 @@
                         model: {
                             id: "Id",
                             fields: {
-                                Name: { type: "text" },
-                                LastName: { type: "text" },
-                                Email: { type: "text" },
                                 LastAdvisDate: { type: "date" }
                             }
                         },
@@ -159,7 +156,7 @@
                     {
                         field: "Email", title: "Email", width: 230,
                         persistId: "email", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Email,
+                        template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
                         hidden: false,
                         filterable: {
