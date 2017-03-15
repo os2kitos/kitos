@@ -71,6 +71,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId)
                 .WillCascadeOnDelete(true);
+
+            HasMany(e => e.ItProjectStatusUpdates)
+                .WithOptional(e => e.AssociatedItProject)
+                .HasForeignKey(e => e.AssociatedItProjectId)
+                .WillCascadeOnDelete(true);
         }
     }
 }
