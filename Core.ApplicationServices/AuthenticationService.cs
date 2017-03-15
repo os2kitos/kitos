@@ -115,13 +115,15 @@ namespace Core.ApplicationServices
                     return (awareEntity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
 
                 }
+
+                return false;
             }
 
             // User is a special case
             if (entity is User)
                 return CheckUserSpecialCase((User)entity, user);
 
-            return false;
+            return true;
         }
 
         private static bool CheckUserSpecialCase(User entity, User user)
