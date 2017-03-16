@@ -27,26 +27,27 @@ namespace Presentation.Web.Controllers.OData
                 return Unauthorized();
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
 
             var result = Repository.AsQueryable();
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
-                if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(T)) && !_authService.IsGlobalAdmin(UserId))
+                if (hasAccessModifier && !_authService.IsGlobalAdmin(UserId))
                 {
                     if (hasOrg)
                     {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
+                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
                     }
                     else
                     {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
+                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
                     }
                 }
             }
             else
             {
-                result = result.Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId));
+                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
             }
 
             return Ok(result);

@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
-                var result = GetAllQuery();
+                var result = GetAllQuery().AsEnumerable();
 
                 if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
                 {
@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id));
                 }
 
-                var query = Page(result, paging);
+                var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);
                 return Ok(dtos);
             }
