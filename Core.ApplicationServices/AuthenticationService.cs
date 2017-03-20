@@ -120,20 +120,10 @@ namespace Core.ApplicationServices
             }
 
             // User is a special case
-            if (entity is User)
-                return CheckUserSpecialCase((User)entity, user);
+            //if (entity is User)
+            //    return entity.Id == user.Id || _featureChecker.CanExecute(user, Feature.CanModifyUsers);
 
             return true;
-        }
-
-        private static bool CheckUserSpecialCase(User entity, User user)
-        {
-            if (user.IsLocalAdmin)
-                return true;
-
-            // check if the user is trying edit himself
-            // a user always has write access to himself
-            return entity.Id == user.Id;
         }
 
         /// <summary>
@@ -162,12 +152,12 @@ namespace Core.ApplicationServices
                 // special case for organisation
                 if (entity is Organization)
                 {
-                    if (!CanExecute(userId, Feature.CanSetOrganizationAccessModifierToPublic))
+                    if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {
                         return false;
                     }
                 }
-                else if (!CanExecute(userId, Feature.CanSetAccessModifierToPublic))
+                else if (!_featureChecker.CanExecute(user, Feature.CanSetAccessModifierToPublic))
                 {
                     return false;
                 }
@@ -188,27 +178,20 @@ namespace Core.ApplicationServices
                 }
             }
 
-            // check if user is local admin in target organization
-            if (user.IsLocalAdmin)
-            {
-                // local admins have write access to everything within the context
-                return true;
-            }
-
             // check if module admin in target organization and target entity is of the correct type
-            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ContractModuleAdmin) && entity is IContractModule)
+            if (_featureChecker.CanExecute(user, Feature.CanModifyContracts) && entity is IContractModule)
                 return true;
 
-            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.OrganizationModuleAdmin) && entity is IOrganizationModule)
+            if (_featureChecker.CanExecute(user, Feature.CanModifyOrganizations) && entity is IOrganizationModule)
                 return true;
 
-            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ProjectModuleAdmin) && entity is IProjectModule)
+            if (_featureChecker.CanExecute(user, Feature.CanModifyProjects) && entity is IProjectModule)
                 return true;
 
-            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.SystemModuleAdmin) && entity is ISystemModule)
+            if (_featureChecker.CanExecute(user, Feature.CanModifySystems) && entity is ISystemModule)
                 return true;
 
-            if (user.OrganizationRights.Any(x => x.Role == OrganizationRole.ReportModuleAdmin) && entity is IReportModule)
+            if (_featureChecker.CanExecute(user, Feature.CanModifyReports) && entity is IReportModule)
                 return true;
 
             // check if user has a write role on the target entity
@@ -225,8 +208,8 @@ namespace Core.ApplicationServices
             }
 
             // User is a special case
-            if (entity is User)
-                return CheckUserSpecialCase((User)entity, user);
+            if (entity is User && (entity.Id == user.Id || _featureChecker.CanExecute(user, Feature.CanModifyUsers)))
+                return true;
 
             // all white-list checks failed, deny access
             return false;
