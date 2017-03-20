@@ -17,6 +17,12 @@ namespace Core.ApplicationServices
         CanSetOrganizationTypeVirksomhed,
         CanSetOrganizationTypeAndenOffentligMyndighed,
         CanSetOrganizationAccessModifierToPublic,
+        CanModifyUsers,
+        CanModifyContracts,
+        CanModifyOrganizations,
+        CanModifySystems,
+        CanModifyProjects,
+        CanModifyReports,
     }
 
     public class FeatureChecker : IFeatureChecker
@@ -56,6 +62,12 @@ namespace Core.ApplicationServices
                 {Feature.CanSetOrganizationTypeAndenOffentligMyndighed, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetOrganizationAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
+                {Feature.CanModifyUsers, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin } },
+                {Feature.CanModifyContracts, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin } },
+                {Feature.CanModifyOrganizations, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin } },
+                {Feature.CanModifyProjects, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ProjectModuleAdmin } },
+                {Feature.CanModifySystems, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.SystemModuleAdmin} },
+                {Feature.CanModifyReports, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin} },
             };
         }
 
