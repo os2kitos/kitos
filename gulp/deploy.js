@@ -38,7 +38,7 @@ gulp.task('typescript', function () {
     tsResult = tsProject.src()
         .pipe(tsProject());
 
-    return tsResult.js.pipe(gulp.dest(paths.typescriptOutput));
+    return tsResult.js.pipe(gulp.dest(paths.source));
 });
 
 gulp.task("clean-script-bundles", function () {
@@ -46,6 +46,7 @@ gulp.task("clean-script-bundles", function () {
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
         config.script(config.appBundle),
+        config.script(config.appReportBundle),
     ]);
 });
 
