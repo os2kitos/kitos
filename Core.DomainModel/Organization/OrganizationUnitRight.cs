@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents a users rights on an Organization Unit
     /// </summary>
-    public class OrganizationUnitRight : Entity, IRight<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
+    public class OrganizationUnitRight : Entity, IRight<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IOrganizationModule
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

@@ -7,7 +7,7 @@ namespace Core.DomainModel.Organization
     /// Represents a role that a user can have on an organization unit,
     /// such as an employee or boss.
     /// </summary>
-    public class OrganizationUnitRole : OptionEntity<OrganizationUnitRight>, IRoleEntity, IOptionReference<OrganizationUnitRight>
+    public class OrganizationUnitRole : OptionEntity<OrganizationUnitRight>, IRoleEntity, IOptionReference<OrganizationUnitRight>, IOrganizationModule
     {
         public bool HasReadAccess { get; set; }
 

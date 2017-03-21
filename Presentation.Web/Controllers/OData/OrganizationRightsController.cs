@@ -85,7 +85,6 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            var test = !_authService.IsLocalAdmin(this.UserId);
             if (entity == null)
                 return NotFound();
 

@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents that a user has an administrator role on an organization.
     /// </summary>
-    public class OrganizationRight : Entity, IHasOrganization
+    public class OrganizationRight : Entity, IHasOrganization, IOrganizationModule
     {
         public int UserId { get; set; }
         public virtual User User { get; set; }
