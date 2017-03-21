@@ -60,68 +60,68 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-
-            #region OPTIONS
-
-
-            AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
-
-            AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
-
-            AddOptions<ItSystemType, ItSystem>(context.ItSystemTypes, globalAdmin, "Fagsystem", "Selvbetjening", "Applikation", "Brugerinterface", "Programmeringsinterface", "Applikationsservice", "Applikationskomponent", "Applikationsfunktion", "Applikationsmodul");
-
-            AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalAdmin, "Desing, visualisering og grafik", "Kommunikation", "Hjemmesider og portaler", "Selvbetjening og indberetning", "E-læring", "ESDH og Journalisering", "Specialsystemer", "Processtyring", "IT management", "Økonomi og betaling", "Løn, personale og HR", "BI og ledelsesinformation", "Master data og registre", "GIS", "Bruger- og rettighedsstyring", "Sikkerhed og overvågning", "Sagsbærende", "Administrativt");
-
-            AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalAdmin, "Arkiveret", "Ikke arkiveret", "Arkiveringspligt", "Ikke arkiveringspligt", "Øjebliksbillede", "Periode", "Løbende");
-
-            AddOptions<ArchiveLocation, ItSystemUsage>(context.ArchiveLocation, globalAdmin, "Aalborg", "Aabenraa", "Vejle", "Vejen", "Tårnby", "Tønder", "Thisted", "Sønderborg", "Syddjurs", "Struer", "Slagelse", "Skive", "Silkeborg", "Rudersdal", "Roskilde", "Randers", "Odense", "Næstved", "Norddjurs", "Mariagerfjord", "Læsø", "Lyngby-Taarbæk", "Lolland", "København", "Kolding", "Ishøj", "Hørsholm", "Horsens", "Holbæk", "Hjørring", "Helsingør", "Hedensted", "Haderslev", "Guldborgsund", "Gribskov", "Greve", "Gladsaxe", "Gentofte", "Furesø", "Frederikssund", "Frederikshavn", "Fredensborg", "Faxe", "Esbjerg", "Egedal", "Dragør", "Brøndby", "Bornholm", "Billund");
-
-            AddOptions<DataType, DataRow>(context.DataTypes, globalAdmin, "Person", "Virksomhed", "Sag", "Dokument", "Organisation", "Klassikfikation", "Ejendom", "GIS", "Andet");
-
-            AddOptions<FrequencyType, DataRowUsage>(context.FrequencyTypes, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
-
-            AddOptions<ItInterfaceType, ItInterface>(context.ItInterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
-
-            AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
-
-            AddOptions<MethodType, ItInterface>(context.MethodTypes, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
-
-            AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalAdmin, "Ja", "Nej");
-
-            AddOptions<TsaType, ItInterface>(context.TsaTypes, globalAdmin, "Ja", "Nej");
-
-            AddOptions<ItContractType, ItContract>(context.ItContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
-
-            AddOptions<ItContractTemplateType, ItContract>(context.ItContractTemplateTypes, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
-
-            AddOptions<PurchaseFormType, ItContract>(context.PurchaseFormTypes, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
-
-            AddOptions<PaymentModelType, ItContract>(context.PaymentModelTypes, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
-
-            AddOptions<AgreementElementType, ItContract>(context.AgreementElementTypes, globalAdmin,
-                "Licens", "Udvikling", "Drift", "Vedligehold", "Support",
-                "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
-
-            AddOptions<OptionExtendType, ItContract>(context.OptionExtendTypes, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
-
-            AddOptions<PaymentFreqencyType, ItContract>(context.PaymentFreqencyTypes, globalAdmin, "Månedligt", "Kvartalsvis", "Halvårligt", "Årligt");
-
-            AddOptions<PriceRegulationType, ItContract>(context.PriceRegulationTypes, globalAdmin, "TSA", "KL pris og lønskøn", "Nettoprisindeks");
-
-            AddOptions<ProcurementStrategyType, ItContract>(context.ProcurementStrategyTypes, globalAdmin, "Direkte tildeling", "Annoncering", "Udbud", "EU udbud", "Mini-udbud", "SKI - direkte tildeling", "SKI - mini-udbud", "Underhåndsbud");
-
-            AddOptions<TerminationDeadlineType, ItContract>(context.TerminationDeadlineTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
-
-            AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
-
-            AddOptions<ReportCategoryType, Report>(context.ReportCategoryTypes, globalAdmin, "IT Kontrakt", "IT Projekt", "IT System", "Organisation", "Andet", "Tværgående");
-
-            context.SaveChanges();
-
-            #endregion
-
+            
             if (newBuild == true)
             {
+                #region OPTIONS
+
+
+                AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
+
+                AddOptions<GoalType, Goal>(context.GoalTypes, globalAdmin, "Effektivitet", "Kvalitet", "Service");
+
+                AddOptions<ItSystemType, ItSystem>(context.ItSystemTypes, globalAdmin, "Fagsystem", "Selvbetjening", "Applikation", "Brugerinterface", "Programmeringsinterface", "Applikationsservice", "Applikationskomponent", "Applikationsfunktion", "Applikationsmodul");
+
+                AddOptions<BusinessType, ItSystem>(context.BusinessTypes, globalAdmin, "Desing, visualisering og grafik", "Kommunikation", "Hjemmesider og portaler", "Selvbetjening og indberetning", "E-læring", "ESDH og Journalisering", "Specialsystemer", "Processtyring", "IT management", "Økonomi og betaling", "Løn, personale og HR", "BI og ledelsesinformation", "Master data og registre", "GIS", "Bruger- og rettighedsstyring", "Sikkerhed og overvågning", "Sagsbærende", "Administrativt");
+
+                AddOptions<ArchiveType, ItSystemUsage>(context.ArchiveTypes, globalAdmin, "Arkiveret", "Ikke arkiveret", "Arkiveringspligt", "Ikke arkiveringspligt", "Øjebliksbillede", "Periode", "Løbende");
+
+                AddOptions<ArchiveLocation, ItSystemUsage>(context.ArchiveLocation, globalAdmin, "Aalborg", "Aabenraa", "Vejle", "Vejen", "Tårnby", "Tønder", "Thisted", "Sønderborg", "Syddjurs", "Struer", "Slagelse", "Skive", "Silkeborg", "Rudersdal", "Roskilde", "Randers", "Odense", "Næstved", "Norddjurs", "Mariagerfjord", "Læsø", "Lyngby-Taarbæk", "Lolland", "København", "Kolding", "Ishøj", "Hørsholm", "Horsens", "Holbæk", "Hjørring", "Helsingør", "Hedensted", "Haderslev", "Guldborgsund", "Gribskov", "Greve", "Gladsaxe", "Gentofte", "Furesø", "Frederikssund", "Frederikshavn", "Fredensborg", "Faxe", "Esbjerg", "Egedal", "Dragør", "Brøndby", "Bornholm", "Billund");
+
+                AddOptions<DataType, DataRow>(context.DataTypes, globalAdmin, "Person", "Virksomhed", "Sag", "Dokument", "Organisation", "Klassikfikation", "Ejendom", "GIS", "Andet");
+
+                AddOptions<FrequencyType, DataRowUsage>(context.FrequencyTypes, globalAdmin, "Dagligt", "Ugentligt", "Månedligt", "Årligt", "Kvartal", "Halvårligt");
+
+                AddOptions<ItInterfaceType, ItInterface>(context.ItInterfaceTypes, globalAdmin, "Webservice", "API", "iFrame", "Link", "Link - dybt", "Andet");
+
+                AddOptions<InterfaceType, ItInterface>(context.InterfaceTypes, globalAdmin, "CSV", "WS SOAP", "WS REST", "MOX", "OIO REST", "LDAP", "User interface", "ODBC (SQL)", "Andet");
+
+                AddOptions<MethodType, ItInterface>(context.MethodTypes, globalAdmin, "Batch", "Request-Response", "Store and forward", "Publish-subscribe", "App interface", "Andet");
+
+                AddOptions<SensitiveDataType, ItSystemUsage>(context.SensitiveDataTypes, globalAdmin, "Ja", "Nej");
+
+                AddOptions<TsaType, ItInterface>(context.TsaTypes, globalAdmin, "Ja", "Nej");
+
+                AddOptions<ItContractType, ItContract>(context.ItContractTypes, globalAdmin, "Hovedkontrakt", "Tillægskontrakt", "Snitflade", "Serviceaftale", "Databehandleraftale");
+
+                AddOptions<ItContractTemplateType, ItContract>(context.ItContractTemplateTypes, globalAdmin, "K01", "K02", "K03", "Egen", "KOMBIT", "Leverandør", "OPI", "Anden");
+
+                AddOptions<PurchaseFormType, ItContract>(context.PurchaseFormTypes, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
+
+                AddOptions<PaymentModelType, ItContract>(context.PaymentModelTypes, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
+
+                AddOptions<AgreementElementType, ItContract>(context.AgreementElementTypes, globalAdmin,
+                    "Licens", "Udvikling", "Drift", "Vedligehold", "Support",
+                    "Serverlicenser", "Serverdrift", "Databaselicenser", "Backup", "Overvågning");
+
+                AddOptions<OptionExtendType, ItContract>(context.OptionExtendTypes, globalAdmin, "2 x 1 år", "1 x 1 år", "1 x ½ år");
+
+                AddOptions<PaymentFreqencyType, ItContract>(context.PaymentFreqencyTypes, globalAdmin, "Månedligt", "Kvartalsvis", "Halvårligt", "Årligt");
+
+                AddOptions<PriceRegulationType, ItContract>(context.PriceRegulationTypes, globalAdmin, "TSA", "KL pris og lønskøn", "Nettoprisindeks");
+
+                AddOptions<ProcurementStrategyType, ItContract>(context.ProcurementStrategyTypes, globalAdmin, "Direkte tildeling", "Annoncering", "Udbud", "EU udbud", "Mini-udbud", "SKI - direkte tildeling", "SKI - mini-udbud", "Underhåndsbud");
+
+                AddOptions<TerminationDeadlineType, ItContract>(context.TerminationDeadlineTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
+
+                AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
+
+                AddOptions<ReportCategoryType, Report>(context.ReportCategoryTypes, globalAdmin, "IT Kontrakt", "IT Projekt", "IT System", "Organisation", "Andet", "Tværgående");
+
+                context.SaveChanges();
+
+                #endregion
+
                 #region ORG ROLES
 
                 var boss = new OrganizationUnitRole()
@@ -625,189 +625,6 @@ namespace Infrastructure.DataAccess.Migrations
                 //SetUserDefaultOrganizationUnit(user3, muni2);
 
 
-                #endregion
-
-                #region TEXTS
-
-                if (!context.Texts.Any(x => x.Id == 1))
-                {
-                    context.Texts.AddOrUpdate(new Text()
-                    {
-                        Value = @"<h3>Om KITOS?</h3> <p>KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
-Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
-KITOS er bygget op omkring flg. moduler:
-<ol>
-    <li>IT understøttelse af organisation</li>
-    <li>IT Projekter</li>
-    <li>IT Systemer</li>
-    <li>IT Kontrakter</li>
-</ol>
- Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
-De første kommuner tager KITOS i brug i oktober 2014.
-Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
-Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her for at læse mere</a></p>",
-                        ObjectOwnerId = globalAdmin.Id,
-                        LastChangedByUserId = globalAdmin.Id
-                    });
-                }
-
-                if (!context.Texts.Any(x => x.Id == 2))
-                {
-                    context.Texts.AddOrUpdate(new Text() { Value = "<h3>Driftstatus</h3> Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
-                }
-
-                if (!context.Texts.Any(x => x.Id == 3))
-                {
-                    context.Texts.AddOrUpdate(new Text()
-                    {
-                        Value = @"<h3>Hjælp og vejledning til KITOS</h3> <ul class='list-unstyled'>
-                        <li><a href='/docs/Vejledning til slutbrugeren.pdf' target='_blank'>Vejledning til login og brugerkonto</a></li>
-                        <li><a href='/docs/Vejledning_Masseopret.pdf' target='_blank'>Vejledning til lokale administratorer</a></li>
-                        <li><a href='/docs/Vejledning til roller og rettigheder.pdf' target='_blank'>Vejledning til roller og rettigheder</a></li>
-                        <li><a href='/docs/Vejledning til tabeller på overblik.pdf' target='_blank'>Vejledning til tabeller på overblik</a></li>
-                        <li><a href='/docs/vejledningerOrganisation.pdf' target='_blank'>Vejledning til modulet Organisation</a></li>
-                        <li><a href='/docs/vejledningerITProjekter.pdf' target='_blank'>Vejledning til modulet IT Projekter</a></li>
-                        <li><a href='/docs/vejledningerITSystemer.pdf' target='_blank'>Vejledning til modulet IT Systemer</a></li>
-                        <li><a href='/docs/vejledningerITKontrakter.pdf' target='_blank'>Vejledning til modulet IT Kontrakter</a></li>
-                        <li><a href='/docs/html/index.html' target='_blank'>Kitos kode dokumentation</a></li>
-                        <li><a href='/Content/excel/Kontrakt_Indgåelse_Skabelon.xlsx' target='_blank'>Kontrakt-skabelon</a></li>
-                    </ul>",
-                        ObjectOwnerId = globalAdmin.Id,
-                        LastChangedByUserId = globalAdmin.Id
-                    });
-                }
-
-                if (!context.Texts.Any(x => x.Id == 4))
-                {
-                    context.Texts.AddOrUpdate(new Text() { Value = "<h3>Support</h3> <p>Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.</p> <p><a href='https://kitostest.miracle.dk/docs/LokaladministratoreroversigtKitos.pdf'>Klik her for kontaktinfo på din lokale administrator</p>", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
-                }
-
-                if (!context.Texts.Any(x => x.Id == 5))
-                {
-                    context.Texts.AddOrUpdate(new Text()
-                    {
-                        Value = @"<h3>Hvordan kommer I med på løsningen?</h3> <p>Gør følgende for at tilslutte jer KITOS:</p>
-                    <ol>
-                        <li>Læs tilslutningsaftalen <a href='http://os2.eu/dokument/kitos-tilslutningsaftale-publiceret'>her</a>.</li>
-                        <li>
-                            Udfyld og underskriv tilslutningsaftalen og send den til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at tilmelde jer KITOS. Skriv gerne hvornår
-                            I ønsker, at tilslutningen skal træde i kraft.
-                        </li>
-                        <li>Herefter kontakter vi jer, så vi kan få en snak om, hvad der skal ske fremover, og hvordan I bedst muligt tager KITOS i brug i jeres kommune.</li>
-                    </ol>
-                    <p>Ønsker I mere information om tilslutningsprocessen og KITOS generelt:</p>
-                    <ol>
-                        <li>Læs mere om KITOS <a href='http://os2.eu/produkt/os2kitos'>her</a>.</li>
-                        <li>Skriv til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at få besvaret eventuelle spørgsmål. Oplys et telefonnr., hvis I ønsker at blive ringet op.</li>
-                    </ol>",
-                        ObjectOwnerId = globalAdmin.Id,
-                        LastChangedByUserId = globalAdmin.Id
-                    });
-                }
-
-                #endregion
-
-                #region Global Config
-
-                if (!context.GlobalConfigs.Any(x => x.key == "CanGlobalAdminOnlyEditReports"))
-                {
-                    var globalConfig = new GlobalConfig { key = "CanGlobalAdminOnlyEditReports", value = "true" };
-                    context.GlobalConfigs.AddOrUpdate(globalConfig);
-
-                    context.SaveChanges();
-                }
-
-                #endregion
-
-                //#region KLE
-
-                //var orgUnit = context.Organizations.Single(x => x.Name == "Fælles Kommune").OrgUnits.First();
-                //var kle = GenerateAllTasks(globalAdmin, orgUnit);
-                //context.TaskRefs.AddRange(kle);
-
-                //#endregion
-            }
-            else
-            {
-                #region ORG ROLES
-                try
-                {
-                    var maxCount = context.OrganizationUnitRoles.Max(r => r.Priority);
-                    foreach (var organizationUnitRole in context.OrganizationUnitRoles)
-                    {
-                        if (organizationUnitRole.Priority == 0)
-                        {
-                            maxCount++;
-                            organizationUnitRole.Priority = maxCount;
-                        }
-
-                    }
-                    context.OrganizationUnitRoles.AddOrUpdate(role => role.Name);
-                    context.SaveChanges();
-                }
-                catch
-                {
-                    // we don't really care about duplicates
-                    // just do nothing
-                }
-
-                #endregion
-
-                #region PROJECT ROLES
-
-                context.ItProjectRoles.AddOrUpdate(r => r.Name);
-                
-                var itProjFullMaxCount = context.ItProjectRoles.Max(r => r.Priority);
-                foreach (var role in context.ItProjectRoles)
-                {
-                    if (role.Priority == 0)
-                    {
-                        itProjFullMaxCount++;
-                        role.Priority = itProjFullMaxCount;
-                    }
-                }
-
-                context.SaveChanges();
-                #endregion
-
-                #region SYSTEM ROLES
-
-                context.ItSystemRoles.AddOrUpdate(x => x.Name);
-                var itSystemRolesMaxPriority = context.ItSystemRoles.Max(r => r.Priority);
-                foreach (var role in context.ItSystemRoles)
-                {
-                    if (role.Priority == 0)
-                    {
-                        itSystemRolesMaxPriority++;
-                        role.Priority = itSystemRolesMaxPriority;
-                    }
-                }
-
-                context.SaveChanges();
-
-                #endregion
-
-                #region CONTRACT ROLES
-
-                context.ItContractRoles.AddOrUpdate(x => x.Name);
-                
-                var itContractRolesMaxCount = context.ItContractRoles.Max(x => x.Priority);
-                foreach (var role in context.ItContractRoles)
-                {
-                    if (role.Priority == 0)
-                    {
-                        itContractRolesMaxCount++;
-                        role.Priority = itContractRolesMaxCount;
-                    }
-
-                }
-
-                context.SaveChanges();
-
-                #endregion
-
-                #region ORGANIZATIONS
-                
                 #endregion
 
                 #region TEXTS
