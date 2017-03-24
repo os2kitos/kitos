@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
 
                 user.Uuid = Guid.NewGuid();
-                PatchQuery(user);
+                PatchQuery(user, null);
                 return Ok(user.Uuid);
             }
             catch (Exception e)

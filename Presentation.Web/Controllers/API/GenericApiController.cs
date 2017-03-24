@@ -186,23 +186,10 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected virtual TModel PatchQuery(TModel item)
+        protected virtual TModel PatchQuery(TModel item, JObject obj)
         {
-            Repository.Update(item);
-            Repository.Save();
-
-            return item;
-        }
-
-        // PATCH api/T
-        public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
-        {
-            try
+            if (obj != null)
             {
-                var item = Repository.GetByKey(id);
-                if (item == null) return NotFound();
-                if (HasWriteAccess(item, organizationId)) return Unauthorized();
-
                 var itemType = item.GetType();
                 // get name of mapped property
                 var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
@@ -231,7 +218,7 @@ namespace Presentation.Web.Controllers.API
                         propRef.SetValue(item, enumValue);
                     }
                     // parse null values properly
-                    else if (t.IsEquivalentTo(typeof (int?)))
+                    else if (t.IsEquivalentTo(typeof(int?)))
                     {
                         var value = valuePair.Value.Value<string>();
 
@@ -275,9 +262,24 @@ namespace Presentation.Web.Controllers.API
 
                 item.LastChanged = DateTime.UtcNow;
                 item.LastChangedByUser = KitosUser;
+            }
+            Repository.Update(item);
+            Repository.Save();
 
-                PatchQuery(item);
-                return Ok(Map(item));
+            return item;
+        }
+
+        // PATCH api/T
+        public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            try
+            {
+                var item = Repository.GetByKey(id);
+                if (item == null) return NotFound();
+                if (HasWriteAccess(item, organizationId)) return Unauthorized();
+
+                var result = PatchQuery(item, obj);
+                return Ok(Map(result));
             }
             catch (Exception e)
             {

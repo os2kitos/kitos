@@ -750,7 +750,7 @@ namespace Presentation.Web.Controllers.API
             project.LastChanged = DateTime.UtcNow;
             project.LastChangedByUser = KitosUser;
 
-            PatchQuery(project);
+            PatchQuery(project, null);
 
             return Ok();
         }
