@@ -201,7 +201,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
                 if (item == null) return NotFound();
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+                if (HasWriteAccess(item, organizationId)) return Unauthorized();
 
                 var itemType = item.GetType();
                 // get name of mapped property
@@ -309,7 +309,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>True iff user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            return AuthenticationService.HasWriteAccess(user.Id, obj);
+            return AuthenticationService.HasWriteAccess(user.Id, obj) || (KitosUser.DefaultOrganizationId == organizationId && KitosUser.IsLocalAdmin);
         }
 
         /// <summary>
