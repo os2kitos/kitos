@@ -344,7 +344,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>True iff user has write access to obj</returns>
         protected bool HasWriteAccess(TModel obj, int organizationId)
         {
-            return HasWriteAccess(obj, KitosUser, organizationId);
+            return HasWriteAccess(obj, KitosUser, organizationId) || KitosUser.IsLocalAdmin;
         }
 
         #endregion
