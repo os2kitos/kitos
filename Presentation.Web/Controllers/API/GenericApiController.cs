@@ -276,7 +276,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
                 if (item == null) return NotFound();
-                if (HasWriteAccess(item, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
                 var result = PatchQuery(item, obj);
                 return Ok(Map(result));
@@ -346,7 +346,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>True iff user has write access to obj</returns>
         protected bool HasWriteAccess(TModel obj, int organizationId)
         {
-            return HasWriteAccess(obj, KitosUser, organizationId) || KitosUser.IsLocalAdmin;
+            return HasWriteAccess(obj, KitosUser, organizationId);
         }
 
         #endregion
