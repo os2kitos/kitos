@@ -43,7 +43,7 @@ namespace Core.ApplicationServices
 
         private static IEnumerable<OrganizationRole> CreateRoleList(User user)
         {
-            var roles = user.OrganizationRights.Select(x => x.Role).Distinct().ToList();
+            var roles = user.OrganizationRights.Where(or => or.OrganizationId == user.DefaultOrganizationId).Select(x => x.Role).Distinct().ToList();
             if (user.IsGlobalAdmin)
                 roles.Add(OrganizationRole.GlobalAdmin);
 
