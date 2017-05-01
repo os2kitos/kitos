@@ -39,7 +39,7 @@ namespace Core.DomainModel
         public string Email { get; set; }
         public string Password { get; set; }
         public string Salt { get; set; }
-        public Guid? Uuid { get; set; }
+        public string UniqueId { get; set; }
         public DateTime? LastAdvisDate { get; set; }
 
         public int? DefaultOrganizationId { get; set; }
