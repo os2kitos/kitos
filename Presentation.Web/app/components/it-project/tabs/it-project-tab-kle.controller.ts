@@ -22,8 +22,8 @@
 
     app.controller("project.EditKleCtrl",
         [
-            "$scope", "$http", "$state", "$stateParams", "notify", "user", "hasWriteAccess",
-            function ($scope, $http, $state, $stateParams, notify, user, hasWriteAccess) {
+            "$scope", "$http", "$state", "$stateParams", "notify", "user",
+            function ($scope, $http, $state, $stateParams, notify, user) {
                 var projectId = $stateParams.id;
                 var baseUrl = "api/itProject/" + projectId;
 
@@ -31,7 +31,6 @@
                     skip: 0,
                     take: 50
                 };
-                $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.showAllTasks = true;
 

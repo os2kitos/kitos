@@ -6,7 +6,8 @@
             Tilknyttede opgaver
         </div>
         <div class="panel-body">
-            <div data-kle-filter="projectEditVm.selectedTaskGroup" data-has-write-access="projectEditVm.hasWriteAccess"></div>
+            <!-- selectedTaskGroup is on $scope and not projectEditVm -->
+            <div data-kle-filter="selectedTaskGroup" data-has-write-access="projectEditVm.hasWriteAccess"></div>
         </div>
         <table class="table table-condensed">
             <thead>

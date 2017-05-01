@@ -50,7 +50,7 @@
         }
 
         saveUser = (user, orgAndDefaultUnit) => {
-            
+
             var currOrg = orgAndDefaultUnit.organization;
             var defaultOrgUnit = orgAndDefaultUnit.defaultOrgUnit;
             var defaultOrgUnitId = defaultOrgUnit == null ? null : defaultOrgUnit.id;
@@ -365,7 +365,7 @@
                     deferred.resolve(result);
                     return deferred.promise;
                 }
-            
+
                 var modal = this.showOrganizationsModal(orgs);
 
                 modal.result.then((data) => {
@@ -402,7 +402,6 @@
                     };
 
                     $modalScope.ok = () => {
-                        console.log("chosen Id: " + $modalScope.orgChooser.selectedId);
                         var selectedOrgAndUnit = this._.find($modalScope.organizations, function (org: any) { return org.id === $modalScope.orgChooser.selectedId; });
 
                         $modalInstance.close(selectedOrgAndUnit);
@@ -431,7 +430,6 @@
             this.getCurrentUserIfAuthorized().then(result => {
 
                 user = result.data.response;
-                console.log(user);
                 this.chooseOrganization().then((orgAndDefaultUnit: any) => {
 
                     this.saveUserInfo(user, orgAndDefaultUnit);

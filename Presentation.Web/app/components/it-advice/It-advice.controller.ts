@@ -1,6 +1,6 @@
 ﻿(function (ng, app) {
-    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'users', 'type', 'advicename', 'hasWriteAccess',
-        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, users, type, advicename, hasWriteAccess) {
+    app.controller('object.EditAdviceCtrl', ['$', '$scope', '$http', '$state', '$stateParams', '$timeout', 'notify', '$uibModal', 'Roles', 'object', 'type', 'advicename', 'hasWriteAccess',
+        function ($, $scope, $http, $state, $stateParams, $timeout, notify, $modal, roles, object, type, advicename, hasWriteAccess) {
             $scope.type = type;
             $scope.object = object;
             $scope.hasWriteAccess = hasWriteAccess;
@@ -27,80 +27,80 @@
                     attributes: { "class": "might-overflow" }
                 },
                 {
-                            field: "SentDate",
-                            title: "Sidst sendt",
-                            template: x => {
-                                if (x.SentDate != null) {
-                                    return kendo.toString(new Date(x.SentDate), "d");
-                                }
-                                return "";
-                            },
-                            attributes: { "class": "might-overflow" }
-                        },
-                        {
-                            field: "Id",
-                            hidden: true
-                        },
-                        
-                        {
-                            field: "AlarmDate",
-                            title: "Start dato",
-                            template: x => {
-                                if (x.AlarmDate != null) {
-                                    return kendo.toString(new Date(x.AlarmDate), "d");
-                                }
-                                return "";
-                            },
-                            attributes: { "class": "might-overflow" }
-                        },
-                        {
-                            field: "StopDate",
-                            title: "Slut dato",
-                            template: x => {
-                                if (x.StopDate != null) {
-                                    return kendo.toString(new Date(x.StopDate), "d");
-                                }
-                                return "";
-                            },
-                            attributes: { "class": "might-overflow" }
-                        },
-                        {
-                            field: "Reciepients.Name", title: "Modtager",
-                            template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                            attributes: { "class": "might-overflow" }
-                        },
-                        {
-                            field: "Reciepients.Name",
-                            title: "CC",
-                            template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                                    attributes: { "class": "might-overflow" }
-                        },
-                        {
-                            field: "Subject",
-                            title: "Emne"
-                        },
-                        {
-                            template: (dataItem) => {
-                                var isActive = moment().isAfter(moment(dataItem.StopDate)) || dataItem.Scheduling === 'Immediate';
-                                var canDelete = dataItem.AdviceSent.length === 0;
-                                if (hasWriteAccess) {
-                                    return `<button class="btn-link" ng-disabled="${isActive}" data-ng-click="newAdvice('PATCH',${dataItem.Id})"><i class="glyphicon glyphicon-pencil"></i></button>
+                    field: "SentDate",
+                    title: "Sidst sendt",
+                    template: x => {
+                        if (x.SentDate != null) {
+                            return kendo.toString(new Date(x.SentDate), "d");
+                        }
+                        return "";
+                    },
+                    attributes: { "class": "might-overflow" }
+                },
+                {
+                    field: "Id",
+                    hidden: true
+                },
+
+                {
+                    field: "AlarmDate",
+                    title: "Start dato",
+                    template: x => {
+                        if (x.AlarmDate != null) {
+                            return kendo.toString(new Date(x.AlarmDate), "d");
+                        }
+                        return "";
+                    },
+                    attributes: { "class": "might-overflow" }
+                },
+                {
+                    field: "StopDate",
+                    title: "Slut dato",
+                    template: x => {
+                        if (x.StopDate != null) {
+                            return kendo.toString(new Date(x.StopDate), "d");
+                        }
+                        return "";
+                    },
+                    attributes: { "class": "might-overflow" }
+                },
+                {
+                    field: "Reciepients.Name", title: "Modtager",
+                    template: () =>
+                        `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                    attributes: { "class": "might-overflow" }
+                },
+                {
+                    field: "Reciepients.Name",
+                    title: "CC",
+                    template: () =>
+                        `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                    attributes: { "class": "might-overflow" }
+                },
+                {
+                    field: "Subject",
+                    title: "Emne"
+                },
+                {
+                    template: (dataItem) => {
+                        var isActive = moment().isAfter(moment(dataItem.StopDate)) || dataItem.Scheduling === 'Immediate';
+                        var canDelete = dataItem.AdviceSent.length === 0;
+                        if (hasWriteAccess) {
+                            return `<button class="btn-link" ng-disabled="${isActive}" data-ng-click="newAdvice('PATCH',${dataItem.Id})"><i class="glyphicon glyphicon-pencil"></i></button>
                                             <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
-                                } else {
-                                    return 'Ingen rettigheder';
-                                }
-                            }
+                        } else {
+                            return 'Ingen rettigheder';
                         }
+                    }
+                }
                 ],
-                    toolbar: [
-                        {
-                            name: "opretRolle",
-                            text: "Opret rolle",
-                            template: "<button data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
-                        }
-                    ],
+                toolbar: [
+                    {
+                        name: "opretRolle",
+                        text: "Opret rolle",
+                        template: "<button data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
+                    }
+                ],
                 pageable: {
                     refresh: true,
                     pageSizes: [10, 25, 50, 100, 200],
@@ -110,14 +110,14 @@
 
             $scope.detailGridOptions = {
                 dataSource: {
-                type: "odata-v4",
-                transport: {
-                    read:  {
-                        url: "/Odata/adviceSent?$filter=AdviceId eq 0",
+                    type: "odata-v4",
+                    transport: {
+                        read: {
+                            url: "/Odata/adviceSent?$filter=AdviceId eq 0",
                             dataType: "json"
+                        },
                     },
-                },
-                pageSize: 25
+                    pageSize: 25
                 },
                 columns: [{
                     field: "AdviceSentDate",
@@ -151,9 +151,9 @@
             $scope.deleteAdvice = (id) => {
                 $http.delete(`odata/advice(${id})`)
                     .then(() => {
-                            notify.addSuccessMessage("Advisen er slettet!");
-                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                        },
+                        notify.addSuccessMessage("Advisen er slettet!");
+                        $("#mainGrid").data("kendoGrid").dataSource.read();
+                    },
                     () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
             }
 
@@ -170,7 +170,7 @@
 
                         windowClass: "modal fade in",
                         templateUrl: "app/components/it-advice/it-advice-modal-view.html",
-                        controller: ["$scope", "$uibModalInstance", "users", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, users, roles, $window, type, action, object, currentUser) {
+                        controller: ["$scope", "$uibModalInstance", "Roles", "$window", "type", "action", "object", "currentUser", function ($scope, $modalInstance, roles, $window, type, action, object, currentUser) {
 
                             $scope.showRoleFields = true;
                             modalOpen = true;
@@ -427,9 +427,6 @@
                                     return [];
                                 }
                             }],
-                            users: ['UserGetService', function (UserGetService) {
-                                return UserGetService.GetAllUsers();
-                            }],
                             type: [function () {
                                 return $scope.type;
                             }],
@@ -452,7 +449,7 @@
                         }
                     });
                 }
-        }
+            }
         }]);
 
 })(angular, app);

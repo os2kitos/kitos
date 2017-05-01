@@ -1,5 +1,5 @@
-﻿(function(ng, app) {
-    app.config(['$stateProvider', function($stateProvider) {
+﻿(function (ng, app) {
+    app.config(['$stateProvider', function ($stateProvider) {
         $stateProvider.state('it-contract.edit.advice-generic', {
             url: '/advice',
             templateUrl: 'app/components/it-advice/it-advice.view.html',
@@ -19,9 +19,6 @@
                 }],
                 object: ['contract', function (contract) {
                     return contract;
-                }],
-                users: ['UserGetService', function (UserGetService) {
-                    return UserGetService.GetAllUsers();
                 }],
                 type: [function () {
                     return "itContract";

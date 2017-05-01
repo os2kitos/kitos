@@ -6,5 +6,4 @@
         data-field="{{ field }}"
         multiple>
     <option data-ng-repeat="option in roles() | filter: $select.search" value="{{ option.Name }}">{{option.Name}} </option>
-    <option data-ng-repeat="option in users() | filter: $select.search" value="{{ option.Email }}">{{option.Email}} </option>
 </select>
