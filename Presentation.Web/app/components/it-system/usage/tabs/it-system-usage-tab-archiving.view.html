@@ -107,9 +107,10 @@
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
-                           data-ng-model="systemUsage.ArchivedDate"
-                           ng-blur="patchDate('ArchivedDate', systemUsage.ArchivedDate)"
+                           data-ng-model="ArchivedDate"
+                           ng-blur="patchDate('ArchivedDate', ArchivedDate)"
                            data-field="ArchivedDate">
+                    <span id="helpBlock" class="help-block small">Eksempelvis "2017-04-25"</span>
                 </div>
                 <!-- ArchiveNotes -->
                 <div class="form-group">
