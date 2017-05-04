@@ -462,18 +462,18 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsAvailable(string name, int orgId)
         {
-            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId );
+            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
         }
 
         protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
         {
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
-                return true;
+            return HasWriteAccess();
+        }
 
-            return base.HasWriteAccess(obj, user, organizationId);
+        protected bool HasWriteAccess()
+        {
+            return KitosUser.IsGlobalAdmin;
         }
     }
 }
