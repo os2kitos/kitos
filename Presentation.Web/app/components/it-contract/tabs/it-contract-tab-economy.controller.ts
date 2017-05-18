@@ -15,15 +15,15 @@
                 externalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
                     return $http.get(`api/EconomyStream/?externPaymentForContractWithId=${contract.id}`).then(function (result) {
                         return result.data.response;
-                    }, function () {
-                        return null;
+                    }, function (error) {
+                        return error;
                     });
                 }],
                 internalEconomyStreams: ["$http", "contract", "$state", function ($http, contract) {
                     return $http.get(`api/EconomyStream/?internPaymentForContractWithId=${contract.id}`).then(function (result) {
                         return result.data.response;
-                    }, function () {
-                        return null;
+                    }, function (error) {
+                        return error;
                     });
                 }]
             }
@@ -31,14 +31,16 @@
     }]);
 
     app.controller("contract.EditEconomyCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify",
-        "contract", "orgUnits", "user", "hasWriteAccess", "externalEconomyStreams", "internalEconomyStreams", "_",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, hasWriteAccess, externalEconomyStreams, internalEconomyStreams, _) {
-            if (externalEconomyStreams === null && internalEconomyStreams == null) {
+        "contract", "orgUnits", "user", "externalEconomyStreams", "internalEconomyStreams", "_",
+        function ($scope, $http, $timeout, $state, $stateParams, notify, contract, orgUnits: { ean; }[], user, externalEconomyStreams, internalEconomyStreams, _) {
+
+            // in order to have write access the user and the contract must belong to the same organization and the user must either own the object or have a valid role in the organization
+            $scope.hasWriteAccess = user.currentOrganizationId === contract.organizationId && (user.id === contract.objectOwnerId || user.isGlobalAdmin || user.isLocalAdmin || user.isContractAdmin);
+
+            if (externalEconomyStreams.status === 401 && internalEconomyStreams.status === 401) {
                 notify.addInfoMessage("Du har ikke lov til at se disse informationer. Kontakt venligst din lokale administrator eller kontrakt administrator.");
             } else {
-
                 var baseUrl = "api/economyStream";
-                $scope.noEconomyStreams = externalEconomyStreams.length === 0 && internalEconomyStreams.length === 0;
                 $scope.datepickerOptions = {
                     format: "dd-MM-yyyy",
                     parseFormats: ["yyyy-MM-dd"]
@@ -73,17 +75,18 @@
                 });
 
                 $scope.changeVisibility = function () {
-                    if ($scope.noEconomyStreams) {
-                        notify.addInfoMessage("Ingen betalinger at opdatere...", true);
-                    } else if (hasWriteAccess) {
-                        let msg = notify.addInfoMessage("Opdaterer betalingernes synlighed...", true);
+                    if ($scope.hasWriteAccess) {
                         if (externalEconomyStreams.length !== 0) {
                             _.each(externalEconomyStreams,
                                 function (stream) {
                                     patchEconomyStream(stream).then(function () {
-                                        msg.toSuccessMessage("Synligheden blev opdateret");
-                                    }, function () {
-                                        msg.toSErrorMessage("Synligheden blev ikke opdateret");
+                                        notify.addSuccessMessage("Synligheden for ekstern betaling blev opdateret");
+                                    }, function (error) {
+                                        if (error.status === 403) {
+                                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
+                                        } else {
+                                            notify.addErrorMessage("Synligheden for ekstern betaling blev ikke opdateret");
+                                        }
                                     });
                                 });
                         }
@@ -92,12 +95,17 @@
                             _.each(internalEconomyStreams,
                                 function (stream) {
                                     patchEconomyStream(stream).then(function () {
-                                        msg.toSuccessMessage("Synligheden blev opdateret");
-                                    }, function () {
-                                        msg.toSErrorMessage("Synligheden blev ikke opdateret");
+                                        notify.addSuccessMessage("Synligheden for intern betaling blev opdateret");
+                                    }, function (error) {
+                                        if (error.status === 403) {
+                                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
+                                        } else {
+                                            notify.addErrorMessage("Synligheden for intern betaling blev ikke opdateret");
+                                        }
                                     });
                                 });
                         }
+
                     } else {
                         notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
                     }

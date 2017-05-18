@@ -3,7 +3,7 @@
     /// <summary>
     /// Associates a <see cref="User"/> with an it system (<see cref="Object"/>) in a specific <see cref="Role"/>.
     /// </summary>
-    public class ItSystemRight : Entity, IRight<ItSystemUsage.ItSystemUsage, ItSystemRight, ItSystemRole>
+    public class ItSystemRight : Entity, IRight<ItSystemUsage.ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

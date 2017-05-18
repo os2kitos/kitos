@@ -9,8 +9,8 @@
                     <div class="form-group">
                         <div id="remark-accessModifier" class="btn-group"
                              data-ng-model="accessModifier">
-                            <label class="btn btn-default" ng-model="accessModifier" uib-btn-radio="'Local'" style="width: 100px;" data-ng-disabled="!hasWriteAccess">Lokal</label>
-                            <label class="btn btn-default" ng-model="accessModifier" uib-btn-radio="'Public'" style="width: 100px;" data-ng-disabled="!hasWriteAccess">Offentlig</label>
+                            <label class="btn btn-default" ng-model="visibility" uib-btn-radio="'Local'" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Lokal</label>
+                            <label class="btn btn-default" ng-model="visibility" uib-btn-radio="'Public'" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess">Offentlig</label>
                         </div>
                     </div>
                 </form>

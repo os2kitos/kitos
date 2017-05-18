@@ -311,7 +311,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>True iff user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            return AuthenticationService.HasWriteAccess(user.Id, obj) || (KitosUser.DefaultOrganizationId == organizationId && KitosUser.IsLocalAdmin);
+            return AuthenticationService.HasWriteAccess(user.Id, obj);
         }
 
         /// <summary>

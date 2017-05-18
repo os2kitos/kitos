@@ -68,6 +68,12 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage Post(int contractId, EconomyStreamDTO streamDTO)
         {
             var contract = _contracts.GetByKey(contractId);
+
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
             var stream = Map<EconomyStreamDTO, EconomyStream>(streamDTO);
 
             if (streamDTO.ExternPaymentForId != null)
@@ -77,6 +83,11 @@ namespace Presentation.Web.Controllers.API
             else
             {
                 stream.InternPaymentFor = contract;
+            }
+
+            if (!AuthenticationService.HasWriteAccess(KitosUser.Id, stream))
+            {
+                return Unauthorized();
             }
 
             stream.ObjectOwner = KitosUser;

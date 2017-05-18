@@ -364,10 +364,6 @@
     <Compile Include="Migrations\201703151425005_DatabaseRelationsshipAddedInItProject.Designer.cs">
       <DependentUpon>201703151425005_DatabaseRelationsshipAddedInItProject.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201703080934064_Added ItContractRemark. AccessModifier for EconomyStream and ItContractRemark.cs" />
-    <Compile Include="Migrations\201703080934064_Added ItContractRemark. AccessModifier for EconomyStream and ItContractRemark.Designer.cs">
-      <DependentUpon>201703080934064_Added ItContractRemark. AccessModifier for EconomyStream and ItContractRemark.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -545,9 +541,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703151425005_DatabaseRelationsshipAddedInItProject.resx">
       <DependentUpon>201703151425005_DatabaseRelationsshipAddedInItProject.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201703080934064_Added ItContractRemark. AccessModifier for EconomyStream and ItContractRemark.resx">
-      <DependentUpon>201703080934064_Added ItContractRemark. AccessModifier for EconomyStream and ItContractRemark.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

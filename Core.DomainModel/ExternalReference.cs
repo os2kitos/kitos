@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel
 {
@@ -15,7 +14,7 @@ namespace Core.DomainModel
         ExternalId,
         Url
     }
-    public class ExternalReference : Entity
+    public class ExternalReference : Entity, IProjectModule, ISystemModule, IContractModule
     {
 
         public int? ItProject_Id { get; set; }
