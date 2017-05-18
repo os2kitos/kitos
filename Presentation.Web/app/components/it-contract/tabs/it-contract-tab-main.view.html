@@ -108,19 +108,6 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="col-xs-12">
-
-                        <!-- Note -->
-                        <div class="form-group">
-                            <label for="contract-note" class="control-label small">Bemærkning</label>
-                            <textarea id="contract-note" class="form-control input-sm" rows="4"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-ng-model="contract.note"
-                                      data-autosave="{{ autoSaveUrl }}"
-                                      data-field="note"></textarea>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -225,52 +212,49 @@
                                    data-field="signedDate">
                         </div>
                     </div>
-
                     <div class="col-xs-12">
-                        <label for="agreement-concluded" class="control-label small">
-                            Gyldig fra
+                        <div class="form-group">
+                            <label for="agreement-concluded" class="control-label small">
+                                Gyldig fra
+                            </label>
+                            <input id="agreement-concluded"
+                                   type="text"
+                                   class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.concluded"
+                                   data-autosave="{{ autosaveUrl2 }}"
+                                   data-ng-blur="checkContractValidity()"
+                                   data-field="concluded">
+                            <label for="agreement-expiration" class="control-label small">Gyldig til</label>
+                            <input type="text" class="form-control" id="agreement-expiration"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="contract.expirationDate"
+                                   data-ng-blur="checkContractValidity()"
+                                   data-autosave="{{ autosaveUrl2 }}"
+                                   data-field="expirationDate">
+                        </div>
+                    </div>
+
+                    <!-- Intern contract is Active regardless of concluded and expirationdate -->
+                    <div class="col-xs-12">
+                        <input type="checkbox" id="contractIsActive"
+                               class="tags-checkbox sr-only"
+                               data-ng-model="contract.active"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-autosave="{{ autoSaveUrl }}"
+                               data-field="active"
+                               data-ng-change="checkContractValidity()" />
+                        <label for="contractIsActive">
+                            <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
+                            <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
+                            <span class='label-content'>Gyldig: </span>
                         </label>
-                        <input id="agreement-concluded"
-                               type="text"
-                               class="form-control"
-                               data-kendo-date-picker
-                               data-k-options="datepickerOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.concluded"
-                               data-autosave="{{ autosaveUrl2 }}"
-                               data-ng-blur="checkContractValidity()"
-                               data-field="concluded">
+                        <i ng-show="contract.isActive" class="fa fa-check" aria-hidden="true"></i>
                     </div>
-                    <div class="col-xs-12">
-                        <label for="agreement-expiration" class="control-label small">Gyldig til</label>
-                        <input type="text" class="form-control" id="agreement-expiration"
-                               data-kendo-date-picker
-                               data-k-options="datepickerOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="contract.expirationDate"
-                               data-ng-blur="checkContractValidity()"
-                               data-autosave="{{ autosaveUrl2 }}"
-                               data-field="expirationDate">
-                    </div>
-
-
-                </div>
-
-                <!-- Intern contract is Active regardless of concluded and expirationdate -->
-                <div class="checkbox" style="position: absolute; left: 0;">
-                    <input type="checkbox" id="contractIsActive"
-                           class="tags-checkbox sr-only"
-                           data-ng-model="contract.active"
-                           data-ng-disabled="!hasWriteAccess"
-                           data-autosave="{{ autoSaveUrl }}"
-                           data-field="active"
-                           data-ng-change="checkContractValidity()" />
-                    <label for="contractIsActive">
-                        <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
-                        <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
-                        <span class='label-content'>Gyldig: </span>
-                    </label>
-                    <i ng-show="contract.isActive" class="fa fa-check" aria-hidden="true"></i>
                 </div>
             </div>
         </div>

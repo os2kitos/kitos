@@ -23,6 +23,7 @@ namespace Core.ApplicationServices
         CanModifySystems,
         CanModifyProjects,
         CanModifyReports,
+        CanSetContractElementsAccessModifierToPublic
     }
 
     public class FeatureChecker : IFeatureChecker
@@ -68,6 +69,7 @@ namespace Core.ApplicationServices
                 {Feature.CanModifyProjects, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ProjectModuleAdmin } },
                 {Feature.CanModifySystems, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.SystemModuleAdmin} },
                 {Feature.CanModifyReports, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin} },
+                {Feature.CanSetContractElementsAccessModifierToPublic, new List<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin} }
             };
         }
 
