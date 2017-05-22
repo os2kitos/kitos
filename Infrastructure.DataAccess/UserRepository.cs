@@ -20,9 +20,9 @@ namespace Infrastructure.DataAccess
             return _context.Users.SingleOrDefault(u => u.Email == email);
         }
 
-        public User GetByUuid(Guid uuid)
+        public User GetByUuid(string uniqueId)
         {
-            return _context.Users.SingleOrDefault(u => u.Uuid == uuid);
+            return _context.Users.SingleOrDefault(u => u.UniqueId == uniqueId);
         }
     }
 }

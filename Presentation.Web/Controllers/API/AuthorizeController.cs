@@ -80,17 +80,16 @@ namespace Presentation.Web.Controllers.API
                 
                 var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
                 var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-                Guid uuid = Guid.Empty;
-                if (uuidClaim != null && Guid.TryParse(uuidClaim.Value, out uuid))
+                if (uuidClaim != null && !String.IsNullOrEmpty(uuidClaim.Value))
                 {
-                    user = _userRepository.GetByUuid(uuid);
+                    user = _userRepository.GetByUuid(uuidClaim.Value);
                 }
                 if (user == null && emailClaim != null)
                 {
                     user = _userRepository.GetByEmail(emailClaim.Value);
-                    if (user != null && uuid != Guid.Empty)
+                    if (user != null && !String.IsNullOrEmpty(uuidClaim.Value))
                     {
-                        user.Uuid = uuid;
+                        user.UniqueId = uuidClaim.Value;
                         _userRepository.Update(user);
                         _userRepository.Save();
                     }

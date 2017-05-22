@@ -148,8 +148,7 @@ namespace Presentation.Web.Controllers.API
                     if (header != null)
                     {
                         var xauth = header.First();
-                        var uuid = new Guid(xauth);
-                        return UserRepository.Get(u => u.Uuid == uuid).First();
+                        return UserRepository.Get(u => u.UniqueId == xauth).First();
                     }
 
                     var id = Convert.ToInt32(User.Identity.Name);
