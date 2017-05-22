@@ -368,6 +368,10 @@
     <Compile Include="Migrations\201705010745599_Changed UUID.Designer.cs">
       <DependentUpon>201705010745599_Changed UUID.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.cs" />
+    <Compile Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.Designer.cs">
+      <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -548,6 +552,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705010745599_Changed UUID.resx">
       <DependentUpon>201705010745599_Changed UUID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.resx">
+      <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
