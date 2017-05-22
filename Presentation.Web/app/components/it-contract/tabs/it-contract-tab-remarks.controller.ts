@@ -1,22 +1,22 @@
 ﻿(function (ng, app) {
 
     app.config(["$stateProvider", function ($stateProvider) {
-        $stateProvider.state("it-contract.edit.remarks", {
-            url: "/remarks",
-            templateUrl: "app/components/it-contract/tabs/it-contract-tab-remarks.view.html",
-            controller: "contract.RemarksCtrl",
-            resolve: {
-                getRemark: ["$http", "contract", function ($http, contract) {
-                    return $http.get(`odata/ItContracts(${contract.id})/Remark`).then(function (result) {
-                        return result.data;
-                    }, function (error) {
-                        //Contracts can have 0 or 1 remark and if there is no remark a 404 error is returned
-                        return error;
-                    });
-                }]
-            }
-        });
-    }
+            $stateProvider.state("it-contract.edit.remarks", {
+                url: "/remarks",
+                templateUrl: "app/components/it-contract/tabs/it-contract-tab-remarks.view.html",
+                controller: "contract.RemarksCtrl",
+                resolve: {
+                    getRemark: ["$http", "contract", function ($http, contract) {
+                        return $http.get(`odata/ItContracts(${contract.id})/Remark`).then(function (result) {
+                            return result.data;
+                        }, function (error) {
+                            //Contracts can have 0 or 1 remark and if there is no remark a 404 error is returned
+                            return error;
+                        });
+                    }]
+                }
+            });
+        }
     ]);
 
     app.controller("contract.RemarksCtrl", ["$scope", "$http", "$stateParams", "notify", "contract", "user", "getRemark",
@@ -24,7 +24,7 @@
 
             $scope.itContractRemark = getRemark;
             // in order to have write access the user and the contract must belong to the same organization and the user must either own the object or have a valid role in the organization
-            $scope.hasWriteAccess = user.currentOrganizationId === contract.organizationId && (user.id === $scope.itContractRemark.ObjectOwnerId || user.isGlobalAdmin || user.isLocalAdmin || user.isContractAdmin);
+            $scope.hasWriteAccess = user.currentOrganizationId === contract.organizationId && (user.id === contract.objectOwnerId || user.isGlobalAdmin || user.isLocalAdmin || user.isContractAdmin);
             $scope.visibility = "Local";
             $scope.remark = "";
 
@@ -37,7 +37,7 @@
 
             $scope.saveRemark = function () {
                 if ($scope.hasWriteAccess) {
-                    //If the is no remark (404) we POST otherwise PATCH
+                    //If the contract has no remark (404) we POST otherwise PATCH
                     if ($scope.itContractRemark.status === 404) {
                         postRemark();
                     } else {
