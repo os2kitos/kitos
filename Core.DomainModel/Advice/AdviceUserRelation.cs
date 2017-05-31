@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.Advice
 {
@@ -13,7 +11,7 @@ namespace Core.DomainModel.Advice
         RECIEVER
     }
 
-    public class AdviceUserRelation : Entity
+    public class AdviceUserRelation : Entity, IProjectModule, ISystemModule, IContractModule
     {
         /*public int? RoleId { get; set; }
         public int? UserId { get; set; }
@@ -24,6 +22,6 @@ namespace Core.DomainModel.Advice
         public RecieverType RecpientType { get; set; }
         public int? AdviceId { get; set; }
         public virtual Advice Advice { get; set; }
-    
+
     }
 }

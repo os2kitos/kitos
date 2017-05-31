@@ -3,7 +3,7 @@
     /// <summary>
     /// Associates a <see cref="User"/> with an it contract (<see cref="Object"/>) in a specific <see cref="Role"/>.
     /// </summary>
-    public class ItContractRight : Entity, IRight<ItContract, ItContractRight, ItContractRole>
+    public class ItContractRight : Entity, IRight<ItContract, ItContractRight, ItContractRole>, IContractModule
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

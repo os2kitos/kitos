@@ -136,6 +136,7 @@ namespace Infrastructure.DataAccess
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
         public DbSet<AdviceSent> AdviceSent { get; set; }
+        public DbSet<ItContractRemark> ItContractNoteses { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -218,6 +219,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
+            modelBuilder.Configurations.Add(new ItContractRemarkMap());
         }
     }
 }

@@ -149,8 +149,16 @@ namespace Core.ApplicationServices
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
             if (accessModifier == AccessModifier.Public)
             {
+                // Special case for setting accessModifier for EconomyStream and ItContractRemark
+                if (entity is EconomyStream || entity is ItContractRemark)
+                {
+                    if (!(CanExecute(userId, Feature.CanSetContractElementsAccessModifierToPublic) || userId == entity.ObjectOwnerId))
+                    {
+                        return false;
+                    }
+                }
                 // special case for organisation
-                if (entity is Organization)
+                else if (entity is Organization)
                 {
                     if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {

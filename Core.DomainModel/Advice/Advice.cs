@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.Advice
 {
@@ -23,7 +26,7 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity
+    public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
     {
         public Advice() {
             AdviceSent = new List<AdviceSent.AdviceSent>();
@@ -36,7 +39,7 @@ namespace Core.DomainModel.Advice
         public ObjectType? Type { get; set; }
 
         public Scheduling? Scheduling { get; set; }
-       
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance is active.
         /// </summary>
@@ -58,7 +61,7 @@ namespace Core.DomainModel.Advice
         /// </summary>
         /// <remarks>
         /// Once the alarm expires an email should be sent to all users assigned to
-        /// the <see cref="ItContract"/> with the role defined in <see cref="Receiver"/>
+        /// the <see cref="Core.DomainModel.ItContract"/> with the role defined in <see cref="Receiver"/>
         /// and <see cref="CarbonCopyReceiver"/>.
         /// </remarks>
         /// <value>
@@ -82,7 +85,7 @@ namespace Core.DomainModel.Advice
         /// The sent date.
         /// </value>
         public DateTime? SentDate { get; set; }
-       
+
         /// <summary>
         /// Gets or sets the receiver contract role identifier.
         /// </summary>
@@ -131,7 +134,7 @@ namespace Core.DomainModel.Advice
         /// The email body.
         /// </value>
         public string Body { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the subject of the email.
         /// </summary>
@@ -159,6 +162,6 @@ namespace Core.DomainModel.Advice
                 */
             return base.HasUserWriteAccess(user);
         }
-        
+
     }
 }

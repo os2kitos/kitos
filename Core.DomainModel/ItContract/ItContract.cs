@@ -570,5 +570,7 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
         #endregion
+
+        public virtual ItContractRemark Remark { get; set; }
     }
 }

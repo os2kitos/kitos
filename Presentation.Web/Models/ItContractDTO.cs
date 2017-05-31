@@ -9,7 +9,7 @@ namespace Presentation.Web.Models
         public int Id { get; set; }
         public int OrganizationId { get; set; }
         public string Name { get; set; }
-        public string Note { get; set; }
+        public string Remark { get; set; }
         public string ItContractId { get; set; }
         public string Esdh { get; set; }
         public string Folder { get; set; }
@@ -65,9 +65,6 @@ namespace Presentation.Web.Models
         public IEnumerable<ItInterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
         public IEnumerable<ItInterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
 
-        public IEnumerable<EconomyStreamDTO> InternEconomyStreams { get; set; }
-        public IEnumerable<EconomyStreamDTO> ExternEconomyStreams { get; set; }
-
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
@@ -78,6 +75,7 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
+        public int? ObjectOwnerId { get; set; }
 
         public string Running { get; set; }
         public string ByEnding { get; set; }
