@@ -27,15 +27,22 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ExternEconomyStreams(Organization={orgKey})")]
         public IHttpActionResult GetByOrganization(int orgKey)
         {
-            if (!HasAccessWithinOrganization(orgKey))
-                return Unauthorized();
-
             var result =
                 _repository.AsQueryable()
                     .Where(
                         m =>
                             m.ExternPaymentFor.OrganizationId == orgKey &&
                             m.InternPaymentFor == null);
+
+            var economyStream = result.FirstOrDefault();
+
+            if (economyStream == null) return NotFound();
+
+            var contractId = economyStream.ExternPaymentFor.Id;
+
+            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
+                return Unauthorized();
+
             return Ok(result);
         }
 
@@ -44,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams")]
         public IHttpActionResult GetAllExtern(int orgKey, int contractKey)
         {
-            if (!HasAccessWithinOrganization(orgKey))
+            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
                 return Unauthorized();
 
             var result =
@@ -61,7 +68,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams")]
         public IHttpActionResult GetAllIntern(int orgKey, int contractKey)
         {
-            if (!HasAccessWithinOrganization(orgKey))
+            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
                 return Unauthorized();
 
             var result =
@@ -78,7 +85,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams({key})")]
         public IHttpActionResult GetSingleExtern(int orgKey, int contractKey, int key)
         {
-            if (!HasAccessWithinOrganization(orgKey))
+            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
                 return Unauthorized();
 
             var result =
@@ -96,7 +103,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams({key})")]
         public IHttpActionResult GetSingleIntern(int orgKey, int contractKey, int key)
         {
-            if (!HasAccessWithinOrganization(orgKey))
+            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
                 return Unauthorized();
 
             var result =
@@ -114,6 +121,20 @@ namespace Presentation.Web.Controllers.OData
             var user = _userRepository.Get(u => u.Id == id).FirstOrDefault();
             var hasRightsOnOrganization = user != null && user.OrganizationRights.Any(x => x.OrganizationId == orgKey);
             return hasRightsOnOrganization;
+        }
+
+        private bool EconomyStreamIsPublic(int contractKey)
+        {
+            if (contractKey == 0)
+            {
+                // contractKey is zero by default if GetByOrganization does not find any EconomyStreams
+                return false;
+            }
+
+            var economyStream = _repository.AsQueryable()
+                .FirstOrDefault(e => e.ExternPaymentForId == contractKey);
+
+            return economyStream != null && economyStream.AccessModifier == AccessModifier.Public;
         }
     }
 }
