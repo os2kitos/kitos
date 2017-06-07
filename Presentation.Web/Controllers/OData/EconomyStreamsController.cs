@@ -132,7 +132,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             var economyStream = _repository.AsQueryable()
-                .FirstOrDefault(e => e.ExternPaymentForId == contractKey);
+                .FirstOrDefault(e => e.ExternPaymentForId == contractKey || e.InternPaymentForId == contractKey);
 
             return economyStream != null && economyStream.AccessModifier == AccessModifier.Public;
         }

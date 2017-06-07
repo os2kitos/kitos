@@ -339,6 +339,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
+    <Compile Include="Controllers\API\SSOConfigController.cs" />
     <Compile Include="Controllers\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\OData\AdviceController.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
