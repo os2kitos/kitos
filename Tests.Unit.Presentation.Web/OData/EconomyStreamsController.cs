@@ -67,6 +67,47 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
+        public void GetByOrganizationWithPublic_Access_ReturnOk()
+        {
+            // Arrange
+            const int orgKey = 1;
+            const int contractKey = 1;
+            SetAccess(false, orgKey);
+            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Public, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
+            _economyStreamRepository.AsQueryable()
+                .Returns(list);
+
+            // Act
+            var result = _economyStreamsController.GetByOrganization(orgKey);
+
+            // Assert
+            Assert.IsType<OkNegotiatedContentResult<IQueryable<EconomyStream>>>(result);
+            var okNegotiatedContentResult = result as OkNegotiatedContentResult<IQueryable<EconomyStream>>;
+            if (okNegotiatedContentResult == null) return;
+
+            var data = okNegotiatedContentResult.Content;
+            Assert.Equal(list, data);
+        }
+
+        [Fact]
+        public void GetByOrganizationWithLocal_NoAccess_ReturnUnauthorized()
+        {
+            // Arrange
+            const int orgKey = 1;
+            const int contractKey = 1;
+            SetAccess(false, orgKey);
+            IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Local, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
+            _economyStreamRepository.AsQueryable()
+                .Returns(list);
+
+            // Act
+            var result = _economyStreamsController.GetByOrganization(orgKey);
+
+            // Assert
+            Assert.IsType<UnauthorizedResult>(result);
+        }
+
+        [Fact]
         public void GetAllExtern_NoAccess_ReturnUnauthorized()
         {
             // Arrange

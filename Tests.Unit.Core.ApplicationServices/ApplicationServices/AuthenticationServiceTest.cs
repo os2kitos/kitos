@@ -39,7 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _itContractRepository = Substitute.For<IGenericRepository<ItContract>>();
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
-            _featureChecker = Substitute.For<IFeatureChecker>();
+            _featureChecker = new FeatureChecker();
             _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);

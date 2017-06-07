@@ -36,11 +36,14 @@ namespace Presentation.Web.Controllers.OData
 
             var economyStream = result.FirstOrDefault();
 
-            if (economyStream == null) return NotFound();
+            if (economyStream != null)
+            {
+                var contractId = economyStream.ExternPaymentFor.Id;
 
-            var contractId = economyStream.ExternPaymentFor.Id;
-
-            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
+                if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
+                    return Unauthorized();
+            }
+            else if (!HasAccessWithinOrganization(orgKey))
                 return Unauthorized();
 
             return Ok(result);
@@ -132,7 +135,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             var economyStream = _repository.AsQueryable()
-                .FirstOrDefault(e => e.ExternPaymentForId == contractKey || e.InternPaymentForId == contractKey);
+                .FirstOrDefault(e => e.ExternPaymentFor.Id == contractKey || e.InternPaymentFor.Id == contractKey);
 
             return economyStream != null && economyStream.AccessModifier == AccessModifier.Public;
         }
