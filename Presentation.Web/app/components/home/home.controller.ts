@@ -62,11 +62,7 @@
 
                 if ($scope.loginForm.$invalid) return;
 
-                userService.login($scope.email, $scope.password, $scope.remember).then(user => $scope.loginResult(user));
-            };
-
-            $scope.loginResult = (user) => 
-                {
+                userService.login($scope.email, $scope.password, $scope.remember).then(user => {
                     notify.addSuccessMessage("Du er nu logget ind!");
                     if (user.isAuth === true) {
                         if (navigationService.checkState(user.defaultUserStartPreference)) {
@@ -83,7 +79,8 @@
                     }
                     else
                         notify.addErrorMessage("Forkert brugernavn eller password!");
-                };
+                });
+            };
 
             $scope.save = (text) => {
                 var msg = notify.addInfoMessage("Gemmer...", false);

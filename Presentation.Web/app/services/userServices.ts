@@ -241,7 +241,12 @@
                     "password": password,
                     "rememberMe": rememberMe
                 };
-                deferred.resolve(this.loadUser(data));
+
+                this.loadUser(data).then((resp) => {
+                    deferred.resolve(resp)
+                }, (resp) => {
+                    deferred.reject(resp)
+                });
             }
 
             return deferred.promise;
