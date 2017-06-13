@@ -225,14 +225,14 @@ namespace Core.ApplicationServices
 
         public int GetCurrentOrganizationId(int userId)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
             return loggedIntoOrganizationId;
         }
 
         public bool CanExecute(int userId, Feature feature)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
+            var user = _userRepository.GetByKey(userId);
             return _featureChecker.CanExecute(user, feature);
         }
 

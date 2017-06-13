@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
-            var currentOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
+            var currentOrgId = KitosUser.DefaultOrganizationId;
 
             if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id))
             {
@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
-            var currentOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
+            var currentOrgId = KitosUser.DefaultOrganizationId;
 
             if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id))
             {

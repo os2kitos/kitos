@@ -188,12 +188,5 @@ namespace Core.ApplicationServices
         {
             return password.Length >= 6;
         }
-
-        public int GetCurrentOrganizationId(int userId)
-        {
-            var user = _userRepository.AsQueryable().SingleOrDefault(x => x.Id == userId);
-
-            return user?.DefaultOrganizationId ?? 0;
-        }
     }
 }

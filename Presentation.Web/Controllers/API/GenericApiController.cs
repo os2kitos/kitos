@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API
                     {
                         if (hasOrg)
                         {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id));
+                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                         }
                         else
                         {
@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API
                 }
                 else
                 {
-                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthenticationService.GetCurrentOrganizationId(KitosUser.Id));
+                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                 }
 
                 var query = Page(result.AsQueryable(), paging);
