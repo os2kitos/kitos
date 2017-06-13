@@ -86,7 +86,7 @@
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
                                 // set if the user can edit
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin) {
+                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isOrgAdmin) {
                                     usr.canEdit = true;
                                 } else if (this.user.id === usr.Id) {
                                     usr.canEdit = true;
@@ -261,15 +261,17 @@
                         sortable: false
                     },
                     {
-                        command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: `k-custom-delete`, iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                        ],
-                        title: " ", width: 176,
+                        template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
+                        title: " ",
+                        width: 176,
                         persistId: "command"
                     }
                 ]
             };
+        }
+
+        public onEdit(entityId) {
+            this.$state.go("organization.user.edit", { id: entityId });
         }
 
         private roleTemplate = (dataItem: IGridModel) => {
@@ -295,21 +297,9 @@
             return filterUrl.replace(pattern, `$1concat(concat(Name, ' '), LastName)$2`);
         }
 
-        private onEdit = (e: JQueryEventObject) => {
-            e.preventDefault();
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var entityId = dataItem["Id"];
-            this.$state.go("organization.user.edit", { id: entityId });
-        }
-
-        private onDelete = (e: JQueryEventObject) => {
+        public onDelete(entityId) {
             if (this.hasWriteAccess == true) {
-                e.preventDefault();
-                var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-                var entityId = dataItem["Id"];
                 this.$state.go("organization.user.delete", { id: entityId });
-                //this.mainGrid.dataSource.remove(dataItem);
-                //this.mainGrid.dataSource.sync();
             } else {
                 this.notify.addErrorMessage("Brugeren har ikke rettigheder til at ændre i organisationen");
             }
