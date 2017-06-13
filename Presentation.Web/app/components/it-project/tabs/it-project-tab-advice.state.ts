@@ -20,9 +20,9 @@
                 object: ['project', function (project) {
                     return project;
                 }],
-                users: ['UserGetService', function (UserGetService) {
-                    return UserGetService.GetAllUsers();
-                }],
+                //users: ['UserGetService', function (UserGetService) {
+                //    return UserGetService.GetAllUsers();
+                //}],
                 type: [function () {
                     return "itProject";
                 }],
