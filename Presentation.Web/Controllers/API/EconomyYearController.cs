@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API
         {
             CheckHasWriteAccess();
 
-            return base.PatchQuery(item, null);
+            return base.PatchQuery(item, obj);
         }
 
         private void CheckHasWriteAccess()
