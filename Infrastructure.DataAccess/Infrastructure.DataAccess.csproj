@@ -372,6 +372,10 @@
     <Compile Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.Designer.cs">
       <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.cs" />
+    <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.Designer.cs">
+      <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -555,6 +559,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.resx">
       <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708171252435_Added PreviousName to ItSystem.resx">
+      <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

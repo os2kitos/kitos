@@ -30,6 +30,16 @@
                                    data-ng-model="system.name">
                         </div>
 
+                        <!--PreviousName-->
+                        <div class="form-group">
+                            <label for="system-previousname" class="control-label small">Tidligere navn</label>
+                            <input type="text" id="system-previousname" class="form-control input-sm"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="previousname"
+                                   data-ng-model="system.previousName">
+                        </div>
+
                         <!--Parent system-->
                         <div class="form-group">
                             <label for="system-parent" class="control-label small">Overordnet system</label>

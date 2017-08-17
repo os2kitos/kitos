@@ -39,6 +39,7 @@ namespace Presentation.Web.Models
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string Name { get; set; }
+        public string PreviousName { get; set; }
         public string ItSystemId { get; set; }
         public int ObjectOwnerId { get; set; }
         public string ObjectOwnerName { get; set; }

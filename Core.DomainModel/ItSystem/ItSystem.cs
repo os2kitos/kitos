@@ -33,6 +33,8 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public string ItSystemId { get; set; }
 
+        public string PreviousName { get; set; }
+
         public int? AppTypeOptionId { get; set; }
         public virtual ItSystemType AppTypeOption { get; set; }
 
