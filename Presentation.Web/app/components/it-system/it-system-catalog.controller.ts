@@ -238,6 +238,18 @@
                         }
                     },
                     {
+                        field: "PreviousName", title: "Tidligere Systemnavn", width: 285,
+                        persistId: "previousname", // DON'T YOU DARE RENAME!
+                        template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
