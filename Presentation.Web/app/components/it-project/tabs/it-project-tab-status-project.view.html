@@ -8,9 +8,30 @@
                     <select id="statusMethod" data-ng-change="projectStatusVm.onSelectStatusMethod(projectStatusVm.showCombinedChart.val)" data-ng-model="projectStatusVm.showCombinedChart" data-ng-options="opt as opt.label for opt in projectStatusVm.methodOptions" class="form-control input-sm" data-ng-disabled="!projectEditVm.hasWriteAccess"></select>
                 </div>
                 <div class="form-group" data-ng-if="projectStatusVm.currentStatusUpdate">
-                    <label class="control-label small">Dato for sidste status</label>
-                    <p class="small" data-ng-bind="projectStatusVm.moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
-                </div>
+                    <table>
+                        <thead>
+                        <tr class="small">
+                            <th>
+                                <p style="font-weight:normal">Dato for sidste status</p>
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- Dato for status -->
+                                <td>
+                                    <p data-ng-bind="projectStatusVm.moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
+                                </td>
+                                <!-- Rediger dato -->
+                                <td>
+                                    <button id="dateEdit" class="glyphicon glyphicon-edit fa-lg" data-ui-sref="it-project.edit.status-project.status-edit-modal" data-ng-hide="!projectEditVm.hasWriteAccess"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+               </div>
                 <div class="form-group">
                     <button class="btn btn-primary btn-block" data-ng-disabled="!projectEditVm.hasWriteAccess" ui-sref="it-project.edit.status-project.status-update-modal">Opret ny status</button>
                     <button class="btn btn-primary btn-block" data-ng-if="projectStatusVm.currentStatusUpdate" ui-sref="it-project.edit.status-project.status-history-modal">Historik</button>
