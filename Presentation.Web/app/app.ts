@@ -36,7 +36,7 @@ app.config(["$authProvider", $authProvider => {
     $authProvider.configure({
         redirectUri: location.origin + "/#/?",
         scope: "openid email",
-        basePath: "https://os2sso-test.miracle.dk",
+        basePath: location.origin.indexOf("test") > 0 ? "https://os2sso-test.miracle.dk" : "https://os2sso.miracle.dk",
         clientId: "kitos_client"
     });
 }]);
