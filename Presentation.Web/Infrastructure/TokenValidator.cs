@@ -11,11 +11,13 @@ using System.Web;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace Presentation.Web.Infrastructure
 {
     public class TokenValidator
     {
+        public ILogger Logger = Log.Logger;
         public ClaimsPrincipal Validate(string idToken)
         {
             try
@@ -23,7 +25,7 @@ namespace Presentation.Web.Infrastructure
                 var ssoConfig = GetKeyFromConfig();
                 if (ssoConfig == null)
                 {
-                    //TODO log 
+                    Logger.Error("TokenValidator: Could not load SSOConfig");
                     return null;
                 }
                 var tokenhandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
@@ -38,7 +40,7 @@ namespace Presentation.Web.Infrastructure
             }
             catch (Exception e)
             {
-                //TODO log exception
+                Logger.Error(e, "TokenValidator: Error validating token");
                 return null;
             }
         }
@@ -64,9 +66,9 @@ namespace Presentation.Web.Infrastructure
                     result.SigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(cert)));
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //TODO log exception
+                Logger.Error(e, "TokenValidator: Exception while getting Signingkey from " + configUrl);
                 return null;
             }
             return result;
