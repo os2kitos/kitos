@@ -11,6 +11,7 @@
         /** Gets or sets the sub (child) it systems. */
         Children: Array<IItSystem>;
         ParentId: number;
+        Disabled: boolean;
         /** Gets or sets the parent (master) it system. */
         Parent: IItSystem;
         BusinessTypeId: number;
@@ -20,5 +21,7 @@
         TaskRefs: Array<ITaskRef>;
         /** Gets or sets the usages. */
         Usages: Array<ItSystemUsage.IItSystemUsage>;
+        Reference: any;
+        PreviousName: string;
     }
 }

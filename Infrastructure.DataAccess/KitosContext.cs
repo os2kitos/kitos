@@ -7,6 +7,10 @@ using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
 using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
+using Core.DomainModel.LocalOptions;
+using Core.DomainModel.AdviceSent;
 
 namespace Infrastructure.DataAccess
 {
@@ -20,17 +24,21 @@ namespace Infrastructure.DataAccess
         public KitosContext()
             : base("Name=KitosContext")
         {
-            Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            //Disabled by MEMA 23/11-2016 to speed up debug sessions
+            //Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
+            Database.Log = null;
         }
 
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
-        public DbSet<OrganizationRole> OrganizationRoles { get; set; }
-        public DbSet<Advice> Advices { get; set; }
+        public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
+        public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
+        public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
+        public DbSet<GlobalConfig> GlobalConfigs { get; set; }
         public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
         public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
@@ -46,7 +54,8 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
+        // Udkommenteret ifm. OS2KITOS-663
+        //public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
         public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
@@ -57,6 +66,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
         public DbSet<ItProjectStatus> ItProjectStatuses { get; set; }
+        public DbSet<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
         public DbSet<ItProjectRight> ItProjectRights { get; set; }
         public DbSet<ItProjectRole> ItProjectRoles { get; set; }
         public DbSet<ItProjectOrgUnitUsage> ItProjectOrgUnitUsages { get; set; }
@@ -69,6 +79,7 @@ namespace Infrastructure.DataAccess
         public DbSet<MethodType> MethodTypes { get; set; }
         public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrganizationType> OrganizationTypes { get; set; }
         public DbSet<OrganizationUnit> OrganizationUnits { get; set; }
         public DbSet<OrganizationUnitRight> OrganizationUnitRights { get; set; }
         public DbSet<OrganizationUnitRole> OrganizationUnitRoles { get; set; }
@@ -80,16 +91,52 @@ namespace Infrastructure.DataAccess
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
         public DbSet<ItProjectType> ItProjectTypes { get; set; }
         public DbSet<PurchaseFormType> PurchaseFormTypes { get; set; }
+        public DbSet<Report> Reports { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
+        public DbSet<AccessType> AccessTypes { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
+
+        public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
+        public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
+        public DbSet<LocalArchiveLocation> LocalArchiveLocation { get; set; }
+        public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
+        public DbSet<LocalDataType> LocalDataTypes { get; set; }
+        public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }
+        public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
+        public DbSet<LocalHandoverTrialType> LocalHandoverTrialTypes { get; set; }
+        public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
+        public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
+        public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
+        public DbSet<LocalItContractType> LocalItContractTypes { get; set; }
+        public DbSet<LocalItInterfaceType> LocalItInterfaceTypes { get; set; }
+        public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
+        public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
+        public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
+        public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
+        public DbSet<LocalMethodType> LocalMethodTypes { get; set; }
+        public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
+        public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
+        public DbSet<LocalPaymentModelType> LocalPaymentModelTypes { get; set; }
+        public DbSet<LocalPriceRegulationType> LocalPriceRegulationTypes { get; set; }
+        public DbSet<LocalProcurementStrategyType> LocalProcurementStrategyTypes { get; set; }
+        public DbSet<LocalPurchaseFormType> LocalPurchaseFormTypes { get; set; }
+        public DbSet<LocalReportCategoryType> LocalReportCategoryTypes { get; set; }
+        public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
+        public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
+        public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
+        public DbSet<ExternalReference> ExternalReferences { get; set; }
+        public DbSet<HelpText> HelpTexts { get; set; }
+        public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
+        public DbSet<AdviceSent> AdviceSent { get; set; }
+        public DbSet<ItContractRemark> ItContractNoteses { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -103,8 +150,6 @@ namespace Infrastructure.DataAccess
 
             modelBuilder.ComplexType<ItProjectPhase>();
 
-            modelBuilder.Configurations.Add(new OrganizationRightMap());
-            modelBuilder.Configurations.Add(new OrganizationRoleMap());
             modelBuilder.Configurations.Add(new AdviceMap());
             modelBuilder.Configurations.Add(new AgreementElementTypeMap());
             modelBuilder.Configurations.Add(new ArchiveTypeMap());
@@ -128,7 +173,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
-            modelBuilder.Configurations.Add(new ItInterfaceUseMap());
+            // Udkommenteret ifm. OS2KITOS-663
+            //modelBuilder.Configurations.Add(new ItInterfaceUseMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
@@ -149,6 +195,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemTypeMap());
             modelBuilder.Configurations.Add(new MethodTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
+            modelBuilder.Configurations.Add(new OrganizationRightMap());
+            modelBuilder.Configurations.Add(new OrganizationTypeMap());
             modelBuilder.Configurations.Add(new OrganizationUnitMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRightMap());
             modelBuilder.Configurations.Add(new OrganizationUnitRoleMap());
@@ -156,6 +204,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormTypeMap());
+            modelBuilder.Configurations.Add(new ReportMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());
@@ -170,6 +219,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
+            modelBuilder.Configurations.Add(new ItContractRemarkMap());
         }
     }
 }

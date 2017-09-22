@@ -47,7 +47,8 @@
             "systemRoles",
             "user",
             "gridStateService",
-            "orgUnits"
+            "orgUnits",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -64,7 +65,8 @@
             private systemRoles: Array<any>,
             private user,
             private gridStateService: Services.IGridStateFactory,
-            private orgUnits: Array<any>) {
+            private orgUnits: Array<any>,
+            private needsWidthFixService) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -164,7 +166,10 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
-
+        public isValidUrl(Url) {
+            var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return regexp.test(Url.toLowerCase());
+        };
         private activate() {
             // overview grid options
             var mainGridOptions: IKendoGridOptions<IItSystemUsageOverview> = {
@@ -174,7 +179,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -335,8 +340,22 @@
                     {
                         field: "ItSystem.Name", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.usage.interfaces({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.ItSystem && dataItem.ItSystem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.ItSystem.Disabled)
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Inaktiv) </a>`;
+                            else
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
+                                if (dataItem.ItSystem.Disabled)
+                                    return dataItem.ItSystem.Name + " (Inaktiv)";
+                                else
+                                    return dataItem.ItSystem.Name;
+                            } else {
+                                return ""
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -411,7 +430,7 @@
                     {
                         field: "ItSystem.TaskRefs.TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.pluck(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
+                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -426,7 +445,7 @@
                     {
                         field: "ItSystem.TaskRefs.Description", title: "KLE navn", width: 150,
                         persistId: "klename", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.pluck(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
+                        template: dataItem => dataItem.ItSystem.TaskRefs.length > 0 ? this._.map(dataItem.ItSystem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
@@ -438,12 +457,20 @@
                         sortable: false
                     },
                     {
-                        field: "EsdhRef", title: "ESDH ref", width: 150,
-                        persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.EsdhRef ? `<a target="_blank" href="${dataItem.EsdhRef}"><i class="fa fa-link"></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.EsdhRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
+                        field: "Reference.Title", title: "Reference", width: 150,
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.URL) {
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -453,6 +480,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
@@ -468,6 +496,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "CmdbRef", title: "CMDB ref", width: 150,
                         persistId: "cmdb", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
@@ -633,7 +662,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -714,6 +743,9 @@
         }
 
         private isContractActive(dataItem) {
+            console.log(dataItem);
+
+            if (!dataItem.Active) {
             var today = this.moment();
             var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
             var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
@@ -726,9 +758,11 @@
                 // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
                 return today >= startDate && today <= terminationDate;
             }
-
+        
             // indgået-dato <= dags dato <= udløbs-dato
             return today >= startDate && today <= endDate;
+            }
+            return dataItem.Active;
         }
 
         //// show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
@@ -951,6 +985,7 @@
                     var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
                     this.mainGrid.showColumn(gridFieldName);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };
@@ -1004,6 +1039,7 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
         }
     }
@@ -1019,7 +1055,7 @@
                     controllerAs: "systemOverviewVm",
                     resolve: {
                         systemRoles: [
-                            "$http", $http => $http.get("odata/ItSystemRoles").then(result => result.data.value)
+                            "$http", $http => $http.get("odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()

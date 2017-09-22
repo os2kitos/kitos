@@ -63,7 +63,7 @@ class ItProjectEditTabRisk implements IPageObject {
     responsibleSelect = new Select2Wrapper("#s2id_responsible");
 
     // save new risk
-    saveRiskElement = element(by.css("#save-risk"));
+    saveRiskElement = element(by.id('save-risk'));
 
     // average risk product
     averageProductValue() {

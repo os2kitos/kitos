@@ -38,13 +38,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
 
-            this.HasMany(t => t.CanUseInterfaces)
-                .WithRequired(t => t.ItSystem)
-                .HasForeignKey(d => d.ItSystemId);
-
             this.HasMany(t => t.ItInterfaceExhibits)
                 .WithRequired(t => t.ItSystem)
                 .HasForeignKey(d => d.ItSystemId);
+
+            HasOptional(t => t.Reference);
+            HasMany(t => t.ExternalReferences)
+                .WithOptional(d => d.ItSystem)
+                .HasForeignKey(d => d.ItSystem_Id)
+                //No cascading delete in order to avoid causing cycles or multiple cascade paths
+                .WillCascadeOnDelete(false);
         }
     }
 }

@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystem
 {
+    using System;
+
     /// <summary>
     /// Represents an it system.
     /// </summary>
@@ -10,11 +13,13 @@ namespace Core.DomainModel.ItSystem
         public ItSystem()
         {
             this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
-            this.CanUseInterfaces = new List<ItInterfaceUse>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
+            this.AccessTypes = new List<AccessType>();
             this.Wishes = new List<Wish>();
             this.Usages = new List<ItSystemUsage.ItSystemUsage>();
+            ExternalReferences = new List<ExternalReference>();
+
         }
 
         /// <summary>
@@ -28,6 +33,8 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public string ItSystemId { get; set; }
 
+        public string PreviousName { get; set; }
+
         public int? AppTypeOptionId { get; set; }
         public virtual ItSystemType AppTypeOption { get; set; }
 
@@ -38,14 +45,6 @@ namespace Core.DomainModel.ItSystem
         /// Exhibited interfaces.
         /// </value>
         public virtual ICollection<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
-
-        /// <summary>
-        /// Gets or sets interfaces that can use this instance.
-        /// </summary>
-        /// <value>
-        /// Usable interfaces.
-        /// </value>
-        public virtual ICollection<ItInterfaceUse> CanUseInterfaces { get; set; }
 
         /// <summary>
         /// Gets or sets the sub (child) it systems.
@@ -77,6 +76,10 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
+        public virtual ICollection<AccessType> AccessTypes { get; set; }
+
+        public bool Disabled { get; set; }
+
         /// <summary>
         /// Gets or sets the usages.
         /// </summary>
@@ -84,5 +87,12 @@ namespace Core.DomainModel.ItSystem
         /// The usages.
         /// </value>
         public virtual ICollection<ItSystemUsage.ItSystemUsage> Usages { get; set; }
+
+        /// <summary>
+        /// External references
+        /// </summary>
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public virtual ExternalReference Reference { get; set; }
     }
 }

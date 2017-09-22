@@ -6,15 +6,21 @@
             controller: 'contract.EditRolesCtrl',
             resolve: {
                 itContractRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itcontractrights/" + $stateParams.id)
+                    return $http.get("api/itcontractright/" + $stateParams.id)
                         .then(function (result) {
                             return result.data.response;
                         });
                 }],
                 itContractRoles: ['$http', function ($http) {
-                    return $http.get("api/itcontractrole/?nonsuggestions=")
+                    return $http.get("odata/ItContractRoles")
                         .then(function (result) {
-                            return result.data.response;
+                            return result.data.value;
+                        });
+                }],
+                localItContractRoles: ['$http', function ($http) {
+                    return $http.get("odata/LocalItContractRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                        .then(function (result) {
+                            return result.data.value;
                         });
                 }],
                 user: ['userService', function(userService) {
@@ -26,20 +32,26 @@
         });
     }]);
 
-    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'user',
-        function ($scope, $http, notify, contract, itContractRights, itContractRoles, user) {
+    app.controller('contract.EditRolesCtrl', ['$scope', '$http', 'notify', 'contract', 'itContractRights', 'itContractRoles', 'localItContractRoles', 'user',
+        function ($scope, $http, notify, contract, itContractRights, itContractRoles, localItContractRoles, user) {
             var contractId = contract.id;
             $scope.orgId = user.currentOrganizationId;
+            $scope.contract = contract;
 
             //normal user roles
-            $scope.activeItContractRoles = _.where(itContractRoles, { isActive: true });
-            $scope.itContractRoles = itContractRoles;
+            $scope.activeItContractRoles = localItContractRoles;
             $scope.newRole = itContractRoles.length > 0 ? 1 : 0;
 
             $scope.rights = [];
             _.each(itContractRights, function (right: { role; roleId; show; userForSelect; roleForSelect; user; }) {
-                right.role = _.findWhere(itContractRoles, { id: right.roleId });
+                right.role = _.find(itContractRoles, { Id: right.roleId });
                 right.show = true;
+
+                var localRole: any = _.find($scope.activeItContractRoles, { Id: right.roleId });
+
+                if (!angular.isUndefined(localRole) && localRole.Description) {
+                    right.role.Description = localRole.Description;
+                }
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
@@ -64,7 +76,7 @@
                     "userId": uId
                 };
 
-                $http.post("api/itcontractrights/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
                     notify.addSuccessMessage(result.response.user.fullName + " er knyttet i rollen");
 
                     $scope.rights.push({
@@ -74,7 +86,7 @@
                         user: result.response.user,
                         userForSelect: { id: result.response.userId, text: result.response.user.fullName },
                         roleForSelect: result.response.roleId,
-                        role: _.findWhere(itContractRoles, { id: result.response.roleId }),
+                        role: _.find(localItContractRoles, { Id: result.response.roleId }),
                         show: true
                     });
 
@@ -92,7 +104,7 @@
                 var rId = right.roleId;
                 var uId = right.userId;
 
-                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete("api/itcontractright/" + contractId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
                     right.show = false;
                     notify.addSuccessMessage('Rollen er slettet!');
                 }).error(function (deleteResult) {
@@ -103,8 +115,12 @@
             };
 
             $scope.updateRight = function (right) {
-
                 if (!right.roleForSelect || !right.userForSelect) return;
+
+                if (!$scope.checkIfRoleIsAvailable(right.roleForSelect)) {
+                    right.edit = false;
+                    return;
+                }
 
                 //old values
                 var rIdOld = right.roleId;
@@ -121,20 +137,20 @@
 
                 //otherwise, we should delete the old entry, then add a new one
 
-                $http.delete("api/itcontractrights/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
+                $http.delete("api/itcontractright/" + contractId + "?rId=" + rIdOld + "&uId=" + uIdOld + '&organizationId=' + user.currentOrganizationId).success(function (deleteResult) {
 
                     var data = {
                         "roleId": rIdNew,
                         "userId": uIdNew
                     };
 
-                    $http.post("api/itcontractrights/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
+                    $http.post("api/itcontractright/" + contractId + '?organizationId=' + user.currentOrganizationId, data).success(function (result) {
 
                         right.roleId = result.response.roleId;
                         right.user = result.response.user;
                         right.userId = result.response.userId;
 
-                        right.role = _.findWhere(itContractRoles, { id: right.roleId }),
+                        right.role = _.find(localItContractRoles, { Id: right.roleId }),
 
                         right.edit = false;
 
@@ -165,13 +181,13 @@
             $scope.rightSort = function (right) {
                 switch ($scope.rightSortBy) {
                     case "roleName":
-                        return right.role.name;
+                        return right.role.Priority;
                     case "userName":
                         return right.user.name;
                     case "userEmail":
                         return right.user.email;
                     default:
-                        return right.role.name;
+                        return right.role.Priority;
                 }
             };
 
@@ -184,6 +200,11 @@
 
                 $scope.rightSortBy = val;
             };
+
+            $scope.checkIfRoleIsAvailable = function (roleId) {
+                var foundSelectedInOptions = _.find($scope.activeItContractRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+                return (foundSelectedInOptions);
+            }
 
         }]);
 

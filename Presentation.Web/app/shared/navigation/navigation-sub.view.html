@@ -1,10 +1,10 @@
-﻿<nav>
-    <ul class="nav nav-tabs">
-        <li role="presentation" data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
-            <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}" class="btn btn-tab">{{link.text}}</a>
-        </li>
-        <li role="presentation" data-ng-repeat="btn in page.subnav.buttons" data-ng-if="!btn.showWhen || $state.includes(btn.showWhen)">
-            <a class="btn btn-sm" data-ng-class="btn.style" data-ng-click="btn.func()"><i class="glyphicon" data-ng-class="btn.icon"></i> {{ btn.text }}</a>
-        </li>
-    </ul>
-</nav>
+﻿<ul data-ng-hide="subnavNotPositioned">
+    <li data-ng-repeat="link in page.subnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)">
+        <a data-ui-sref="{{link.state}}" data-ng-class="{'btn-tab-active': $state.includes(link.state)}">{{link.text}}</a>
+    </li>
+</ul>
+<ul class="icons" data-ng-if="user.isAuth">
+    <li><global-advis data-user="user" data-state-name="{{$state.current.name}}"></global-advis></li>
+    <li class="disable-advis-link"><a><i class="fa fa-bar-chart"></i></a></li>
+    <li><help-text data-no-button-layout="true" data-key="{{$state.current.name}}" data-default-title="{{$state.current.name}}"></help-text></li>
+</ul>

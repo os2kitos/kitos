@@ -1,50 +1,87 @@
-﻿<div>
-    <form class="form-horizontal fix-label-padding">
+﻿<div class="object-section-container">
+    <h4>{{projectEditVm.project.name}}</h4>
+    <div class="panel panel-default">
         <div class="row">
-            <div class="col-md-5">
-                <!-- Status traffic light -->
+            <div class="col-xs-4">
                 <div class="form-group">
-                    <label class="col-md-5 control-label small" for="statusProject">Status projekt (økonomi, tid og kvalitet):</label>
-                    <div class="col-md-7">
-                        <span id="statusProject"
-                              data-select-status2=""
-                              data-ng-model="projectStatusVm.project.statusProject"
-                              data-can-write="projectEditVm.hasWriteAccess"
-                              data-field="statusProject"
-                              data-autosave="{{projectStatusVm.project.updateUrl}}">
-                        </span>
+                    <label for="statusMethod" class="control-label small">Metode</label>
+                    <select id="statusMethod" data-ng-change="projectStatusVm.onSelectStatusMethod(projectStatusVm.showCombinedChart.val)" data-ng-model="projectStatusVm.showCombinedChart" data-ng-options="opt as opt.label for opt in projectStatusVm.methodOptions" class="form-control input-sm" data-ng-disabled="!projectEditVm.hasWriteAccess"></select>
+                </div>
+                <div class="form-group" data-ng-if="projectStatusVm.currentStatusUpdate">
+                    <table>
+                        <thead>
+                        <tr class="small">
+                            <th>
+                                <p style="font-weight:normal">Dato for sidste status</p>
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <!-- Dato for status -->
+                                <td>
+                                    <p data-ng-bind="projectStatusVm.moment(projectStatusVm.currentStatusUpdate.Created).format('DD-MM-YYYY')"></p>
+                                </td>
+                                <!-- Rediger dato -->
+                                <td>
+                                    <button id="dateEdit" class="glyphicon glyphicon-edit fa-lg" data-ui-sref="it-project.edit.status-project.status-edit-modal" data-ng-hide="!projectEditVm.hasWriteAccess"></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+               </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-block" data-ng-disabled="!projectEditVm.hasWriteAccess" ui-sref="it-project.edit.status-project.status-update-modal">Opret ny status</button>
+                    <button class="btn btn-primary btn-block" data-ng-if="projectStatusVm.currentStatusUpdate" ui-sref="it-project.edit.status-project.status-history-modal">Historik</button>
+                </div>
+            </div>
+            <div class="col-xs-4 text-center" data-ng-if="projectStatusVm.currentStatusUpdate">
+                <div id="splitted-triangle-wrapper" data-ng-if="!projectStatusVm.showCombinedChart.val">
+                    <div id="text1">
+                        T
+                    </div>
+                    <div id="text2">
+                        R
+                    </div>
+                    <div id="text3">
+                        K
+                    </div>
+                    <div id="part1" class="{{ projectStatusVm.currentStatusUpdate.TimeStatus | lowercase }}">
+                        <div id="part2_1" class="{{ projectStatusVm.currentStatusUpdate.QualityStatus | lowercase }}">
+                        </div>
+                        <div id="part3" class="{{ projectStatusVm.currentStatusUpdate.ResourcesStatus | lowercase }}">
+                            <div id="part2_2" class="{{ projectStatusVm.currentStatusUpdate.QualityStatus | lowercase }}">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Date for status update -->
-                <div class="form-group">
-                    <label class="col-md-5 control-label small" for="statusDate">Dato for statusopdatering:</label>
-                    <div class="col-md-4">
-                        <input type="text" class="form-control" id="statusDate"
-                               data-kendo-date-picker
-                               data-k-options="projectStatusVm.datepickerOptions"
-                               data-ng-disabled="!projectEditVm.hasWriteAccess"
-                               data-ng-model="projectStatusVm.project.statusDate"
-                               data-autosave="{{projectStatusVm.project.updateUrl}}"
-                               data-field="statusDate">
+                <div id="combined-triangle-wrapper" data-ng-if="projectStatusVm.showCombinedChart.val">
+                    <div id="part1" class="{{ projectStatusVm.currentStatusUpdate.CombinedStatus | lowercase }}">
+                        <div class="text">
+                            S
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Notes to status of project -->
-            <div class="col-md-7">
+            <div class="col-xs-4" data-ng-if="projectStatusVm.currentStatusUpdate">
                 <div class="form-group">
-                    <label class="col-md-2 control-label small" for="note">Bemærkning til samlet status på projekt:</label>
-                    <div class="col-md-10">
-                        <textarea id="note" class="form-control input-sm" rows="4"
-                                  data-ng-model="projectStatusVm.project.statusNote"
-                                  data-field="statusNote"
-                                  data-autosave="{{projectStatusVm.project.updateUrl}}"
-                                  data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
-                    </div>
+                    <label class="control-label small">Bemærkning</label>
+                    <p class="small" data-ng-bind="projectStatusVm.currentStatusUpdate.Note"></p>
+                </div>
+                <div class="form-group">
+                    <label class="control-label small">Afsluttende</label>
+                    <p class="small" data-ng-if="projectStatusVm.currentStatusUpdate.IsFinal">Ja</p>
+                    <p class="small" data-ng-if="!projectStatusVm.currentStatusUpdate.IsFinal">Nej</p>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<form class="form-horizontal fix-label-padding">
+    <div class="object-section-container">
         <div class="panel panel-default">
             <div class="panel-heading small">
                 Milepæle og opgaver
@@ -157,11 +194,11 @@
                     <tr>
                         <td colspan="11" class="text-right">
                             <button id="addAssignment" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'assignment', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj opgave</button>
-                            <button id="addMilestone" class="btn btn-primary btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
+                            <button id="addMilestone" class="btn btn-success btn-sm" data-ui-sref="it-project.edit.status-project.modal({type: 'milestone', activityId: ''})" data-ng-hide="!projectEditVm.hasWriteAccess">Tilføj milepæl</button>
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-    </form>
-</div>
+    </div>
+</form>

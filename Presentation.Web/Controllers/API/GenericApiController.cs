@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
+using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericApiController<TModel, TDto> : BaseApiController
-        where TModel : Entity
+        where TModel : class, IEntity
     {
         protected readonly IGenericRepository<TModel> Repository;
 
@@ -30,13 +31,35 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var query = Page(GetAllQuery(), paging);
+                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
+                var result = GetAllQuery().AsEnumerable();
+
+                if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
+                {
+                    if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(TModel)) && !AuthenticationService.IsGlobalAdmin(KitosUser.Id))
+                    {
+                        if (hasOrg)
+                        {
+                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                        }
+                        else
+                        {
+                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
+                        }
+                    }
+                }
+                else
+                {
+                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                }
+
+                var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);
                 return Ok(dtos);
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -47,6 +70,11 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
+                if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
+
                 if (item == null) return NotFound();
 
                 var dto = Map(item);
@@ -54,7 +82,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -75,7 +103,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -105,15 +133,18 @@ namespace Presentation.Web.Controllers.API
             {
                 return Conflict(e.Message);
             }
+            catch (SecurityException e)
+            {
+                return Unauthorized(e.Message);
+            }
             catch (Exception e)
             {
                 // check if inner message is a duplicate, if so return conflict
-                if (e.InnerException != null)
-                    if (e.InnerException.InnerException != null)
-                        if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
-                            return Conflict(e.InnerException.InnerException.Message);
+                if (e.InnerException?.InnerException != null)
+                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                        return Conflict(e.InnerException.InnerException.Message);
 
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -151,27 +182,14 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
-        protected virtual TModel PatchQuery(TModel item)
+        protected virtual TModel PatchQuery(TModel item, JObject obj)
         {
-            Repository.Update(item);
-            Repository.Save();
-
-            return item;
-        }
-
-        // PATCH api/T
-        public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
-        {
-            try
+            if (obj != null)
             {
-                var item = Repository.GetByKey(id);
-                if (item == null) return NotFound();
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
-
                 var itemType = item.GetType();
                 // get name of mapped property
                 var map = AutoMapper.Mapper.FindTypeMapFor<TDto, TModel>().GetPropertyMaps();
@@ -200,7 +218,7 @@ namespace Presentation.Web.Controllers.API
                         propRef.SetValue(item, enumValue);
                     }
                     // parse null values properly
-                    else if (t.IsEquivalentTo(typeof (int?)))
+                    else if (t.IsEquivalentTo(typeof(int?)))
                     {
                         var value = valuePair.Value.Value<string>();
 
@@ -244,9 +262,24 @@ namespace Presentation.Web.Controllers.API
 
                 item.LastChanged = DateTime.UtcNow;
                 item.LastChangedByUser = KitosUser;
+            }
+            Repository.Update(item);
+            Repository.Save();
 
-                PatchQuery(item);
-                return Ok(Map(item));
+            return item;
+        }
+
+        // PATCH api/T
+        public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            try
+            {
+                var item = Repository.GetByKey(id);
+                if (item == null) return NotFound();
+                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+
+                var result = PatchQuery(item, obj);
+                return Ok(Map(result));
             }
             catch (Exception e)
             {
@@ -256,7 +289,7 @@ namespace Presentation.Web.Controllers.API
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
                             return Conflict(e.InnerException.InnerException.Message);
 
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -278,11 +311,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>True iff user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
-            // global admin always have write access
-            if (user.IsGlobalAdmin)
-                return true;
-
-            return obj.HasUserWriteAccess(user);
+            return AuthenticationService.HasWriteAccess(user.Id, obj);
         }
 
         /// <summary>

@@ -1,28 +1,28 @@
-﻿(function(ng, app) {
+﻿(function (ng, app) {
     'use strict';
 
     app.directive('autosave', [
-        '$http', '$timeout', 'notify', 'userService', 'moment', function($http, $timeout, notify, userService, moment) {
+        '$http', '$timeout', 'notify', 'userService', 'moment', function ($http, $timeout, notify, userService, moment) {
             return {
                 restrict: 'A',
                 require: 'ngModel',
                 priority: 0,
-                link: function(scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs, ctrl) {
                     var user; // TODO this isn't always ready when needed and will result in an error from time to time... angular 2 support resolve on directives so yeah...
 
-                    userService.getUser().then(function(result) {
+                    userService.getUser().then(function (result) {
                         user = result;
                     });
 
                     var oldValue;
-                    $timeout(function() {
+                    $timeout(function () {
                         oldValue = ctrl.$modelValue; // get initial value
                     });
 
                     function saveIfNew() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -37,7 +37,7 @@
                     function saveDate() {
                         var newValue = ctrl.$modelValue;
                         if (attrs.pluck)
-                            newValue = _.pluck(newValue, attrs.pluck);
+                            newValue = _.map(newValue, attrs.pluck);
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
@@ -57,33 +57,97 @@
                     function saveCheckbox() {
                         // ctrl.$viewValue reflects the old state.
                         // using timeout to wait for the value to update
-                        $timeout(function() {
-                            var newValue = ctrl.$modelValue;
-                            var payload = {};
-                            payload[attrs.field] = newValue;
-                            save(payload);
+                        $timeout(function () {
+                            if (attrs.globalOptionId) {
+                                saveLocalOption();
+                            } else {
+                                var newValue = ctrl.$modelValue
+                                var payload = {};
+                                payload[attrs.field] = newValue;
+                                save(payload);
+                            }
                         });
                     }
 
-                    function saveSelect2() {
-                        // ctrl.$viewValue reflects the old state.
-                        // using timeout to wait for the value to update
-                        $timeout(function() {
-                            var newValue;
+                    function saveLocalOption() {
+                        var globalOptionId = parseInt(attrs.globalOptionId, 10);
+                        var isActive = ctrl.$modelValue;
+                        var payload = {};
+                        payload[attrs.field] = globalOptionId;
 
-                            var viewValue = ctrl.$viewValue;
-                            if (angular.isArray(viewValue)) {
-                                newValue = _.pluck(viewValue, 'id');
-                            } else if (angular.isObject(viewValue)) {
-                                newValue = viewValue.id;
-                            } else {
-                                newValue = viewValue;
-                            }
+                        if (isActive) {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            if (!attrs.appendurl)
+                                attrs.appendurl = '';
 
+                            $http({ method: 'POST', url: attrs.autosave, data: payload, ignoreLoadingBar: true })
+                                .success(function () {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                    oldValue = ctrl.$modelValue;
+                                })
+                                .error(function (result, status) {
+                                    if (status === 409) {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                                    } else {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    }
+                                });
+                        } else {
+                            var msg = notify.addInfoMessage("Gemmer...", false);
+                            if (!attrs.appendurl)
+                                attrs.appendurl = '';
+
+                            $http({ method: 'DELETE', url: attrs.autosave + "(" + globalOptionId + ")", ignoreLoadingBar: true })
+                                .success(function () {
+                                    msg.toSuccessMessage("Feltet er opdateret.");
+                                    oldValue = ctrl.$modelValue;
+                                })
+                                .error(function (result, status) {
+                                    if (status === 409) {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
+                                    } else {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    }
+                                });
+                        }
+                    }
+
+                    function saveTypeahead() {
+                        $timeout(function () {
                             var payload = {};
-                            payload[attrs.field] = newValue;
+                            payload[attrs.field] = ctrl.$modelValue;
 
                             save(payload);
+                        }, 200);
+                    }
+
+                    function saveSelect2() {
+
+                        // ctrl.$viewValue reflects the old state.
+                        // using timeout to wait for the value to update
+                        $timeout(function () {
+                            if (attrs.field) {
+                                if (angular.isUndefined(user)) {
+                                    notify.addWarnMessage("Brugeren er endnu ikke indlæst. Vent venligst og prøv igen.", true);
+                                    return;
+                                }
+
+                                var newValue;
+
+                                var viewValue = ctrl.$viewValue;
+                                if (angular.isArray(viewValue)) {
+                                    newValue = _.map(viewValue, 'id');
+                                } else if (angular.isObject(viewValue)) {
+                                    newValue = viewValue.id;
+                                } else {
+                                    newValue = viewValue;
+                                }
+
+                                var payload = {};
+                                payload[attrs.field] = newValue;
+
+                                save(payload);
+                            }
                         });
                     }
 
@@ -92,19 +156,19 @@
                         if (e.added) {
                             id = e.added.id;
                             $http.post(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function() {
+                                .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
-                                .error(function() {
+                                .error(function () {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         } else if (e.removed) {
                             id = e.removed.id;
                             $http.delete(attrs.autosave + '?organizationId=' + user.currentOrganizationId + '&' + attrs.field + '=' + id)
-                                .success(function() {
+                                .success(function () {
                                     msg.toSuccessMessage("Feltet er opdateret.");
                                 })
-                                .error(function() {
+                                .error(function () {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
                                 });
                         }
@@ -115,12 +179,12 @@
                         if (!attrs.appendurl)
                             attrs.appendurl = '';
 
-                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true})
-                            .success(function() {
+                        $http({ method: 'PATCH', url: attrs.autosave + '?organizationId=' + user.currentOrganizationId + attrs.appendurl, data: payload, ignoreLoadingBar: true })
+                            .success(function () {
                                 msg.toSuccessMessage("Feltet er opdateret.");
                                 oldValue = ctrl.$modelValue;
                             })
-                            .error(function(result, status) {
+                            .error(function (result, status) {
                                 if (status === 409) {
                                     msg.toErrorMessage("Fejl! Feltet kunne ikke ændres da værdien den allerede findes i KITOS!");
                                 } else {
@@ -129,7 +193,7 @@
                             });
                     }
 
-                    // select2 fields trigger the change event
+                    // ui select fields trigger the change event
                     if (!angular.isUndefined(attrs.uiSelect2)) {
                         if (attrs.multiple) {
                             element.bind('change', saveMultipleSelect2);
@@ -141,6 +205,8 @@
                         element.bind('blur', saveDate);
                     } else if (attrs.type === 'checkbox') {
                         element.bind('change', saveCheckbox);
+                    } else if (!angular.isUndefined(attrs.autosaveTypeahead)) {
+                        element.bind('blur', saveTypeahead);
                     } else {
                         element.bind('blur', saveIfNew);
                     }

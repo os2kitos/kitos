@@ -4,6 +4,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Presentation.Web.App_Start;
 
 namespace Presentation.Web
 {
@@ -14,8 +15,9 @@ namespace Presentation.Web
     {
         protected void Application_Start()
         {
+            LogConfig.RegisterLog();
+            //GlobalConfiguration.Configuration.MessageHandlers.Add(new MessageLoggingHandler());
             AreaRegistration.RegisterAllAreas();
-
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -33,6 +35,7 @@ namespace Presentation.Web
 
             // Convert all dates to UTC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+
         }
     }
 }

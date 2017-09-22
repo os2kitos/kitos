@@ -3,7 +3,7 @@
     /// <summary>
     /// Associates a <see cref="User"/> with an it project (<see cref="Object"/>) in a specific <see cref="Role"/>.
     /// </summary>
-    public class ItProjectRight : Entity, IRight<ItProject, ItProjectRight, ItProjectRole>
+    public class ItProjectRight : Entity, IRight<ItProject, ItProjectRight, ItProjectRole>, IProjectModule
     {
         public int UserId { get; set; }
         public int RoleId { get; set; }

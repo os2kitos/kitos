@@ -9,7 +9,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class ItInterfaceExhibitUsage
+    public class ItInterfaceExhibitUsage : ISystemModule
     {
         public int ItSystemUsageId { get; set; }
         /// <summary>

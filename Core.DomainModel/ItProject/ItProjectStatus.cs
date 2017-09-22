@@ -4,7 +4,7 @@
     /// Base class of Milestone and Assignment.
     /// Called status for lack of a better word.
     /// </summary>
-    public abstract class ItProjectStatus : Entity, IContextAware
+    public abstract class ItProjectStatus : Entity, IContextAware, IProjectModule
     {
         /// <summary>
         /// Human readable ID ("brugervendt noegle" in OIO)

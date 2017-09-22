@@ -4,21 +4,27 @@ module.exports = {
     // library script bundle
     // not minified!
     librarySrc: [
-        bower("/lodash/lodash.min.js"),
+        bower("/lodash/dist/lodash.min.js"),
         bower("/jquery/dist/jquery.min.js"),
         bower("/select2/select2.min.js"),
         bower("/select2/select2_locale_da.js"),
         bower("/moment/min/moment.min.js"),
-        bower("/jsonfn-bower/jsonfn.min.js")
+        bower("/jsonfn-bower/jsonfn.min.js"),
+        bower("/tinymce/tinymce.js"),
+        bower("/tinymce/plugins/image/plugin.min.js"),
+        bower("/tinymce/plugins/code/plugin.min.js"),
+        bower("/tinymce/plugins/link/plugin.min.js"),
+        bower("/tinymce/themes/modern/theme.min.js")
     ],
     libraryBundle: "library-bundle.min.js",
 
     libraryStylesSrc: [
-        bower("/bootstrap/dist/css/bootstrap.min.css"),
-        bower("/font-awesome/css/font-awesome.min.css"),
         bower("/select2/select2.css"),
         bower("/select2-bootstrap-css/select2-bootstrap.min.css"),
-        bower("/angular-loading-bar/build/loading-bar.min.css")
+        bower("/angular-loading-bar/build/loading-bar.min.css"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.css"),
+        bower("/tinymce/skins/lightgray/skin.min.css"),
+        bower("/tinymce/skins/lightgray/content.min.css")
     ],
 
     // angular script bundle
@@ -32,7 +38,16 @@ module.exports = {
         bower("/angular-bootstrap/ui-bootstrap-tpls.min.js"),
         bower("/angular-ui-select2/src/select2.js"),
         bower("/angular-loading-bar/build/loading-bar.min.js"),
-        bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js")
+        bower("/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js"),
+        bower("/angular-confirm-modal/angular-confirm.min.js"),
+        bower("/angular-messages/angular-messages.min.js"),
+        bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
+        bower("/angular-ui-tinymce/src/tinymce.js"),
+        bower("/ZingChart-AngularJS/src/zingchart-angularjs.js"),
+        bower("/angular-route/angular-route.js"),
+        bower("/ngstorage/ngstorage.js"),
+        bower("/angular-base64/angular-base64.js"),
+        bower("/oidc-angular/oidc-angular.js")
     ],
     angularBundle: "angular-bundle.min.js",
 
@@ -40,10 +55,28 @@ module.exports = {
     appSrc: paths.allJavaScriptNoTests,
     appBundle: "app-bundle.min.js",
 
+    // app script bundle
+    appReportSrc: [
+        app("models/api/organization-role.js"),
+        appReport("reportApp.module.js"),
+        app("shared/notify/notify.module.js"),
+        app("shared/notify/notify.directive.js"),
+        app("shared/notify/notify.factory.js"),
+        appReport("services/stimulsoftService.js"),
+        app("services/ReportService.js"),
+        app("services/userServices.js"),
+        appReport("report-viewer.controller.js")
+    ],
+    appReportBundle: "appReport-bundle.min.js",
+
     // font bundle
     fontSrc: [
         bower("/bootstrap/dist/fonts/*.*"),
         bower("/font-awesome/fonts/*.*")
+    ],
+
+    tinyMCEFontSrc: [
+        bower("/tinymce/skins/lightgray/fonts/*.*")
     ],
 
     // assets
@@ -54,19 +87,20 @@ module.exports = {
 
     // custom style bundle
     customCssSrc: [
-        content("/notify/notify.css"),
-        content("/kitos.css")
+        content("/less/styles.less") 
     ],
     cssBundle: "app.css",
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
+    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 
     script: script,
     content: content,
-    bower: bower
+    bower: bower,
+    npm: npm
 };
 
 // path helper functions
@@ -81,3 +115,17 @@ function content(file) {
 function bower(file) {
     return paths.bowerComponents + "/" + file;
 }
+
+function npm(file) {
+    return paths.npm + "/" + file;
+}
+
+function app(file) {
+    return "Presentation.Web/app/" + file;
+}
+
+function appReport(file) {
+    return "Presentation.Web/appReport/" + file;
+}
+
+

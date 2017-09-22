@@ -11,9 +11,10 @@
     }]);
 
     app.controller("system.EditHierarchy",
-        ["$scope", "_", "hierarchyFlat",
-            ($scope, _, hierarchyFlat) => {
+        ["$scope", "_", "hierarchyFlat", "itSystemUsage",
+            ($scope, _, hierarchyFlat, itSystemUsage) => {
                 $scope.systems = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
+                $scope.usage = itSystemUsage;
             }
         ]
     );

@@ -9,7 +9,7 @@ class ItSystemEditPo implements IPageObject {
     }
 
     // delete system
-    public deleteSystemElement = element.all(by.css("a.btn-danger .glyphicon-minus"));
+    public deleteSystemElement = element(by.css("a.btn-danger"));
 
     // appTypeOption
     public appTypeSelect = new Select2Wrapper("#s2id_system-type");

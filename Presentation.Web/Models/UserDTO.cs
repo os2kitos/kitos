@@ -10,6 +10,7 @@ namespace Presentation.Web.Models
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public string DefaultUserStartPreference { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
         public string DefaultOrganizationUnitName { get; set; }
         public bool IsGlobalAdmin { get; set; }

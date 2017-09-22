@@ -8,7 +8,7 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
-        where TModel : Entity, IOptionEntity<TReference>
+        where TModel : OptionEntity<TReference>
     {
         protected GenericOptionApiController(IGenericRepository<TModel> repository)
             : base(repository)
@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable().Where(t => t.IsActive && !t.IsSuggestion);
+            return Repository.AsQueryable().Where(t => t.IsLocallyAvailable && !t.IsSuggestion);
         }
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 

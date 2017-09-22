@@ -28,6 +28,10 @@
         ItSystem: ItSystem;
         ArchiveTypeId: number;
         ArchiveType: ItSystem.IArchiveType;
+
+        ArchiveLocationId: number;
+        ArchiveLocation: ItSystem.IArchiveLocation;
+
         SensitiveDataTypeId: number;
         SensitiveDataType: ItSystem.ISensitiveDataType;
         OverviewId: number;
@@ -51,5 +55,8 @@
         ItInterfaceExhibitUsages: Array<ItSystemUsage.IItInterfaceExhibitUsage>;
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
+
+        ReferenceId: number;
+        Reference: IReference;
     }
 }

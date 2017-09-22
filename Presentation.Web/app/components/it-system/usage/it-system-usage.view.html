@@ -1,266 +1,56 @@
 ﻿<!-- it system usage master sheet -->
-<form role="form" class="container-fluid">
-    <div class="row">
-        <!-- Left side -->
-        <div class="col-md-6">
-            <div class="row">
-                <div class="col-md-12"></div>
-                <!-- 1st column -->
-                <div class="col-md-6">
-                    <!--AppTypeOption-->
-                    <div class="form-group">
-                        <label for="system-type" class="control-label small">Applikationstype</label>
-                        <select id="system-type" class="form-control input-sm" disabled="disabled">
-                            <option value="" selected>{{usage.itSystem.appTypeOptionName}}</option>
-                        </select>
-                    </div>
-
-                    <!--Name-->
-                    <div class="form-group">
-                        <label for="system-name" class="control-label small">IT System</label>
-                        <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
-                    </div>
-
-                    <!--Parent system-->
-                    <div class="form-group">
-                        <label for="system-parent" class="control-label small">Overordnet system</label>
-                        <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
-                    </div>
-
-                    <!--Usage type-->
-                    <div class="form-group">
-                        <label for="system-business-type" class="control-label small">Forretningstype</label>
-                        <select id="system-business-type" class="form-control input-sm" disabled>
-                            <option value="" selected>{{ usage.itSystem.businessTypeName }}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- 2st column -->
-                <div class="col-md-6">
-                    <!--Belongs to-->
-                    <div class="form-group">
-                        <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
-                        <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
-                    </div>
-
-                    <!-- Object owner -->
-                    <div class="form-group">
-                        <label class="control-label small">Oprettet af</label>
-                        <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
-                    </div>
-
-                    <!--Access modifier -->
-                    <div class="form-group">
-                        <label for="system-access" class="control-label small">Synlighed</label>
-                        <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
-                    </div>
-
-                    <!-- UUID -->
-                    <div class="form-group">
-                        <label class="control-label small">UUID</label>
-                        <input type="text" value="{{usage.itSystem.uuid}}" class="form-control input-sm" disabled="disabled" />
-                    </div>
-                </div>
-
-                <!-- full width -->
-                <div class="col-md-12">
-                    <!-- Description and URL -->
-                    <div class="form-group">
-                        <label for="system-description" class="control-label small">Beskrivelse</label>
-                        <textarea id="system-description" class="form-control input-sm" rows="7" disabled data-ng-model="usage.itSystem.description"></textarea>
-                        <span class="help-block">
-                            Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
-                        </span>
-                    </div>
-                </div>
+<form role="form" class="container-fluid object-wrapper">
+    <!-- Left menu -->
+    <div class="col-xs-3 col-lg-2 left-menu-container">
+        <div class="left-menu">
+            <div class="header">
+                <h3>IT System</h3>
             </div>
-        </div>
+            <ul>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.main"><img src="/Content/img/Systemforside.svg"></img> Systemforside</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.interfaces"><img src="/Content/img/Snitflader.svg"></img> Snitflader</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.contracts"><img src="/Content/img/Kontrakter.svg"></img> Kontrakter</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.hierarchy"><img src="/Content/img/Hierarki.svg"></img> Hierarki</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.roles"><img src="/Content/img/Systemroller.svg"></img> Systemroller</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.wishes"><img src="/Content/img/Aendringsoenske.svg"></img> Ændringsønske</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.org"><img src="/Content/img/Organisation.svg"></img> Organisation</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.kle"><img src="/Content/img/KLE.svg"></img> KLE</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.proj"><img src="/Content/img/ITprojekter.svg"></img> IT Projekter</a>
+                </li>
 
-        <!-- Right side -->
-        <div class="col-md-6">
-            <div class="row">
-                <!-- 3rd column -->
-                <div class="col-md-6">
-                    <!-- local sys id -->
-                    <div class="form-group">
-                        <label for="sysId" class="control-label small">Lokal System ID</label>
-                        <input id="sysId" type="text" class="form-control input-sm" autofocus
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.localSystemId"
-                               data-field="localSystemId"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                    </div>
-
-                    <!-- local call name -->
-                    <div class="form-group">
-                        <label for="localcallname" class="control-label small">Lokal kaldenavn</label>
-                        <input id="localcallname" type="text" class="form-control input-sm"
-                               data-ng-model="usage.localCallName"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-field="localCallName"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                    </div>
-
-                    <!-- sensitive data -->
-                    <div class="form-group">
-                        <select-option data-id="sensitive"
-                                       data-label="Persondata"
-                                       data-placeholder="Vælg persondata"
-                                       data-selected-text="{{ usage.sensitiveDataTypeName }}"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="usage.sensitiveDataTypeId"
-                                       data-options="sensitiveDataTypes"
-                                       data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                       data-field="sensitiveDataTypeId">
-                        </select-option>
-                    </div>
-
-                    <!-- esdh ref -->
-                    <div class="form-group">
-                        <label for="esdh" class="control-label small">ESDH ref.</label>
-                        <div class="input-group">
-                            <input id="esdh" type="text" class="form-control input-sm" placeholder="http://"
-                                   data-ng-model="usage.esdhRef"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-field="esdhRef"
-                                   data-autosave="api/itSystemUsage/{{usageId}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.esdhRef">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-
-                    <!-- link ref -->
-                    <div class="form-group">
-                        <label for="url" class="control-label small">Mappe/URL ref.</label>
-                        <div class="input-group">
-                            <input id="url" type="text" class="form-control input-sm" placeholder="http://"
-                                   data-ng-model="usage.directoryOrUrlRef"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-field="directoryOrUrlRef"
-                                   data-autosave="api/itSystemUsage/{{usageId}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.directoryOrUrlRef">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-                </div>
-
-                <!-- 4th column -->
-                <div class="col-md-6">
-                    <!-- version -->
-                    <div class="form-group">
-                        <label for="version" class="control-label small">Version</label>
-                        <input id="version" type="text" class="form-control input-sm"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.version"
-                               data-field="version"
-                               data-autosave="api/itSystemUsage/{{usageId}}">
-                    </div>
-
-                    <!-- Object owner -->
-                    <div class="form-group">
-                        <label for="usage-owner" class="control-label small">Taget i anvendelse af</label>
-                        <input type="text" id="usage-owner" class="form-control input-sm"
-                               data-ng-disabled="true"
-                               value="{{usage.objectOwnerFullName}}">
-                    </div>
-
-                    <!-- overview system -->
-                    <div class="form-group">
-                        <label for="overview" class="control-label small">Overblik</label>
-                        <input type="hidden" id="overview" class="form-control input-sm"
-                               data-ui-select2="itSytemUsagesSelectOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="usage.overview"
-                               data-autosave="api/itSystemUsage/{{usageId}}"
-                               data-field="overviewId">
-                    </div>
-
-                    <!-- archiving -->
-                    <div class="form-group">
-                        <select-option data-id="archive"
-                                       data-label="Arkivering"
-                                       data-placeholder="Vælg arkivering"
-                                       data-selected-text="{{ usage.archiveTypeName }}"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="usage.archiveTypeId"
-                                       data-options="archiveTypes"
-                                       data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                       data-field="archiveTypeId">
-                        </select-option>
-                        <span class="help-block small">&nbsp;</span>
-                    </div>
-
-                    <!-- CMDB ref -->
-                    <div class="form-group">
-                        <label for="cmdb" class="control-label small">CMDB ref.</label>
-                        <div class="input-group">
-                            <input id="cmdb" type="text" class="form-control input-sm" placeholder="http://"
-                                   data-ng-model="usage.cmdbRef"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-field="cmdbRef"
-                                   data-autosave="api/itSystemUsage/{{usageId}}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="usage.cmdbRef">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-                </div>
-
-                <!-- full width -->
-                <div class="col-md-12">
-
-                    <!-- note -->
-                    <div class="form-group">
-                        <label for="note" class="control-label small">Note</label>
-                        <textarea id="note" class="form-control input-sm" rows="5"
-                                  data-ng-model="usage.note"
-                                  data-ng-disabled="!hasWriteAccess"
-                                  data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
-                    </div>
-                </div>
-            </div>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.advice"><img src="/Content/img/Advis.svg"></img> Advis</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.references"><img src="/Content/img/References.svg"></img> Referencer</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.usage.access-control"><img src="/Content/img/Accesscontrol.svg"></img> Adgangsstyring</a>
+                </li>
+                <li data-ui-sref-active="active">
+                <a data-ui-sref="it-system.usage.archiving"><img src="/Content/img/Arkiv.svg"></img> Arkivering</a>
+                </li>
+            </ul>
         </div>
     </div>
+    <div class="col-xs-9 col-lg-10 object-content">
+        <ui-view />
+    </div>
 </form>
-
-<ul class="nav nav-tabs">
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.interfaces">Snitflader</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.contracts">Kontrakter</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.hierarchy">Hierarki</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.roles">Systemroller</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.wishes">Ændringsønske</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.org">Organisation</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.kle">KLE</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.usage.proj">IT Projekter</a>
-    </li>
-</ul>
-
-<!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs" />

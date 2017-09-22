@@ -28,7 +28,10 @@
             "moment",
             "notify",
             "user",
-            "gridStateService"
+            "gridStateService",
+            "$uibModal",
+            "$http",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -41,7 +44,10 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory,
+            private $modal,
+            private $http,
+            private needsWidthFixService) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -98,8 +104,11 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
-                            }
+                                if (!user.isGlobalAdmin) {
+                                    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
 
+                                }
+                            }
                             return parameterMap;
                         }
                     },
@@ -120,6 +129,11 @@
                     serverFiltering: true
                 },
                 toolbar: [
+                    {
+                        name: "createSnitflade",
+                        text: "Opret Snitflade",
+                        template: "<a ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
@@ -186,8 +200,24 @@
                     {
                         field: "Name", title: "Snitflade", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-system.interface-edit.interface-details({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.Disabled) {
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv)</a>`;
+                            } else {
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.Name) {
+                                if (dataItem.Disabled) {
+                                    return dataItem.Name + " (Inaktiv)";
+                                } else {
+                                    return dataItem.Name;
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -269,7 +299,12 @@
                     {
                         field: "ExhibitedBy.ItSystem.Name", title: "Udstillet af", width: 230,
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
+                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
+                            else
+                                return "";
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -334,7 +369,7 @@
                         template: dataItem => {
                             var value = "";
                             if (dataItem.DataRows.length > 0) {
-                                value = this._.pluck(dataItem.DataRows.slice(0, 4), "DataType.Name").join(", ");
+                                value = this._.map(dataItem.DataRows.slice(0, 4), "DataType.Name").join(", ");
                             }
                             if (dataItem.DataRows.length > 5) {
                                 value += ", ...";
@@ -344,7 +379,7 @@
                         excelTemplate: dataItem => {
                             var value = "";
                             if (dataItem && dataItem.DataRows.length > 0) {
-                                value = this._.pluck(dataItem.DataRows, "DataType.Name").join(", ");
+                                value = this._.map(dataItem.DataRows, "DataType.Name").join(", ");
                             }
                             return value;
                         },
@@ -431,6 +466,57 @@
                 ]
             };
         }
+
+
+        public createSnitflade() {
+            var self = this;
+            var modalInstance = this.$modal.open({
+                // fade in instead of slide from top, fixes strange cursor placement in IE
+                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-system/it-interface/it-interface-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
+                    $scope.formData = { itInterfaceId: "" }; // set itInterfaceId to an empty string
+                    $scope.type = "IT Snitflade";
+                    $scope.checkAvailbleUrl = "api/itInterface/";
+
+
+                    $scope.validateName = function () {
+                        $scope.createForm.name.$validate();
+                    }
+                    $scope.validateItInterfaceId = function () {
+                        $scope.createForm.itInterfaceId.$validate();
+                    }
+
+                    $scope.uniqueConstraintError = false;
+
+                    $scope.submit = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            itInterfaceId: $scope.formData.itInterfaceId,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId
+                        };
+
+                        var msg = self.notify.addInfoMessage("Opretter snitflade...", false);
+                        self.$http.post("api/itinterface", payload)
+                            .success(function (result) {
+                                msg.toSuccessMessage("En ny snitflade er oprettet!");
+                                var interfaceId = result.response.id;
+                                $modalInstance.close(interfaceId);
+                            }).error(function () {
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette snitflade!");
+                            });
+                    };
+                }]
+            });
+
+            modalInstance.result.then(function (id) {
+                // modal was closed with OK
+                self.$state.go("it-system.interface-edit.main", { id: id });
+            });
+        }
+
 
         // saves grid state to localStorage
         private saveGridOptions = () => {
@@ -585,6 +671,7 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
         }
 

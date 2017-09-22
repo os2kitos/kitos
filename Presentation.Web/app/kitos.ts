@@ -17,6 +17,7 @@
     export interface IKendoGridOptions<TDataSource> extends kendo.ui.GridOptions {
         toolbar?: IKendoGridToolbarItem[];
         columns?: IKendoGridColumn<TDataSource>[];
+        detailTemplate?: ((dataItem: TDataSource) => string)|string;
     }
 
     export interface IKendoGrid<TDataSource> extends kendo.ui.Grid {
@@ -42,5 +43,27 @@
 
     export interface IKendoGridExcelExportEvent<TDataSource> extends kendo.ui.GridExcelExportEvent {
         sender: IKendoGrid<TDataSource>;
+    }
+
+    export interface IRequestShortcutConfigWithCustomConfig extends ng.IRequestShortcutConfig {
+        [key: string]: any;
+    }
+
+    export interface IHttpServiceWithCustomConfig extends ng.IHttpService {
+        post<T>(url: string, data: any, config?: IRequestShortcutConfigWithCustomConfig): ng.IHttpPromise<T>;
+    }
+
+    export interface IRequestConfigWithCustomConfig extends ng.IRequestConfig, IRequestShortcutConfigWithCustomConfig {
+
+    }
+
+    export interface IHttpInterceptorWithCustomConfig extends ng.IHttpInterceptor {
+        request?: (config: IRequestConfigWithCustomConfig) => IRequestConfigWithCustomConfig | ng.IPromise<IRequestConfigWithCustomConfig>;
+    }
+
+    export interface AuthRoles extends ng.ui.IStateProvider {
+        authRoles: [Models.OrganizationRole|"GlobalAdmin"];
+        noAuth: string;
+        name: string;
     }
 }

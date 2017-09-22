@@ -5,20 +5,20 @@
     <div class="modal-body">
         <div class="form-group">
             <!-- Name -->
-            <label for="name" class="col-md-2 control-label small">
+            <label for="name" class="col-xs-2 control-label small">
                 Målnavn:
             </label>
-            <div class="col-md-6">
+            <div class="col-xs-6">
                 <input type="text" id="name" class="form-control input-sm"
                        data-ng-model="goal.name"
                        autofocus>
             </div>
 
             <!-- Human readable ID -->
-            <label for="humanReadableId" class="col-md-1 control-label small">
+            <label for="humanReadableId" class="col-xs-1 control-label small">
                 ID:
             </label>
-            <div class="col-md-3">
+            <div class="col-xs-3">
                 <input type="text" id="humanReadableId" class="form-control input-sm"
                        data-ng-model="goal.humanReadableId">
             </div>
@@ -26,19 +26,20 @@
 
         <div class="form-group">
             <!-- Goal type -->
-            <label for="type" class="col-md-2 control-label small">
+            <label for="type" class="col-xs-2 control-label small">
                 Type:
             </label>
-            <div class="col-md-4">
-                <select id="type" class="input-sm form-control"
-                        data-ng-model="goal.goalTypeId"
-                        data-ng-options="type.id as type.name for type in goalTypes">
-                    <option value=""></option>
-                </select>
+            <div class="col-xs-4">
+                <select-option data-id="goal-type"
+                               data-placeholder="Vælg type"
+                               data-ng-model="goal.goalTypeId"
+                               data-options="goalTypes"
+                               data-required="true">
+                </select-option>
             </div>
 
             <!-- Measurable -->
-            <div class="col-md-2">
+            <div class="col-xs-2">
                 <label class="checkbox checkbox-inline">
                     <input type="checkbox" id="measurable"
                            data-ng-model="goal.measurable">
@@ -47,10 +48,10 @@
             </div>
 
             <!-- Status traffic light -->
-            <label class="control-label col-md-1">
+            <label class="control-label col-xs-1">
                 Status:
             </label>
-            <div class="col-md-3">
+            <div class="col-xs-3">
                 <span id="statusGoal"
                       data-select-status2=""
                       data-ng-model="goal.status"
@@ -61,10 +62,10 @@
 
         <div class="form-group">
             <!-- Description -->
-            <label for="description" class="col-md-2 control-label small">
+            <label for="description" class="col-xs-2 control-label small">
                 Beskrivelse
             </label>
-            <div class="col-md-10">
+            <div class="col-xs-10">
                 <textarea id="description" class="form-control input-sm" rows="4"
                           data-ng-model="goal.description"></textarea>
             </div>
@@ -75,21 +76,21 @@
             <p>Delmål 1</p>
 
             <div class="form-group">
-                <label for="subGoalDate1" class="col-md-1 control-label small">Dato</label>
-                <div class="col-md-3">
+                <label for="subGoalDate1" class="col-xs-1 control-label small">Dato</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control" id="subGoalDate1"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate1">
                 </div>
-                <label for="subGoal1" class="col-md-1 control-label small">Mål</label>
-                <div class="col-md-3">
+                <label for="subGoal1" class="col-xs-1 control-label small">Mål</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoal1"
                            data-ng-model="goal.subGoal1">
                 </div>
 
-                <label for="subGoalRea1" class="col-md-1 control-label small">Rea</label>
-                <div class="col-md-3">
+                <label for="subGoalRea1" class="col-xs-1 control-label small">Rea</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea1"
                            data-ng-model="goal.subGoalRea1">
                 </div>
@@ -101,21 +102,21 @@
             <p>Delmål 2</p>
 
             <div class="form-group">
-                <label for="subGoalDate2" class="col-md-1 control-label small">Dato</label>
-                <div class="col-md-3">
+                <label for="subGoalDate2" class="col-xs-1 control-label small">Dato</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control" id="subGoalDate2"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate2">
                 </div>
-                <label for="subGoal2" class="col-md-1 control-label small">Mål</label>
-                <div class="col-md-3">
+                <label for="subGoal2" class="col-xs-1 control-label small">Mål</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoal2"
                            data-ng-model="goal.subGoal2">
                 </div>
 
-                <label for="subGoalRea2" class="col-md-1 control-label small">Rea</label>
-                <div class="col-md-3">
+                <label for="subGoalRea2" class="col-xs-1 control-label small">Rea</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea2"
                            data-ng-model="goal.subGoalRea2">
                 </div>
@@ -127,21 +128,21 @@
             <p>Delmål 3</p>
 
             <div class="form-group">
-                <label for="subGoalDate3" class="col-md-1 control-label small">Dato</label>
-                <div class="col-md-3">
+                <label for="subGoalDate3" class="col-xs-1 control-label small">Dato</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control" id="subGoalDate3"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate3">
                 </div>
-                <label for="subGoal3" class="col-md-1 control-label small">Mål</label>
-                <div class="col-md-3">
+                <label for="subGoal3" class="col-xs-1 control-label small">Mål</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoal3"
                            data-ng-model="goal.subGoal3">
                 </div>
 
-                <label for="subGoalRea3" class="col-md-1 control-label small">Rea</label>
-                <div class="col-md-3">
+                <label for="subGoalRea3" class="col-xs-1 control-label small">Rea</label>
+                <div class="col-xs-3">
                     <input type="text" class="form-control input-sm" id="subGoalRea3"
                            data-ng-model="goal.subGoalRea3">
                 </div>
@@ -150,10 +151,10 @@
 
         <div class="form-group">
             <!-- Note -->
-            <label for="note" class="col-md-2 control-label small">
+            <label for="note" class="col-xs-2 control-label small">
                 Note
             </label>
-            <div class="col-md-10">
+            <div class="col-xs-10">
                 <textarea id="note" class="form-control input-sm" rows="4"
                           data-ng-model="goal.note"></textarea>
             </div>

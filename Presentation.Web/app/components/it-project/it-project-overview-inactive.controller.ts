@@ -40,7 +40,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "economyCalc"
+            "economyCalc",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -58,7 +59,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: any,
-            private economyCalc) {
+            private economyCalc,
+            private needsWidthFixService) {
             this.$rootScope.page.title = "IT Projekt - Overblik";
 
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -157,7 +159,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears`;
+                                var urlParameters = `?$expand=ItProjectStatuses,Parent,ItProjectType,Rights($expand=User,Role),ResponsibleUsage($expand=OrganizationUnit),GoalStatus,EconomyYears,ItProjectStatusUpdates($orderby=Created desc;$top=1)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -255,7 +257,7 @@
                     }
                 ],
                 excel: {
-                    fileName: "IT System Overblik.xlsx",
+                    fileName: "IT Project inaktive.xlsx",
                     filterable: true,
                     allPages: true
                 },
@@ -303,7 +305,7 @@
                     {
                         field: "Parent.Name", title: "Overordnet IT Projekt", width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.status-project({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
+                        template: dataItem => dataItem.Parent ? `<a data-ui-sref="it-project.edit.main({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>` : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
                         filterable: {
@@ -317,7 +319,7 @@
                     {
                         field: "Name", title: "IT Projekt", width: 370,
                         persistId: "projname", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref="it-project.edit.status-project({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref="it-project.edit.main({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
                             cell: {
@@ -352,7 +354,9 @@
                     //        }
                     //    }
                     //},
+                    // TODO Reference skal muligvis indføres som i it-project-overview
                     {
+                        // TODO Skal muligvis slettes
                         field: "Esdh", title: "ESDH ref", width: 150,
                         persistId: "esdh", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
@@ -368,6 +372,7 @@
                         }
                     },
                     {
+                        // TODO Skal muligvis slettes
                         field: "Folder", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
@@ -447,23 +452,130 @@
                         filterable: false
                     },
                     {
-                        field: "StatusProject", title: "Status projekt", width: 100,
+                        field: "ItProjectStatus", title: "Status: Samlet", width: 100,
                         persistId: "statusproj", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<span data-square-traffic-light="${dataItem.StatusProject}"></span>`,
-                        excelTemplate: dataItem => dataItem && dataItem.StatusProject.toString() || "",
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "eq"
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusTime = latestStatus.TimeStatus;
+                                var statusQuality = latestStatus.QualityStatus;
+                                var statusResources = latestStatus.ResourcesStatus;
+                                if (latestStatus.IsCombined) {
+                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
+                                } else {
+                                    /* If no combined status exists, take the lowest status from the splitted status */
+                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
+                                        return "<span data-square-traffic-light='Red'></span>";
+                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
+                                        return "<span data-square-traffic-light='Yellow'></span>";
+                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
+                                        return "<span data-square-traffic-light='Green'></span>";
+                                    } else {
+                                        return "<span data-square-traffic-light='White'></span>";
+                                    }
+                                }
+                            } else {
+                                return "";
                             }
                         },
-                        values: [
-                            { text: "Hvid", value: 0 },
-                            { text: "Rød", value: 1 },
-                            { text: "Gul", value: 2 },
-                            { text: "Grøn", value: 3 }
-                        ]
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusTime = latestStatus.TimeStatus;
+                                var statusQuality = latestStatus.QualityStatus;
+                                var statusResources = latestStatus.ResourcesStatus;
+                                if (latestStatus.IsCombined) {
+                                    return `<span data-square-traffic-light="${latestStatus.CombinedStatus}"></span>`;
+                                } else {
+                                    /* If no combined status exists, take the lowest status from the splitted status */
+                                    if (statusTime === "Red" || statusQuality === "Red" || statusResources === "Red") {
+                                        return "<span data-square-traffic-light='Red'></span>";
+                                    } else if (statusTime === "Yellow" || statusQuality === "Yellow" || statusResources === "Yellow") {
+                                        return "<span data-square-traffic-light='Yellow'></span>";
+                                    } else if (statusTime === "Green" || statusQuality === "Green" || statusResources === "Green") {
+                                        return "<span data-square-traffic-light='Green'></span>";
+                                    } else {
+                                        return "<span data-square-traffic-light='White'></span>";
+                                    }
+                                }
+                            } else {
+                                return "";
+                            }
+                        },
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.TimeStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.QualityStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
+                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem.ItProjectStatusUpdates.length > 0) {
+                                var latestStatus = dataItem.ItProjectStatusUpdates[0];
+                                var statusToShow = (latestStatus.IsCombined) ? latestStatus.CombinedStatus : latestStatus.ResourcesStatus;
+                                return `<span data-square-traffic-light="${statusToShow}"></span>`;
+                            } else {
+                                return "";
+                            }
+                        },
+                        filterable: false,
+                        sortable: false
                     },
                     {
                         field: "StatusDate", title: "Status projekt: Dato", format: "{0:dd-MM-yyyy}", width: 130,
@@ -488,7 +600,7 @@
                         field: "Assignments", title: "Opgaver", width: 150,
                         persistId: "assignments", // DON'T YOU DARE RENAME!
                         hidden: true,
-                        template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.contains(n["@odata.type"], "Assignment")).length.toString(),
+                        template: dataItem => this._.filter(dataItem.ItProjectStatuses, n => this._.includes(n["@odata.type"], "Assignment")).length.toString(),
                         filterable: false,
                         sortable: false
                     },
@@ -544,7 +656,7 @@
             };
 
             // find the index of column where the role columns should be inserted
-            var insertIndex = this._.findIndex(mainGridOptions.columns, "persistId", "orgunit") + 1;
+            var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -680,6 +792,7 @@
                     var gridFieldName = `role${selectedId}`;
                     // show only the selected role column
                     this.mainGrid.showColumn(gridFieldName);
+                    this.needsWidthFixService.fixWidth();
                 }
             }
         };
@@ -736,6 +849,7 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
         }
 
@@ -783,7 +897,7 @@
                     controllerAs: "projectOverviewVm",
                     resolve: {
                         projectRoles: [
-                            "$http", $http => $http.get("odata/ItProjectRoles").then(result => result.data.value)
+                            "$http", $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(result => result.data.value)
                         ],
                         user: [
                             "userService", userService => userService.getUser()

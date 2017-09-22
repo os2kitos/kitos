@@ -33,6 +33,7 @@
                     lastName: user.lastName,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
+                    defaultUserStartPreference: user.defaultUserStartPreference,
                     defaultOrganizationUnitId: user.defaultOrganizationUnitId,
                     isUsingDefaultOrgUnit: user.isUsingDefaultOrgUnit,
                     currentOrganizationName: user.currentOrganizationName,
@@ -52,7 +53,6 @@
                 $scope.fakeDefaultOrganizationUnitId = user.currentOrganization.root.id;
                 $scope.noOrgUnits = true;
             }
-
             //can't use autosave - need to patch through userService!
             $scope.patch = function (field, value) {
                 var payload = {};
@@ -65,20 +65,16 @@
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
             };
-
             $scope.updateDefaultOrgUnit = function() {
-                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function(newUser) {
-                    init(newUser);
+                userService.updateDefaultOrgUnit($scope.user.defaultOrganizationUnitId).then(function (newUser) {
+                    var updatedUser = userService.getUser().then(
+                        (data) => { return data });
+                    //init(newUser);
                     notify.addSuccessMessage("Feltet er opdateret!");
                 }, function() {
                     notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
                 });
             };
-
-            $scope.fakeUpdateDefaultOrgUnit = function () {
-                notify.addSuccessMessage("Feltet er opdateret!");
-            };
-
         }]);
 
 })(angular, app);

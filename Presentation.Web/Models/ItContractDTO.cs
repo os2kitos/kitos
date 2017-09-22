@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel;
+using System;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Models
@@ -8,7 +9,7 @@ namespace Presentation.Web.Models
         public int Id { get; set; }
         public int OrganizationId { get; set; }
         public string Name { get; set; }
-        public string Note { get; set; }
+        public string Remark { get; set; }
         public string ItContractId { get; set; }
         public string Esdh { get; set; }
         public string Folder { get; set; }
@@ -20,7 +21,9 @@ namespace Presentation.Web.Models
         public DateTime? OperationalAcceptanceTestExpected { get; set; }
         public DateTime? OperationalAcceptanceTestApproved { get; set; }
         public DateTime? Concluded { get; set; }
-        public int Duration { get; set; }
+        public int? DurationYears { get; set; }
+        public int? DurationMonths { get; set; }
+        public bool DurationOngoing { get; set; }
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? ExpirationDate { get; set; }
         public DateTime? OperationRemunerationBegun { get; set; }
@@ -37,8 +40,7 @@ namespace Presentation.Web.Models
         public string PriceRegulationName { get; set; }
         public int? OptionExtendId { get; set; }
         public string OptionExtendName { get; set; }
-        public int? ContractSignerId { get; set; }
-        public UserDTO ContractSigner { get; set; }
+        public string ContractSigner { get; set; }
 
         public bool IsSigned { get; set; }
         public DateTime? SignedDate { get; set; }
@@ -63,9 +65,6 @@ namespace Presentation.Web.Models
         public IEnumerable<ItInterfaceUsageDTO> AssociatedInterfaceUsages { get; set; }
         public IEnumerable<ItInterfaceExposureDTO> AssociatedInterfaceExposures { get; set; }
 
-        public IEnumerable<EconomyStreamDTO> InternEconomyStreams { get; set; }
-        public IEnumerable<EconomyStreamDTO> ExternEconomyStreams { get; set; }
-
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
@@ -76,5 +75,14 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
+        public int? ObjectOwnerId { get; set; }
+
+        public string Running { get; set; }
+        public string ByEnding { get; set; }
+        public bool? Active { get; set; }
+        public bool? IsActive { get; set; }
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
     }
 }

@@ -5,17 +5,8 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract price regulation option.
     /// </summary>
-    public class PriceRegulationType : Entity, IOptionEntity<ItContract>
+    public class PriceRegulationType : OptionEntity<ItContract>, IOptionReference<ItContract>
     {
-        public PriceRegulationType()
-        {
-            References = new List<ItContract>();
-        }
-
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public virtual ICollection<ItContract> References { get; set; }
+        public virtual ICollection<ItContract> References { get; set; } = new HashSet<ItContract>();
     }
 }

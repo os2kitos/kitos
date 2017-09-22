@@ -1,5 +1,4 @@
-﻿using System;
-using System.Security.Principal;
+﻿using System.Security.Principal;
 using System.Web.OData;
 
 namespace Tests.Unit.Presentation.Web.Helpers
@@ -39,7 +38,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
         public void LogOff()
         {
             _user = new GenericPrincipal(
-                new GenericIdentity(String.Empty),
+                new GenericIdentity(string.Empty),
                 new string[0]
             );
 

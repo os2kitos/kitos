@@ -2,49 +2,35 @@
 
     <!-- show/hide-module -->
     <div class="form-group">
-        <label class="col-md-2 control-label">
+        <label class="col-xs-2 control-label">
             Generelt
         </label>
-        <div class="col-md-10">
+        <div class="col-xs-10">
             <div>
                 <label class="control-label">
-                    <input type="checkbox" data-ng-model="config.showItSystemModule" data-autosave="{{config.autosaveUrl}}" data-field="showItSystemModule" tabindex="1"/>
+                    <input type="checkbox" data-ng-model="config.showItSystemModule" data-autosave="{{config.autosaveUrl}}" data-field="ShowItSystemModule" tabindex="1"/>
                     Medtag dette modul
+                </label>
+            </div>
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItSystemPrefix" data-autosave="{{config.autosaveUrl}}" data-field="ShowItSystemPrefix" tabindex="1" />
+                    Brug 'IT' prefix
                 </label>
             </div>
         </div>
     </div>
 
-    <div data-option-list="" title="Roller" data-options-url="api/itSystemRole"></div>
-    <div data-suggest-new-role="" data-url="api/itSystemRole"></div>
-
-    <div data-option-list="" title="Applikationstyper" data-options-url="api/itSystemTypeOption"></div>
-    <div data-suggest-new="" data-url="api/itSystemTypeOption"></div>
-
-    <div data-option-list="" title="Forretningstyper" data-options-url="api/businessType"></div>
-    <div data-suggest-new="" data-url="api/businessType"></div>
-
-    <div data-option-list="" title="Arkiveringstyper" data-options-url="api/archiveType"></div>
-    <div data-suggest-new="" data-url="api/archiveType"></div>
-
-    <div data-option-list="" title="Datatyper" data-options-url="api/dataType"></div>
-    <div data-suggest-new="" data-url="api/dataType"></div>
-
-    <div data-option-list="" title="Frekvenser" data-options-url="api/frequency"></div>
-    <div data-suggest-new="" data-url="api/frequency"></div>
-
-    <div data-option-list="" title="Snitfladetyper" data-options-url="api/interfaceType"></div>
-    <div data-suggest-new="" data-url="api/interfaceType"></div>
-
-    <div data-option-list="" title="Grænseflader" data-options-url="api/interface"></div>
-    <div data-suggest-new="" data-url="api/interface"></div>
-
-    <div data-option-list="" title="Metoder" data-options-url="api/method"></div>
-    <div data-suggest-new="" data-url="api/method"></div>
-
-    <div data-option-list="" title="Personfølsomme data" data-options-url="api/sensitiveDataType"></div>
-    <div data-suggest-new="" data-url="api/sensitiveDataType"></div>
-
-    <div data-option-list="" title="TSA" data-options-url="api/tsa"></div>
-    <div data-suggest-new="" data-url="api/tsa"></div>
+    <div data-local-option-role-list="" title="Roller" dir-id="localSystemRoleId" state="local-config.system.edit-system-roles" data-options-url="odata/LocalItSystemRoles"></div>
+    <div data-local-option-list="" title="Applikationstyper" dir-id="localApplicationTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalItSystemTypes"></div>
+    <div data-local-option-list="" title="Forretningstyper" dir-id="localBusinessTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalBusinessTypes"></div>
+    <div data-local-option-list="" title="Arkiveringstyper" dir-id="localArchiveTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalArchiveTypes"></div>
+    <div data-local-option-list="" title="Arkiveringssted" dir-id="localArchiveLocationId" state="local-config.system.edit-system-types" data-options-url="odata/LocalArchiveLocations"></div>
+    <div data-local-option-list="" title="Datatyper" dir-id="localDataTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalDataTypes"></div>
+    <div data-local-option-list="" title="Frekvenser" dir-id="localFrequencyTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalFrequencyTypes"></div>
+    <div data-local-option-list="" title="Snitfladetyper" dir-id="localItInterfaceTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalItInterfaceTypes"></div>
+    <div data-local-option-list="" title="Grænseflader" dir-id="localInterfaceTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalInterfaceTypes"></div>
+    <div data-local-option-list="" title="Metoder" dir-id="localMethodTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalMethodTypes"></div>
+    <div data-local-option-list="" title="Personfølsomme data" dir-id="localSensitiveDataTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalSensitiveDataTypes"></div>
+    <div data-local-option-list="" title="TSA" dir-id="localTsaTypeId" state="local-config.system.edit-system-types" data-options-url="odata/LocalTsaTypes"></div>
 </form>

@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API
 {
-    //TODO refactor this mess
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-
-
-        public AuthorizeController(IUserRepository userRepository, IUserService userService,  IOrganizationService organizationService)
+        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
@@ -26,42 +28,126 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetLogin()
         {
+            var user = KitosUser;
+            Logger.Debug($"GetLogin called for {user}");
             try
             {
-                var response = CreateLoginResponse(KitosUser);
+                var response = Map<User, UserDTO>(user);
 
                 return Ok(response);
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
+        }
+
+        [Route("api/authorize/GetOrganizations")]
+        public HttpResponseMessage GetOrganizations()
+        {
+            var user = KitosUser;
+            var orgs = _organizationService.GetOrganizations(user);
+            var dtos = AutoMapper.Mapper.Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            return Ok(dtos);
+        }
+
+        [Route("api/authorize/GetOrganization({orgId})")]
+        public HttpResponseMessage GetOrganization(int orgId)
+        {
+            var user = KitosUser;
+            var org = _organizationService.GetOrganizations(user).Single(o=>o.Id == orgId);
+            var defaultUnit = _organizationService.GetDefaultUnit(org, user);
+            var dto = new OrganizationAndDefaultUnitDTO()
+            {
+                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
+                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
+            };
+            return Ok(dto);
+        }
+
+        private User LoginWithToken(string token)
+        {
+            User user = null;
+            var principal = new TokenValidator().Validate(token);
+            if (principal == null || !principal.Identity.IsAuthenticated)
+            {
+                Logger.Info($"Uservalidation: Could not validate token.");
+                throw new ArgumentException();
+            }
+
+            if (principal.Claims.Any(c => c.Type == ClaimTypes.Email || c.Type == ClaimTypes.NameIdentifier))
+            {
+                
+                var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
+                var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                if (uuidClaim != null && !String.IsNullOrEmpty(uuidClaim.Value))
+                {
+                    user = _userRepository.GetByUuid(uuidClaim.Value);
+                }
+                if (user == null && emailClaim != null)
+                {
+                    user = _userRepository.GetByEmail(emailClaim.Value);
+                    if (user != null && !String.IsNullOrEmpty(uuidClaim.Value))
+                    {
+                        user.UniqueId = uuidClaim.Value;
+                        _userRepository.Update(user);
+                        _userRepository.Save();
+                    }
+                }
+            }
+            return user;
         }
 
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
+            var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
+
+            if (loginDto != null)
+                loginInfo = new { Token = loginInfo.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+
             try
             {
-                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
-                    throw new ArgumentException();
+                User user;
+                if (!string.IsNullOrEmpty(loginDto.Token))
+                {
+                    user = LoginWithToken(loginDto.Token);
+                    if (user == null)
+                    {
+                        throw new ArgumentException();
+                    }
 
-                var user = _userRepository.GetByEmail(loginDto.Email);
+                }
+                else
+                {
+                    if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                    {
+                        throw new ArgumentException();
+                    }
 
+                    user = _userRepository.GetByEmail(loginDto.Email);
+                }
+
+                
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
-
-                var response = CreateLoginResponse(user);
+                var response = Map<User, UserDTO>(user);
+                loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
+                Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
             }
             catch (ArgumentException)
             {
+                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
+
                 return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
-                return Error(e);
+                Logger.Info($"Uservalidation: Error. {loginInfo}");
+
+                return LogError(e);
             }
         }
 
@@ -75,7 +161,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -92,17 +178,15 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
         // helper function
-        private LoginResponseDTO CreateLoginResponse(User user)
+        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
         {
             var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
 
-            // getting all the organizations that the user is member of
-            var organizations = _organizationService.GetOrganizations(user).ToList();
             // getting the default org units (one or null for each organization)
             var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
 
@@ -113,12 +197,14 @@ namespace Presentation.Web.Controllers.API
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
             });
 
-            return new LoginResponseDTO()
+
+            var response = new LoginResponseDTO()
             {
                 User = userDto,
                 Organizations = orgsDto
             };
 
+            return response;
         }
     }
 }

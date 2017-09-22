@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
+using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -25,83 +29,13 @@ namespace Presentation.Web.Controllers.API
         {
             if (!string.IsNullOrWhiteSpace(q))
                 paging.Where(x => x.Name.Contains(q) || x.Cvr.Contains(q));
-            return base.GetAll(paging);
+            return GetAll(paging);
         }
 
         public HttpResponseMessage GetBySearch(string q, int orgId)
         {
             try
             {
-                //var orgs = Repository.Get(
-                //    org =>
-                //        // filter by project name
-                //        org.Name.Contains(q) &&
-                //        // global admin sees all
-                //        (KitosUser.IsGlobalAdmin ||
-                //        // object owner sees his own objects
-                //        org.ObjectOwnerId == KitosUser.Id ||
-                //        // it's public everyone can see it
-                //        org.AccessModifier == AccessModifier.Public ||
-                //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Local &&
-                //        org.Id == orgId ||
-                //        // user with a role on the object can see it
-                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
-                //        // !SPECIAL CASE! user with a role on a org unit can see it
-                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
-                //    );
-
-                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
-                // so have to do it the slow way :(
-
-                var orgs = Repository.Get(
-                    org =>
-                        // filter by project name or cvr
-                        (org.Name.Contains(q) || org.Cvr.Contains(q))).ToList();
-
-                // filter locally
-                var orgs2 = orgs.Where(org => KitosUser.IsGlobalAdmin || org.ObjectOwnerId == KitosUser.Id ||
-                    // it's public everyone can see it
-                        org.AccessModifier == AccessModifier.Public ||
-                    // everyone in the same organization can see normal objects
-                        org.AccessModifier == AccessModifier.Local &&
-                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
-
-                var dtos = Map(orgs2);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
-
-        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public, int orgId)
-        {
-            try
-            {
-                //var orgs = Repository.Get(
-                //    org =>
-                //        // filter by project name or cvr
-                //        (org.Name.Contains(q) || org.Cvr.Contains(q)) &&
-                //        // global admin sees all
-                //        (KitosUser.IsGlobalAdmin ||
-                //        // object owner sees his own objects
-                //        org.ObjectOwnerId == KitosUser.Id ||
-                //        // it's public everyone can see it
-                //        org.AccessModifier == AccessModifier.Public ||
-                //        // everyone in the same organization can see normal objects
-                //        org.AccessModifier == AccessModifier.Local &&
-                //        org.Id == orgId ||
-                //        // user with a role on the object can see it
-                //        org.Rights.Any(x => x.UserId == KitosUser.Id) ||
-                //        // !SPECIAL CASE! user with a role on a org unit can see it
-                //        org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)))
-                //    );
-
-                // MySql.Data v6.9.5 can't do org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id))
-                // so have to do it the slow way :(
-
                 var orgs = Repository.Get(
                     org =>
                         // filter by project name or cvr
@@ -120,7 +54,33 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
+            }
+        }
+
+        public HttpResponseMessage GetPublic(string q, [FromUri] bool? @public, int orgId)
+        {
+            try
+            {
+                var orgs = Repository.Get(
+                    org =>
+                        // filter by project name or cvr
+                        (org.Name.Contains(q) || org.Cvr.Contains(q))).ToList();
+
+                // filter locally
+                var orgs2 = orgs.Where(org => KitosUser.IsGlobalAdmin || org.ObjectOwnerId == KitosUser.Id ||
+                        // it's public everyone can see it
+                        org.AccessModifier == AccessModifier.Public ||
+                        // everyone in the same organization can see normal objects
+                        org.AccessModifier == AccessModifier.Local &&
+                        org.Id == orgId || org.OrgUnits.Any(x => x.Rights.Any(y => y.UserId == KitosUser.Id)));
+
+                var dtos = Map(orgs2);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
             }
         }
 
@@ -135,31 +95,76 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                // OLD METHOD
-                // gets users with a role in the organization
-                //var qry =
-                //    Repository.AsQueryable().Single(x => x.Id == id).OrgUnits.SelectMany(y => y.Rights)
-                //              .Select(z => z.User)
-                //              .Where(u => u.Name.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1 || u.Email.IndexOf(q, StringComparison.OrdinalIgnoreCase) != -1);
-
-                //var qry = _useRepository.Get(x => x.CreatedInId == id && (x.Name.Contains(q) || x.Email.Contains(q)));
                 var qry =
                     _useRepository.Get(
                         u =>
-                            u.OrganizationRights.Count(r => r.ObjectId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
+                            u.OrganizationRights.Count(r => r.OrganizationId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
 
                 return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
         protected override Organization PostQuery(Organization item)
         {
+            if (item.TypeId > 0)
+            {
+                var typeKey = (OrganizationTypeKeys)item.TypeId;
+                switch (typeKey)
+                {
+                    case OrganizationTypeKeys.Kommune:
+                        if (!FeatureChecker.CanExecute(KitosUser, Feature.CanSetOrganizationTypeKommune))
+                            throw new SecurityException();
+                        break;
+                    case OrganizationTypeKeys.Interessefællesskab:
+                        if (!FeatureChecker.CanExecute(KitosUser, Feature.CanSetOrganizationTypeInteressefællesskab))
+                            throw new SecurityException();
+                        break;
+                    case OrganizationTypeKeys.Virksomhed:
+                        if (!FeatureChecker.CanExecute(KitosUser, Feature.CanSetOrganizationTypeVirksomhed))
+                            throw new SecurityException();
+                        break;
+                    case OrganizationTypeKeys.AndenOffentligMyndighed:
+                        if (!FeatureChecker.CanExecute(KitosUser, Feature.CanSetOrganizationTypeAndenOffentligMyndighed))
+                            throw new SecurityException();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            if (item.AccessModifier == AccessModifier.Public &&
+                !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
+                throw new SecurityException("Du har ikke rettigheder til at sætte synligheden til offentlig");
+
             _organizationService.SetupDefaultOrganization(item, KitosUser);
             return base.PostQuery(item);
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            if (!KitosUser.IsGlobalAdmin)
+            {
+                if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
+                {
+                    // only global admin is allowed to change the type of an organization
+                    return Unauthorized();
+                }
+            }
+
+            return base.Patch(id, organizationId, obj);
+        }
+
+        protected override bool HasWriteAccess(Organization obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

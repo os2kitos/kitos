@@ -25,6 +25,7 @@ namespace Presentation.Web.Models
         public int? ExhibitedById { get; set; }
         public int? ExhibitedByItSystemId { get; set; }
         public string ExhibitedByItSystemName { get; set; }
+        public bool ExhibitedByItSystemDisabled { get; set; }
         public int? TsaId { get; set; }
         public string TsaName { get; set; }
         public int? InterfaceId { get; set; }
@@ -45,5 +46,7 @@ namespace Presentation.Web.Models
         ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
         /// </value>
         public bool IsUsed { get; set; }
+
+        public bool Disabled { get; set; }
     }
 }

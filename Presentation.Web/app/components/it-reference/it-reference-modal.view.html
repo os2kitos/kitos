@@ -1,0 +1,50 @@
+﻿<div class="modal-header">
+    <div class="clearfix">
+        <h3 class="modal-title pull-left">Opret ny reference</h3>
+        <help-text class="pull-right" data-key="it_reference_create" data-default-title="Opret reference"></help-text>
+    </div>
+</div>
+<form name="activityForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="documentTitle" class="col-xs-4 control-label small">
+                Dokumenttitel
+            </label>
+            <div class="col-xs-7">
+                <input type="text" id="documentTitle" ng-model="reference.title" class="form-control input-sm" required />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="DokomentID" class="col-xs-4 control-label small">
+                Evt. DokumentID/sagsnr./Anden Reference
+            </label>
+            <div class="col-xs-7">
+                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" class="form-inline form-control input-sm" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-4 control-label small">
+                URL, hvis dokumenttitel skal virke som link
+            </label>
+            <div class="col-xs-7">
+                <input type="text" id="DokomentID" ng-model="reference.url" class="form-control form-inline input-sm" aria-describedby="helpBlock"/>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancel"
+                    type="button"
+                    class="btn btn-warning"
+                    data-ng-click="dismiss()"
+                    data-disabled-on-busy="">
+                Annuller
+            </button>
+            <button id="save"
+                    type="submit"
+                    class="btn btn-success"
+                    data-disabled-on-busy=""
+                    data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)">
+                Gem
+            </button>
+        </div>
+    </div>
+</form>

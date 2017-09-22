@@ -37,7 +37,9 @@
             "moment",
             "notify",
             "user",
-            "gridStateService"
+            "gridStateService",
+            "$uibModal",
+            "needsWidthFixService"
         ];
 
         constructor(
@@ -52,7 +54,9 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
-            private gridStateService: Services.IGridStateFactory) {
+            private gridStateService: Services.IGridStateFactory,
+            private $uibModal,
+            private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -89,7 +93,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
 
             // catalog grid
             this.mainGridOptions = {
@@ -113,6 +117,10 @@
                                 parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/, "TaskRefs/any(c: $1c/Description$2)");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
+
+                                if (user.isGlobalAdmin) {
+                                    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
+                                }
                             }
 
                             return parameterMap;
@@ -135,7 +143,14 @@
                     serverFiltering: true
                 },
                 toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
+                    {
+                        name: "createITSystem",
+                        text: "Opret IT System",
+                        template: "<a ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right'>#: text #</a>"
+                    },
+                    {
+                        name: "excel", text: "Eksportér til Excel", className: "pull-right"
+                    },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -187,16 +202,19 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Usages", title: "Anvend/Fjern anvendelse", width: 100,
+                        field: "Usages", title: "Anvendes", width: 40,
                         persistId: "command", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // true if system is being used by system within current context, else false
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<button type="button" class="btn btn-danger col-md-7" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})">Fjern anv.</button>`;
+                                return `<div class="text-center"><button type="button" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
-                            return `<button type="button" class="btn btn-success col-md-7" data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})">Anvend</button>`;
+                            if (dataItem.Disabled)
+                                return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+
+                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
@@ -220,10 +238,36 @@
                         }
                     },
                     {
+                        field: "PreviousName", title: "Tidligere Systemnavn", width: 285,
+                        persistId: "previousname", // DON'T YOU DARE RENAME!
+                        template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
                         field: "Name", title: "It System", width: 285,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref="it-system.edit.interfaces({id: ${dataItem.Id}})">${dataItem.Name}</a>`,
-                        excelTemplate: dataItem => dataItem && dataItem.Name || "",
+                        template: dataItem => {
+                            if (dataItem.Disabled)
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv) </a>`;
+                            else
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
+                        },
+                        excelTemplate: dataItem => {
+                            if (dataItem && dataItem.Name) {
+                                if (dataItem.Disabled)
+                                    return dataItem.Name + " (Inaktiv)";
+                                else
+                                    return dataItem.Name;
+                            } else {
+                                return ""
+                            }
+                        },
                         filterable: {
                             cell: {
                                 dataSource: [],
@@ -286,7 +330,7 @@
                     {
                         field: "TaskKey", title: "KLE ID", width: 150,
                         persistId: "taskkey", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "TaskKey").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "TaskKey").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
@@ -301,7 +345,7 @@
                     {
                         field: "TaskName", title: "KLE Navn", width: 155,
                         persistId: "taskname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.pluck(dataItem.TaskRefs, "Description").join(", ") : "",
+                        template: dataItem => dataItem.TaskRefs.length > 0 ? this._.map(dataItem.TaskRefs, "Description").join(", ") : "",
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
@@ -313,49 +357,14 @@
                         sortable: false
                     },
                     {
-                        field: "Url", title: "Link til beskrivelse", width: 125,
-                        persistId: "link", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem.Url) {
-                                return "";
-                            }
-                            return `<a href="${dataItem.Url}" title="Link til yderligere..." target="_blank"><i class="fa fa-link"></i></a>`;
-                        },
-                        excelTemplate: dataItem => dataItem && dataItem.Url || "",
-                        attributes: { "class": "text-center" },
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem =>
-                            `<a class="col-md-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
+                            `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
                         sortable: false
                     },
-                    //{
-                    //    field: "", title: "Snitflader: Udstilles globalt", width: 95,
-                    //    persistId: "globalexpsure", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "", title: "Snitflader: Anvendes globalt", width: 95,
-                    //    persistId: "globalusage", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
                         persistId: "orgname", // DON'T YOU DARE RENAME!
@@ -398,12 +407,18 @@
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => {
+                        template: dataItem => {
                             // handles null cases
-                            if (!dataItem || !dataItem.LastChanged) {
+                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
                                 return "";
                             }
-
+                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                        },
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem || !dataItem.LastChanged || this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                                return "";
+                            }
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
                         },
                         attributes: { "class": "text-center" },
@@ -411,6 +426,31 @@
                             cell: {
                                 showOperators: false,
                                 operator: "gte"
+                            }
+                        }
+                    },
+                    {
+                        field: "References.Title",
+                        title: "Reference",
+                        width: 150,
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.URL) {
+                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
+                        filterable: {
+                            cell: {
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
                             }
                         }
                     },
@@ -430,6 +470,72 @@
                 ]
             };
         }
+
+        public createITSystem() {
+            var self = this;
+
+            var modalInstance = this.$uibModal.open({
+                // fade in instead of slide from top, fixes strange cursor placement in IE
+                // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
+                windowClass: 'modal fade in',
+                templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
+                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                    $scope.formData = {};
+                    $scope.type = 'IT System';
+                    $scope.checkAvailableUrl = 'api/itSystem/';
+
+                    $scope.saveAndProceed = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId,
+                            taskRefIds: []
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        self.$http.post('api/itsystem', payload)
+                            .success(function (result: any) {
+                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                var systemId = result.response.id;
+                                $modalInstance.close(systemId);
+                                if (systemId) {
+                                    self.$state.go('it-system.edit.main', { id: systemId });
+                                }
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                            });
+                    };
+
+                    $scope.save = function () {
+                        var payload = {
+                            name: $scope.formData.name,
+                            belongsToId: self.user.currentOrganizationId,
+                            organizationId: self.user.currentOrganizationId,
+                            taskRefIds: []
+                        };
+
+                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        self.$http.post('api/itsystem', payload)
+                            .success(function (result: any) {
+                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                var systemId = result.response.id;
+                                $modalInstance.close(systemId);
+                                if (systemId) {
+                                    self.$state.reload();
+                                }
+
+                            }).error(function () {
+                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                            });
+                    };
+                }]
+            });
+
+            /*modalInstance.result.then(function (id) {
+                // modal was closed with OK
+                self.$state.go('it-system.edit.interfaces', { id: id });
+            });*/
+        };
 
         // usagedetails grid empty-grid handling
         private detailsBound(e) {
@@ -480,13 +586,18 @@
             this.gridState.removeLocal();
             this.gridState.removeSession();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
+            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :( works with this.loadGridOptions() and this.mainGrid.dataSource.read();
             this.reload();
         };
 
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
+
+        public isValidUrl(Url) {
+            var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+            return regexp.test(Url.toLowerCase());
+        };
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
@@ -572,6 +683,7 @@
 
                 // hide loadingbar when export is finished
                 kendo.ui.progress(this.mainGrid.element, false);
+                this.needsWidthFixService.fixWidth();
             }
         }
 
@@ -587,7 +699,6 @@
             } else {
                 template = t => t;
             }
-
             return template;
         }
 

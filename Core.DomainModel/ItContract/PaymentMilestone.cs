@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract payment milestone
     /// </summary>
-    public class PaymentMilestone : Entity, IContextAware
+    public class PaymentMilestone : Entity, IContextAware, IContractModule
     {
         /// <summary>
         /// Gets or sets the title.
@@ -53,7 +53,7 @@ namespace Core.DomainModel.ItContract
         /// </returns>
         public override bool HasUserWriteAccess(User user)
         {
-            if (ItContract != null && ItContract.HasUserWriteAccess(user)) 
+            if (ItContract != null && ItContract.HasUserWriteAccess(user))
                 return true;
 
             return base.HasUserWriteAccess(user);
@@ -71,7 +71,7 @@ namespace Core.DomainModel.ItContract
             // delegate to ItContract
             if (ItContract != null)
                 return ItContract.OrganizationId == organizationId;
-            
+
             return false;
         }
     }

@@ -1,9 +1,11 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 
 namespace Core.DomainServices
 {
     public interface IUserRepository : IGenericRepository<User>
     {
         User GetByEmail(string email);
+        User GetByUuid(string uniqueId);
     }
 }

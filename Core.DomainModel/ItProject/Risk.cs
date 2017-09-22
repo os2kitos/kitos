@@ -1,6 +1,6 @@
 namespace Core.DomainModel.ItProject
 {
-    public class Risk : Entity, IContextAware
+    public class Risk : Entity, IContextAware, IProjectModule
     {
         /// <summary>
         /// Gets or sets the associated it project identifier.

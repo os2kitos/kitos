@@ -1,105 +1,107 @@
-﻿<div class="panel panel-default">
-    <div class="panel-heading">IT Systemet har følgende IT kontrakter tilknyttet:</div>
+﻿<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <div class="panel panel-default">
+        <div class="panel-heading">IT Systemet har følgende IT kontrakter tilknyttet:</div>
+        <table class="table table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        IT Kontrakt
+                    </th>
+                    <th>
+                        Kontrakttype
+                    </th>
+                    <th>
+                        Leverandør
+                    </th>
+                    <th>
+                        Drift
+                    </th>
+                    <th>
+                        Indgået
+                    </th>
+                    <th>
+                        Udløber
+                    </th>
+                    <th>
+                        Opsagt
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="contract in usage.contracts">
+                    <!-- name -->
+                    <td>
+                        <a data-ui-sref="it-contract.edit.systems({id: contract.id})">
+                            {{ contract.name ? contract.name : 'Unavngiven' }}
+                        </a>
+                    </td>
 
-    <table class="table table-condensed table-striped">
-        <thead>
-            <tr>
-                <th>
-                    IT Kontrakt
-                </th>
-                <th>
-                    Kontrakttype
-                </th>
-                <th>
-                    Leverandør
-                </th>
-                <th>
-                    Drift
-                </th>
-                <th>
-                    Indgået
-                </th>
-                <th>
-                    Udløber
-                </th>
-                <th>
-                    Opsagt
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr data-ng-repeat="contract in usage.contracts">
-                <!-- name -->
-                <td>
-                    <a data-ui-sref="it-contract.edit.systems({id: contract.id})">
-                        {{ contract.name ? contract.name : 'Unavngiven' }}
-                    </a>
-                </td>
+                    <!-- type -->
+                    <td>
+                        {{ contract.contractTypeName }}
+                    </td>
 
-                <!-- type -->
-                <td>
-                    {{ contract.contractTypeName }}
-                </td>
+                    <!-- supplier -->
+                    <td>
+                        {{ contract.supplierName }}
+                    </td>
 
-                <!-- supplier -->
-                <td>
-                    {{ contract.supplierName }}
-                </td>
+                    <!-- has operation -->
+                    <td>
+                        <span data-ng-if="contract.hasOperationElement" class="text-success">
+                            <i class="glyphicon glyphicon-ok"></i>
+                        </span>
+                    </td>
 
-                <!-- has operation -->
-                <td>
-                    <span data-ng-if="contract.hasOperationElement" class="text-success">
-                        <i class="glyphicon glyphicon-ok"></i>
-                    </span>
-                </td>
+                    <!-- concluded ("indgået") -->
+                    <td>
+                       <span data-ng-model="contract.concluded" data-datereader=""></span>
+                    </td>
+                    <!-- expiration -->
+                    <td>
+                        <span data-ng-model="contract.expirationDate" data-datereader=""></span>
+                    </td>
+                    <!-- terminated -->
+                    <td>
+                        <span data-ng-model="contract.terminated" data-datereader=""></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-                <!-- concluded ("indgået") -->
-                <td>
-                    <span data-ng-model="contract.concluded" data-datereader=""></span>
-                </td>
+    <div class="object-section-container">
+        <div class="panel panel-default">
+            <form class="form-horizontal">
+                <div class="form-group row">
+                    <label class="col-xs-4 control-label">
+                        Hvilken kontrakt skal afgøre om IT systemet er aktivt:
+                    </label>
+                    <div class="col-xs-3">
+                        <select id="contract-selector"
+                                class="form-control input-sm"
+                                data-ui-select2="allowClearOption"
+                                data-placeholder="Ingen kontrakt"
+                                data-ng-model="mainContractId"
+                                data-ng-change="saveMainContract()"
+                                data-ng-disabled="!hasWriteAccess">
+                            <option value=""></option>
+                            <option data-ng-repeat="contract in contracts" value="{{contract.id}}">{{contract.name}}</option>
+                        </select>
 
-                <!-- expiration -->
-                <td>
-                    <span data-ng-model="contract.expirationDate" data-datereader=""></span>
-                </td>
-
-                <!-- terminated -->
-                <td>
-                    <span data-ng-model="contract.terminated" data-datereader=""></span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<div>
-    <form class="form-horizontal">
-        <div class="form-group">
-            <label class="col-md-4 control-label">
-                Hvilken kontrakt skal afgøre om IT systemet er aktivt:
-            </label>
-            <div class="col-md-3">
-                <select id="contract-selector"
-                        class="form-control input-sm"
-                        data-ui-select2="allowClearOption"
-                        data-placeholder="Ingen kontrakt"
-                        data-ng-model="mainContractId"
-                        data-ng-change="saveMainContract()"
-                        data-ng-disabled="!hasWriteAccess">
-                    <option value=""></option>
-                    <option data-ng-repeat="contract in contracts" value="{{contract.id}}">{{contract.name}}</option>
-                </select>
-
-            </div>
-            <div class="col-md-4">
-                IT systemet har nu status som:
-                <strong class="text-success" data-ng-show="usage.mainContractIsActive">
-                    Aktivt
-                </strong>
-                <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
-                    Inaktivt
-                </strong>
-            </div>
+                    </div>
+                    <div class="col-xs-4">
+                        IT systemet har nu status som:
+                        <strong class="text-success" data-ng-show="usage.mainContractIsActive">
+                            Aktivt
+                        </strong>
+                        <strong class="text-danger" data-ng-hide="usage.mainContractIsActive">
+                            Inaktivt
+                        </strong>
+                    </div>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

@@ -9,7 +9,7 @@
                     return userService.getUser();
                 }]
             },
-            controller: ['$rootScope', '$http', '$state', 'notify', 'user', function ($rootScope, $http, $state, notify, user) {
+            controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', function ($rootScope, $http, $state, $modal, notify, user, $scope) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
                     { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
@@ -17,23 +17,9 @@
                     { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
                 ];
                 $rootScope.page.subnav.buttons = [
-                    { func: create, text: 'Opret IT Kontrakt', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
                 ];
-
-                function create() {
-                    var orgId = user.currentOrganizationId;
-                    var msg = notify.addInfoMessage("Opretter kontrakt...", false);
-                    $http.post('api/itcontract', { organizationId: orgId, name: 'Unavngivet kontrakt' })
-                        .success(function(result) {
-                            msg.toSuccessMessage("En ny kontrakt er oprettet!");
-                            var contract = result.response;
-                            $state.go('it-contract.edit.systems', { id: contract.id });
-                        })
-                        .error(function() {
-                            msg.toErrorMessage("Fejl! Kunne ikke oprette en ny kontrakt!");
-                        });
-                }
+                $rootScope.subnavPositionCenter = false;
 
                 function remove() {
                     if (!confirm("Er du sikker på du vil slette kontrakten?")) {
@@ -50,6 +36,10 @@
                             msg.toErrorMessage("Fejl! Kunne ikke slette IT Kontrakten!");
                         });
                 }
+
+                $scope.$on('$viewContentLoaded', function () {
+                    $rootScope.positionSubnav();
+                });
             }]
         });
     }]);

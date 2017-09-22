@@ -14,14 +14,19 @@ x64/
 build/
 [Bb]in/
 [Oo]bj/
+Output/
+Presentation.Web/[Ss]cripts/
 Presentation.Web/app/**/*.js
 Presentation.Web/app/**/*.js.map
+Presentation.Web/appReport/**/*.js
+Presentation.Web/appReport/**/*.js.map
 Presentation.Web/Content/css/
 Presentation.Web/Content/fonts/
-Presentation.Web/Scripts/*-bundle.min.js
+Presentation.Web/Scripts/*-bundle*.js
 Presentation.Web/Scripts/maps/
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
+Presentation.Web/typescriptOutput
 
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
@@ -33,6 +38,7 @@ results.xml
 # Protractor tests
 results-protractor.json
 results-protractor.xml
+testresults
 
 # Coverage report
 coverage/
@@ -41,7 +47,11 @@ karmaCoverage/
 # Packages
 node_modules/
 bower_components/
+jspm_packages/
 packages/
+
+# typings
+typings/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -176,3 +186,7 @@ $RECYCLE.BIN/
 
 # Mac desktop service store files
 .DS_Store
+._.DS_Store
+
+# deploy folder
+deploy/

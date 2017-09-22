@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProjectPhase
+    public class ItProjectPhase : IProjectModule
     {
         /// <summary>
         /// Gets or sets the phase name.

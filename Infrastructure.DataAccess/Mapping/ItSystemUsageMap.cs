@@ -11,6 +11,12 @@ namespace Infrastructure.DataAccess.Mapping
             this.ToTable("ItSystemUsage");
 
             // Relationships
+            HasOptional(t => t.Reference);
+            HasMany(t => t.ExternalReferences)
+                .WithOptional(d => d.ItSystemUsage)
+                .HasForeignKey(d => d.ItSystemUsage_Id)
+                .WillCascadeOnDelete(true);
+
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 
@@ -49,6 +55,13 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.ItSystemUsage)
                 .HasForeignKey(d => d.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.AccessTypes)
+                .WithMany(t => t.ItSystemUsages);
+
+            this.HasOptional(t => t.ArchiveLocation)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ArchiveLocationId);
         }
     }
 }

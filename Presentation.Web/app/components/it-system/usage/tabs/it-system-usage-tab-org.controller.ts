@@ -111,7 +111,7 @@
                 return null;
             }
 
-            var selectedOrgUnitIds = _.pluck(selectedOrgUnits, 'id');
+            var selectedOrgUnitIds = _.map(selectedOrgUnits, 'id');
             _.each(selectedOrgUnitIds, function (id) {
                 var found = searchTree(orgUnitsTree[0], id);
                 if (found) {

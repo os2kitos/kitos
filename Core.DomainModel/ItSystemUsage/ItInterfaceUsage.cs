@@ -10,7 +10,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class ItInterfaceUsage
+    public class ItInterfaceUsage : ISystemModule
     {
         public ItInterfaceUsage()
         {
@@ -42,7 +42,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int ItInterfaceId { get; set; }
         public int ItSystemId { get; set; }
-        public virtual ItInterfaceUse ItInterfaceUse { get; set; } // careful ItInterfaceUse has a composite key
+        public virtual ItInterface ItInterface { get; set; }
 
         /// <summary>
         /// Whether local usage of the interface is wanted or not.

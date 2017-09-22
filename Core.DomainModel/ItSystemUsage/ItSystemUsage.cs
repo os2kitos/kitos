@@ -1,13 +1,19 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage
 {
+    using System;
+    using System.ComponentModel.DataAnnotations.Schema;
+
+    using ItSystem = Core.DomainModel.ItSystem.ItSystem;
+
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization
     {
         public ItSystemUsage()
         {
@@ -15,12 +21,96 @@ namespace Core.DomainModel.ItSystemUsage
             this.Wishes = new List<Wish>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
+            this.AccessTypes = new List<AccessType>();
+            this.TaskRefsOptOut = new List<TaskRef>();
             this.ItInterfaceUsages = new List<ItInterfaceUsage>();
             this.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
+            ExternalReferences = new List<ExternalReference>();
         }
 
+        public bool IsActive
+        {
+            get
+            {
+                if (!this.Active)
+                {
+                    var today = DateTime.UtcNow;
+                    var startDate = this.Concluded ?? today;
+                    var endDate = DateTime.MaxValue;
+
+                    if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
+                    {
+                        endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
+                    }
+
+                    if (this.Terminated.HasValue)
+                    {
+                        var terminationDate = this.Terminated;
+                        if (this.TerminationDeadlineInSystem != null)
+                        {
+                            int deadline;
+                            int.TryParse(this.TerminationDeadlineInSystem.Name, out deadline);
+                            terminationDate = this.Terminated.Value.AddMonths(deadline);
+                        }
+                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
+                    }
+
+                    // indgået-dato <= dags dato <= udløbs-dato
+                    return today >= startDate.Date && today <= endDate;
+                }
+                return this.Active;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets Active.
+        /// </summary>
+        /// <value>
+        ///   Active.
+        /// </value>
+        public bool Active { get; set; }
+
+        /// <summary>
+        ///     When the system began. (indgået)
+        /// </summary>
+        /// <value>
+        ///     The concluded date.
+        /// </value>
+        public DateTime? Concluded { get; set; }
+
+        /// <summary>
+        ///     When the system expires. (udløbet)
+        /// </summary>
+        /// <value>
+        ///     The expiration date.
+        /// </value>
+        public DateTime? ExpirationDate { get; set; }
+
+        /// <summary>
+        ///     Date the system ends. (opsagt)
+        /// </summary>
+        /// <value>
+        ///     The termination date.
+        /// </value>
+        public DateTime? Terminated { get; set; }
+
+        //public int? TerminationDeadlineId { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the termination deadline option. (opsigelsesfrist)
+        /// </summary>
+        /// <remarks>
+        ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
+        ///     It's a string but should be treated as an int.
+        ///     TODO perhaps a redesign of OptionEntity is in order
+        /// </remarks>
+        /// <value>
+        ///     The termination deadline.
+        /// </value>
+        public virtual TerminationDeadlineTypesInSystem TerminationDeadlineInSystem { get; set; }
         /// <summary>
         /// Gets or sets a value indicating whether this instance's status is active.
         /// </summary>
@@ -95,7 +185,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// The responsible organization.
         /// </value>
-        public virtual Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public int ItSystemId { get; set; }
         /// <summary>
@@ -104,7 +194,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// It system.
         /// </value>
-        public virtual ItSystem.ItSystem ItSystem { get; set; }
+        public virtual ItSystem ItSystem { get; set; }
 
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
@@ -172,6 +262,10 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
         /// <summary>
+        /// Gets or sets the tasks that has been opted out from by an organization.
+        /// </summary>
+        public virtual ICollection<TaskRef> TaskRefsOptOut { get; set; }
+        /// <summary>
         /// The local usages of interfaces.
         /// </summary>
         public virtual ICollection<ItInterfaceUsage> ItInterfaceUsages { get; set; }
@@ -190,6 +284,12 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
+        public int? ReferenceId { get; set; }
+        public virtual ExternalReference Reference { get; set; }
+        public virtual ICollection<AccessType> AccessTypes { get; set; }
+
         /// <summary>
         /// Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -201,5 +301,23 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return OrganizationId == organizationId;
         }
+
+        
+        public bool? ArchiveDuty { get; set; }
+
+        public bool? Archived { get; set; }
+
+        public bool? ReportedToDPA { get; set; }
+
+        public string DocketNo { get; set; }
+
+        [Column(TypeName = "date")]
+        public DateTime? ArchivedDate { get; set; }
+
+        public string ArchiveNotes { get; set; }
+
+        public int? ArchiveLocationId { get; set; }
+
+        public virtual ArchiveLocation ArchiveLocation { get; set; }
     }
 }

@@ -11,8 +11,9 @@
     }]);
 
     app.controller("project.EditHierarchyCtrl",
-    ["$scope", "_", "hierarchyFlat",
-        ($scope, _, hierarchyFlat) => {
-            $scope.hierarchy = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
+        ["$scope", "_", "hierarchyFlat", "project",
+            ($scope, _, hierarchyFlat, project) => {
+                $scope.hierarchy = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
+                $scope.project = project;
         }]);
 })(angular, app);

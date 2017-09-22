@@ -7,7 +7,6 @@
                 templateUrl: "app/shared/selectMultipleOption/selectMultipleOption.view.html",
                 scope: {
                     id: "@",
-                    label: "@",
                     placeholder: "@",
                     options: "&",
                     selectedIds: "=ngModel",
@@ -19,9 +18,9 @@
                 link: function (scope, element, attr, ctrl) {
                     var deletedOptions = [];
                     _.forEach(scope.selectedIds, function (value, key) {
-                        var isDeleted = !_.some(scope.options(), { id: value });
+                        var isDeleted = !_.some(scope.options(), { Id: value });
                         if (isDeleted) {
-                            deletedOptions.push({ id: value, name: scope.selectedTexts()[key] });
+                            deletedOptions.push({ Id: value, Name: scope.selectedTexts()[key] });
                         }
                     });
 

@@ -7,6 +7,7 @@ namespace Presentation.Web.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public bool RememberMe { get; set; }
+        public string Token { get; set; }
     }
 
 
@@ -20,6 +21,5 @@ namespace Presentation.Web.Models
     {
         public UserDTO User { get; set; }
         public IEnumerable<OrganizationAndDefaultUnitDTO> Organizations { get; set; }
-        
     }
 }

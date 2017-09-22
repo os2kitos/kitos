@@ -36,7 +36,7 @@
                 orderBy: 'taskRef.taskKey'
             };
 
-            $scope.csvUrl = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&organizationId=' + user.currentOrganizationId;
+            $scope.csvUrl = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&orgUnitId=' + user.currentOrganizationId;
 
             $scope.$watchCollection('pagination', function() {
                 //var url = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';

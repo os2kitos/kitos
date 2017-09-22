@@ -7,16 +7,9 @@
                 controller: 'globalAdmin.localAdminsCtrl',
                 authRoles: ['GlobalAdmin'],
                 resolve: {
-                    localAdminRole: [
-                        '$http', function($http) {
-                            return $http.get('api/OrganizationRole?getLocalAdminRole=true').then(function(result) {
-                                return result.data.response;
-                            });
-                        }
-                    ],
                     adminRights: [
                         '$http', function($http) {
-                            return $http.get('api/OrganizationRights/?roleName=LocalAdmin&roleWithName').then(function (result) {
+                            return $http.get('api/OrganizationRight/?roleName=LocalAdmin&roleWithName').then(function (result) {
                                 return result.data.response;
                             });
                         }
@@ -32,8 +25,8 @@
     ]);
 
     app.controller('globalAdmin.localAdminsCtrl', [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'localAdminRole', 'adminRights', 'user',
-        function($rootScope, $scope, $http, $state, notify, localAdminRole, adminRights, user) {
+        '$rootScope', '$scope', '$http', '$state', 'notify', 'adminRights', 'user',
+        function($rootScope, $scope, $http, $state, notify, adminRights, user) {
             $rootScope.page.title = 'Lokal administratorer';
             $scope.adminRights = adminRights;
 
@@ -41,24 +34,24 @@
                 // select2 changes the value twice, first with invalid values
                 // so ignore invalid values
                 if (typeof $scope.newUser !== 'object') return;
-                if (!(localAdminRole && $scope.newOrg && $scope.newUser)) return;
+                if (!($scope.newOrg && $scope.newUser)) return;
 
                 var user = $scope.newUser;
                 var uId = user.id;
                 var oId = $scope.newOrg.id;
                 var orgName = $scope.newOrg.text;
 
-                var rId = localAdminRole.id;
+                var rId = Kitos.API.Models.OrganizationRole.LocalAdmin;
 
                 if (!(uId && oId && rId)) return;
 
                 var data = {
                     userId: uId,
-                    roleId: rId,
+                    role: rId,
                 };
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/OrganizationRights/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
+                $http.post("api/OrganizationRight/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                     reload();
                 }).error(function() {
@@ -83,12 +76,12 @@
             });
 
             $scope.deleteLocalAdmin = function(right) {
-                var oId = right.objectId;
-                var rId = right.roleId;
+                var oId = right.organizationId;
+                var rId = right.role;
                 var uId = right.userId;
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.delete("api/OrganizationRights/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
+                $http.delete("api/OrganizationRight/" + oId + "?rId=" + rId + "&uId=" + uId + '&organizationId=' + user.currentOrganizationId).success(function(deleteResult) {
                     msg.toSuccessMessage(right.userName + " er ikke længere lokal administrator");
                     reload();
                 }).error(function(deleteResult) {

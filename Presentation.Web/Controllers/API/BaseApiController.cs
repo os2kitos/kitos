@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
+using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
+using System.Runtime.Caching;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -20,19 +23,31 @@ namespace Presentation.Web.Controllers.API
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        public IAdminService AdminService { get; set; }
+        public IAuthenticationService AuthenticationService { get; set; }
+
+        [Inject]
+        public IFeatureChecker FeatureChecker { get; set; }
+
+        [Inject]
+        public ILogger Logger { get; set; }
+
+        protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
+        {
+            Logger?.Error(exp, memberName);
+
+            return Error("Der opstod en ukendt fejl. Kontakt din IT-afdeling, hvis problemet gentager sig.");
+        }
 
         protected HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T response, string msg = "")
         {
             var wrap = new ApiReturnDTO<T>
-                {
-                    Msg = msg,
-                    Response = response
-                };
+            {
+                Msg = msg,
+                Response = response
+            };
 
             return Request.CreateResponse(statusCode, wrap);
         }
-
 
         protected HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string msg = "")
         {
@@ -53,12 +68,12 @@ namespace Presentation.Web.Controllers.API
             return result;
         }
 
-        protected HttpResponseMessage Ok()
+        protected new HttpResponseMessage Ok()
         {
             return CreateResponse(HttpStatusCode.OK);
         }
 
-        protected HttpResponseMessage Ok<T>(T response)
+        protected new HttpResponseMessage Ok<T>(T response)
         {
             return CreateResponse(HttpStatusCode.OK, response);
         }
@@ -85,7 +100,7 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.NoContent);
         }
 
-        protected HttpResponseMessage NotFound()
+        protected new HttpResponseMessage NotFound()
         {
             return CreateResponse(HttpStatusCode.NotFound);
         }
@@ -109,7 +124,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                return AdminService.IsGlobalAdmin(KitosUser);
+                int userId;
+                int.TryParse(User.Identity.Name, out userId);
+
+                return AuthenticationService.IsGlobalAdmin(userId);
             }
             catch
             {
@@ -130,27 +148,26 @@ namespace Presentation.Web.Controllers.API
                     if (header != null)
                     {
                         var xauth = header.First();
-                        var uuid = new Guid(xauth);
-                        return UserRepository.Get(u => u.Uuid == uuid).First();
+                        return UserRepository.Get(u => u.UniqueId == xauth).First();
                     }
 
-                    var id = Convert.ToUInt32(User.Identity.Name);
-                    var user = UserRepository.Get(u => u.Id == id).FirstOrDefault();
-                    if (user == null) throw new SecurityException();
+                    var id = Convert.ToInt32(User.Identity.Name);
+                    var user = UserRepository.GetByKey(id);
+
+                    if (user == null)
+                        throw new SecurityException();
 
                     return user;
                 }
-                catch (Exception)
+                catch (Exception exp)
                 {
+                    Logger?.Error("Error in property KitosUser", exp);
                     throw new SecurityException();
                 }
             }
         }
 
-        protected bool IsAuthenticated
-        {
-            get { return User.Identity.IsAuthenticated; }
-        }
+        protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {

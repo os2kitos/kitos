@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e.Message);
+                return LogError(e);
             }
             return base.Patch(id, organizationId, obj);
         }

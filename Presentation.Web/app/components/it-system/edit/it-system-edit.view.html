@@ -1,145 +1,28 @@
 ﻿<!-- it system master sheet -->
-<form role="form" class="container-fluid">
-    <div class="row">
-        <!-- Left side -->
-        <div class="col-md-8">
-            <div class="row">
-                <div class="col-md-6">
-                    <!--AppTypeOption-->
-                    <div class="form-group">
-                        <select-option data-id="system-type"
-                                       data-label="Applikationstype"
-                                       data-placeholder="Vælg applikationstype"
-                                       data-selected-text="{{ system.appTypeOptionName }}"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="system.appTypeOptionId"
-                                       data-options="appTypeOptions"
-                                       data-auto-save-url="{{ system.updateUrl }}"
-                                       data-field="appTypeOptionId">
-                        </select-option>
-                    </div>
-
-                    <!--Name-->
-                    <div class="form-group">
-                        <label for="system-name" class="control-label small">IT System</label>
-                        <input type="text" id="system-name" class="form-control input-sm" required
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}"
-                               data-field="name"
-                               data-ng-model="system.name">
-                    </div>
-
-                    <!--Parent system-->
-                    <div class="form-group">
-                        <label for="system-parent" class="control-label small">Overordnet system</label>
-                        <input type="hidden" id="system-parent" class="form-control input-sm"
-                               data-ui-select2="itSystemsSelectOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}"
-                               data-field="parentId"
-                               data-placeholder="Vælg system"
-                               data-ng-model="system.parent">
-                    </div>
-
-                    <!-- Usage type -->
-                    <div class="form-group">
-                        <select-option data-id="system-business-type"
-                                       data-label="Forretningstype"
-                                       data-placeholder="Vælg forretningstype"
-                                       data-selected-text="{{ system.businessTypeName }}"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="system.businessTypeId"
-                                       data-options="businessTypes"
-                                       data-auto-save-url="{{ system.updateUrl }}"
-                                       data-field="businessTypeId">
-                        </select-option>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <!-- belongs to -->
-                    <div class="form-group">
-                        <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
-                        <input type="hidden" id="system-belongs-to" class="form-control input-sm"
-                               data-ui-select2="organizationSelectOptions"
-                               data-placeholder="Vælg organisation"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-autosave="{{system.updateUrl}}"
-                               data-field="belongsToId"
-                               data-ng-model="system.belongsTo">
-                    </div>
-
-                    <!-- Object owner -->
-                    <div class="form-group">
-                        <label class="control-label small">Oprettet af</label>
-                        <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
-                    </div>
-
-                    <!-- Access modifier -->
-                    <div class="form-group">
-                        <label for="system-access" class="control-label small">Synlighed</label>
-                        <input id="system-access" class="form-control input-sm"
-                               data-autosave="{{system.updateUrl}}"
-                               data-field="accessModifier"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="system.accessModifier"
-                               data-select-access-modifier="">
-                    </div>
-
-                    <!-- UUID -->
-                    <div class="form-group">
-                        <label class="control-label small">UUID</label>
-                        <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
-                    </div>
-                </div>
+<div class="container-fluid object-wrapper">
+    <!-- Left menu -->
+    <div class="col-xs-3 col-lg-2 left-menu-container">
+        <div class="left-menu">
+            <div class="header">
+                <h3>IT System</h3>
             </div>
-        </div>
-
-        <!-- Right side -->
-        <div class="col-md-4">
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label for="system-description" class="control-label small">Beskrivelse</label>
-                        <textarea id="system-description" class="form-control input-sm" rows="7"
-                                  data-autosave="{{system.updateUrl}}"
-                                  data-field="description"
-                                  data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="system.description"></textarea>
-                    </div>
-
-                    <!-- Further description -->
-                    <div class="form-group">
-                        <label for="system-url" class="control-label small">Link til yderligere beskrivelse</label>
-                        <div class="input-group">
-                            <input type="text" id="system-url" class="form-control input-sm" placeholder="http://"
-                                   data-autosave="{{system.updateUrl}}"
-                                   data-field="url"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="system.url">
-                            <span class="input-group-btn">
-                                <button class="btn btn-sm btn-default" type="button" data-href-blank="system.url">
-                                    <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
-                                </button>
-                            </span>
-                        </div>
-                        <span class="help-block small">Skal starte med http://</span>
-                    </div>
-                </div>
-            </div>
+            <ul>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.edit.main"><img src="/Content/img/Systemforside.svg"></img> Systemforside</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.edit.kle"><img src="/Content/img/KLE.svg"></img> KLE</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.edit.access-control"><img src="/Content/img/Accesscontrol.svg"></img> Adgangsstyring</a>
+                </li>
+                <li data-ui-sref-active="active">
+                    <a data-ui-sref="it-system.edit.references"><img src="/Content/img/References.svg"></img> Referencer</a>
+                </li>
+            </ul>
         </div>
     </div>
-</form>
-
-<!-- sub tab buttons -->
-<ul class="nav nav-tabs">
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.edit.interfaces">Snitflader</a>
-    </li>
-    <li data-ui-sref-active="active">
-        <a data-ui-sref="it-system.edit.kle">KLE</a>
-    </li>
-</ul>
-
-<!-- sub tabs view -->
-<ui-view autoscroll="false" class="subtabs"/>
+    <div class="col-xs-9 col-lg-10 object-content">
+        <ui-view />
+    </div>
+</div>

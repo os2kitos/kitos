@@ -4,7 +4,9 @@ using System.Net.Mail;
 using System.Text;
 using System.Web;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using System.Security.Cryptography;
 
 namespace Core.ApplicationServices
 {
@@ -18,6 +20,8 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
+        private readonly SHA256Managed _crypt;
+        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -36,9 +40,10 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
+            _crypt = new SHA256Managed();
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int? orgId)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId)
         {
             // hash his salt and default password
             user.Salt = _cryptoService.Encrypt(DateTime.UtcNow + " spices");
@@ -49,28 +54,29 @@ namespace Core.ApplicationServices
 #endif
 
             user.LastChanged = DateTime.UtcNow;
+            user.DefaultOrganizationId = orgId;
 
             _userRepository.Insert(user);
             _userRepository.Save();
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            if (sendMailOnCreation && orgId != null)
-                IssueAdvisMail(savedUser, false, (int)orgId);
+            if (sendMailOnCreation)
+                IssueAdvisMail(savedUser, false, orgId);
 
             return savedUser;
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int? orgId)
+        public void IssueAdvisMail(User user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
             var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
 
-            var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse af KITOS profil " + _mailSuffix;
+            var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " +
                           org.Name + ".</p>" +
@@ -78,8 +84,8 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='" + _baseUrl +
-                          "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                          "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                          "<p>Bemærk at denne mail ikke kan besvares.</p>";
 
             IssuePasswordReset(user, subject, content);
 
@@ -91,7 +97,7 @@ namespace Core.ApplicationServices
         public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
         {
             if (user == null)
-                throw new ArgumentNullException("user");
+                throw new ArgumentNullException(nameof(user));
 
             var mailContent = "";
             var reset = new PasswordResetRequest();
@@ -103,7 +109,8 @@ namespace Core.ApplicationServices
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='" + _baseUrl + "docs/Vejledning%20til%20slutbrugeren.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>";
+                              "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                              "<p>Bemærk at denne mail ikke kan besvares.</p>";
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
 
@@ -124,7 +131,13 @@ namespace Core.ApplicationServices
         private PasswordResetRequest GenerateResetRequest(User user)
         {
             var now = DateTime.UtcNow;
-            var hash = _cryptoService.Encrypt(now + user.Email);
+
+            byte[] randomNumber = new byte[8];
+            rngCsp.GetBytes(randomNumber);
+
+            byte[] encrypted = _crypt.ComputeHash(randomNumber);
+
+            var hash = HttpServerUtility.UrlTokenEncode(encrypted);
 
             var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id, ObjectOwner = user, LastChangedByUser = user };
 
@@ -155,7 +168,7 @@ namespace Core.ApplicationServices
         public void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword)
         {
             if (passwordResetRequest == null)
-                throw new ArgumentNullException("passwordResetRequest");
+                throw new ArgumentNullException(nameof(passwordResetRequest));
 
             if (!IsValidPassword(newPassword))
                 throw new ArgumentException("New password is invalid");

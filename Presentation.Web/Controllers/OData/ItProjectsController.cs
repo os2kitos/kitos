@@ -7,17 +7,23 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using System.Net;
+using Core.DomainModel.Organization;
+using Core.ApplicationServices;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItProjectsController : BaseController<ItProject>
+    [Authorize]
+    public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+        private readonly IAuthenticationService _authService;
 
-        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
-            : base(repository)
+        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
+            : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
+            _authService = authService;
         }
 
         [EnableQuery]
@@ -25,30 +31,60 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Get()
         {
             return base.Get();
+
+            //if (AuthenticationService.HasReadAccessOutsideContext(UserId))
+            //    return base.Get();
+
+            //var orgId = CurrentOrganizationId;
+            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
-        // GET /Organizations(1)/ItSystems
+        // GET /Organizations(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItProjects")]
-        public IHttpActionResult GetItSystems(int key)
+        public IHttpActionResult GetItProjects(int key)
         {
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-            return Ok(result);
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (!_authService.HasReadAccessOutsideContext(UserId))
+            {
+                if (loggedIntoOrgId != key)
+                    return StatusCode(HttpStatusCode.Forbidden);
+
+                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+                return Ok(result);
+            }
+            else
+            {
+                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+                return Ok(result);
+            }
         }
 
-        // GET /Organizations(1)/ItSystems(1)
+        // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
-        public IHttpActionResult GetItSystems(int orgKey, int projKey)
+        public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
-            var result = Repository.AsQueryable().Where(m => m.Id == projKey && (m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public));
-            return Ok(result);
+            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
+            if (entity == null)
+                return NotFound();
+
+            if (_authService.HasReadAccess(UserId, entity))
+                return Ok(entity);
+
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
+        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
+        // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
             var projects = new List<ItProject>();
 
             // using iteration instead of recursion else we're running into

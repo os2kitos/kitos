@@ -1,0 +1,58 @@
+﻿<div class="modal-header">
+    <span>
+        Rediger seneste opdaterede status
+    </span>
+</div>
+<div class="modal-body">
+    <table class="table table-condensed table-striped">
+        <tr>
+            <th class="col-xs-4">
+                Metode
+            </th>
+            <th class="col-xs-4">
+                Seneste ændring
+            </th>
+            <th class="col-xs-8">
+                Dato for sidste status
+            </th>
+        </tr>
+        <tr ng-repeat="obj in statusUpdates">
+            <td class="col-xs-4">
+                <div ng-if="obj.IsCombined">
+                    Samlet
+                </div> 
+                <div ng-if="obj.IsCombined == false">
+                    Tid, kvalitet og ressourcer
+                </div> 
+            </td>
+            <td class="col-xs-4">
+                {{moment(obj.LastChanged).format('DD-MM-YYYY')}}
+            </td>
+            <td class="col-xs-8">
+                <!-- Date for status update -->
+                <div class="form-group">
+                        <input type="text" class="form-control" id="statusDate"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-model="obj.Created"
+                               data-ng-blur="save(obj)"
+                               data-field="statusDate">
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="modal-footer">
+    <!--<button id="save"
+            type="button"
+            class="btn btn-success"
+            data-ng-click="save()">
+        Gem
+    </button>-->
+    <button id="close"
+            type="button"
+            class="btn btn-danger"
+            data-ng-click="dismiss()">
+        Luk
+    </button>
+</div>

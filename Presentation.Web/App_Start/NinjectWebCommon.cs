@@ -1,26 +1,27 @@
+using System;
+using System.Web;
 using System.Web.Security;
 using Core.ApplicationServices;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
+using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using Ninject;
+using Ninject.Extensions.Interception.Infrastructure.Language;
+using Ninject.Web.Common;
+using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
+using Hangfire;
 
-[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Start")]
-[assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(Presentation.Web.App_Start.NinjectWebCommon), "Stop")]
+[assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
+[assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
 
-namespace Presentation.Web.App_Start
+namespace Presentation.Web
 {
-    using System;
-    using System.Web;
-
-    using Microsoft.Web.Infrastructure.DynamicModuleHelper;
-
-    using Ninject;
-    using Ninject.Web.Common;
-
     public static class NinjectWebCommon
     {
+        // ReSharper disable once InconsistentNaming
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
 
         /// <summary>
@@ -48,12 +49,15 @@ namespace Presentation.Web.App_Start
         private static IKernel CreateKernel()
         {
             var kernel = new StandardKernel();
+
             try
             {
                 kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel);
                 kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>();
 
                 RegisterServices(kernel);
+                //To enable ninject in hangfire
+                GlobalConfiguration.Configuration.UseNinjectActivator(kernel);
                 return kernel;
             }
             catch
@@ -80,16 +84,21 @@ namespace Presentation.Web.App_Start
                 .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl)
                 .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
-            kernel.Bind<IAdminService>().To<AdminService>().InRequestScope();
+            kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
+            kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
+            kernel.Bind<IAdviceService>().To<AdviceService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
+            // Udkommenteret ifm. OS2KITOS-663
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InRequestScope();
             kernel.Bind<IItContractService>().To<ItContractService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
-            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope();
+            kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
+            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InSingletonScope();
+
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

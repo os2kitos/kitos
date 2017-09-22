@@ -11,6 +11,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
@@ -21,12 +22,14 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
+        private readonly ReferenceService _referenceService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService)
+        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService, ReferenceService referenceService)
             : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
+            _referenceService = referenceService;
         }
 
         // DELETE api/T
@@ -40,11 +43,18 @@ namespace Presentation.Web.Controllers.API
                 if (item.Usages.Any())
                     return Conflict("Cannot delete a system in use!");
 
+                // OS2KITOS-796: Handles cascading delete of references when deleting an IT System
+                if (item.ExternalReferences.Any())
+                {
+                    var ids = item.ExternalReferences.ToList().Select(t => t.Id);
+                    _referenceService.Delete(ids);
+                }
+
                 return base.Delete(id, organizationId);
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -70,8 +80,8 @@ namespace Presentation.Web.Controllers.API
                         s.ObjectOwnerId == KitosUser.Id ||
                         // everyone in the same organization can see normal objects
                         s.AccessModifier == AccessModifier.Local)
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
                     );
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
@@ -82,7 +92,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -102,8 +112,8 @@ namespace Presentation.Web.Controllers.API
                             // everyone in the same organization can see normal objects
                             s.AccessModifier == AccessModifier.Local &&
                             s.OrganizationId == organizationId
-                            // it systems doesn't have roles so private doesn't make sense
-                            // only object owners will be albe to see private objects
+                        // it systems doesn't have roles so private doesn't make sense
+                        // only object owners will be albe to see private objects
                         ));
 
                 //if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
@@ -150,7 +160,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -173,15 +183,15 @@ namespace Presentation.Web.Controllers.API
                          // everyone in the same organization can see normal objects
                          s.AccessModifier == AccessModifier.Local &&
                          s.OrganizationId == orgId)
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
+                    // it systems doesn't have roles so private doesn't make sense
+                    // only object owners will be albe to see private objects
                     );
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -195,7 +205,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -209,7 +219,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -222,7 +232,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -243,7 +253,7 @@ namespace Presentation.Web.Controllers.API
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
-                item.Uuid = dto.Uuid == Guid.Empty ? Guid.NewGuid() : dto.Uuid;
+                item.Uuid = Guid.NewGuid();
 
                 foreach (var id in dto.TaskRefIds)
                 {
@@ -257,7 +267,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -271,7 +281,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -317,7 +327,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -359,7 +369,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -409,7 +419,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -429,8 +439,9 @@ namespace Presentation.Web.Controllers.API
             obj.TryGetValue("name", out nameToken);
             if (nameToken != null)
             {
-                var orgId = Repository.GetByKey(id).OrganizationId;
-                if (!IsAvailable(nameToken.Value<string>(), orgId))
+                string name = nameToken.Value<string>();
+                var system = Repository.Get(x => x.Name == name && x.OrganizationId == organizationId && x.Id != id);
+                if (system.Any())
                     return Conflict("Name is already taken!");
             }
 
@@ -445,7 +456,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -453,6 +464,16 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
+        }
+
+        protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
+        {
+            return HasWriteAccess();
+        }
+
+        protected bool HasWriteAccess()
+        {
+            return KitosUser.IsGlobalAdmin;
         }
     }
 }

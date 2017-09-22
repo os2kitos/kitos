@@ -1,16 +1,24 @@
+"use strict";
+
 var source = "Presentation.Web",
+    typescriptOutput = source + "/typescriptOutput",
+    typescriptOutputApp = typescriptOutput + "/app",
+    typescriptOutputAppReport = typescriptOutput + "/appReport",
     sourceApp = source + "/app",
+    sourceAppReport = source + "/appReport",
     sourceScript = source + "/Scripts",
-    allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.js"],
-    allJavaScriptNoTests = [sourceApp + "/**/!(*.spec|*.po).js"],
-    allTypeScript = [sourceApp + "/**/*.ts"],
+    allJavaScript = [sourceApp + "/app.js", sourceApp + "/**/*.module.js" ,sourceApp + "/**/*.js"],
+    allJavaScriptNoTests = [sourceApp + "/app.js", sourceApp + "/**/*.module.js", sourceApp + "/**/!(*.spec|*.po).js"],
+    appTypeScriptOut = [typescriptOutputApp + "/app.js", typescriptOutputApp + "/**/*.module.js", typescriptOutputApp + "/**/!(*.spec|*.po).js"],
+    appReportTypeScriptOut = typescriptOutput + "/appReport",
     bowerComponents = "bower_components",
+    appMaps = sourceApp + "/**/*.js.map",
+    appJavaScript = [typescriptOutput + "/app.js", sourceApp + "/**/*.module.js", sourceApp + "/**/!(*.spec|*.po).js"],
 
     // dependency files of files to unit test
     unitDependencies = [
         "bower_components/lodash/lodash.js",
         "bower_components/jquery/dist/jquery.js",
-        "bower_components/select2/select2.js",
         "bower_components/moment/moment.js",
         "bower_components/jsonfn-bower/jsonfn.js",
         "bower_components/angular/angular.js",
@@ -21,7 +29,7 @@ var source = "Presentation.Web",
         "bower_components/angular-ui-router/release/angular-ui-router.js",
         "bower_components/angular-bootstrap/ui-bootstrap.js",
         "bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-        "bower_components/angular-ui-select2/src/select2.js"
+        "bower_components/angular-ui-select/dist/select.js"
     ],
 
     // unit
@@ -42,6 +50,7 @@ var source = "Presentation.Web",
         itSystem: source + "/Tests/it-system/**/*e2e.spec.js",
         itContract: source + "/Tests/it-contract/**/*e2e.spec.js"
     },
+
     e2eReport = "results-protractor",
 
     // coverage
@@ -54,10 +63,15 @@ var source = "Presentation.Web",
 module.exports = {
     source: source,
     sourceApp: sourceApp,
+    appMaps: appMaps,
     sourceScript: sourceScript,
     allJavaScript: allJavaScript,
-    allTypeScript: allTypeScript,
     allJavaScriptNoTests: allJavaScriptNoTests,
+    typescriptOutput: typescriptOutput,
+    appTypeScriptOut: appTypeScriptOut,
+    typescriptOutputAppReport: typescriptOutputAppReport,
+    appReportTypeScriptOut: appReportTypeScriptOut,
+    sourceAppReport: sourceAppReport,
     bowerComponents: bowerComponents,
     unit: unit,
     e2eFiles: e2eFiles,

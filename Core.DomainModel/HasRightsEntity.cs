@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+// ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel
 {
@@ -12,11 +13,11 @@ namespace Core.DomainModel
     public abstract class HasRightsEntity<TModel, TRight, TRole> : Entity
         where TModel : HasRightsEntity<TModel, TRight, TRole>
         where TRight : IRight<TModel, TRight, TRole>
-        where TRole : IRoleEntity<TRight>
+        where TRole : IRoleEntity
     {
         protected HasRightsEntity()
         {
-            this.Rights = new List<TRight>();
+            Rights = new List<TRight>();
         }
 
         public virtual ICollection<TRight> Rights { get; set; }
@@ -31,10 +32,7 @@ namespace Core.DomainModel
         public override bool HasUserWriteAccess(User user)
         {
             // check if the user has a write role on this instance
-            if (Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess))
-                return true;
-
-            return base.HasUserWriteAccess(user);
+            return Rights.Any(right => right.UserId == user.Id && right.Role.HasWriteAccess) || base.HasUserWriteAccess(user);
         }
     }
 }

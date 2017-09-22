@@ -1,0 +1,117 @@
+﻿<div class="modal-header">
+    <span>
+        Opdater status
+    </span>
+</div>
+<form name="updateForm" class="form-horizontal" data-ng-submit="save()">
+    <div class="modal-body">
+
+        <div class="form-group">
+            <label for="statusMethod" class="col-xs-3 control-label small">
+                Metode
+            </label>
+            <div class="col-xs-9">
+                <select id="statusMethod" data-ng-init="update.IsCombined = 'false'" data-ng-model="update.IsCombined" class="form-control input-sm">
+                    <option value="false">Tid, kvalitet og ressourcer</option>
+                    <option value="true">Samlet</option>
+                </select>
+            </div>
+        </div>
+        <div data-ng-if="update.IsCombined == 'true'">
+            <div class="form-group">
+                <label class="col-xs-3 control-label small" for="combinedStatus">Status samlet:</label>
+                <div class="col-xs-9">
+                    <span id="combinedStatus"
+                          data-select-status2=""
+                          data-ng-model="update.CombinedStatus"
+                          data-can-write="true" required>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div data-ng-if="update.IsCombined == 'false'">
+            <div class="form-group">
+                <label class="col-xs-3 control-label small" for="economyStatus">Status ressourcer:</label>
+                <div class="col-xs-9">
+                    <span id="resourcesStatus"
+                          data-select-status2=""
+                          data-ng-model="update.ResourcesStatus"
+                          data-can-write="true" required>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 control-label small" for="timeStatus">Status tid:</label>
+                <div class="col-xs-9">
+                    <span id="timeStatus"
+                          data-select-status2=""
+                          data-ng-model="update.TimeStatus"
+                          data-can-write="true" required>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-xs-3 control-label small" for="qualityStatus">Status kvalitet:</label>
+                <div class="col-xs-9">
+                    <span id="qualityStatus"
+                          data-select-status2=""
+                          data-ng-model="update.QualityStatus"
+                          data-can-write="true" required>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- Start date -->
+            <label for="createDate" class="col-xs-3 control-label small">
+                Dato
+            </label>
+            <div class="col-xs-9">
+                <input type="text" class="form-control" id="createDate"
+                        data-kendo-date-picker
+                        data-k-options="datepickerOptions"
+                        data-ng-model="update.Created" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- Note -->
+            <label for="note" class="col-xs-3 control-label small">
+                Bemærkning
+            </label>
+            <div class="col-xs-9">
+                <textarea id="note"
+                            class="form-control input-sm"
+                            rows="4"
+                            data-ng-model="update.Note"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <!-- Final -->
+            <label for="final" class="col-xs-3 control-label small">
+                Afsluttende
+            </label>
+            <div class="col-xs-9">
+                <input type="checkbox" id="final" class="input-sm" data-ng-model="update.IsFinal">
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="close"
+                type="button"
+                class="btn btn-danger"
+                data-ng-click="dismiss()">
+            Luk
+        </button>
+        <button id="save"
+                type="submit"
+                class="btn btn-success"
+                data-disabled-on-busy=""
+                data-ng-disabled="updateForm.$invalid">
+            Gem
+        </button>
+    </div>
+</form>

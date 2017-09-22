@@ -39,6 +39,7 @@ namespace Presentation.Web.Models
         public int OrganizationId { get; set; }
         public string OrganizationName { get; set; }
         public string Name { get; set; }
+        public string PreviousName { get; set; }
         public string ItSystemId { get; set; }
         public int ObjectOwnerId { get; set; }
         public string ObjectOwnerName { get; set; }
@@ -88,5 +89,14 @@ namespace Presentation.Web.Models
         ///   <c>true</c> if this instance has a usage; otherwise, <c>false</c>.
         /// </value>
         public bool IsUsed { get; set; }
+        public bool? Active { get; set; }
+        public bool? IsActive { get; set; }
+        public DateTime? Concluded { get; set; }
+        public DateTime? ExpirationDate { get; set; }
+        public bool Disabled { get; set; }
+
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
     }
 }

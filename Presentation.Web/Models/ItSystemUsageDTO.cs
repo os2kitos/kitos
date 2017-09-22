@@ -2,6 +2,8 @@
 
 namespace Presentation.Web.Models
 {
+    using System;
+
     public class ItSystemUsageDTO
     {
         public int Id { get; set; }
@@ -18,6 +20,8 @@ namespace Presentation.Web.Models
         public string SensitiveDataTypeName { get; set; }
         public int? ArchiveTypeId { get; set; }
         public string ArchiveTypeName { get; set; }
+        public int? ArchiveLocationId { get; set; }
+        public string ArchiveLocationName { get; set; }
 
         public string ResponsibleOrgUnitName { get; set; }
 
@@ -56,5 +60,16 @@ namespace Presentation.Web.Models
         {
             get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
         }
+        public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
+        public int? ReferenceId { get; set; }
+        public ExternalReferenceDTO Reference;
+
+        public bool? Active { get; set; }
+
+        public bool IsActive { get; set; }
+
+        public DateTime Concluded { get; set; }
+
+        public DateTime ExpirationDate { get; set; }
     }
 }

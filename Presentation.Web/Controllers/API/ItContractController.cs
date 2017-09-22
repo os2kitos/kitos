@@ -17,7 +17,11 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    using Core.DomainModel;
+    using Core.DomainModel.Organization;
+
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
+
     {
         private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
         private readonly IGenericRepository<ItContractRole> _roleRepository;
@@ -65,7 +69,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -88,7 +92,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -97,13 +101,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
+                {
+                    return Unauthorized();
+                }
                 var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
                 var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
                 return Ok(dtos);
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -125,10 +133,10 @@ namespace Presentation.Web.Controllers.API
                 var usage = _usageRepository.GetByKey(systemUsageId);
                 if (usage == null) return NotFound();
 
-                if (_itContractItSystemUsageRepository.GetByKey(new object[] {id, systemUsageId}) != null)
+                if (_itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId }) != null)
                     return Conflict("The IT system usage is already associated with the contract");
 
-                contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage {ItContractId = id, ItSystemUsageId = systemUsageId});
+                contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContractId = id, ItSystemUsageId = systemUsageId });
                 contract.LastChanged = DateTime.UtcNow;
                 contract.LastChangedByUser = KitosUser;
 
@@ -138,7 +146,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -170,7 +178,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -183,8 +191,12 @@ namespace Presentation.Web.Controllers.API
                 if (itContract == null)
                     return NotFound();
 
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, itContract))
+                {
+                    return Unauthorized();
+                }
                 // this trick will put the first object in the result as well as the children
-                var children = new [] { itContract }.SelectNestedChildren(x => x.Children);
+                var children = new[] { itContract }.SelectNestedChildren(x => x.Children);
                 // gets parents only
                 var parents = itContract.SelectNestedParents(x => x.Parent);
                 // put it all in one result
@@ -193,12 +205,17 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
         public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
+            if (KitosUser.DefaultOrganizationId != organizationId)
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 //Get contracts within organization
@@ -217,7 +234,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -253,7 +270,6 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Aktiv", contract.IsActive);
                     obj.Add("It Kontrakt", contract.Name);
                     obj.Add("OrgUnit", contract.ResponsibleOrganizationUnitName);
-                    obj.Add("Underskriver", contract.ContractSignerFullName);
                     foreach (var role in roles)
                     {
                         var roleId = role.Id;
@@ -281,12 +297,17 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
         public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
+            if (KitosUser.DefaultOrganizationId != organizationId)
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 //Get contracts within organization
@@ -305,7 +326,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -369,7 +390,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -381,6 +402,16 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItContract entity)
         {
             _itContractService.Delete(entity.Id);
+        }
+
+        protected override bool HasWriteAccess(ItContract obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ContractModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

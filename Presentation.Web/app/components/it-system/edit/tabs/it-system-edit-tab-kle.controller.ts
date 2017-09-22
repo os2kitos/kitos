@@ -13,15 +13,18 @@
     ]);
 
     app.controller('system.SystemKleCtrl', [
-        '$scope', '$http', '$state', 'notify', 'itSystem', 'user',
-        function($scope, $http, $state, notify, itSystem, user) {
+        '$scope', '$http', '$state', 'notify', 'itSystem', 'user', "hasWriteAccess",
+        function ($scope, $http, $state, notify, itSystem, user, hasWriteAccess) {
             var systemId = itSystem.id;
+            $scope.system = itSystem;
             var baseUrl = 'api/itSystem/' + systemId;
 
             $scope.pagination = {
                 skip: 0,
                 take: 50
             };
+
+            $scope.hasWriteAccess = hasWriteAccess;
 
             $scope.showAllTasks = true;
 

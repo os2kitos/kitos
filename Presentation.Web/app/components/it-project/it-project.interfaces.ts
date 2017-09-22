@@ -32,6 +32,7 @@
 
     export interface IApiResponse<T> {
         response: T;
+        value: T;
     }
 
     export interface IPaginationSettings {

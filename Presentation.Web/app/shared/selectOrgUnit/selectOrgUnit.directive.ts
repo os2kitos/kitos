@@ -14,7 +14,8 @@
                 require: 'ngModel',
                 priority: 0,
                 templateUrl: 'app/shared/selectOrgUnit/selectOrgUnit.view.html',
-                link: function(scope, element, attrs, ctrl) {
+                link: function (scope, element, attrs, ctrl) {
+                    scope.isLoading = true;
                     //this is called when the user selects something from select2
                     element.bind('change', function() {
                         $timeout(function() {
@@ -50,9 +51,9 @@
 
                             var option;
                             if (item.id) {
-                                option = _.findWhere(options, { id: parseInt(item.id) });
+                                option = _.find(options, { id: parseInt(item.id) });
                             } else {
-                                option = _.findWhere(options, { id: parseInt(item) });
+                                option = _.find(options, { id: parseInt(item) });
                             }
 
                             if (option) {

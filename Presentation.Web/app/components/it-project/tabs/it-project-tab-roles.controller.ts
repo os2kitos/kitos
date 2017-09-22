@@ -32,6 +32,7 @@
             "project",
             "itProjectRights",
             "itProjectRoles",
+            "localItProjectRoles",
             "user"
         ];
 
@@ -44,18 +45,25 @@
             project,
             itProjectRights,
             private itProjectRoles,
+            private localItProjectRoles,
             private user) {
 
             this.projectId = project.id;
 
             this.orgId = this.user.currentOrganizationId;
-            this.activeItProjectRoles = _.where(this.itProjectRoles, { isActive: true });
+            this.activeItProjectRoles = localItProjectRoles;
             this.newRole = "1";
 
             this.rights = [];
             _.each(itProjectRights, (right: { role; roleId; show; userForSelect; roleForSelect; user; }) => {
-                right.role = _.findWhere(this.itProjectRoles, { id: right.roleId });
+                right.role = _.find(this.itProjectRoles, { Id: right.roleId });
                 right.show = true;
+
+                var localRole: any = _.find(this.activeItProjectRoles, { Id: right.roleId });
+
+                if (!angular.isUndefined(localRole) && localRole.Description) {
+                    right.role.Description = localRole.Description;
+                }
 
                 right.userForSelect = { id: right.user.id, text: right.user.fullName };
                 right.roleForSelect = right.roleId;
@@ -82,18 +90,23 @@
         public rightSort(right): string {
             switch (this.rightSortBy) {
                 case "roleName":
-                    return right.role.name;
+                    return right.role.Priority;
                 case "userName":
                     return right.user.fullName;
                 case "userEmail":
                     return right.user.email;
                 default:
-                    return right.role.name;
+                    return right.role.Priority;
             }
         }
 
         public updateRight(right): void {
             if (!right.roleForSelect || !right.userForSelect) {
+                return;
+            }
+
+            if (!this.checkIfRoleIsAvailable(right.roleForSelect)) {
+                right.edit = false;
                 return;
             }
 
@@ -126,7 +139,7 @@
                                     right.user = result.data.response.user;
                                     right.userId = result.data.response.userId;
 
-                                    right.role = _.findWhere(this.itProjectRoles, { id: right.roleId }),
+                                    right.role = _.find(this.localItProjectRoles, { Id: right.roleId }),
 
                                     right.edit = false;
 
@@ -197,7 +210,7 @@
                             user: result.data.response.user,
                             userForSelect: { id: result.data.response.userId, text: result.data.response.user.fullName },
                             roleForSelect: result.data.response.roleId,
-                            role: this._.findWhere(this.itProjectRoles, { id: result.data.response.roleId }),
+                            role: this._.find(this.localItProjectRoles, { Id: result.data.response.roleId }),
                             show: true
                         });
 
@@ -206,6 +219,11 @@
                     },
                     result => this.notify.addErrorMessage("Fejl!")
                 );
+        }
+
+        public checkIfRoleIsAvailable(roleId) {
+            var foundSelectedInOptions = _.find(this.activeItProjectRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+            return (foundSelectedInOptions);
         }
     }
 
@@ -232,9 +250,15 @@
                     ],
                         itProjectRoles: [
                             "$http",
-                            $http => $http.get("api/itprojectrole/?nonsuggestions=")
-                            .then(result => result.data.response)
+                            $http => $http.get("odata/ItProjectRoles")
+                                .then(result => result.data.value)
                     ],
+                        localItProjectRoles: [
+                            "$http",
+                            $http => $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                                .then(result => result.data.value)
+                    ],
+
                         user: [
                             "userService",
                         userService => userService.getUser()

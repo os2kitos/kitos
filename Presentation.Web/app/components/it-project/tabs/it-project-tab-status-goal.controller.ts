@@ -17,8 +17,8 @@
                     ],
                     goalTypes: [
                         "$http", function($http) {
-                            return $http.get("api/goalType").then(function(result) {
-                                return result.data.response;
+                            return $http.get("odata/LocalGoalTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function(result) {
+                                return result.data.value;
                             });
                         }
                     ]
@@ -29,7 +29,7 @@
 
     app.controller("project.EditStatusGoalCtrl", [
         "$scope", "$http", "notify", "$uibModal", "$state", "project", "goalTypes", "user",
-        function ($scope, $http, notify, $modal, $state, project, goalTypes: { name }[], user) {
+        function ($scope, $http, notify, $modal, $state, project, goalTypes: { Name }[], user) {
             $scope.goalStatus = project.goalStatus;
             $scope.goalStatus.updateUrl = "api/goalStatus/" + project.goalStatus.id;
 
@@ -39,9 +39,9 @@
             };
 
             $scope.getGoalTypeName = function(goalTypeId) {
-                var type = _.findWhere(goalTypes, { id: goalTypeId });
+                var type = _.find(goalTypes, { Id: goalTypeId });
 
-                return type && type.name;
+                return type && type.Name;
             };
 
             $scope.goals = [];
@@ -51,7 +51,7 @@
                 goal.show = true;
 
                 //see if goal already in list - in that case, just update it
-                var prevEntry = _.findWhere($scope.goals, { id: goal.id });
+                var prevEntry = _.find($scope.goals, { id: goal.id });
                 if (prevEntry) {
                     prevEntry = goal;
                     return;

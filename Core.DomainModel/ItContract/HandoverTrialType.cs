@@ -2,12 +2,8 @@
 
 namespace Core.DomainModel.ItContract
 {
-    public class HandoverTrialType : Entity, IOptionEntity<HandoverTrial>
+    public class HandoverTrialType : OptionEntity<HandoverTrial>, IOptionReference<HandoverTrial>
     {
-        public string Name { get; set; }
-        public bool IsActive { get; set; }
-        public bool IsSuggestion { get; set; }
-        public string Note { get; set; }
-        public ICollection<HandoverTrial> References { get; set; }
+        public virtual ICollection<HandoverTrial> References { get; set; } = new HashSet<HandoverTrial>();
     }
 }

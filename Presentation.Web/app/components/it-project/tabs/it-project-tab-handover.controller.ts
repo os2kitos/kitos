@@ -22,9 +22,10 @@
                             var rights = rightResult.data.response;
 
                             //get the role names
-                            return $http.get("api/itprojectrole/")
+                            //return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            return $http.get("odata/ItProjectRoles?%24format=json&%24top=100&%24orderby=priority+desc&%24count=true")
                                 .then(function(roleResult) {
-                                    var roles: { name }[] = roleResult.data.response;
+                                    var roles: { Name }[] = roleResult.data.value;
 
                                     //the resulting map
                                     var users = {};
@@ -33,10 +34,10 @@
                                         //use the user from the map if possible
                                         var user = users[right.userId] || right.user;
 
-                                        var role = _.findWhere(roles, { id: right.roleId });
+                                        var role = _.find(roles, { Id: right.roleId });
 
                                         var roleNames = user.roleNames || [];
-                                        roleNames.push(role.name);
+                                        roleNames.push(role.Name);
                                         user.roleNames = roleNames;
 
                                         users[right.userId] = user;

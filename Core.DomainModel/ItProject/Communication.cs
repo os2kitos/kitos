@@ -5,7 +5,7 @@ namespace Core.DomainModel.ItProject
     /// <summary>
     /// It project communication data.
     /// </summary>
-    public class Communication : Entity, IContextAware
+    public class Communication : Entity, IContextAware, IProjectModule
     {
         /// <summary>
         /// Gets or sets the target audiance.
@@ -96,7 +96,7 @@ namespace Core.DomainModel.ItProject
         {
             // delegate to ItProject
             if (ItProject != null)
-                ItProject.IsInContext(organizationId);
+                return ItProject.IsInContext(organizationId);
             
             return false;
         }

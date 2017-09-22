@@ -4,7 +4,7 @@
             "method": "GET",
             "path": "api/itcontract/1",
             "queryString": {
-                "hasWriteAccess": "true",
+                "hasWriteAccess": "false",
                 "organizationId": "1"
             }
         },

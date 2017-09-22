@@ -12,6 +12,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
@@ -68,7 +69,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -96,7 +97,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -119,7 +120,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -150,7 +151,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -252,7 +253,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -272,7 +273,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -325,7 +326,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -357,7 +358,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -376,7 +377,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -403,7 +404,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -436,7 +437,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -482,7 +483,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -524,7 +525,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -574,7 +575,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -589,7 +590,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -617,7 +618,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -628,24 +629,23 @@ namespace Presentation.Web.Controllers.API
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                    return Unauthorized();
 
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
-
-                if (systemUsage == null) return NotFound();
+                if (systemUsage == null)
+                    return NotFound();
 
                 project.ItSystemUsages.Remove(systemUsage);
-
                 project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
-
                 Repository.Save();
 
                 return Ok();
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -660,15 +660,12 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var projects = _itProjectService.GetAll(orgId, includePublic: false);
-
                 // TODO: if list is empty, return empty list, not NotFound()
-                if (projects == null) return NotFound();
-
-                return Ok(Map(projects));
+                return projects == null ? NotFound() : Ok(Map(projects));
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -689,7 +686,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -707,7 +704,7 @@ namespace Presentation.Web.Controllers.API
         public override HttpResponseMessage Post(ItProjectDTO dto)
         {
             // only global admin can set access mod to public
-            if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
                 return Unauthorized();
             }
@@ -736,7 +733,7 @@ namespace Presentation.Web.Controllers.API
                     try
                     {
                         // get reference to the generic method obj.Value<t>(parameter);
-                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(new Type[] { t });
+                        var genericMethod = jToken.GetType().GetMethod("Value").MakeGenericMethod(t);
                         // use reflection to call obj.Value<t>("keyName");
                         var value = genericMethod.Invoke(phaseObj, new object[] { valuePair.Key });
                         // update the entity
@@ -753,7 +750,7 @@ namespace Presentation.Web.Controllers.API
             project.LastChanged = DateTime.UtcNow;
             project.LastChangedByUser = KitosUser;
 
-            PatchQuery(project);
+            PatchQuery(project, null);
 
             return Ok();
         }
@@ -764,11 +761,23 @@ namespace Presentation.Web.Controllers.API
             JToken accessModToken;
             obj.TryGetValue("accessModifier", out accessModToken);
             // only global admin can set access mod to public
-            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+
+            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public &&
+                !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
                 return Unauthorized();
             }
             return base.Patch(id, organizationId, obj);
+        }
+
+        protected override bool HasWriteAccess(ItProject obj, User user, int organizationId)
+        {
+            // local admin have write access if the obj is in context
+            if (obj.IsInContext(organizationId) &&
+                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ProjectModuleAdmin)))
+                return true;
+
+            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

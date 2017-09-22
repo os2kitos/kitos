@@ -14,6 +14,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Ninject;
@@ -92,13 +93,13 @@ namespace Presentation.Web.Controllers.API
                 // if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
-                    _userService.IssueAdvisMail(existingUser, true, orgId);
+                    _userService.IssueAdvisMail(existingUser, true, orgId.Value);
                     return Ok(Map(existingUser));
                 }
                 // if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
-                    _userService.IssueAdvisMail(existingUser, false, orgId);
+                    _userService.IssueAdvisMail(existingUser, false, orgId.Value);
                     return Ok(Map(existingUser));
                 }
 
@@ -108,13 +109,13 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                item = _userService.AddUser(item, sendMailOnCreation, orgId);
+                item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
 
                 return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -141,23 +142,23 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        public HttpResponseMessage PostTokenRequest(bool? token, int userId)
-        {
-            try
-            {
-                var user = Repository.GetByKey(userId);
-                if (user == null)
-                    return NotFound();
+        //public HttpResponseMessage PostTokenRequest(bool? token, int userId)
+        //{
+        //    try
+        //    {
+        //        var user = Repository.GetByKey(userId);
+        //        if (user == null)
+        //            return NotFound();
 
-                user.Uuid = Guid.NewGuid();
-                PatchQuery(user);
-                return Ok(user.Uuid);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        user.UniqueId = Guid.NewGuid();
+        //        PatchQuery(user, null);
+        //        return Ok(user.Uuid);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return LogError(e);
+        //    }
+        //}
 
         public HttpResponseMessage GetBySearch(string q)
         {
@@ -168,7 +169,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -182,7 +183,7 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 // Get all users inside the organization
-                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role == OrganizationRole.User && r.OrganizationId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
 
@@ -190,7 +191,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -204,7 +205,7 @@ namespace Presentation.Web.Controllers.API
                         || u.Email.Contains(q));
 
                 // Get all users inside the organization
-                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+                pagingModel.Where(u => u.OrganizationRights.Count(r => r.OrganizationId == orgId) > 0);
 
                 var users = Page(Repository.AsQueryable(), pagingModel).ToList();
                 var dtos = new List<UserOverviewDTO>();
@@ -221,7 +222,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -229,7 +230,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var users = Repository.Get(u => u.OrganizationRights.Count(r => r.ObjectId == orgId) != 0);
+                var users = Repository.Get(u => u.OrganizationRights.Count(r => r.OrganizationId == orgId) != 0);
 
                 var dtos = Map(users);
 
@@ -238,6 +239,7 @@ namespace Presentation.Web.Controllers.API
                 header.Add("Fornavn", "Fornavn");
                 header.Add("Efternavn", "Efternavn");
                 header.Add("Email", "Email");
+                header.Add("DefaultUserStartPreference", "DefaultUserStartPreference");
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
@@ -253,6 +255,7 @@ namespace Presentation.Web.Controllers.API
                     obj.Add("Fornavn", user.Name);
                     obj.Add("Efternavn", user.LastName);
                     obj.Add("Email", user.Email);
+                    obj.Add("DefaultUserStartPreference", user.DefaultUserStartPreference);
                     obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
                     obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
                     obj.Add("Oprettet", user.ObjectOwnerName + " " + user.ObjectOwnerLastName);
@@ -277,7 +280,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -350,7 +353,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
         }
 
@@ -363,7 +366,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
         {
-            var users = Repository.Get(u => u.Email == email && u.OrganizationRights.Count(r => r.Role.Name == "Medarbejder" && r.ObjectId == orgId) > 0);
+            var users = Repository.Get(u => u.Email == email && u.OrganizationRights.Count(r => r.Role == OrganizationRole.User && r.OrganizationId == orgId) > 0);
 
             if (users.Any()) return Ok();
 
@@ -380,13 +383,22 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                return Error(e);
+                return LogError(e);
             }
+        }
+
+        public HttpResponseMessage PostDefaultOrganization(bool? updateDefaultOrganization, int organizationId)
+        {
+            var userId = int.Parse(User.Identity.Name);
+            var user = Repository.Get(x => x.Id == userId).First();
+            user.DefaultOrganizationId = organizationId;
+            Repository.Save();
+            return Ok();
         }
 
         protected override bool HasWriteAccess(User obj, User user, int organizationId)
         {
-            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.ObjectId == organizationId && x.Role.HasWriteAccess);
+            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
             if (isLocalAdmin)
                 return true;
 

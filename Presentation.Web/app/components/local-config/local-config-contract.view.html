@@ -1,53 +1,36 @@
 ﻿<form class="form-horizontal">
-    
+
     <!-- show/hide-module -->
     <div class="form-group">
-        <label class="col-md-2 control-label">
+        <label class="col-xs-2 control-label">
             Generelt
         </label>
-        <div class="col-md-10">
+        <div class="col-xs-10">
             <div>
                 <label class="control-label">
-                    <input type="checkbox" data-ng-model="config.showItContractModule" data-autosave="{{config.autosaveUrl}}" data-field="showItContractModule" tabindex="1" />
+                    <input type="checkbox" data-ng-model="config.showItContractModule" data-autosave="{{config.autosaveUrl}}" data-field="ShowItContractModule" tabindex="1" />
                     Medtag dette modul
+                </label>
+            </div>
+            <div>
+                <label class="control-label">
+                    <input type="checkbox" data-ng-model="config.showItContractPrefix" data-autosave="{{config.autosaveUrl}}" data-field="ShowItContractPrefix" tabindex="1" />
+                    Brug 'IT' prefix
                 </label>
             </div>
         </div>
     </div>
 
-   <div data-option-list="" title="Roller" data-options-url="api/itContractRole"></div>
-    <div data-suggest-new-role="" data-url="api/itContractRole"></div>
-
-    <div data-option-list="" title="Kontrakttyper" data-options-url="api/contractType"></div>
-    <div data-suggest-new="" data-url="api/contractType"></div>
-
-    <div data-option-list="" title="Kontraktskabeloner" data-options-url="api/contractTemplate"></div>
-    <div data-suggest-new="" data-url="api/contractTemplate"></div>
-
-    <div data-option-list="" title="Indkøbsformer" data-options-url="api/purchaseForm"></div>
-    <div data-suggest-new="" data-url="api/purchaseForm"></div>
-
-    <div data-option-list="" title="Betalingsmodeller" data-options-url="api/paymentModel"></div>
-    <div data-suggest-new="" data-url="api/paymentModel"></div>
-
-    <div data-option-list="" title="Aftaleelementer" data-options-url="api/agreementElement"></div>
-    <div data-suggest-new="" data-url="api/agreementElement"></div>
-
-    <div data-option-list="" title="Option forlæng" data-options-url="api/optionExtend"></div>
-    <div data-suggest-new="" data-url="api/optionExtend"></div>
-
-    <div data-option-list="" title="Betalingsfrekvenser" data-options-url="api/paymentFrequency"></div>
-    <div data-suggest-new="" data-url="api/paymentFrequency"></div>
-    
-    <div data-option-list="" title="Pris reguleringer" data-options-url="api/priceRegulation"></div>
-    <div data-suggest-new="" data-url="api/priceRegulation"></div>
-    
-    <div data-option-list="" title="Udbudsstrategi" data-options-url="api/procurementStrategy"></div>
-    <div data-suggest-new="" data-url="api/procurementStrategy"></div>
-
-    <div data-option-list="" title="Opsigelsesfrister" data-options-url="api/terminationDeadline"></div>
-    <div data-suggest-new="" data-url="api/terminationDeadline"></div>
-
-    <div data-option-list="" title="Overtagelsesprøver" data-options-url="api/handoverTrialType"></div>
-    <div data-suggest-new="" data-url="api/handoverTrialType"></div>
+    <div data-local-option-role-list="" title="Roller" dir-id="localItContractRoleId" state="local-config.contract.edit-contract-roles" data-options-url="odata/LocalItContractRoles"></div>
+    <div data-local-option-list="" title="Kontrakttyper" dir-id="localItContractTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalItContractTypes"></div>
+    <div data-local-option-list="" title="Kontraktskabeloner" dir-id="localItContractTemplateTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalItContractTemplateTypes"></div>
+    <div data-local-option-list="" title="Indkøbsformer" dir-id="localPurchaseFormTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPurchaseFormTypes"></div>
+    <div data-local-option-list="" title="Betalingsmodeller" dir-id="localPaymentModelTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPaymentModelTypes"></div>
+    <div data-local-option-list="" title="Aftaleelementer" dir-id="localAgreementElementTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalAgreementElementTypes"></div>
+    <div data-local-option-list="" title="Option forlæng" dir-id="localOptionExtendTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalOptionExtendTypes"></div>
+    <div data-local-option-list="" title="Betalingsfrekvenser" dir-id="localPaymentFrequencyTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPaymentFrequencyTypes"></div>
+    <div data-local-option-list="" title="Pris reguleringer" dir-id="localPriceRegulationTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalPriceRegulationTypes"></div>
+    <div data-local-option-list="" title="Indkøbsstrategier" dir-id="localProcurementStrategyTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalProcurementStrategyTypes"></div>
+    <div data-local-option-list="" title="Opsigelsesfrister" dir-id="localTerminationDeadlineTypId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalTerminationDeadlineTypes"></div>
+    <div data-local-option-list="" title="Overtagelsesprøver" dir-id="localHandoverTrialTypeId" state="local-config.contract.edit-contract-types" data-options-url="odata/LocalHandoverTrialTypes"></div>
 </form>

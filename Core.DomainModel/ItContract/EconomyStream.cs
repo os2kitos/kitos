@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItContract
 {
@@ -6,7 +7,7 @@ namespace Core.DomainModel.ItContract
     /// It contract economy stream.
     /// </summary>
     /// TODO Refactor into a base class and extern & intern derived classes
-    public class EconomyStream : Entity, IContextAware
+    public class EconomyStream : Entity, IContextAware, IContractModule, IHasAccessModifier
     {
         /// <summary>
         /// The EconomyStream might be an extern payment for a contract.
@@ -94,6 +95,14 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public string Note { get; set; }
 
+        public AccessModifier AccessModifier { get; set; }
+
+        public EconomyStream()
+        {
+            // Default "Synlighed" must be local
+            AccessModifier = AccessModifier.Local;
+        }
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
@@ -122,5 +131,6 @@ namespace Core.DomainModel.ItContract
 
             return false;
         }
+
     }
 }

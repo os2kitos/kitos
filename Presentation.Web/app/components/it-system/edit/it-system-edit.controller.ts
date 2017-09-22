@@ -11,92 +11,90 @@
                             return result.data.response;
                         });
                 }],
+                user: [
+                    'userService', function (userService) {
+                        return userService.getUser();
+                    }
+                ],
                 hasWriteAccess: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
                     return $http.get("api/itsystem/" + $stateParams.id + "?hasWriteAccess=true&organizationId=" + user.currentOrganizationId)
                         .then(function (result) {
                             return result.data.response;
                         });
-                }],
-                businessTypes: [
-                    '$http', function($http) {
-                        return $http.get("api/businesstype");
-                    }
-                ],
-                appTypeOptions: [
-                    '$http', function ($http) {
-                        return $http.get("api/itSystemTypeOption").then(function (result) {
-                            return result.data.response;
-                        });
-                    }
-                ],
-                user: [
-                    'userService', function(userService) {
-                        return userService.getUser();
-                    }
-                ]
+                }]
             }
         });
     }]);
 
     app.controller('system.EditCtrl',
-    [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 'itSystem', 'hasWriteAccess', 'businessTypes', 'user', 'autofocus', 'appTypeOptions',
-        function ($rootScope, $scope, $http, $state, notify, itSystem, hasWriteAccess, businessTypes, user, autofocus, appTypeOptions) {
-            $rootScope.page.title = 'IT System - Rediger system';
-            autofocus();
+        [
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
 
-            itSystem.updateUrl = 'api/itsystem/' + itSystem.id;
-            itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
-            itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
+                $scope.hasWriteAccess = hasWriteAccess;
 
-            $scope.select2AllowClearOpt = {
-                allowClear: true
-            };
+                if (!$scope.hasWriteAccess) {
+                    _.remove($rootScope.page.subnav.buttons, function (o) {
+                        return o.text === "Slet IT System";
+                    });
+                } else if (user.isGlobalAdmin) {
+                    _.remove($rootScope.page.subnav.buttons, function (o) {
+                        return o.text === "Deaktivér IT System";
+                    });
 
-            $scope.appTypeOptions = appTypeOptions;
-            $scope.system = itSystem;
-            $scope.hasWriteAccess = hasWriteAccess;
-            $scope.businessTypes = businessTypes.data.response;
-            $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
+                    _.remove($rootScope.page.subnav.buttons, function (o) {
+                        return o.text === "Aktivér IT System";
+                    });
 
-            function selectLazyLoading(url, allowClear, paramAry) {
-                return {
-                    minimumInputLength: 1,
-                    initSelection: function(elem, callback) {
-                    },
-                    allowClear: allowClear,
-                    ajax: {
-                        data: function(term, page) {
-                            return { query: term };
-                        },
-                        quietMillis: 500,
-                        transport: function(queryParams) {
-                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
-                            res.abort = function() {
-                                return null;
-                            };
-
-                            return res;
-                        },
-
-                        results: function(data, page) {
-                            var results = [];
-
-                            _.each(data.data.response, function(obj: { id; name; }) {
-
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.name
-                                });
-                            });
-
-                            return { results: results };
+                    if (itSystem.accessModifier === 1) {
+                        if (!itSystem.disabled) {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                            );
+                        } else {
+                            $rootScope.page.subnav.buttons.push(
+                                { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                            );
                         }
                     }
-                };
+                }
+
+                function disableSystem() {
+                    if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
+                        return;
+                    }
+
+                    var payload: any = {};
+                    payload.Disabled = true;
+
+                    var msg = notify.addInfoMessage('Deaktiverer IT System...', false);
+                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                        .success(function (result) {
+                            msg.toSuccessMessage('IT System er deaktiveret!');
+                            $state.reload();
+                        })
+                        .error(function (data, status) {
+                            msg.toErrorMessage('Fejl! Kunne ikke deaktivere IT System!');
+                        });
+                }
+
+                function enableSystem() {
+                    if (!confirm('Er du sikker på du vil aktivere systemet?')) {
+                        return;
+                    }
+                    var payload: any = {};
+                    payload.Disabled = false;
+
+                    var msg = notify.addInfoMessage('Aktiverer IT System...', false);
+                    $http.patch('odata/ItSystems(' + itSystem.id + ')', payload)
+                        .success(function (result) {
+                            msg.toSuccessMessage('IT System er aktiveret!');
+                            $state.reload();
+                        })
+                        .error(function (data, status) {
+                            msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
+                        });
+                }
             }
-        }
-    ]);
+        ]);
 })(angular, app);

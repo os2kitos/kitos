@@ -1,6 +1,17 @@
-﻿<textarea rows="6"
-          class="form-control"
-          data-ng-model="projectDescriptionVm.project.description"
-          data-autosave="api/itproject/{{projectDescriptionVm.project.id}}"
-          data-field="description"
-          data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+﻿<div class="object-section-container">
+    <h4>{{projectEditVm.project.name}}</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <textarea rows="6"
+                              class="form-control"
+                              data-ng-model="projectDescriptionVm.project.description"
+                              data-autosave="api/itproject/{{projectDescriptionVm.project.id}}"
+                              data-field="description"
+                              data-ng-disabled="!projectEditVm.hasWriteAccess"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

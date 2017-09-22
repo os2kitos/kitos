@@ -6,7 +6,7 @@ namespace Core.DomainModel
     /// Base entity class.
     /// Every domain model should extend this.
     /// </summary>
-    public abstract class Entity
+    public abstract class Entity : IEntity
     {
         protected Entity()
         {
@@ -50,6 +50,11 @@ namespace Core.DomainModel
         /// </returns>
         public virtual bool HasUserWriteAccess(User user)
         {
+            if (this is IContextAware && user.DefaultOrganizationId.HasValue)
+            {
+                if (((IContextAware) this).IsInContext(user.DefaultOrganizationId.Value) && user.IsLocalAdmin)
+                    return true;
+            }
             return ObjectOwnerId == user.Id;
         }
 

@@ -1,20 +1,41 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Web.Http;
 using System.Web.OData;
-using System.Web.OData.Query;
+using System.Web.OData.Extensions;
 using Core.DomainServices;
+using System.Web.OData.Routing;
+using Microsoft.OData.Core;
+using Microsoft.OData.Core.UriParser;
+using Ninject;
+using Ninject.Extensions.Logging;
+using System.Web.Http.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     public abstract class BaseController<T> : ODataController where T : class
     {
-        protected ODataValidationSettings ValidationSettings;
-        protected IGenericRepository<T> Repository;
+        protected readonly IGenericRepository<T> Repository;
+
+        [Inject]
+        public ILogger Logger { get; set; }
 
         protected BaseController(IGenericRepository<T> repository)
         {
-            ValidationSettings = new ODataValidationSettings {AllowedQueryOptions = AllowedQueryOptions.All};
             Repository = repository;
+        }
+
+        protected int UserId
+        {
+            get
+            {
+                int userId;
+                int.TryParse(User.Identity.Name, out userId);
+                return userId;
+            }
         }
 
         [EnableQuery]
@@ -30,72 +51,31 @@ namespace Presentation.Web.Controllers.OData
             return Ok(entity);
         }
 
-        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
 
-        //protected IHttpActionResult Put(int key, T entity)
-        //{
-        //    return StatusCode(HttpStatusCode.NotImplemented);
-        //}
+        protected TKey GetKeyFromUri<TKey>(HttpRequestMessage request, Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException("uri");
+            }
 
-        //protected IHttpActionResult Post(T entity)
-        //{
-        //    Validate(entity);
+            var urlHelper = request.GetUrlHelper() ?? new UrlHelper(request);
 
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
+            string serviceRoot = urlHelper.CreateODataLink(
+                request.ODataProperties().RouteName,
+                request.ODataProperties().PathHandler, new List<ODataPathSegment>());
+            var odataPath = request.ODataProperties().PathHandler.Parse(
+                request.ODataProperties().Model,
+                serviceRoot, uri.LocalPath);
 
-        //    try
-        //    {
-        //        entity = Repository.Insert(entity);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
+            var keySegment = odataPath.Segments.OfType<KeyValuePathSegment>().FirstOrDefault();
+            if (keySegment == null)
+            {
+                throw new InvalidOperationException("The link does not contain a key.");
+            }
 
-        //    return Created(entity);
-        //}
-
-        //protected IHttpActionResult Patch(int key, Delta<T> delta)
-        //{
-        //    Validate(delta.GetEntity());
-
-        //    if (!ModelState.IsValid) return BadRequest(ModelState);
-
-        //    var entity = Repository.GetByKey(key);
-        //    if(entity == null)
-        //        return NotFound();
-
-        //    try
-        //    {
-        //        delta.Patch(entity);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
-
-        //    return Updated(entity);
-        //}
-
-        //protected IHttpActionResult Delete(int key)
-        //{
-        //    var entity = Repository.GetByKey(key);
-        //    if (entity == null)
-        //        return NotFound();
-
-        //    try
-        //    {
-        //        Repository.DeleteByKey(key);
-        //        Repository.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return InternalServerError(e);
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
+            var value = ODataUriUtils.ConvertFromUriLiteral(keySegment.Value, ODataVersion.V4);
+            return (TKey)value;
+        }
     }
 }

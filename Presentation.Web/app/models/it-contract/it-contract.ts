@@ -17,10 +17,8 @@
         HasSupplierSigned: boolean;
         /** Gets or sets the supplier signed date. */
         SupplierSignedDate: Date;
-        /** Gets or sets the contract signer identifier. */
-        ContractSignerId: number;
         /** Gets or sets the contract signer. */
-        ContractSigner: IUser;
+        ContractSigner: string;
         /** Gets or sets a value indicating whether this contract is signed. */
         IsSigned: boolean;
         /** Gets or sets the signed date. */
@@ -76,9 +74,13 @@
         OperationalAcceptanceTestApproved: Date;
         /** When the contract began. (indgået) */
         Concluded: Date;
-        /** Gets or sets the duration. (varighed) */
-        Duration: number;
+        /** Gets or sets the duration in years. (varighed) */
+        DurationYears: number;
+        /** Gets or sets the duration in months. (varighed) */
+        DurationMonths: number;
         /** Gets or sets the irrevocable to. (uopsigelig til) */
+        DurationOngoing: boolean;
+        /** Gets or sets the ongoing status. (løbende) */
         IrrevocableTo: Date;
         /** When the contract expires. (udløbet) */
         ExpirationDate: Date;
@@ -92,6 +94,10 @@
         OptionExtendId: number;
         OptionExtend: IOptionExtend;
         ExtendMultiplier: number;
+        /** (løbende) */
+        Running: string;
+        /** (indtil udgangen af) */
+        ByEnding: string;
         /** Gets or sets the handover trials. */
         HandoverTrials: Array<IHandoverTrial>;
 
@@ -121,5 +127,8 @@
 
         /** Whether the contract is active or not */
         IsActive: boolean;
+
+        ReferenceId: number;
+        Reference: IReference;
     }
 }

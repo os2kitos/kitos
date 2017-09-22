@@ -1,0 +1,188 @@
+﻿<div class="object-section-container">
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <!-- 3rd column -->
+            <div class="col-xs-6">
+                <!-- local sys id -->
+                <div class="form-group">
+                    <label for="sysId" class="control-label small">Lokal System ID</label>
+                    <input id="sysId" type="text" class="form-control input-sm" autofocus
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="usage.localSystemId"
+                           data-field="localSystemId"
+                           data-autosave="api/itSystemUsage/{{usageId}}">
+                </div>
+
+                <!-- local call name -->
+                <div class="form-group">
+                    <label for="localcallname" class="control-label small">Lokal kaldenavn</label>
+                    <input id="localcallname" type="text" class="form-control input-sm"
+                           data-ng-model="usage.localCallName"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-field="localCallName"
+                           data-autosave="api/itSystemUsage/{{usageId}}">
+                </div>
+                <div class="form-group">
+                    <select-option data-id="sensitive"
+                                   data-label="Persondata"
+                                   data-placeholder="Vælg persondata"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="usage.sensitiveDataTypeId"
+                                   data-options="sensitiveDataTypes"
+                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
+                                   data-field="sensitiveDataTypeId">
+                    </select-option>
+                </div>
+                <!-- note -->
+                <div class="form-group">
+                    <label for="note" class="control-label small">Note</label>
+                    <textarea id="note" class="form-control input-sm" rows="5"
+                              data-ng-model="usage.note"
+                              data-ng-disabled="!hasWriteAccess"
+                              data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
+                </div>
+            </div>
+
+            <!-- 4th column -->
+            <div class="col-xs-6">
+                <!-- version -->
+                <div class="form-group">
+                    <label for="version" class="control-label small">Version</label>
+                    <input id="version" type="text" class="form-control input-sm"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="usage.version"
+                           data-field="version"
+                           data-autosave="api/itSystemUsage/{{usageId}}">
+                </div>
+
+                <!-- Object owner -->
+                <div class="form-group">
+                    <label for="usage-owner" class="control-label small">Taget i anvendelse af</label>
+                    <input type="text" id="usage-owner" class="form-control input-sm"
+                           data-ng-disabled="true"
+                           value="{{usage.objectOwnerFullName}}">
+                </div>
+                <div class="form-group">
+                    <label for="agreement-concluded" class="control-label small"> Ibrugtagningsdato</label>
+                    <input id="agreement-concluded"
+                           type="text"
+                           class="form-control"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-model="usage.concluded"
+                           data-autosave="{{ autosaveUrl2 }}"
+                           data-ng-blur="checkSystemValidity()"
+                           data-field="concluded">
+                </div>
+                <div class="form-group">
+                    <label for="agreement-expiration" class="control-label small">Slutdato for anvendelse</label>
+                    <input type="text" class="form-control" id="agreement-expiration"
+                           data-kendo-date-picker
+                           data-k-options="datepickerOptions"
+                           data-ng-model="usage.expirationDate"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-blur="checkSystemValidity()"
+                           data-autosave="{{ autosaveUrl2 }}"
+                           data-field="expirationDate">
+                </div>
+                <div class="checkbox" style="position: absolute; left: 0;">
+                    <input type="checkbox" id="system-int-signed"
+                           class="tags-checkbox sr-only"
+                           data-ng-model="usage.active"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{ autoSaveUrl }}"
+                           data-field="active"
+                           data-ng-change="checkSystemValidity()" />
+                    <label for="system-int-signed">
+                        <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
+                        <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
+                        <span class='label-content'>Gyldig: </span>
+                    </label>
+                    <i ng-show="usage.isActive" class="fa fa-check" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="object-section-container">
+    <h4>Produktdata</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-xs-6">
+                <!--AppTypeOption-->
+                <div class="form-group">
+                    <select-option data-id="system-app-type"
+                                   data-label="Applikationstype"
+                                   data-ng-disabled="true"
+                                   data-ng-model="usage.itSystem.appTypeOptionId"
+                                   data-options="appTypeOptions">
+                    </select-option>
+                </div>
+
+                <!--Name-->
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">IT System</label>
+                    <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
+                </div>
+
+                <!--Parent system-->
+                <div class="form-group">
+                    <label for="system-parent" class="control-label small">Overordnet system</label>
+                    <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
+                </div>
+
+                <!--Business type-->
+                <div class="form-group">
+                    <select-option data-id="system-business-type"
+                                   data-label="Forretningstype"
+                                   data-ng-disabled="true"
+                                   data-ng-model="usage.itSystem.businessTypeId"
+                                   data-options="businessTypes">
+                    </select-option>
+                </div>
+            </div>
+
+            <!-- 2st column -->
+            <div class="col-xs-6">
+                <!--Belongs to-->
+                <div class="form-group">
+                    <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
+                    <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
+                </div>
+
+                <!-- Object owner -->
+                <div class="form-group">
+                    <label class="control-label small">Oprettet af</label>
+                    <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
+                </div>
+
+                <!--Access modifier -->
+                <div class="form-group">
+                    <label for="system-access" class="control-label small">Synlighed</label>
+                    <input id="system-access" class="form-control input-sm" disabled data-select-access-modifier="" data-ng-model="usage.itSystem.accessModifier">
+                </div>
+
+                <!-- UUID -->
+                <div class="form-group">
+                    <label class="control-label small">UUID</label>
+                    <input type="text" value="{{usage.itSystem.uuid}}" class="form-control input-sm" disabled="disabled" />
+                </div>
+            </div>
+
+            <!-- full width -->
+            <div class="col-xs-12">
+                <!-- Description and URL -->
+                <div class="form-group">
+                    <label for="system-description" class="control-label small">Beskrivelse</label>
+                    <textarea id="system-description" class="form-control input-sm" rows="7" disabled data-ng-model="usage.itSystem.description"></textarea>
+                    <span class="help-block">
+                        Yderligere beskrivelse: <a data-ng-href="{{usage.itSystem.url}}">{{usage.itSystem.url}}</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
