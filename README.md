@@ -1,6 +1,6 @@
 # OS2KITOS
 
-The OS2KITOS was programmed by IT Minds ApS (http://it-minds.dk)
+The OS2KITOS is delivered by Miracle A/S (http://www.miracle.dk)
 for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).
 
 Copyright (c) 2014, OS2 - Offentligt digitaliseringsfællesskab.
@@ -13,17 +13,3 @@ http://mozilla.org/MPL/2.0/.
 
 All source code in this and the underlying directories is subject to
 the terms of the Mozilla Public License, v. 2.0. 
-
-[![Build status](https://ci.appveyor.com/api/projects/status/ryacihsuw13o1qcw/branch/master?svg=true)](https://ci.appveyor.com/project/Kitos/kitos/branch/master) [![codecov.io](https://codecov.io/github/os2kitos/kitos/coverage.svg?branch=master)](https://codecov.io/github/os2kitos/kitos?branch=master)
-
-See the automated test results on [BrowserStack Automate](https://www.browserstack.com/automate).
-
-## Documentation
-
-[Technical documentation](https://github.com/os2kitos/kitos/blob/master/DOCUMENTATION.md)
-
-=======
-
-This website uses [BrowserStack](https://www.browserstack.com/) for testing.
-
-<a name="BrowserStack">[<img src="https://cdn.rawgit.com/os2kitos/kitos/master/Assets/BrowserStack.svg" width="300" />](https://www.browserstack.com/)</a>
