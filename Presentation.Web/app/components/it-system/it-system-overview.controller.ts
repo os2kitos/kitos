@@ -743,12 +743,11 @@
         }
 
         private isContractActive(dataItem) {
-            console.log(dataItem);
-
-            if (!dataItem.Active) {
-            var today = this.moment();
-            var startDate = dataItem.Concluded ? moment(dataItem.Concluded) : today;
-            var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+         
+        if (!dataItem.Active) {
+                var today = this.moment().startOf('day');
+                var startDate = dataItem.Concluded ? moment(dataItem.Concluded).startOf('day') : today;
+                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
 
             if (dataItem.Terminated) {
                 var terminationDate = moment(dataItem.Terminated);

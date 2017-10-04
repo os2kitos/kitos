@@ -747,9 +747,9 @@
 
 
             if (!dataItem.Active) {
-                var today = this.moment();
-                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded) : today;
-                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+                var today = this.moment().startOf('day');
+                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded).startOf('day') : today;
+                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
 
                 if (dataItem.Terminated) {
                     var terminationDate = this.moment(dataItem.Terminated);

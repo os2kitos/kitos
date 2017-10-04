@@ -318,7 +318,7 @@
 
                     if (concluded && expirationDate) {
 
-                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
+                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today <= expirationDateObject.setHours(23, 59, 59, 999));
 
                     }
                     else if (concluded && !expirationDate) {
