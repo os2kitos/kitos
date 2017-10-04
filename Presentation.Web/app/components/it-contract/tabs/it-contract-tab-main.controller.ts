@@ -59,7 +59,15 @@
                                 return results;
                             });
                         }
-                    ]
+                    ],
+                    contractRemark: ["$http", "contract", function ($http, contract) {
+                        return $http.get(`odata/ItContracts(${contract.id})/Remark`).then(function (result) {
+                            return result.data;
+                        }, function (error) {
+                            //Contracts can have 0 or 1 remark and if there is no remark a 404 error is returned
+                            return error;
+                        });
+                    }],
                 }
             });
         }
@@ -67,15 +75,17 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '$stateParams', 'notify','contractRemark', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, $stateParams, notify,contractRemark, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.kitosUsers = kitosUsers;
+                $scope.contractRemark= contractRemark;
                 autofocus();
-
+                
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
@@ -126,6 +136,51 @@
                         $scope.contract.procurementPlan = plan.id; // select it
                     }
                 }
+
+                $scope.postRemark = function () {
+                    if ($scope.hasWriteAccess) {
+                        //If the contract has no remark (404) we POST otherwise PATCH
+                        if ($scope.contractRemark.status === 404) {
+                            postRemark();
+                        } else {
+                            patchRemark();
+                        }
+                    }
+                }
+
+                function postRemark() {
+                    const payload = {
+                        "Id": `${contract.id}`,
+                        "Remark": $scope.contractRemark.Remark
+                    };
+                    $http.post(`odata/ItContractRemarks(${contract.id})`, payload).then(function (result) {
+                        notify.addSuccessMessage("Bemærkningen er gemt");
+                        $scope.contractRemark = result.data;
+                    }, function (error) {
+                        if (error.status === 401) {
+                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
+                        } else {
+                            notify.addErrorMessage("Bemærkningen kunne ikke gemmes");
+                        }
+                    });
+                };
+
+                function patchRemark() {
+                    const payload = {
+                        "Remark": $scope.contractRemark.Remark
+                    };
+                    $http.patch(`odata/ItContractRemarks(${$scope.contractRemark.Id})`, payload).then(function (success) {
+                        notify.addSuccessMessage("Bemærkningen er gemt");
+                        $scope.contractRemark.Remark = success.config.data.Remark;
+                    }, function (error) {
+                        if (error.status === 403) {
+                            notify.addInfoMessage("Du har ikke lov til at foretage denne handling.");
+                            $scope.contractRemark.Remark = $scope.contractRemark.Remark;
+                        } else {
+                            notify.addErrorMessage("Bemærkningen kunne ikke gemmes");
+                        }
+                    });
+                };
 
                 $scope.saveProcurement = function () {
                     var payload;

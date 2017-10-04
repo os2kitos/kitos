@@ -3,22 +3,14 @@
     /// <summary>
     /// The it contract notes class.
     /// </summary>
-    public class ItContractRemark : Entity, IHasAccessModifier, IContextAware, IContractModule
+    public class ItContractRemark : Entity, IContextAware, IContractModule
     {
 
         public virtual ItContract ItContract { get; set; }
-        public AccessModifier AccessModifier { get; set; }
         /// <summary>
         /// Gets or sets the remark of a contract.
         /// </summary>
         public string Remark { get; set; }
-
-        public ItContractRemark()
-        {
-            // Default "Synlighed" must be local
-            AccessModifier = AccessModifier.Local;
-        }
-
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>

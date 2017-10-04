@@ -394,6 +394,10 @@
     <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.Designer.cs">
       <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.cs" />
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.Designer.cs">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -580,6 +584,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708171252435_Added PreviousName to ItSystem.resx">
       <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710040651514_access modifier removed from itcontractremark.resx">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
