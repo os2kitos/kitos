@@ -602,7 +602,7 @@
                     },
                     {
                         field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojtime", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -626,7 +626,7 @@
                     },
                     {
                         field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojqual", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -650,7 +650,7 @@
                     },
                     {
                         field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojress", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -905,7 +905,7 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                if (selectedIndex > 0) {
+                          if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {
