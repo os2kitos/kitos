@@ -112,7 +112,6 @@
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
-    <Compile Include="Mapping\ItContractRemarkMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
@@ -398,6 +397,10 @@
     <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.Designer.cs">
       <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.cs" />
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.Designer.cs">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -587,6 +590,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710040651514_access modifier removed from itcontractremark.resx">
       <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111321047_Removed itContractRemark entity.resx">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

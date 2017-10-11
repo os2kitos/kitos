@@ -129,7 +129,6 @@
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />
-    <Compile Include="ItContract\ItContractRemark.cs" />
     <Compile Include="ItProject\Assignment.cs" />
     <Compile Include="IHasOrganization.cs" />
     <Compile Include="ItProject\IProjectModule.cs" />
