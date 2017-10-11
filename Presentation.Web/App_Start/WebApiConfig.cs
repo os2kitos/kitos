@@ -118,9 +118,6 @@ namespace Presentation.Web
             var itContractRoles = builder.EntitySet<ItContractRole>(nameof(ItContractRolesController).Replace("Controller", string.Empty));
             itContractRoles.EntityType.HasKey(x => x.Id);
 
-            var itContractRemarks = builder.EntitySet<ItContractRemark>(nameof(ItContractRemarksController).Replace("Controller", string.Empty));
-            itContractRemarks.EntityType.HasKey(x => x.Id);
-
             //builder.EntitySet<ItProjectStatus>("ItProjectStatuses");
 
             var itProjectRights = builder.EntitySet<ItProjectRight>(nameof(ItProjectRightsController).Replace("Controller", string.Empty));

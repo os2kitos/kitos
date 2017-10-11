@@ -50,6 +50,34 @@ namespace Presentation.Web.Controllers.API
             return base.GetAll(paging);
         }
 
+        public override HttpResponseMessage GetSingle(int id) {
+
+            try
+            {
+                var item = Repository.GetByKey(id);
+
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
+
+                if (item == null) return NotFound();
+
+                var dto = Map(item);
+
+                if (item.OrganizationId != KitosUser.DefaultOrganizationId) {
+                    dto.Note = "";
+                }
+
+                return Ok(dto);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
+
         public virtual HttpResponseMessage PostAgreementElement(int id, int organizationId, int elemId)
         {
             try
