@@ -72,7 +72,9 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
+        /// <summary>  
+        ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation
+        /// </summary>  
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
             try
@@ -689,10 +691,14 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
+        /// <summary>  
+        ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation.
+        /// </summary>
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
+            //force set access modifier to 0
+            item.AccessModifier = 0;
             return _itProjectService.AddProject(item);
         }
 
@@ -708,6 +714,8 @@ namespace Presentation.Web.Controllers.API
             {
                 return Unauthorized();
             }
+            //force set access modifier to 0
+            dto.AccessModifier = 0;
             return base.Post(dto);
         }
 
@@ -749,6 +757,9 @@ namespace Presentation.Web.Controllers.API
 
             project.LastChanged = DateTime.UtcNow;
             project.LastChangedByUser = KitosUser;
+
+            //force set access modifier to 0
+            project.AccessModifier = 0;
 
             PatchQuery(project, null);
 
