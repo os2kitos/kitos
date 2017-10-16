@@ -74,6 +74,7 @@
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
+                $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
                 

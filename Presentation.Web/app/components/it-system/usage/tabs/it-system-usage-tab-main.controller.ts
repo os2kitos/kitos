@@ -40,9 +40,9 @@
         });
     }]);
 
-    app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage',
+    app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage','user',
         'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess', 'appTypeOptions',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage,user, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
             $rootScope.page.title = 'IT System - Anvendelse';
 
             $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
@@ -54,6 +54,7 @@
             $scope.archiveTypes = archiveTypes;
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.appTypeOptions = appTypeOptions;
+            $scope.hasViewAccess = user.currentOrganizationId == itSystemUsage.organizationId;
             autofocus();
 
             var today = new Date();

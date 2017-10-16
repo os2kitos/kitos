@@ -35,7 +35,7 @@
                     </select-option>
                 </div>
                 <!-- note -->
-                <div class="form-group">
+                <div class="form-group" data-ng-hide="!hasViewAccess">
                     <label for="note" class="control-label small">Note</label>
                     <textarea id="note" class="form-control input-sm" rows="5"
                               data-ng-model="usage.note"
@@ -87,7 +87,7 @@
                            data-autosave="{{ autosaveUrl2 }}"
                            data-field="expirationDate">
                 </div>
-                <div class="checkbox" style="position: absolute; left: 0;">
+                <div class="checkbox">
                     <input type="checkbox" id="system-int-signed"
                            class="tags-checkbox sr-only"
                            data-ng-model="usage.active"
@@ -95,7 +95,7 @@
                            data-autosave="{{ autoSaveUrl }}"
                            data-field="active"
                            data-ng-change="checkSystemValidity()" />
-                    <label for="system-int-signed">
+                    <label for="system-int-signed"  style="padding-left:0px;">
                         <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
                         <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
                         <span class='label-content'>Gyldig: </span>
