@@ -462,6 +462,9 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItSystemUsage obj, User user, int organizationId)
         {
+            //if readonly
+            if (user.IsReadOnly && !user.IsGlobalAdmin)
+                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))

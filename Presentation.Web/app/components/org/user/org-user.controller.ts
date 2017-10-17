@@ -87,9 +87,9 @@
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
                                 // set if the user can edit
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isOrgAdmin) {
+                                if (this.user.isGlobalAdmin || ((this.user.isLocalAdmin || this.user.isOrgAdmin) && !this.user.isReadOnly)) {
                                     usr.canEdit = true;
-                                } else if (this.user.id === usr.Id) {
+                                } else if (this.user.id === usr.Id && !this.user.isReadOnly) {
                                     usr.canEdit = true;
                                 } else {
                                     usr.canEdit = false;

@@ -144,6 +144,16 @@ namespace Core.ApplicationServices
                 // global admin always have access
                 return true;
             }
+            //check if user is readonly
+            if (user.IsReadOnly) {
+                return false;
+            }
+
+            if (user.IsGlobalAdmin)
+            {
+                // global admin always have access
+                return true;
+            }
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
