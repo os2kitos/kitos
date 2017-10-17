@@ -138,7 +138,8 @@
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
                 if (this.vm.isReportAdmin)
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
-
+                if (this.vm.isReadOnly)
+                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
                 // when all requests are done
                 this.$q.all(promises).then(
                     () => {

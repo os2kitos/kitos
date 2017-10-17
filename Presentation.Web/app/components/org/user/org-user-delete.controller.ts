@@ -111,13 +111,13 @@
             this.initCollections(system, this.vmSystemRoles);
             this.initCollections(itContracts, this.vmContractRoles);
             this.initCollections(orgAdmin, this.vmAdminRoles);
-
+      
             this.vmUsersInOrganization = usersInOrganization.filter(x => x.Id !== user.Id);
             this.vmProject = projects;
             this.vmSystem = system;
             this.vmItContracts = itContracts;
             this.vmOrgUnits = orgUnits;
-            this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User"));
+            this.vmOrgAdmin = orgAdmin.filter(bar => (bar.Role !== "User")).filter(bar => (bar.Role !== "ReadOnly"));
             this.itemSelected = false;
             this.isUserSelected = true;
             this.curOrganization = user.currentOrganizationName;
