@@ -25,6 +25,7 @@
         private gridState = this.gridStateService.getService(this.storageKey);
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -237,8 +238,8 @@
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
                 return regexp.test(Url.toLowerCase());
         };
-
         private activate() {
+            this.canCreate = !this.user.isReadOnly;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -324,7 +325,7 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
-                        template: "<a ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {

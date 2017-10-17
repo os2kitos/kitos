@@ -65,7 +65,7 @@
                 return g.key === "CanGlobalAdminOnlyEditReports";
             });
 
-            this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
+            this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin || !user.isReadOnly;
 
             this.categoryTypeValues = [];
             var self = this;

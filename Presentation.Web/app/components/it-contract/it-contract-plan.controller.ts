@@ -24,6 +24,7 @@
         private roleSelectorDataSource;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -213,6 +214,8 @@
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
 
+            this.canCreate = !this.user.isReadOnly;
+
             var mainGridOptions: Kitos.IKendoGridOptions<IItContractPlan> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -308,7 +311,7 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
-                        template: "<a ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewPlanVm.canCreate\">#: text #</button>"
                     },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {

@@ -24,6 +24,7 @@
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -94,7 +95,7 @@
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
             var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
-
+            this.canCreate = !this.user.isReadOnly;
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -146,7 +147,7 @@
                     {
                         name: "createITSystem",
                         text: "Opret IT System",
-                        template: "<a ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "excel", text: "Eksportér til Excel", className: "pull-right"
