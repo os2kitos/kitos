@@ -144,21 +144,23 @@ namespace Core.ApplicationServices
                 // global admin always have access
                 return true;
             }
+            //check if user is readonly
+            if (user.IsReadOnly) {
+                return false;
+            }
+
+            if (user.IsGlobalAdmin)
+            {
+                // global admin always have access
+                return true;
+            }
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
             if (accessModifier == AccessModifier.Public)
             {
-                // Special case for setting accessModifier for EconomyStream and ItContractRemark
-                if (entity is EconomyStream || entity is ItContractRemark)
-                {
-                    if (!(CanExecute(userId, Feature.CanSetContractElementsAccessModifierToPublic) || userId == entity.ObjectOwnerId))
-                    {
-                        return false;
-                    }
-                }
                 // special case for organisation
-                else if (entity is Organization)
+                if (entity is Organization)
                 {
                     if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {

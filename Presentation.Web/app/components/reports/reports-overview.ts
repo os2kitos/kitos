@@ -67,6 +67,10 @@
 
             this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
 
+            if (!user.isGlobalAdmin && user.isReadOnly){
+                this.canCreate = false;
+            }
+
             this.categoryTypeValues = [];
             var self = this;
             this._.each(this.reportCategoryTypes, function (value) {

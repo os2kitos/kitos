@@ -108,6 +108,17 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-xs-12"  data-ng-hide="!hasViewAccess">
+                        <div class="form-group">
+                            <label for="contract-note" class="control-label small">Bemærkning</label>
+                            <textarea id="contract-note" class="form-control input-sm" rows="4"
+                                      data-ng-disabled="!hasWriteAccess"
+                                      data-ng-model="contract.note"
+                                      data-autosave="{{ autoSaveUrl }}"
+                                      data-field="note">
+                            </textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -18,6 +18,8 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
+        public canCreate: boolean;
+
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -86,6 +88,7 @@
             }
 
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            this.canCreate = !this.user.isReadOnly;
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -132,7 +135,7 @@
                     {
                         name: "createSnitflade",
                         text: "Opret Snitflade",
-                        template: "<a ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
                     },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {

@@ -9,7 +9,7 @@ namespace Presentation.Web.Models
         public int Id { get; set; }
         public int OrganizationId { get; set; }
         public string Name { get; set; }
-        public string Remark { get; set; }
+        public string Note { get; set; }
         public string ItContractId { get; set; }
         public string Esdh { get; set; }
         public string Folder { get; set; }

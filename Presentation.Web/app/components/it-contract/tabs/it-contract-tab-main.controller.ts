@@ -69,13 +69,15 @@
         [
             '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
             function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
+                $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
-
+                
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
@@ -263,7 +265,7 @@
 
                     if (concluded && expirationDate) {
 
-                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
+                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today <= expirationDateObject.setHours(23, 59, 59, 999));
 
                     }
                     else if (concluded && !expirationDate) {

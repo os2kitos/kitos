@@ -25,6 +25,7 @@
         private gridState = this.gridStateService.getService(this.storageKey);
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -237,8 +238,8 @@
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
                 return regexp.test(Url.toLowerCase());
         };
-
         private activate() {
+            this.canCreate = !this.user.isReadOnly;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -324,7 +325,7 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
-                        template: "<a ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
                     { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
@@ -602,7 +603,7 @@
                     },
                     {
                         field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojtime", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -626,7 +627,7 @@
                     },
                     {
                         field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojqual", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -650,7 +651,7 @@
                     },
                     {
                         field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojress", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -836,7 +837,7 @@
 
                         roles = this.concatRoles(dataItem.roles[role.Id]);
 
-                        var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                        var link = `<a data-ui-sref='it-project.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
                         return link;
                     },
@@ -905,7 +906,7 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                if (selectedIndex > 0) {
+                          if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {
