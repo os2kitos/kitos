@@ -103,7 +103,12 @@
                     msg.toSuccessMessage("Varigheden blev gemt.");
                     $scope.durationYears = "";
                     $scope.durationMonths = "";
+
+                    //it is done this way so '0' doesnt appear in input
                     $scope.contract.durationOngoing = $scope.durationOngoing;
+                    $scope.contract.durationYears = $scope.durationYears;
+                    $scope.contract.durationMonths = $scope.durationMonths;
+
                 }).error(() => {
                     msg.toErrorMessage("Varigheden blev ikke gemt.");
                 });
