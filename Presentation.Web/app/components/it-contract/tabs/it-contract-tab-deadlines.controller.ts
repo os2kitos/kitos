@@ -103,6 +103,7 @@
                     msg.toSuccessMessage("Varigheden blev gemt.");
                     $scope.durationYears = "";
                     $scope.durationMonths = "";
+                    $scope.contract.durationOngoing = $scope.durationOngoing;
                 }).error(() => {
                     msg.toErrorMessage("Varigheden blev ikke gemt.");
                 });
