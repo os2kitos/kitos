@@ -25,6 +25,7 @@
                     scope.model = `${selectedItem.Name} ${selectedItem.LastName}`;
                     scope.searchInput = `${selectedItem.Name} ${selectedItem.LastName}`;
                     scope.current = 0;
+                    scope.showItems = false;
                 };
 
                 scope.current = 0;
