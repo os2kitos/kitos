@@ -348,6 +348,7 @@
     <Compile Include="Controllers\OData\ConfigsController.cs" />
     <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
+    <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />

@@ -62,6 +62,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterfaceType> ItInterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
+        public virtual DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
@@ -218,6 +219,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
+            modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
         }
     }
 }

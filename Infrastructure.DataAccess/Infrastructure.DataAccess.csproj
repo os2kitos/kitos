@@ -112,6 +112,7 @@
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
+    <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
@@ -401,6 +402,10 @@
     <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.Designer.cs">
       <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710250648438_itcontract agreementelement type is now represented by entity.cs" />
+    <Compile Include="Migrations\201710250648438_itcontract agreementelement type is now represented by entity.Designer.cs">
+      <DependentUpon>201710250648438_itcontract agreementelement type is now represented by entity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -593,6 +598,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710111321047_Removed itContractRemark entity.resx">
       <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710250648438_itcontract agreementelement type is now represented by entity.resx">
+      <DependentUpon>201710250648438_itcontract agreementelement type is now represented by entity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
