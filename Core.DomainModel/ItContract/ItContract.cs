@@ -14,6 +14,7 @@ namespace Core.DomainModel.ItContract
         public ItContract()
         {
             AgreementElements = new List<AgreementElementType>();
+            //AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             Children = new List<ItContract>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
             AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
@@ -344,6 +345,8 @@ namespace Core.DomainModel.ItContract
         ///     Chosen agreement elements.
         /// </value>
         public virtual ICollection<AgreementElementType> AgreementElements { get; set; }
+
+       // public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
 
         #endregion
 

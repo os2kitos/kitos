@@ -61,8 +61,11 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
         public DbSet<ItInterfaceType> ItInterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
+
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
-        public virtual DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
+
+       // public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
+
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }

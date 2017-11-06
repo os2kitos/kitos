@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class itcontractagreementelementtypeisnowrepresentedbyentity : IMigrationMetadata
+    public sealed partial class test : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(itcontractagreementelementtypeisnowrepresentedbyentity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(test));
         
         string IMigrationMetadata.Id
         {
-            get { return "201710250648438_itcontract agreementelement type is now represented by entity"; }
+            get { return "201711061209056_test"; }
         }
         
         string IMigrationMetadata.Source
