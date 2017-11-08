@@ -77,7 +77,6 @@
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
                 autofocus();
-                
                 $scope.contractTypes = contractTypes;
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
@@ -133,12 +132,16 @@
                     var payload;
                     // if empty the value has been cleared
                     if ($scope.contract.procurementPlan === '') {
+                        contract = $scope.contract; 
                         payload = { procurementPlanHalf: null, procurementPlanYear: null };
                     } else {
                         var id = $scope.contract.procurementPlan;
                         var result = $scope.procurementPlans[id];
                         payload = { procurementPlanHalf: result.half, procurementPlanYear: result.year };
                     }
+
+                    $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
+                    $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 };
 
