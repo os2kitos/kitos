@@ -96,6 +96,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -112,6 +114,7 @@
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
+    <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
@@ -401,6 +404,10 @@
     <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.Designer.cs">
       <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.cs" />
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.Designer.cs">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -593,6 +600,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710111321047_Removed itContractRemark entity.resx">
       <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711221241038_Override of exisiting table.resx">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

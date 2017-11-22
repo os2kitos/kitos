@@ -87,7 +87,10 @@ namespace Presentation.Web.Controllers.API
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
-                contract.AgreementElements.Add(elem);
+                contract.AssociatedAgreementElementTypes.Add(new ItContractAgreementElementTypes {
+                    AgreementElementType_Id = elem.Id,
+                    ItContract_Id = contract.Id
+                });
                 contract.LastChanged = DateTime.UtcNow;
                 contract.LastChangedByUser = KitosUser;
 
@@ -110,7 +113,9 @@ namespace Presentation.Web.Controllers.API
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
-                contract.AgreementElements.Remove(elem);
+                var relation = contract.AssociatedAgreementElementTypes.FirstOrDefault(e => e.AgreementElementType_Id == elem.Id);
+                contract.AssociatedAgreementElementTypes.Remove(relation);
+
                 contract.LastChanged = DateTime.UtcNow;
                 contract.LastChangedByUser = KitosUser;
 

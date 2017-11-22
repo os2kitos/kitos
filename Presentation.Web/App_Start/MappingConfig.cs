@@ -357,22 +357,26 @@ namespace Presentation.Web
             Mapper.CreateMap<Communication, CommunicationDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.ItProject, opt => opt.Ignore());
-
+            //AssociatedAgreementElementTypes
             Mapper.CreateMap<ItContract, ItContractDTO>()
                   .ForMember(dest => dest.AssociatedSystemUsages, opt => opt.MapFrom(src => src.AssociatedSystemUsages.Select(x => x.ItSystemUsage)))
+                  .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedInterfaceExposures, opt => opt.Ignore())
-                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore());
+                  .ForMember(contract => contract.AssociatedInterfaceUsages, opt => opt.Ignore())
+                  .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore());
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItContract, ItContractOverviewDTO>();
 
             //Output only - this mapping should not be reversed
             Mapper.CreateMap<ItContract, ItContractPlanDTO>();
+               
 
             //Output only - this mapping should not be reversed
-            Mapper.CreateMap<ItContract, ItContractSystemDTO>();
+            Mapper.CreateMap<ItContract, ItContractSystemDTO>()
+                .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)));
 
             Mapper.CreateMap<PaymentMilestone, PaymentMilestoneDTO>()
                   .ReverseMap();
