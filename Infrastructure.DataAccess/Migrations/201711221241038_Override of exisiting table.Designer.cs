@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class test : IMigrationMetadata
+    public sealed partial class Overrideofexisitingtable : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(test));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Overrideofexisitingtable));
         
         string IMigrationMetadata.Id
         {
-            get { return "201711061209056_test"; }
+            get { return "201711221241038_Override of exisiting table"; }
         }
         
         string IMigrationMetadata.Source

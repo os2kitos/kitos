@@ -1,4 +1,4 @@
-using System.Data.Entity;
+    using System.Data.Entity;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -29,6 +29,7 @@ namespace Infrastructure.DataAccess
             Database.Log = null;
         }
 
+        public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
@@ -61,11 +62,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
         public DbSet<ItInterfaceType> ItInterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
-
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
-
-       // public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
-
         public DbSet<ItContractRight> ItContractRights { get; set; }
         public DbSet<ItContractRole> ItContractRoles { get; set; }
         public DbSet<ItProject> ItProjects { get; set; }
@@ -182,7 +179,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
-            modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
+    
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
@@ -222,6 +219,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
+            modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
         }
     }

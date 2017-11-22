@@ -19,7 +19,7 @@ namespace Core.ApplicationServices
         {
             // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
             // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var contract = _repository.Get(x => x.Id == id, null, $"{nameof(ItContract.AgreementElements)}, {nameof(ItContract.ExternEconomyStreams)}, {nameof(ItContract.InternEconomyStreams)}, {nameof(ItContract.AssociatedInterfaceExposures)}").FirstOrDefault();
+            var contract = _repository.Get(x => x.Id == id, null, $"{nameof(ItContract.AssociatedAgreementElementTypes)}, {nameof(ItContract.ExternEconomyStreams)}, {nameof(ItContract.InternEconomyStreams)}, {nameof(ItContract.AssociatedInterfaceExposures)}").FirstOrDefault();
 
             // delete it interface
             _repository.Delete(contract);

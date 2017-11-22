@@ -8,7 +8,6 @@ namespace Core.DomainModel.ItContract
 
     public class ItContractAgreementElementTypes
     {
-        
         public int ItContract_Id { get; set; }
         public virtual ItContract ItContract { get; set; }
 

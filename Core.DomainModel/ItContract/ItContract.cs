@@ -13,9 +13,8 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            AgreementElements = new List<AgreementElementType>();
-            //AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             Children = new List<ItContract>();
+            AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
             AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
             AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
@@ -344,11 +343,12 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     Chosen agreement elements.
         /// </value>
-        public virtual ICollection<AgreementElementType> AgreementElements { get; set; }
-
-       // public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
-
-        #endregion
+        /// 
+        /// 
+        /// 
+        /// 
+        /// 
+        /// #endregion
 
         #region Deadlines (aftalefrister)
 
@@ -522,6 +522,11 @@ namespace Core.DomainModel.ItContract
         public int? PriceRegulationId { get; set; }
         public virtual PriceRegulationType PriceRegulation { get; set; }
 
+        #endregion
+
+        #region Elementtypes
+        
+        public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
         #endregion
 
         #region IT Systems
