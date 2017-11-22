@@ -337,18 +337,7 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<ItContract> Children { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the chosen agreement elements.
-        /// </summary>
-        /// <value>
-        ///     Chosen agreement elements.
-        /// </value>
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// #endregion
+        #endregion
 
         #region Deadlines (aftalefrister)
 
