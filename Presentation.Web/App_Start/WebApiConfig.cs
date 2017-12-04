@@ -18,6 +18,7 @@ using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
+using Presentation.Web.Models;
 
 namespace Presentation.Web
 {
@@ -71,6 +72,11 @@ namespace Presentation.Web
 
             var agreementElementTypes = builder.EntitySet<AgreementElementType>(nameof(AgreementElementTypesController).Replace("Controller", string.Empty));
             agreementElementTypes.EntityType.HasKey(x => x.Id);
+
+
+            var ItContractAgreementElementTypes = builder.EntitySet<ItContractAgreementElementTypes>("ItContractAgreementElementTypes");
+            ItContractAgreementElementTypes.EntityType.HasKey(x => x.ItContract_Id).HasKey(x => x.AgreementElementType_Id);
+
 
             //builder.EntitySet<BusinessType>("BusinessTypes");
             //builder.EntitySet<Communication>("Communications");
@@ -159,7 +165,25 @@ namespace Presentation.Web
             var taskRefs = builder.EntitySet<TaskRef>("TaskRefs"); // no controller yet
             taskRefs.EntityType.HasKey(x => x.Id);
 
-            var organizations = builder.EntitySet<Organization>(nameof(OrganizationsController).Replace("Controller", string.Empty));
+            //singleton instead of entity type because of navigation conflict with 'Organizations'
+            var ReportsMunicipalitiesEntitySetName = nameof(ReportsMunicipalitiesController).Replace("Controller", string.Empty);
+            var ReportsMunicipalities = builder.Singleton<Organization>(ReportsMunicipalitiesEntitySetName);
+            
+            //singleton instead of entity type because of navigation conflict with 'ItSystems'
+            var ReportsItSystemsEntitySetName = nameof(ReportsItSystemsController).Replace("Controller", string.Empty);
+            var ReportsItSystems = builder.Singleton<ItSystem>(ReportsItSystemsEntitySetName);
+            
+            //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
+            var ReportsItSystemRolesEntitySetName = nameof(ReportsItSystemRolesController).Replace("Controller", string.Empty);
+            var ReportsItSystemRoles = builder.Singleton<ItSystemRole>(ReportsItSystemRolesEntitySetName);
+
+            //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
+            var ReportsITSystemContactsEntitySetName = nameof(ReportsITSystemContactsController).Replace("Controller", string.Empty);
+            var ReportsITSystemContacts = builder.Singleton<ReportItSystemRightOutputDTO>(ReportsITSystemContactsEntitySetName);
+            ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
+
+            var organizationEntitySetName = nameof(OrganizationsController).Replace("Controller", string.Empty);
+            var organizations = builder.EntitySet<Organization>(organizationEntitySetName);;
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
             var adviceFunction = organizations.EntityType.Function("Advice").ReturnsCollectionFromEntitySet<Advice>("Advice");
@@ -200,9 +224,6 @@ namespace Presentation.Web
 
             var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
-
-            var ItContractAgreementElementTypes = builder.EntitySet<ItContractAgreementElementTypes>("ItContractAgreementElementTypes");
-            ItContractAgreementElementTypes.EntityType.HasKey(x => x.ItContract_Id).HasKey(x => x.AgreementElementType_Id);
 
             var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
             contracts.EntityType.HasKey(x => x.Id);
@@ -421,6 +442,8 @@ namespace Presentation.Web
 
             var itProjectStatusUpdates = builder.EntitySet<ItProjectStatusUpdate>(nameof(ItProjectStatusUpdatesController).Replace("Controller", string.Empty));
             itProjectStatusUpdates.EntityType.HasKey(x => x.Id);
+
+            
 
             return builder.GetEdmModel();
         }
