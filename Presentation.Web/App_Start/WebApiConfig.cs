@@ -66,7 +66,9 @@ namespace Presentation.Web
 
             var organizationRightEntitySetName = nameof(OrganizationRightsController).Replace("Controller", string.Empty);
             var organizationRights = builder.EntitySet<OrganizationRight>(organizationRightEntitySetName);
+            organizationRights.HasRequiredBinding(o => o.Organization, "Organizations");
             organizationRights.EntityType.HasKey(x => x.Id);
+            
 
             //builder.EntitySet<Advice>("Advices");
 
@@ -136,6 +138,7 @@ namespace Presentation.Web
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
             var itProject = builder.EntitySet<ItProject>(nameof(ItProjectsController).Replace("Controller", string.Empty));
+            itProject.HasRequiredBinding(o => o.Organization, "Organizations");
             itProject.EntityType.HasKey(x => x.Id);
 
             var interfaceUsage = builder.EntitySet<ItInterfaceUsage>("ItInterfaceUsages"); // no controller yet
@@ -154,28 +157,41 @@ namespace Presentation.Web
             archiveOption.EntityType.HasKey(x => x.Id);
 
             var itSystems = builder.EntitySet<ItSystem>(nameof(ItSystemsController).Replace("Controller", string.Empty));
+            itSystems.HasRequiredBinding(o => o.Organization, "Organizations");
+            itSystems.HasRequiredBinding(o => o.BelongsTo, "Organizations");
+            itSystems.HasManyBinding(i => i.Children, "ItSystems");
+            itSystems.HasRequiredBinding(i => i.Parent, "ItSystems");
             itSystems.EntityType.HasKey(x => x.Id);
 
             var itSystemType = builder.EntitySet<ItSystemType>(nameof(ItSystemTypesController).Replace("Controller", string.Empty));
+            itSystemType.HasManyBinding(i => i.References, "ItSystems");
             itSystemType.EntityType.HasKey(x => x.Id);
 
             var businessTypes = builder.EntitySet<BusinessType>(nameof(BusinessTypesController).Replace("Controller", string.Empty));
             businessTypes.EntityType.HasKey(x => x.Id);
+            businessTypes.HasManyBinding(b => b.References, "ItSystems");
 
             var taskRefs = builder.EntitySet<TaskRef>("TaskRefs"); // no controller yet
+            taskRefs.HasManyBinding(t => t.ItSystems, "ItSystems");
             taskRefs.EntityType.HasKey(x => x.Id);
-
-            //singleton instead of entity type because of navigation conflict with 'Organizations'
+            
             var ReportsMunicipalitiesEntitySetName = nameof(ReportsMunicipalitiesController).Replace("Controller", string.Empty);
-            var ReportsMunicipalities = builder.Singleton<Organization>(ReportsMunicipalitiesEntitySetName);
-            
-            //singleton instead of entity type because of navigation conflict with 'ItSystems'
+            var ReportsMunicipalities = builder.EntitySet<Organization>(ReportsMunicipalitiesEntitySetName);
+            ReportsMunicipalities.HasManyBinding(o => o.ItSystems, "ItSystems");
+            ReportsMunicipalities.HasManyBinding(o => o.BelongingSystems, "ItSystems");
+
             var ReportsItSystemsEntitySetName = nameof(ReportsItSystemsController).Replace("Controller", string.Empty);
-            var ReportsItSystems = builder.Singleton<ItSystem>(ReportsItSystemsEntitySetName);
-            
+            var ReportsItSystems = builder.EntitySet<ItSystem>(ReportsItSystemsEntitySetName);
+            ReportsItSystems.HasRequiredBinding(o => o.Organization, "Organizations");
+            ReportsItSystems.HasRequiredBinding(o => o.BelongsTo, "Organizations");
+            ReportsItSystems.HasManyBinding(i => i.Children, "ItSystems");
+            ReportsItSystems.HasRequiredBinding(i => i.Parent, "ItSystems");
+
             //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
             var ReportsItSystemRolesEntitySetName = nameof(ReportsItSystemRolesController).Replace("Controller", string.Empty);
             var ReportsItSystemRoles = builder.Singleton<ItSystemRole>(ReportsItSystemRolesEntitySetName);
+
+   
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
             var ReportsITSystemContactsEntitySetName = nameof(ReportsITSystemContactsController).Replace("Controller", string.Empty);
@@ -183,34 +199,44 @@ namespace Presentation.Web
             ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
 
             var organizationEntitySetName = nameof(OrganizationsController).Replace("Controller", string.Empty);
-            var organizations = builder.EntitySet<Organization>(organizationEntitySetName);;
+            var organizations = builder.EntitySet<Organization>(organizationEntitySetName);
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
+            organizations.HasManyBinding(o => o.ItSystems, "ItSystems");
+            organizations.HasManyBinding(o => o.BelongingSystems, "ItSystems");
+
             var adviceFunction = organizations.EntityType.Function("Advice").ReturnsCollectionFromEntitySet<Advice>("Advice");
             var removeUserAction = organizations.EntityType.Action("RemoveUser");
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
+
             var userFunction = organizations.EntityType.Function("Users").ReturnsCollectionFromEntitySet<User>("Users");
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
+            orgUnits.HasRequiredBinding(o => o.Organization, "Organizations");
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
             orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
 
             var userEntitySetName = nameof(UsersController).Replace("Controller", string.Empty);
             var users = builder.EntitySet<User>(userEntitySetName);
+            users.HasRequiredBinding(u => u.DefaultOrganization, "Organizations");
             users.EntityType.HasKey(x => x.Id);
             users.EntityType.Ignore(x => x.Password);
             users.EntityType.Ignore(x => x.Salt);
             users.EntityType.Property(x => x.Name).IsRequired();
             users.EntityType.Property(x => x.Email).IsRequired();
+
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
             userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
             userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
+
             var userCheckEmailFunction = users.EntityType.Collection.Function("IsEmailAvailable").Returns<bool>();
             userCheckEmailFunction.Parameter<string>("email").OptionalParameter = false;
 
             var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
+            usages.HasRequiredBinding(u => u.Organization, "Organizations");
+            usages.HasRequiredBinding(u => u.ItSystem, "ItSystems");
             usages.EntityType.HasKey(x => x.Id);
 
             var itSystemRights = builder.EntitySet<ItSystemRight>(nameof(ItSystemRightsController).Replace("Controller", string.Empty));
@@ -226,6 +252,8 @@ namespace Presentation.Web
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
 
             var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
+            contracts.HasRequiredBinding(o => o.Organization, "Organizations");
+            contracts.HasRequiredBinding(o => o.Supplier, "Organizations");
             contracts.EntityType.HasKey(x => x.Id);
             contracts.EntityType.HasMany(x => x.ExternEconomyStreams).IsNotExpandable(); // do not remove
             contracts.EntityType.HasMany(x => x.InternEconomyStreams).IsNotExpandable(); // do not remove
@@ -239,6 +267,8 @@ namespace Presentation.Web
             interfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaces = builder.EntitySet<ItInterface>(nameof(ItInterfacesController).Replace("Controller", string.Empty));
+            itInterfaces.HasRequiredBinding(o => o.Organization, "Organizations");
+            itInterfaces.HasRequiredBinding(o => o.BelongsTo, "Organizations");
             itInterfaces.EntityType.HasKey(x => x.Id);
 
             var itInterfaceTypes = builder.EntitySet<ItInterfaceType>(nameof(ItInterfaceTypesController).Replace("Controller", string.Empty));
@@ -309,90 +339,119 @@ namespace Presentation.Web
             //Local options
 
             var LocalAgreementElementType = builder.EntitySet<LocalAgreementElementType>(nameof(LocalAgreementElementTypesController).Replace("Controller", string.Empty));
+            LocalAgreementElementType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalAgreementElementType.EntityType.HasKey(x => x.Id);
 
             var LocalArchiveType = builder.EntitySet<LocalArchiveType>(nameof(LocalArchiveTypesController).Replace("Controller", string.Empty));
+            LocalArchiveType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalArchiveType.EntityType.HasKey(x => x.Id);
 
             var LocalArchiveLocation = builder.EntitySet<LocalArchiveLocation>(nameof(LocalArchiveLocationsController).Replace("Controller", string.Empty));
+            LocalArchiveLocation.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalArchiveLocation.EntityType.HasKey(x => x.Id);
 
             var LocalBusinessType = builder.EntitySet<LocalBusinessType>(nameof(LocalBusinessTypesController).Replace("Controller", string.Empty));
+            LocalBusinessType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalBusinessType.EntityType.HasKey(x => x.Id);
 
             var LocalDataType = builder.EntitySet<LocalDataType>(nameof(LocalDataTypesController).Replace("Controller", string.Empty));
+            LocalDataType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalDataType.EntityType.HasKey(x => x.Id);
 
             var LocalFrequencyType = builder.EntitySet<LocalFrequencyType>(nameof(LocalFrequencyTypesController).Replace("Controller", string.Empty));
+            LocalFrequencyType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalFrequencyType.EntityType.HasKey(x => x.Id);
 
             var LocalGoalType = builder.EntitySet<LocalGoalType>(nameof(LocalGoalTypesController).Replace("Controller", string.Empty));
+            LocalGoalType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalGoalType.EntityType.HasKey(x => x.Id);
 
             var LocalHandoverTrialType = builder.EntitySet<LocalHandoverTrialType>(nameof(LocalHandoverTrialTypesController).Replace("Controller", string.Empty));
+            LocalHandoverTrialType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalHandoverTrialType.EntityType.HasKey(x => x.Id);
 
             var LocalInterfaceType = builder.EntitySet<LocalInterfaceType>(nameof(LocalInterfaceTypesController).Replace("Controller", string.Empty));
+            LocalInterfaceType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalInterfaceType.EntityType.HasKey(x => x.Id);
 
             var LocalItContractRole = builder.EntitySet<LocalItContractRole>(nameof(LocalItContractRolesController).Replace("Controller", string.Empty));
+            LocalItContractRole.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItContractRole.EntityType.HasKey(x => x.Id);
 
             var LocalItContractTemplateType = builder.EntitySet<LocalItContractTemplateType>(nameof(LocalItContractTemplateTypesController).Replace("Controller", string.Empty));
+            LocalItContractTemplateType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItContractTemplateType.EntityType.HasKey(x => x.Id);
 
             var LocalItContractType = builder.EntitySet<LocalItContractType>(nameof(LocalItContractTypesController).Replace("Controller", string.Empty));
+            LocalItContractType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItContractType.EntityType.HasKey(x => x.Id);
 
             var LocalItInterfaceType = builder.EntitySet<LocalItInterfaceType>(nameof(LocalItInterfaceTypesController).Replace("Controller", string.Empty));
+            LocalItInterfaceType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItInterfaceType.EntityType.HasKey(x => x.Id);
 
             var LocalItProjectRole = builder.EntitySet<LocalItProjectRole>(nameof(LocalItProjectRolesController).Replace("Controller", string.Empty));
+            LocalItProjectRole.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItProjectRole.EntityType.HasKey(x => x.Id);
 
             var LocalItProjectType = builder.EntitySet<LocalItProjectType>(nameof(LocalItProjectTypesController).Replace("Controller", string.Empty));
+            LocalItProjectType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItProjectType.EntityType.HasKey(x => x.Id);
 
             var LocalItSystemRole = builder.EntitySet<LocalItSystemRole>(nameof(LocalItSystemRolesController).Replace("Controller", string.Empty));
+            LocalItSystemRole.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItSystemRole.EntityType.HasKey(x => x.Id);
 
             var LocalItSystemType = builder.EntitySet<LocalItSystemType>(nameof(LocalItSystemTypesController).Replace("Controller", string.Empty));
+            LocalItSystemType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalItSystemType.EntityType.HasKey(x => x.Id);
 
             var LocalMethodType = builder.EntitySet<LocalMethodType>(nameof(LocalMethodTypesController).Replace("Controller", string.Empty));
+            LocalMethodType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalMethodType.EntityType.HasKey(x => x.Id);
 
             var LocalOptionExtendType = builder.EntitySet<LocalOptionExtendType>(nameof(LocalOptionExtendTypesController).Replace("Controller", string.Empty));
+            LocalOptionExtendType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalOptionExtendType.EntityType.HasKey(x => x.Id);
 
             var LocalPaymentFreqencyType = builder.EntitySet<LocalPaymentFreqencyType>(nameof(LocalPaymentFrequencyTypesController).Replace("Controller", string.Empty));
+            LocalPaymentFreqencyType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalPaymentFreqencyType.EntityType.HasKey(x => x.Id);
 
             var LocalPaymentModelType = builder.EntitySet<LocalPaymentModelType>(nameof(LocalPaymentModelTypesController).Replace("Controller", string.Empty));
+            LocalPaymentModelType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalPaymentModelType.EntityType.HasKey(x => x.Id);
 
             var LocalPriceRegulationType = builder.EntitySet<LocalPriceRegulationType>(nameof(LocalPriceRegulationTypesController).Replace("Controller", string.Empty));
+            LocalPriceRegulationType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalPriceRegulationType.EntityType.HasKey(x => x.Id);
 
             var LocalProcurementStrategyType = builder.EntitySet<LocalProcurementStrategyType>(nameof(LocalProcurementStrategyTypesController).Replace("Controller", string.Empty));
+            LocalProcurementStrategyType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalProcurementStrategyType.EntityType.HasKey(x => x.Id);
 
             var LocalPurchaseFormType = builder.EntitySet<LocalPurchaseFormType>(nameof(LocalPurchaseFormTypesController).Replace("Controller", string.Empty));
+            LocalPurchaseFormType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalPurchaseFormType.EntityType.HasKey(x => x.Id);
 
             var LocalReportCategoryType = builder.EntitySet<LocalReportCategoryType>(nameof(LocalReportCategoryTypesController).Replace("Controller", string.Empty));
+            LocalReportCategoryType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalReportCategoryType.EntityType.HasKey(x => x.Id);
 
             var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
+            LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
 
             var LocalTerminationDeadlineType = builder.EntitySet<LocalTerminationDeadlineType>(nameof(LocalTerminationDeadlineTypesController).Replace("Controller", string.Empty));
+            LocalTerminationDeadlineType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalTerminationDeadlineType.EntityType.HasKey(x => x.Id);
 
             var LocalTsaType = builder.EntitySet<LocalTsaType>(nameof(LocalTsaTypesController).Replace("Controller", string.Empty));
+            LocalTsaType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalTsaType.EntityType.HasKey(x => x.Id);
 
             var LocalOrganizationUnitRole = builder.EntitySet<LocalOrganizationUnitRole>(nameof(LocalOrganizationUnitRolesController).Replace("Controller", string.Empty));
+            LocalOrganizationUnitRole.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalOrganizationUnitRole.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<Risk>("Risks");
@@ -402,6 +461,7 @@ namespace Presentation.Web
             terminationDeadlineType.EntityType.HasKey(x => x.Id);
 
             var config = builder.EntitySet<Config>(nameof(ConfigsController).Replace("Controller", string.Empty));
+            config.HasRequiredBinding(u => u.Organization, "Organizations");
             config.EntityType.HasKey(x => x.Id);
 
 
@@ -431,7 +491,10 @@ namespace Presentation.Web
             //builder.EntitySet<User>("Users");
             //builder.EntitySet<Wish>("Wishes");
 
-            builder.EntitySet<Report>("Reports").EntityType.HasKey(x => x.Id);
+            var reports = builder.EntitySet<Report>("Reports");
+            reports.HasRequiredBinding(u => u.Organization, "Organizations");
+            reports.EntityType.HasKey(x => x.Id);
+
             builder.EntitySet<ExternalReference>("ExternalReferences").EntityType.HasKey(x => x.Id);
 
             var reportCategoryTypes = builder.EntitySet<ReportCategoryType>(nameof(ReportCategoryTypesController).Replace("Controller", string.Empty));
@@ -442,8 +505,8 @@ namespace Presentation.Web
 
             var itProjectStatusUpdates = builder.EntitySet<ItProjectStatusUpdate>(nameof(ItProjectStatusUpdatesController).Replace("Controller", string.Empty));
             itProjectStatusUpdates.EntityType.HasKey(x => x.Id);
+            itProjectStatusUpdates.HasRequiredBinding(o => o.Organization, "Organizations");
 
-            
 
             return builder.GetEdmModel();
         }
