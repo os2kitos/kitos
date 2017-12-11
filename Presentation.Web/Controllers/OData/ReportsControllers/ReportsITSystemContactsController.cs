@@ -26,10 +26,10 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [HttpGet]
+        [EnableQuery]
         [ODataRoute("ReportsITSystemContacts")]
         public IHttpActionResult Get()
         {
-            
             if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 return StatusCode(HttpStatusCode.Forbidden);
@@ -37,7 +37,6 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.Get();
             try {
             var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
-
                 return Ok(dtos);
             }
             catch(Exception e)

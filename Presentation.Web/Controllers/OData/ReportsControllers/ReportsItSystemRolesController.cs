@@ -24,6 +24,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [HttpGet]
+        [EnableQuery]
         [ODataRoute("ReportsItSystemRoles")]
         public IHttpActionResult Get()
         {

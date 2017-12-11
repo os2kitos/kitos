@@ -23,6 +23,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [HttpGet]
+        [EnableQuery]
         [ODataRoute("ReportsMunicipalities")]
         public IHttpActionResult Get()
         {
@@ -30,8 +31,8 @@ namespace Presentation.Web.Controllers.OData
             {
                 return StatusCode(HttpStatusCode.Forbidden);
             }
-            var result = Repository.Get().Where(m => m.Type.Category == OrganizationCategory.Municipality);
-            return Ok(result);
+            var result = Repository.Get().Where(m => m.TypeId == 1);
+            return Ok(result.OrderBy(r => r.Name));
         }
     }
 }
