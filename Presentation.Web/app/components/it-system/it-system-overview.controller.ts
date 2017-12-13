@@ -92,7 +92,7 @@
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
-        }
+              }
 
         private fixKleIdFilter(filterUrl, column) {
             var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
@@ -195,8 +195,20 @@
                             var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);
 
                             if (parameterMap.$filter) {
-                                this._.forEach(this.systemRoles, role => {
+                                //the role list is sorted since all roles after role 1 will match in regexp resulting in a bad request do not change this.
+                                var sortedRoles = this.systemRoles.sort((n1, n2) => {
+                                    if (n1.Id > n2.Id) {
+                                        return -1;
+                                    }
+                                    if (n1.Id < n2.Id) {
+                                        return 1;
+                                    }
+                                    return 0;
+                                });
+
+                                this._.forEach(sortedRoles, role => {
                                     parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
+                                
                                 });
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
