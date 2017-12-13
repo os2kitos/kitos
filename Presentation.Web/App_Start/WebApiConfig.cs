@@ -189,13 +189,13 @@ namespace Presentation.Web
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
             var ReportsItSystemRolesEntitySetName = nameof(ReportsItSystemRolesController).Replace("Controller", string.Empty);
-            var ReportsItSystemRoles = builder.Singleton<ItSystemRole>(ReportsItSystemRolesEntitySetName);
+            var ReportsItSystemRoles = builder.EntitySet<ItSystemRole>(ReportsItSystemRolesEntitySetName);
 
    
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
             var ReportsITSystemContactsEntitySetName = nameof(ReportsITSystemContactsController).Replace("Controller", string.Empty);
-            var ReportsITSystemContacts = builder.Singleton<ReportItSystemRightOutputDTO>(ReportsITSystemContactsEntitySetName);
+            var ReportsITSystemContacts = builder.EntitySet<ReportItSystemRightOutputDTO>(ReportsITSystemContactsEntitySetName);
             ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
 
             var organizationEntitySetName = nameof(OrganizationsController).Replace("Controller", string.Empty);
@@ -240,6 +240,7 @@ namespace Presentation.Web
             usages.EntityType.HasKey(x => x.Id);
 
             var itSystemRights = builder.EntitySet<ItSystemRight>(nameof(ItSystemRightsController).Replace("Controller", string.Empty));
+            itSystemRights.HasRequiredBinding(u => u.Role, "ItSystemRoles");
             itSystemRights.EntityType.HasKey(x => x.Id);
 
             var roles = builder.EntitySet<ItSystemRole>(nameof(ItSystemRolesController).Replace("Controller", string.Empty));
@@ -275,6 +276,7 @@ namespace Presentation.Web
             itInterfaceTypes.EntityType.HasKey(x => x.Id);
 
             var itInterfaceExihibits = builder.EntitySet<ItInterfaceExhibit>("ItInterfaceExhibits"); // no controller yet
+            itInterfaceExihibits.HasRequiredBinding(o => o.ItSystem, "ItSystems");
             itInterfaceExihibits.EntityType.HasKey(x => x.Id);
 
             var itInterfaceExhibitUsage = builder.EntitySet<ItInterfaceExhibitUsage>("ItInterfaceExhibitUsages"); // no controller yet
@@ -483,6 +485,7 @@ namespace Presentation.Web
             globalConfig.EntityType.HasKey(x => x.Id);
 
             var accessType = builder.EntitySet<AccessType>(nameof(AccessTypesController).Replace("Controller", string.Empty));
+            accessType.HasRequiredBinding(a => a.ItSystem, "ItSystems");
             accessType.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<TaskRef>("TaskRefs");
@@ -495,7 +498,9 @@ namespace Presentation.Web
             reports.HasRequiredBinding(u => u.Organization, "Organizations");
             reports.EntityType.HasKey(x => x.Id);
 
-            builder.EntitySet<ExternalReference>("ExternalReferences").EntityType.HasKey(x => x.Id);
+            var references = builder.EntitySet<ExternalReference>("ExternalReferences");
+            references.EntityType.HasKey(x => x.Id);
+            references.HasRequiredBinding(a => a.ItSystem, "ItSystems");
 
             var reportCategoryTypes = builder.EntitySet<ReportCategoryType>(nameof(ReportCategoryTypesController).Replace("Controller", string.Empty));
             reportCategoryTypes.EntityType.HasKey(x => x.Id);
