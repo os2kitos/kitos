@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 
 namespace Presentation.Web.Models
 {
@@ -16,12 +17,6 @@ namespace Presentation.Web.Models
         public Guid Uuid { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }
-
-        //public int? ExposedById { get; set; }
-        //public ItSystemDTO ExposedBy { get; set; }
-
-        //public IEnumerable<int> CanUseInterfaceIds { get; set; }
-        //public IEnumerable<ItSystemSimpleDTO> CanUseInterfaces { get; set; }
 
         /// <summary>
         /// Gets or sets the exposed interface ids.
@@ -98,5 +93,9 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
+        
+        //GDPR
+        public string GeneralPurpose { get; set; }
+        public DataLevel DataLevel { get; set; }
     }
 }

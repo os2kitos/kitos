@@ -34,7 +34,7 @@
             function ($rootScope, $scope, $http, $state, notify, itSystem, businessTypes, user, autofocus, appTypeOptions, hasWriteAccess) {
                 $rootScope.page.title = 'IT System - Rediger system';
                 autofocus();
-
+                console.log(itSystem);
                 itSystem.updateUrl = 'api/itsystem/' + itSystem.id;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
@@ -48,8 +48,25 @@
                 $scope.businessTypes = businessTypes.data.value;
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
-
+            
                 $scope.hasWriteAccess = hasWriteAccess;
+
+
+                $scope.submitDataLevel = function () {
+                    console.log($scope.system.dataLevel);
+                    var data = {
+                        DataLevel: $scope.system.dataLevel
+                    };
+                  
+                    $http.patch("api/itsystem/" + itSystem.id + "?organizationId=" + itSystem.organizationId, data).success(function (result) {
+
+                        notify.addSuccessMessage("Success");
+
+                    }).error(function (result) {
+                        notify.addErrorMessage('Fejl!');
+                    });
+                };
+
 
                 function selectLazyLoading(url, allowClear, paramAry) {
                     return {

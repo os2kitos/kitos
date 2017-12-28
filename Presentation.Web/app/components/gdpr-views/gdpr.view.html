@@ -1,0 +1,19 @@
+﻿<div class="object-section-container">
+    <h4>{{system.Name}}</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label small">Overordnet formål</label>
+                    <input type="text" 
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{updateUrl}}" 
+                           class="form-control input-sm"
+                           data-field="GeneralPurpose"
+                           data-ng-model="system.GeneralPurpose"
+                           data-placeholder="Overordnet formål"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -94,5 +94,15 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }
+        //GDPR
+        public string GeneralPurpose { get; set; }
+        public DataLevel DataLevel { get; set; }
+
+    }
+    public enum DataLevel
+    {
+        None,
+        PersonalData,
+        PersonalDataAndSensitiveData
     }
 }
