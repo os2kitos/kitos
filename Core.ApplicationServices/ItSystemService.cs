@@ -12,10 +12,10 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<ItSystem> _repository;
         private readonly IGenericRepository<ItSystemRight> _Rightsrepository;
 
-        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<ItSystemRight> _Rightsrepository)
+        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<ItSystemRight> rightsrepository)
         {
             _repository = repository;
-            _Rightsrepository = _Rightsrepository;
+            _Rightsrepository = rightsrepository;
         }
 
 
