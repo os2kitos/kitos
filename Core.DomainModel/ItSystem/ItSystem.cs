@@ -3,7 +3,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystem
 {
-    using System;
+    using DataTypes;
 
     /// <summary>
     /// Represents an it system.
@@ -96,13 +96,10 @@ namespace Core.DomainModel.ItSystem
         public virtual ExternalReference Reference { get; set; }
         //GDPR
         public string GeneralPurpose { get; set; }
-        public DataLevel DataLevel { get; set; }
+        public DataSensitivityLevel DataLevel { get; set; }
+        public DataOptions ContainsLegalInfo { get; set; }
+        public bool IsDataTransferedToThirdCountries { get; set; }
+        public string DataIsTransferedTo { get; set; }
 
-    }
-    public enum DataLevel
-    {
-        None,
-        PersonalData,
-        PersonalDataAndSensitiveData
     }
 }

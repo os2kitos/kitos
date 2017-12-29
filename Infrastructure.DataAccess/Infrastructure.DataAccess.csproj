@@ -416,6 +416,14 @@
     <Compile Include="Migrations\201712281227026_data level added to itsystem.Designer.cs">
       <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.cs" />
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.Designer.cs">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.cs" />
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -617,6 +625,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712281227026_data level added to itsystem.resx">
       <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291105417_containslegalinfo added to itsystem.resx">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

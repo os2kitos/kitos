@@ -139,6 +139,7 @@
     <Compile Include="ItSystemUsage\TerminationDeadlineTypesInSystem.cs" />
     <Compile Include="ItSystem\AccessType.cs" />
     <Compile Include="ItSystem\ArchiveLocation.cs" />
+    <Compile Include="ItSystem\DataLevelTypes\DataTypes.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />

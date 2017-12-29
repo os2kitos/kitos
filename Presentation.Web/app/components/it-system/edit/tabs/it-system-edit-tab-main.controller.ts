@@ -34,7 +34,7 @@
             function ($rootScope, $scope, $http, $state, notify, itSystem, businessTypes, user, autofocus, appTypeOptions, hasWriteAccess) {
                 $rootScope.page.title = 'IT System - Rediger system';
                 autofocus();
-                console.log(itSystem);
+
                 itSystem.updateUrl = 'api/itsystem/' + itSystem.id;
                 itSystem.belongsTo = (!itSystem.belongsToId) ? null : { id: itSystem.belongsToId, text: itSystem.belongsToName };
                 itSystem.parent = (!itSystem.parentId) ? null : { id: itSystem.parentId, text: itSystem.parentName };
@@ -53,7 +53,6 @@
 
 
                 $scope.submitDataLevel = function () {
-                    console.log($scope.system.dataLevel);
                     var data = {
                         DataLevel: $scope.system.dataLevel
                     };
