@@ -299,6 +299,14 @@ namespace Presentation.Web
             var sensitiveDataOption = builder.EntitySet<SensitiveDataType>(nameof(SensitiveDataTypesController).Replace("Controller", string.Empty));
             sensitiveDataOption.EntityType.HasKey(x => x.Id);
 
+            var RegularPersonalDataTypes = builder.EntitySet<RegularPersonalDataType>(nameof(RegularPersonalDataTypesController).Replace("Controller", string.Empty));
+            RegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
+            RegularPersonalDataTypes.HasManyBinding(b => b.References, "ItSystems");
+
+            var SensitivePersonalDataTypes = builder.EntitySet<SensitivePersonalDataType>(nameof(SensistivePersonalDataTypesController).Replace("Controller", string.Empty));
+            SensitivePersonalDataTypes.EntityType.HasKey(x => x.Id);
+            SensitivePersonalDataTypes.HasManyBinding(b => b.References, "ItSystems");
+
             var optionExtendTypes = builder.EntitySet<OptionExtendType>(nameof(OptionExtendTypesController).Replace("Controller", string.Empty));
             optionExtendTypes.EntityType.HasKey(x => x.Id);
 

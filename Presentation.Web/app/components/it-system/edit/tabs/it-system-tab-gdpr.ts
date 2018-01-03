@@ -22,7 +22,6 @@
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.system = theSystem;
             $scope.updateUrl = 'api/itsystem/' + theSystem.id;
-            $scope.isDataTransferedToThirdCountries = this.convertToBool
             
 
             $scope.changeDataField = function (fieldName) {
@@ -49,10 +48,5 @@
                     notify.addErrorMessage('Fejl!');
                 });
             };
-
-            $scope.convertToBool = function (isVisible) {
-                return (isVisible == 'true');
-            }
-
         }]);
 })(angular, app);

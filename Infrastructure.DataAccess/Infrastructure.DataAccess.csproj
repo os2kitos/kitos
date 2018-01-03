@@ -107,6 +107,8 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
+    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -424,6 +426,10 @@
     <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
       <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712291522252_2 new optiontypes added.cs" />
+    <Compile Include="Migrations\201712291522252_2 new optiontypes added.Designer.cs">
+      <DependentUpon>201712291522252_2 new optiontypes added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -631,6 +637,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
       <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291522252_2 new optiontypes added.resx">
+      <DependentUpon>201712291522252_2 new optiontypes added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

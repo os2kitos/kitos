@@ -141,6 +141,8 @@
     <Compile Include="ItSystem\ArchiveLocation.cs" />
     <Compile Include="ItSystem\DataLevelTypes\DataTypes.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
+    <Compile Include="ItSystem\SensitivePersonalDataType.cs" />
+    <Compile Include="ItSystem\RegularPersonalDataType.cs" />
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
     <Compile Include="LocalOptions\LocalDataType.cs" />

@@ -407,6 +407,8 @@
     <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionBaseController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
