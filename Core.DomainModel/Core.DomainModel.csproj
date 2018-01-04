@@ -124,6 +124,7 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="AttachedOption.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
@@ -173,6 +174,8 @@
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
     <Compile Include="LocalOptions\LocalTsaType.cs" />
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
+    <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
+    <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IContextAware.cs" />

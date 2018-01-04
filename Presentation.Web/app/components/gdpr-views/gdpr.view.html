@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="form-group"  
-                     data-ng-show="system.isDataTransferedToThirdCountries">
+                     data-ng-show="true">
                     <label class="control-label small">Hvilket land er der overført data til?</label>
                     <input type="text"
                            data-ng-disabled="!hasWriteAccess"
@@ -51,6 +51,27 @@
                            data-field="DataIsTransferedTo"
                            data-ng-model="system.dataIsTransferedTo"
                            data-placeholder="Overordnet formål" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group"
+                     data-ng-show="true">
+                    <label class="control-label small">Almindelige persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
+                            <label><input type="checkbox" ng-model="r.Checked" ng-change="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group"
+                     data-ng-show="true">
+                    <label class="control-label small">Følsomme persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in sensitivePersonalData">
+                            <label><input type="checkbox" ng-model="r.Checked" ng-change="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

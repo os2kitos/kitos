@@ -342,6 +342,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
     <Compile Include="Controllers\API\SSOConfigController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptionsController.cs" />
     <Compile Include="Controllers\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\OData\AdviceController.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
@@ -381,6 +382,8 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />

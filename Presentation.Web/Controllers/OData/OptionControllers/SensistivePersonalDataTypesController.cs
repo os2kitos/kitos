@@ -5,9 +5,9 @@ using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    public class SensistivePersonalDataTypesController : BaseOptionController<SensitiveDataType, ItSystemUsage>
+    public class SensistivePersonalDataTypesController : BaseOptionController<SensitivePersonalDataType, ItSystem>
     {
-        public SensistivePersonalDataTypesController(IGenericRepository<SensitiveDataType> repository, IAuthenticationService authService)
+        public SensistivePersonalDataTypesController(IGenericRepository<SensitivePersonalDataType> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
         }

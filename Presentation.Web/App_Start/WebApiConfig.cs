@@ -19,6 +19,7 @@ using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Presentation.Web.Models;
+using System.Linq;
 
 namespace Presentation.Web
 {
@@ -134,6 +135,13 @@ namespace Presentation.Web
             var itProjectRoles = builder.EntitySet<ItProjectRole>(nameof(ItProjectRolesController).Replace("Controller", string.Empty));
             itProjectRoles.EntityType.HasKey(x => x.Id);
 
+            var AttachedOptions = builder.EntitySet<AttachedOption>(nameof(AttachedOptionsController).Replace("Controller", string.Empty));
+            AttachedOptions.EntityType.HasKey(x => x.Id);
+
+           /* var removeOptionAction = AttachedOptions.EntityType.Action("Remove");
+            removeOptionAction.Parameter<int>("key").OptionalParameter = false;
+            removeOptionAction.Parameter<OptionType>("type").OptionalParameter = false;
+            */
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
@@ -447,10 +455,36 @@ namespace Presentation.Web
             var LocalReportCategoryType = builder.EntitySet<LocalReportCategoryType>(nameof(LocalReportCategoryTypesController).Replace("Controller", string.Empty));
             LocalReportCategoryType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalReportCategoryType.EntityType.HasKey(x => x.Id);
+            
+            var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
+            GetRegularPersonalDataByObjectID.Parameter<int>("id");
+            GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
+            var RemoveOption = builder.Function("RemoveOption");
+            RemoveOption.Parameter<int>("id");
+            RemoveOption.Parameter<int>("systemId");
+            RemoveOption.Parameter<OptionType>("type");
+            RemoveOption.Returns<IHttpActionResult>();
+            RemoveOption.ReturnsCollectionFromEntitySet<AttachedOption>("AttachedOptions");
+
+             var GetSensitivePersonalDataByObjectID = builder.Function("GetSensitivePersonalDataByObjectID");
+            GetSensitivePersonalDataByObjectID.Parameter<int>("id");
+            GetSensitivePersonalDataByObjectID.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty("Checked"));
+            
             var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
             LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
+
+            var LocalSensistivePersonalDataTypes = builder.EntitySet<LocalSensitivePersonalDataType>(nameof(LocalSensistivePersonalDataTypesController).Replace("Controller", string.Empty));
+            LocalSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
+            LocalSensistivePersonalDataTypes.EntityType.HasKey(x => x.Id);
+
+            var LocalRegularPersonalDataTypes = builder.EntitySet<LocalRegularPersonalDataType>(nameof(LocalRegularPersonalDataTypesController).Replace("Controller", string.Empty));
+            LocalRegularPersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
+            LocalRegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
+
 
             var LocalTerminationDeadlineType = builder.EntitySet<LocalTerminationDeadlineType>(nameof(LocalTerminationDeadlineTypesController).Replace("Controller", string.Empty));
             LocalTerminationDeadlineType.HasRequiredBinding(u => u.Organization, "Organizations");
@@ -486,7 +520,6 @@ namespace Presentation.Web
             GetAdvicesByObjectID.Parameter<int>("id");
             GetAdvicesByObjectID.Parameter<int>("type");
             GetAdvicesByObjectID.ReturnsCollectionFromEntitySet<Advice>("Advice");
-
 
 
             var globalConfig = builder.EntitySet<GlobalConfig>(nameof(GlobalConfigsController).Replace("Controller", string.Empty));

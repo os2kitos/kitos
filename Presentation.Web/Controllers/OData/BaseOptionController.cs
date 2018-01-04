@@ -81,7 +81,24 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Post(TType entity)
         {
-            entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
+            try
+            {
+                var Entities = _repository.Get();
+
+                if(Entities.Count() > 0)
+                {
+                    entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
+                }else
+                {
+                    entity.Priority = 1;
+                }
+            }
+            catch(Exception e)
+            {
+                var message = e.Message;
+                return InternalServerError(e);
+            }
+
             return base.Post(entity);
         }
 
