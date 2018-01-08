@@ -79,5 +79,55 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="object-section-container">
+                    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+                    <div class="panel panel-default">
+                        <!--div class="panel-heading">Systemet vedrører følgende IT projekter</!--div-->
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Databehandlere</th>
+                                    <th><!-- edit ctrl --></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="dataWorker in dataWorkers">
+                                    <td>
+                                        <a data-ui-sref="#">{{ dataWorker.name }}</a>
+                                    </td>
+                                    <td>
+
+                                    </td>
+                                    <td class="text-right">
+                                        <button type="button"
+                                                class="btn btn-danger btn-xs delete-project"
+                                                data-confirmed-click="delete({{ dataWorker.id }})"
+                                                data-confirm-click="Er du sikker på at du vil slette tilknytningen?"
+                                                data-ng-show="hasWriteAccess">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot data-ng-show="hasWriteAccess">
+                                <tr>
+                                    <td colspan="2">
+                                        <input type="hidden"
+                                               id="dataWorker-selector"
+                                               class="form-control input-sm"
+                                               data-ui-select2="dataWorkerSelectOptions"
+                                               data-ng-model="selectedDataWorker"
+                                               data-ng-change="save()"
+                                               data-placeholder="Vælg Databehandler" />
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+              </div>
+          </div>
     </div>
 </div>

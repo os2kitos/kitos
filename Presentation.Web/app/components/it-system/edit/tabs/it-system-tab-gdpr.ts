@@ -27,13 +27,13 @@
         });
     }]);
 
-    app.controller("system.EditGdpr", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess", "theSystem", "regularSensitiveData","sensitivePersonalData",
-        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, theSystem, regularSensitiveData, sensitivePersonalData) {
+    app.controller("system.EditGdpr", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess","user", "theSystem", "regularSensitiveData","sensitivePersonalData",
+        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, user, theSystem, regularSensitiveData, sensitivePersonalData) {
 
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.system = theSystem;
             $scope.updateUrl = 'api/itsystem/' + theSystem.id;
-
+            console.log($scope.system);
             $scope.regularSensitiveData = regularSensitiveData;
             $scope.sensitivePersonalData = sensitivePersonalData;
 
@@ -51,14 +51,14 @@
                     };
 
                     $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(function (result) {
-                        msg.toSuccessMessage("Felt Opdateret!");
+                        msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");
                     });
                 
                 } else {
                     $http.delete("Odata/RemoveOption(id=" + OptionId + ", systemId=" + theSystem.id + ",type='" + optionType + "')").success(function () {
-                        msg.toSuccessMessage("Felt Opdateret!");
+                        msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");
                     });
@@ -88,6 +88,62 @@
                 }).error(function (result) {
                     notify.addErrorMessage('Fejl!');
                 });
+            };
+
+            // select2 options for looking up it system usages
+            $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);;
+
+            function selectLazyLoading(url, excludeSelf, paramAry) {
+                return {
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    placeholder: ' ',
+                    initSelection: function (elem, callback) {
+                    },
+                    ajax: {
+                        data: function (term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function (queryParams) {
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            res.abort = function () {
+                                return null;
+                            };
+
+                            return res;
+                        },
+
+                        results: function (data, page) {
+                            var results = [];
+
+                            _.each(data.data.response, function (obj: { id; name; cvr; }) {
+                                if (excludeSelf && obj.id == theSystem.id)
+                                    return; // don't add self to result
+
+                                results.push({
+                                    id: obj.id,
+                                    text: obj.name ? obj.name : 'Unavngiven',
+                                    cvr: obj.cvr
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+            }
+
+            $scope.save = function () {
+                $http.post("api/itproject/" + $scope.selectedProject.id + "?usageId=" + usageId + "&organizationId=" + user.currentOrganizationId)
+                    .success(function () {
+                        notify.addSuccessMessage("Projektet er tilknyttet.");
+                        reload();
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte projektet!");
+                    });
             };
         }]);
 })(angular, app);

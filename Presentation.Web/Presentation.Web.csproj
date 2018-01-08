@@ -290,6 +290,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\ArchiveLocationController.cs" />
+    <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
@@ -447,6 +448,7 @@
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
@@ -1347,6 +1349,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\BaseOdataAuthorization\" />
+    <Folder Include="Views\Dataworker\" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>

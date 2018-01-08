@@ -142,6 +142,7 @@ namespace Infrastructure.DataAccess
         public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
+        public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

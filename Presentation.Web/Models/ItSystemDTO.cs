@@ -12,6 +12,7 @@ namespace Presentation.Web.Models
         {
             TaskRefIds = new List<int>();
             //CanUseInterfaceIds = new List<int>();
+            this.AssociatedDataWorkers = new List<ItSystemDataWorkerRelation>();
         }
 
         public int Id { get; set; }
@@ -101,5 +102,6 @@ namespace Presentation.Web.Models
         public DataOptions ContainsLegalInfo { get; set; }
         public bool IsDataTransferedToThirdCountries { get; set; }
         public string DataIsTransferedTo { get; set; }
+        public ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
     }
 }

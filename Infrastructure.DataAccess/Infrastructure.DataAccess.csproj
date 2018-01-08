@@ -430,6 +430,10 @@
     <Compile Include="Migrations\201801041517268_new optionTypes added.Designer.cs">
       <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801081305042_dataworkers added to system.cs" />
+    <Compile Include="Migrations\201801081305042_dataworkers added to system.Designer.cs">
+      <DependentUpon>201801081305042_dataworkers added to system.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -640,6 +644,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801041517268_new optionTypes added.resx">
       <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801081305042_dataworkers added to system.resx">
+      <DependentUpon>201801081305042_dataworkers added to system.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
