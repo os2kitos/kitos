@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class attachedoptionsadded : IMigrationMetadata
+    public sealed partial class newoptionTypesadded : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(attachedoptionsadded));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(newoptionTypesadded));
         
         string IMigrationMetadata.Id
         {
-            get { return "201801031316042_attached options added"; }
+            get { return "201801041517268_new optionTypes added"; }
         }
         
         string IMigrationMetadata.Source

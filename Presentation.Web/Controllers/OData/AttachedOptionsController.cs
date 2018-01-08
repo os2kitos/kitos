@@ -19,83 +19,110 @@ namespace Presentation.Web.Controllers.OData
         IGenericRepository<AttachedOption> _optionRepository;
         IGenericRepository<ItSystem> _itSystemRepository;
         IGenericRepository<RegularPersonalDataType> _regularPersonalDataTypeRepository;
-        IGenericRepository<SensitivePersonalDataType> _sensitivePersonalDataTypeRepository;
+        IGenericRepository<LocalRegularPersonalDataType> _localregularPersonalDataTypeRepository;
+        IGenericRepository<SensitivePersonalDataType> _sensitiveDataTypeRepository;
+        IGenericRepository<LocalSensitivePersonalDataType> _localSensitivePersonalDataTypeRepository;
 
 
         public AttachedOptionsController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService, IGenericRepository<ItSystem> itSystemRepository,
-            IGenericRepository<RegularPersonalDataType> regularPersonalDataTypeRepository, IGenericRepository<SensitivePersonalDataType> sensitivePersonalDataTypeRepository)
-            : base(repository, authService)
+            IGenericRepository<RegularPersonalDataType> regularPersonalDataTypeRepository,
+            IGenericRepository<LocalRegularPersonalDataType> localregularPersonalDataTypeRepository,
+            IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository,
+            IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository)
+           : base(repository, authService)
         {
             _authService = authService;
             _optionRepository = repository;
             _itSystemRepository = itSystemRepository;
             _regularPersonalDataTypeRepository = regularPersonalDataTypeRepository;
-            _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
+            _localregularPersonalDataTypeRepository = localregularPersonalDataTypeRepository;
+            _localSensitivePersonalDataTypeRepository = localSensitivePersonalDataTypeRepository;
+            _sensitiveDataTypeRepository = sensitiveDataTypeRepository;
         }
-
+        [HttpGet]
         [EnableQuery]
         [ODataRoute("GetRegularPersonalDataByObjectID(id={id})")]
-        public IHttpActionResult GetRegularPersonalDataByObjectID(int id)
+        public IHttpActionResult GetRegularPersonalDataByObjectIDAndType(int id)
         {
             if (UserId == 0)
                 return Unauthorized();
 
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
+            var localpersonalData = _localregularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
 
+            List<RegularPersonalDataType> result = new List<RegularPersonalDataType>();
+
+            foreach (var p in localpersonalData){
+                var data = _regularPersonalDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && s.IsEnabled);
+                    if(data != null) { 
+                        result.Add(data);
+                }
+            }
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
             var system = _itSystemRepository.AsQueryable().FirstOrDefault(s => s.Id == id);
 
-            var result = _regularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsEnabled || p.IsObligatory).ToList();
-
-            if (system != null) {
+            if (system != null)
+            {
 
                 List<AttachedOption> options;
 
                 if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
                 {
                     //tolist so we can operate with open datareaders in the following foreach loop.
-                     options = _optionRepository.AsQueryable().Where(x => x.ObjectId == system.Id && x.OptionType == OptionType.REGULARPERSONALDATA).ToList();
-                }else
-                {
-                  options = _optionRepository.AsQueryable()
-                   .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.OptionType == OptionType.REGULARPERSONALDATA).ToList();
+                    options = _optionRepository.AsQueryable().Where(x => x.ObjectId == system.Id && x.OptionType == OptionType.REGULARPERSONALDATA).ToList();
                 }
-                    if (options.Count() <= 0)
+                else
+                {
+                    options = _optionRepository.AsQueryable()
+                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.OptionType == OptionType.REGULARPERSONALDATA).ToList();
+                }
+                if (options.Count() <= 0)
+                {
+                    return Ok(result);
+                }
+                foreach (var o in options)
+                {
+                    var currentOption = result.FirstOrDefault(r => r.Id == o.OptionId);
+                    if (currentOption != null)
                     {
-                        return Ok(result);
+                        result.FirstOrDefault(r => r.Id == o.OptionId).Checked = true;
                     }
-                    foreach(var o in options)
+                    else
                     {
-                        var currentOption = result.FirstOrDefault(r => r.Id == o.OptionId);
-                        if(currentOption != null)
-                        {
-                            result.FirstOrDefault(r => r.Id == o.OptionId).Checked = true;
-                        }
-                        else
-                        {
-                            _optionRepository.Delete(o);
-                            _optionRepository.Save();
-                        }
+                        _optionRepository.Delete(o);
+                        _optionRepository.Save();
                     }
+                }
             }
-            else {
+            else
+            {
                 return NotFound();
             }
 
-             return Ok(result);    
+            return Ok(result);
         }
 
+        [HttpGet]
         [EnableQuery]
         [ODataRoute("GetSensitivePersonalDataByObjectID(id={id})")]
-        public IHttpActionResult GetSensitivePersonalDataByObjectID(int id)
+        public IHttpActionResult GetSensitivePersonalDataByObjectIDAndType(int id)
         {
             if (UserId == 0)
                 return Unauthorized();
 
+            var localpersonalData = _localSensitivePersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
+
+            List<SensitivePersonalDataType> result = new List<SensitivePersonalDataType>();
+
+            foreach (var p in localpersonalData)
+            {
+                var data = _sensitiveDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && s.IsEnabled);
+                if (data != null)
+                {
+                    result.Add(data);
+                }
+            }
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
-
             var system = _itSystemRepository.AsQueryable().FirstOrDefault(s => s.Id == id);
-
-            var result = _sensitivePersonalDataTypeRepository.AsQueryable().Where(p => p.IsObligatory || p.IsEnabled).ToList();
 
             if (system != null)
             {
@@ -110,7 +137,7 @@ namespace Presentation.Web.Controllers.OData
                 else
                 {
                     options = _optionRepository.AsQueryable()
-                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.OptionType == OptionType.SENSITIVEPERSONALDATA).ToList();
+                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.ObjectId == id && x.OptionType == OptionType.REGULARPERSONALDATA).ToList();
                 }
                 if (options.Count() <= 0)
                 {

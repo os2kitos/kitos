@@ -138,10 +138,6 @@ namespace Presentation.Web
             var AttachedOptions = builder.EntitySet<AttachedOption>(nameof(AttachedOptionsController).Replace("Controller", string.Empty));
             AttachedOptions.EntityType.HasKey(x => x.Id);
 
-           /* var removeOptionAction = AttachedOptions.EntityType.Action("Remove");
-            removeOptionAction.Parameter<int>("key").OptionalParameter = false;
-            removeOptionAction.Parameter<OptionType>("type").OptionalParameter = false;
-            */
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
@@ -455,24 +451,23 @@ namespace Presentation.Web
             var LocalReportCategoryType = builder.EntitySet<LocalReportCategoryType>(nameof(LocalReportCategoryTypesController).Replace("Controller", string.Empty));
             LocalReportCategoryType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalReportCategoryType.EntityType.HasKey(x => x.Id);
-            
-            var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
-            GetRegularPersonalDataByObjectID.Parameter<int>("id");
-            GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
-            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
             var RemoveOption = builder.Function("RemoveOption");
             RemoveOption.Parameter<int>("id");
             RemoveOption.Parameter<int>("systemId");
             RemoveOption.Parameter<OptionType>("type");
-            RemoveOption.Returns<IHttpActionResult>();
             RemoveOption.ReturnsCollectionFromEntitySet<AttachedOption>("AttachedOptions");
 
              var GetSensitivePersonalDataByObjectID = builder.Function("GetSensitivePersonalDataByObjectID");
-            GetSensitivePersonalDataByObjectID.Parameter<int>("id");
+            GetSensitivePersonalDataByObjectID.Parameter<int>("id"); 
             GetSensitivePersonalDataByObjectID.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty("Checked"));
             
+            var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
+            GetRegularPersonalDataByObjectID.Parameter<int>("id");
+             GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
+
             var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
             LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalSensitiveDataType.EntityType.HasKey(x => x.Id);

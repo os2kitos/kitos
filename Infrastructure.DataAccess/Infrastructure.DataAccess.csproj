@@ -426,21 +426,9 @@
     <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
       <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201712291522252_2 new optiontypes added.cs" />
-    <Compile Include="Migrations\201712291522252_2 new optiontypes added.Designer.cs">
-      <DependentUpon>201712291522252_2 new optiontypes added.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801031023026_local objects added.cs" />
-    <Compile Include="Migrations\201801031023026_local objects added.Designer.cs">
-      <DependentUpon>201801031023026_local objects added.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801031316042_attached options added.cs" />
-    <Compile Include="Migrations\201801031316042_attached options added.Designer.cs">
-      <DependentUpon>201801031316042_attached options added.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801031322433_attachedoptions is changed to entity type.cs" />
-    <Compile Include="Migrations\201801031322433_attachedoptions is changed to entity type.Designer.cs">
-      <DependentUpon>201801031322433_attachedoptions is changed to entity type.cs</DependentUpon>
+    <Compile Include="Migrations\201801041517268_new optionTypes added.cs" />
+    <Compile Include="Migrations\201801041517268_new optionTypes added.Designer.cs">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -650,17 +638,8 @@
     <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
       <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712291522252_2 new optiontypes added.resx">
-      <DependentUpon>201712291522252_2 new optiontypes added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801031023026_local objects added.resx">
-      <DependentUpon>201801031023026_local objects added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801031316042_attached options added.resx">
-      <DependentUpon>201801031316042_attached options added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801031322433_attachedoptions is changed to entity type.resx">
-      <DependentUpon>201801031322433_attachedoptions is changed to entity type.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201801041517268_new optionTypes added.resx">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
