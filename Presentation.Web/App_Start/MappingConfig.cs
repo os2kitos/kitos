@@ -35,6 +35,11 @@ namespace Presentation.Web
 
             // TODO do we need an admin DTO and normal DTO to strip unused properties in normal DTO
             // like IsActive and Description
+            Mapper.CreateMap<ItSystemDataWorkerRelation, ItSystemDataWorkerRelationDTO>()
+                  .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
+                  .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
+                  .ReverseMap();
+
             Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
                   .ReverseMap();
 

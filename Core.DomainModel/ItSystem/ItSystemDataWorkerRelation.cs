@@ -8,7 +8,6 @@ namespace Core.DomainModel.ItSystem
 {
     public class ItSystemDataWorkerRelation: Entity
     {
-        public int Id { get; set; }
         public int ItSystemId { get; set; }
         public virtual ItSystem ItSystem { get; set; }
 

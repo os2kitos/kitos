@@ -84,21 +84,22 @@
                 <div class="object-section-container">
                     <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
                     <div class="panel panel-default">
-                        <!--div class="panel-heading">Systemet vedrører følgende IT projekter</!--div-->
+                        <div class="panel-heading">Databehandlere</div>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>Databehandlere</th>
-                                    <th><!-- edit ctrl --></th>
+                                    <th>Navn</th>
+                                    <th>CVR</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr data-ng-repeat="dataWorker in dataWorkers">
                                     <td>
-                                        <a data-ui-sref="#">{{ dataWorker.name }}</a>
+                                        {{ dataWorker.dataWorkerName }}
                                     </td>
                                     <td>
-
+                                        {{ dataWorker.dataWorkerCvr }}
                                     </td>
                                     <td class="text-right">
                                         <button type="button"
@@ -113,7 +114,7 @@
                             </tbody>
                             <tfoot data-ng-show="hasWriteAccess">
                                 <tr>
-                                    <td colspan="2">
+                                    <td colspan="3">
                                         <input type="hidden"
                                                id="dataWorker-selector"
                                                class="form-control input-sm"
@@ -127,7 +128,7 @@
                         </table>
                     </div>
                 </div>
-              </div>
+                </div>
           </div>
     </div>
 </div>

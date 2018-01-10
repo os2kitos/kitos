@@ -36,8 +36,9 @@
             console.log($scope.system);
             $scope.regularSensitiveData = regularSensitiveData;
             $scope.sensitivePersonalData = sensitivePersonalData;
-
-
+            $scope.dataWorkers = theSystem.associatedDataWorkers;
+            // select2 options for looking up organization as dataworkers
+            $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
             $scope.updateDataLevel = function (OptionId, Checked, optionType) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -90,8 +91,16 @@
                 });
             };
 
-            // select2 options for looking up it system usages
-            $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);;
+            $scope.delete = function (dataworkerId) {
+                $http.delete("api/DataWorker/" + dataworkerId + "?organizationid=" + $scope.system.organizationId)
+                    .success(function () {
+                        notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
+                        reload();
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
+                    });
+            };
 
             function selectLazyLoading(url, excludeSelf, paramAry) {
                 return {
@@ -134,9 +143,27 @@
                     }
                 };
             }
+            // work around for $state.reload() not updating scope
+            // https://github.com/angular-ui/ui-router/issues/582
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
+            };
 
             $scope.save = function () {
-                $http.post("api/itproject/" + $scope.selectedProject.id + "?usageId=" + usageId + "&organizationId=" + user.currentOrganizationId)
+
+                var data = {
+                    ItSystemId: $scope.system.id,
+                    DataWorkerId: $scope.selectedDataWorker.id
+                }
+
+                $http.post("api/Dataworker/", data)
                     .success(function () {
                         notify.addSuccessMessage("Projektet er tilknyttet.");
                         reload();

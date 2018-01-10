@@ -11,9 +11,9 @@ namespace Presentation.Web.Models
     {
         public int Id { get; set; }
         public int ItSystemId { get; set; }
-        public virtual ItSystem ItSystem { get; set; }
-
         public int DataWorkerId { get; set; }
-        public virtual Organization DataWorker { get; set; }
+        public string DataWorkerName { get; set; }
+        public string DataWorkerCvr { get; set; }
+        
     }
 }

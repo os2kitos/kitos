@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201801081305042_dataworkers added to system"; }
+            get { return "201801101135275_dataworkers added to system"; }
         }
         
         string IMigrationMetadata.Source

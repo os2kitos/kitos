@@ -227,7 +227,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap());
+            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
+            modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
         }
     }
 }
