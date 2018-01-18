@@ -117,6 +117,7 @@
     <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemCategoriesMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />

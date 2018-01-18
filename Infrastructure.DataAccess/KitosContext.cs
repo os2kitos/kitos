@@ -74,6 +74,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOrgUnitUsage> ItSystemUsageOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
+        public DbSet<ItSystemCategories> ItSystemCategories { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
         public DbSet<ItSystemType> ItSystemTypes { get; set; }
@@ -122,6 +123,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
         public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
+        public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
         public DbSet<LocalMethodType> LocalMethodTypes { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
         public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
@@ -220,7 +222,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
-            modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
-        }
+            modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());}
     }
 }

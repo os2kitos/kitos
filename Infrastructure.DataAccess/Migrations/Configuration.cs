@@ -118,6 +118,8 @@ namespace Infrastructure.DataAccess.Migrations
 
                 AddOptions<ReportCategoryType, Report>(context.ReportCategoryTypes, globalAdmin, "IT Kontrakt", "IT Projekt", "IT System", "Organisation", "Andet", "Tværgående");
 
+                AddOptions<ItSystemCategories, ItSystemUsage>(context.ItSystemCategories, globalAdmin, "Offentlige data", "Interne data", "Fortrolige data", "Hemmelige data");
+
                 context.SaveChanges();
 
                 #endregion

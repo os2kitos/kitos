@@ -319,5 +319,9 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ArchiveLocationId { get; set; }
 
         public virtual ArchiveLocation ArchiveLocation { get; set; }
+
+        public int? ItSystemCategoriesId { get; set; }
+
+        public virtual ItSystemCategories ItSystemCategories  { get; set; }
     }
 }
