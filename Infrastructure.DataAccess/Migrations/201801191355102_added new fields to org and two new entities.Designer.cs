@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class test : IMigrationMetadata
+    public sealed partial class addednewfieldstoorgandtwonewentities : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(test));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addednewfieldstoorgandtwonewentities));
         
         string IMigrationMetadata.Id
         {
-            get { return "201801190935460_test"; }
+            get { return "201801191355102_added new fields to org and two new entities"; }
         }
         
         string IMigrationMetadata.Source

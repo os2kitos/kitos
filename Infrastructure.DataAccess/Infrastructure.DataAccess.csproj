@@ -437,25 +437,9 @@
     <Compile Include="Migrations\201801101135275_dataworkers added to system.Designer.cs">
       <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201801161011373_additional fields added to organization.cs" />
-    <Compile Include="Migrations\201801161011373_additional fields added to organization.Designer.cs">
-      <DependentUpon>201801161011373_additional fields added to organization.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801190804468_new entities added.cs" />
-    <Compile Include="Migrations\201801190804468_new entities added.Designer.cs">
-      <DependentUpon>201801190804468_new entities added.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801190924065_reference to organization added.cs" />
-    <Compile Include="Migrations\201801190924065_reference to organization added.Designer.cs">
-      <DependentUpon>201801190924065_reference to organization added.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801190935460_test.cs" />
-    <Compile Include="Migrations\201801190935460_test.Designer.cs">
-      <DependentUpon>201801190935460_test.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801191223501_wip.cs" />
-    <Compile Include="Migrations\201801191223501_wip.Designer.cs">
-      <DependentUpon>201801191223501_wip.cs</DependentUpon>
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.cs" />
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.Designer.cs">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -671,20 +655,8 @@
     <EmbeddedResource Include="Migrations\201801101135275_dataworkers added to system.resx">
       <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801161011373_additional fields added to organization.resx">
-      <DependentUpon>201801161011373_additional fields added to organization.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801190804468_new entities added.resx">
-      <DependentUpon>201801190804468_new entities added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801190924065_reference to organization added.resx">
-      <DependentUpon>201801190924065_reference to organization added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801190935460_test.resx">
-      <DependentUpon>201801190935460_test.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801191223501_wip.resx">
-      <DependentUpon>201801191223501_wip.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201801191355102_added new fields to org and two new entities.resx">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
