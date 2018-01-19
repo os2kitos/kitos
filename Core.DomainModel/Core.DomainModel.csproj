@@ -178,6 +178,8 @@
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
     <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
+    <Compile Include="Organization\DataProtectionAdvisor.cs" />
+    <Compile Include="Organization\DataResponsible.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IContextAware.cs" />

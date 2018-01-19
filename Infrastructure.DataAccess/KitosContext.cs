@@ -143,6 +143,8 @@ namespace Infrastructure.DataAccess
         public DbSet<AttachedOption> AttachedOptions { get; set; }
         public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
         public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
+        public DbSet<DataResponsible> DataResponsibles { get; set; }
+        public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -229,6 +231,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
             modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
             modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
+            modelBuilder.Configurations.Add(new DataResponsibleMap());
+            modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
         }
     }
 }

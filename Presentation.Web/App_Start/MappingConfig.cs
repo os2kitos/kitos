@@ -152,6 +152,12 @@ namespace Presentation.Web
                   .ForMember(dest => dest.References, opt => opt.Ignore());
 
             Mapper.CreateMap<Config, ConfigDTO>().ReverseMap();
+
+            Mapper.CreateMap<DataProtectionAdvisor, DataProtectionAdvisorDTO>()
+                  .ReverseMap();
+
+            Mapper.CreateMap<DataResponsible, DataResponsibleDTO>()
+                  .ReverseMap(); 
         }
     }
 
