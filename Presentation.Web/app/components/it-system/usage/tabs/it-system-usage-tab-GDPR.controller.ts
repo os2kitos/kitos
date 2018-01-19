@@ -26,7 +26,6 @@
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.systemCategories = systemCategories;
-            $scope.dataResponsible = 'Test af data ansvarlig';
             $scope.dataProcessor = 'Test af data behandler';
             $scope.dataProcessingAgreement = 'Test af databehandler aftale';
             $scope.dataProcessorControl = 2;
