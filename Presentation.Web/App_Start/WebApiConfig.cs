@@ -22,6 +22,11 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web
 {
+    using DocumentFormat.OpenXml.Wordprocessing;
+
+    using DataType = Core.DomainModel.ItSystem.DataType;
+    using HelpText = Core.DomainModel.HelpText;
+
     public static class WebApiConfig
     {
         public static void Register(HttpConfiguration config)
@@ -155,6 +160,9 @@ namespace Presentation.Web
 
             var archiveOption = builder.EntitySet<ArchiveType>(nameof(ArchiveTypesController).Replace("Controller", string.Empty));
             archiveOption.EntityType.HasKey(x => x.Id);
+
+            var itSystemCategories = builder.EntitySet<ItSystemCategories>(nameof(ItSystemCategoriesController).Replace("Controller", string.Empty));
+            itSystemCategories.EntityType.HasKey(x => x.Id);
 
             var itSystems = builder.EntitySet<ItSystem>(nameof(ItSystemsController).Replace("Controller", string.Empty));
             itSystems.HasRequiredBinding(o => o.Organization, "Organizations");
@@ -351,6 +359,10 @@ namespace Presentation.Web
             var LocalArchiveLocation = builder.EntitySet<LocalArchiveLocation>(nameof(LocalArchiveLocationsController).Replace("Controller", string.Empty));
             LocalArchiveLocation.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalArchiveLocation.EntityType.HasKey(x => x.Id);
+
+            var LocalItSystemCategories = builder.EntitySet<LocalItSystemCategories>(nameof(LocalItSystemCategoriesController).Replace("Controller", string.Empty));
+            LocalItSystemCategories.HasRequiredBinding(x => x.Organization, "Organizations");
+            LocalItSystemCategories.EntityType.HasKey(x => x.Id);
 
             var LocalBusinessType = builder.EntitySet<LocalBusinessType>(nameof(LocalBusinessTypesController).Replace("Controller", string.Empty));
             LocalBusinessType.HasRequiredBinding(u => u.Organization, "Organizations");

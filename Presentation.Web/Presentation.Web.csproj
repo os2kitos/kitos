@@ -277,6 +277,7 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
@@ -292,6 +293,7 @@
     <Compile Include="Controllers\API\ArchiveLocationController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
+    <Compile Include="Controllers\API\ItSystemCategorieController.cs" />
     <Compile Include="Controllers\API\ItSystemTypeOptionController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
@@ -353,6 +355,7 @@
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTypesController.cs" />
@@ -403,6 +406,7 @@
     <Compile Include="Controllers\OData\OptionControllers\ItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItProjectTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />

@@ -5,6 +5,10 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-GDPR.view.html",
             controller: "system.GDPR",
             resolve: {
+                systemCategories: [
+                    "$http", $http => $http.get("odata/LocalItSystemCategories?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                    .then(result => result.data.value)
+                ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
@@ -16,21 +20,12 @@
 
     app.controller("system.GDPR",
     [
-        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage",
-        "moment", "notify",
-        ($scope,
-            $http,
-            $state,
-            $stateParams,
-            $timeout,
-            itSystemUsage,
-            itSystemUsageService,
-            systemUsage,
-            moment,
-            notify) => {
+        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories","moment", "notify",
+        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify) => {
             $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
+            $scope.systemCategories = systemCategories;
             $scope.dataResponsible = 'Test af data ansvarlig';
             $scope.dataProcessor = 'Test af data behandler';
             $scope.dataProcessingAgreement = 'Test af databehandler aftale';

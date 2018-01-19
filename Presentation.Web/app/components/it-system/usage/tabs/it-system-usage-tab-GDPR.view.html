@@ -4,6 +4,19 @@
         <div class="row">
             <!-- 1st column -->
             <div class="col-xs-6">
+                <!-- Category of data -->
+                <div class="form-group">
+                    <select-option data-id="category"
+                                   data-label="Kategorier af data i systemet"
+                                   data-placeholder="Vælg kategori"
+                                   data-selected-text="{{ systemCategories }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="systemCategories.Id"
+                                   data-options="systemCategories"
+                                   data-auto-save-url=""
+                                   data-field="systemCategories">
+                    </select-option>
+                </div>
                 <!-- Data responsible -->
                 <div class="form-group">
                     <label for="dataResponsible" class="control-label small">Dataansvarlig for system</label>

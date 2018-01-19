@@ -409,6 +409,10 @@
     <Compile Include="Migrations\201711221241038_Override of exisiting table.Designer.cs">
       <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs" />
+    <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.Designer.cs">
+      <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -604,6 +608,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711221241038_Override of exisiting table.resx">
       <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.resx">
+      <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
