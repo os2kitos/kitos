@@ -124,10 +124,13 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="AttachedOption.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
+    <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
     <Compile Include="ItContract\IContractModule.cs" />
@@ -140,7 +143,10 @@
     <Compile Include="ItSystemUsage\TerminationDeadlineTypesInSystem.cs" />
     <Compile Include="ItSystem\AccessType.cs" />
     <Compile Include="ItSystem\ArchiveLocation.cs" />
+    <Compile Include="ItSystem\DataLevelTypes\DataTypes.cs" />
     <Compile Include="ItSystem\ISystemModule.cs" />
+    <Compile Include="ItSystem\SensitivePersonalDataType.cs" />
+    <Compile Include="ItSystem\RegularPersonalDataType.cs" />
     <Compile Include="ItSystem\ItSystemCategories.cs" />
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
@@ -173,6 +179,10 @@
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
     <Compile Include="LocalOptions\LocalTsaType.cs" />
     <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
+    <Compile Include="LocalOptions\LocalRegularPersonalDataType.cs" />
+    <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
+    <Compile Include="Organization\DataProtectionAdvisor.cs" />
+    <Compile Include="Organization\DataResponsible.cs" />
     <Compile Include="Organization\OrganizationRight.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="IContextAware.cs" />

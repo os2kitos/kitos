@@ -29,8 +29,10 @@ namespace Core.DomainModel.Organization
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
         }
-
         public string Name { get; set; }
+        public string Phone { get; set; }
+        public string Adress { get; set; }
+        public string Email { get; set; }
         public int TypeId { get; set; }
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public virtual OrganizationType Type { get; set; }

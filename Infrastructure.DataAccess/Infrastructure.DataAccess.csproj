@@ -107,6 +107,11 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\DataResponsibleMap.cs" />
+    <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
+    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
+    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -409,6 +414,50 @@
     <Compile Include="Migrations\201711221241038_Override of exisiting table.Designer.cs">
       <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.cs" />
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.Designer.cs">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.cs" />
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.Designer.cs">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.cs" />
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.Designer.cs">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.cs" />
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801041517268_new optionTypes added.cs" />
+    <Compile Include="Migrations\201801041517268_new optionTypes added.Designer.cs">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.cs" />
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.Designer.cs">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801161011373_additional fields added to organization.cs" />
+    <Compile Include="Migrations\201801161011373_additional fields added to organization.Designer.cs">
+      <DependentUpon>201801161011373_additional fields added to organization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801190804468_new entities added.cs" />
+    <Compile Include="Migrations\201801190804468_new entities added.Designer.cs">
+      <DependentUpon>201801190804468_new entities added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801190924065_reference to organization added.cs" />
+    <Compile Include="Migrations\201801190924065_reference to organization added.Designer.cs">
+      <DependentUpon>201801190924065_reference to organization added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801190935460_test.cs" />
+    <Compile Include="Migrations\201801190935460_test.Designer.cs">
+      <DependentUpon>201801190935460_test.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191223501_wip.cs" />
+    <Compile Include="Migrations\201801191223501_wip.Designer.cs">
+      <DependentUpon>201801191223501_wip.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs" />
     <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.Designer.cs">
       <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>
@@ -608,6 +657,39 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711221241038_Override of exisiting table.resx">
       <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281114451_general purpose added to itsystem.resx">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281227026_data level added to itsystem.resx">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291105417_containslegalinfo added to itsystem.resx">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801041517268_new optionTypes added.resx">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801101135275_dataworkers added to system.resx">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801161011373_additional fields added to organization.resx">
+      <DependentUpon>201801161011373_additional fields added to organization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801190804468_new entities added.resx">
+      <DependentUpon>201801190804468_new entities added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801190924065_reference to organization added.resx">
+      <DependentUpon>201801190924065_reference to organization added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801190935460_test.resx">
+      <DependentUpon>201801190935460_test.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191223501_wip.resx">
+      <DependentUpon>201801191223501_wip.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.resx">
       <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>

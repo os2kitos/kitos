@@ -48,8 +48,24 @@
                 $scope.businessTypes = businessTypes.data.value;
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
-
+            
                 $scope.hasWriteAccess = hasWriteAccess;
+
+
+                $scope.submitDataLevel = function () {
+                    var data = {
+                        DataLevel: $scope.system.dataLevel
+                    };
+                  
+                    $http.patch("api/itsystem/" + itSystem.id + "?organizationId=" + itSystem.organizationId, data).success(function (result) {
+
+                        notify.addSuccessMessage("Success");
+
+                    }).error(function (result) {
+                        notify.addErrorMessage('Fejl!');
+                    });
+                };
+
 
                 function selectLazyLoading(url, allowClear, paramAry) {
                     return {

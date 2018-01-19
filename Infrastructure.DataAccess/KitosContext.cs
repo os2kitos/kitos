@@ -134,11 +134,19 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalReportCategoryType> LocalReportCategoryTypes { get; set; }
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
+        public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
+        public DbSet<LocalRegularPersonalDataType> LocalRegularPersonalDataTypes { get; set; }
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
         public DbSet<AdviceSent> AdviceSent { get; set; }
+        public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
+        public DbSet<AttachedOption> AttachedOptions { get; set; }
+        public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
+        public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
+        public DbSet<DataResponsible> DataResponsibles { get; set; }
+        public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -222,6 +230,12 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
             modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
+            modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
+            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
+            modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
+            modelBuilder.Configurations.Add(new DataResponsibleMap());
+            modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
+        }
             modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());}
     }
 }

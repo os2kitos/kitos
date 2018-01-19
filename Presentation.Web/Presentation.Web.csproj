@@ -276,6 +276,9 @@
   <ItemGroup>
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-gdpr.ts" />
+    <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
@@ -289,8 +292,11 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
+    <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\ArchiveLocationController.cs" />
+    <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItSystemCategorieController.cs" />
@@ -344,6 +350,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
     <Compile Include="Controllers\API\SSOConfigController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptionsController.cs" />
     <Compile Include="Controllers\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\OData\AdviceController.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
@@ -384,6 +391,8 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
@@ -411,6 +420,8 @@
     <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionBaseController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
@@ -444,8 +455,11 @@
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
+    <Compile Include="Models\DataResponsibleDTO.cs" />
+    <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
@@ -599,6 +613,7 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\gdpr-views\gdpr.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
@@ -606,6 +621,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
@@ -1346,6 +1362,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\BaseOdataAuthorization\" />
+    <Folder Include="Views\Dataworker\" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
