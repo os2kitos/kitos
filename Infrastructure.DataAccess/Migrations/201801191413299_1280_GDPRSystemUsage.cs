@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class OS2Kitos1280_GDPRItSystemUsagesCategories : DbMigration
+    public partial class _1280_GDPRSystemUsage : DbMigration
     {
         public override void Up()
         {

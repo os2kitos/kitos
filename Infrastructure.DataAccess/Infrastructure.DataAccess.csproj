@@ -442,9 +442,9 @@
     <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.Designer.cs">
       <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs" />
-    <Compile Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.Designer.cs">
-      <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.cs" />
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.Designer.cs">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -663,8 +663,8 @@
     <EmbeddedResource Include="Migrations\201801191355102_added new fields to org and two new entities.resx">
       <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.resx">
-      <DependentUpon>201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201801191413299_1280_GDPRSystemUsage.resx">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

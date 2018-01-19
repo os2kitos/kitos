@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class OS2Kitos1280_GDPRItSystemUsagesCategories : IMigrationMetadata
+    public sealed partial class _1280_GDPRSystemUsage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(OS2Kitos1280_GDPRItSystemUsagesCategories));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(_1280_GDPRSystemUsage));
         
         string IMigrationMetadata.Id
         {
-            get { return "201801181059224_OS2Kitos-1280_GDPRItSystemUsagesCategories"; }
+            get { return "201801191413299_1280_GDPRSystemUsage"; }
         }
         
         string IMigrationMetadata.Source
