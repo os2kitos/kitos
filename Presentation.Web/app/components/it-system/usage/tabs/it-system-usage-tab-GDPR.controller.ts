@@ -13,7 +13,15 @@
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
-                ]
+                ],
+            itSystemUsage: [
+                '$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/itSystemUsage/' + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }
+            ]
             }
         });
     }]);
