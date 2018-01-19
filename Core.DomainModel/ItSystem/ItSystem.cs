@@ -96,14 +96,21 @@ namespace Core.DomainModel.ItSystem
         /// The ExternalReferences.
         /// </value>
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
         public int? ReferenceId { get; set; }
+
         public virtual ExternalReference Reference { get; set; }
         //GDPR
         public string GeneralPurpose { get; set; }
+
         public DataSensitivityLevel DataLevel { get; set; }
+
         public DataOptions ContainsLegalInfo { get; set; }
+
         public bool IsDataTransferedToThirdCountries { get; set; }
+
         public string DataIsTransferedTo { get; set; }
+
         public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
     }

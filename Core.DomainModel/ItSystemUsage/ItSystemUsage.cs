@@ -323,5 +323,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ItSystemCategoriesId { get; set; }
 
         public virtual ItSystemCategories ItSystemCategories  { get; set; }
+
+        public string GeneralPurpose { get; set;}
     }
 }

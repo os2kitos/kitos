@@ -73,6 +73,7 @@ namespace Presentation.Web.Models
         public DateTime ExpirationDate { get; set; }
 
         public int? ItSystemCategoriesId { get; set; }
+        public string GeneralPurpose { get; set; }
 
     }
 }

@@ -4,6 +4,18 @@
         <div class="row">
             <!-- 1st column -->
             <div class="col-xs-6">
+
+                <div class="form-group">
+                    <label class="control-label small">Overordnet formål</label>
+                    <input type="text"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{updateUrl}}"
+                           class="form-control input-sm"
+                           data-field="GeneralPurpose"
+                           data-ng-model="generalPurpose"
+                           data-placeholder="Overordnet formål" />
+                </div>
+
                 <!-- Category of data -->
                 <div class="form-group">
                     <select-option data-id="category"

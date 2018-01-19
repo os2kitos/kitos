@@ -23,6 +23,17 @@
         "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories","moment", "notify",
         ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify) => {
             $scope.usage = itSystemUsage;
+
+            //inherit from parent if general purpose is empty
+            $scope.generalPurpose = $scope.usage.generalPurpose;
+            if (!$scope.generalPurpose) {
+                $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
+            }
+
+            $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
+
+
+
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.systemCategories = systemCategories;
