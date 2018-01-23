@@ -5,6 +5,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage
 {
+    using ItSystem.DataTypes;
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -325,5 +326,6 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ItSystemCategories ItSystemCategories  { get; set; }
 
         public string GeneralPurpose { get; set;}
+        public DataOptions isBusinessCritical { get; set; }
     }
 }

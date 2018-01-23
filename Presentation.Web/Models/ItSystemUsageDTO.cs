@@ -2,6 +2,7 @@
 
 namespace Presentation.Web.Models
 {
+    using Core.DomainModel.ItSystem.DataTypes;
     using System;
 
     public class ItSystemUsageDTO
@@ -74,6 +75,7 @@ namespace Presentation.Web.Models
 
         public int? ItSystemCategoriesId { get; set; }
         public string GeneralPurpose { get; set; }
+        public DataOptions isBusinessCritical { get; set; }
 
     }
 }

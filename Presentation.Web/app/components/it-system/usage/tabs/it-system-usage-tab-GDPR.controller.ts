@@ -37,7 +37,6 @@
             if (!$scope.generalPurpose) {
                 $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
             }
-
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
 
 
