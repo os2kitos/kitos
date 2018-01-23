@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Core.ApplicationServices
             _dataRowUsageRepository = dataRowUsageRepository;
         }
 
-        public ItSystemUsage Add(int systemId, int orgId, User objectOwner)
+        public ItSystemUsage Add(int systemId, int orgId, DataSensitivityLevel dataLevel, User objectOwner)
         {
             // create the system usage
             var usage = _usageRepository.Create();
@@ -29,6 +30,7 @@ namespace Core.ApplicationServices
             usage.OrganizationId = orgId;
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
+            usage.DataLevel = dataLevel;
 
             _usageRepository.Insert(usage);
 

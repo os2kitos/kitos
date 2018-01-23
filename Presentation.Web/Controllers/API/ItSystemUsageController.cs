@@ -202,7 +202,8 @@ namespace Presentation.Web.Controllers.API
                                             && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
 
-                var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId, KitosUser);
+                var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId,dto.DataLevel, KitosUser);
+                sysUsage.DataLevel = dto.DataLevel;
 
                 return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 

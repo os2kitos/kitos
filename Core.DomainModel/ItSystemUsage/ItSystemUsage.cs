@@ -327,5 +327,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string GeneralPurpose { get; set;}
         public DataOptions isBusinessCritical { get; set; }
+        public DataSensitivityLevel DataLevel { get; set; }
     }
 }

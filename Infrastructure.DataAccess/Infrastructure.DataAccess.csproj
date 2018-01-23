@@ -454,6 +454,10 @@
     <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.Designer.cs">
       <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.cs" />
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.Designer.cs">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -679,6 +683,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801230816140_isBusinessCritical added to system usage.resx">
       <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231023532_dataLevel added to system usage.resx">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
