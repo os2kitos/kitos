@@ -30,6 +30,21 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label>
+                    <select class="form-control input-sm"
+                            data-ng-disabled="!hasWriteAccess"
+                            ui-select2="{minimumResultsForSearch: -1}"
+                            data-ng-model="usage.containsLegalInfo"
+                            data-autosave="{{updateUrl}}"
+                            data-field="containsLegalInfo">
+                        <option value="1">Ja</option>
+                        <option value="0">Nej</option>
+                        <option value="2">Ved Ikke</option>
+                    </select>
+                </div>
+
+
 
                 <!-- Category of data -->
                 <div class="form-group">

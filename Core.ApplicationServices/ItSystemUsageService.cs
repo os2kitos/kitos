@@ -22,15 +22,16 @@ namespace Core.ApplicationServices
             _dataRowUsageRepository = dataRowUsageRepository;
         }
 
-        public ItSystemUsage Add(int systemId, int orgId, DataSensitivityLevel dataLevel, User objectOwner)
+        public ItSystemUsage Add(ItSystemUsage ItSystemUsage, User objectOwner)
         {
             // create the system usage
             var usage = _usageRepository.Create();
-            usage.ItSystemId = systemId;
-            usage.OrganizationId = orgId;
+            usage.ItSystemId = ItSystemUsage.ItSystemId;
+            usage.OrganizationId = ItSystemUsage.OrganizationId;
             usage.ObjectOwner = objectOwner;
             usage.LastChangedByUser = objectOwner;
-            usage.DataLevel = dataLevel;
+            usage.DataLevel = ItSystemUsage.DataLevel;
+            usage.ContainsLegalInfo = ItSystemUsage.ContainsLegalInfo;
 
             _usageRepository.Insert(usage);
 

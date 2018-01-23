@@ -720,7 +720,8 @@
             return this.$http.post("api/itSystemUsage", {
                 itSystemId: dataItem.Id,
                 organizationId: this.user.currentOrganizationId,
-                dataLevel: dataItem.DataLevel
+                dataLevel: dataItem.DataLevel,
+                containsLegalInfo: dataItem.ContainsLegalInfo
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));

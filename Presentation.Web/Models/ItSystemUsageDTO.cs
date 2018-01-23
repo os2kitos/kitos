@@ -82,5 +82,7 @@ namespace Presentation.Web.Models
         public DataSensitivityLevel DataLevel { get; set; }
 
         public UserCount UserCount { get; set; }
+
+        public DataOptions ContainsLegalInfo { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace Core.DomainServices
 {
     public interface IItSystemUsageService
     {
-        ItSystemUsage Add(int systemId, int orgId, DataSensitivityLevel dataLevel, User objectOwner);
+        ItSystemUsage Add(ItSystemUsage ItSystemUsage, User objectOwner);
         //void AddInterfaceUsage(ItSystemUsage usage, ItSystem theInterface);
         void Delete(int id);
     }
