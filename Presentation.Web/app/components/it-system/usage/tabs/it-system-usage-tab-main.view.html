@@ -61,6 +61,20 @@
 
             <!-- 4th column -->
             <div class="col-xs-6">
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
+                    <select class="form-control input-sm"
+                            ui-select2="{minimumResultsForSearch: -1}"
+                            data-ng-model="usage.userCount"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-field="userCount"
+                            data-autosave="api/itSystemUsage/{{usageId}}">
+                        <option value="0"><10</option>
+                        <option value="1">10-50</option>
+                        <option value="2">50-100</option>
+                        <option value="3">>100</option>
+                    </select>
+                </div>
                 <!-- version -->
                 <div class="form-group">
                     <label for="version" class="control-label small">Version</label>

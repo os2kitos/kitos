@@ -458,6 +458,10 @@
     <Compile Include="Migrations\201801231023532_dataLevel added to system usage.Designer.cs">
       <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -686,6 +690,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801231023532_dataLevel added to system usage.resx">
       <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231236182_UserCount Added to Systemusage.resx">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -80,5 +80,7 @@ namespace Presentation.Web.Models
         public DataOptions isBusinessCritical { get; set; }
 
         public DataSensitivityLevel DataLevel { get; set; }
+
+        public UserCount UserCount { get; set; }
     }
 }
