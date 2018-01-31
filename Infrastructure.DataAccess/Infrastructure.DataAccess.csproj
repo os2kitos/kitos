@@ -466,6 +466,10 @@
     <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.Designer.cs">
       <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801241120532_register type option added.cs" />
+    <Compile Include="Migrations\201801241120532_register type option added.Designer.cs">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -700,6 +704,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.resx">
       <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801241120532_register type option added.resx">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

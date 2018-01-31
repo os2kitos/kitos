@@ -21,23 +21,63 @@
                             return result.data.response;
                         });
                 }
-            ]
+                ],
+            registerTypes: ['$http', '$stateParams', function ($http, $stateParams) {
+                return $http.get("odata/GetRegisterTypesByObjectID(id=" + $stateParams.id + ")")
+                    .then(function (result) {
+                        return result.data.value;
+                    });
+            }]
             }
         });
     }]);
 
     app.controller("system.GDPR",
-    [
-        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories","moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify) => {
+        [
+            "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes",
+        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes) => {
+
             $scope.usage = itSystemUsage;
+            $scope.registerTypes = registerTypes;
 
             //inherit from parent if general purpose is empty
             $scope.generalPurpose = $scope.usage.generalPurpose;
+
             if (!$scope.generalPurpose) {
                 $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
             }
+
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
+
+
+
+            $scope.updateDataLevel = function (OptionId, Checked, optionType) {
+
+                var msg = notify.addInfoMessage("Arbejder ...", false);
+
+                if (Checked == true) {
+
+                    var data = {
+                        ObjectId: itSystemUsage.id,
+                        OptionId: OptionId,
+                        OptionType: optionType
+                    };
+
+                    $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(function (result) {
+                        msg.toSuccessMessage("Feltet er Opdateret.");
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl!");
+                    });
+
+                } else {
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type='" + optionType + "')").success(function () {
+                        msg.toSuccessMessage("Feltet er Opdateret.");
+                    }).error(function () {
+                        msg.toErrorMessage("Fejl!");
+                    });
+                }
+            }
+
 
 
 

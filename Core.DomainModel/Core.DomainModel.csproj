@@ -130,6 +130,8 @@
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
+    <Compile Include="ItSystemUsage\RegisterType.cs" />
+    <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
