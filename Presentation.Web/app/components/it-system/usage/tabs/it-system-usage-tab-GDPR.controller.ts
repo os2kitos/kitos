@@ -26,24 +26,15 @@
                             return result.data.value;
                         });
                 }]
-                ],
-            itSystemUsage: [
-                '$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get('api/itSystemUsage/' + $stateParams.id)
-                        .then(function (result) {
-                            return result.data.response;
-                        });
-                }
-            ]
             }
         });
     }]);
 
     app.controller("system.GDPR",
     [
-        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "regularSensitiveData", "sensitivePersonalData", "moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, regularSensitiveData, sensitivePersonalData, moment, notify) => {
-            $scope.usage = itSystemUsage;
+        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsageService", "systemUsage", "systemCategories", "regularSensitiveData", "sensitivePersonalData", "moment", "notify",
+        ($scope, $http, $state, $stateParams, $timeout, itSystemUsageService, systemUsage, systemCategories, regularSensitiveData, sensitivePersonalData, moment, notify) => {
+            $scope.usage = systemUsage;
 
             //inherit from parent if general purpose is empty
             $scope.generalPurpose = $scope.usage.generalPurpose;
@@ -71,6 +62,27 @@
                 'Logning',
                 'Rettigheds- og adgangsstyring'
             ];
+
+            $scope.patch = (field, value) => {
+                var payload = {};
+                payload[field] = value;
+                itSystemUsageService.patchSystem($scope.usageId, payload);
+            }
+
+            $scope.patchDate = (field, value) => {
+                var date = moment(value);
+
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                    $scope.ArchivedDate = systemUsage.ArchivedDate;
+                } else {
+                    date = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = date;
+                    itSystemUsageService.patchSystem($scope.usageId, payload);
+                    $scope.ArchivedDate = date;
+                }
+            }
 
             $scope.toggleSelection = data => {
                 console.log(data);
