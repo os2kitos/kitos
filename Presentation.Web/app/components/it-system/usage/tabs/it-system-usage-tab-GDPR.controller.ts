@@ -14,7 +14,7 @@
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
                 ],
-                regularSensitiveData: ['$http', '$stateParams', 'theSystem', function ($http, $stateParams, theSystem) {
+                regularSensitiveData: ['$http', '$stateParams', 'systemUsage', function ($http, $stateParams, systemUsage) {
                     return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ")")
                         .then(function (result) {
                             return result.data.value;
@@ -25,24 +25,21 @@
                         .then(function (result) {
                             return result.data.value;
                         });
+                    }],
+                registerTypes: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("odata/GetRegisterTypesByObjectID(id=" + $stateParams.id + ")")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
                 }]
-            }
-                }
-                ],
-            registerTypes: ['$http', '$stateParams', function ($http, $stateParams) {
-                return $http.get("odata/GetRegisterTypesByObjectID(id=" + $stateParams.id + ")")
-                    .then(function (result) {
-                        return result.data.value;
-                    });
-            }]
             }
         });
     }]);
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes",
-        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes) => {
+            "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData",
+            ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;

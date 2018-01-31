@@ -13,6 +13,8 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
+    using System.Net;
+
     public class AttachedOptionsRegularPersonalDataController : AttachedOptionsController
     {
         IGenericRepository<AttachedOption> _optionRepository;
@@ -74,7 +76,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             }
             else
             {
-                return NotFound();
+                return StatusCode(HttpStatusCode.NoContent);
             }
 
             return Ok(result);
