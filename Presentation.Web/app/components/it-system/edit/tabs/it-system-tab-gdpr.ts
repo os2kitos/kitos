@@ -2,7 +2,7 @@
     app.config(["$stateProvider", function ($stateProvider) {
         $stateProvider.state("it-system.edit.gdpr", {
             url: "/gdpr",
-            templateUrl: "app/components/gdpr-views/gdpr.view.html",
+            templateUrl: "app/components/it-system/edit/tabs/it-system-tab-gdpr.view.html",
             controller: "system.EditGdpr",
             resolve: {
                 theSystem: ['$http', '$stateParams', function ($http, $stateParams) {
@@ -33,12 +33,12 @@
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.system = theSystem;
             $scope.updateUrl = 'api/itsystem/' + theSystem.id;
-            console.log($scope.system);
             $scope.regularSensitiveData = regularSensitiveData;
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.dataWorkers = theSystem.associatedDataWorkers;
             // select2 options for looking up organization as dataworkers
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
+
             $scope.updateDataLevel = function (OptionId, Checked, optionType) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -58,7 +58,7 @@
                     });
                 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", systemId=" + theSystem.id + ",type='" + optionType + "')").success(function () {
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type='" + optionType + "')").success(function () {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");

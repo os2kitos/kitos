@@ -23,6 +23,7 @@ using System.Linq;
 
 namespace Presentation.Web
 {
+    using Controllers.OData.AttachedOptions;
     using DocumentFormat.OpenXml.Wordprocessing;
 
     using DataType = Core.DomainModel.ItSystem.DataType;
@@ -139,7 +140,7 @@ namespace Presentation.Web
 
             var itProjectRoles = builder.EntitySet<ItProjectRole>(nameof(ItProjectRolesController).Replace("Controller", string.Empty));
             itProjectRoles.EntityType.HasKey(x => x.Id);
-
+            
             var AttachedOptions = builder.EntitySet<AttachedOption>(nameof(AttachedOptionsController).Replace("Controller", string.Empty));
             AttachedOptions.EntityType.HasKey(x => x.Id);
 
@@ -315,6 +316,9 @@ namespace Presentation.Web
             RegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
             RegularPersonalDataTypes.HasManyBinding(b => b.References, "ItSystems");
 
+            var RegisterTypes = builder.EntitySet<RegisterType>(nameof(RegisterTypesController).Replace("Controller", string.Empty));
+            RegisterTypes.EntityType.HasKey(x => x.Id);
+
             var SensitivePersonalDataTypes = builder.EntitySet<SensitivePersonalDataType>(nameof(SensistivePersonalDataTypesController).Replace("Controller", string.Empty));
             SensitivePersonalDataTypes.EntityType.HasKey(x => x.Id);
             SensitivePersonalDataTypes.HasManyBinding(b => b.References, "ItSystems");
@@ -363,6 +367,7 @@ namespace Presentation.Web
             var LocalAgreementElementType = builder.EntitySet<LocalAgreementElementType>(nameof(LocalAgreementElementTypesController).Replace("Controller", string.Empty));
             LocalAgreementElementType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalAgreementElementType.EntityType.HasKey(x => x.Id);
+
 
             var LocalArchiveType = builder.EntitySet<LocalArchiveType>(nameof(LocalArchiveTypesController).Replace("Controller", string.Empty));
             LocalArchiveType.HasRequiredBinding(u => u.Organization, "Organizations");
@@ -466,7 +471,7 @@ namespace Presentation.Web
 
             var RemoveOption = builder.Function("RemoveOption");
             RemoveOption.Parameter<int>("id");
-            RemoveOption.Parameter<int>("systemId");
+            RemoveOption.Parameter<int>("objectId");
             RemoveOption.Parameter<OptionType>("type");
             RemoveOption.ReturnsCollectionFromEntitySet<AttachedOption>("AttachedOptions");
 
@@ -480,6 +485,11 @@ namespace Presentation.Web
              GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
+            var GetRegisterTypeByObjectID = builder.Function("GetRegisterTypesByObjectID");
+            GetRegisterTypeByObjectID.Parameter<int>("id");
+            GetRegisterTypeByObjectID.ReturnsCollectionFromEntitySet<RegisterType>("RegisterTypes");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(RegisterType)).AddProperty(typeof(RegisterType).GetProperty("Checked"));
+
             var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
             LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
@@ -491,8 +501,11 @@ namespace Presentation.Web
             var LocalRegularPersonalDataTypes = builder.EntitySet<LocalRegularPersonalDataType>(nameof(LocalRegularPersonalDataTypesController).Replace("Controller", string.Empty));
             LocalRegularPersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalRegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
-
-
+            
+            var LocalRegisterTypes = builder.EntitySet<LocalRegisterType>(nameof(LocalRegisterTypesController).Replace("Controller", string.Empty));
+            LocalRegisterTypes.HasRequiredBinding(u => u.Organization, "Organizations");
+            LocalRegisterTypes.EntityType.HasKey(x => x.Id);
+            
             var LocalTerminationDeadlineType = builder.EntitySet<LocalTerminationDeadlineType>(nameof(LocalTerminationDeadlineTypesController).Replace("Controller", string.Empty));
             LocalTerminationDeadlineType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalTerminationDeadlineType.EntityType.HasKey(x => x.Id);

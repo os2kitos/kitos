@@ -147,6 +147,8 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
         public DbSet<DataResponsible> DataResponsibles { get; set; }
         public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+        public DbSet<RegisterType> RegisterTypes { get; set; }
+        public DbSet<LocalRegisterType> LocalRegisterTypes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

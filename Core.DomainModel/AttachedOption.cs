@@ -16,6 +16,7 @@ namespace Core.DomainModel
     public enum OptionType
     {
         REGULARPERSONALDATA,
-        SENSITIVEPERSONALDATA
+        SENSITIVEPERSONALDATA,
+        REGISTERTYPEDATA
     }
 }
