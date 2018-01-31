@@ -446,6 +446,26 @@
     <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.Designer.cs">
       <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.cs" />
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.Designer.cs">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.cs" />
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.Designer.cs">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.cs" />
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.Designer.cs">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -665,6 +685,21 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801191413299_1280_GDPRSystemUsage.resx">
       <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191527385_general purpose added to usage.resx">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801230816140_isBusinessCritical added to system usage.resx">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231023532_dataLevel added to system usage.resx">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231236182_UserCount Added to Systemusage.resx">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.resx">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

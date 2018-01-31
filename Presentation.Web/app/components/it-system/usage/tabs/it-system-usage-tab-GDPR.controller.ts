@@ -26,6 +26,15 @@
                             return result.data.value;
                         });
                 }]
+                ],
+            itSystemUsage: [
+                '$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get('api/itSystemUsage/' + $stateParams.id)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }
+            ]
             }
         });
     }]);
@@ -35,6 +44,16 @@
         "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "regularSensitiveData", "sensitivePersonalData", "moment", "notify",
         ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, regularSensitiveData, sensitivePersonalData, moment, notify) => {
             $scope.usage = itSystemUsage;
+
+            //inherit from parent if general purpose is empty
+            $scope.generalPurpose = $scope.usage.generalPurpose;
+            if (!$scope.generalPurpose) {
+                $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
+            }
+            $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
+
+
+
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.systemCategories = systemCategories;

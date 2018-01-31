@@ -215,7 +215,7 @@
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
@@ -716,10 +716,12 @@
         }
 
         // adds system to usage within the current context
-        private addUsage(systemId) {
+        private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
-                itSystemId: systemId,
-                organizationId: this.user.currentOrganizationId
+                itSystemId: dataItem.Id,
+                organizationId: this.user.currentOrganizationId,
+                dataLevel: dataItem.DataLevel,
+                containsLegalInfo: dataItem.ContainsLegalInfo
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));

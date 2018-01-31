@@ -4,6 +4,48 @@
         <div class="row">
             <!-- 1st column -->
             <div class="col-xs-6">
+
+                <div class="form-group">
+                    <label class="control-label small">Overordnet formål</label>
+                    <input type="text"
+                           data-ng-disabled="!hasWriteAccess"
+                           data-autosave="{{updateUrl}}"
+                           class="form-control input-sm"
+                           data-field="GeneralPurpose"
+                           data-ng-model="generalPurpose"
+                           data-placeholder="Overordnet formål" />
+                </div>
+
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">Er systemet forretningskritisk?</label>
+                    <select class="form-control input-sm"
+                            data-ng-disabled="!hasWriteAccess"
+                            data-autosave="{{updateUrl}}"
+                            data-field="isBusinessCritical"
+                            ui-select2="{minimumResultsForSearch: -1}"
+                            data-ng-model="usage.isBusinessCritical">
+                        <option value="1">Ja</option>
+                        <option value="0">Nej</option>
+                        <option value="2">Ved Ikke</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label>
+                    <select class="form-control input-sm"
+                            data-ng-disabled="!hasWriteAccess"
+                            ui-select2="{minimumResultsForSearch: -1}"
+                            data-ng-model="usage.containsLegalInfo"
+                            data-autosave="{{updateUrl}}"
+                            data-field="containsLegalInfo">
+                        <option value="1">Ja</option>
+                        <option value="0">Nej</option>
+                        <option value="2">Ved Ikke</option>
+                    </select>
+                </div>
+
+
+
                 <!-- Category of data -->
                 <div class="form-group">
                     <select-option data-id="category"

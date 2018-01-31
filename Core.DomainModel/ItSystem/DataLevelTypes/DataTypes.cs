@@ -18,4 +18,12 @@ namespace Core.DomainModel.ItSystem.DataTypes
         YES,
         DONTKNOW
     }
+
+    public enum UserCount
+    {
+        BELOWTEN,
+        TENTOFIFTY,
+        FIFTYTOHUNDRED,
+        HUNDREDPLUS
+    }
 }
