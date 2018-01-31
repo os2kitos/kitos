@@ -781,6 +781,7 @@
     <Content Include="Content\img\EksterneReferencer.svg" />
     <Content Include="Content\img\End-to-end.svg" />
     <Content Include="Content\img\Faser.svg" />
+    <Content Include="Content\img\GDPR-Lock.svg" />
     <Content Include="Content\img\Gevinster.svg" />
     <Content Include="Content\img\Hierarki.svg" />
     <Content Include="Content\img\Interessenter.svg" />

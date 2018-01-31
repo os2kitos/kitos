@@ -13,39 +13,37 @@
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
-                ]
+                ],
+                regularSensitiveData: ['$http', '$stateParams', 'theSystem', function ($http, $stateParams, theSystem) {
+                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ")")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
+                sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ")")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }]
             }
         });
     }]);
 
     app.controller("system.GDPR",
     [
-        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories","moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify) => {
+        "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "regularSensitiveData", "sensitivePersonalData", "moment", "notify",
+        ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, regularSensitiveData, sensitivePersonalData, moment, notify) => {
             $scope.usage = itSystemUsage;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.systemCategories = systemCategories;
+            $scope.regularSensitiveData = regularSensitiveData;
+            $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.dataProcessor = 'Test af data behandler';
             $scope.dataProcessingAgreement = 'Test af databehandler aftale';
             $scope.dataProcessorControl = 2;
             $scope.lastControl = '2017-01-01';
-            $scope.catagory = {
-                name: 'test navn',
-                address: 'test adresse',
-                tlf: '123456',
-                mail: 'something@kitos.dk',
-                CPR: '123456-7890',
-                economics: 'the good, the bad and the ugly',
-                ethnicity: 'human etnisk',
-                politicalAffiliation: 'holdninger',
-                religious: 'tro, håb og ....',
-                unionized: 'fagforening',
-                geneticDate: 'genetisk data',
-                biometricDate: 'Bimetrisk data',
-                health: 'helbredet',
-                SexualOrientation: 'sex it up'
-            };
             $scope.selection = [];
             $scope.persOptions = [
                 'Kryptering',

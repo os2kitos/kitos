@@ -96,11 +96,30 @@
             <!-- 2nd column -->
             <div class="col-xs-6">
                 <!-- Catagory of data -->
-                <div class="form-group">
-                    <label for="catagorydata" class="control-label small">Katagori af oplsyninger</label>
-                    <div ng-repeat="(key, data) in catagory">
-                        <input type="checkbox" id="catagorydata" name="selectedData[]" value="data" ng-checked="selection.indexOf(data) > -1" ng-click="toggleSelection(data)" />
-                        <b>{{key}}</b>: {{data}}
+                <div class="form-group"
+                     data-ng-show="system.dataLevel == 1">
+                    <label class="control-label small">Almindelige persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
+                            <label>
+                                <input type="checkbox" ng-model="r.Checked"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group"
+                     data-ng-show="system.dataLevel == 2">
+                    <label class="control-label small">Følsomme persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in sensitivePersonalData">
+                            <label>
+                                <input type="checkbox" ng-model="r.Checked"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <!-- Data on convictions -->
