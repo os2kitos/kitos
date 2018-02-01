@@ -11,7 +11,7 @@
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.organization.cvr"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="CVR-nummer" />
                 </div>
 
                 <div class="form-group">
@@ -22,7 +22,7 @@
                            class="form-control input-sm"
                            data-field="adress"
                            data-ng-model="ctrl.organization.adress"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Adresse" />
                 </div>
             </div>
             <div class="col-md-6">
@@ -34,7 +34,7 @@
                            class="form-control input-sm"
                            data-field="phone"
                            data-ng-model="ctrl.organization.phone"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Telefonnummer" />
                 </div>
 
                 <div class="form-group">
@@ -45,7 +45,7 @@
                            class="form-control input-sm"
                            data-field="email"
                            data-ng-model="ctrl.organization.email"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="E-mail" />
                 </div>
             </div>
         </div>
@@ -58,6 +58,16 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
+                    <label class="control-label small">Navn</label>
+                    <input type="text"
+                           data-ng-disabled="!ctrl.hasWriteAccess"
+                           data-autosave="{{ctrl.updatedataResponsibleUrl}}"
+                           class="form-control input-sm"
+                           data-field="name"
+                           data-ng-model="ctrl.dataResponsible.name"
+                           data-placeholder="Navn" />
+                </div>
+                <div class="form-group">
                     <label class="control-label small">CVR-nummer</label>
                     <input type="text"
                            data-ng-disabled="!ctrl.hasWriteAccess"
@@ -65,7 +75,7 @@
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.dataResponsible.cvr"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="CVR-nummer" />
                 </div>
 
                 <div class="form-group">
@@ -76,7 +86,7 @@
                            class="form-control input-sm"
                            data-field="adress"
                            data-ng-model="ctrl.dataResponsible.adress"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Adresse" />
                 </div>
             </div>
             <div class="col-md-6">
@@ -88,7 +98,7 @@
                            class="form-control input-sm"
                            data-field="phone"
                            data-ng-model="ctrl.dataResponsible.phone"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Telefonnummer" />
                 </div>
 
                 <div class="form-group">
@@ -99,7 +109,7 @@
                            class="form-control input-sm"
                            data-field="email"
                            data-ng-model="ctrl.dataResponsible.email"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="E-mail" />
                 </div>
             </div>
         </div>
@@ -113,6 +123,16 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
+                    <label class="control-label small">Navn</label>
+                    <input type="text"
+                           data-ng-disabled="!ctrl.hasWriteAccess"
+                           data-autosave="{{ctrl.updatedataProtectionAdvisorUrl}}"
+                           class="form-control input-sm"
+                           data-field="name"
+                           data-ng-model="ctrl.dataProtectionAdvisor.name"
+                           data-placeholder="Navn" />
+                </div>
+                <div class="form-group">
                     <label class="control-label small">CVR-nummer</label>
                     <input type="text"
                            data-ng-disabled="!ctrl.hasWriteAccess"
@@ -120,7 +140,7 @@
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.dataProtectionAdvisor.cvr"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="CVR-nummer" />
                 </div>
 
                 <div class="form-group">
@@ -131,7 +151,7 @@
                            class="form-control input-sm"
                            data-field="adress"
                            data-ng-model="ctrl.dataProtectionAdvisor.adress"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Adresse" />
                 </div>
             </div>
             <div class="col-md-6">
@@ -143,7 +163,7 @@
                            class="form-control input-sm"
                            data-field="phone"
                            data-ng-model="ctrl.dataProtectionAdvisor.phone"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Telefonnummer" />
                 </div>
                 <div class="form-group">
                     <label class="control-label small">E-mail</label>
@@ -153,7 +173,7 @@
                            class="form-control input-sm"
                            data-field="email"
                            data-ng-model="ctrl.dataProtectionAdvisor.email"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="E-mail" />
                 </div>
             </div>
         </div>

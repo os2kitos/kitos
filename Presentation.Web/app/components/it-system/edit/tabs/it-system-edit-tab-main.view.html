@@ -107,7 +107,8 @@
                             <select class="form-control input-sm"
                                     ui-select2="{minimumResultsForSearch: -1}"
                                     data-ng-model="system.dataLevel"
-                                    data-ng-change="submitDataLevel()">
+                                    data-ng-change="submitDataLevel()"
+                                   data-ng-disabled="!hasWriteAccess">
                                 <option value="0">Ingen persondata</option>
                                 <option value="1">Persondata</option>
                                 <option value="2">Persondata og følsomme persondata</option>
