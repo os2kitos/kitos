@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 var localRegisterTypes = _localRegisterTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
                 foreach (var p in localRegisterTypes)
                 {
-                    var data = _registerTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && s.IsEnabled);
+                    var data = _registerTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled || s.IsObligatory));
                     if (data != null)
                     {
                         result.Add(data);

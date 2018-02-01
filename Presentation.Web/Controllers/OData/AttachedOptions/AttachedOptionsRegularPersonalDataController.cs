@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             var localpersonalData = _localregularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
             foreach (var p in localpersonalData)
             {
-                var data = _regularPersonalDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && s.IsEnabled);
+                var data = _regularPersonalDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled || s.IsObligatory));
                 if (data != null)
                 {
                     result.Add(data);

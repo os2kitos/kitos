@@ -125,9 +125,7 @@
             }
 
             $scope.toggleSelection = data => {
-                console.log(data);
                 var idx = $scope.selection.indexOf(data);
-                console.log(idx);
                 // Is currently selected
                 if (idx > -1) {
                     $scope.selection.splice(idx, 1);
