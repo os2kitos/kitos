@@ -470,13 +470,9 @@
     <Compile Include="Migrations\201801241120532_register type option added.Designer.cs">
       <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802011451139_name added to dataprotectionadvisor and dataResponsible on organization.cs" />
-    <Compile Include="Migrations\201802011451139_name added to dataprotectionadvisor and dataResponsible on organization.Designer.cs">
-      <DependentUpon>201802011451139_name added to dataprotectionadvisor and dataResponsible on organization.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201802021435440_OS2KITOS_1267_entetiesAdded.cs" />
-    <Compile Include="Migrations\201802021435440_OS2KITOS_1267_entetiesAdded.Designer.cs">
-      <DependentUpon>201802021435440_OS2KITOS_1267_entetiesAdded.cs</DependentUpon>
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.cs" />
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.Designer.cs">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -716,11 +712,8 @@
     <EmbeddedResource Include="Migrations\201801241120532_register type option added.resx">
       <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802011451139_name added to dataprotectionadvisor and dataResponsible on organization.resx">
-      <DependentUpon>201802011451139_name added to dataprotectionadvisor and dataResponsible on organization.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802021435440_OS2KITOS_1267_entetiesAdded.resx">
-      <DependentUpon>201802021435440_OS2KITOS_1267_entetiesAdded.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.resx">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

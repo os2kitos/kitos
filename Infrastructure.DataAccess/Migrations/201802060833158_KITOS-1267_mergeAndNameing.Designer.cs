@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class OS2KITOS_1267_entetiesAdded : IMigrationMetadata
+    public sealed partial class KITOS1267_mergeAndNameing : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(OS2KITOS_1267_entetiesAdded));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(KITOS1267_mergeAndNameing));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802021435440_OS2KITOS_1267_entetiesAdded"; }
+            get { return "201802060833158_KITOS-1267_mergeAndNameing"; }
         }
         
         string IMigrationMetadata.Source

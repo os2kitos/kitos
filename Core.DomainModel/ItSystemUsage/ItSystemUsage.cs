@@ -337,7 +337,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int dataProcessorControl { get; set; }
 
-        public DateTime lastControl { get; set; }
+        public DateTime? lastControl { get; set; }
 
         public string note { get; set; }
 
@@ -347,7 +347,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int riskAssessment { get; set; }
 
-        public DateTime riskAssesmentDate { get; set; }
+        public DateTime? riskAssesmentDate { get; set; }
 
         public int preriskAssessment { get; set; }
 
@@ -355,11 +355,11 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int DPIAhearing { get; set; }
 
-        public DateTime DPIADate { get; set; }
+        public DateTime? DPIADate { get; set; }
 
         public int answeringDataDPIA { get; set; }
 
-        public DateTime DPIAdeleteDate { get; set; }
+        public DateTime? DPIAdeleteDate { get; set; }
 
         public int numberDPIA { get; set; }
     }
