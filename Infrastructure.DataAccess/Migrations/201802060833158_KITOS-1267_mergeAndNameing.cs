@@ -22,6 +22,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.ItSystemUsage", "answeringDataDPIA", c => c.Int(nullable: false));
             AddColumn("dbo.ItSystemUsage", "DPIAdeleteDate", c => c.DateTime(precision: 7, storeType: "datetime2"));
             AddColumn("dbo.ItSystemUsage", "numberDPIA", c => c.Int(nullable: false));
+            AddColumn("dbo.ItSystemUsage", "precautionsOptions", c => c.Int(nullable: false));
             AddColumn("dbo.DataProtectionAdvisors", "Name", c => c.String());
             AddColumn("dbo.DataResponsibles", "Name", c => c.String());
         }
@@ -30,6 +31,7 @@ namespace Infrastructure.DataAccess.Migrations
         {
             DropColumn("dbo.DataResponsibles", "Name");
             DropColumn("dbo.DataProtectionAdvisors", "Name");
+            DropColumn("dbo.ItSystemUsage", "precautionsOptions");
             DropColumn("dbo.ItSystemUsage", "numberDPIA");
             DropColumn("dbo.ItSystemUsage", "DPIAdeleteDate");
             DropColumn("dbo.ItSystemUsage", "answeringDataDPIA");

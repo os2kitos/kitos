@@ -362,5 +362,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? DPIAdeleteDate { get; set; }
 
         public int numberDPIA { get; set; }
+
+        public int precautionsOptions { get; set; }
     }
 }

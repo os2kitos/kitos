@@ -45,15 +45,15 @@
                 </div>
                 <!-- Category of data -->
                 <div class="form-group">
-                    <select-option data-id="archiveLocation"
+                    <select-option data-id="categories"
                                    data-label="Kategorier af data i systemet"
                                    data-placeholder="Vælg kategori"
                                    data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="systemUsage.ItSystemCategoriesId"
                                    data-options="systemCategories"
-                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                   data-field="ItSystemCategoriesId">
+                                   data-auto-save-url="{{updateUrl}}"
+                                   data-field="itSystemCategoriesId">
                     </select-option>
                 </div>
                 <!-- Data responsible -->
@@ -75,11 +75,20 @@
                            data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)">
                 </div>
                 <!-- Data processing agreement -->
-                <div class="form-group">
+                <div class="form-group" ng-show="filterDataProcessor">
                     <label for="dataProcessingAgreement" class="control-label small">Databehandler aftale</label>
-                    <input type="text" id="dataProcessingAgreement" class="form-control input-sm"
-                           data-ng-disabled="true"
-                           value="{{systemUsage.dataProcessingAgreement}}">
+                    <textarea data-ng-disabled="true"
+                              class="form-control input-sm"
+                              style="overflow:auto;resize:none"
+                              ng-repeat="contract in contracts">{{contract.name}}
+                    </textarea>
+                </div>
+                <div class="form-group" ng-hide="filterDataProcessor">
+                    <label for="dataProcessingAgreement" class="control-label small">Databehandler aftale</label>
+                    <textarea data-ng-disabled="true"
+                              class="form-control input-sm"
+                              style="overflow:auto;resize:none">Ingen
+                    </textarea>
                 </div>
                 <!-- Data processor control -->
                 <div class="form-group">
@@ -230,10 +239,14 @@
                                data-field="precautions">
                         <label class="control-label small" for="precautionsDunno">Ved ikke</label>
                     </div>
-                    <div ng-show="precautions == 1">
+                    <div ng-show="systemUsage.precautions == 1">
                         <label class="control-label small">Hvad består de af?</label><br>
-                        <select class="form-group">
-                            <option ng-repeat="x in persOptions">{{x}}</option>
+                        <select class="form-group"
+                                id="precautionsOptions"
+                                ng-options="option.name for option in persOptions track by option.id"
+                                ng-model="selection"
+                                ng-change="patch('precautionsOptions', selection.id)">
+                            <option value="" disabled selected>Vælg</option>
                         </select>
                     </div>
                 </div>
