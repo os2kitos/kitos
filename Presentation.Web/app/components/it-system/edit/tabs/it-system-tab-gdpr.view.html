@@ -4,14 +4,14 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="control-label small">Overordnet formål</label>
+                    <label class="control-label small">Systemets overordnede formål</label>
                     <input type="text" 
                            data-ng-disabled="!hasWriteAccess"
                            data-autosave="{{updateUrl}}" 
                            class="form-control input-sm"
                            data-field="GeneralPurpose"
                            data-ng-model="system.generalPurpose"
-                           data-placeholder="Overordnet formål"/>
+                           data-placeholder="Systemets overordnede formål"/>
                 </div>
 
                 <div class="form-group">
@@ -50,12 +50,12 @@
                            class="form-control input-sm"
                            data-field="DataIsTransferedTo"
                            data-ng-model="system.dataIsTransferedTo"
-                           data-placeholder="Overordnet formål" />
+                           data-placeholder="Hvilket land er der overført data til" />
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group"
-                     data-ng-show="system.dataLevel == 1">
+                     data-ng-show="system.dataLevel == 1 || system.dataLevel == 2">
                     <label class="control-label small">Almindelige persondata:</label>
                     <div class="well">
                         <div class="checkbox" data-ng-repeat="r in regularSensitiveData">

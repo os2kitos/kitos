@@ -28,8 +28,6 @@
             this.updateOrgUrl = 'api/Organization/' + this.organization.id;
             this.updatedataProtectionAdvisorUrl = 'api/dataProtectionAdvisor/' + this.dataProtectionAdvisor.id;
             this.updatedataResponsibleUrl = 'api/dataResponsible/' + this.dataResponsible.id;
-
-            
         }
 
     }

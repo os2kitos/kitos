@@ -44,7 +44,6 @@
         'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess', 'appTypeOptions',
         function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage,user, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
             $rootScope.page.title = 'IT System - Anvendelse';
-            console.log(itSystemUsage);
             $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
             $scope.autosaveUrl2 = 'api/itsystemusage/' + $scope.usage.id;
             $scope.usage = itSystemUsage;

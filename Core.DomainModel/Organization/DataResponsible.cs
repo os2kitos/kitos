@@ -8,6 +8,7 @@ namespace Core.DomainModel.Organization
 {
     public class DataResponsible : Entity
     {
+        public string Name { get; set; }
         public string Cvr { get; set; }
         public string Phone { get; set; }
         public string Adress { get; set; } 

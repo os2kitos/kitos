@@ -32,7 +32,6 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
-
                 if (!$scope.hasWriteAccess) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";

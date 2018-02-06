@@ -84,7 +84,7 @@
 
                 $http.patch("api/itsystem/" + theSystem.id + "?organizationId=" + theSystem.organizationId, data).success(function (result) {
 
-                    notify.addSuccessMessage("Success");
+                    notify.addSuccessMessage("Feltet er Opdateret.");
 
                 }).error(function (result) {
                     notify.addErrorMessage('Fejl!');
