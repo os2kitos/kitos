@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             if (UserId == 0)
                 return Unauthorized();
 
-            var globalOptionData = _sensitiveDataTypeRepository.AsQueryable().Where(s => s.IsEnabled || s.IsObligatory);
+            var globalOptionData = _sensitiveDataTypeRepository.AsQueryable().Where(s => s.IsEnabled || (s.IsEnabled && s.IsObligatory));
             var localpersonalData = _localSensitivePersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
 
             List<SensitivePersonalDataType> result = new List<SensitivePersonalDataType>();

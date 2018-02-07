@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 if (UserId == 0)
                     return Unauthorized();
 
-                var globalOptionData = _registerTypeRepository.AsQueryable().Where(s => s.IsEnabled || s.IsObligatory);
+                var globalOptionData = _registerTypeRepository.AsQueryable().Where(s => s.IsEnabled || (s.IsEnabled && s.IsObligatory));
                 var localRegisterTypes = _localRegisterTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
 
                 List<RegisterType> result = new List<RegisterType>();
