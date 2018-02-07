@@ -474,6 +474,10 @@
     <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.Designer.cs">
       <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802070853146_Merge_issue.cs" />
+    <Compile Include="Migrations\201802070853146_Merge_issue.Designer.cs">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -714,6 +718,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.resx">
       <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802070853146_Merge_issue.resx">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

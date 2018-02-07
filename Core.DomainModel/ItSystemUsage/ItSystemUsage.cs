@@ -339,7 +339,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public DateTime? lastControl { get; set; }
 
-        public string note { get; set; }
+        public string noteUsage { get; set; }
 
         public int convictionsData { get; set; }
 
