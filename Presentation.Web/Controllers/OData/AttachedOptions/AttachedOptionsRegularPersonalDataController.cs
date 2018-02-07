@@ -40,12 +40,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             if (UserId == 0)
                 return Unauthorized();
 
-            List<RegularPersonalDataType> result = new List<RegularPersonalDataType>();
-
+            var globalOptionData = _regularPersonalDataTypeRepository.AsQueryable().Where(s => s.IsEnabled || s.IsObligatory);
             var localpersonalData = _localregularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
+
+            List<RegularPersonalDataType> result = new List<RegularPersonalDataType>();
+            result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));
+
             foreach (var p in localpersonalData)
             {
-                var data = _regularPersonalDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled || s.IsObligatory));
+                var data = globalOptionData.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled && !s.IsObligatory));
                 if (data != null)
                 {
                     result.Add(data);

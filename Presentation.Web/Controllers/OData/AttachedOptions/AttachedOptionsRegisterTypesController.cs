@@ -44,12 +44,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 if (UserId == 0)
                     return Unauthorized();
 
-                List<RegisterType> result = new List<RegisterType>();
-
+                var globalOptionData = _registerTypeRepository.AsQueryable().Where(s => s.IsEnabled || s.IsObligatory);
                 var localRegisterTypes = _localRegisterTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
+
+                List<RegisterType> result = new List<RegisterType>();
+                result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));    
+
                 foreach (var p in localRegisterTypes)
                 {
-                    var data = _registerTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled || s.IsObligatory));
+                    var data = globalOptionData.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled && !s.IsObligatory));
                     if (data != null)
                     {
                         result.Add(data);

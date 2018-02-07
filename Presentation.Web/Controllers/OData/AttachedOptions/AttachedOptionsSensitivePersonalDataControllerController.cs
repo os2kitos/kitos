@@ -42,13 +42,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             if (UserId == 0)
                 return Unauthorized();
 
+            var globalOptionData = _sensitiveDataTypeRepository.AsQueryable().Where(s => s.IsEnabled || s.IsObligatory);
             var localpersonalData = _localSensitivePersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
 
             List<SensitivePersonalDataType> result = new List<SensitivePersonalDataType>();
+            result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));
 
             foreach (var p in localpersonalData)
             {
-                var data = _sensitiveDataTypeRepository.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled || s.IsObligatory));
+                var data = globalOptionData.AsQueryable().FirstOrDefault(s => s.Id == p.OptionId && (s.IsEnabled && !s.IsObligatory));
                 if (data != null)
                 {
                     result.Add(data);
