@@ -330,5 +330,39 @@ namespace Core.DomainModel.ItSystemUsage
         public DataOptions ContainsLegalInfo { get; set; }
         public DataSensitivityLevel DataLevel { get; set; }
         public UserCount UserCount { get; set; }
+
+        public string systemCategories { get; set; }
+
+        public string dataProcessor { get; set; }
+
+        public int dataProcessorControl { get; set; }
+
+        public DateTime? lastControl { get; set; }
+
+        public string note { get; set; }
+
+        public int convictionsData { get; set; }
+
+        public int precautions { get; set; }
+
+        public int riskAssessment { get; set; }
+
+        public DateTime? riskAssesmentDate { get; set; }
+
+        public int preriskAssessment { get; set; }
+
+        public string noteRisks { get; set; }
+
+        public int DPIAhearing { get; set; }
+
+        public DateTime? DPIADate { get; set; }
+
+        public int answeringDataDPIA { get; set; }
+
+        public DateTime? DPIAdeleteDate { get; set; }
+
+        public int numberDPIA { get; set; }
+
+        public int precautionsOptions { get; set; }
     }
 }

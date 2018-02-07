@@ -9,10 +9,10 @@
                     <label class="control-label small">Overordnet formål</label>
                     <input type="text"
                            data-ng-disabled="!hasWriteAccess"
-                           data-autosave="{{updateUrl}}"
+                           data-ng-blur="patch('GeneralPurpose', systemUsage.GeneralPurpose)"
                            class="form-control input-sm"
                            data-field="GeneralPurpose"
-                           data-ng-model="generalPurpose"
+                           data-ng-model="systemUsage.GeneralPurpose"
                            data-placeholder="Overordnet formål" />
                 </div>
 
@@ -43,19 +43,17 @@
                         <option value="2">Ved Ikke</option>
                     </select>
                 </div>
-
-                //** Dummy data herfra og ned **\\
                 <!-- Category of data -->
                 <div class="form-group">
-                    <select-option data-id="category"
+                    <select-option data-id="categories"
                                    data-label="Kategorier af data i systemet"
                                    data-placeholder="Vælg kategori"
-                                   data-selected-text="{{ systemCategories }}"
+                                   data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemCategories.Id"
+                                   data-ng-model="systemUsage.ItSystemCategoriesId"
                                    data-options="systemCategories"
-                                   data-auto-save-url=""
-                                   data-field="systemCategories">
+                                   data-auto-save-url="{{updateUrl}}"
+                                   data-field="itSystemCategoriesId">
                     </select-option>
                 </div>
                 <!-- Data responsible -->
@@ -71,23 +69,32 @@
                 <div class="form-group">
                     <label for="dataProcessor" class="control-label small">Dataansvarlig for system</label>
                     <input id="dataProcessor" type="text" class="form-control input-sm"
-                           data-ng-model="dataProcessor"
+                           data-ng-model="systemUsage.dataProcessor"
                            data-ng-disabled="!hasWriteAccess"
                            data-field="dataProcessor"
-                           data-autosave="api/itSystemUsage/{{usageId}}">
+                           data-ng-blur="patch('dataProcessor', systemUsage.dataProcessor)">
                 </div>
                 <!-- Data processing agreement -->
-                <div class="form-group">
+                <div class="form-group" ng-show="filterDataProcessor">
                     <label for="dataProcessingAgreement" class="control-label small">Databehandler aftale</label>
-                    <input type="text" id="dataProcessingAgreement" class="form-control input-sm"
-                           data-ng-disabled="true"
-                           value="{{dataProcessingAgreement}}">
+                    <textarea data-ng-disabled="true"
+                              class="form-control input-sm"
+                              style="overflow:auto;resize:none"
+                              ng-repeat="contract in contracts">{{contract.name}}
+                    </textarea>
+                </div>
+                <div class="form-group" ng-hide="filterDataProcessor">
+                    <label for="dataProcessingAgreement" class="control-label small">Databehandler aftale</label>
+                    <textarea data-ng-disabled="true"
+                              class="form-control input-sm"
+                              style="overflow:auto;resize:none">Ingen
+                    </textarea>
                 </div>
                 <!-- Data processor control -->
                 <div class="form-group">
                     <label class="control-label small">Tilsyn/kontrol af databehandleren</label><br>
                     <input type="radio" id="dataProcessorControlYes"
-                           data-ng-model="dataProcessorControl"
+                           data-ng-model="systemUsage.dataProcessorControl"
                            ng-value="1"
                            data-ng-disabled="!hasWriteAccess"
                            ng-click="patch('dataProcessorControl', 1)"
@@ -95,7 +102,7 @@
                     <label class="control-label small" for="dataProcessorControlYes">Ja</label>
                     &nbsp;
                     <input type="radio" id="dataProcessorControlNo"
-                           data-ng-model="dataProcessorControl"
+                           data-ng-model="systemUsage.dataProcessorControl"
                            ng-value="0"
                            data-ng-disabled="!hasWriteAccess"
                            ng-click="patch('dataProcessorControl', 0)"
@@ -103,14 +110,14 @@
                     <label class="control-label small" for="dataProcessorControlNo">Nej</label>
                     &nbsp;
                     <input type="radio" id="dataProcessorControlDunno"
-                           data-ng-model="dataProcessorControl"
+                           data-ng-model="systemUsage.dataProcessorControl"
                            ng-value="2"
                            data-ng-disabled="!hasWriteAccess"
                            ng-click="patch('dataProcessorControl', 2)"
                            data-field="dataProcessorControl">
                     <label class="control-label small" for="dataProcessorControlDunno">Ved ikke</label>
                 </div>
-                <div ng-show="dataProcessorControl == 1">
+                <div ng-show="systemUsage.dataProcessorControl == 1">
                     <!-- Date of last control of the data processor -->
                     <div class="form-group">
                         <label for="lastControl" class="control-label small">Dato for seneste tilsyn/kontrol</label>
@@ -118,8 +125,8 @@
                                data-kendo-date-picker
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="lastControl"
-                               ng-blur="patchDate('lastControl', lastControl)"
+                               data-ng-model="systemUsage.lastControl"
+                               ng-blur="patchDate('lastControl', systemUsage.lastControl)"
                                data-field="lastControl">
                         <span id="helpBlock" class="help-block small">Eksempelvis "2017-04-25"</span>
                     </div>
@@ -129,283 +136,288 @@
                     <label for="note" class="control-label small">Bemærkninger</label>
                     <textarea id="note" class="form-control input-sm" rows="5"
                               data-ng-disabled="!hasWriteAccess"
-                              data-ng-model="note"
-                              ng-blur="patch('note', note)"
+                              data-ng-model="systemUsage.note"
+                              ng-blur="patch('note', systemUsage.note)"
                               data-field="note"></textarea>
                 </div>
             </div>
             <!-- 2nd column -->
             <div class="col-xs-6">
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label small">Hvilke kategorier af registrerede indgår i databehandlingen?</label>
-                        <div class="well">
-                            <div class="checkbox" data-ng-repeat="r in registerTypes">
-                                <label>
-                                    <input type="checkbox" ng-model="r.Checked"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           ng-click="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    //** Dummy data herfra og ned **\\
-                    <!-- Catagory of data -->
-                    <div class="form-group"
-                         data-ng-show="system.dataLevel == 1">
-                        <label class="control-label small">Almindelige persondata:</label>
-                        <div class="well">
-                            <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
-                                <label>
-                                    <input type="checkbox" ng-model="r.Checked"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           ng-click="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group"
-                         data-ng-show="system.dataLevel == 2">
-                        <label class="control-label small">Følsomme persondata:</label>
-                        <div class="well">
-                            <div class="checkbox" data-ng-repeat="r in sensitivePersonalData">
-                                <label>
-                                    <input type="checkbox" ng-model="r.Checked"
-                                           data-ng-disabled="!hasWriteAccess"
-                                           ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Data on convictions -->
-                    <div class="form-group">
-                        <label class="control-label small">Oplysninger om straffedomme og lovovertrædelser</label><br>
-                        <input type="radio" id="convictionsDataYes"
-                               data-ng-model="convictionsData"
-                               ng-value="1"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('convictionsData', 1)"
-                               data-field="convictionsData">
-                        <label class="control-label small" for="convictionsDataYes">Ja</label>
-                        &nbsp;
-                        <input type="radio" id="convictionsDataNo"
-                               data-ng-model="convictionsData"
-                               ng-value="0"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('convictionsData', 0)"
-                               data-field="convictionsData">
-                        <label class="control-label small" for="convictionsDataNo">Nej</label>
-                        &nbsp;
-                        <input type="radio" id="convictionsDataDunno"
-                               data-ng-model="convictionsData"
-                               ng-value="2"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('convictionsData', 2)"
-                               data-field="convictionsData">
-                        <label class="control-label small" for="convictionsDataDunno">Ved ikke</label>
-                    </div>
-                    <div ng-show="convictionsData == 1 || selection.length > 0">
-                        <!-- Implemented technical precautions -->
-                        <div class="form-group">
-                            <label class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
-                            <input type="radio" id="precautionsYes"
-                                   data-ng-model="precautions"
-                                   ng-value="1"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('precautions', 1)"
-                                   data-field="precautions">
-                            <label class="control-label small" for="precautionsYes">Ja</label>
-                            &nbsp;
-                            <input type="radio" id="precautionsNo"
-                                   data-ng-model="precautions"
-                                   ng-value="0"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('precautions', 0)"
-                                   data-field="precautions">
-                            <label class="control-label small" for="precautionsNo">Nej</label>
-                            &nbsp;
-                            <input type="radio" id="precautionsDunno"
-                                   data-ng-model="precautions"
-                                   ng-value="2"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('precautions', 2)"
-                                   data-field="precautions">
-                            <label class="control-label small" for="precautionsDunno">Ved ikke</label>
-                        </div>
-                        <div ng-show="precautions == 1">
-                            <label class="control-label small">Hvad består de af?</label><br>
-                            <select class="form-group">
-                                <option ng-repeat="x in persOptions">{{x}}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- Risk assessment -->
-                    <div class="form-group">
-                        <label class="control-label small">Foretaget risikovurdering</label><br>
-                        <input type="radio" id="riskAssessmentYes"
-                               data-ng-model="riskAssessment"
-                               ng-value="1"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('riskAssessment', 1)"
-                               data-field="riskAssessment">
-                        <label class="control-label small" for="riskAssessmentYes">Ja</label>
-                        &nbsp;
-                        <input type="radio" id="riskAssessmentNo"
-                               data-ng-model="riskAssessment"
-                               ng-value="0"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('riskAssessment', 0)"
-                               data-field="riskAssessment">
-                        <label class="control-label small" for="riskAssessmentNo">Nej</label>
-                        &nbsp;
-                        <input type="radio" id="riskAssessmentDunno"
-                               data-ng-model="riskAssessment"
-                               ng-value="2"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('riskAssessment', 2)"
-                               data-field="riskAssessment">
-                        <label class="control-label small" for="riskAssessmentDunno">Ved ikke</label>
-                    </div>
-                    <div ng-show="riskAssessment == 1">
-                        <!-- Date of last risk assesment -->
-                        <div class="form-group">
-                            <label for="riskAssesmentDate" class="control-label small">Dato for seneste risikovurdering</label>
-                            <input type="text" id="riskAssesmentDate" class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="riskAssesmentDate"
-                                   ng-blur="patchDate('riskAssesmentDate', riskAssesmentDate)"
-                                   data-field="riskAssesmentDate">
-                            <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
-                        </div>
-                        <!-- Previous risk assessment -->
-                        <div class="form-group">
-                            <label class="control-label small">Hvad viste den seneste risikovurdering?</label><br>
-                            <input type="radio" id="preriskAssessmentYes"
-                                   data-ng-model="preriskAssessment"
-                                   ng-value="1"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('preriskAssessment', 0)"
-                                   data-field="preriskAssessment">
-                            <label class="control-label small" for="preriskAssessmentYes">Lav risiko</label>
-                            &nbsp;
-                            <input type="radio" id="preriskAssessmentNo"
-                                   data-ng-model="preriskAssessment"
-                                   ng-value="0"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('preriskAssessment', 1)"
-                                   data-field="preriskAssessment">
-                            <label class="control-label small" for="preriskAssessmentNo">Mellem risiko</label>
-                            &nbsp;
-                            <input type="radio" id="preriskAssessmentDunno"
-                                   data-ng-model="preriskAssessment"
-                                   ng-value="2"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('preriskAssessment', 2)"
-                                   data-field="preriskAssessment">
-                            <label class="control-label small" for="preriskAssessmentDunno">Høj risiko</label>
-                        </div>
-                        <!-- Notes risk -->
-                        <div class="form-group">
-                            <label for="noteRisks" class="control-label small">Bemærkninger</label>
-                            <textarea id="noteRisks" class="form-control input-sm" rows="5"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-ng-model="noteRisks"
-                                      ng-blur="patch('noteRisks', noteRisks)"
-                                      data-field="noteRisks"></textarea>
-                        </div>
-                    </div>
-                    <div ng-show="preriskAssessment == 2">
-                        <!-- DPIA hearing -->
-                        <div class="form-group">
-                            <label class="control-label small">Er der foretaget en høring hos Datatilsynet?</label><br>
-                            <input type="radio" id="DPIAhearingYes"
-                                   data-ng-model="DPIAhearing"
-                                   ng-value="1"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('DPIAhearing', 1)"
-                                   data-field="DPIAhearing">
-                            <label class="control-label small" for="DPIAhearingYes">Ja</label>
-                            &nbsp;
-                            <input type="radio" id="DPIAhearingNo"
-                                   data-ng-model="DPIAhearing"
-                                   ng-value="0"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('DPIAhearing', 0)"
-                                   data-field="DPIAhearing">
-                            <label class="control-label small" for="DPIAhearingNo">Nej</label>
-                            &nbsp;
-                            <input type="radio" id="DPIAhearingDunno"
-                                   data-ng-model="DPIAhearing"
-                                   ng-value="2"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('DPIAhearing', 2)"
-                                   data-field="DPIAhearing">
-                            <label class="control-label small" for="DPIAhearingDunno">Ved ikke</label>
-                        </div>
-                        <div ng-show="DPIAhearing == 1">
-                            <!-- Date of DPIA -->
-                            <div class="form-group">
-                                <label for="DPIADate" class="control-label small">Dato for høring</label>
-                                <input type="text" id="DPIADate" class="form-control"
-                                       data-kendo-date-picker
-                                       data-k-options="datepickerOptions"
+                <div class="form-group">
+                    <label class="control-label small">Hvilke kategorier af registrerede indgår i databehandlingen?</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in registerTypes">
+                            <label>
+                                <input type="checkbox" ng-model="r.Checked"
                                        data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="DPIADate"
-                                       ng-blur="patchDate('DPIADate', DPIADate)"
-                                       data-field="DPIADate">
-                                <span id="helpBlockDPIA" class="help-block small">Eksempelvis "2017-04-25"</span>
-                            </div>
-                            <!-- Answering data DPIA -->
-                            <div class="form-group">
-                                <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
-                                <input type="radio" id="answeringDataDPIAYes"
-                                       data-ng-model="answeringDataDPIA"
-                                       ng-value="1"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="patch('answeringDataDPIA', 1)"
-                                       data-field="answeringDataDPIA">
-                                <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
-                                &nbsp;
-                                <input type="radio" id="answeringDataDPIANo"
-                                       data-ng-model="answeringDataDPIA"
-                                       ng-value="0"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="patch('answeringDataDPIA', 0)"
-                                       data-field="answeringDataDPIA">
-                                <label class="control-label small" for="answeringDataDPIANo">Nej</label>
-                                &nbsp;
-                                <input type="radio" id="answeringDataDPIADunno"
-                                       data-ng-model="answeringDataDPIA"
-                                       ng-value="2"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       ng-click="patch('answeringDataDPIA', 2)"
-                                       data-field="answeringDataDPIA">
-                                <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
-                            </div>
-                            <!-- Date of next delete of data DPIA -->
-                            <div class="form-group">
-                                <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>
-                                <input type="text" id="DPIAdeleteDate" class="form-control"
-                                       data-kendo-date-picker
-                                       data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="DPIAdeleteDate"
-                                       ng-blur="patchDate('DPIAdeleteDate', DPIAdeleteDate)"
-                                       data-field="DPIAdeleteDate">
-                                <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "2017-04-25"</span>
-                            </div>
-                            <div class="form-group">
-                                <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
-                                <input id="numberDPIA" type="number" class="form-control">
-                            </div>
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGISTERTYPEDATA')">{{r.Name}}
+                            </label>
                         </div>
                     </div>
                 </div>
+
+                <!-- Catagory of data -->
+                <div class="form-group"
+                     data-ng-show="systemUsage.dataLevel == 1">
+                    <label class="control-label small">Almindelige persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in regularSensitiveData">
+                            <label>
+                                <input type="checkbox" ng-model="r.Checked"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'REGULARPERSONALDATA')">{{r.Name}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group"
+                     data-ng-show="systemUsage.dataLevel == 2">
+                    <label class="control-label small">Følsomme persondata:</label>
+                    <div class="well">
+                        <div class="checkbox" data-ng-repeat="r in sensitivePersonalData">
+                            <label>
+                                <input type="checkbox" ng-model="r.Checked"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       ng-click="updateDataLevel(r.Id, r.Checked, 'SENSITIVEPERSONALDATA')">{{r.Name}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <!-- Data on convictions -->
+                <div class="form-group">
+                    <label class="control-label small">Oplysninger om straffedomme og lovovertrædelser</label><br>
+                    <input type="radio" id="convictionsDataYes"
+                           data-ng-model="systemUsage.convictionsData"
+                           ng-value="1"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('convictionsData', 1)"
+                           data-field="convictionsData">
+                    <label class="control-label small" for="convictionsDataYes">Ja</label>
+                    &nbsp;
+                    <input type="radio" id="convictionsDataNo"
+                           data-ng-model="systemUsage.convictionsData"
+                           ng-value="0"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('convictionsData', 0)"
+                           data-field="convictionsData">
+                    <label class="control-label small" for="convictionsDataNo">Nej</label>
+                    &nbsp;
+                    <input type="radio" id="convictionsDataDunno"
+                           data-ng-model="systemUsage.convictionsData"
+                           ng-value="2"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('convictionsData', 2)"
+                           data-field="convictionsData">
+                    <label class="control-label small" for="convictionsDataDunno">Ved ikke</label>
+                </div>
+                <div ng-show="systemUsage.convictionsData == 1 || selection.length > 0">
+                    <!-- Implemented technical precautions -->
+                    <div class="form-group">
+                        <label class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
+                        <input type="radio" id="precautionsYes"
+                               data-ng-model="systemUsage.precautions"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('precautions', 1)"
+                               data-field="precautions">
+                        <label class="control-label small" for="precautionsYes">Ja</label>
+                        &nbsp;
+                        <input type="radio" id="precautionsNo"
+                               data-ng-model="systemUsage.precautions"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('precautions', 0)"
+                               data-field="precautions">
+                        <label class="control-label small" for="precautionsNo">Nej</label>
+                        &nbsp;
+                        <input type="radio" id="precautionsDunno"
+                               data-ng-model="systemUsage.precautions"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('precautions', 2)"
+                               data-field="precautions">
+                        <label class="control-label small" for="precautionsDunno">Ved ikke</label>
+                    </div>
+                    <div ng-show="systemUsage.precautions == 1">
+                        <label class="control-label small">Hvad består de af?</label><br>
+                        <select class="form-group"
+                                id="precautionsOptions"
+                                ng-options="option.name for option in persOptions track by option.id"
+                                ng-model="selection"
+                                ng-change="patch('precautionsOptions', selection.id)">
+                            <option value="" disabled selected>Vælg</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Risk assessment -->
+                <div class="form-group">
+                    <label class="control-label small">Foretaget risikovurdering</label><br>
+                    <input type="radio" id="riskAssessmentYes"
+                           data-ng-model="systemUsage.riskAssessment"
+                           ng-value="1"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('riskAssessment', 1)"
+                           data-field="riskAssessment">
+                    <label class="control-label small" for="riskAssessmentYes">Ja</label>
+                    &nbsp;
+                    <input type="radio" id="riskAssessmentNo"
+                           data-ng-model="systemUsage.riskAssessment"
+                           ng-value="0"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('riskAssessment', 0)"
+                           data-field="riskAssessment">
+                    <label class="control-label small" for="riskAssessmentNo">Nej</label>
+                    &nbsp;
+                    <input type="radio" id="riskAssessmentDunno"
+                           data-ng-model="systemUsage.riskAssessment"
+                           ng-value="2"
+                           data-ng-disabled="!hasWriteAccess"
+                           ng-click="patch('riskAssessment', 2)"
+                           data-field="riskAssessment">
+                    <label class="control-label small" for="riskAssessmentDunno">Ved ikke</label>
+                </div>
+                <div ng-show="systemUsage.riskAssessment == 1">
+                    <!-- Date of last risk assesment -->
+                    <div class="form-group">
+                        <label for="riskAssesmentDate" class="control-label small">Dato for seneste risikovurdering</label>
+                        <input type="text" id="riskAssesmentDate" class="form-control"
+                               data-kendo-date-picker
+                               data-k-options="datepickerOptions"
+                               data-ng-disabled="!hasWriteAccess"
+                               data-ng-model="systemUsage.riskAssesmentDate"
+                               ng-blur="patchDate('riskAssesmentDate', systemUsage.riskAssesmentDate)"
+                               data-field="riskAssesmentDate">
+                        <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
+                    </div>
+                    <!-- Previous risk assessment -->
+                    <div class="form-group">
+                        <label class="control-label small">Hvad viste den seneste risikovurdering?</label><br>
+                        <input type="radio" id="preriskAssessmentYes"
+                               data-ng-model="systemUsage.preriskAssessment"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('preriskAssessment', 0)"
+                               data-field="preriskAssessment">
+                        <label class="control-label small" for="preriskAssessmentYes">Lav risiko</label>
+                        &nbsp;
+                        <input type="radio" id="preriskAssessmentNo"
+                               data-ng-model="systemUsage.preriskAssessment"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('preriskAssessment', 1)"
+                               data-field="preriskAssessment">
+                        <label class="control-label small" for="preriskAssessmentNo">Mellem risiko</label>
+                        &nbsp;
+                        <input type="radio" id="preriskAssessmentDunno"
+                               data-ng-model="systemUsage.preriskAssessment"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('preriskAssessment', 2)"
+                               data-field="preriskAssessment">
+                        <label class="control-label small" for="preriskAssessmentDunno">Høj risiko</label>
+                    </div>
+                    <!-- Notes risk -->
+                    <div class="form-group">
+                        <label for="noteRisks" class="control-label small">Bemærkninger</label>
+                        <textarea id="noteRisks" class="form-control input-sm" rows="5"
+                                  data-ng-disabled="!hasWriteAccess"
+                                  data-ng-model="systemUsage.noteRisks"
+                                  ng-blur="patch('noteRisks', systemUsage.noteRisks)"
+                                  data-field="noteRisks"></textarea>
+                    </div>
+                </div>
+                <div ng-show="systemUsage.preriskAssessment == 2">
+                    <!-- DPIA hearing -->
+                    <div class="form-group">
+                        <label class="control-label small">Er der foretaget en høring hos Datatilsynet?</label><br>
+                        <input type="radio" id="DPIAhearingYes"
+                               data-ng-model="systemUsage.DPIAhearing"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIAhearing', 1)"
+                               data-field="DPIAhearing">
+                        <label class="control-label small" for="DPIAhearingYes">Ja</label>
+                        &nbsp;
+                        <input type="radio" id="DPIAhearingNo"
+                               data-ng-model="systemUsage.DPIAhearing"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIAhearing', 0)"
+                               data-field="DPIAhearing">
+                        <label class="control-label small" for="DPIAhearingNo">Nej</label>
+                        &nbsp;
+                        <input type="radio" id="DPIAhearingDunno"
+                               data-ng-model="systemUsage.DPIAhearing"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIAhearing', 2)"
+                               data-field="DPIAhearing">
+                        <label class="control-label small" for="DPIAhearingDunno">Ved ikke</label>
+                    </div>
+                    <div ng-show="systemUsage.DPIAhearing == 1">
+                        <!-- Date of DPIA -->
+                        <div class="form-group">
+                            <label for="DPIADate" class="control-label small">Dato for høring</label>
+                            <input type="text" id="DPIADate" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="systemUsage.DPIADate"
+                                   ng-blur="patchDate('DPIADate', systemUsage.DPIADate)"
+                                   data-field="DPIADate">
+                            <span id="helpBlockDPIA" class="help-block small">Eksempelvis "2017-04-25"</span>
+                        </div>
+                        <!-- Answering data DPIA -->
+                        <div class="form-group">
+                            <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
+                            <input type="radio" id="answeringDataDPIAYes"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="1"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('answeringDataDPIA', 1)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
+                            &nbsp;
+                            <input type="radio" id="answeringDataDPIANo"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="0"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('answeringDataDPIA', 0)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIANo">Nej</label>
+                            &nbsp;
+                            <input type="radio" id="answeringDataDPIADunno"
+                                   data-ng-model="systemUsage.answeringDataDPIA"
+                                   ng-value="2"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('answeringDataDPIA', 2)"
+                                   data-field="answeringDataDPIA">
+                            <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
+                        </div>
+                        <!-- Date of next delete of data DPIA -->
+                        <div class="form-group">
+                            <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>
+                            <input type="text" id="DPIAdeleteDate" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="systemUsage.DPIAdeleteDate"
+                                   ng-blur="patchDate('DPIAdeleteDate', systemUsage.DPIAdeleteDate)"
+                                   data-field="DPIAdeleteDate">
+                            <span id="helpBlockDeleteDPIA" class="help-block small">Eksempelvis "2017-04-25"</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="numberDPIA" class="control-label small">Antal måneder mellem sletningsdatoerne - sletningsperioder.</label>
+                            <input type="number" step="1" min="0" class="form-control input-sm"
+                                   ng-change="patch('numberDPIA', systemUsage.numberDPIA)"
+                                   data-field="numberDPIA"
+                                   data-ng-model="systemUsage.numberDPIA"
+                                   data-ng-disabled="!hasWriteAccess" />
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
