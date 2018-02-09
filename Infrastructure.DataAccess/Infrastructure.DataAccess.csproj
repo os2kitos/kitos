@@ -109,6 +109,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
     <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
@@ -478,6 +479,10 @@
     <Compile Include="Migrations\201802070853146_Merge_issue.Designer.cs">
       <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.cs" />
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.Designer.cs">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -721,6 +726,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802070853146_Merge_issue.resx">
       <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802090900414_databehandlere added to itsystemusage.resx">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

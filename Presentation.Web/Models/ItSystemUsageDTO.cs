@@ -2,11 +2,15 @@
 
 namespace Presentation.Web.Models
 {
+    using Core.DomainModel.ItSystem;
     using Core.DomainModel.ItSystem.DataTypes;
     using System;
 
     public class ItSystemUsageDTO
     {
+        public ItSystemUsageDTO(){
+            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelationDTO>();
+        }
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
@@ -84,5 +88,6 @@ namespace Presentation.Web.Models
         public UserCount UserCount { get; set; }
 
         public DataOptions ContainsLegalInfo { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
     }
 }
