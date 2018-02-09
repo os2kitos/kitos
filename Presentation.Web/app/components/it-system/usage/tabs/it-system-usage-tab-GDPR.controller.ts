@@ -35,8 +35,8 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData",
-            ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData) => {
+            "$scope", "$http", "$state", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData","user",
+            ($scope, $http, $state, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData,user) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
@@ -49,6 +49,7 @@
             }
 
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
+            $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
 
 
@@ -128,6 +129,85 @@
                 else {
                     $scope.selection.push(data);
                 }
+            };
+
+            $scope.delete = function (dataworkerId) {
+                $http.delete("api/UsageDataWorker/" + dataworkerId + "?organizationid=" + $scope.usage.organizationId)
+                    .success(function () {
+                        notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
+                        reload();
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
+                    });
+            };
+            function selectLazyLoading(url, excludeSelf, paramAry) {
+                return {
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    placeholder: ' ',
+                    initSelection: function (elem, callback) {
+                    },
+                    ajax: {
+                        data: function (term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function (queryParams) {
+                            var extraParams = paramAry ? '&' + paramAry.join('&') : '';
+                            var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                            res.abort = function () {
+                                return null;
+                            };
+
+                            return res;
+                        },
+
+                        results: function (data, page) {
+                            var results = [];
+
+                            _.each(data.data.response, function (obj: { id; name; cvr; }) {
+                                if (excludeSelf && obj.id == itSystemUsage.id)
+                                    return; // don't add self to result
+
+                                results.push({
+                                    id: obj.id,
+                                    text: obj.name ? obj.name : 'Unavngiven',
+                                    cvr: obj.cvr
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
+            }
+
+            function reload() {
+                return $state.transitionTo($state.current, $stateParams, {
+                    reload: true
+                }).then(function () {
+                    $scope.hideContent = true;
+                    return $timeout(function () {
+                        return $scope.hideContent = false;
+                    }, 1);
+                });
+            }
+            $scope.save = function () {
+
+                var data = {
+                    ItSystemUsageId: $scope.usage.id,
+                    DataWorkerId: $scope.selectedDataWorker.id
+                }
+
+                $http.post("api/UsageDataworker/", data)
+                    .success(function () {
+                        notify.addSuccessMessage("Projektet er tilknyttet.");
+                        reload();
+                    })
+                    .error(function () {
+                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte projektet!");
+                    });
             };
 
             $scope.datepickerOptions = {

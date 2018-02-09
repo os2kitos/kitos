@@ -295,6 +295,7 @@
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\ArchiveLocationController.cs" />
+    <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
     <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
@@ -464,6 +465,7 @@
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />

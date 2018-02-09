@@ -32,9 +32,8 @@ namespace Core.ApplicationServices
             usage.LastChangedByUser = objectOwner;
             usage.DataLevel = ItSystemUsage.DataLevel;
             usage.ContainsLegalInfo = ItSystemUsage.ContainsLegalInfo;
-
+            usage.AssociatedDataWorkers = ItSystemUsage.AssociatedDataWorkers;
             _usageRepository.Insert(usage);
-
             _usageRepository.Save(); // abuse this as UoW
             return usage;
         }

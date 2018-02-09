@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core.DomainModel.Organization
 {
-    public class DataResponsible : Entity
+    public class DataResponsible : Entity, IOrganizationModule
     {
         public string Name { get; set; }
         public string Cvr { get; set; }

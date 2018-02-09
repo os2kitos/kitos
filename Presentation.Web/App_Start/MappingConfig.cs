@@ -43,6 +43,11 @@ namespace Presentation.Web
             Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
                   .ReverseMap();
 
+            Mapper.CreateMap<ItSystemUsageDataWorkerRelation, ItSystemUsageDataWorkerRelationDTO>()
+                  .ForMember(dest => dest.DataWorkerName, opt => opt.MapFrom(src => src.DataWorker.Name))
+                  .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
+                  .ReverseMap();
+            
             Mapper.CreateMap<AgreementElementType, OptionDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore());

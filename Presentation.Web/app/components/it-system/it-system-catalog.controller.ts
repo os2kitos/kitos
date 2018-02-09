@@ -94,7 +94,7 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
             this.canCreate = !this.user.isReadOnly;
             // catalog grid
             this.mainGridOptions = {
@@ -721,7 +721,8 @@
                 itSystemId: dataItem.Id,
                 organizationId: this.user.currentOrganizationId,
                 dataLevel: dataItem.DataLevel,
-                containsLegalInfo: dataItem.ContainsLegalInfo
+                containsLegalInfo: dataItem.ContainsLegalInfo,
+                AssociatedDataWorkers: dataItem.AssociatedDataWorkers
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));

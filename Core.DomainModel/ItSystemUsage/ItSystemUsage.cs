@@ -30,6 +30,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
+            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
         }
 
         public bool IsActive
@@ -377,5 +378,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int numberDPIA { get; set; }
 
         public int precautionsOptions { get; set; }
+
+        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
     }
 }
