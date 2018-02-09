@@ -202,11 +202,11 @@
 
                 $http.post("api/UsageDataworker/", data)
                     .success(function () {
-                        notify.addSuccessMessage("Projektet er tilknyttet.");
+                        notify.addSuccessMessage("Databehandleren er tilknyttet.");
                         reload();
                     })
                     .error(function () {
-                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte projektet!");
+                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
                     });
             };
 
