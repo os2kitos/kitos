@@ -14,16 +14,18 @@
                     $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                     .then(result => result.data)
                 ],
-                regularSensitiveData: [
-                    '$http', '$stateParams', ($http, $stateParams) =>
-                    $http.get(`odata/GetRegularPersonalDataByObjectID(id=${$stateParams.id})`)
-                    .then(result => result.data.value)
-                ],
-                sensitivePersonalData: [
-                    '$http', '$stateParams', ($http, $stateParams) =>
-                    $http.get(`odata/GetSensitivePersonalDataByObjectID(id=${$stateParams.id})`)
-                    .then(result => result.data.value)
-                ],
+                regularSensitiveData: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ")")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
+                sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ")")
+                        .then(function (result) {
+                            return result.data.value;
+                        });
+                }],
                 registerTypes: [
                     '$http', '$stateParams', ($http, $stateParams) =>
                     $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)

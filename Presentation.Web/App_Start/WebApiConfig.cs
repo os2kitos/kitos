@@ -482,7 +482,7 @@ namespace Presentation.Web
             
             var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
             GetRegularPersonalDataByObjectID.Parameter<int>("id");
-             GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
+            GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
             var GetRegisterTypeByObjectID = builder.Function("GetRegisterTypesByObjectID");

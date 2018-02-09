@@ -48,7 +48,8 @@
                     var data = {
                         ObjectId: theSystem.id,
                         OptionId: OptionId,
-                        OptionType: optionType
+                        OptionType: optionType,
+                        ObjectType: 'ITSYSTEM'
                     };
 
                     $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(function (result) {

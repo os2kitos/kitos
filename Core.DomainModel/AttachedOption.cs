@@ -9,6 +9,7 @@ namespace Core.DomainModel
     public class AttachedOption : Entity { 
 
         public int ObjectId { get; set; }
+        public EntityType ObjectType { get; set; }
         public int OptionId { get; set; }
         public OptionType OptionType { get; set; }
     }
@@ -18,5 +19,10 @@ namespace Core.DomainModel
         REGULARPERSONALDATA,
         SENSITIVEPERSONALDATA,
         REGISTERTYPEDATA
+    }
+    public enum EntityType
+    {
+        ITSYSTEM,
+        ITSYSTEMUSAGE
     }
 }
