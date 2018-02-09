@@ -473,7 +473,7 @@ namespace Presentation.Web
             RemoveOption.Parameter<int>("id");
             RemoveOption.Parameter<int>("objectId");
             RemoveOption.Parameter<OptionType>("type");
-            RemoveOption.ReturnsCollectionFromEntitySet<AttachedOption>("AttachedOptions");
+            RemoveOption.Returns<IHttpActionResult>();
 
              var GetSensitivePersonalDataByObjectID = builder.Function("GetSensitivePersonalDataByObjectID");
             GetSensitivePersonalDataByObjectID.Parameter<int>("id"); 
