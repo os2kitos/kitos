@@ -20,6 +20,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             this.Contracts = new List<ItContractItSystemUsage>();
             this.Wishes = new List<Wish>();
+            this.ArchivePeriods = new List<ArchivePeriod>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
@@ -237,6 +238,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// Wishes.
         /// </value>
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         /// <summary>
         /// Gets or sets the organization units associated with this instance.
@@ -316,6 +318,17 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? ArchivedDate { get; set; }
 
         public string ArchiveNotes { get; set; }
+
+        public string ArchiveSupplier { get; set; }
+
+        public int? SupplierId { get; set; }
+        /// <summary>
+        ///     Gets or sets the organization marked as supplier for this contract.
+        /// </summary>
+        /// <value>
+        ///     The organization.
+        /// </value>
+        public virtual Organization.Organization Supplier { get; set; }
 
         public int? ArchiveLocationId { get; set; }
 

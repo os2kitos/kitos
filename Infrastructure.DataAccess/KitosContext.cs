@@ -105,6 +105,7 @@ namespace Infrastructure.DataAccess
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
+        public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
 
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
         public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
@@ -227,6 +228,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
+            modelBuilder.Configurations.Add(new ArchivePeriodMap());
             modelBuilder.Configurations.Add(new PriceRegulationTypeMap());
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
