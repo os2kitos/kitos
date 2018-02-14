@@ -17,7 +17,7 @@
                 ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
-                        $http.get(`odata/itSystemUsages(${$stateParams.id})`)
+                        $http.get(`odata/itSystemUsages(${$stateParams.id})?$expand=itsystem`)
                             .then(result => result.data)
                 ],
                 archivePeriod: ["$http", "$stateParams", ($http, $stateParams) =>
@@ -27,9 +27,9 @@
         });
     }]);
 
-    app.controller("system.EditArchiving", ["$scope", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
-            $scope.usage = itSystemUsage;
+    app.controller("system.EditArchiving", ["$scope", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
+        ($scope, $http, $state, $stateParams, $timeout, user, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
+            console.log(systemUsage);
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
             $scope.usageId = $stateParams.id;
@@ -38,8 +38,8 @@
             $scope.archivePeriod = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
 
-            if (itSystemUsage.itSystem.ArchiveDuty !== 0) {
-                $scope.ArchiveDuty = itSystemUsage.itSystem.ArchiveDuty;
+            if (systemUsage.ItSystem.ArchiveDuty !== 0) {
+                $scope.ArchiveDuty = systemUsage.itSystem.ArchiveDuty;
             }
 
             $scope.patch = (field, value) => {

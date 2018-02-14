@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <h4>{{systemUsage.itSystem.name}} <span ng-if="systemUsage.itSystem.disabled">(inaktiv)</span></h4>
     <div class="panel panel-default">
         <div class="row">
             <!-- 1st column -->
@@ -11,16 +11,14 @@
                            data-ng-model="systemUsage.Archived"
                            ng-value="true"
                            data-ng-disabled="!hasWriteAccess"
-                           ng-click="patch('Archived', true)"
-                           data-field="Archived">
+                           ng-click="patch('Archived', true)">
                     <label class="control-label small" for="Archived">Ja</label>
 
                     <input type="radio" id="Archived2"
                            data-ng-model="systemUsage.Archived"
                            ng-value="false"
                            data-ng-disabled="!hasWriteAccess"
-                           ng-click="patch('Archived', false)"
-                           data-field="Archived">
+                           ng-click="patch('Archived', false)">
                     <label class="control-label small" for="Archived2">Nej</label>
                 </div>
                 <!-- ArchiveDuty -->
@@ -47,7 +45,7 @@
                     <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
                     <select class="form-control input-sm" id="archiveDuty"
                             ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="usage.itSystem.archiveDuty"
+                            data-ng-model="systemUsage.itSystem.archiveDuty"
                             data-autosave=""
                             data-field="ArchiveDuty"
                             data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
@@ -92,9 +90,9 @@
                     <select-option data-id="archive"
                                    data-label="Arkivtype"
                                    data-placeholder="Vælg arkivering"
-                                   data-selected-text="{{ usage.archiveTypeName }}"
-                                   ng-disabled="!systemUsage.Archived"
-                                   data-ng-model="usage.archiveTypeId"
+                                   data-selected-text="{{ systemUsage.archiveTypeName }}"
+                                   data-ng-disabled="systemUsage.Archived == false"
+                                   data-ng-model="systemUsage.archiveTypeId"
                                    data-options="archiveTypes"
                                    data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                    data-field="archiveTypeId">
@@ -106,9 +104,9 @@
                     <select-option data-id="archiveLocation"
                                    data-label="Arkiveringssted"
                                    data-placeholder="Vælg arkiveringssted"
-                                   data-selected-text="{{ usage.archiveLocationName }}"
+                                   data-selected-text="{{ systemUsage.archiveLocationName }}"
                                    data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                                   data-ng-model="usage.archiveLocationId"
+                                   data-ng-model="systemUsage.archiveLocationId"
                                    data-options="archiveLocations"
                                    data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                    data-field="archiveLocationId">
