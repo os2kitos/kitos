@@ -12,13 +12,13 @@
                         });
                 }],
                 regularSensitiveData: ['$http', '$stateParams','theSystem', function ($http, $stateParams, theSystem) {
-                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ")")
+                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
                         .then(function (result) {
                             return result.data.value;
                         });
                 }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ")")
+                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -48,7 +48,8 @@
                     var data = {
                         ObjectId: theSystem.id,
                         OptionId: OptionId,
-                        OptionType: optionType
+                        OptionType: optionType,
+                        ObjectType: 'ITSYSTEM'
                     };
 
                     $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(function (result) {
@@ -58,7 +59,7 @@
                     });
                 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type='" + optionType + "')").success(function () {
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type='" + optionType + "', entitytype='ITSYSTEM')").success(function () {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");
@@ -94,7 +95,7 @@
             $scope.delete = function (dataworkerId) {
                 $http.delete("api/DataWorker/" + dataworkerId + "?organizationid=" + $scope.system.organizationId)
                     .success(function () {
-                        notify.addSuccessMessage("Databehandlerens tilknyttning er fjernet.");
+                        notify.addSuccessMessage("Databehandlerens tilknytning er fjernet.");
                         reload();
                     })
                     .error(function () {
@@ -165,11 +166,11 @@
 
                 $http.post("api/Dataworker/", data)
                     .success(function () {
-                        notify.addSuccessMessage("Projektet er tilknyttet.");
+                        notify.addSuccessMessage("Databehandleren er tilknyttet.");
                         reload();
                     })
                     .error(function () {
-                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte projektet!");
+                        notify.addErrorMessage("Fejl! Kunne ikke tilknytte databehandleren!");
                     });
             };
         }]);

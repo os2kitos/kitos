@@ -473,16 +473,19 @@ namespace Presentation.Web
             RemoveOption.Parameter<int>("id");
             RemoveOption.Parameter<int>("objectId");
             RemoveOption.Parameter<OptionType>("type");
-            RemoveOption.ReturnsCollectionFromEntitySet<AttachedOption>("AttachedOptions");
+            RemoveOption.Parameter<EntityType>("entityType");
+            RemoveOption.Returns<IHttpActionResult>();
 
              var GetSensitivePersonalDataByObjectID = builder.Function("GetSensitivePersonalDataByObjectID");
-            GetSensitivePersonalDataByObjectID.Parameter<int>("id"); 
+            GetSensitivePersonalDataByObjectID.Parameter<int>("id");
+            GetSensitivePersonalDataByObjectID.Parameter<EntityType>("entitytype");
             GetSensitivePersonalDataByObjectID.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty("Checked"));
             
             var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
             GetRegularPersonalDataByObjectID.Parameter<int>("id");
-             GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
+            GetRegularPersonalDataByObjectID.Parameter<EntityType>("entitytype");
+            GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
             var GetRegisterTypeByObjectID = builder.Function("GetRegisterTypesByObjectID");

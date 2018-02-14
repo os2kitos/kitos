@@ -26,18 +26,22 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IGenericRepository<ItSystemRole> _roleRepository;
+        private readonly IGenericRepository<AttachedOption> _attachedOptionsRepository;
+
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<ItSystemRole> roleRepository)
+            IGenericRepository<ItSystemRole> roleRepository,
+            IGenericRepository<AttachedOption> attachedOptionsRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
             _roleRepository = roleRepository;
+            _attachedOptionsRepository = attachedOptionsRepository;
         }
 
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
@@ -206,6 +210,17 @@ namespace Presentation.Web.Controllers.API
 
                 var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
+
+                //copy attached options from system to systemusage
+                var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
+                foreach (var option in attachedOptions)
+                {
+                    option.ObjectId = sysUsage.Id;
+                    option.ObjectType = EntityType.ITSYSTEMUSAGE;
+                    _attachedOptionsRepository.Insert(option);
+                }
+                _attachedOptionsRepository.Save();
+
 
                 return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
