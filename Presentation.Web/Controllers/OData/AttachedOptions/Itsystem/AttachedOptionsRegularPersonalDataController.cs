@@ -17,22 +17,18 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
     public class AttachedOptionsRegularPersonalDataController : AttachedOptionsFunctionController<ItSystem, RegularPersonalDataType, LocalRegularPersonalDataType>
     {
-        public AttachedOptionsRegularPersonalDataController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService, IGenericRepository<ItSystem> itSystemRepository,
+        public AttachedOptionsRegularPersonalDataController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService,
             IGenericRepository<RegularPersonalDataType> regularPersonalDataTypeRepository,
             IGenericRepository<LocalRegularPersonalDataType> localregularPersonalDataTypeRepository)
-           : base(repository, authService, itSystemRepository, regularPersonalDataTypeRepository,
-                 localregularPersonalDataTypeRepository)
-        {
-            globalEntityType = EntityType.ITSYSTEM;
-            globalOptionType = OptionType.REGULARPERSONALDATA;
-        }
+           : base(repository, authService, regularPersonalDataTypeRepository,
+                 localregularPersonalDataTypeRepository){}
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        [ODataRoute("GetRegularPersonalDataByObjectID(id={id})")]
-        public override IHttpActionResult GetOptionsByObjectIDAndType(int id)
+        [ODataRoute("GetRegularPersonalDataByObjectID(id={id},entitytype={entitytype})")]
+        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
         {
-            return base.GetOptionsByObjectIDAndType(id);
+            return base.GetOptionsByObjectIDAndType(id, entitytype, OptionType.REGULARPERSONALDATA);
         }
     }
 }

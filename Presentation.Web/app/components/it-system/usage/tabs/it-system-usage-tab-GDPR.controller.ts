@@ -15,13 +15,13 @@
                     .then(result => result.data)
                 ],
                 regularSensitiveData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ")")
+                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEMUSAGE')")
                         .then(function (result) {
                             return result.data.value;
                         });
                 }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ")")
+                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEMUSAGE')")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -55,7 +55,7 @@
 
 
 
-            $scope.updateDataLevel = function (OptionId, Checked, optionType) {
+            $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
@@ -64,7 +64,8 @@
                     var data = {
                         ObjectId: itSystemUsage.id,
                         OptionId: OptionId,
-                        OptionType: optionType
+                        OptionType: optionType,
+                        ObjectType: 'ITSYSTEMUSAGE'
                     };
 
                     $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
@@ -74,7 +75,7 @@
                     });
 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type='" + optionType + "')").success(() => {
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type='" + optionType + "', entityType='ITSYSTEMUSAGE')").success(() => {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(() => {
                         msg.toErrorMessage("Fejl!");

@@ -17,23 +17,18 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
-        public AttachedOptionsSensitivePersonalDataController(IGenericRepository<AttachedOption> repository, 
-            IAuthenticationService authService, IGenericRepository<ItSystem> itSystemRepository,
-            IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository,
+        public AttachedOptionsSensitivePersonalDataController(IGenericRepository<AttachedOption> repository,
+            IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository, IAuthenticationService authService,
             IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository)
-           : base(repository, authService, itSystemRepository, sensitiveDataTypeRepository,
-                 localSensitivePersonalDataTypeRepository)
-        {
-            globalEntityType = EntityType.ITSYSTEM;
-            globalOptionType = OptionType.SENSITIVEPERSONALDATA;
-        }
+           : base(repository, authService, sensitiveDataTypeRepository,
+                 localSensitivePersonalDataTypeRepository){}
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        [ODataRoute("GetSensitivePersonalDataByObjectID(id={id})")]
-        public override IHttpActionResult GetOptionsByObjectIDAndType(int id)
+        [ODataRoute("GetSensitivePersonalDataByObjectID(id={id}, entitytype={entitytype})")]
+        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
         {
-            return base.GetOptionsByObjectIDAndType(id);
+            return base.GetOptionsByObjectIDAndType(id,entitytype, OptionType.SENSITIVEPERSONALDATA);
         }
     }
 }

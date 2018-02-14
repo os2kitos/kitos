@@ -20,20 +20,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             public AttachedOptionsRegisterTypesController(IGenericRepository<AttachedOption> repository,
                 IAuthenticationService authService,
                 IGenericRepository<RegisterType> registerTypeRepository,
-                IGenericRepository<LocalRegisterType> localRegisterTypeRepository,
-                IGenericRepository<ItSystemUsage> usageRepository)
-               : base(repository, authService, usageRepository, registerTypeRepository, localRegisterTypeRepository)
-            {
-            globalEntityType = EntityType.ITSYSTEMUSAGE;
-            globalOptionType = OptionType.REGISTERTYPEDATA;
-        }
+                IGenericRepository<LocalRegisterType> localRegisterTypeRepository)
+               : base(repository, authService, registerTypeRepository, localRegisterTypeRepository){}
 
             [System.Web.Http.HttpGet]
             [EnableQuery]
             [ODataRoute("GetRegisterTypesByObjectID(id={id})")]
-            public override IHttpActionResult GetOptionsByObjectIDAndType(int id)
+            public IHttpActionResult GetOptionsByObjectID(int id)
             {
-            return base.GetOptionsByObjectIDAndType(id);
+            return base.GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGISTERTYPEDATA);
             }
     }
 }
