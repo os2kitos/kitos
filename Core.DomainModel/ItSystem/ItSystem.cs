@@ -113,6 +113,8 @@ namespace Core.DomainModel.ItSystem
 
         public string DataIsTransferedTo { get; set; }
 
+        public int ArchiveDuty { get; set; }
+
         public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
     }

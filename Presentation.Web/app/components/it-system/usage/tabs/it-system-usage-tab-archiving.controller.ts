@@ -6,78 +6,98 @@
             controller: "system.EditArchiving",
             resolve: {
                 archiveTypes: [
-                    "$http", function ($http) {
-                        return $http.get("odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }
+                    "$http", $http =>
+                    $http.get("odata/LocalArchiveTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            .then(result => result.data.value)
                 ],
                 archiveLocations: [
-                    "$http", function ($http) {
-                        return $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                            .then(function (result) {
-                                return result.data.value;
-                            });
-                    }
+                    "$http", $http =>
+                    $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            .then(result => result.data.value)
                 ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
                             .then(result => result.data)
-                ]
+                ],
+                archivePeriod: ["$http", "$stateParams", ($http, $stateParams) =>
+                    $http.get("api/ArchivePeriod/" + $stateParams.id + "?system=true")
+                            .then(result => result.data.response)]
             }
         });
     }]);
 
-    app.controller("system.EditArchiving", ["$scope", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, moment, notify) => {
+    app.controller("system.EditArchiving", ["$scope", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
+        ($scope, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
             $scope.usage = itSystemUsage;
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.ArchivedDate = systemUsage.ArchivedDate;
+            $scope.archivePeriod = archivePeriod;
+            $scope.hasWriteAccessAndArchived = systemUsage.Archived;
+
+            if (itSystemUsage.itSystem.ArchiveDuty !== 0) {
+                $scope.ArchiveDuty = itSystemUsage.itSystem.ArchiveDuty;
+            }
 
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
             }
-
+            $scope.patchSupplier = (field, value) => {
+                var payload = {};
+                payload[field] = value.id;
+                payload["ArchiveSupplier"] = value.text;
+                itSystemUsageService.patchSystem($scope.usageId, payload);
+            }
+            
             $scope.comm = {
                 itProjectId: $stateParams.id
             };
 
+            if (systemUsage.SupplierId) {
+                $scope.systemUsage.supplier = {
+                    id: systemUsage.SupplierId,
+                    text: systemUsage.ArchiveSupplier
+                };
+            }
+
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
 
-                if ($scope.commForm.$invalid) { return; }
+                if ($scope.archiveForm.$invalid) { return; }
 
-                var dueDate = moment($scope.comm.dueDate, "DD-MM-YYYY");
-                if (dueDate.isValid()) {
-                    $scope.comm.dueDate = dueDate.format("YYYY-MM-DD");
+                var startDate = moment($scope.archivePeriod.startDate, "DD-MM-YYYY");
+                if (startDate.isValid()) {
+                    $scope.archivePeriod.startDate = startDate.format("YYYY-MM-DD");
                 } else {
-                    $scope.comm.dueDate = null;
+                    $scope.archivePeriod.startDate = null;
                 }
-
-                $http.post("api/communication", $scope.comm).finally(reload);
+                var endDate = moment($scope.archivePeriod.endDate, "DD-MM-YYYY");
+                if (endDate.isValid()) {
+                    $scope.archivePeriod.endDate = endDate.format("YYYY-MM-DD");
+                } else {
+                    $scope.archivePeriod.endDate = null;
+                }
+                $http.post("api/ArchivePeriod", $scope.archivePeriod).finally(reload);
             };
 
             function reload() {
                 return $state.transitionTo($state.current, $stateParams, {
                     reload: true
-                }).then(function () {
+                }).then(() => {
                     $scope.hideContent = true;
-                    return $timeout(function () {
-                        return $scope.hideContent = false;
-                    }, 1);
+                    return $timeout(() => $scope.hideContent = false, 1);
                 });
             };
 
             $scope.delete = id => {
-                $http.delete("api/communication/" + id + "?organizationId=" + user.currentOrganizationId).finally(reload);
+                $http.delete("api/ArchivePeriod/" + id + "?organizationId=" + user.currentOrganizationId).finally(reload);
             };
+
             $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public=true', 'orgId=' + user.currentOrganizationId]);
             function formatSupplier(supplier) {
                 var result = '<div>' + supplier.text + '</div>';
@@ -125,7 +145,6 @@
                     }
                 };
             }
-
             $scope.patchDate = (field, value) => {
                 var date = moment(value);
 
@@ -149,7 +168,7 @@
                 $scope.usage.archiveLocationId != null ||
                 $scope.ArchivedDate != null ||
                 $scope.systemUsage.ArchiveNotes != null;
-            console.log($scope.dirty);
+
             $scope.datepickerOptions = {
                 format: "yyyy-MM-dd"
             };

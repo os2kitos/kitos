@@ -18,7 +18,7 @@
                     <input type="radio" id="Archived2"
                            data-ng-model="systemUsage.Archived"
                            ng-value="false"
-                           data-ng-disabled="!hasWriteAccess || dirty"
+                           data-ng-disabled="!hasWriteAccess"
                            ng-click="patch('Archived', false)"
                            data-field="Archived">
                     <label class="control-label small" for="Archived2">Nej</label>
@@ -41,6 +41,20 @@
                            ng-click="patch('ArchiveDuty', false)"
                            data-field="ArchiveDuty">
                     <label class="control-label small" for="ArchiveDuty2">Nej</label>
+                </div>
+                <!-- Archive duty -->
+                <div class="form-group">
+                    <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
+                    <select class="form-control input-sm" id="archiveDuty"
+                            ui-select2="{minimumResultsForSearch: -1}"
+                            data-ng-model="usage.itSystem.archiveDuty"
+                            data-autosave=""
+                            data-field="ArchiveDuty"
+                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
+                        <option value="0">Ingen valgt</option>
+                        <option value="1">B</option>
+                        <option value="2">K</option>
+                    </select>
                 </div>
                 <!-- ReportedToDPA -->
                 <div class="form-group">
@@ -79,7 +93,7 @@
                                    data-label="Arkivtype"
                                    data-placeholder="Vælg arkivering"
                                    data-selected-text="{{ usage.archiveTypeName }}"
-                                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                                   ng-disabled="!systemUsage.Archived"
                                    data-ng-model="usage.archiveTypeId"
                                    data-options="archiveTypes"
                                    data-auto-save-url="api/itSystemUsage/{{usageId}}"
@@ -105,10 +119,10 @@
                     <label for="archiveSupplier" class="control-label small">Arkiveringsleverandører</label>
                     <input type="hidden" id="archiveSupplier" class="form-control input-sm"
                            data-ui-select2="suppliersSelectOptions"
-                           data-ng-model="contract.supplier"
-                           data-autosave="api/itSystemUsage/{{usageId}}"
-                           data-field="archiveSupplierId"
-                           data-ng-disabled="!hasWriteAccess">
+                           data-ng-model="systemUsage.supplier"
+                           ng-click="patchSupplier('SupplierId', systemUsage.supplier)"
+                           data-field="SupplierId"
+                           data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
                 </div>
                 <!-- ArchivedDate -->
                 <div class="form-group">
@@ -133,7 +147,7 @@
                 </div>
             </div>
         </div>
-        <form role="form" name="commForm">
+        <form role="form" name="archiveForm">
             <table class="table">
                 <thead>
                     <tr>
@@ -144,14 +158,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="c in comms">
+                    <tr data-ng-repeat="archive in archivePeriod">
                         <td>
                             <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.startDate"
-                                   data-autosave="api/itSystemUsage/{{usageId}}"
+                                   data-ng-model="archive.startDate"
+                                   data-autosave="api/archivePeriod/{{archive.Id}}"
                                    data-field="startDate">
                         </td>
                         <td>
@@ -159,15 +173,15 @@
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.endDate"
-                                   data-autosave="api/itSystemUsage/{{usageId}}"
+                                   data-ng-model="archive.endDate"
+                                   data-autosave="api/ArchivePeriod/{{archive.Id}}"
                                    data-field="endDate">
                         </td>
                         <td>
                             <div class="form-group">
                                 <textarea class="form-control input-sm" style="resize:none" maxlength="20"
-                                          data-ng-model="systemUsage.uniqueArchiveId"
-                                          data-autosave="api/itSystemUsage/{{usageId}}"
+                                          data-ng-model="archive.uniqueArchiveId"
+                                          data-autosave="api/ArchivePeriod/{{archive.Id}}"
                                           data-field="uniqueArchiveId"
                                           data-ng-disabled="!hasWriteAccess"></textarea>
                             </div>
@@ -194,7 +208,7 @@
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
                                        data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="systemUsage.startDate">
+                                       data-ng-model="archivePeriod.startDate">
                             </div>
                         </td>
                         <td>
@@ -206,12 +220,12 @@
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
                                        data-ng-disabled="!hasWriteAccess"
-                                       data-ng-model="systemUsage.endDate">
+                                       data-ng-model="archivePeriod.endDate">
                             </div>
                         </td>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <input type="text" name="uniqueArchiveId" class="form-control input-sm" data-ng-model="systemUsage.uniqueArchiveId" style="resize: none" maxlength="20"/>
+                                <input type="text" name="uniqueArchiveId" class="form-control input-sm" data-ng-model="archivePeriod.uniqueArchiveId" style="resize: none" maxlength="20"/>
                             </div>
                         </td>
                         <td>

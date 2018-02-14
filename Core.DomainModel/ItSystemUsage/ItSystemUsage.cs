@@ -329,8 +329,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         ///     The organization.
         /// </value>
-        public virtual Organization.Organization Supplier { get; set; }
-
         public int? ArchiveLocationId { get; set; }
 
         public virtual ArchiveLocation ArchiveLocation { get; set; }

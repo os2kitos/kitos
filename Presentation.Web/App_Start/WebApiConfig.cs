@@ -549,6 +549,9 @@ namespace Presentation.Web
             accessType.HasRequiredBinding(a => a.ItSystem, "ItSystems");
             accessType.EntityType.HasKey(x => x.Id);
 
+            var archivePeriod = builder.EntitySet<ArchivePeriod>(nameof(ArchivePeriodsController).Replace("Controller", string.Empty));
+            archivePeriod.EntityType.HasKey(x => x.Id);
+
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");
             //builder.EntitySet<Text>("Texts");
