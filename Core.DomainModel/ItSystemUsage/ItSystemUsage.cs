@@ -307,7 +307,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         
-        public bool? ArchiveDuty { get; set; }
+        public int? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }
 

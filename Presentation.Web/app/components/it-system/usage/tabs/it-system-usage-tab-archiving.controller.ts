@@ -37,7 +37,7 @@
             $scope.ArchivedDate = systemUsage.ArchivedDate;
             $scope.archivePeriod = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
-
+            console.log(itSystemUsage);
             if (itSystemUsage.itSystem.ArchiveDuty !== 0) {
                 $scope.ArchiveDuty = itSystemUsage.itSystem.ArchiveDuty;
             }
@@ -67,7 +67,7 @@
 
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
-
+                console.log($scope);
                 if ($scope.archiveForm.$invalid) { return; }
 
                 var startDate = moment($scope.archivePeriod.startDate, "DD-MM-YYYY");
@@ -82,7 +82,11 @@
                 } else {
                     $scope.archivePeriod.endDate = null;
                 }
-                $http.post("api/ArchivePeriod", $scope.archivePeriod).finally(reload);
+                var payload = {};
+                payload["startDate"] = $scope.archivePeriod.startDate;
+                payload["endDate"] = $scope.archivePeriod.endDate;
+                payload["uniqueArchiveId"] = $scope.archivePeriod.endDate;
+                $http.post("odate/ArchivePeriod", $scope.archivePeriod).finally(reload);
             };
 
             function reload() {
