@@ -54,10 +54,6 @@
                 itSystemUsageService.patchSystem($scope.usageId, payload);
             }
             
-            $scope.comm = {
-                itProjectId: $stateParams.id
-            };
-
             if (systemUsage.SupplierId) {
                 $scope.systemUsage.supplier = {
                     id: systemUsage.SupplierId,
