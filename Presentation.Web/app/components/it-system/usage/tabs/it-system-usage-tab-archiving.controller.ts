@@ -64,7 +64,7 @@
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
                 console.log($scope);
-                if ($scope.archiveForm.$invalid) { return; }
+                //if ($scope.archiveForm.$invalid) { return; }
 
                 var startDate = moment($scope.archivePeriod.startDate, "DD-MM-YYYY");
                 if (startDate.isValid()) {
@@ -79,10 +79,11 @@
                     $scope.archivePeriod.endDate = null;
                 }
                 var payload = {};
-                payload["startDate"] = $scope.archivePeriod.startDate;
-                payload["endDate"] = $scope.archivePeriod.endDate;
-                payload["uniqueArchiveId"] = $scope.archivePeriod.endDate;
-                $http.post("odate/ArchivePeriod", $scope.archivePeriod).finally(reload);
+                payload["StartDate"] = $scope.archivePeriod.startDate;
+                payload["EndDate"] = $scope.archivePeriod.endDate;
+                payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
+                payload["ItSystemUsageId"] = $stateParams.id;
+                $http.post("odate/ArchivePeriods", payload).finally(reload);
             };
 
             function reload() {
