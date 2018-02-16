@@ -56,10 +56,8 @@
                     var data = {
                         DataLevel: $scope.system.dataLevel
                     };
-                  
                     $http.patch("api/itsystem/" + itSystem.id + "?organizationId=" + itSystem.organizationId, data).success(function (result) {
-
-                        notify.addSuccessMessage("Success");
+                        notify.addSuccessMessage("Feltet er opdateret.");
 
                     }).error(function (result) {
                         notify.addErrorMessage('Fejl!');

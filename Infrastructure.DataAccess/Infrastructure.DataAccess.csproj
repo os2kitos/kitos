@@ -492,6 +492,10 @@
     <Compile Include="Migrations\201802141207354_ArchivingNew.Designer.cs">
       <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802141332011_ChangedType.cs" />
+    <Compile Include="Migrations\201802141332011_ChangedType.Designer.cs">
+      <DependentUpon>201802141332011_ChangedType.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -744,6 +748,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802141207354_ArchivingNew.resx">
       <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802141332011_ChangedType.resx">
+      <DependentUpon>201802141332011_ChangedType.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
