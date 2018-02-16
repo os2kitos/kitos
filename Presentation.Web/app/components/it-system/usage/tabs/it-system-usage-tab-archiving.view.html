@@ -18,7 +18,7 @@
                     <input type="radio" id="Archived2"
                            data-ng-model="systemUsage.Archived"
                            ng-value="false"
-                           data-ng-disabled="!hasWriteAccess"
+                           data-ng-disabled="!hasWriteAccess || dirty"
                            ng-click="patch('Archived', false)"
                            data-field="Archived">
                     <label class="control-label small" for="Archived2">Nej</label>
@@ -125,7 +125,7 @@
                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
                 </div>
                 <!-- ArchivedDate -->
-                <div class="form-group">
+                <!--<div class="form-group">
                     <label for="ArchivedDateId" class="control-label small">Arkiveringsdato</label>
                     <input type="text" id="ArchivedDateId" class="form-control"
                            data-kendo-date-picker
@@ -135,7 +135,7 @@
                            ng-blur="patchDate('ArchivedDate', ArchivedDate)"
                            data-field="ArchivedDate">
                     <span id="helpBlock" class="help-block small">Eksempelvis "2017-04-25"</span>
-                </div>
+                </div>-->
                 <!-- ArchiveNotes -->
                 <div class="form-group">
                     <label for="ArchiveNotes" class="control-label small">Arkiveringsbemærkninger</label>
@@ -158,46 +158,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-ng-repeat="archive in archivePeriod">
+                    <tr data-ng-repeat="archive in archivePeriods">
                         <td>
                             <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="archive.startDate"
-                                   data-autosave="api/archivePeriod/{{archive.Id}}"
+                                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                                   data-ng-model="archive.StartDate"
+                                   ng-change="patchDatePeriode('StartDate', archive.StartDate, archive.Id)"
                                    data-field="startDate">
                         </td>
                         <td>
                             <input type="text" class="form-control"
                                    data-kendo-date-picker
                                    data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="archive.endDate"
-                                   data-autosave="api/ArchivePeriod/{{archive.Id}}"
+                                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                                   data-ng-model="archive.EndDate"
+                                   ng-change="patchDatePeriode('EndDate', archive.EndDate, archive.Id)"
                                    data-field="endDate">
                         </td>
                         <td>
                             <div class="form-group">
                                 <textarea class="form-control input-sm" style="resize:none" maxlength="20"
-                                          data-ng-model="archive.uniqueArchiveId"
-                                          data-autosave="api/ArchivePeriod/{{archive.Id}}"
+                                          data-ng-model="archive.UniqueArchiveId"
+                                          ng-blur="patchPeriode('UniqueArchiveId', archive.UniqueArchiveId, archive.Id)"
                                           data-field="uniqueArchiveId"
-                                          data-ng-disabled="!hasWriteAccess"></textarea>
+                                          data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"></textarea>
                             </div>
                         </td>
 
                         <td>
                             <button class="btn btn-danger btn-sm delete-archive"
-                                    data-confirmed-click="delete(usageId)"
+                                    data-confirmed-click="delete(archive.Id)"
                                     data-confirm-click="Er du sikker på at du vil slette?"
-                                    data-ng-disabled="!hasWriteAccess">
+                                    data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
                                 <span class="glyphicon glyphicon-trash small"></span>
                             </button>
                         </td>
                     </tr>
                 </tbody>
-                <tfoot data-ng-hide="!hasWriteAccess">
+                <tfoot data-ng-hide="!hasWriteAccess || !systemUsage.Archived">
                     <tr>
                         <td>
                             <div class="form-group" data-show-errors>
@@ -207,7 +207,7 @@
                                        required
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
                                        data-ng-model="archivePeriod.startDate">
                             </div>
                         </td>
@@ -219,7 +219,7 @@
                                        required
                                        data-kendo-date-picker
                                        data-k-options="datepickerOptions"
-                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
                                        data-ng-model="archivePeriod.endDate">
                             </div>
                         </td>
@@ -229,7 +229,7 @@
                             </div>
                         </td>
                         <td>
-                            <button id="save-archive" class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
+                            <button id="save-archive" class="btn btn-success btn-sm" data-ng-click="save()">Gem{{archivePeriod.startDate}}</button>
                         </td>
                     </tr>
                 </tfoot>

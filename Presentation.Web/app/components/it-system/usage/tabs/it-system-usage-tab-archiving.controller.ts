@@ -21,27 +21,44 @@
                             .then(result => result.data)
                 ],
                 archivePeriod: ["$http", "$stateParams", ($http, $stateParams) =>
-                    $http.get("api/ArchivePeriod/" + $stateParams.id + "?system=true")
-                            .then(result => result.data.response)]
+                    $http.get(`odata/ArchivePeriods?$filter=ItSystemUsageId eq ${$stateParams.id}&$orderby=StartDate`)
+                            .then(result => result.data.value)]
             }
         });
     }]);
 
-    app.controller("system.EditArchiving", ["$scope", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
-        ($scope, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
+    app.controller("system.EditArchiving", ["$scope", "_", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
+        ($scope, _,$http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
             $scope.usage = itSystemUsage;
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.ArchivedDate = systemUsage.ArchivedDate;
-            $scope.archivePeriod = archivePeriod;
+            $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
-            console.log(itSystemUsage);
+
             if (itSystemUsage.itSystem.ArchiveDuty !== 0) {
                 $scope.ArchiveDuty = itSystemUsage.itSystem.ArchiveDuty;
             }
-
+            if ($scope.archivePeriods) {
+                sortDate();
+            }
+            function sortDate() {
+                let dateList = [];
+                let dateNotList = [];
+                _.each($scope.archivePeriods, x => {
+                    if (moment().isBetween(moment(x.StartDate), moment(x.EndDate), 'days', '[]')) {
+                        dateList.push(x);
+                    } else {
+                        dateNotList.push(x);
+                    }
+                });
+                _.each(dateNotList, x => {
+                    dateList.push(x);
+                });
+                $scope.archivePeriods = dateList;
+            }
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
@@ -60,30 +77,29 @@
                     text: systemUsage.ArchiveSupplier
                 };
             }
-
+            
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
-                console.log($scope);
                 //if ($scope.archiveForm.$invalid) { return; }
 
-                var startDate = moment($scope.archivePeriod.startDate, "DD-MM-YYYY");
-                if (startDate.isValid()) {
-                    $scope.archivePeriod.startDate = startDate.format("YYYY-MM-DD");
+                var startDate = moment($scope.archivePeriod.startDate);
+                if (!startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
                 } else {
-                    $scope.archivePeriod.startDate = null;
+                    startDate = startDate.format("YYYY-MM-DD");
                 }
-                var endDate = moment($scope.archivePeriod.endDate, "DD-MM-YYYY");
-                if (endDate.isValid()) {
-                    $scope.archivePeriod.endDate = endDate.format("YYYY-MM-DD");
+                var endDate = moment($scope.archivePeriod.endDate);
+                if (!endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
                 } else {
-                    $scope.archivePeriod.endDate = null;
+                    endDate = endDate.format("YYYY-MM-DD");
                 }
                 var payload = {};
-                payload["StartDate"] = $scope.archivePeriod.startDate;
-                payload["EndDate"] = $scope.archivePeriod.endDate;
+                payload["StartDate"] = startDate;
+                payload["EndDate"] = endDate;
                 payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
                 payload["ItSystemUsageId"] = $stateParams.id;
-                $http.post("odate/ArchivePeriods", payload).finally(reload);
+                $http.post(`odata/ArchivePeriods`, payload).finally(reload);
             };
 
             function reload() {
@@ -95,8 +111,9 @@
                 });
             };
 
-            $scope.delete = id => {
-                $http.delete("api/ArchivePeriod/" + id + "?organizationId=" + user.currentOrganizationId).finally(reload);
+            $scope.delete = (id) => {
+                $http.delete(`odata/ArchivePeriods(${id})`).finally(reload);
+                notify.addSuccessMessage("Slettet!");
             };
 
             $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['public=true', 'orgId=' + user.currentOrganizationId]);
@@ -146,6 +163,7 @@
                     }
                 };
             }
+
             $scope.patchDate = (field, value) => {
                 var date = moment(value);
 
@@ -159,6 +177,26 @@
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                     $scope.ArchivedDate = date;
                 }
+            };
+            $scope.patchDatePeriode = (field, value, id) => {
+                var date = moment(value);
+
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                } else {
+                    date = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = date;
+                    sortDate();
+                    $http.patch(`odata/ArchivePeriods(${id})`, payload).finally(reload);
+                    notify.addSuccessMessage("Datoen er opdateret!");
+                }
+            }
+            $scope.patchPeriode = (field, value, id) => {
+                var payload = {};
+                payload[field] = value;
+                $http.patch(`odata/ArchivePeriods(${id})`, payload);
+                notify.addSuccessMessage("Feltet er opdateret!");
             }
 
             $scope.dirty = $scope.systemUsage.ArchiveDuty != null ||
