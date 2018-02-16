@@ -67,8 +67,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -82,9 +82,16 @@
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
-
                 var today = new Date();
 
+                $scope.dataHandlerLink = '';
+
+                if ($scope.contract.dataHandler != null) {
+                    $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId+ '/main';
+                } else if ($scope.contract.dataHandlerAgreementUrl != '') {
+                    $scope.dataHandlerLink = $scope.contract.dataHandlerAgreementUrl;
+                }
+                
                 if (!contract.active) {
                     if (contract.concluded < today && today < contract.expirationDate) {
                         $scope.displayActive = true;
@@ -191,6 +198,57 @@
                         result += '<div class="small">' + supplier.cvr + '</div>';
                     }
                     return result;
+                }
+
+                $scope.editLink = function () {
+                    $uibModal.open({
+                        templateUrl: 'app/components/it-contract/tabs/it-contract-gdpr-editlink-modal.view.html',
+                        controller: ['$scope', '$state', '$uibModalInstance', 'contracts', 'contract', function ($scope, $state, $uibModalInstance, contracts, contract) {
+                            $scope.contracts = contracts
+                            $scope.contract = contract
+
+                            if ($scope.contract.dataHandlerId == 0){
+                                $scope.contract.dataHandlerId = "";
+                            }
+                            
+                            $scope.ok = function () {
+                                
+                                var msg = notify.addInfoMessage("Gemmer...", false);
+
+                                var payload = {
+                                    Id: contract.id,
+                                    DataHandlerId: $scope.contract.dataHandlerId,
+                                    DataHandlerAgreementUrl: $scope.contract.dataHandlerAgreementUrl
+                                }
+
+                                $http({ method: 'PATCH', url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId, data: payload })
+                                    .success(function () {
+                                        msg.toSuccessMessage("Feltet er opdateret.");
+                                        $state.reload();
+                                    })
+                                    .error(function () {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    });
+                                $uibModalInstance.close();
+                            };
+
+                            $scope.cancel = function () {
+                                $uibModalInstance.dismiss('cancel');
+                            };
+                        }],
+                        resolve: {
+                            contracts: [
+                                '$http', function ($http) {
+                                    return $http.get('odata/ItContracts?$filter=Active eq true').then(function (result) {
+                                        return result.data.value;
+                                    });
+                                }],
+                                contract: [ function () {
+                                    return $scope.contract;
+                                    }
+                            ]
+                        }
+                    })
                 }
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {

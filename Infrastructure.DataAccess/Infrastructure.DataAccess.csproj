@@ -487,6 +487,10 @@
     <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.Designer.cs">
       <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs" />
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.Designer.cs">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -736,6 +740,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802091422355_objectType to make attachedoption more generic.resx">
       <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.resx">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -620,6 +620,7 @@
     <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
     <Content Include="appReport\locales\da-DK.xml" />
     <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\it-contract\tabs\it-contract-gdpr-editlink-modal.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
