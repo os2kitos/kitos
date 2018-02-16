@@ -629,6 +629,7 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
     <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
     <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />

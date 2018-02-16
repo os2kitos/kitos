@@ -367,5 +367,14 @@ namespace Core.DomainModel.ItSystemUsage
         public int precautionsOptions { get; set; }
 
         public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+        public string RiskSupervisionDocumentationUrl { get; set; }
+        public string DPIASupervisionDocumentationUrl { get; set; }
+        public string DataHearingSupervisionDocumentationUrl { get; set; }
+
+        public DateTime UserSupervisionDate { get; set; }
+        public int UserSupervision { get; set; }
     }
 }

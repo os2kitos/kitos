@@ -1,30 +1,16 @@
 ﻿<div class="modal-header">
     <div class="clearfix">
-        <h3 class="modal-title pull-left">Indsæt Link til Databehandleraftalen.</h3>
+        <h3 class="modal-title pull-left">Indtast Url til dokumentation.</h3>
     </div>
 </div>
 <form name="activityForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
     <div class="modal-body">
-        <div class="form-group" data-ng-show="!contract.dataHandlerAgreementUrl">
-            <label for="DokomentID" class="col-xs-4 control-label small">
-                Søg efter aftale
-            </label>
-            <div class="col-xs-7">
-                <select-option data-id="contract-strat"
-                               data-placeholder="Vælg en aftale"
-                               data-selected-text="{{ contract.Name }}"
-                               data-ng-model="contract.dataHandlerId"
-                               data-options="contracts">
-                </select-option>
-            </div>
-        </div>
-
         <div class="form-group" data-ng-show="!contract.dataHandlerId">
             <label class="col-xs-4 control-label small" for="DokomentID">
-                URL, hvis aftale ligger i et andet system
+               Url:
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" data-ng-model="contract.dataHandlerAgreementUrl"
+                <input type="text" id="DokomentID" data-ng-model="Url"
                        class="form-control form-inline input-sm" aria-describedby="helpBlock" />
             </div>
         </div>
