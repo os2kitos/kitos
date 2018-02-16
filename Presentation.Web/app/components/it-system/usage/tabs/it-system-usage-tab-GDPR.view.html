@@ -6,13 +6,13 @@
             <div class="col-xs-6">
 
                 <div class="form-group">
-                    <label class="control-label small">Overordnet formål</label>
+                    <label class="control-label small">Systemets overordnede formål</label>
                     <input type="text"
                            data-ng-disabled="!hasWriteAccess"
-                           data-ng-blur="patch('GeneralPurpose', systemUsage.GeneralPurpose)"
+                           data-ng-blur="patch('GeneralPurpose', generalPurpose)"
                            class="form-control input-sm"
-                           data-field="GeneralPurpose"
-                           data-ng-model="systemUsage.GeneralPurpose"
+                           data-field="generalPurpose"
+                           data-ng-model="generalPurpose"
                            data-placeholder="Overordnet formål" />
                 </div>
 
@@ -240,7 +240,7 @@
                            data-field="convictionsData">
                     <label class="control-label small" for="convictionsDataDunno">Ved ikke</label>
                 </div>
-                <div ng-show="systemUsage.convictionsData == 1 || selection.length > 0">
+                <div data-ng-show="usage.dataLevel == 2">
                     <!-- Implemented technical precautions -->
                     <div class="form-group">
                         <label class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
