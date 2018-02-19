@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ChangedType : IMigrationMetadata
+    public sealed partial class ArchivingNew : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangedType));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ArchivingNew));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802141332011_ChangedType"; }
+            get { return "201802191120416_ArchivingNew"; }
         }
         
         string IMigrationMetadata.Source

@@ -500,13 +500,9 @@
     <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.Designer.cs">
       <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802141207354_ArchivingNew.cs" />
-    <Compile Include="Migrations\201802141207354_ArchivingNew.Designer.cs">
-      <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201802141332011_ChangedType.cs" />
-    <Compile Include="Migrations\201802141332011_ChangedType.Designer.cs">
-      <DependentUpon>201802141332011_ChangedType.cs</DependentUpon>
+    <Compile Include="Migrations\201802191120416_ArchivingNew.cs" />
+    <Compile Include="Migrations\201802191120416_ArchivingNew.Designer.cs">
+      <DependentUpon>201802191120416_ArchivingNew.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -767,11 +763,8 @@
     <EmbeddedResource Include="Migrations\201802161536558_user supervision info added to sysusage.resx">
       <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802141207354_ArchivingNew.resx">
-      <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802141332011_ChangedType.resx">
-      <DependentUpon>201802141332011_ChangedType.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802191120416_ArchivingNew.resx">
+      <DependentUpon>201802191120416_ArchivingNew.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

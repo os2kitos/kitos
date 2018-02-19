@@ -26,21 +26,27 @@
                 <!-- ArchiveDuty -->
                 <div class="form-group">
                     <label class="control-label small">Arkiveringspligt</label><br>
-                    <input type="radio" id="ArchiveDuty"
+                    <input type="radio" id="ArchiveDutyB"
                            data-ng-model="systemUsage.ArchiveDuty"
-                           ng-value="true"
+                           ng-value="0"
                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                           ng-click="patch('ArchiveDuty', true)"
+                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
                            data-field="ArchiveDuty">
-                    <label class="control-label small" for="ArchiveDuty">Ja</label>
-
-                    <input type="radio" id="ArchiveDuty2"
+                    <label class="control-label small" for="ArchiveDutyB">B</label>
+                    <input type="radio" id="ArchiveDutyK"
                            data-ng-model="systemUsage.ArchiveDuty"
-                           ng-value="false"
+                           ng-value="1"
                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                           ng-click="patch('ArchiveDuty', false)"
+                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
                            data-field="ArchiveDuty">
-                    <label class="control-label small" for="ArchiveDuty2">Nej</label>
+                    <label class="control-label small" for="ArchiveDutyK">K </label>
+                    <input type="radio" id="ArchiveDutyDunno"
+                           data-ng-model="systemUsage.ArchiveDuty"
+                           ng-value="2"
+                           data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
+                           data-field="ArchiveDuty">
+                    <label class="control-label small" for="ArchiveDutyDunno">Ved ikke</label>
                 </div>
                 <!-- Archive duty -->
                 <div class="form-group">

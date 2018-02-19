@@ -34,6 +34,7 @@ namespace Infrastructure.DataAccess.Migrations
             AddColumn("dbo.ItSystem", "ArchiveDuty", c => c.Int(nullable: false));
             AddColumn("dbo.ItSystemUsage", "ArchiveSupplier", c => c.String());
             AddColumn("dbo.ItSystemUsage", "SupplierId", c => c.Int());
+            AlterColumn("dbo.ItSystemUsage", "ArchiveDuty", c => c.Int());
         }
         
         public override void Down()
@@ -46,6 +47,7 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ArchivePeriod", new[] { "LastChangedByUserId" });
             DropIndex("dbo.ArchivePeriod", new[] { "ObjectOwnerId" });
             DropIndex("dbo.ArchivePeriod", new[] { "ItSystemUsageId" });
+            AlterColumn("dbo.ItSystemUsage", "ArchiveDuty", c => c.Boolean());
             DropColumn("dbo.ItSystemUsage", "SupplierId");
             DropColumn("dbo.ItSystemUsage", "ArchiveSupplier");
             DropColumn("dbo.ItSystem", "ArchiveDuty");
