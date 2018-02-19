@@ -454,7 +454,50 @@
                                   data-field="noteRisks"></textarea>
                     </div>
                 </div>
-                <div ng-show="systemUsage.preriskAssessment == 2">
+                <div>
+                    <!-- DPIA -->
+                    <div class="form-group">
+                        <label class="control-label small">Er der gennemført en DPIA?</label><br>
+                        <input type="radio" id="DPIAYes"
+                               data-ng-model="systemUsage.DPIA"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIA', 1)"
+                               data-field="DPIA">
+                        <label class="control-label small" for="DPIAYes">Ja</label>
+                        &nbsp;
+                        <input type="radio" id="DPIANo"
+                               data-ng-model="systemUsage.DPIA"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIA', 0)"
+                               data-field="DPIA">
+                        <label class="control-label small" for="DPIANo">Nej</label>
+                        &nbsp;
+                        <input type="radio" id="DPIADunno"
+                               data-ng-model="systemUsage.DPIA"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('DPIA', 2)"
+                               data-field="DPIA">
+                        <label class="control-label small" for="DPIADunno">Ved ikke</label>
+                    </div>
+                    <div ng-show="systemUsage.DPIA == 1">
+                        <!-- Date of DPIA -->
+                        <div class="form-group">
+                            <label for="DPIADateFor" class="control-label small">Dato for høring</label>
+                            <input type="text" id="DPIADateFor" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="systemUsage.DPIADateFor"
+                                   ng-blur="patchDate('DPIADateFor', systemUsage.DPIADateFor)"
+                                   data-field="DPIADateFor">
+                            <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "2017-04-25"</span>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="systemUsage.DPIA == 1">
                     <!-- DPIA hearing -->
                     <div class="form-group">
                         <label class="control-label small">Er der foretaget en høring hos Datatilsynet?</label><br>

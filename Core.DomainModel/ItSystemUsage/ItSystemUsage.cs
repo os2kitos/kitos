@@ -358,6 +358,10 @@ namespace Core.DomainModel.ItSystemUsage
 
         public DateTime? DPIADate { get; set; }
 
+        public int DPIA { get; set; }
+
+        public DateTime? DPIADateFor { get; set; }
+
         public int answeringDataDPIA { get; set; }
 
         public DateTime? DPIAdeleteDate { get; set; }
