@@ -504,9 +504,9 @@
     <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802191120416_ArchivingNew.cs" />
-    <Compile Include="Migrations\201802191120416_ArchivingNew.Designer.cs">
-      <DependentUpon>201802191120416_ArchivingNew.cs</DependentUpon>
+    <Compile Include="Migrations\201802191243189_ArchivingNew.cs" />
+    <Compile Include="Migrations\201802191243189_ArchivingNew.Designer.cs">
+      <DependentUpon>201802191243189_ArchivingNew.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -770,8 +770,8 @@
     <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802191120416_ArchivingNew.resx">
-      <DependentUpon>201802191120416_ArchivingNew.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802191243189_ArchivingNew.resx">
+      <DependentUpon>201802191243189_ArchivingNew.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
