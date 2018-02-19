@@ -488,6 +488,18 @@
     <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.Designer.cs">
       <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs" />
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.Designer.cs">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.cs" />
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.Designer.cs">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.cs" />
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.Designer.cs">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\201802141207354_ArchivingNew.cs" />
     <Compile Include="Migrations\201802141207354_ArchivingNew.Designer.cs">
       <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>
@@ -745,6 +757,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802091422355_objectType to make attachedoption more generic.resx">
       <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.resx">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161445054_reference fields added to sysusage.resx">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161536558_user supervision info added to sysusage.resx">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802141207354_ArchivingNew.resx">
       <DependentUpon>201802141207354_ArchivingNew.cs</DependentUpon>

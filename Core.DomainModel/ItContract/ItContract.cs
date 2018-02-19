@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.ItSystem.DataTypes;
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItContract
@@ -62,7 +63,6 @@ namespace Core.DomainModel.ItContract
             }
         }
 
-
         /// <summary>
         ///     Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -76,7 +76,16 @@ namespace Core.DomainModel.ItContract
         }
 
         public int? ReferenceId { get; set; }
+
         public virtual ExternalReference Reference { get; set; }
+
+        public DataOptions ContainsDataHandlerAgreement { get; set; }
+
+        public string DataHandlerAgreementUrl { get; set; }
+
+        public int? DataHandlerId { get; set; }
+        public virtual ItContract DataHandler { get; set; }
+
 
         #region Master
 
@@ -567,6 +576,8 @@ namespace Core.DomainModel.ItContract
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 
         #endregion
-        
+
+
+
     }
 }

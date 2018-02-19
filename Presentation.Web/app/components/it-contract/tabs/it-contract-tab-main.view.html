@@ -54,6 +54,20 @@
                                            data-field="contractTemplateId">
                             </select-option>
                         </div>
+
+                        <div class="form-group">
+                            <label for="system-name" class="control-label small">Er der lavet en databehandleraftale?</label>
+                            <select class="form-control input-sm"
+                                    data-ng-disabled="!hasWriteAccess"
+                                    ui-select2="{minimumResultsForSearch: -1}"
+                                    data-ng-model="contract.containsDataHandlerAgreement"
+                                    data-autosave="{{autoSaveUrl}}"
+                                    data-field="ContainsDataHandlerAgreement">
+                                <option value="1">Ja</option>
+                                <option value="0">Nej</option>
+                                <option value="2">Ved Ikke</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- 2nd column -->
@@ -106,6 +120,20 @@
                                 <option value=""></option>
                                 <option data-ng-repeat="procurementPlan in procurementPlans" value="{{procurementPlan.id}}">{{procurementPlan.half + ' | ' + procurementPlan.year}}</option>
                             </select>
+                        </div>
+
+                        <div class="form-group" data-ng-show="contract.containsDataHandlerAgreement == 1" >
+                            <label for="datahandler-link" class="control-label small">Link til databehandleraftalen</label>
+                            
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-hide="dataHandlerLink == ''">
+                                <a id="datahandler-link" href="{{dataHandlerLink}}">Databehandler aftale</a>
+                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink()"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </div>
+
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-show="dataHandlerLink == ''">
+                                <label for="datahandler-link" class="control-label small">Intet Link til databehandleraftalen.</label>
+                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink()"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </div>
                         </div>
                     </div>
                     <div class="col-xs-12"  data-ng-hide="!hasViewAccess">

@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.ItSystem.DataTypes;
 using System;
 using System.Collections.Generic;
 
@@ -84,5 +85,11 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
+        public DataOptions ContainsDataHandlerAgreement { get; set; }
+
+        public string DataHandlerAgreementUrl { get; set; }
+
+        public int DataHandlerId { get; set; }
+        public virtual ItContractDTO DataHandler { get; set; }
     }
 }
