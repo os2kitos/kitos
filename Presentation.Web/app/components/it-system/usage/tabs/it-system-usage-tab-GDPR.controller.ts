@@ -91,15 +91,6 @@
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
 
-            $scope.persOptions = [
-                { id: '0', name: 'Kryptering' },
-                { id: '1', name: 'Pseudonymisering' },
-                { id: '2', name: 'Dataminimering' },
-                { id: '3', name: 'Logning' },
-                { id: '4', name: 'Rettigheds- og adgangsstyring' }
-            ];
-            $scope.selection = $scope.persOptions[systemUsage.precautionsOptions];
-
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
