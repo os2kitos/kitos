@@ -320,7 +320,11 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string ArchiveNotes { get; set; }
 
+        public int ArchiveFreq { get; set; }
+
         public string ArchiveSupplier { get; set; }
+
+        public bool Registertype { get; set; }
 
         public int? SupplierId { get; set; }
         /// <summary>
@@ -332,6 +336,10 @@ namespace Core.DomainModel.ItSystemUsage
         public int? ArchiveLocationId { get; set; }
 
         public virtual ArchiveLocation ArchiveLocation { get; set; }
+
+        public int? ArchiveTestLocationId { get; set; }
+
+        public virtual ArchiveTestLocation ArchiveTestLocation { get; set; }
 
         public int? ItSystemCategoriesId { get; set; }
 

@@ -32,6 +32,9 @@
         ArchiveLocationId: number;
         ArchiveLocation: ItSystem.IArchiveLocation;
 
+        ArchiveTestLocationId: number;
+        ArchiveTestLocation: ItSystem.IArchiveTestLocation;
+
         SensitiveDataTypeId: number;
         SensitiveDataType: ItSystem.ISensitiveDataType;
         OverviewId: number;

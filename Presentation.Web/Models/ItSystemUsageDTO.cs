@@ -28,6 +28,10 @@ namespace Presentation.Web.Models
         public int? ArchiveLocationId { get; set; }
         public string ArchiveLocationName { get; set; }
 
+        public int? ArchiveTestLocationId { get; set; }
+
+        public string ArchiveTestLocationName { get; set; }
+
         public string ArchiveSupplier { get; set; }
         public int SupplierId { get; set; }
 

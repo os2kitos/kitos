@@ -15,6 +15,11 @@
                     $http.get("odata/LocalArchivelocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             .then(result => result.data.value)
                 ],
+                archiveTestLocations: [
+                    "$http", $http =>
+                    $http.get("odata/LocalArchiveTestlocations?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                            .then(result => result.data.value)
+                ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
                         $http.get(`odata/itSystemUsages(${$stateParams.id})`)
@@ -27,11 +32,12 @@
         });
     }]);
 
-    app.controller("system.EditArchiving", ["$scope", "_", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "systemUsage", "archivePeriod", "moment", "notify",
-        ($scope, _,$http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, systemUsage, archivePeriod, moment, notify) => {
+    app.controller("system.EditArchiving", ["$scope", "_", "$http", "$state", "$stateParams", "$timeout", "user", "itSystemUsage", "itSystemUsageService", "archiveTypes", "archiveLocations", "archiveTestLocations", "systemUsage", "archivePeriod", "moment", "notify",
+        ($scope, _, $http, $state, $stateParams, $timeout, user, itSystemUsage, itSystemUsageService, archiveTypes, archiveLocations, archiveTestLocations, systemUsage, archivePeriod, moment, notify) => {
             $scope.usage = itSystemUsage;
             $scope.archiveTypes = archiveTypes;
             $scope.archiveLocations = archiveLocations;
+            $scope.archiveTestLocations = archiveTestLocations;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.ArchivedDate = systemUsage.ArchivedDate;
@@ -68,7 +74,17 @@
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
-                itSystemUsageService.patchSystem($scope.usageId, payload);
+                if (field === "Archived") {
+                    $http.patch(`/odata/ItSystemUsages(${$scope.usageId})`, payload)
+                        .then(() => {
+                            notify.addSuccessMessage("Feltet er opdateret!");
+                            reload();
+                            },
+                            () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                }
+                else {
+                    itSystemUsageService.patchSystem($scope.usageId, payload);
+                }
             }
             $scope.patchSupplier = (field, value) => {
                 var payload = {};
@@ -76,7 +92,7 @@
                 payload["ArchiveSupplier"] = value.text;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
             }
-            
+
             if (systemUsage.SupplierId) {
                 $scope.systemUsage.supplier = {
                     id: systemUsage.SupplierId,
@@ -86,7 +102,6 @@
             
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
-                //if ($scope.archiveForm.$invalid) { return; }
 
                 var startDate = moment($scope.archivePeriod.startDate);
                 if (!startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099) {
