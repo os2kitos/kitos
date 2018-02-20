@@ -230,7 +230,7 @@
                 $scope.systemUsage.ArchiveNotes != null;
 
             $scope.datepickerOptions = {
-                format: "yyyy-MM-dd"
+                format: "dd-MM-yyyy"
             };
         }]);
 
