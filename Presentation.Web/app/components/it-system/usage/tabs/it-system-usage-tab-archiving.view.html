@@ -27,40 +27,26 @@
                 <div class="form-group">
                     <label class="control-label small">Arkiveringspligt</label><br>
                     <input type="radio" id="ArchiveDutyB"
-                           data-ng-model="systemUsage.ArchiveDuty"
-                           ng-value="0"
-                           data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
-                           data-field="ArchiveDuty">
-                    <label class="control-label small" for="ArchiveDutyB">B</label>
-                    <input type="radio" id="ArchiveDutyK"
-                           data-ng-model="systemUsage.ArchiveDuty"
+                           data-ng-model="ArchiveDuty"
                            ng-value="1"
                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
+                           ng-click="patch('ArchiveDuty', ArchiveDuty)"
+                           data-field="ArchiveDuty">
+                    <label class="control-label small" for="ArchiveDutyB">B </label>
+                    <input type="radio" id="ArchiveDutyK"
+                           data-ng-model="ArchiveDuty"
+                           ng-value="2"
+                           data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                           ng-click="patch('ArchiveDuty', ArchiveDuty)"
                            data-field="ArchiveDuty">
                     <label class="control-label small" for="ArchiveDutyK">K </label>
                     <input type="radio" id="ArchiveDutyDunno"
-                           data-ng-model="systemUsage.ArchiveDuty"
-                           ng-value="2"
+                           data-ng-model="ArchiveDuty"
+                           ng-value="3"
                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                           ng-click="patch('ArchiveDuty', systemUsage.ArchiveDuty)"
+                           ng-click="patch('ArchiveDuty', ArchiveDuty)"
                            data-field="ArchiveDuty">
                     <label class="control-label small" for="ArchiveDutyDunno">Ved ikke</label>
-                </div>
-                <!-- Archive duty -->
-                <div class="form-group">
-                    <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
-                    <select class="form-control input-sm" id="archiveDuty"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="usage.itSystem.archiveDuty"
-                            data-autosave=""
-                            data-field="ArchiveDuty"
-                            data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
-                        <option value="0">Ingen valgt</option>
-                        <option value="1">B</option>
-                        <option value="2">K</option>
-                    </select>
                 </div>
                 <!-- ReportedToDPA -->
                 <div class="form-group">

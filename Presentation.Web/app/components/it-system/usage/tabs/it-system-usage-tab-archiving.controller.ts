@@ -37,10 +37,16 @@
             $scope.ArchivedDate = systemUsage.ArchivedDate;
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
+            $scope.ArchiveDuty = systemUsage.ArchiveDuty;
 
-            if (itSystemUsage.itSystem.ArchiveDuty !== 0) {
-                $scope.ArchiveDuty = itSystemUsage.itSystem.ArchiveDuty;
+            if (!systemUsage.Archived) {
+                $scope.systemUsage.Archived = false;
             }
+
+            if (!systemUsage.ArchiveDuty) {
+                $scope.ArchiveDuty = itSystemUsage.itSystem.archiveDuty;
+            }
+
             if ($scope.archivePeriods) {
                 sortDate();
             }
