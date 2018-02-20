@@ -102,14 +102,15 @@
             
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
+                var formatString = "DD-MM-YYYY";
 
-                var startDate = moment($scope.archivePeriod.startDate);
+                var startDate = moment($scope.archivePeriod.startDate, formatString);
                 if (!startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
                 } else {
                     startDate = startDate.format("YYYY-MM-DD");
                 }
-                var endDate = moment($scope.archivePeriod.endDate);
+                var endDate = moment($scope.archivePeriod.endDate, formatString);
                 if (!endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
                 } else {
@@ -186,8 +187,9 @@
             }
 
             $scope.patchDate = (field, value) => {
-                var date = moment(value);
-
+                var formatString = "DD-MM-YYYY";
+                var date = moment(value, formatString);
+                console.log(date);
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     $scope.ArchivedDate = systemUsage.ArchivedDate;
@@ -200,7 +202,9 @@
                 }
             };
             $scope.patchDatePeriode = (field, value, id) => {
-                var date = moment(value);
+                var formatString = "DD-MM-YYYY";
+                console.log(value);
+                var date = moment(value, formatString);
 
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");

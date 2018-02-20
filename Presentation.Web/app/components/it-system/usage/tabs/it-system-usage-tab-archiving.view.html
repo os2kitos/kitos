@@ -128,6 +128,18 @@
                                data-field="archiveTestLocationId">
                 </select-option>
             </div>
+            <!-- ArchivedDate -->
+            <div class="form-group">
+                <label for="ArchivedDateId" class="control-label small">Arkiveringsdato {{ArchivedDate}}</label>
+                <input type="text" id="ArchivedDateId" class="form-control"
+                       data-kendo-date-picker
+                       data-k-options="datepickerOptions"
+                       data-ng-disabled="!hasWriteAccess"
+                       data-ng-model="ArchivedDate"
+                       ng-blur="patchDate('ArchivedDate', ArchivedDate)"
+                       data-field="ArchivedDate">
+                <span id="helpBlock" class="help-block small">Eksempelvis "2017-04-25"</span>
+            </div>
             <!-- ArchiveNotes -->
             <div class="form-group">
                 <label for="ArchiveNotes" class="control-label small">Arkiveringsbemærkninger</label>
