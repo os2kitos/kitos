@@ -116,9 +116,8 @@
                 $uibModal.open({
                     templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
                     controller: ['$scope', '$state', '$uibModalInstance', 'usage', function ($scope, $state, $uibModalInstance, usage) {
-                        console.log(usage);
-                        $scope.usage = usage;
 
+                        $scope.usage = usage;
 
                         switch (field) {
                             case 'datahandlerSupervisionDocumentationUrl':
@@ -167,10 +166,7 @@
                                     payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
                                     break;
                             }
-
-                            console.log('payload:');
-                            console.log(payload);
-                       
+                      
                             var msg = notify.addInfoMessage("Gemmer...", false);
 
                             $http({ method: 'PATCH', url: 'api/itsystemusage/' + $scope.usage.Id + '?organizationId=' + user.currentOrganizationId, data: payload })
