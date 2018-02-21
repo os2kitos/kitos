@@ -149,6 +149,7 @@
                                 userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
                                 riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
                                 dataHearingSupervisionDocumentationUrl: $scope.usage.DataHearingSupervisionDocumentationUrl,
+                                DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl
                             }
 
                             switch (field) {
