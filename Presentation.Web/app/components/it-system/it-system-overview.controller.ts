@@ -179,7 +179,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -233,7 +233,8 @@
                         model: {
                             fields: {
                                 LastChanged: { type: "date" },
-                                Concluded: { type: "date" }
+                                Concluded: { type: "date" },
+                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" }
                             }
                         },
                         parse: response => {
@@ -674,7 +675,6 @@
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 220,
                         persistId: "concludedSystem", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            console.log(dataItem);
                             if (!dataItem || !dataItem.Concluded) {
                                 return "";
                             }
@@ -682,6 +682,31 @@
                         },
                         hidden: true,
                         filterable: true
+                    },
+                    {
+                        field: "EndDate", title: "Journalperiode slutdato", format: "{0:dd-MM-yyyy}", width: 180,
+                        persistId: "ArchivePeriodsEndDate", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (!dataItem || !dataItem.ArchivePeriods) {
+                                return "";
+                            }
+                            let dateList;
+                            _.each(dataItem.ArchivePeriods, x => {
+                                if (moment().isBetween(moment(x.StartDate), moment(x.EndDate), 'days', '[]')) {
+                                    if (!dateList || dateList.StartDate > x.StartDate) {
+                                        dateList = x;
+                                    }
+                                } 
+                            });
+                            if (!dateList) {
+                                return "";
+                            } else {
+                                return this.moment(dateList.EndDate).format("DD-MM-YYYY");
+                            }
+                            
+                        },
+                        hidden: true,
+                        filterable: false
                     }
                 ]
             };
@@ -788,100 +813,6 @@
             }
             return dataItem.Active;
         }
-
-        //// show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        //public showExposureDetails(usageId, systemName) {
-        //    // filter by usageId
-        //    this.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-        //    // set title
-        //    this.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
-        //    // open modal
-        //    this.exhibitModal.center().open();
-        //}
-
-        //public exhibitDetailsGrid = {
-        //    dataSource: {
-        //        type: "odata-v4",
-        //        transport: {
-        //            read: {
-        //                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
-        //                dataType: "json"
-        //            }
-        //        },
-        //        serverPaging: true,
-        //        serverSorting: true,
-        //        serverFiltering: true
-        //    },
-        //    autoBind: false,
-        //    columns: [
-        //        {
-        //            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
-        //        },
-        //        {
-        //            field: "ItInterface.Name", title: "Snitflade"
-        //        }
-        //    ],
-        //    dataBound: this.exposureDetailsBound
-        //};
-
-        //// exposuredetails grid empty-grid handling
-        //private exposureDetailsBound(e) {
-        //    var grid = e.sender;
-        //    if (grid.dataSource.total() == 0) {
-        //        var colCount = grid.columns.length;
-        //        this.$(e.sender.wrapper)
-        //            .find("tbody")
-        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System udstiller ikke nogle snitflader</td></tr>`);
-        //    }
-        //}
-
-        //// show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        //private showUsageDetails(systemId, systemName) {
-        //    // filter by systemId
-        //    this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-        //    // set modal title
-        //    this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
-        //    // open modal
-        //    this.modal.center().open();
-        //}
-
-        //// usagedetails grid - shows which organizations has a given itsystem in local usage
-        //public usageDetailsGrid = {
-        //    dataSource: {
-        //        type: "odata-v4",
-        //        transport:
-        //        {
-        //            read: {
-        //                url: "/odata/ItInterfaceUses/?$expand=ItInterface",
-        //                dataType: "json"
-        //            },
-        //        },
-        //        serverPaging: true,
-        //        serverSorting: true,
-        //        serverFiltering: true
-        //    },
-        //    autoBind: false,
-        //    columns: [
-        //        {
-        //            field: "ItInterfaceId", title: "Snitflade ID"
-        //        },
-        //        {
-        //            field: "ItInterface.Name", title: "Snitflade"
-        //        }
-        //    ],
-        //    dataBound: this.detailsBound
-        //};
-
-        //// usagedetails grid empty-grid handling
-        //private detailsBound(e) {
-        //    var grid = e.sender;
-        //    if (grid.dataSource.total() == 0) {
-        //        var colCount = grid.columns.length;
-        //        this.$(e.sender.wrapper)
-        //            .find("tbody")
-        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
-        //    }
-        //};
 
         private orgUnitDropDownList = (args) => {
             var self = this;
