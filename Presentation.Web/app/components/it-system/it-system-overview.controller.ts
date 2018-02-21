@@ -233,7 +233,8 @@
                         model: {
                             fields: {
                                 LastChanged: { type: "date" },
-                                Concluded: { type: "date" }
+                                Concluded: { type: "date" },
+                                ArchiveDuty: { type: "number"}
                             }
                         },
                         parse: response => {
@@ -674,7 +675,6 @@
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 220,
                         persistId: "concludedSystem", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            console.log(dataItem);
                             if (!dataItem || !dataItem.Concluded) {
                                 return "";
                             }
@@ -682,6 +682,36 @@
                         },
                         hidden: true,
                         filterable: true
+                    },
+                    {
+                        field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
+                        persistId: "ArchiveDuty", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            switch (dataItem.ArchiveDuty) {
+                                case 1:
+                                    return "B";
+                                case 2:
+                                    return "K";
+                                case 3:
+                                    return "Ved ikke";
+                                default:
+                                    return "";
+                            }
+                        },
+                        hidden: false,
+                        filterable:{
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
                     }
                 ]
             };
