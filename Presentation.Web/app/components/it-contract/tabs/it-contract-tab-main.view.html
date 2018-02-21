@@ -125,12 +125,12 @@
                         <div class="form-group" data-ng-show="contract.containsDataHandlerAgreement == 1" >
                             <label for="datahandler-link" class="control-label small">Link til databehandleraftalen</label>
                             
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-hide="dataHandlerLink == ''">
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-hide="dataHandlerLink == ''"  data-ng-disabled="!hasWriteAccess">
                                 <a id="datahandler-link" href="{{dataHandlerLink}}">Databehandler aftale</a>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink()"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
 
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-show="dataHandlerLink == ''">
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-show="dataHandlerLink == ''"  data-ng-disabled="!hasWriteAccess">
                                 <label for="datahandler-link" class="control-label small">Intet Link til databehandleraftalen.</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink()"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>

@@ -150,10 +150,10 @@
 
                     <div class="form-group">
                         <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;">
-                            <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Dokumentation</a>
-                            <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
-                            <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                         <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
+                             <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Dokumentation</a>
+                             <label for="datahandler-link" class="control-label small"  data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
+                             <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -314,8 +314,8 @@
                         </div>
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;">
-                                <a id="datahandler-link" href="{{systemUsage.technicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.technicalSupervisionDocumentationUrl == ''">Dokumentation</a>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-link" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.technicalSupervisionDocumentationUrl == ''">Dokumentation</a>
                                 <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.technicalSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('technicalSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
@@ -358,16 +358,16 @@
                             <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
                         </div>
 
-                        <div class="form-group">
-                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;">
-                                <a id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == ''">Dokumentation</a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
-                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
-                            </div>
+                    <div class="form-group">
+                        <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
+                            <a id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == ''">Dokumentation</a>
+                            <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
+                            <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
+            </div>
                 <!-- Risk assessment -->
                 <div class="form-group">
                     <label class="control-label small">Foretaget risikovurdering</label><br>
@@ -438,7 +438,7 @@
 
                     <div class="form-group">
                         <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;">
+                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
                             <a id="datahandler-link" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == ''">Dokumentation</a>
                             <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.RiskSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
                             <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('RiskSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
@@ -495,6 +495,15 @@
                                    data-field="DPIADateFor">
                             <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "2017-04-25"</span>
                         </div>
+
+                        <div class="form-group">
+                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == ''">Dokumentation</a>
+                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
+                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DPIASupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div ng-show="systemUsage.DPIA == 1">
@@ -525,10 +534,9 @@
                                data-field="DPIAhearing">
                         <label class="control-label small" for="DPIAhearingDunno">Ved ikke</label>
                     </div>
-                    <div ng-show="systemUsage.DPIA == 1">
-
+                    <div ng-show="systemUsage.DPIAhearing == 1">
                         <!-- Date of DPIA -->
-                        <div class="form-group">
+                        <div class="form-group" >
                             <label for="DPIADate" class="control-label small">Dato for høring</label>
                             <input type="text" id="DPIADate" class="form-control"
                                    data-kendo-date-picker
@@ -542,9 +550,9 @@
 
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;">
-                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DataHearingSupervisionDocumentationUrl == ''">Dokumentation</a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DataHearingSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Dokumentation</a>
+                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DataHearingSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
                         </div>
