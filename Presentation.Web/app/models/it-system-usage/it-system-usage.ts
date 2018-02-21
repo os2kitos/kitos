@@ -66,6 +66,7 @@
 
         Concluded?: Date;
         ArchiveDuty: number;
+        Registertype: boolean;
 
     }
 }

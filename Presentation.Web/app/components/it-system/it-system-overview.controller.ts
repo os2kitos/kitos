@@ -235,6 +235,7 @@
                                 LastChanged: { type: "date" },
                                 Concluded: { type: "date" },
                                 ArchiveDuty: { type: "number" },
+                                Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" }
                             }
                         },
@@ -705,6 +706,24 @@
                                 template: function (args) {
                                     args.element.kendoDropDownList({
                                         dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    }, {
+                        field: "Registertype", title: "Er dokumentbærende", width: 160,
+                        persistId: "Registertype", // DON'T YOU DARE RENAME!
+                        template: dataItem => {return dataItem.Registertype ? "Ja" : "Nej"; },
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
                                         dataTextField: "type",
                                         dataValueField: "value",
                                         valuePrimitive: true
