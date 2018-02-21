@@ -612,7 +612,19 @@
                         attributes: { "class": "text-right" },
                         hidden: true,
                         sortable: false,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: "YES" }, { type: "Nej", value: "NO" }, { type: "Ved ikke", value: "DONTKNOW" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
                     },
                     {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
