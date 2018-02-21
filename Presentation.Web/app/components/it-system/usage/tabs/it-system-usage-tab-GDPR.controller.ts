@@ -42,7 +42,14 @@
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
-            console.log(itSystemUsage);
+            $scope.usageId = $stateParams.id;
+            $scope.systemUsage = systemUsage;
+            $scope.systemCategories = systemCategories;
+            $scope.regularSensitiveData = regularSensitiveData;
+            $scope.sensitivePersonalData = sensitivePersonalData;
+            $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
+            $scope.filterDataProcessor = $scope.contracts.length > 0;
+            console.log($scope.systemUsage);
             //inherit from parent if general purpose is empty
             $scope.generalPurpose = $scope.usage.generalPurpose;
 
@@ -82,14 +89,6 @@
                     });
                 }
             }
-
-            $scope.usageId = $stateParams.id;
-            $scope.systemUsage = systemUsage;
-            $scope.systemCategories = systemCategories;
-            $scope.regularSensitiveData = regularSensitiveData;
-            $scope.sensitivePersonalData = sensitivePersonalData;
-            $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
-            $scope.filterDataProcessor = $scope.contracts.length > 0;
 
             $scope.patch = (field, value) => {
                 var payload = {};
@@ -135,6 +134,9 @@
                             case 'DataHearingSupervisionDocumentationUrl':
                                 $scope.Url = $scope.usage.DataHearingSupervisionDocumentationUrl;
                                 break;
+                            case 'DPIASupervisionDocumentationUrl':
+                                $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
+                                break;
                         }
 
 
@@ -164,6 +166,9 @@
                                     break;
                                 case 'DataHearingSupervisionDocumentationUrl':
                                     payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
+                                    break;
+                                case 'DPIASupervisionDocumentationUrl':
+                                    payload.DPIASupervisionDocumentationUrl = $scope.Url;
                                     break;
                             }
                       

@@ -495,6 +495,15 @@
                                    data-field="DPIADateFor">
                             <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "2017-04-25"</span>
                         </div>
+
+                        <div class="form-group">
+                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == ''">Dokumentation</a>
+                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
+                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DPIASupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div ng-show="systemUsage.DPIA == 1">
