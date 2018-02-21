@@ -61,5 +61,7 @@
 
         ReferenceId: number;
         Reference: IReference;
+
+        Concluded?: Date;
     }
 }

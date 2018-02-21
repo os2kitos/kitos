@@ -232,7 +232,8 @@
                     schema: {
                         model: {
                             fields: {
-                                LastChanged: { type: "date" }
+                                LastChanged: { type: "date" },
+                                Concluded: { type: "date" }
                             }
                         },
                         parse: response => {
@@ -659,7 +660,6 @@
                             if (!dataItem || !dataItem.LastChanged) {
                                 return "";
                             }
-
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
                         },
                         hidden: true,
@@ -669,6 +669,19 @@
                                 operator: "gte"
                             }
                         }
+                    },
+                    {
+                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 220,
+                        persistId: "concludedSystem", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            console.log(dataItem);
+                            if (!dataItem || !dataItem.Concluded) {
+                                return "";
+                            }
+                            return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
+                        },
+                        hidden: true,
+                        filterable: true
                     }
                 ]
             };
