@@ -167,6 +167,14 @@ namespace Core.ApplicationServices
                         return false;
                     }
                 }
+                //Economy stream can be modified by local admin and contractmodule admin which is why this is a special case.
+                if(entity is EconomyStream)
+                {
+                    if (!_featureChecker.CanExecute(user, Feature.CanSetContractElementsAccessModifierToPublic))
+                    {
+                        return false;
+                    }
+                }
                 else if (!_featureChecker.CanExecute(user, Feature.CanSetAccessModifierToPublic))
                 {
                     return false;
