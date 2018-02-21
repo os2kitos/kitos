@@ -700,6 +700,18 @@
                                     return "";
                             }
                         },
+                        excelTemplate: dataItem => {
+                            switch (dataItem.ArchiveDuty) {
+                                case 1:
+                                    return "B";
+                                case 2:
+                                    return "K";
+                                case 3:
+                                    return "Ved ikke";
+                                default:
+                                    return "";
+                            }
+                        },
                         hidden: false,
                         filterable:{
                             cell: {
