@@ -91,15 +91,6 @@
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
 
-            $scope.persOptions = [
-                { id: '0', name: 'Kryptering' },
-                { id: '1', name: 'Pseudonymisering' },
-                { id: '2', name: 'Dataminimering' },
-                { id: '3', name: 'Logning' },
-                { id: '4', name: 'Rettigheds- og adgangsstyring' }
-            ];
-            $scope.selection = $scope.persOptions[systemUsage.precautionsOptions];
-
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
@@ -125,9 +116,8 @@
                 $uibModal.open({
                     templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
                     controller: ['$scope', '$state', '$uibModalInstance', 'usage', function ($scope, $state, $uibModalInstance, usage) {
-                        console.log(usage);
-                        $scope.usage = usage;
 
+                        $scope.usage = usage;
 
                         switch (field) {
                             case 'datahandlerSupervisionDocumentationUrl':
@@ -176,10 +166,7 @@
                                     payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
                                     break;
                             }
-
-                            console.log('payload:');
-                            console.log(payload);
-                       
+                      
                             var msg = notify.addInfoMessage("Gemmer...", false);
 
                             $http({ method: 'PATCH', url: 'api/itsystemusage/' + $scope.usage.Id + '?organizationId=' + user.currentOrganizationId, data: payload })
@@ -296,7 +283,7 @@
             };
 
             $scope.datepickerOptions = {
-                format: "yyyy-MM-dd"
+                format: "dd-MM-yyyy"
             };
         }]);
 

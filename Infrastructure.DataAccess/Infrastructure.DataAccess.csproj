@@ -499,6 +499,10 @@
     <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.Designer.cs">
       <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802191216367_DPIAAdded.cs" />
+    <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -757,6 +761,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802161536558_user supervision info added to sysusage.resx">
       <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
