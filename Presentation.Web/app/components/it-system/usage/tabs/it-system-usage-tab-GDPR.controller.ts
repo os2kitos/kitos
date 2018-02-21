@@ -42,7 +42,7 @@
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
-        
+            console.log(itSystemUsage);
             //inherit from parent if general purpose is empty
             $scope.generalPurpose = $scope.usage.generalPurpose;
 

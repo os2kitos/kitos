@@ -525,10 +525,9 @@
                                data-field="DPIAhearing">
                         <label class="control-label small" for="DPIAhearingDunno">Ved ikke</label>
                     </div>
-                    <div ng-show="systemUsage.DPIA == 1">
-
+                    <div ng-show="systemUsage.DPIAhearing == 1">
                         <!-- Date of DPIA -->
-                        <div class="form-group">
+                        <div class="form-group" >
                             <label for="DPIADate" class="control-label small">Dato for høring</label>
                             <input type="text" id="DPIADate" class="form-control"
                                    data-kendo-date-picker
@@ -543,7 +542,7 @@
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.dataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Dokumentation</a>
+                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Dokumentation</a>
                                 <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Intet Link til dokumentation.</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DataHearingSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
