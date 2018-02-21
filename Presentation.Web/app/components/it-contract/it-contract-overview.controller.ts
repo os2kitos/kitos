@@ -610,7 +610,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.ContainsDataHandlerAgreement || "",
                         template: dataItem => this.parseOptionEnum(dataItem.ContainsDataHandlerAgreement),
                         attributes: { "class": "text-right" },
-                        hidden: false,
+                        hidden: true,
                         sortable: false,
                         filterable: false
                     },
