@@ -605,7 +605,7 @@
                         filterable: false
                     },
                     {
-                        field: "ContainsDataHandlerAgreement", title: "Databehandler aftale", width: 150,
+                        field: "ContainsDataHandlerAgreement", title: "Databehandleraftale", width: 150,
                         persistId: "ContainsDataHandlerAgreement", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem && dataItem.ContainsDataHandlerAgreement || "",
                         template: dataItem => this.parseOptionEnum(dataItem.ContainsDataHandlerAgreement),
