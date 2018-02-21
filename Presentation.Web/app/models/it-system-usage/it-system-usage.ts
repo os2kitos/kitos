@@ -65,5 +65,7 @@
         Reference: IReference;
 
         Concluded?: Date;
+        ArchiveDuty: number;
+
     }
 }
