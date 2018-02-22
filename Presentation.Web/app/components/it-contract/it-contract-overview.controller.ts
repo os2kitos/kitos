@@ -18,6 +18,7 @@
         Operation: number;
         Other: number;
         AuditDate: string;
+        ContainsDataHandlerAgreement: string;
         status: {
             max: number;
             white: number;
@@ -223,6 +224,20 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
+        
+
+        public parseOptionEnum(enumName: string): string {
+            switch (enumName) {
+                case "YES":
+                    return "Ja";
+                case "NO":
+                    return "Nej";
+                case "DONTKNOW":
+                    return "Ved ikke";
+                default:
+                    return "";
+            }
+        }      
 
         private activate() {
 
@@ -590,6 +605,28 @@
                         filterable: false
                     },
                     {
+                        field: "ContainsDataHandlerAgreement", title: "Databehandleraftale", width: 150,
+                        persistId: "ContainsDataHandlerAgreement", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem && dataItem.ContainsDataHandlerAgreement || "",
+                        template: dataItem => this.parseOptionEnum(dataItem.ContainsDataHandlerAgreement),
+                        attributes: { "class": "text-right" },
+                        hidden: true,
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: "YES" }, { type: "Nej", value: "NO" }, { type: "Ved ikke", value: "DONTKNOW" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    },
+                    {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "opremun", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
@@ -691,7 +728,7 @@
                     }
                 }
             };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole); 
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
