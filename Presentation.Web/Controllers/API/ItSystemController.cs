@@ -468,6 +468,10 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
         {
+            if (user.IsLocalAdmin && obj.ObjectOwnerId == user.Id)
+            {
+                return true;
+            }
             return HasWriteAccess();
         }
 

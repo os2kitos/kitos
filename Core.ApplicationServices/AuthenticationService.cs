@@ -149,9 +149,9 @@ namespace Core.ApplicationServices
                 return false;
             }
 
-            if (user.IsGlobalAdmin)
+            //User has access if user created entity
+            if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
             {
-                // global admin always have access
                 return true;
             }
 
