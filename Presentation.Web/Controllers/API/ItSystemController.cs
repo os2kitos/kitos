@@ -466,18 +466,18 @@ namespace Presentation.Web.Controllers.API
             return !system.Any();
         }
 
-        protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
-        {
-            if (user.IsLocalAdmin && obj.ObjectOwnerId == user.Id)
-            {
-                return true;
-            }
-            return HasWriteAccess();
-        }
+        //protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
+        //{
+        //    if (user.IsLocalAdmin && obj.ObjectOwnerId == user.Id)
+        //    {
+        //        return true;
+        //    }
+        //    return HasWriteAccess();
+        //}
 
-        protected bool HasWriteAccess()
-        {
-            return KitosUser.IsGlobalAdmin;
-        }
+        //protected bool HasWriteAccess()
+        //{
+        //    return KitosUser.IsGlobalAdmin;
+        //}
     }
 }
