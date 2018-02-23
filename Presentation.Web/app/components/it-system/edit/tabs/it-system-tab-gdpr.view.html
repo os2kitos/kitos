@@ -32,11 +32,13 @@
                     <div class="well">
                         <label class="radio-inline">
                             <input type="radio" data-ng-model="system.isDataTransferedToThirdCountries" name="inlineRadioOptions"
-                                   id="inlineRadioNo" ng-value="true" data-ng-change="changeDataField('isDataTransferedToThirdCountries')"> Ja
+                                   id="inlineRadioNo" ng-value="true" data-ng-change="changeDataField('isDataTransferedToThirdCountries')" 
+                                   data-ng-disabled="!hasWriteAccess"> Ja
                         </label>
                         <label class="radio-inline">
                             <input type="radio" data-ng-model="system.isDataTransferedToThirdCountries" name="inlineRadioOptions"
-                                   id="inlineRadioNo" ng-value="false" data-ng-change="changeDataField('isDataTransferedToThirdCountries')"> Nej
+                                   id="inlineRadioNo" ng-value="false" data-ng-change="changeDataField('isDataTransferedToThirdCountries')" 
+                                   data-ng-disabled="!hasWriteAccess"> Nej
                         </label>
                     </div>
                 </div>

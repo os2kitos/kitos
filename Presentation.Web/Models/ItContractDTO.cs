@@ -89,7 +89,7 @@ namespace Presentation.Web.Models
 
         public string DataHandlerAgreementUrl { get; set; }
 
-        public int DataHandlerId { get; set; }
+        public int? DataHandlerId { get; set; }
         public virtual ItContractDTO DataHandler { get; set; }
     }
 }
