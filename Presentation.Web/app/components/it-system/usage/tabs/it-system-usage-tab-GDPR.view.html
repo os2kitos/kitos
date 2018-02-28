@@ -67,18 +67,22 @@
                 <!-- Data processing agreement -->
                 <div class="form-group" ng-show="filterDataProcessor">
                     <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
-                    <textarea data-ng-disabled="true"
-                              class="form-control input-sm"
-                              style="overflow:auto;resize:none"
-                              ng-repeat="contract in contracts">{{contract.name}}
-                    </textarea>
+                    <div class="well">
+                        <ul id="dataProcessingAgreement"
+                            
+                            style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
+                            ng-repeat="contract in contracts">
+                            <li><a data-ui-sref="it-contract.edit.systems({id: contract.id})"> {{contract.name}} </a></li>
+                        </ul>
+                    </div>
+                    <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
                 </div>
                 <div class="form-group" ng-hide="filterDataProcessor">
-                    <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
-                    <textarea data-ng-disabled="true"
+                    <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
+                    <ul data-ng-disabled="true" id="dataProcessingAgreementNone"
                               class="form-control input-sm"
-                              style="overflow:auto;resize:none">Ingen
-                    </textarea>
+                              style="list-style-type:none">Ingen
+                    </ul>
                 </div>
                 <!-- Data processor control -->
                 <div class="form-group">
