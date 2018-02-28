@@ -83,15 +83,29 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 var today = new Date();
-
                 $scope.dataHandlerLink = '';
+                console.log($scope.contract)
 
+                
                 if ($scope.contract.dataHandler != null) {
-                    $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId+ '/main';
+                    $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId + '/main';
+
+                    if ($scope.contract.dataHandlerAgreementUrlName == '') {
+                        $scope.dataHandlerLinkName = $scope.contract.dataHandler.name;
+                    } else {
+                        $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
+                    }
+
                 } else if ($scope.contract.dataHandlerAgreementUrl != '') {
                     $scope.dataHandlerLink = $scope.contract.dataHandlerAgreementUrl;
+
+                    if ($scope.contract.dataHandlerAgreementUrlName == '') {
+                        $scope.dataHandlerLinkName = "Databehandleraftale";
+                    } else {
+                        $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
+                    }
                 }
-                
+
                 if (!contract.active) {
                     if (contract.concluded < today && today < contract.expirationDate) {
                         $scope.displayActive = true;
@@ -218,7 +232,8 @@
                                 var payload = {
                                     Id: contract.id,
                                     DataHandlerId: $scope.contract.dataHandlerId,
-                                    DataHandlerAgreementUrl: $scope.contract.dataHandlerAgreementUrl
+                                    DataHandlerAgreementUrl: $scope.contract.dataHandlerAgreementUrl,
+                                    DataHandlerAgreementUrlName: $scope.contract.dataHandlerAgreementUrlName
                                 }
 
                                 $http({ method: 'PATCH', url: 'api/itcontract/' + contract.id + '?organizationId=' + user.currentOrganizationId, data: payload })

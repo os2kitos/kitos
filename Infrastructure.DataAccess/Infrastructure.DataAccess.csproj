@@ -507,6 +507,10 @@
     <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.Designer.cs">
       <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.cs" />
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.Designer.cs">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -771,6 +775,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.resx">
       <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281250267_Name for url on itcontract added.resx">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
