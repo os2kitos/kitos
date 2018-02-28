@@ -503,6 +503,10 @@
     <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.cs" />
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.Designer.cs">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -764,6 +768,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.resx">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

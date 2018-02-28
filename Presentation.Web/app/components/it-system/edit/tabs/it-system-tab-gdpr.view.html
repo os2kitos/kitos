@@ -15,17 +15,35 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="system-name" class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label>
-                    <select class="form-control input-sm"
-                            data-ng-disabled="!hasWriteAccess"
-                            ui-select2="{minimumResultsForSearch: -1}"
-                            data-ng-model="system.containsLegalInfo"
-                            data-ng-change="changeDataField('containsLegalInfo')">
-                        <option value="1">Ja</option>
-                        <option value="0">Nej</option>
-                        <option value="2">Ved Ikke</option>
-                    </select>
+                    <label class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label><br>
+                    <div class="well">
+                        <input type="radio" id="containsLegalInfoYes"
+                               data-ng-model="system.containsLegalInfo"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="changeDataField('containsLegalInfo')"
+                               data-field="containsLegalInfo">
+                        <label class="control-label small" for="containsLegalInfoYes">Ja</label>
+                        &nbsp;
+                        <input type="radio" id="containsLegalInfoNo"
+                               data-ng-model="system.containsLegalInfo"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="changeDataField('containsLegalInfo')"
+                               data-field="containsLegalInfo">
+                        <label class="control-label small" for="containsLegalInfoNo">Nej</label>
+                        &nbsp;
+                        <input type="radio" id="containsLegalInfoDunno"
+                               data-ng-model="system.containsLegalInfo"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="changeDataField('containsLegalInfo')"
+                               data-field="containsLegalInfo">
+                        <label class="control-label small" for="containsLegalInfoDunno">Ved ikke</label>
+                    </div>
                 </div>
+
+
 
                 <div class="form-group">
                     <label for="system-name" class="control-label small">Sker der overførsel af data til 3. lande?</label>
