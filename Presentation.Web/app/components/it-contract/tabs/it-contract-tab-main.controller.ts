@@ -84,13 +84,12 @@
                 $scope.orgUnits = orgUnits;
                 var today = new Date();
                 $scope.dataHandlerLink = '';
-                console.log($scope.contract)
 
                 
                 if ($scope.contract.dataHandler != null) {
                     $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId + '/main';
 
-                    if ($scope.contract.dataHandlerAgreementUrlName == '') {
+                    if (!$scope.contract.dataHandlerAgreementUrlName) {
                         $scope.dataHandlerLinkName = $scope.contract.dataHandler.name;
                     } else {
                         $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
@@ -99,7 +98,7 @@
                 } else if ($scope.contract.dataHandlerAgreementUrl != '') {
                     $scope.dataHandlerLink = $scope.contract.dataHandlerAgreementUrl;
 
-                    if ($scope.contract.dataHandlerAgreementUrlName == '') {
+                    if (!$scope.contract.dataHandlerAgreementUrlName) {
                         $scope.dataHandlerLinkName = "Databehandleraftale";
                     } else {
                         $scope.dataHandlerLinkName = $scope.contract.dataHandlerAgreementUrlName;
