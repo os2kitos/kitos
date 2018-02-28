@@ -81,6 +81,7 @@ namespace Core.DomainModel.ItContract
 
         public DataOptions ContainsDataHandlerAgreement { get; set; }
 
+        public string DataHandlerAgreementUrlName { get; set; }
         public string DataHandlerAgreementUrl { get; set; }
 
         public int? DataHandlerId { get; set; }

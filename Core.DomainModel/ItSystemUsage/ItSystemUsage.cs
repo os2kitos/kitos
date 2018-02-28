@@ -341,9 +341,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? lastControl { get; set; }
 
         public string noteUsage { get; set; }
-
-        public int convictionsData { get; set; }
-
+        
         public int precautions { get; set; }
 
         public int riskAssessment { get; set; }
@@ -371,14 +369,27 @@ namespace Core.DomainModel.ItSystemUsage
         public int precautionsOptions { get; set; }
 
         public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
+
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
         public string datahandlerSupervisionDocumentationUrl { get; set; }
+
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
+
+        public string UserSupervisionDocumentationUrlName { get; set; }
         public string UserSupervisionDocumentationUrl { get; set; }
+
+        public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
+
+        public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
+
+        public string DataHearingSupervisionDocumentationUrlName { get; set; }
         public string DataHearingSupervisionDocumentationUrl { get; set; }
 
         public DateTime UserSupervisionDate { get; set; }
+
         public int UserSupervision { get; set; }
     }
 }

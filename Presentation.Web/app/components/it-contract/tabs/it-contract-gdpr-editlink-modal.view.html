@@ -5,6 +5,17 @@
 </div>
 <form name="activityForm" novalidate="novalidate" class="form-horizontal" data-ng-submit="save()">
     <div class="modal-body">
+
+        <div class="form-group">
+            <label class="col-xs-4 control-label small" for="dataHandlerAgreementUrlName">
+                Navn
+            </label>
+            <div class="col-xs-7">
+                <input type="text" id="dataHandlerAgreementUrlName" data-ng-model="contract.dataHandlerAgreementUrlName"
+                       class="form-control form-inline input-sm" aria-describedby="helpBlock" />
+            </div>
+        </div>
+
         <div class="form-group" data-ng-show="!contract.dataHandlerAgreementUrl">
             <label for="DokomentID" class="col-xs-4 control-label small">
                 Søg efter aftale

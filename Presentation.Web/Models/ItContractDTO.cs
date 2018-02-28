@@ -87,9 +87,10 @@ namespace Presentation.Web.Models
         public ExternalReferenceDTO Reference;
         public DataOptions ContainsDataHandlerAgreement { get; set; }
 
+        public string DataHandlerAgreementUrlName { get; set; }
         public string DataHandlerAgreementUrl { get; set; }
 
-        public int DataHandlerId { get; set; }
+        public int? DataHandlerId { get; set; }
         public virtual ItContractDTO DataHandler { get; set; }
     }
 }

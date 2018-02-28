@@ -42,33 +42,6 @@
                            data-field="isBusinessCritical">
                     <label class="control-label small" for="businesscriticalDunno">Ved ikke</label>
                 </div>
-            <!-- Does the system contains legal info -->
-            <div class="form-group">
-                <label class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label><br>
-                <input type="radio" id="containsLegalInfoYes"
-                       data-ng-model="usage.containsLegalInfo"
-                       ng-value="1"
-                       data-ng-disabled="!hasWriteAccess"
-                       ng-click="patch('ContainsLegalInfo', '1')"
-                       data-field="containsLegalInfo">
-                <label class="control-label small" for="containsLegalInfoYes">Ja</label>
-                &nbsp;
-                <input type="radio" id="containsLegalInfoNo"
-                       data-ng-model="usage.containsLegalInfo"
-                       ng-value="0"
-                       data-ng-disabled="!hasWriteAccess"
-                       ng-click="patch('ContainsLegalInfo', '0')"
-                       data-field="containsLegalInfo">
-                <label class="control-label small" for="containsLegalInfoNo">Nej</label>
-                &nbsp;
-                <input type="radio" id="containsLegalInfoDunno"
-                       data-ng-model="usage.containsLegalInfo"
-                       ng-value="2"
-                       data-ng-disabled="!hasWriteAccess"
-                       ng-click="patch('ContainsLegalInfo', '2')"
-                       data-field="containsLegalInfo">
-                <label class="control-label small" for="containsLegalInfoDunno">Ved ikke</label>
-            </div>
                 <!-- Category of data -->
                 <div class="form-group">
                     <select-option data-id="categories"
@@ -155,7 +128,9 @@
                     <div class="form-group">
                         <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                          <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                             <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Dokumentation</a>
+                             <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">
+                             {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
+                             </a>
                              <label for="datahandler-link" class="control-label small"  data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
                              <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                         </div>
@@ -244,34 +219,37 @@
                         </div>
                     </div>
                 </div>
-                <!-- Data on convictions -->
-                <div class="form-group">
-                    <label class="control-label small">Oplysninger om straffedomme og lovovertrædelser</label><br>
-                    <input type="radio" id="convictionsDataYes"
-                           data-ng-model="systemUsage.convictionsData"
+                <!-- Does the system contains legal info -->
+                <div class="form-group well">
+                    <label class="control-label small">Indeholder systemet oplysninger om straffedomme og lovovertrædelser?</label><br>
+                    <input type="radio" id="containsLegalInfoYes"
+                           data-ng-model="usage.containsLegalInfo"
                            ng-value="1"
                            data-ng-disabled="!hasWriteAccess"
-                           ng-click="patch('convictionsData', 1)"
-                           data-field="convictionsData">
-                    <label class="control-label small" for="convictionsDataYes">Ja</label>
+                           ng-click="patch('ContainsLegalInfo', '1')"
+                           data-field="containsLegalInfo">
+                    <label class="control-label small" for="containsLegalInfoYes">Ja</label>
                     &nbsp;
-                    <input type="radio" id="convictionsDataNo"
-                           data-ng-model="systemUsage.convictionsData"
+                    <input type="radio" id="containsLegalInfoNo"
+                           data-ng-model="usage.containsLegalInfo"
                            ng-value="0"
                            data-ng-disabled="!hasWriteAccess"
-                           ng-click="patch('convictionsData', 0)"
-                           data-field="convictionsData">
-                    <label class="control-label small" for="convictionsDataNo">Nej</label>
+                           ng-click="patch('ContainsLegalInfo', '0')"
+                           data-field="containsLegalInfo">
+                    <label class="control-label small" for="containsLegalInfoNo">Nej</label>
                     &nbsp;
-                    <input type="radio" id="convictionsDataDunno"
-                           data-ng-model="systemUsage.convictionsData"
+                    <input type="radio" id="containsLegalInfoDunno"
+                           data-ng-model="usage.containsLegalInfo"
                            ng-value="2"
                            data-ng-disabled="!hasWriteAccess"
-                           ng-click="patch('convictionsData', 2)"
-                           data-field="convictionsData">
-                    <label class="control-label small" for="convictionsDataDunno">Ved ikke</label>
+                           ng-click="patch('ContainsLegalInfo', '2')"
+                           data-field="containsLegalInfo">
+                    <label class="control-label small" for="containsLegalInfoDunno">Ved ikke</label>
                 </div>
+
+                
                 <div data-ng-show="usage.dataLevel == 2">
+                    <div class="well">
                     <!-- Implemented technical precautions -->
                     <div class="form-group">
                         <label class="control-label small">Implementeret passende tekniske foranstaltninger</label><br>
@@ -300,79 +278,85 @@
                         <label class="control-label small" for="precautionsDunno">Ved ikke</label>
                     </div>
                     <!-- Technical precautions consists of -->
-                    <div ng-show="systemUsage.precautions == 1">
-                        <div class="form-group">
-                            <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
-                            <select class="form-control input-sm" id="precautionsOptions"
-                                    data-ng-disabled="!hasWriteAccess"
-                                    ng-change="patch('precautionsOptions', systemUsage.precautionsOptions)"
-                                    data-field="precautionsOptions"
-                                    ui-select2="{minimumResultsForSearch: -1}"
-                                    data-ng-model="systemUsage.precautionsOptions">
-                                <option value="0">Kryptering</option>
-                                <option value="1">Pseudonymisering</option>
-                                <option value="2">Dataminimering</option>
-                                <option value="3">Logning</option>
-                                <option value="4">Rettigheds- og adgangsstyring</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.technicalSupervisionDocumentationUrl == ''">Dokumentation</a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.technicalSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
-                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('technicalSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                        <div ng-show="systemUsage.precautions == 1">
+                            <div class="form-group">
+                                <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
+                                <select class="form-control input-sm" id="precautionsOptions"
+                                        data-ng-disabled="!hasWriteAccess"
+                                        ng-change="patch('precautionsOptions', systemUsage.precautionsOptions)"
+                                        data-field="precautionsOptions"
+                                        ui-select2="{minimumResultsForSearch: -1}"
+                                        data-ng-model="systemUsage.precautionsOptions">
+                                    <option value="0">Kryptering</option>
+                                    <option value="1">Pseudonymisering</option>
+                                    <option value="2">Dataminimering</option>
+                                    <option value="3">Logning</option>
+                                    <option value="4">Rettigheds- og adgangsstyring</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                    <a id="datahandler-link" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.TechnicalSupervisionDocumentationUrl == ''">                                        
+                                    {{systemUsage.TechnicalSupervisionDocumentationUrlName ? systemUsage.TechnicalSupervisionDocumentationUrlName : "Dokumentation" }}</a>
+                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.TechnicalSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                                    <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('technicalSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="control-label small">Er der foretaget brugerkontrol?</label><br>
-                        <input type="radio" id="userSupervisionYes"
-                               data-ng-model="systemUsage.UserSupervision"
-                               ng-value="1"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('UserSupervision', 1)">
-                        <label class="control-label small" for="userSupervisionYes">Ja</label>
-                        &nbsp;
-                        <input type="radio" id="userSupervisionNo"
-                               data-ng-model="systemUsage.UserSupervision"
-                               ng-value="0"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('UserSupervision', 0)"
-                               data-field="precautions">
-                        <label class="control-label small" for="userSupervisionNo">Nej</label>
-                        &nbsp;
-                        <input type="radio" id="userSupervisionDunno"
-                               data-ng-model="systemUsage.UserSupervision"
-                               ng-value="2"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('UserSupervision', 2)">
-                        <label class="control-label small" for="userSupervisionDunno">Ved ikke</label>
-                    </div>
-                    <div ng-show="systemUsage.UserSupervision == 1">
+                    <div class="well">
                         <div class="form-group">
-                            <label class="control-label small">Dato for seneste brugerkontrol</label><br>
-                            <input type="text" id="riskAssesmentDate" class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
+                            <label class="control-label small">Er der foretaget brugerkontrol?</label><br>
+                            <input type="radio" id="userSupervisionYes"
+                                   data-ng-model="systemUsage.UserSupervision"
+                                   ng-value="1"
                                    data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.UserSupervisionDate"
-                                   ng-blur="patchDate('UserSupervisionDate', systemUsage.UserSupervisionDate)">
-                            <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
+                                   ng-click="patch('UserSupervision', 1)">
+                            <label class="control-label small" for="userSupervisionYes">Ja</label>
+                            &nbsp;
+                            <input type="radio" id="userSupervisionNo"
+                                   data-ng-model="systemUsage.UserSupervision"
+                                   ng-value="0"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('UserSupervision', 0)"
+                                   data-field="precautions">
+                            <label class="control-label small" for="userSupervisionNo">Nej</label>
+                            &nbsp;
+                            <input type="radio" id="userSupervisionDunno"
+                                   data-ng-model="systemUsage.UserSupervision"
+                                   ng-value="2"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('UserSupervision', 2)">
+                            <label class="control-label small" for="userSupervisionDunno">Ved ikke</label>
                         </div>
+                        <div ng-show="systemUsage.UserSupervision == 1">
+                            <div class="form-group">
+                                <label class="control-label small">Dato for seneste brugerkontrol</label><br>
+                                <input type="text" id="riskAssesmentDate" class="form-control"
+                                       data-kendo-date-picker
+                                       data-k-options="datepickerOptions"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="systemUsage.UserSupervisionDate"
+                                       ng-blur="patchDate('UserSupervisionDate', systemUsage.UserSupervisionDate)">
+                                <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                            <a id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == ''">Dokumentation</a>
-                            <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
-                            <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            <div class="form-group">
+                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                    <a id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == ''">
+                                    {{systemUsage.UserSupervisionDocumentationUrlName ? systemUsage.UserSupervisionDocumentationUrlName : "Dokumentation" }}</a>
+                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                                    <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
             </div>
                 <!-- Risk assessment -->
+                <div class="well">
                 <div class="form-group">
                     <label class="control-label small">Foretaget risikovurdering</label><br>
                     <input type="radio" id="riskAssessmentYes"
@@ -399,66 +383,70 @@
                            data-field="riskAssessment">
                     <label class="control-label small" for="riskAssessmentDunno">Ved ikke</label>
                 </div>
-                <div ng-show="systemUsage.riskAssessment == 1">
-                    <!-- Date of last risk assesment -->
-                    <div class="form-group">
-                        <label for="riskAssesmentDate" class="control-label small">Dato for seneste risikovurdering</label>
-                        <input type="text" id="riskAssesmentDate" class="form-control"
-                               data-kendo-date-picker
-                               data-k-options="datepickerOptions"
-                               data-ng-disabled="!hasWriteAccess"
-                               data-ng-model="systemUsage.riskAssesmentDate"
-                               ng-blur="patchDate('riskAssesmentDate', systemUsage.riskAssesmentDate)"
-                               data-field="riskAssesmentDate">
-                        <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
-                    </div>
-                    <!-- Previous risk assessment -->
-                    <div class="form-group">
-                        <label class="control-label small">Hvad viste den seneste risikovurdering?</label><br>
-                        <input type="radio" id="preriskAssessmentYes"
-                               data-ng-model="systemUsage.preriskAssessment"
-                               ng-value="1"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('preriskAssessment', 0)"
-                               data-field="preriskAssessment">
-                        <label class="control-label small" for="preriskAssessmentYes">Lav risiko</label>
-                        &nbsp;
-                        <input type="radio" id="preriskAssessmentNo"
-                               data-ng-model="systemUsage.preriskAssessment"
-                               ng-value="0"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('preriskAssessment', 1)"
-                               data-field="preriskAssessment">
-                        <label class="control-label small" for="preriskAssessmentNo">Mellem risiko</label>
-                        &nbsp;
-                        <input type="radio" id="preriskAssessmentDunno"
-                               data-ng-model="systemUsage.preriskAssessment"
-                               ng-value="2"
-                               data-ng-disabled="!hasWriteAccess"
-                               ng-click="patch('preriskAssessment', 2)"
-                               data-field="preriskAssessment">
-                        <label class="control-label small" for="preriskAssessmentDunno">Høj risiko</label>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                            <a id="datahandler-link" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == ''">Dokumentation</a>
-                            <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.RiskSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
-                            <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('RiskSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                    <div ng-show="systemUsage.riskAssessment == 1">
+                        <!-- Date of last risk assesment -->
+                        <div class="form-group">
+                            <label for="riskAssesmentDate" class="control-label small">Dato for seneste risikovurdering</label>
+                            <input type="text" id="riskAssesmentDate" class="form-control"
+                                   data-kendo-date-picker
+                                   data-k-options="datepickerOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="systemUsage.riskAssesmentDate"
+                                   ng-blur="patchDate('riskAssesmentDate', systemUsage.riskAssesmentDate)"
+                                   data-field="riskAssesmentDate">
+                            <span id="helpBlockRisk" class="help-block small">Eksempelvis "2017-04-25"</span>
                         </div>
-                    </div>
-                    <!-- Notes risk -->
-                    <div class="form-group">
-                        <label for="noteRisks" class="control-label small">Bemærkninger</label>
-                        <textarea id="noteRisks" class="form-control input-sm" rows="5"
-                                  data-ng-disabled="!hasWriteAccess"
-                                  data-ng-model="systemUsage.noteRisks"
-                                  ng-blur="patch('noteRisks', systemUsage.noteRisks)"
-                                  data-field="noteRisks"></textarea>
+                        <!-- Previous risk assessment -->
+                        <div class="form-group">
+                            <label class="control-label small">Hvad viste den seneste risikovurdering?</label><br>
+                            <input type="radio" id="preriskAssessmentYes"
+                                   data-ng-model="systemUsage.preriskAssessment"
+                                   ng-value="1"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('preriskAssessment', 0)"
+                                   data-field="preriskAssessment">
+                            <label class="control-label small" for="preriskAssessmentYes">Lav risiko</label>
+                            &nbsp;
+                            <input type="radio" id="preriskAssessmentNo"
+                                   data-ng-model="systemUsage.preriskAssessment"
+                                   ng-value="0"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('preriskAssessment', 1)"
+                                   data-field="preriskAssessment">
+                            <label class="control-label small" for="preriskAssessmentNo">Mellem risiko</label>
+                            &nbsp;
+                            <input type="radio" id="preriskAssessmentDunno"
+                                   data-ng-model="systemUsage.preriskAssessment"
+                                   ng-value="2"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   ng-click="patch('preriskAssessment', 2)"
+                                   data-field="preriskAssessment">
+                            <label class="control-label small" for="preriskAssessmentDunno">Høj risiko</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                <a id="datahandler-link" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == ''">
+                                    {{systemUsage.RiskSupervisionDocumentationUrlName ? systemUsage.RiskSupervisionDocumentationUrlName : "Dokumentation" }}
+                                </a>
+                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.RiskSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('RiskSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            </div>
+                        </div>
+                        <!-- Notes risk -->
+                        <div class="form-group">
+                            <label for="noteRisks" class="control-label small">Bemærkninger</label>
+                            <textarea id="noteRisks" class="form-control input-sm" rows="5"
+                                      data-ng-disabled="!hasWriteAccess"
+                                      data-ng-model="systemUsage.noteRisks"
+                                      ng-blur="patch('noteRisks', systemUsage.noteRisks)"
+                                      data-field="noteRisks"></textarea>
+                        </div>
                     </div>
                 </div>
                 <div>
+                    <div class="well">
                     <!-- DPIA -->
                     <div class="form-group">
                         <label class="control-label small">Er der gennemført en DPIA?</label><br>
@@ -486,32 +474,36 @@
                                data-field="DPIA">
                         <label class="control-label small" for="DPIADunno">Ved ikke</label>
                     </div>
-                    <div ng-show="systemUsage.DPIA == 1">
-                        <!-- Date of DPIA -->
-                        <div class="form-group">
-                            <label for="DPIADateFor" class="control-label small">Dato for den seneste DPIA</label>
-                            <input type="text" id="DPIADateFor" class="form-control"
-                                   data-kendo-date-picker
-                                   data-k-options="datepickerOptions"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.DPIADateFor"
-                                   ng-blur="patchDate('DPIADateFor', systemUsage.DPIADateFor)"
-                                   data-field="DPIADateFor">
-                            <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "2017-04-25"</span>
-                        </div>
+                        <div ng-show="systemUsage.DPIA == 1">
+                            <!-- Date of DPIA -->
+                            <div class="form-group">
+                                <label for="DPIADateFor" class="control-label small">Dato for den seneste DPIA</label>
+                                <input type="text" id="DPIADateFor" class="form-control"
+                                       data-kendo-date-picker
+                                       data-k-options="datepickerOptions"
+                                       data-ng-disabled="!hasWriteAccess"
+                                       data-ng-model="systemUsage.DPIADateFor"
+                                       ng-blur="patchDate('DPIADateFor', systemUsage.DPIADateFor)"
+                                       data-field="DPIADateFor">
+                                <span id="helpBlockDPIADateFor" class="help-block small">Eksempelvis "2017-04-25"</span>
+                            </div>
 
-                        <div class="form-group">
-                            <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                            <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == ''">Dokumentation</a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
-                                <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DPIASupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                            <div class="form-group">
+                                <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
+                                <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                                    <a id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == ''">
+                                        {{systemUsage.DPIASupervisionDocumentationUrlName ? systemUsage.DPIASupervisionDocumentationUrlName : "Dokumentation" }}
+                                    </a>
+                                    <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                                    <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DPIASupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div ng-show="systemUsage.DPIA == 1">
+                <div ng-show="systemUsage.DPIA == 1" class="well">
                     <!-- DPIA hearing -->
+                    
                     <div class="form-group">
                         <label class="control-label small">Er der foretaget en høring hos Datatilsynet?</label><br>
                         <input type="radio" id="DPIAhearingYes"
@@ -555,8 +547,9 @@
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Dokumentation</a>
-                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.dataHearingSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DataHearingSupervisionDocumentationUrl == ''">
+                                {{systemUsage.DataHearingSupervisionDocumentationUrlName ? systemUsage.DataHearingSupervisionDocumentationUrlName : "Dokumentation" }}</a>
+                                <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DataHearingSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DataHearingSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
                         </div>
