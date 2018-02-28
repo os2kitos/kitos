@@ -305,7 +305,9 @@
                                 Terminated: { type: "date" },
                                 Acquisition: { type: "number" },
                                 Operation: { type: "number" },
-                                Other: { type: "number" }
+                                Other: { type: "number" },
+                                isActive: { type: "boolean"}
+
                             }
                         },
                         parse: response => {
@@ -426,14 +428,18 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "isActive", title: "Aktiv", width: 50,
+                        field: "Active", title: "Aktiv", width: 160,
                         persistId: "active", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var isActive = this.isContractActive(dataItem);
-
-                            if (isActive)
+                            switch (isActive) {
+                            case true:
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
-                            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                            case false:
+                                return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                            default:
+                                return "";
+                            }
                         },
                         excelTemplate: dataItem => {
                             var isActive = false;
@@ -443,8 +449,34 @@
                             return isActive.toString();
                         },
                         attributes: { "class": "text-center" },
-                        sortable: false,
-                        filterable: false
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: args => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [ { type: "Aktiv" }, { type: "Ikke aktiv" } ],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false,
+                                filter: {
+                                    logic: "or",
+                                    filters: [
+                                        { field: "Active", operator: "eq", value: true },
+                                        {
+                                            logic: "and",
+                                            filters: [
+                                                { field: "Concluded", operator: "lte", value: new Date() },
+                                                { field: "terminationDate", operator: "gte", value: new Date() }
+                                                
+                                                ]
+                                        }
+                                    ]
+                                },
+                            }
+                        }
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -801,7 +833,6 @@
                 return today >= startDate && today <= endDate;
             }
             return dataItem.Active;
-
         }
 
         private exportFlag = false;
