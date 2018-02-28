@@ -120,21 +120,27 @@
 
                         switch (field) {
                             case 'datahandlerSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
                                 break;
                             case 'technicalSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
                                 break;
                             case 'UserSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
                                 break;
                             case 'RiskSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
                                 break;
                             case 'DataHearingSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.DataHearingSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.DataHearingSupervisionDocumentationUrl;
                                 break;
                             case 'DPIASupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
                                 break;
                         }
@@ -144,31 +150,49 @@
 
                             var payload = {
                                 Id: $scope.usage.Id,
+
+                                datahandlerSupervisionDocumentationUrlName: $scope.usage.DatahandlerSupervisionDocumentationUrlName,
                                 datahandlerSupervisionDocumentationUrl: $scope.usage.DatahandlerSupervisionDocumentationUrl,
+
+                                technicalSupervisionDocumentationUrlName: $scope.usage.TechnicalSupervisionDocumentationUrlName,
                                 technicalSupervisionDocumentationUrl: $scope.usage.TechnicalSupervisionDocumentationUrl,
+
+                                userSupervisionDocumentationUrlName: $scope.usage.UserSupervisionDocumentationUrlName,
                                 userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
+
+                                riskSupervisionDocumentationUrlName: $scope.usage.RiskSupervisionDocumentationUrlName,
                                 riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
+
+                                dataHearingSupervisionDocumentationUrlName: $scope.usage.DataHearingSupervisionDocumentationUrlName,
                                 dataHearingSupervisionDocumentationUrl: $scope.usage.DataHearingSupervisionDocumentationUrl,
+
+                                DPIASupervisionDocumentationUrlName: $scope.usage.DPIASupervisionDocumentationUrlName,
                                 DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl
                             }
 
                             switch (field) {
                                 case 'datahandlerSupervisionDocumentationUrl':
+                                    payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'technicalSupervisionDocumentationUrl':
+                                    payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.technicalSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'UserSupervisionDocumentationUrl':
+                                    payload.userSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.userSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'RiskSupervisionDocumentationUrl':
+                                    payload.riskSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.riskSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'DataHearingSupervisionDocumentationUrl':
+                                    payload.dataHearingSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'DPIASupervisionDocumentationUrl':
+                                    payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
                                     payload.DPIASupervisionDocumentationUrl = $scope.Url;
                                     break;
                             }
