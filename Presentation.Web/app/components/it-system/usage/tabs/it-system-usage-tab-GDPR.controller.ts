@@ -49,8 +49,8 @@
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
-            console.log($scope.systemUsage);
-            //inherit from parent if general purpose is empty
+
+                //inherit from parent if general purpose is empty
             $scope.generalPurpose = $scope.usage.generalPurpose;
 
             if (!$scope.generalPurpose) {
@@ -97,7 +97,7 @@
             }
 
             $scope.patchDate = (field, value) => {
-                var date = moment(value);
+                var date = moment(moment(value, "DD-MM-YYYY", true).format());
 
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
