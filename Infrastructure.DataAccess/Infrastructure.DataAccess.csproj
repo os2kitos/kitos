@@ -511,10 +511,6 @@
     <Compile Include="Migrations\201802281250267_Name for url on itcontract added.Designer.cs">
       <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803021138167_cascade delete added to itprojectusage.cs" />
-    <Compile Include="Migrations\201803021138167_cascade delete added to itprojectusage.Designer.cs">
-      <DependentUpon>201803021138167_cascade delete added to itprojectusage.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -782,9 +778,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802281250267_Name for url on itcontract added.resx">
       <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803021138167_cascade delete added to itprojectusage.resx">
-      <DependentUpon>201803021138167_cascade delete added to itprojectusage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
