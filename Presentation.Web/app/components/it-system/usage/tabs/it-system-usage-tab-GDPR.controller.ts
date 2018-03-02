@@ -30,15 +30,21 @@
                     '$http', '$stateParams', ($http, $stateParams) =>
                     $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)
                     .then(result => result.data.value)
-                ]
+                ],
+                dataResponsible: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                    return $http.get('api/dataResponsible/' + user.currentOrganizationId)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
             }
         });
     }]);
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData","user",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData,user) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
@@ -49,23 +55,26 @@
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
-            console.log($scope.systemUsage);
+
                 //inherit from parent if general purpose is empty
-            $scope.generalPurpose = $scope.usage.generalPurpose;
+            $scope.generalPurpose = itSystemUsage.generalPurpose;
             if (!$scope.generalPurpose) {
-                $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
+                $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
             }
-
-            $scope.LinkToDirectoryUrl = $scope.usage.linkToDirectoryUrl;
+                //inherit from parent
+            $scope.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
             if (!$scope.LinkToDirectoryUrl) {
-                $scope.LinkToDirectoryUrl = $scope.usage.itSystem.linkToDirectoryAdminUrl;
+                $scope.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
             }
-
-            $scope.LinkToDirectoryUrlName = $scope.usage.linkToDirectoryUrlName;
+                //inherit from parent
+            $scope.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
             if (!$scope.LinkToDirectoryUrlName) {
-                $scope.LinkToDirectoryUrlName = $scope.usage.itSystem.linkToDirectoryAdminUrlName;
+                $scope.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
             }
-
+                //inherit from parent
+            if (!systemUsage.dataProcessor) {
+                $scope.systemUsage.dataProcessor = dataResponsible.name;
+            }
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
@@ -159,8 +168,6 @@
                                 $scope.Url = $scope.LinkToDirectoryUrl;
                                 break;
                             }
-
-
                             $scope.ok = function() {
 
                                 var payload = {
