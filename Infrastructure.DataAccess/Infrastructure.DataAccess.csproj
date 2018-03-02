@@ -515,6 +515,10 @@
     <Compile Include="Migrations\201803010908075_GDPRChanges.Designer.cs">
       <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.cs" />
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.Designer.cs">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -785,6 +789,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803010908075_GDPRChanges.resx">
       <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021222458_cascade delete added to itprojectusage.resx">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
