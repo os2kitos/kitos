@@ -34,6 +34,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.OrganizationUnit)
                 .HasForeignKey(d => d.OrganizationUnitId)
                 .WillCascadeOnDelete(false);
+
+            HasMany(o => o.UsingItProjects)
+                .WithRequired(o => o.OrganizationUnit)
+                .WillCascadeOnDelete(true);
         }
     }
 }
