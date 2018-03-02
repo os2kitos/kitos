@@ -113,5 +113,7 @@ namespace Core.DomainModel.ItSystem
 
         public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
+        public string LinkToDirectoryAdminUrl { get; set; }
+        public string LinkToDirectoryAdminUrlName { get; set; }
     }
 }
