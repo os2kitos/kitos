@@ -69,7 +69,6 @@
                     <label for="dataProcessingAgreement" class="control-label small">Databehandleraftale</label>
                     <div class="well">
                         <ul id="dataProcessingAgreement"
-                            
                             style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
                             ng-repeat="contract in contracts">
                             <li><a data-ui-sref="it-contract.edit.systems({id: contract.id})"> {{contract.name}} </a></li>
@@ -80,8 +79,9 @@
                 <div class="form-group" ng-hide="filterDataProcessor">
                     <label for="dataProcessingAgreementNone" class="control-label small">Databehandleraftale</label>
                     <ul data-ng-disabled="true" id="dataProcessingAgreementNone"
-                              class="form-control input-sm"
-                              style="list-style-type:none">Ingen
+                        class="form-control input-sm"
+                        style="list-style-type:none">
+                        Ingen
                     </ul>
                 </div>
                 <!-- Data processor control -->
@@ -127,12 +127,12 @@
 
                     <div class="form-group">
                         <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
-                         <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                             <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">
-                             {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
-                             </a>
-                             <label for="datahandler-link" class="control-label small"  data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
-                             <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                        <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                            <a id="datahandler-link" href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == ''">
+                                {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
+                            </a>
+                            <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.datahandlerSupervisionDocumentationUrl == ''">Intet link til dokumentation</label>
+                            <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('datahandlerSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -145,6 +145,17 @@
                               data-ng-model="systemUsage.noteUsage"
                               ng-blur="patch('noteUsage', systemUsage.noteUsage)"
                               data-field="noteUsage"></textarea>
+                </div>
+                <!-- Link til fortegnelse -->
+                <div class="form-group">
+                    <label for="datahandler-link" class="control-label small">Link til fortegnelse</label>
+                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                        <a id="datahandler-link" href="{{LinkToDirectoryUrl}}" data-ng-hide="LinkToDirectoryUrl == ''">
+                            {{LinkToDirectoryUrlName ? LinkToDirectoryUrlName : "Dokumentation" }}
+                        </a>
+                        <label for="datahandler-link" class="control-label small" data-ng-show="LinkToDirectoryUrl == ''">Intet link til fortegnelse</label>
+                        <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('LinkToDirectoryUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                    </div>
                 </div>
             </div>
             <!-- 2nd column -->
@@ -281,18 +292,12 @@
                         <div ng-show="systemUsage.precautions == 1">
                             <div class="form-group">
                                 <label for="precautionsOptions" class="control-label small">Hvad består de af?</label>
-                                <select class="form-control input-sm" id="precautionsOptions"
-                                        data-ng-disabled="!hasWriteAccess"
-                                        ng-change="patch('precautionsOptions', systemUsage.precautionsOptions)"
-                                        data-field="precautionsOptions"
-                                        ui-select2="{minimumResultsForSearch: -1}"
-                                        data-ng-model="systemUsage.precautionsOptions">
-                                    <option value="0">Kryptering</option>
-                                    <option value="1">Pseudonymisering</option>
-                                    <option value="2">Dataminimering</option>
-                                    <option value="3">Logning</option>
-                                    <option value="4">Rettigheds- og adgangsstyring</option>
-                                </select>
+                                <div id="precautionsOptions">
+                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsEncryption" ng-click="patch('precautionsOptionsEncryption', systemUsage.precautionsOptionsEncryption)" /> <span style="font-size: small;">Kryptering</span><br/>
+                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsPseudonomisering" ng-click="patch('precautionsOptionsPseudonomisering', systemUsage.precautionsOptionsPseudonomisering)" /> <span style="font-size: small;">Pseudonomisering</span><br />
+                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsAccessControl" ng-click="patch('precautionsOptionsAccessControl', systemUsage.precautionsOptionsAccessControl)" /> <span style="font-size: small;">Adgangsstyring</span><br />
+                                    <input type="checkbox" ng-model="systemUsage.precautionsOptionsLogning" ng-click="patch('precautionsOptionsLogning', systemUsage.precautionsOptionsLogning)" /> <span style="font-size: small;">Logning</span><br />
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="datahandler-link" class="control-label small">Link til dokumentation</label>

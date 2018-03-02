@@ -366,7 +366,10 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int numberDPIA { get; set; }
 
-        public int precautionsOptions { get; set; }
+        public bool precautionsOptionsEncryption { get; set; }
+        public bool precautionsOptionsPseudonomisering { get; set; }
+        public bool precautionsOptionsAccessControl { get; set; }
+        public bool precautionsOptionsLogning { get; set; }
 
         public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
 
@@ -381,7 +384,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
-
+        
         public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
 
@@ -391,5 +394,7 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime UserSupervisionDate { get; set; }
 
         public int UserSupervision { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
     }
 }

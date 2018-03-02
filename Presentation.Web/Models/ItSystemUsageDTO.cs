@@ -110,5 +110,8 @@ namespace Presentation.Web.Models
 
         public DateTime UserSupervisionDate { get; set; }
         public int UserSupervision { get; set; }
+
+        public string LinkToDirectoryUrlName { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
     }
 }
