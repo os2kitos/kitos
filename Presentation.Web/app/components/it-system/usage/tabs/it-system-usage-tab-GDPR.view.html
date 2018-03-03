@@ -71,7 +71,7 @@
                         <ul id="dataProcessingAgreement"
                             style="list-style-type: none; padding: 0; margin: 0; font-size: small;"
                             ng-repeat="contract in contracts">
-                            <li><a data-ui-sref="it-contract.edit.systems({id: contract.id})"> {{contract.name}} </a></li>
+                            <li><a data-ui-sref="it-contract.edit.main({id: contract.id})"> {{contract.name}} </a></li>
                         </ul>
                     </div>
                     <span class="help-block small"><i class="fa fa-info-circle" aria-hidden="true"></i> Databehandleraftalen hentes automatisk fra kontraktmodulet, når der oprettes en kontrakt og en henvisning til systemet oprettes.</span>
@@ -158,10 +158,10 @@
                 <div class="form-group">
                     <label for="datahandler-link" class="control-label small">Link til fortegnelse</label>
                     <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a id="datahandler-link" href="{{LinkToDirectoryUrl}}" data-ng-hide="LinkToDirectoryUrl == ''">
-                            {{LinkToDirectoryUrlName ? LinkToDirectoryUrlName : "Fortegnelse" }}
+                        <a id="datahandler-link" href="{{usage.LinkToDirectoryUrl}}" data-ng-hide="usage.LinkToDirectoryUrl == ''">
+                            {{usage.LinkToDirectoryUrlName ? usage.LinkToDirectoryUrlName : "Fortegnelse" }}
                         </a>
-                        <label for="datahandler-link" class="control-label small" data-ng-show="LinkToDirectoryUrl == ''">Intet link til fortegnelse</label>
+                        <label for="datahandler-link" class="control-label small" data-ng-show="usage.LinkToDirectoryUrl == ''">Intet link til fortegnelse</label>
                         <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('LinkToDirectoryUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                     </div>
                 </div>

@@ -62,14 +62,14 @@
                 $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
             }
                 //inherit from parent
-            $scope.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
-            if (!$scope.LinkToDirectoryUrl) {
-                $scope.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
+            $scope.usage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
+            if (!$scope.usage.LinkToDirectoryUrl) {
+                $scope.usage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
             }
                 //inherit from parent
-            $scope.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
-            if (!$scope.LinkToDirectoryUrlName) {
-                $scope.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
+            $scope.usage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
+            if (!$scope.usage.LinkToDirectoryUrlName) {
+                $scope.usage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
             }
                 //inherit from parent
             if (!systemUsage.dataProcessor) {
@@ -164,8 +164,8 @@
                                 $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
                                 break;
                             case 'LinkToDirectoryUrl':
-                                $scope.linkName = $scope.LinkToDirectoryUrlName;
-                                $scope.Url = $scope.LinkToDirectoryUrl;
+                                    $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
+                                    $scope.Url = $scope.usage.LinkToDirectoryUrl;
                                 break;
                             }
                             $scope.ok = function() {
@@ -200,8 +200,8 @@
                                         .DPIASupervisionDocumentationUrlName,
                                     DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
 
-                                    LinkToDirectoryUrlName: $scope.LinkToDirectoryUrlName,
-                                    LinkToDirectoryUrl: $scope.LinkToDirectoryUrl
+                                    LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
+                                    LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
                                 }
 
                                 switch (field) {
@@ -232,8 +232,8 @@
                                 case 'LinkToDirectoryUrl':
                                     payload.LinkToDirectoryUrlName = $scope.linkName;
                                     payload.LinkToDirectoryUrl = $scope.Url;
-                                    $scope.LinkToDirectoryUrlName = $scope.linkName;
-                                    $scope.LinkToDirectoryUrl = $scope.Url;
+                                    $scope.usage.LinkToDirectoryUrlName = $scope.linkName;
+                                    $scope.usage.LinkToDirectoryUrl = $scope.Url;
                                     break;
                                 }
 
