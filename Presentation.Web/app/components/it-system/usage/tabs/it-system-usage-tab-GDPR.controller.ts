@@ -62,14 +62,14 @@
                 $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
             }
                 //inherit from parent
-            $scope.usage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
-            if (!$scope.usage.LinkToDirectoryUrl) {
-                $scope.usage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
+            $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
+            if (!$scope.systemUsage.LinkToDirectoryUrl) {
+                $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
             }
                 //inherit from parent
-            $scope.usage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
-            if (!$scope.usage.LinkToDirectoryUrlName) {
-                $scope.usage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
+            $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
+            if (!$scope.systemUsage.LinkToDirectoryUrlName) {
+                $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
             }
                 //inherit from parent
             if (!systemUsage.dataProcessor) {
@@ -232,8 +232,6 @@
                                 case 'LinkToDirectoryUrl':
                                     payload.LinkToDirectoryUrlName = $scope.linkName;
                                     payload.LinkToDirectoryUrl = $scope.Url;
-                                    $scope.usage.LinkToDirectoryUrlName = $scope.linkName;
-                                    $scope.usage.LinkToDirectoryUrl = $scope.Url;
                                     break;
                                 }
 
