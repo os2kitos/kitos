@@ -504,14 +504,6 @@
     <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201802191243189_ArchivingNew.cs" />
-    <Compile Include="Migrations\201802191243189_ArchivingNew.Designer.cs">
-      <DependentUpon>201802191243189_ArchivingNew.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201802201257190_ArchiveTestLocation.cs" />
-    <Compile Include="Migrations\201802201257190_ArchiveTestLocation.Designer.cs">
-      <DependentUpon>201802201257190_ArchiveTestLocation.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -773,12 +765,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
       <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802191243189_ArchivingNew.resx">
-      <DependentUpon>201802191243189_ArchivingNew.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201802201257190_ArchiveTestLocation.resx">
-      <DependentUpon>201802201257190_ArchiveTestLocation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
