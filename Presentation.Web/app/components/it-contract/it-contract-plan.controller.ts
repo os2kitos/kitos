@@ -361,9 +361,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 detailTemplate: (dataItem) => {
                     //These might be candidates for refactoring. They are quite expensive
                     return `<uib-tabset active="0">

@@ -208,7 +208,8 @@
                 },
                 batch: false,
                 sync: false,
-                columnMenu: false,
+                columnMenu: true,
+                height: 900,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -239,7 +240,6 @@
                 },
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,
                 toolbar: [
                     {
                         name: "createReport",
@@ -287,9 +287,8 @@
                 filterable: {
                     mode: "row",
                 },
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
