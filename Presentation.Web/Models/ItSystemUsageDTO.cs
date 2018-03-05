@@ -89,14 +89,29 @@ namespace Presentation.Web.Models
 
         public DataOptions ContainsLegalInfo { get; set; }
         public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
+
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
         public string datahandlerSupervisionDocumentationUrl { get; set; }
+
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
+
+        public string UserSupervisionDocumentationUrlName { get; set; }
         public string UserSupervisionDocumentationUrl { get; set; }
+
+        public string RiskSupervisionDocumentationUrlName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
+
+        public string DPIASupervisionDocumentationUrlName { get; set; }
         public string DPIASupervisionDocumentationUrl { get; set; }
+
+        public string DataHearingSupervisionDocumentationUrlName { get; set; }
         public string DataHearingSupervisionDocumentationUrl { get; set; }
 
         public DateTime UserSupervisionDate { get; set; }
         public int UserSupervision { get; set; }
+
+        public string LinkToDirectoryUrlName { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
     }
 }
