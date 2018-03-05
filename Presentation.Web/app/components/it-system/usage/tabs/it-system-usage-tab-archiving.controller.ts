@@ -84,6 +84,7 @@
                 }
                 else {
                     itSystemUsageService.patchSystem($scope.usageId, payload);
+                    $scope.dirty = true;
                 }
             }
             $scope.patchSupplier = (field, value) => {
@@ -122,6 +123,7 @@
                 payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
                 payload["ItSystemUsageId"] = $stateParams.id;
                 $http.post(`odata/ArchivePeriods`, payload).finally(reload);
+                $scope.dirty = true;
             };
 
             function reload() {
@@ -199,6 +201,7 @@
                     payload[field] = date;
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                     $scope.ArchivedDate = date;
+                    $scope.dirty = true;
                 }
             };
             $scope.patchDatePeriode = (field, value, id) => {

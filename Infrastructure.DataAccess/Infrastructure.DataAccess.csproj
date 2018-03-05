@@ -520,6 +520,10 @@
     <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.Designer.cs">
       <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803050825306_ArchivingNew.cs" />
+    <Compile Include="Migrations\201803050825306_ArchivingNew.Designer.cs">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -793,6 +797,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803021222458_cascade delete added to itprojectusage.resx">
       <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050825306_ArchivingNew.resx">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
