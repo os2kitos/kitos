@@ -103,5 +103,8 @@ namespace Presentation.Web.Models
         public bool IsDataTransferedToThirdCountries { get; set; }
         public string DataIsTransferedTo { get; set; }
         public ICollection<ItSystemDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
+
+        public string LinkToDirectoryAdminUrlName { get; set; }
+        public string LinkToDirectoryAdminUrl { get; set; }
     }
 }

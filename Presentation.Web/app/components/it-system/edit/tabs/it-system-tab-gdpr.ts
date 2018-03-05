@@ -27,8 +27,8 @@
         });
     }]);
 
-    app.controller("system.EditGdpr", ["$scope", "$http", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess","user", "theSystem", "regularSensitiveData","sensitivePersonalData",
-        function ($scope, $http, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, user, theSystem, regularSensitiveData, sensitivePersonalData) {
+    app.controller("system.EditGdpr", ["$scope", "$http", "$uibModal", "$timeout", "$state", "$stateParams", "$confirm", "notify", "hasWriteAccess","user", "theSystem", "regularSensitiveData","sensitivePersonalData",
+        function ($scope, $http, $uibModal, $timeout, $state, $stateParams, $confirm, notify, hasWriteAccess, user, theSystem, regularSensitiveData, sensitivePersonalData) {
 
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.system = theSystem;
@@ -38,7 +38,7 @@
             $scope.dataWorkers = theSystem.associatedDataWorkers;
             // select2 options for looking up organization as dataworkers
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
-
+            console.log($scope.system);
             $scope.updateDataLevel = function (OptionId, Checked, optionType) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -102,6 +102,62 @@
                         notify.addErrorMessage("Fejl! Kunne ikke fjerne databehandlerens tilknyttning!");
                     });
             };
+
+            $scope.editLink = () => {
+                $uibModal.open({
+                    templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
+                    controller: [
+                        '$scope', '$state', '$uibModalInstance', 'usage',
+                        ($scope, $state, $uibModalInstance, usage) => {
+                            $scope.usage = usage;
+
+                            $scope.linkName = $scope.usage.linkToDirectoryAdminUrlName;
+                            $scope.Url = $scope.usage.linkToDirectoryAdminUrl;
+
+                            $scope.ok = () => {
+
+                                var payload = {
+                                    Id: $scope.usage.Id,
+                                    LinkToDirectoryAdminUrlName: $scope.usage
+                                        .linkToDirectoryAdminUrlName,
+                                    LinkToDirectoryAdminUrl: $scope.usage
+                                        .linkToDirectoryAdminUrl
+                                }
+
+                                payload.LinkToDirectoryAdminUrlName = $scope.linkName;
+                                payload.LinkToDirectoryAdminUrl = $scope.Url;
+                                
+
+                                var msg = notify.addInfoMessage("Gemmer...", false);
+
+                                $http({
+                                        method: 'PATCH',
+                                        url: 'api/itsystem/' +
+                                            $scope.usage.id +
+                                            '?organizationId=' +
+                                            user.currentOrganizationId,
+                                        data: payload
+                                    })
+                                    .success(function () {
+                                        msg.toSuccessMessage("Feltet er opdateret.");
+                                        $state.reload();
+                                    })
+                                    .error(function () {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    });
+                                $uibModalInstance.close();
+                            };
+
+                            $scope.cancel = function () {
+                                $uibModalInstance.dismiss('cancel');
+                            };
+                        }
+                    ],
+                    resolve: {
+                        usage: [function () { return $scope.system; }]
+                    }
+                });
+            }
 
             function selectLazyLoading(url, excludeSelf, paramAry) {
                 return {

@@ -30,15 +30,21 @@
                     '$http', '$stateParams', ($http, $stateParams) =>
                     $http.get(`odata/GetRegisterTypesByObjectID(id=${$stateParams.id})`)
                     .then(result => result.data.value)
-                ]
+                ],
+                dataResponsible: ['$http', '$stateParams', 'user', function ($http, $stateParams, user) {
+                    return $http.get('api/dataResponsible/' + user.currentOrganizationId)
+                        .then(function (result) {
+                            return result.data.response;
+                        });
+                }]
             }
         });
     }]);
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData","user",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData,user) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
@@ -49,14 +55,26 @@
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
-            console.log($scope.systemUsage);
-            //inherit from parent if general purpose is empty
-            $scope.generalPurpose = $scope.usage.generalPurpose;
 
+                //inherit from parent if general purpose is empty
+            $scope.generalPurpose = itSystemUsage.generalPurpose;
             if (!$scope.generalPurpose) {
-                $scope.generalPurpose = $scope.usage.itSystem.generalPurpose;
+                $scope.generalPurpose = itSystemUsage.itSystem.generalPurpose;
             }
-
+                //inherit from parent
+            $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.linkToDirectoryUrl;
+            if (!$scope.systemUsage.LinkToDirectoryUrl) {
+                $scope.systemUsage.LinkToDirectoryUrl = itSystemUsage.itSystem.linkToDirectoryAdminUrl;
+            }
+                //inherit from parent
+            $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.linkToDirectoryUrlName;
+            if (!$scope.systemUsage.LinkToDirectoryUrlName) {
+                $scope.systemUsage.LinkToDirectoryUrlName = itSystemUsage.itSystem.linkToDirectoryAdminUrlName;
+            }
+                //inherit from parent
+            if (!systemUsage.dataProcessor) {
+                $scope.systemUsage.dataProcessor = dataResponsible.name;
+            }
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
@@ -97,7 +115,7 @@
             }
 
             $scope.patchDate = (field, value) => {
-                var date = moment(value);
+                var date = moment(moment(value, "DD-MM-YYYY", true).format());
 
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
@@ -114,86 +132,138 @@
             $scope.editLink = function (field) {
                 $uibModal.open({
                     templateUrl: 'app/components/it-system/usage/tabs/it-systemusage-tab-gdpr-editlink-modal.view.html',
-                    controller: ['$scope', '$state', '$uibModalInstance', 'usage', function ($scope, $state, $uibModalInstance, usage) {
+                    controller: [
+                        '$scope', '$state', '$uibModalInstance', 'usage',
+                        function($scope, $state, $uibModalInstance, usage) {
 
-                        $scope.usage = usage;
+                            $scope.usage = usage;
 
-                        switch (field) {
+                            switch (field) {
                             case 'datahandlerSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.datahandlerSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.datahandlerSupervisionDocumentationUrl;
                                 break;
                             case 'technicalSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.TechnicalSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.TechnicalSupervisionDocumentationUrl;
                                 break;
                             case 'UserSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.UserSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.UserSupervisionDocumentationUrl;
                                 break;
                             case 'RiskSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.RiskSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.RiskSupervisionDocumentationUrl;
                                 break;
                             case 'DataHearingSupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.DataHearingSupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.DataHearingSupervisionDocumentationUrl;
                                 break;
                             case 'DPIASupervisionDocumentationUrl':
+                                $scope.linkName = $scope.usage.DPIASupervisionDocumentationUrlName;
                                 $scope.Url = $scope.usage.DPIASupervisionDocumentationUrl;
                                 break;
-                        }
-
-
-                        $scope.ok = function () {
-
-                            var payload = {
-                                Id: $scope.usage.Id,
-                                datahandlerSupervisionDocumentationUrl: $scope.usage.DatahandlerSupervisionDocumentationUrl,
-                                technicalSupervisionDocumentationUrl: $scope.usage.TechnicalSupervisionDocumentationUrl,
-                                userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
-                                riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
-                                dataHearingSupervisionDocumentationUrl: $scope.usage.DataHearingSupervisionDocumentationUrl,
-                                DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl
+                            case 'LinkToDirectoryUrl':
+                                    $scope.linkName = $scope.usage.LinkToDirectoryUrlName;
+                                    $scope.Url = $scope.usage.LinkToDirectoryUrl;
+                                break;
                             }
+                            $scope.ok = function() {
 
-                            switch (field) {
+                                var payload = {
+                                    Id: $scope.usage.Id,
+
+                                    datahandlerSupervisionDocumentationUrlName: $scope.usage
+                                        .DatahandlerSupervisionDocumentationUrlName,
+                                    datahandlerSupervisionDocumentationUrl: $scope.usage
+                                        .DatahandlerSupervisionDocumentationUrl,
+
+                                    technicalSupervisionDocumentationUrlName: $scope.usage
+                                        .TechnicalSupervisionDocumentationUrlName,
+                                    technicalSupervisionDocumentationUrl: $scope.usage
+                                        .TechnicalSupervisionDocumentationUrl,
+
+                                    userSupervisionDocumentationUrlName: $scope.usage
+                                        .UserSupervisionDocumentationUrlName,
+                                    userSupervisionDocumentationUrl: $scope.usage.UserSupervisionDocumentationUrl,
+
+                                    riskSupervisionDocumentationUrlName: $scope.usage
+                                        .RiskSupervisionDocumentationUrlName,
+                                    riskSupervisionDocumentationUrl: $scope.usage.RiskSupervisionDocumentationUrl,
+
+                                    dataHearingSupervisionDocumentationUrlName: $scope.usage
+                                        .DataHearingSupervisionDocumentationUrlName,
+                                    dataHearingSupervisionDocumentationUrl: $scope.usage
+                                        .DataHearingSupervisionDocumentationUrl,
+
+                                    DPIASupervisionDocumentationUrlName: $scope.usage
+                                        .DPIASupervisionDocumentationUrlName,
+                                    DPIASupervisionDocumentationUrl: $scope.usage.DPIASupervisionDocumentationUrl,
+
+                                    LinkToDirectoryUrlName: $scope.usage.LinkToDirectoryUrlName,
+                                    LinkToDirectoryUrl: $scope.usage.LinkToDirectoryUrl
+                                }
+
+                                switch (field) {
                                 case 'datahandlerSupervisionDocumentationUrl':
+                                    payload.datahandlerSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.datahandlerSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'technicalSupervisionDocumentationUrl':
+                                    payload.technicalSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.technicalSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'UserSupervisionDocumentationUrl':
+                                    payload.userSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.userSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'RiskSupervisionDocumentationUrl':
+                                    payload.riskSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.riskSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'DataHearingSupervisionDocumentationUrl':
+                                    payload.dataHearingSupervisionDocumentationUrlName = $scope.linkName;
                                     payload.dataHearingSupervisionDocumentationUrl = $scope.Url;
                                     break;
                                 case 'DPIASupervisionDocumentationUrl':
+                                    payload.DPIASupervisionDocumentationUrlName = $scope.linkName;
                                     payload.DPIASupervisionDocumentationUrl = $scope.Url;
                                     break;
-                            }
-                      
-                            var msg = notify.addInfoMessage("Gemmer...", false);
+                                case 'LinkToDirectoryUrl':
+                                    payload.LinkToDirectoryUrlName = $scope.linkName;
+                                    payload.LinkToDirectoryUrl = $scope.Url;
+                                    break;
+                                }
 
-                            $http({ method: 'PATCH', url: 'api/itsystemusage/' + $scope.usage.Id + '?organizationId=' + user.currentOrganizationId, data: payload })
-                                .success(function () {
-                                    msg.toSuccessMessage("Feltet er opdateret.");
-                                    $state.reload();
-                                })
-                                .error(function () {
-                                    msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
-                                });
-                            $uibModalInstance.close();
-                        };
+                                var msg = notify.addInfoMessage("Gemmer...", false);
 
-                        $scope.cancel = function () {
-                            $uibModalInstance.dismiss('cancel');
-                        };
-                    }],
+                                $http({
+                                        method: 'PATCH',
+                                        url: 'api/itsystemusage/' +
+                                            $scope.usage.Id +
+                                            '?organizationId=' +
+                                            user.currentOrganizationId,
+                                        data: payload
+                                    })
+                                    .success(function() {
+                                        msg.toSuccessMessage("Feltet er opdateret.");
+                                        $state.reload();
+                                    })
+                                    .error(function() {
+                                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                                    });
+                                $uibModalInstance.close();
+                            };
+
+                            $scope.cancel = function() {
+                                $uibModalInstance.dismiss('cancel');
+                            };
+                        }
+                    ],
                     resolve: {
-                        usage: [function () { return $scope.systemUsage;}]
+                        usage: [function() { return $scope.systemUsage; }]
                     }
-                })
+                });
             }
 
             $scope.toggleSelection = data => {
