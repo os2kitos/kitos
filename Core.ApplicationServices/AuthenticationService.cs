@@ -150,10 +150,10 @@ namespace Core.ApplicationServices
             }
 
             //User has access if user created entity
-            if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
-            {
-                return true;
-            }
+            //if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
+            //{
+            //    return true;
+            //}
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
