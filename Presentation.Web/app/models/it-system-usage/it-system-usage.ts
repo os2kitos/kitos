@@ -58,5 +58,6 @@
 
         ReferenceId: number;
         Reference: IReference;
+        IsActive: boolean;
     }
 }

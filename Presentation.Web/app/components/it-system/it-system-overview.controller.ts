@@ -232,7 +232,8 @@
                     schema: {
                         model: {
                             fields: {
-                                LastChanged: { type: "date" }
+                                LastChanged: { type: "date" },
+                                IsActive: {type: "boolean"}
                             }
                         },
                         parse: response => {
@@ -308,7 +309,39 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
-                columns: [
+                columns: [{
+
+                    field: "IsActive",
+                    title: "Gyldig/Ikke gyldig",
+                    width: 90,
+                    persistId: "isActive", // DON'T YOU DARE RENAME!
+                    template: dataItem => {
+                        if (dataItem.IsActive) {
+                            return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                        }
+                        return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                    },
+                    excelTemplate: dataItem => {
+                        var isActive = this.isContractActive(dataItem);
+                        return isActive.toString();
+                    },
+                    attributes: { "class": "text-center" },
+                    sortable: false,
+                    filterable: {
+                        cell: {
+                            template: args => {
+                                args.element.kendoDropDownList({
+                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                    dataTextField: "type",
+                                    dataValueField: "value",
+                                    valuePrimitive: true
+                                });
+                            },
+                            showOperators: false
+
+                        }
+                    }
+                },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!

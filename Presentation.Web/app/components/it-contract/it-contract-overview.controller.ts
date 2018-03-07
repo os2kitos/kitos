@@ -306,8 +306,7 @@
                                 Acquisition: { type: "number" },
                                 Operation: { type: "number" },
                                 Other: { type: "number" },
-                                isActive: { type: "boolean"}
-
+                                IsActive: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -427,18 +426,13 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Active", title: "Aktiv", width: 160,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 150,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-                            switch (isActive) {
-                            case true:
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
-                            case false:
-                                return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
-                            default:
-                                return "";
                             }
+                            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
                             var isActive = false;
@@ -448,32 +442,19 @@
                             return isActive.toString();
                         },
                         attributes: { "class": "text-center" },
-                        sortable: true,
+                        sortable: false,
                         filterable: {
                             cell: {
                                 template: args => {
                                     args.element.kendoDropDownList({
-                                        dataSource: [ { type: "Aktiv" }, { type: "Ikke aktiv" } ],
+                                        dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
                                         dataTextField: "type",
                                         dataValueField: "value",
                                         valuePrimitive: true
                                     });
                                 },
-                                showOperators: false,
-                                filter: {
-                                    logic: "or",
-                                    filters: [
-                                        { field: "Active", operator: "eq", value: true },
-                                        {
-                                            logic: "and",
-                                            filters: [
-                                                { field: "Concluded", operator: "lte", value: new Date() },
-                                                { field: "terminationDate", operator: "gte", value: new Date() }
-                                                
-                                                ]
-                                        }
-                                    ]
-                                },
+                                showOperators: false
+                           
                             }
                         }
                     },
