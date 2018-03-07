@@ -11,6 +11,8 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -129,7 +131,29 @@ namespace Presentation.Web.Controllers.API
                     user = _userRepository.GetByEmail(loginDto.Email);
                 }
 
-                
+                var Secret = "db3OIsj+BXE9NZDy0t8W3TcNekrF+2d/1sFnWG4HnV8TZY30iTOdtVWJG8abWvB1GlOgJuQZdcF2Luqm/hccMw==";
+                var symmetricKey = Convert.FromBase64String(Secret);
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new[]
+                  {
+                        new Claim(ClaimTypes.Name, loginDto.Email)
+                    }),
+
+                    //   Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
+
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                var stoken = tokenHandler.CreateToken(tokenDescriptor);
+                var token = tokenHandler.WriteToken(stoken);
+
+
+
+
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
                 loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };

@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Principal;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -43,6 +45,30 @@ namespace Presentation.Web.Infrastructure
                 Logger.Error(e, "TokenValidator: Error validating token");
                 return null;
             }
+        }
+
+        public string CreateToken() {
+
+            var ssoConfig = GetKeyFromConfig();
+
+            var handler = new JwtSecurityTokenHandler();
+
+            ClaimsIdentity identity = new ClaimsIdentity(
+           /*     new GenericIdentity(user.Username, "TokenAuth"),
+                new[] {
+                    new Claim("ID", user.ID.ToString())
+                }*/
+            );
+
+            var securityToken = handler.CreateToken(new SecurityTokenDescriptor
+            {
+                Issuer = ssoConfig.Issuer,
+                Audience = ssoConfig.Audience,
+                Subject = identity,
+                Expires = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + 1)
+            });
+
+            return handler.WriteToken(securityToken);
         }
 
         private SsoConfig GetKeyFromConfig()
