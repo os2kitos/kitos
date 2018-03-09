@@ -23,7 +23,7 @@
                            data-field="localCallName"
                            data-autosave="api/itSystemUsage/{{usageId}}">
                 </div>
-                <div class="form-group">
+                <!--<div class="form-group">
                     <select-option data-id="sensitive"
                                    data-label="Persondata"
                                    data-placeholder="Vælg persondata"
@@ -33,7 +33,7 @@
                                    data-auto-save-url="api/itSystemUsage/{{usageId}}"
                                    data-field="sensitiveDataTypeId">
                     </select-option>
-                </div>
+                </div>-->
 
                 <div class="form-group">
                     <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
@@ -52,7 +52,7 @@
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">
                     <label for="note" class="control-label small">Note</label>
-                    <textarea id="note" class="form-control input-sm" rows="5"
+                    <textarea id="note" class="form-control input-sm" rows="6"
                               data-ng-model="usage.note"
                               data-ng-disabled="!hasWriteAccess"
                               data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
