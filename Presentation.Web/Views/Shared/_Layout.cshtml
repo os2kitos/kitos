@@ -9,6 +9,10 @@
 
     <link href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.common-bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.rtl.min.css">
+    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.default.min.css">
+    <link rel="stylesheet" href="//kendo.cdn.telerik.com/2016.2.714/styles/kendo.mobile.all.min.css">
+
     @Styles.Render("~/Content/css/css")
 
     @Scripts.Render("~/Scripts/vendor")
@@ -20,8 +24,9 @@
     <script src="//kendo.cdn.telerik.com/2016.2.714/js/messages/kendo.messages.da-DK.min.js"></script>
     <!-- Kendo globalization -->
     <script src="//kendo.cdn.telerik.com/2016.2.714/js/cultures/kendo.culture.da-DK.min.js"></script>
-    
-    
+    <script src="//kendo.cdn.telerik.com/2016.2.714/js/kendo.all.min.js"></script>
+    <script src="//kendo.cdn.telerik.com/2016.2.714/js/angular.min.js"></script>
+
     @if (ViewBag.Environment != "Prod")
     {
         if (ViewBag.Environment == "Test")
