@@ -18,17 +18,17 @@ namespace Presentation.Web
 
             var ssoConfig = new TokenValidator().GetKeyFromConfig();
 
-            string key = "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429090fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1";
+            string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
 
             var test = ssoConfig.SigningKey;
             // Create Security key  using private key above:
-            /* // not that latest version of JWT using Microsoft namespace instead of System */
             var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 
             // Initializing the Hangfire scheduler
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
             app.UseHangfireDashboard();
             app.UseHangfireServer();
+            //setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
                 AuthenticationMode = Microsoft.Owin.Security.AuthenticationMode.Active,

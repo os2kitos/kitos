@@ -55,10 +55,11 @@ namespace Presentation.Web.Infrastructure
 
             ClaimsIdentity identity = new ClaimsIdentity(
                 new GenericIdentity(user.Id.ToString(), "TokenAuth")/*,
+                Add claims here:
                 new[] {
                 }*/
             );
-            string key = "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429090fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1";
+            string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
 
            // Create Security key  using private key above:
            var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
