@@ -8,12 +8,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens;
 using System.Security.Principal;
+using System.Text;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -30,7 +30,7 @@ namespace Presentation.Web.Infrastructure
                     Logger.Error("TokenValidator: Could not load SSOConfig");
                     return null;
                 }
-                var tokenhandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var tokenhandler = new System.IdentityModel.Tokens.JwtSecurityTokenHandler();
                 SecurityToken sToken;
                 var tokenValidationParameters = new TokenValidationParameters
                 {
@@ -47,31 +47,50 @@ namespace Presentation.Web.Infrastructure
             }
         }
 
-        public string CreateToken() {
+        public string CreateToken(Core.DomainModel.User user) {
 
             var ssoConfig = GetKeyFromConfig();
 
             var handler = new JwtSecurityTokenHandler();
 
             ClaimsIdentity identity = new ClaimsIdentity(
-           /*     new GenericIdentity(user.Username, "TokenAuth"),
+                new GenericIdentity(user.Id.ToString(), "TokenAuth")/*,
                 new[] {
-                    new Claim("ID", user.ID.ToString())
                 }*/
             );
+            string key = "401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727429090fb337591abd3e44453b954555b7a0812e1081c39b740293f765eae731f5a65ed1";
 
+            var test = ssoConfig.SigningKey;
+           // Create Security key  using private key above:
+           /* // not that latest version of JWT using Microsoft namespace instead of System */
+           var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+              
+            // Also note that securityKey length should be >256b
+            // so you have to make sure that your private key has a proper length
+            //
+            try { 
             var securityToken = handler.CreateToken(new SecurityTokenDescriptor
             {
-                Issuer = ssoConfig.Issuer,
-                Audience = ssoConfig.Audience,
+                //Issuer = ssoConfig.Issuer,
+                //Audience = ssoConfig.Audience,
                 Subject = identity,
-                Expires = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + 1)
+                TokenIssuerName = ssoConfig.Issuer,
+                Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
+                
+                
+              //  Expires = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day + 1),
+                SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)// SecurityAlgorithms.DefaultDigestAlgorithm) // SecurityAlgorithms.//.RsaV15KeyWrap)//HmacSha256Signature)
+                
             });
 
-            return handler.WriteToken(securityToken);
+
+                return handler.WriteToken(securityToken);
+            }
+            catch(Exception E) { }
+            return null;
         }
 
-        private SsoConfig GetKeyFromConfig()
+        public SsoConfig GetKeyFromConfig()
         {
             var result = new SsoConfig();
             var configUrl = ConfigurationManager.AppSettings["SSOGateway"];
@@ -101,7 +120,7 @@ namespace Presentation.Web.Infrastructure
         }
     }
 
-    internal class SsoConfig
+    public class SsoConfig
     {
         public SecurityKey SigningKey { get; set; }
         public string Issuer { get; set; }

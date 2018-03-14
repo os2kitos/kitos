@@ -11,7 +11,7 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Web.Controllers.API
@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetOrganization(int orgId)
         {
             var user = KitosUser;
-            var org = _organizationService.GetOrganizations(user).Single(o=>o.Id == orgId);
+            var org = _organizationService.GetOrganizations(user).Single(o => o.Id == orgId);
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
             var dto = new OrganizationAndDefaultUnitDTO()
             {
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API
 
             if (principal.Claims.Any(c => c.Type == ClaimTypes.Email || c.Type == ClaimTypes.NameIdentifier))
             {
-                
+
                 var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
                 var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 if (uuidClaim != null && !String.IsNullOrEmpty(uuidClaim.Value))
@@ -99,6 +99,49 @@ namespace Presentation.Web.Controllers.API
             }
             return user;
         }
+        //Post api/authorize/gettoken
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("api/authorize/GetToken")]
+        public HttpResponseMessage GetToken(LoginDTO loginDto) {
+
+            var Response = new { Token = "", Expires = "", Email = "", LoginSuccessful = false };
+            try
+            {
+                User user;
+
+                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                {
+                    throw new ArgumentException();
+                }
+
+                user = _userRepository.GetByEmail(loginDto.Email);
+
+                var Token = "Bearer " + new TokenValidator().CreateToken(user);
+
+                var Expires = DateTime.Now.AddDays(1).ToString();
+
+                Response = new { Token, Expires, loginDto.Email, LoginSuccessful = true };
+
+                Logger.Info($"Uservalidation: Successful {Response}");
+
+                return Created(Response);
+            }
+            catch (ArgumentException)
+            {
+                Logger.Info($"Uservalidation: Unsuccessful. {Response}");
+
+                return Unauthorized("Bad credentials");
+            }
+            catch (Exception e)
+            {
+                Logger.Info($"Uservalidation: Error. {Response}");
+
+                return LogError(e);
+            }
+        }
+    
+
 
         // POST api/Authorize
         [AllowAnonymous]
@@ -130,29 +173,6 @@ namespace Presentation.Web.Controllers.API
 
                     user = _userRepository.GetByEmail(loginDto.Email);
                 }
-
-                var Secret = "db3OIsj+BXE9NZDy0t8W3TcNekrF+2d/1sFnWG4HnV8TZY30iTOdtVWJG8abWvB1GlOgJuQZdcF2Luqm/hccMw==";
-                var symmetricKey = Convert.FromBase64String(Secret);
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new[]
-                  {
-                        new Claim(ClaimTypes.Name, loginDto.Email)
-                    }),
-
-                    //   Expires = now.AddMinutes(Convert.ToInt32(expireMinutes)),
-
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(symmetricKey), SecurityAlgorithms.HmacSha256Signature)
-                };
-
-                var stoken = tokenHandler.CreateToken(tokenDescriptor);
-                var token = tokenHandler.WriteToken(stoken);
-
-
-
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
