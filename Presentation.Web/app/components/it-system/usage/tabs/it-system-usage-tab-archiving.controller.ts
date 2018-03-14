@@ -57,7 +57,17 @@
                 sortDate();
             }
             $scope.$watch("usage.archiveTypeId", (newValue, oldValue) => {
-                if (newValue !== oldValue) {
+                if (newValue !== oldValue && newValue !== null) {
+                    $scope.dirty = true;
+                }
+            });
+            $scope.$watch("usage.archiveLocationId", (newValue, oldValue) => {
+                if (newValue !== oldValue && newValue !== null) {
+                    $scope.dirty = true;
+                }
+            });
+            $scope.$watch("usage.archiveTestLocationId", (newValue, oldValue) => {
+                if (newValue !== oldValue && newValue !== null) {
                     $scope.dirty = true;
                 }
             });
@@ -97,6 +107,7 @@
                 payload[field] = value.id;
                 payload["ArchiveSupplier"] = value.text;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
+                $scope.dirty = true;
             }
 
             if (systemUsage.SupplierId) {
