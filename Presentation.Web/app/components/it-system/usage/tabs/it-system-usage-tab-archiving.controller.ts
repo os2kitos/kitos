@@ -56,6 +56,11 @@
             if ($scope.archivePeriods) {
                 sortDate();
             }
+            $scope.$watch("usage.archiveTypeId", (newValue, oldValue) => {
+                if (newValue !== oldValue) {
+                    $scope.dirty = true;
+                }
+            });
             function sortDate() {
                 let dateList = [];
                 let dateNotList = [];
