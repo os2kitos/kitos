@@ -11,7 +11,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class ArchivePeriodController : GenericContextAwareApiController<ArchivePeriod, ArchivePeriodDTO>
+    public class ArchivePeriodController : GenericApiController<ArchivePeriod, ArchivePeriodDTO>
     {
         // GET: ArchivePeriod
 

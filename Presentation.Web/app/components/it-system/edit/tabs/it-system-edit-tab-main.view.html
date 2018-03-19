@@ -130,7 +130,7 @@
                                     data-ng-model="system.archiveDuty"
                                     data-autosave="{{system.updateUrl}}"
                                     data-field="ArchiveDuty"
-                                    data-ng-disabled="!isGlobalAdmin">
+                                    data-ng-disabled="!hasWriteAccess">
                                 <option value="1">B</option>
                                 <option value="2">K</option>
                                 <option value="3">Ved ikke</option>

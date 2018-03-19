@@ -75,7 +75,7 @@
                 let dateList = [];
                 let dateNotList = [];
                 _.each($scope.archivePeriods, x => {
-                    if (moment().isBetween(moment(x.StartDate), moment(x.EndDate), 'days', '[]')) {
+                    if (moment().isBetween(moment(x.StartDate).startOf('day'), moment(x.EndDate).endOf('day'), null, '[]')) {
                         dateList.push(x);
                     } else {
                         dateNotList.push(x);
