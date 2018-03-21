@@ -504,7 +504,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Inaktiv)";
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Slettes)";
                                 else
                                     value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
                             }

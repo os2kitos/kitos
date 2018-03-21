@@ -56,11 +56,28 @@
             if ($scope.archivePeriods) {
                 sortDate();
             }
+            $scope.$watch("usage.archiveTypeId", (newValue, oldValue) => {
+                if (newValue !== oldValue && newValue !== null) {
+                    $scope.dirty = true;
+                }
+            });
+            $scope.$watch("usage.archiveLocationId", (newValue, oldValue) => {
+                if (newValue !== oldValue && newValue !== null) {
+                    $scope.dirty = true;
+                }
+            });
+            $scope.$watch("usage.archiveTestLocationId", (newValue, oldValue) => {
+                if (newValue !== oldValue && newValue !== null) {
+                    $scope.dirty = true;
+                }
+            });
             function sortDate() {
                 let dateList = [];
                 let dateNotList = [];
                 _.each($scope.archivePeriods, x => {
-                    if (moment().isBetween(moment(x.StartDate), moment(x.EndDate), 'days', '[]')) {
+                    var formatString = "DD-MM-YYYY";
+                    var formatDateString = "YYYY-MM-DD";
+                    if (moment().isBetween(moment(x.StartDate, [formatString, formatDateString]).startOf('day'), moment(x.EndDate, [formatString, formatDateString]).endOf('day'), null, '[]')) {
                         dateList.push(x);
                     } else {
                         dateNotList.push(x);
@@ -82,6 +99,9 @@
                             },
                             () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
+                else if (field === "ArchiveFreq" && (value < 0 || value.length === 0)) {
+                    notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!");
+                }
                 else {
                     itSystemUsageService.patchSystem($scope.usageId, payload);
                     $scope.dirty = true;
@@ -92,6 +112,7 @@
                 payload[field] = value.id;
                 payload["ArchiveSupplier"] = value.text;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
+                $scope.dirty = true;
             }
 
             if (systemUsage.SupplierId) {
@@ -106,24 +127,27 @@
                 var formatString = "DD-MM-YYYY";
 
                 var startDate = moment($scope.archivePeriod.startDate, formatString);
-                if (!startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
-                } else {
-                    startDate = startDate.format("YYYY-MM-DD");
-                }
                 var endDate = moment($scope.archivePeriod.endDate, formatString);
-                if (!endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099) {
+                var startDateValid = !startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099;
+                var endDateValid = !endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099;
+                var dateCheck = startDate.startOf('day') >= endDate.endOf('day');
+                if (startDateValid || endDateValid) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig."); { return; };
-                } else {
-                    endDate = endDate.format("YYYY-MM-DD");
                 }
-                var payload = {};
-                payload["StartDate"] = startDate;
-                payload["EndDate"] = endDate;
-                payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
-                payload["ItSystemUsageId"] = $stateParams.id;
-                $http.post(`odata/ArchivePeriods`, payload).finally(reload);
-                $scope.dirty = true;
+                else if (dateCheck) {
+                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen."); { return; };
+                }
+                else {
+                    startDate = startDate.format("YYYY-MM-DD");
+                    endDate = endDate.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload["StartDate"] = startDate;
+                    payload["EndDate"] = endDate;
+                    payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
+                    payload["ItSystemUsageId"] = $stateParams.id;
+                    $http.post(`odata/ArchivePeriods`, payload).finally(reload);
+                    $scope.dirty = true;
+                }
             };
 
             function reload() {
@@ -187,31 +211,22 @@
                     }
                 };
             }
-
-            $scope.patchDate = (field, value) => {
-                var formatString = "DD-MM-YYYY";
-                var date = moment(value, formatString);
-                console.log(date);
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
-                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                    $scope.ArchivedDate = systemUsage.ArchivedDate;
-                } else {
-                    date = date.format("YYYY-MM-DD");
-                    var payload = {};
-                    payload[field] = date;
-                    itSystemUsageService.patchSystem($scope.usageId, payload);
-                    $scope.ArchivedDate = date;
-                    $scope.dirty = true;
-                }
-            };
             $scope.patchDatePeriode = (field, value, id) => {
                 var formatString = "DD-MM-YYYY";
-                console.log(value);
-                var date = moment(value, formatString);
+                var formatDateString = "YYYY-MM-DD";
 
+                var date = moment(value, formatString);
+                var dateObject = $scope.archivePeriods.filter(x => x.Id === id);
+                var dateObjectStart = moment(dateObject[0].StartDate, [formatString, formatDateString]).startOf('day');
+                var dateObjectEnd = moment(dateObject[0].EndDate, [formatString, formatDateString]).endOf('day');
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                } else {
+                }
+                else if (dateObjectStart >= dateObjectEnd) {
+                    $scope.archivePeriods = archivePeriod;
+                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
+                }
+                else {
                     date = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = date;

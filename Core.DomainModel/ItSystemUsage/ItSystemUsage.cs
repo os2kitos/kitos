@@ -239,7 +239,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// Wishes.
         /// </value>
-        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
         public virtual ICollection<Wish> Wishes { get; set; }
         /// <summary>
         /// Gets or sets the organization units associated with this instance.
@@ -415,5 +414,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int UserSupervision { get; set; }
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
+
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
     }
 }

@@ -208,7 +208,7 @@
 
                                 this._.forEach(sortedRoles, role => {
                                     parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
-                                
+
                                 });
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
@@ -358,18 +358,18 @@
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Inaktiv) </a>`;
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
                                 if (dataItem.ItSystem.Disabled)
-                                    return dataItem.ItSystem.Name + " (Inaktiv)";
+                                    return dataItem.ItSystem.Name + " (Slettes)";
                                 else
                                     return dataItem.ItSystem.Name;
                             } else {
-                                return ""
+                                return "";
                             }
                         },
                         filterable: {
@@ -769,10 +769,11 @@
                                 showOperators: false
                             }
                         }
-                    }, {
+                    },
+                    {
                         field: "Registertype", title: "Er dokumentbærende", width: 160,
                         persistId: "Registertype", // DON'T YOU DARE RENAME!
-                        template: dataItem => {return dataItem.Registertype ? "Ja" : "Nej"; },
+                        template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
                         hidden: false,
                         filterable: {
                             cell: {
@@ -797,7 +798,7 @@
                             }
                             let dateList;
                             _.each(dataItem.ArchivePeriods, x => {
-                                if (moment().isBetween(moment(x.StartDate), moment(x.EndDate), 'days', '[]')) {
+                                if (moment().isBetween(moment(x.StartDate).startOf('day'), moment(x.EndDate).endOf('day'), null, '[]')) {
                                     if (!dateList || dateList.StartDate > x.StartDate) {
                                         dateList = x;
                                     }
@@ -811,7 +812,8 @@
                             
                         },
                         hidden: true,
-                        filterable: false
+                        filterable: false,
+                        sortable: false
                     }
                 ]
             };
