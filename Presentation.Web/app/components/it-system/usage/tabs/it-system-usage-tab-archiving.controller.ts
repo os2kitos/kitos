@@ -99,7 +99,7 @@
                             },
                             () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
                 }
-                else if (field === "ArchiveFreq" && value < 0) {
+                else if (field === "ArchiveFreq" && (value < 0 || value.length === 0)) {
                     notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!");
                 }
                 else {

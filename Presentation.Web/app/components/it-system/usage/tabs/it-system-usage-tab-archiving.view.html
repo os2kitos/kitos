@@ -139,7 +139,7 @@
             </div>
             <div class="form-group">
                 <label for="ArchiveFreq" class="control-label small">Arkiveringsfrekvens</label>
-                <input type="number" step="1" min="0" class="form-control input-sm" id="ArchiveFreq" required value="0"
+                <input type="number" step="1" min="0" ng-minlength="1" class="form-control input-sm" id="ArchiveFreq" required
                        ng-change="patch('ArchiveFreq', systemUsage.ArchiveFreq)"
                        data-field="ArchiveFreq"
                        data-ng-model="systemUsage.ArchiveFreq"
