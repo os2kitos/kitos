@@ -730,7 +730,7 @@
                     {
                         field: "Registertype", title: "Er dokumentbærende", width: 160,
                         persistId: "Registertype", // DON'T YOU DARE RENAME!
-                        template: dataItem => {return dataItem.Registertype ? "Ja" : "Nej"; },
+                        template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
                         hidden: false,
                         filterable: {
                             cell: {
@@ -769,7 +769,8 @@
                             
                         },
                         hidden: true,
-                        filterable: false
+                        filterable: false,
+                        sortable: false
                     }
                 ]
             };
