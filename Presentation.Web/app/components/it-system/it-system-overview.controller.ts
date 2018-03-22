@@ -304,9 +304,7 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -676,54 +674,13 @@
                     {
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
-                        //template: dataItem => {
-                        //    if (!dataItem || !dataItem.Concluded) {
-                        //        return "";
-                        //    }
-                        //    return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
-                        //},
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: function(args) {
-                                    var filterCell = args.element.parents(".k-filtercell");
-                                    filterCell.empty();
-                                    filterCell.html(`<span style="display:flex; justify-content:center;">
-                                                    <span>From:</span>
-                                                    <input  class='start-date'/>
-                                                    <span>To:</span>
-                                                    <input  class='end-date'/></span>`
-                                    );
-
-                                    //$(".start-date", filterCell).kendoDatePicker({
-                                    //    change: function (e) {
-                                    //        var startDate = e.sender.value(),
-                                    //            endDate = $("input.end-date", filterCell).data("kendoDatePicker").value(),
-                                    //            dataSource = $("#mainGrid").data("kendoGrid").dataSource;
-
-                                    //        if (startDate & endDate) {
-                                    //            var filter = { logic: "and", filters: [] };
-                                    //            filter.filters.push({ field: "Concluded", operator: "gte", value: startDate });
-                                    //            filter.filters.push({ field: "Concluded", operator: "lte", value: endDate });
-                                    //            dataSource.filter(filter);
-                                    //        }
-                                    //    }
-                                    //});
-                                    //$(".end-date", filterCell).kendoDatePicker({
-                                    //    change: function (e) {
-                                    //        var startDate = $("input.start-date", filterCell).data("kendoDatePicker").value(),
-                                    //            endDate = e.sender.value(),
-                                    //            dataSource = $("#mainGrid").data("kendoGrid").dataSource;
-
-                                    //        if (startDate & endDate) {
-                                    //            var filter = { logic: "and", filters: [] };
-                                    //            filter.filters.push({ field: "Concluded", operator: "gte", value: startDate });
-                                    //            filter.filters.push({ field: "Concluded", operator: "lte", value: endDate });
-                                    //            dataSource.filter(filter);
-                                    //        }
-                                    //    }
-                                    //});
-
+                        hidden: false,
+                        filterable: 
+                        {
+                            operators: {
+                                date: {
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
                                 }
                             }
                         }
