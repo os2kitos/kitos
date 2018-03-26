@@ -566,33 +566,39 @@
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DataHearingSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
                         </div>
-                        <!-- Answering data DPIA -->
-                        <div class="form-group">
-                            <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
-                            <input type="radio" id="answeringDataDPIAYes"
-                                   data-ng-model="systemUsage.answeringDataDPIA"
-                                   ng-value="1"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('answeringDataDPIA', 1)"
-                                   data-field="answeringDataDPIA">
-                            <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
-                            &nbsp;
-                            <input type="radio" id="answeringDataDPIANo"
-                                   data-ng-model="systemUsage.answeringDataDPIA"
-                                   ng-value="0"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('answeringDataDPIA', 0)"
-                                   data-field="answeringDataDPIA">
-                            <label class="control-label small" for="answeringDataDPIANo">Nej</label>
-                            &nbsp;
-                            <input type="radio" id="answeringDataDPIADunno"
-                                   data-ng-model="systemUsage.answeringDataDPIA"
-                                   ng-value="2"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   ng-click="patch('answeringDataDPIA', 2)"
-                                   data-field="answeringDataDPIA">
-                            <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
-                        </div>
+                    </div>
+                </div>
+
+
+                <div ng-show="systemUsage.DPIA == 1" class="well">
+                    <!-- Answering data DPIA -->
+                    <div class="form-group">
+                        <label class="control-label small">Er der bevaringsfrist på data inden de må slettes?</label><br>
+                        <input type="radio" id="answeringDataDPIAYes"
+                               data-ng-model="systemUsage.answeringDataDPIA"
+                               ng-value="1"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('answeringDataDPIA', 1)"
+                               data-field="answeringDataDPIA">
+                        <label class="control-label small" for="answeringDataDPIAYes">Ja</label>
+                        &nbsp;
+                        <input type="radio" id="answeringDataDPIANo"
+                               data-ng-model="systemUsage.answeringDataDPIA"
+                               ng-value="0"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('answeringDataDPIA', 0)"
+                               data-field="answeringDataDPIA">
+                        <label class="control-label small" for="answeringDataDPIANo">Nej</label>
+                        &nbsp;
+                        <input type="radio" id="answeringDataDPIADunno"
+                               data-ng-model="systemUsage.answeringDataDPIA"
+                               ng-value="2"
+                               data-ng-disabled="!hasWriteAccess"
+                               ng-click="patch('answeringDataDPIA', 2)"
+                               data-field="answeringDataDPIA">
+                        <label class="control-label small" for="answeringDataDPIADunno">Ved ikke</label>
+                    </div>
+                    <div data-ng-show="systemUsage.answeringDataDPIA == 1">
                         <!-- Date of next delete of data DPIA -->
                         <div class="form-group">
                             <label for="DPIAdeleteDate" class="control-label small">Dato for hvornår der må foretages sletning af data i systemet næste gang</label>
@@ -614,8 +620,8 @@
                                    data-ng-disabled="!hasWriteAccess" />
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
         </div>
 
         <div class="row">
