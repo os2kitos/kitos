@@ -130,7 +130,7 @@
                         <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                          <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
                             
-                              <a id="datahandler-link" 
+                              <a id="datahandler-link" target="_blank"
                                 href="{{systemUsage.datahandlerSupervisionDocumentationUrl}}" 
                                 data-ng-hide="systemUsage.datahandlerSupervisionDocumentationUrl == '' || systemUsage.datahandlerSupervisionDocumentationUrl == null">
                              {{systemUsage.datahandlerSupervisionDocumentationUrlName ? systemUsage.datahandlerSupervisionDocumentationUrlName : "Dokumentation" }}
@@ -158,7 +158,7 @@
                 <div class="form-group">
                     <label for="docu-link" class="control-label small">Link til fortegnelse</label>
                     <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a id="docu-link" href="{{systemUsage.LinkToDirectoryUrl}}" data-ng-hide="systemUsage.LinkToDirectoryUrl == '' || systemUsage.LinkToDirectoryUrl == null">
+                        <a target="_blank" id="docu-link" href="{{systemUsage.LinkToDirectoryUrl}}" data-ng-hide="systemUsage.LinkToDirectoryUrl == '' || systemUsage.LinkToDirectoryUrl == null">
                             {{systemUsage.LinkToDirectoryUrlName ? systemUsage.LinkToDirectoryUrlName : "Fortegnelse" }}
                         </a>
                         <label for="docu-link" class="control-label small" data-ng-show="systemUsage.LinkToDirectoryUrl == '' || systemUsage.LinkToDirectoryUrl == null">Intet link til fortegnelse</label>
@@ -310,7 +310,7 @@
                             <div class="form-group">
                                 <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a id="datahandler-link" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.TechnicalSupervisionDocumentationUrl == '' || systemUsage.TechnicalSupervisionDocumentationUrl == null">                                        
+                                    <a target="_blank" id="datahandler-link" href="{{systemUsage.TechnicalSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.TechnicalSupervisionDocumentationUrl == '' || systemUsage.TechnicalSupervisionDocumentationUrl == null">                                        
                                     {{systemUsage.TechnicalSupervisionDocumentationUrlName ? systemUsage.TechnicalSupervisionDocumentationUrlName : "Dokumentation" }}</a>
                                     <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.TechnicalSupervisionDocumentationUrl == '' || systemUsage.TechnicalSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
                                     <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('technicalSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
@@ -359,7 +359,7 @@
                             <div class="form-group">
                                 <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == '' || systemUsage.UserSupervisionDocumentationUrl == null">
+                                    <a target="_blank" id="datahandler-link" href="{{systemUsage.UserSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.UserSupervisionDocumentationUrl == '' || systemUsage.UserSupervisionDocumentationUrl == null">
                                     {{systemUsage.UserSupervisionDocumentationUrlName ? systemUsage.UserSupervisionDocumentationUrlName : "Dokumentation" }}</a>
                                     <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.UserSupervisionDocumentationUrl == '' || systemUsage.UserSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
                                     <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('UserSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
@@ -440,7 +440,7 @@
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == '' || systemUsage.RiskSupervisionDocumentationUrl == null">
+                                <a target="_blank" id="datahandler-link" href="{{systemUsage.RiskSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.RiskSupervisionDocumentationUrl == '' || systemUsage.RiskSupervisionDocumentationUrl == null">
                                     {{systemUsage.RiskSupervisionDocumentationUrlName ? systemUsage.RiskSupervisionDocumentationUrlName : "Dokumentation" }}
                                 </a>
                                 <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.RiskSupervisionDocumentationUrl == '' || systemUsage.RiskSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
@@ -504,7 +504,7 @@
                             <div class="form-group">
                                 <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                                 <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                                    <a id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == '' || systemUsage.DPIASupervisionDocumentationUrl == null">
+                                    <a target="_blank" id="datahandler-link" href="{{systemUsage.DPIASupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DPIASupervisionDocumentationUrl == '' || systemUsage.DPIASupervisionDocumentationUrl == null">
                                         {{systemUsage.DPIASupervisionDocumentationUrlName ? systemUsage.DPIASupervisionDocumentationUrlName : "Dokumentation" }}
                                     </a>
                                     <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DPIASupervisionDocumentationUrl == '' || systemUsage.DPIASupervisionDocumentationUrl == null">Intet link til dokumentation</label>
@@ -560,7 +560,7 @@
                         <div class="form-group">
                             <label for="datahandler-link" class="control-label small">Link til dokumentation</label>
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;"  data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DataHearingSupervisionDocumentationUrl == '' || systemUsage.DataHearingSupervisionDocumentationUrl == null">
+                                <a target="_blank" id="datahandler-link" href="{{systemUsage.DataHearingSupervisionDocumentationUrl}}" data-ng-hide="systemUsage.DataHearingSupervisionDocumentationUrl == '' || systemUsage.DataHearingSupervisionDocumentationUrl == null">
                                 {{systemUsage.DataHearingSupervisionDocumentationUrlName ? systemUsage.DataHearingSupervisionDocumentationUrlName : "Dokumentation" }}</a>
                                 <label for="datahandler-link" class="control-label small" data-ng-show="systemUsage.DataHearingSupervisionDocumentationUrl == '' || systemUsage.DataHearingSupervisionDocumentationUrl == null">Intet link til dokumentation</label>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink('DataHearingSupervisionDocumentationUrl')"><i class="fa fa-pencil" aria-hidden="true"></i></button>
