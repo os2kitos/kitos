@@ -181,7 +181,6 @@ module Kitos.Reports {
                     this.viewer.report = this.stiReport;
                 })
                 .catch((result => {
-                    console.log(result);
                     alert("Ingen adgang til rapporten!");
                 }));
         }

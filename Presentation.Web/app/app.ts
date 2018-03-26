@@ -176,7 +176,6 @@ app.run([
 
         // when something goes wrong during state change (e.g a rejected resolve)
         $rootScope.$on("$stateChangeError", (event, toState, toParams, fromState, fromParams, error) => {
-            console.log(error);
             $state.go("index");
         });
 
