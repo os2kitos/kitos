@@ -236,7 +236,7 @@
                                 Concluded: { type: "date" },
                                 ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
-                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" }
+                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 IsActive: {type: "boolean"}
                             }
                         },
