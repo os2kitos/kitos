@@ -32,6 +32,9 @@
         ArchiveLocationId: number;
         ArchiveLocation: ItSystem.IArchiveLocation;
 
+        ArchiveTestLocationId: number;
+        ArchiveTestLocation: ItSystem.IArchiveTestLocation;
+
         SensitiveDataTypeId: number;
         SensitiveDataType: ItSystem.ISensitiveDataType;
         OverviewId: number;
@@ -56,8 +59,15 @@
         /** Gets or sets the associated it projects. */
         ItProjects: Array<ItProject.IItProject>;
 
+        ArchivePeriods: ItSystem.IArchivePeriode;
+
         ReferenceId: number;
         Reference: IReference;
+
+        Concluded?: Date;
+        ArchiveDuty: number;
+        Registertype: boolean;
+
         IsActive: boolean;
     }
 }

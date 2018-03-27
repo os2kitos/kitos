@@ -3,9 +3,9 @@
 namespace Core.DomainModel.ItSystem
 {
     /// <summary>
-    /// Option for archive pane
+    /// Dropdown option for ItSystem, whether it has been archived or not.
     /// </summary>
-    public class ArchiveTestLocation : OptionEntity<ItSystemUsage.ItSystemUsage>, IOptionReference<ItSystemUsage.ItSystemUsage>
+    public class ArchiveType : OptionEntity<ItSystemUsage.ItSystemUsage>, IOptionReference<ItSystemUsage.ItSystemUsage>
     {
         public virtual ICollection<ItSystemUsage.ItSystemUsage> References { get; set; } = new HashSet<ItSystemUsage.ItSystemUsage>();
     }

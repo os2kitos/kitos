@@ -279,6 +279,8 @@
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
@@ -291,6 +293,8 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Controllers\API\ArchiveTestLocationController.cs" />
+    <Compile Include="Controllers\API\ArchivePeriodController.cs" />
     <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
@@ -357,6 +361,7 @@
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsRegularPersonalDataController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsSensitivePersonalDataController.cs" />
+    <Compile Include="Controllers\OData\ArchivePeriodsController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
@@ -364,6 +369,7 @@
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTestLocationsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
@@ -398,6 +404,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveTestLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
     <Compile Include="Controllers\OData\BaseController.cs" />
@@ -461,6 +468,7 @@
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
+    <Compile Include="Models\ArchivePeriodDTO.cs" />
     <Compile Include="Models\DataResponsibleDTO.cs" />
     <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
@@ -1372,6 +1380,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\ArchiveLocations\" />
+    <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
     <Folder Include="Views\AttachedOptionsSensitivePersonalDataController\" />
     <Folder Include="Views\BaseAttachedOptions\" />

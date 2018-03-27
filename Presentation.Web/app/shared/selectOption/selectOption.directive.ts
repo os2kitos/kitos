@@ -21,7 +21,7 @@
                 link: function (scope, element, attr, ctrl) {
                     var foundSelectedInOptions = _.find(scope.options, function(option: any) { return option.Id == scope.selectedId });
                     if (scope.options && scope.selectedId != null && !foundSelectedInOptions) {
-                        scope.options.splice(0, 0, { Id: scope.selectedId, Name: scope.selectedText + " (Inaktiv)" });
+                        scope.options.splice(0, 0, { Id: scope.selectedId, Name: scope.selectedText + " (Slettes)" });
                     }
 
                     scope.savedId = scope.selectedId;

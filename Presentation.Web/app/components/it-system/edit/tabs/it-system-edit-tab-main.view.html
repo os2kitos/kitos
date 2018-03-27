@@ -1,5 +1,5 @@
 ﻿<div class="object-section-container">
-    <h4>{{system.name}} <span data-ng-if="system.disabled">(inaktiv)</span></h4>
+    <h4>{{system.name}} <span data-ng-if="system.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="row">
             <!-- Left side -->
@@ -81,6 +81,20 @@
             <div class="col-xs-4">
                 <div class="row">
                     <div class="col-xs-12">
+                        <!-- Archive duty -->
+                        <div class="form-group">
+                            <label for="archiveDuty" class="control-label small">Arkiveringspligt</label>
+                            <select class="form-control input-sm" id="archiveDuty"
+                                    ui-select2="{minimumResultsForSearch: -1}"
+                                    data-ng-model="system.archiveDuty"
+                                    data-autosave="{{system.updateUrl}}"
+                                    data-field="ArchiveDuty"
+                                    data-ng-disabled="!hasWriteAccess">
+                                <option value="1">B</option>
+                                <option value="2">K</option>
+                                <option value="3">Ved ikke</option>
+                            </select>
+                        </div>
                         <!--PreviousName-->
                         <div class="form-group">
                             <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>

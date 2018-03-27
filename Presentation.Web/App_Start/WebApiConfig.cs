@@ -163,6 +163,9 @@ namespace Presentation.Web
             var archiveLocation = builder.EntitySet<ArchiveLocation>(nameof(ArchiveLocationsController).Replace("Controller", string.Empty));
             archiveLocation.EntityType.HasKey(x => x.Id);
 
+            var archiveTestLocation = builder.EntitySet<ArchiveTestLocation>(nameof(ArchiveTestLocationsController).Replace("Controller", string.Empty));
+            archiveTestLocation.EntityType.HasKey(x => x.Id);
+
             var archiveOption = builder.EntitySet<ArchiveType>(nameof(ArchiveTypesController).Replace("Controller", string.Empty));
             archiveOption.EntityType.HasKey(x => x.Id);
 
@@ -379,6 +382,10 @@ namespace Presentation.Web
             LocalArchiveLocation.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalArchiveLocation.EntityType.HasKey(x => x.Id);
 
+            var LocalArchiveTestLocation = builder.EntitySet<LocalArchiveTestLocation>(nameof(LocalArchiveTestLocationsController).Replace("Controller", string.Empty));
+            LocalArchiveTestLocation.HasRequiredBinding(u => u.Organization, "Organizations");
+            LocalArchiveTestLocation.EntityType.HasKey(x => x.Id);
+
             var LocalItSystemCategories = builder.EntitySet<LocalItSystemCategories>(nameof(LocalItSystemCategoriesController).Replace("Controller", string.Empty));
             LocalItSystemCategories.HasRequiredBinding(x => x.Organization, "Organizations");
             LocalItSystemCategories.EntityType.HasKey(x => x.Id);
@@ -553,6 +560,9 @@ namespace Presentation.Web
             var accessType = builder.EntitySet<AccessType>(nameof(AccessTypesController).Replace("Controller", string.Empty));
             accessType.HasRequiredBinding(a => a.ItSystem, "ItSystems");
             accessType.EntityType.HasKey(x => x.Id);
+
+            var archivePeriod = builder.EntitySet<ArchivePeriod>(nameof(ArchivePeriodsController).Replace("Controller", string.Empty));
+            archivePeriod.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");

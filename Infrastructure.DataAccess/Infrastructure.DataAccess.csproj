@@ -186,6 +186,7 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
+    <Compile Include="Mapping\ArchivePeriodMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201607110712126_Initial.cs" />
     <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
@@ -519,9 +520,9 @@
     <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.Designer.cs">
       <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803051145316_OrganizationPropertyAdded.cs" />
-    <Compile Include="Migrations\201803051145316_OrganizationPropertyAdded.Designer.cs">
-      <DependentUpon>201803051145316_OrganizationPropertyAdded.cs</DependentUpon>
+    <Compile Include="Migrations\201803050825306_ArchivingNew.cs" />
+    <Compile Include="Migrations\201803050825306_ArchivingNew.Designer.cs">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -797,8 +798,8 @@
     <EmbeddedResource Include="Migrations\201803021222458_cascade delete added to itprojectusage.resx">
       <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803051145316_OrganizationPropertyAdded.resx">
-      <DependentUpon>201803051145316_OrganizationPropertyAdded.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201803050825306_ArchivingNew.resx">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -35,6 +35,7 @@ namespace Infrastructure.DataAccess
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
+        public DbSet<ArchiveTestLocation> ArchiveTestLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
@@ -105,10 +106,12 @@ namespace Infrastructure.DataAccess
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
+        public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
 
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
         public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
         public DbSet<LocalArchiveLocation> LocalArchiveLocation { get; set; }
+        public DbSet<LocalArchiveTestLocation> LocalArchiveTestLocation { get; set; }
         public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }
@@ -227,6 +230,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
+            modelBuilder.Configurations.Add(new ArchivePeriodMap());
             modelBuilder.Configurations.Add(new PriceRegulationTypeMap());
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
