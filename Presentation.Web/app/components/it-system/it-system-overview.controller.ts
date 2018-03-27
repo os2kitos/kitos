@@ -306,7 +306,6 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -706,16 +705,18 @@
                         }
                     },
                     {
-                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 220,
-                        persistId: "concludedSystem", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem || !dataItem.Concluded) {
-                                return "";
+                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
+                        persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        filterable: 
+                        {
+                            operators: {
+                                date: {
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
+                                }
                             }
-                            return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
-                        },
-                        hidden: true,
-                        filterable: true
+                        }
                     },
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
