@@ -32,6 +32,7 @@
 
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.system = theSystem;
+            console.log($scope.system);
             $scope.updateUrl = 'api/itsystem/' + theSystem.id;
             $scope.regularSensitiveData = regularSensitiveData;
             $scope.sensitivePersonalData = sensitivePersonalData;
