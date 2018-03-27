@@ -114,6 +114,7 @@
                                                class="form-control"
                                                required
                                                data-kendo-date-picker
+                                               ng-blur="checkDate(comm.dueDate)"
                                                data-k-options="datepickerOptions"
                                                data-ng-disabled="!projectEditVm.hasWriteAccess"
                                                data-ng-model="comm.dueDate">
@@ -132,7 +133,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <button id="save-comm" class="btn btn-success btn-sm" data-ng-click="save()">Gem</button>
+                                    <button id="save-comm" class="btn btn-success btn-sm" ng-disabled="DateFailed" data-ng-click="save()">Gem</button>
                                 </td>
                             </tr>
                         </tfoot>

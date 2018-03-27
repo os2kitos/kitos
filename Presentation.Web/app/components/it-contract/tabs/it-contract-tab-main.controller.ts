@@ -147,6 +147,19 @@
                         $scope.contract.procurementPlan = plan.id; // select it
                     }
                 }
+                $scope.patchDate = (field, value) => {
+                    var date = moment(moment(value, "DD-MM-YYYY", true).format());
+
+                    if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                    } else {
+                        var dateString = date.format("YYYY-MM-DD");
+                        var payload = {};
+                        payload[field] = dateString;
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                    }
+                }
 
                 $scope.saveProcurement = function () {
                     var payload;

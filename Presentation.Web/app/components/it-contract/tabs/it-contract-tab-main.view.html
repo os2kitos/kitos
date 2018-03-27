@@ -194,7 +194,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.supplierSignedDate"
-                                   data-autosave="{{ autoSaveUrl }}"
+                                   ng-blur="patchDate('supplierSignedDate', contract.supplierSignedDate)"
                                    data-field="supplierSignedDate">
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.signedDate"
-                                   data-autosave="{{ autoSaveUrl }}"
+                                   ng-blur="patchDate('signedDate', contract.signedDate)"
                                    data-field="signedDate">
                         </div>
                     </div>
