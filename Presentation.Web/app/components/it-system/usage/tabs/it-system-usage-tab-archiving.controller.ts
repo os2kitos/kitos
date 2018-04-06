@@ -145,6 +145,7 @@
                     payload["EndDate"] = endDate;
                     payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
                     payload["ItSystemUsageId"] = $stateParams.id;
+                    payload["Approved"] = $stateParams.approved;
                     $http.post(`odata/ArchivePeriods`, payload).finally(reload);
                     $scope.dirty = true;
                 }

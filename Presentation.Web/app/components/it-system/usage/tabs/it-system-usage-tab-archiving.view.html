@@ -6,7 +6,7 @@
         <div class="col-xs-6">
             <!-- Archived -->
             <div class="form-group">
-                <label class="control-label small">Arkiveret</label><br>
+                <label class="control-label small">Skal Arkiveres</label><br>
                 <input type="radio" id="Archived"
                        data-ng-model="systemUsage.Archived"
                        ng-value="true"
@@ -48,34 +48,6 @@
                        data-field="ArchiveDuty">
                 <label class="control-label small" for="ArchiveDutyDunno">Ved ikke</label>
             </div>
-            <!-- ReportedToDPA -->
-            <div class="form-group">
-                <label for="ReportedToDPA" class="control-label small">Anmeldt til datatilsynet</label><br>
-                <input type="radio" id="ReportedToDPA"
-                       data-ng-model="systemUsage.ReportedToDPA"
-                       ng-value="true"
-                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                       ng-click="patch('ReportedToDPA', true)"
-                       data-field="ReportedToDPA">
-                <label class="control-label small" for="ReportedToDPA">Ja</label>
-
-                <input type="radio" id="ReportedToDPA2"
-                       data-ng-model="systemUsage.ReportedToDPA"
-                       ng-value="false"
-                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                       ng-click="patch('ReportedToDPA', false)"
-                       data-field="ReportedToDPA">
-                <label class="control-label small" for="ReportedToDPA2">Nej</label>
-            </div>
-            <!-- DocketNo -->
-            <div class="form-group">
-                <label for="DocketNo" class="control-label small">Journal-/Anmeldelsesnr</label>
-                <input type="text" id="DocketNo" class="form-control input-sm"
-                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
-                       data-ng-model="systemUsage.DocketNo"
-                       ng-blur="patch('DocketNo', systemUsage.DocketNo)"
-                       data-field="DocketNo">
-            </div>
             <!-- ArchivedType -->
             <div class="form-group">
                 <select-option data-id="archive"
@@ -89,9 +61,6 @@
                                data-field="archiveTypeId">
                 </select-option>
             </div>
-        </div>
-        <!-- 2nd column -->
-        <div class="col-xs-6">
             <!-- ArchiveLocation -->
             <div class="form-group">
                 <select-option data-id="archiveLocation"
@@ -115,6 +84,9 @@
                        data-field="SupplierId"
                        data-ng-disabled="!hasWriteAccess || !systemUsage.Archived">
             </div>
+        </div>
+        <!-- 2nd column -->
+        <div class="col-xs-6">
             <!-- ArchiveTestLocation -->
             <div class="form-group">
                 <select-option data-id="archiveTestLocation"
@@ -131,11 +103,12 @@
             <!-- ArchiveNotes -->
             <div class="form-group">
                 <label for="ArchiveNotes" class="control-label small">Arkiveringsbemærkninger</label>
-                <input type="text" id="ArchiveNotes" class="form-control input-sm"
+                <textarea id="ArchiveNotes" class="form-control input-sm"
+                       rows="5"
                        data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
                        data-ng-model="systemUsage.ArchiveNotes"
                        ng-blur="patch('ArchiveNotes', systemUsage.ArchiveNotes)"
-                       data-field="ArchiveNotes">
+                       data-field="ArchiveNotes"/>
             </div>
             <div class="form-group">
                 <label for="ArchiveFreq" class="control-label small">Arkiveringsfrekvens</label>
@@ -168,6 +141,7 @@
                         <th class="col-xs-3">Startdato</th>
                         <th class="col-xs-3">Slutdato</th>
                         <th>Unikt arkiv-id</th>
+                        <th>Godkendt</th>
                         <th><!-- control --></th>
                     </tr>
                     </thead>
@@ -200,7 +174,13 @@
                                           data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"></textarea>
                             </div>
                         </td>
+                        <td>
+                            <input type="checkbox" name="approved" class="" 
+                                   ng-blur="patchPeriode('Approved', archive.approved, archive.Id)" 
+                                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived" 
+                                   data-ng-model="archive.Approved" maxlength="20" />
 
+                        </td>
                         <td>
                             <button class="btn btn-danger btn-sm delete-archive"
                                     data-confirmed-click="delete(archive.Id)"
@@ -241,6 +221,10 @@
                             <div class="form-group" data-show-errors>
                                 <input type="text" name="uniqueArchiveId" class="form-control input-sm" data-ng-model="archivePeriod.uniqueArchiveId" style="resize: none" maxlength="20" />
                             </div>
+                        </td>
+                        <td>
+                                <input type="checkbox" name="approved" class="" data-ng-disabled="!hasWriteAccess || !systemUsage.Archived" data-ng-model="archivePeriod.approved" maxlength="20" />
+                          
                         </td>
                         <td>
                             <button id="save-archive" class="btn btn-success btn-sm" data-ng-click="save()">Opret</button>

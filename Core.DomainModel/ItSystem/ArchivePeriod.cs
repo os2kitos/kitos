@@ -14,5 +14,6 @@ namespace Core.DomainModel.ItSystem
         public string UniqueArchiveId { get; set; }
         public int ItSystemUsageId { get; set; }
         public ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
+        public bool Approved { get; set; }
     }
 }
