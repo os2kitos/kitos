@@ -89,6 +89,9 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<Report> Reports { get; set; }
 
+        public virtual int? ContactPersonId { get; set; }
+        public virtual ContactPerson ContactPerson { get; set; }
+
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently
         /// </summary>

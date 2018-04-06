@@ -149,6 +149,7 @@ namespace Infrastructure.DataAccess
         public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
         public DbSet<RegisterType> RegisterTypes { get; set; }
         public DbSet<LocalRegisterType> LocalRegisterTypes { get; set; }
+        public DbSet<ContactPerson> ContactPersons { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
