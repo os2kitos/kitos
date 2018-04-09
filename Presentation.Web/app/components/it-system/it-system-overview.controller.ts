@@ -222,8 +222,11 @@
                         }
                     },
                     sort: {
-                        field: "ItSystem.Name",
+                        field: "SystemName",
                         dir: "asc"
+                    },
+                    AutoComplete: {
+                        disabled: true
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -237,6 +240,7 @@
                                 ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
+                                SystemName: { from: "ItSystem.Name", type: "string" },
                                 IsActive: {type: "boolean"}
                             }
                         },
@@ -355,7 +359,8 @@
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
-                            }
+                            },
+                            ignoreCase: true
                         }
                     },
                     {
@@ -385,7 +390,7 @@
                         }
                     },
                     {
-                        field: "ItSystem.Name", title: "IT System", width: 320,
+                        field: "SystemName", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
