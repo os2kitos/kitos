@@ -11,6 +11,7 @@ namespace Presentation.Web.Models
         public string Adress { get; set; }
         public string Email { get; set; }
         public string Cvr { get; set; }
+        public string ForeignCvr { get; set; }
 
         public int TypeId { get; set; }
         public AccessModifier AccessModifier { get; set; }

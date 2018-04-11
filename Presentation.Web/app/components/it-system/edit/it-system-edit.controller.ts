@@ -30,12 +30,16 @@
         [
             '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_',
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
-
+                
                 $scope.hasWriteAccess = hasWriteAccess;
-                if (!$scope.hasWriteAccess) {
+                if ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId)) {
+                    $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
+                }
+                if (!$scope.hasWriteAccess && !(user.id === itSystem.objectOwnerId)) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
                     });
+                    
                 } else if (user.isGlobalAdmin) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Deaktivér IT System";
@@ -57,6 +61,7 @@
                         }
                     }
                 }
+                
 
                 function disableSystem() {
                     if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
@@ -92,6 +97,27 @@
                         })
                         .error(function (data, status) {
                             msg.toErrorMessage('Fejl! Kunne ikke aktivere IT System!');
+                        });
+                }
+
+                function removeSystem() {
+                    if (!confirm('Er du sikker på du vil slette systemet?')) {
+                        return;
+                    }
+                    var systemId = $state.params.id;
+                    var msg = notify.addInfoMessage('Sletter IT System...', false);
+                    $http.delete('api/itsystem/' + systemId + '?organizationId=' + user.currentOrganizationId)
+                        .success(function (result) {
+                            msg.toSuccessMessage('IT System  er slettet!');
+                            $state.go('it-system.catalog');
+                        })
+                        .error(function (data, status) {
+                            if (status === 409)
+                                msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
+                            else if (status === 401)
+                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
+                            else
+                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
                 }
             }

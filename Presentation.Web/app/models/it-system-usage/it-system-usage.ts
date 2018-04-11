@@ -68,5 +68,6 @@
         ArchiveDuty: number;
         Registertype: boolean;
 
+        IsActive: boolean;
     }
 }

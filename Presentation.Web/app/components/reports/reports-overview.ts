@@ -208,7 +208,7 @@
                 },
                 batch: false,
                 sync: false,
-                columnMenu: false,
+                columnMenu: true,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -239,7 +239,6 @@
                 },
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,
                 toolbar: [
                     {
                         name: "createReport",
@@ -275,8 +274,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [20],
-                    buttonCount: 20
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
@@ -287,9 +286,7 @@
                 filterable: {
                     mode: "row",
                 },
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,

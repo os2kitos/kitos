@@ -1225,11 +1225,18 @@
     </None>
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
+    <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\jquery-3.3.1.js" />
+    <Content Include="Scripts\jquery-3.3.1.min.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.js" />
+    <Content Include="Scripts\jquery-3.3.1.slim.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
+    <Content Include="Scripts\jquery-3.3.1.min.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -1341,7 +1348,11 @@
     <Content Include="Tests\mocks\itContractRole.json" />
     <Content Include="Tests\mocks\advice.json" />
     <Content Include="Tests\mocks\interfaceUsage.json" />
-    <Content Include="Scripts\**\*.js" />
+    <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
+    <Content Include="Scripts\appReport-bundle.min.js" />
+    <Content Include="Scripts\langs\da.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\projectEdit.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\ItProject\Edit\Tabs\projectTabStatusProject.e2e.spec.ts" />
   </ItemGroup>

@@ -305,7 +305,8 @@
                                 Terminated: { type: "date" },
                                 Acquisition: { type: "number" },
                                 Operation: { type: "number" },
-                                Other: { type: "number" }
+                                Other: { type: "number" },
+                                IsActive: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -415,9 +416,7 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -426,13 +425,12 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "isActive", title: "Aktiv", width: 50,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 150,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-
-                            if (isActive)
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
@@ -444,7 +442,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                template: args => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                           
+                            }
+                        }
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -801,7 +812,6 @@
                 return today >= startDate && today <= endDate;
             }
             return dataItem.Active;
-
         }
 
         private exportFlag = false;

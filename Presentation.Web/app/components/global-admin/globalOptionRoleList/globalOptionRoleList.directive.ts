@@ -110,9 +110,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 columns: [
                     {
                         field: "IsEnabled",

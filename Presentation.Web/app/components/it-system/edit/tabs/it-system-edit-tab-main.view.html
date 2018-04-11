@@ -6,67 +6,28 @@
             <div class="col-xs-8">
                 <div class="row">
                     <div class="col-xs-6">
-                            <!--AppTypeOption-->
-                            <div class="form-group">
-                                <select-option data-id="system-type"
-                                               data-label="Applikationstype"
-                                               data-placeholder="Vælg applikationstype"
-                                               data-selected-text="{{ system.appTypeOptionName }}"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               data-ng-model="system.appTypeOptionId"
-                                               data-options="appTypeOptions"
-                                               data-auto-save-url="{{ system.updateUrl }}"
-                                               data-field="appTypeOptionId">
-                                </select-option>
-                            </div>
-
-                            <!--Name-->
-                            <div class="form-group">
-                                <label for="system-name" class="control-label small">IT System</label>
-                                <input type="text" id="system-name" class="form-control input-sm" required
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-autosave="{{system.updateUrl}}"
-                                       data-field="name"
-                                       data-ng-model="system.name">
-                            </div>
-
-                            <!--PreviousName-->
-                            <div class="form-group">
-                                <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>
-                                <input type="text" id="system-previousname" class="form-control input-sm"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-autosave="{{system.updateUrl}}"
-                                       data-field="previousname"
-                                       data-ng-model="system.previousName">
-                            </div>
-
-                            <!--Parent system-->
-                            <div class="form-group">
-                                <label for="system-parent" class="control-label small">Overordnet system</label>
-                                <input type="hidden" id="system-parent" class="form-control input-sm"
-                                       data-ui-select2="itSystemsSelectOptions"
-                                       data-ng-disabled="!hasWriteAccess"
-                                       data-autosave="{{system.updateUrl}}"
-                                       data-field="parentId"
-                                       data-placeholder="Vælg system"
-                                       data-ng-model="system.parent">
-                            </div>
-
-                            <!-- Usage type -->
-                            <div class="form-group">
-                                <select-option data-id="system-business-type"
-                                               data-label="Forretningstype"
-                                               data-placeholder="Vælg forretningstype"
-                                               data-selected-text="{{ system.businessTypeName }}"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               data-ng-model="system.businessTypeId"
-                                               data-options="businessTypes"
-                                               data-auto-save-url="{{ system.updateUrl }}"
-                                               data-field="businessTypeId">
-                                </select-option>
-                            </div>
+                        <!--Name-->
+                        <div class="form-group">
+                            <label for="system-name" class="control-label small">IT System</label>
+                            <input type="text" id="system-name" class="form-control input-sm" required
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="name"
+                                   data-ng-model="system.name">
                         </div>
-                    <div class="col-xs-6">
+                        <!-- Usage type -->
+                        <div class="form-group">
+                            <select-option data-id="system-business-type"
+                                           data-label="Forretningstype"
+                                           data-placeholder="Vælg forretningstype"
+                                           data-selected-text="{{ system.businessTypeName }}"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="system.businessTypeId"
+                                           data-options="businessTypes"
+                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-field="businessTypeId">
+                            </select-option>
+                        </div>
                         <!-- belongs to -->
                         <div class="form-group">
                             <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
@@ -78,13 +39,6 @@
                                    data-field="belongsToId"
                                    data-ng-model="system.belongsTo">
                         </div>
-
-                        <!-- Object owner -->
-                        <div class="form-group">
-                            <label class="control-label small">Oprettet af</label>
-                            <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
-                        </div>
-
                         <!-- Access modifier -->
                         <div class="form-group">
                             <label for="system-access" class="control-label small">Synlighed</label>
@@ -95,12 +49,6 @@
                                    data-ng-model="system.accessModifier"
                                    data-select-access-modifier="">
                         </div>
-
-                        <!-- UUID -->
-                        <div class="form-group">
-                            <label class="control-label small">UUID</label>
-                            <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
-                        </div>
                         <!--Data level-->
                         <div class="form-group">
                             <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
@@ -108,11 +56,22 @@
                                     ui-select2="{minimumResultsForSearch: -1}"
                                     data-ng-model="system.dataLevel"
                                     data-ng-change="submitDataLevel()"
-                                   data-ng-disabled="!hasWriteAccess">
+                                    data-ng-disabled="!hasWriteAccess">
                                 <option value="0">Ingen persondata</option>
                                 <option value="1">Persondata</option>
                                 <option value="2">Persondata og følsomme persondata</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label for="system-description" class="control-label small">Beskrivelse</label>
+                            <textarea id="system-description" class="form-control input-sm" rows="12"
+                                      data-autosave="{{system.updateUrl}}"
+                                      data-field="description"
+                                      data-ng-disabled="!hasWriteAccess"
+                                      data-ng-model="system.description"></textarea>
                         </div>
                     </div>
                 </div>
@@ -136,14 +95,48 @@
                                 <option value="3">Ved ikke</option>
                             </select>
                         </div>
-                        <!-- Description -->
+                        <!--PreviousName-->
                         <div class="form-group">
-                            <label for="system-description" class="control-label small">Beskrivelse</label>
-                            <textarea id="system-description" class="form-control input-sm" rows="7"
-                                      data-autosave="{{system.updateUrl}}"
-                                      data-field="description"
-                                      data-ng-disabled="!hasWriteAccess"
-                                      data-ng-model="system.description"></textarea>
+                            <label for="system-previousname" class="control-label small">Tidligere systemnavn</label>
+                            <input type="text" id="system-previousname" class="form-control input-sm"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="previousname"
+                                   data-ng-model="system.previousName">
+                        </div>
+                        <!--Parent system-->
+                        <div class="form-group">
+                            <label for="system-parent" class="control-label small">Overordnet system</label>
+                            <input type="hidden" id="system-parent" class="form-control input-sm"
+                                   data-ui-select2="itSystemsSelectOptions"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-autosave="{{system.updateUrl}}"
+                                   data-field="parentId"
+                                   data-placeholder="Vælg system"
+                                   data-ng-model="system.parent">
+                        </div>
+                        <!--AppTypeOption-->
+                        <div class="form-group">
+                            <select-option data-id="system-type"
+                                           data-label="Applikationstype"
+                                           data-placeholder="Vælg applikationstype"
+                                           data-selected-text="{{ system.appTypeOptionName }}"
+                                           data-ng-disabled="!hasWriteAccess"
+                                           data-ng-model="system.appTypeOptionId"
+                                           data-options="appTypeOptions"
+                                           data-auto-save-url="{{ system.updateUrl }}"
+                                           data-field="appTypeOptionId">
+                            </select-option>
+                        </div>
+                        <!-- Object owner -->
+                        <div class="form-group">
+                            <label class="control-label small">Oprettet af</label>
+                            <input type="text" value="{{system.objectOwnerFullName}}" class="form-control input-sm" disabled="disabled" />
+                        </div>
+                        <!-- UUID -->
+                        <div class="form-group">
+                            <label class="control-label small">UUID</label>
+                            <input type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
                         </div>
                     </div>
                 </div>

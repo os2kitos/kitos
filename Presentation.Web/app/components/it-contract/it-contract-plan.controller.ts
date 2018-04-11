@@ -281,7 +281,8 @@
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
                                 Terminated: { type: "date" },
-                                Duration: { type: "string" }
+                                Duration: { type: "string" },
+                                IsActive: {type: "boolean"}
                             }
                         },
                         parse: response => {
@@ -361,9 +362,7 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 detailTemplate: (dataItem) => {
                     //These might be candidates for refactoring. They are quite expensive
                     return `<uib-tabset active="0">
@@ -387,14 +386,12 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Active",
-                        title: "Aktiv",
-                        width: 45,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive",
+                        title: "Gyldig/Ikke gyldig",
+                        width: 90,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-
-                            if (isActive) {
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
                             }
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
@@ -405,7 +402,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: false,
+                        filterable: {
+                        cell: {
+                            template: args => {
+                                args.element.kendoDropDownList({
+                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                    dataTextField: "type",
+                                    dataValueField: "value",
+                                    valuePrimitive: true
+                                });
+                            },
+                            showOperators: false
+
+                        }
+                    }
                     },
                     {
                         field: "ItContractId",

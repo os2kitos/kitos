@@ -279,9 +279,7 @@
                     }
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,

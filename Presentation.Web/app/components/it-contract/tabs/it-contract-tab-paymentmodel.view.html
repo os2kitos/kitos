@@ -6,17 +6,17 @@
         <div class="panel panel-default">
             <div class="panel-heading">Betalingsmodel</div>
             <div class="panel-body">
-                <div class="form-group">
+                <div class="form-group col-xs-6">
                     <label for="agreement-operation" class="control-label small">Driftsvederlag påbegyndt</label>
                     <input type="text" class="form-control" id="agreement-operation"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="contract.operationRemunerationBegun"
-                           data-autosave="{{autosaveUrl}}"
+                           ng-blur="patchDate('operationRemunerationBegun', contract.operationRemunerationBegun)"
                            data-field="operationRemunerationBegun">
                 </div>
-                <div class="form-group">
+                <div class="form-group col-xs-6">
                     <select-option data-id="agreement-freq"
                                    data-label="Betalingsfrekvens"
                                    data-placeholder="Vælg betalingsfrekvens"
@@ -28,7 +28,7 @@
                                    data-field="paymentFreqencyId">
                     </select-option>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-xs-12">
                     <select-option data-id="agreement-payment"
                                    data-label="Betalingsmodel"
                                    data-placeholder="Vælg betalingsmodel"
@@ -40,7 +40,7 @@
                                    data-field="paymentModelId">
                     </select-option>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-xs-12">
                     <select-option data-id="agreement-price"
                                    data-label="Prisregulering"
                                    data-placeholder="Vælg prisregulering"

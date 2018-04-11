@@ -232,6 +232,9 @@ namespace Presentation.Web
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
             orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
+            //Add isActive to result form odata
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContract)).AddProperty(typeof(ItContract).GetProperty("IsActive"));
+
 
             var userEntitySetName = nameof(UsersController).Replace("Controller", string.Empty);
             var users = builder.EntitySet<User>(userEntitySetName);
@@ -267,6 +270,7 @@ namespace Presentation.Web
 
             var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage)).AddProperty(typeof(ItSystemUsage).GetProperty("IsActive"));
 
             var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
             contracts.HasRequiredBinding(o => o.Organization, "Organizations");
@@ -277,8 +281,6 @@ namespace Presentation.Web
 
             // TODO this field is causing issues.
             // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
-            // if ItContract.Terminated has a value
-            contracts.EntityType.Ignore(x => x.IsActive);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>(nameof(InterfaceTypesController).Replace("Controller", string.Empty));
             interfaceTypes.EntityType.HasKey(x => x.Id);

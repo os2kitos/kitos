@@ -222,8 +222,11 @@
                         }
                     },
                     sort: {
-                        field: "ItSystem.Name",
+                        field: "SystemName",
                         dir: "asc"
+                    },
+                    AutoComplete: {
+                        disabled: true
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -236,7 +239,9 @@
                                 Concluded: { type: "date" },
                                 ArchiveDuty: { type: "number" },
                                 Registertype: { type: "boolean" },
-                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" }
+                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
+                                SystemName: { from: "ItSystem.Name", type: "string" },
+                                IsActive: {type: "boolean"}
                             }
                         },
                         parse: response => {
@@ -304,16 +309,46 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
-                columns: [
+                columns: [{
+
+                    field: "IsActive",
+                    title: "Gyldig/Ikke gyldig",
+                    width: 90,
+                    persistId: "isActive", // DON'T YOU DARE RENAME!
+                    template: dataItem => {
+                        if (dataItem.IsActive) {
+                            return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                        }
+                        return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                    },
+                    excelTemplate: dataItem => {
+                        var isActive = this.isContractActive(dataItem);
+                        return isActive.toString();
+                    },
+                    attributes: { "class": "text-center" },
+                    sortable: false,
+                    filterable: {
+                        cell: {
+                            template: args => {
+                                args.element.kendoDropDownList({
+                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                    dataTextField: "type",
+                                    dataValueField: "value",
+                                    valuePrimitive: true
+                                });
+                            },
+                            showOperators: false
+
+                        }
+                    }
+                },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!
@@ -324,7 +359,8 @@
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
-                            }
+                            },
+                            ignoreCase: true
                         }
                     },
                     {
@@ -354,7 +390,7 @@
                         }
                     },
                     {
-                        field: "ItSystem.Name", title: "IT System", width: 320,
+                        field: "SystemName", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
@@ -674,16 +710,18 @@
                         }
                     },
                     {
-                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 220,
-                        persistId: "concludedSystem", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem || !dataItem.Concluded) {
-                                return "";
+                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
+                        persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        filterable: 
+                        {
+                            operators: {
+                                date: {
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
+                                }
                             }
-                            return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
-                        },
-                        hidden: true,
-                        filterable: true
+                        }
                     },
                     {
                         field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,

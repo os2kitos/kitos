@@ -55,7 +55,7 @@
                                         Id: data.User.Id
                                     });
                                 });
-
+                                results = _.orderBy(results, x => x.Name, 'asc');
                                 return results;
                             });
                         }
@@ -67,8 +67,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '_', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -84,7 +84,6 @@
                 $scope.orgUnits = orgUnits;
                 var today = new Date();
                 $scope.dataHandlerLink = '';
-
                 
                 if ($scope.contract.dataHandler != null) {
                     $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId + '/main';
@@ -145,6 +144,19 @@
                         var plan = { id: $scope.procurementPlans.length, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
                         $scope.contract.procurementPlan = plan.id; // select it
+                    }
+                }
+                $scope.patchDate = (field, value) => {
+                    var date = moment(moment(value, "DD-MM-YYYY", true).format());
+
+                    if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                    } else {
+                        var dateString = date.format("YYYY-MM-DD");
+                        var payload = {};
+                        payload[field] = dateString;
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                     }
                 }
 
