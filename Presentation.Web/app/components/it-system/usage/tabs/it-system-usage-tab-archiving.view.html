@@ -175,10 +175,10 @@
                             </div>
                         </td>
                         <td>
-                            <input type="checkbox" name="approved" class="" 
-                                   ng-blur="patchPeriode('Approved', archive.approved, archive.Id)" 
+                            <input type="checkbox" name="Approved"
+                                   ng-click="patchPeriode('Approved', archive.Approved, archive.Id)" 
                                    data-ng-disabled="!hasWriteAccess || !systemUsage.Archived" 
-                                   data-ng-model="archive.Approved" maxlength="20" />
+                                   data-ng-model="archive.Approved"/>
 
                         </td>
                         <td>
@@ -223,7 +223,10 @@
                             </div>
                         </td>
                         <td>
-                                <input type="checkbox" name="approved" class="" data-ng-disabled="!hasWriteAccess || !systemUsage.Archived" data-ng-model="archivePeriod.approved" maxlength="20" />
+                                <input type="checkbox"
+                                       name="Approved" 
+                                       data-ng-disabled="!hasWriteAccess || !systemUsage.Archived" 
+                                       data-ng-model="archivePeriod.approved"/>
                           
                         </td>
                         <td>
