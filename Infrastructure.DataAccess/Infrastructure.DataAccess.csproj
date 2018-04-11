@@ -528,6 +528,10 @@
     <Compile Include="Migrations\201804091133514_ArchiveFromSystemAdded.Designer.cs">
       <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.cs" />
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.Designer.cs">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -807,6 +811,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804091133514_ArchiveFromSystemAdded.resx">
       <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804110855592_approved added to archiveperiod.resx">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
