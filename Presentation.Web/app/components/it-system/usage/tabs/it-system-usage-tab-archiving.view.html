@@ -18,8 +18,8 @@
                 <input type="radio" id="Archived2"
                        data-ng-model="systemUsage.Archived"
                        ng-value="false"
-                       data-ng-disabled="!hasWriteAccess || dirty"
-                       ng-click="patch('Archived', false)"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patchArchivedNo()"
                        data-field="Archived">
                 <label class="control-label small" for="Archived2">Nej</label>
             </div>
@@ -76,7 +76,7 @@
             </div>
             <!-- Supplier -->
             <div class="form-group">
-                <label for="archiveSupplier" class="control-label small">Arkiveringsleverandører</label>
+                <label for="archiveSupplier" class="control-label small">Arkiveringsleverandør</label>
                 <input type="hidden" id="archiveSupplier" class="form-control input-sm"
                        data-ui-select2="suppliersSelectOptions"
                        data-ng-model="systemUsage.supplier"
@@ -111,7 +111,7 @@
                        data-field="ArchiveNotes"/>
             </div>
             <div class="form-group">
-                <label for="ArchiveFreq" class="control-label small">Arkiveringsfrekvens</label>
+                <label for="ArchiveFreq" class="control-label small">Arkiveringsfrekvens (antal år)</label>
                 <input type="number" step="1" min="0" ng-minlength="1" class="form-control input-sm" id="ArchiveFreq" required
                        ng-change="patch('ArchiveFreq', systemUsage.ArchiveFreq)"
                        data-field="ArchiveFreq"
@@ -131,9 +131,29 @@
             </div>
         </div>
     </div>
+        <!-- ArchiveFromSystem -->
+    <div class="col-xs-12">
+        <div class="form-group">
+            <label class="control-label small">Er der arkiveret fra systemet?</label><br>
+            <input type="radio" id="ArchiveFromSystemYes"
+                   data-ng-model="systemUsage.ArchiveFromSystem"
+                   ng-value="true"
+                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                   ng-click="patch('ArchiveFromSystem', true)"
+                   data-field="ArchiveFromSystem">
+            <label class="control-label small" for="ArchiveFromSystemYes">Ja</label>
+            <input type="radio" id="ArchiveFromSystemNo"
+                   data-ng-model="systemUsage.ArchiveFromSystem"
+                   ng-value="false"
+                   data-ng-disabled="!hasWriteAccess || !systemUsage.Archived"
+                   ng-click="patch('ArchiveFromSystem', false)"
+                   data-field="ArchiveFromSystem">
+            <label class="control-label small" for="ArchiveFromSystemNo">Nej</label>
+        </div>
+    </div>
         <!-- Journal Period -->
         <div id="JournalPeriod" class="h4">
-            <label for="JournalPeriod">	&nbsp;Journalperiode </label>
+            <label for="JournalPeriod">	&nbsp;	&nbsp;Journalperiode </label>
             <form role="form" name="archiveForm">
                 <table class="table">
                     <thead>
@@ -167,7 +187,7 @@
                         </td>
                         <td>
                             <div class="form-group">
-                                <textarea class="form-control input-sm" style="resize:none" maxlength="20"
+                                <textarea class="form-control input-sm" style="resize: none; height: 35px" maxlength="20" rows="1"
                                           data-ng-model="archive.UniqueArchiveId"
                                           ng-blur="patchPeriode('UniqueArchiveId', archive.UniqueArchiveId, archive.Id)"
                                           data-field="uniqueArchiveId"
@@ -207,7 +227,7 @@
                         </td>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <input type="text"
+                                <input type="text" 
                                        name="end"
                                        class="form-control"
                                        required
@@ -219,7 +239,7 @@
                         </td>
                         <td>
                             <div class="form-group" data-show-errors>
-                                <input type="text" name="uniqueArchiveId" class="form-control input-sm" data-ng-model="archivePeriod.uniqueArchiveId" style="resize: none" maxlength="20" />
+                                <input type="text" name="uniqueArchiveId" class="form-control input-sm" data-ng-model="archivePeriod.uniqueArchiveId" style="resize: none; height: 35px" maxlength="20" />
                             </div>
                         </td>
                         <td>

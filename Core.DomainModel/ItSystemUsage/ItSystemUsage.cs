@@ -319,11 +319,11 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string ArchiveNotes { get; set; }
 
-        public int ArchiveFreq { get; set; }
+        public int? ArchiveFreq { get; set; }
 
         public string ArchiveSupplier { get; set; }
 
-        public bool Registertype { get; set; }
+        public bool? Registertype { get; set; }
 
         public int? SupplierId { get; set; }
         /// <summary>
@@ -416,5 +416,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string LinkToDirectoryUrlName { get; set; }
 
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
+
+        public bool? ArchiveFromSystem { get; set; }
     }
 }
