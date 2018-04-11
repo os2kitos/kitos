@@ -132,7 +132,7 @@
         </div>
     </div>
         <!-- ArchiveFromSystem -->
-    <div class="col-xs-12">
+    <div class="col-xs-12" ng-hide="archivePeriods.length < 1 && !systemUsage.Archived">
         <div class="form-group">
             <label class="control-label small">Er der arkiveret fra systemet?</label><br>
             <input type="radio" id="ArchiveFromSystemYes"
@@ -152,7 +152,7 @@
         </div>
     </div>
         <!-- Journal Period -->
-        <div id="JournalPeriod" class="h4">
+        <div id="JournalPeriod" class="h4" ng-hide="archivePeriods.length < 1 && !systemUsage.Archived">
             <label for="JournalPeriod">	&nbsp;	&nbsp;Journalperiode </label>
             <form role="form" name="archiveForm">
                 <table class="table">

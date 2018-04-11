@@ -44,7 +44,7 @@
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
-            console.log(itSystemUsage);
+
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
             }
@@ -97,24 +97,16 @@
                     resetParameters();
                 }
             }
-            function resetParameters() {
-                //resetOdata();
-                resetAPI();
-            }
-            function resetOdata() {
-                var payload = {};
-                payload["Archived"] = false;
-                payload["ArchiveDuty"] = null;
-                payload["ReportedToDPA"] = null;
-                payload["DocketNo"] = "";
-                payload["ArchiveNotes"] = "";
-                payload["ArchiveFreq"] = null;
-                payload["Registertype"] = null;
-                payload["ArchiveFromSystem"] = null;
-                itSystemUsageService.patchSystem($scope.usageId, payload);
+            function resetPeriodes() {
+                _.each($scope.archivePeriods, (x) => {
+                    $http.delete(`odata/ArchivePeriods(${x.Id})`).then(() => {
+                        notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
+                        reload();
+                    });
+                });
             }
 
-            function resetAPI() {
+            function resetParameters() {
                 var payload = {};
                 var url = `api/itSystemUsage/${$stateParams.id}?organizationId=${user.currentOrganizationId}`;
                 payload["Archived"] = false;
@@ -131,7 +123,7 @@
                 payload["archiveTestLocationId"] = null;
                 $http.patch(url, payload)
                     .then(() => {
-                        notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
+                        $scope.Archived = false;
                         $scope.ArchiveDuty = null;
                         $scope.systemUsage.ReportedToDPA = null;
                         $scope.systemUsage.DocketNo = "";
@@ -143,6 +135,12 @@
                         $scope.usage.archiveLocationId = null;
                         $scope.usage.SupplierId = null;
                         $scope.usage.archiveTestLocationId = null;
+                        if ($scope.archivePeriods.length < 1) {
+                            notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
+                            reload();
+                        } else {
+                            resetPeriodes();
+                        }
                         },
                         () => { () => { notify.addErrorMessage("Dataen for arkivering kunne ikke slettes!") } }
                     );
