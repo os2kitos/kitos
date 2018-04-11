@@ -18,8 +18,8 @@
                 <input type="radio" id="Archived2"
                        data-ng-model="systemUsage.Archived"
                        ng-value="false"
-                       data-ng-disabled="!hasWriteAccess || dirty"
-                       ng-click="patch('Archived', false)"
+                       data-ng-disabled="!hasWriteAccess"
+                       ng-click="patchArchivedNo()"
                        data-field="Archived">
                 <label class="control-label small" for="Archived2">Nej</label>
             </div>

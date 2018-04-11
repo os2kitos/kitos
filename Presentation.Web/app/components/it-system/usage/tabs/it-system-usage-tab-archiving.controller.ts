@@ -44,7 +44,7 @@
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
-
+            console.log(itSystemUsage);
             if (!systemUsage.Archived) {
                 $scope.systemUsage.Archived = false;
             }
@@ -88,6 +88,65 @@
                 });
                 $scope.archivePeriods = dateList;
             }
+            $scope.patchArchivedNo = () => {
+                var cnfrm = confirm('Bekræft at alle de indtastede data i Arkivering vil blive slettet hvis der fortsættes');
+                if (!cnfrm) {
+                    notify.addInfoMessage("Feltet blev ikke opdateret!");
+                    $scope.systemUsage.Archived = true;
+                } else {
+                    resetParameters();
+                }
+            }
+            function resetParameters() {
+                //resetOdata();
+                resetAPI();
+            }
+            function resetOdata() {
+                var payload = {};
+                payload["Archived"] = false;
+                payload["ArchiveDuty"] = null;
+                payload["ReportedToDPA"] = null;
+                payload["DocketNo"] = "";
+                payload["ArchiveNotes"] = "";
+                payload["ArchiveFreq"] = null;
+                payload["Registertype"] = null;
+                payload["ArchiveFromSystem"] = null;
+                itSystemUsageService.patchSystem($scope.usageId, payload);
+            }
+
+            function resetAPI() {
+                var payload = {};
+                var url = `api/itSystemUsage/${$stateParams.id}?organizationId=${user.currentOrganizationId}`;
+                payload["Archived"] = false;
+                payload["ArchiveDuty"] = null;
+                payload["ReportedToDPA"] = null;
+                payload["DocketNo"] = "";
+                payload["ArchiveNotes"] = "";
+                payload["ArchiveFreq"] = 0;
+                payload["Registertype"] = null;
+                payload["ArchiveFromSystem"] = null;
+                payload["archiveTypeId"] = null;
+                payload["archiveLocationId"] = null;
+                payload["SupplierId"] = null;
+                payload["archiveTestLocationId"] = null;
+                $http.patch(url, payload)
+                    .then(() => {
+                        notify.addSuccessMessage("Dataen for arkiveringen er slettet!");
+                        $scope.ArchiveDuty = null;
+                        $scope.systemUsage.ReportedToDPA = null;
+                        $scope.systemUsage.DocketNo = "";
+                        $scope.systemUsage.ArchiveNotes = "";
+                        $scope.systemUsage.ArchiveFreq = 0;
+                        $scope.systemUsage.Registertype = null;
+                        $scope.systemUsage.ArchiveFromSystem = null;
+                        $scope.usage.archiveTypeId = null;
+                        $scope.usage.archiveLocationId = null;
+                        $scope.usage.SupplierId = null;
+                        $scope.usage.archiveTestLocationId = null;
+                        },
+                        () => { () => { notify.addErrorMessage("Dataen for arkivering kunne ikke slettes!") } }
+                    );
+            }
             $scope.patch = (field, value) => {
                 var payload = {};
                 payload[field] = value;
@@ -104,7 +163,6 @@
                 }
                 else {
                     itSystemUsageService.patchSystem($scope.usageId, payload);
-                    $scope.dirty = true;
                 }
             }
             $scope.patchSupplier = (field, value) => {
@@ -112,7 +170,6 @@
                 payload[field] = value.id;
                 payload["ArchiveSupplier"] = value.text;
                 itSystemUsageService.patchSystem($scope.usageId, payload);
-                $scope.dirty = true;
             }
 
             if (systemUsage.SupplierId) {
@@ -146,7 +203,6 @@
                     payload["UniqueArchiveId"] = $scope.archivePeriod.uniqueArchiveId;
                     payload["ItSystemUsageId"] = $stateParams.id;
                     $http.post(`odata/ArchivePeriods`, payload).finally(reload);
-                    $scope.dirty = true;
                 }
             };
 
@@ -241,15 +297,6 @@
                 $http.patch(`odata/ArchivePeriods(${id})`, payload);
                 notify.addSuccessMessage("Feltet er opdateret!");
             }
-
-            $scope.dirty = $scope.systemUsage.ArchiveDuty != null ||
-                $scope.systemUsage.ReportedToDPA != null ||
-                $scope.systemUsage.ReportedToDPA != null ||
-                $scope.systemUsage.DocketNo != null ||
-                $scope.usage.archiveTypeId != null ||
-                $scope.usage.archiveLocationId != null ||
-                $scope.ArchivedDate != null ||
-                $scope.systemUsage.ArchiveNotes != null;
 
             $scope.datepickerOptions = {
                 format: "dd-MM-yyyy"
