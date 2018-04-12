@@ -272,19 +272,14 @@
                                 httpCall(payload, action, url);
                             };
 
-                            $scope.checkErr = function (startDate, endDate) {
+                            $scope.checkErrStart = function (startDate, endDate) {
                                 $scope.errMessage = '';
                                 $scope.startDateErrMessage = '';
                                 $scope.stopDateErrMessage = '';
                                 $scope.curDate = new Date();
-                                var invalidDate = false;
-                                if (!moment($scope.startDate, 'dd-MM-yyyy').isValid() || $scope.startDate == undefined || $scope.stopDate.length < 1) {
+                                if (!moment($scope.startDate, 'dd-MM-yyyy').isValid() || $scope.startDate == undefined) {
                                     $scope.startDateErrMessage = 'Fra Dato er ugyldig!';
-                                    invalidDate = true;
-                                }
-                                else if (!moment($scope.stopDate, 'dd-MM-yyyy').isValid() || $scope.stopDate == undefined || $scope.stopDate.length < 1) {
-                                    $scope.stopDateErrMessage = 'Til Dato er ugyldig!';
-                                    invalidDate = true;
+                                    return false;
                                 }
                                 if ($scope.startDate && $scope.stopDate) {
                                     if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
@@ -295,9 +290,31 @@
                                     $scope.errMessage = 'Begge dato felter skal udfyldes!';
                                     return false;
                                 }
-                                if (invalidDate) {
+                                
+                                $scope.startDateErrMessage = '';
+                                $scope.stopDateErrMessage = '';
+                                $scope.errMessage = '';
+                                return true;
+                            };
+                            $scope.checkErrEnd = function (startDate, endDate) {
+                                $scope.errMessage = '';
+                                $scope.startDateErrMessage = '';
+                                $scope.stopDateErrMessage = '';
+                                $scope.curDate = new Date();
+                                if (!moment($scope.stopDate, 'dd-MM-yyyy').isValid() || $scope.stopDate == undefined) {
+                                    $scope.stopDateErrMessage = 'Til Dato er ugyldig!';
                                     return false;
                                 }
+                                if ($scope.startDate && $scope.stopDate) {
+                                    if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
+                                        $scope.errMessage = '\'Til Dato\' skal være senere end eller samme som \'Fra dato\'!';
+                                        return false;
+                                    }
+                                } else {
+                                    $scope.errMessage = 'Begge dato felter skal udfyldes!';
+                                    return false;
+                                }
+                                
                                 $scope.startDateErrMessage = '';
                                 $scope.stopDateErrMessage = '';
                                 $scope.errMessage = '';
