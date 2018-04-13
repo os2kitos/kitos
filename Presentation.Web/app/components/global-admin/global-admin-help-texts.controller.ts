@@ -78,8 +78,9 @@
                     }
                 },
                 groupable: false,
-                columnMenu: true,
-                height: 900,
+                columnMenu: {
+                    filterable: false
+                },
                 toolbar: [
                     {
                         //TODO ng-show='hasWriteAccess'

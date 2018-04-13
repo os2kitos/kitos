@@ -92,8 +92,9 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: true,
-                height: 900,
+                columnMenu: {
+                    filterable: false
+                },
                 columns: [
                     {
                         field: "IsLocallyAvailable", title: "Aktiv", width: 112,

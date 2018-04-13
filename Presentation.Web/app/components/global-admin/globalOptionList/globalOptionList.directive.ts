@@ -110,8 +110,9 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: true,
-                height: 900,
+                columnMenu: {
+                    filterable: false
+                }
             };
 
             if (this.dirId === "reportCategoryTypeId") {
