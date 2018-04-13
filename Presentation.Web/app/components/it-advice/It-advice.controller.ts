@@ -275,7 +275,6 @@
                             $scope.checkErrStart = function (startDate, endDate) {
                                 $scope.errMessage = '';
                                 $scope.startDateErrMessage = '';
-                                $scope.stopDateErrMessage = '';
                                 $scope.curDate = new Date();
                                 if (!moment($scope.startDate, 'dd-MM-yyyy').isValid() || $scope.startDate == undefined) {
                                     $scope.startDateErrMessage = 'Fra Dato er ugyldig!';
@@ -292,13 +291,11 @@
                                 }
                                 
                                 $scope.startDateErrMessage = '';
-                                $scope.stopDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;
                             };
                             $scope.checkErrEnd = function (startDate, endDate) {
                                 $scope.errMessage = '';
-                                $scope.startDateErrMessage = '';
                                 $scope.stopDateErrMessage = '';
                                 $scope.curDate = new Date();
                                 if (!moment($scope.stopDate, 'dd-MM-yyyy').isValid() || $scope.stopDate == undefined) {
@@ -315,7 +312,6 @@
                                     return false;
                                 }
                                 
-                                $scope.startDateErrMessage = '';
                                 $scope.stopDateErrMessage = '';
                                 $scope.errMessage = '';
                                 return true;

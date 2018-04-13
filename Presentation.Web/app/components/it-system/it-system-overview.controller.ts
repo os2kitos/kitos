@@ -410,6 +410,11 @@
                         },
                         filterable: {
                             cell: {
+                                template: args => {
+                                    args.element.kendoAutoComplete({
+                                        noDataTemplate: ''
+                                    });
+                                },
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
