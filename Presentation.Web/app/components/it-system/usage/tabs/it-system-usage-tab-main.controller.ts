@@ -55,7 +55,7 @@
             $scope.appTypeOptions = appTypeOptions;
             $scope.hasViewAccess = user.currentOrganizationId == itSystemUsage.organizationId;
             autofocus();
-
+            console.log($scope.usage);
             var today = new Date();
 
             if (!itSystemUsage.active) {
