@@ -24,14 +24,14 @@
 <div class="object-section-container">
     <div class="panel panel-default">
         <div class="row">
-            <div class="col-xs-6">
+            <div class="col-xs-12">
                 <div class="row">
                     <!-- 1st column -->
                     <div class="col-xs-6">
                         <!-- Parent -->
                         <div class="form-group">
                             <label for="contract-parent" class="control-label small">Overordnet kontrakt</label>
-                            <input type="hidden" id="contract-parent" class="form-control input-sm"
+                            <input type="hidden" id="contract-parent" class="form-control input-sm" style="overflow-y: auto;"
                                    data-ui-select2="itContractsSelectOptions"
                                    data-ng-model="contract.parent"
                                    data-autosave="{{ autoSaveUrl }}"

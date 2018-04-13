@@ -20,6 +20,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             this.Contracts = new List<ItContractItSystemUsage>();
             this.Wishes = new List<Wish>();
+            this.ArchivePeriods = new List<ArchivePeriod>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
@@ -305,7 +306,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         
-        public bool? ArchiveDuty { get; set; }
+        public int? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }
 
@@ -318,9 +319,26 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string ArchiveNotes { get; set; }
 
+        public int ArchiveFreq { get; set; }
+
+        public string ArchiveSupplier { get; set; }
+
+        public bool Registertype { get; set; }
+
+        public int? SupplierId { get; set; }
+        /// <summary>
+        ///     Gets or sets the organization marked as supplier for this contract.
+        /// </summary>
+        /// <value>
+        ///     The organization.
+        /// </value>
         public int? ArchiveLocationId { get; set; }
 
         public virtual ArchiveLocation ArchiveLocation { get; set; }
+
+        public int? ArchiveTestLocationId { get; set; }
+
+        public virtual ArchiveTestLocation ArchiveTestLocation { get; set; }
 
         public int? ItSystemCategoriesId { get; set; }
 
@@ -396,5 +414,7 @@ namespace Core.DomainModel.ItSystemUsage
         public int UserSupervision { get; set; }
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
+
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
     }
 }

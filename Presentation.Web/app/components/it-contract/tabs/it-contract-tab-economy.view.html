@@ -114,7 +114,7 @@
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
+                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 
@@ -248,7 +248,7 @@
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
+                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 

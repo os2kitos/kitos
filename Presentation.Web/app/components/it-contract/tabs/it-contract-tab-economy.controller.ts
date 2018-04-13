@@ -168,7 +168,30 @@
                 $scope.newIntern = function () {
                     postStream("InternPaymentForId", "OrganizationId");
                 };
+                $scope.patchDate = (field, value, id) => {
+                    var date = moment(value, "DD-MM-YYYY");
 
+                    if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                    }
+                    else {
+                        var dateString = date.format("YYYY-MM-DD");
+                        var payload = {};
+                        payload[field] = dateString;
+                        patch(payload, `api/EconomyStream/?id=${id}&organizationId=${user.currentOrganizationId}`);
+                    }
+                }
+                function patch(payload, url) {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    $http({ method: 'PATCH', url: url, data: payload })
+                        .success(function () {
+                            msg.toSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                }
                 // work around for $state.reload() not updating scope
                 // https://github.com/angular-ui/ui-router/issues/582
                 function reload() {

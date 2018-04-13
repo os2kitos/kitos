@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
+            this.ArchivePeriods = new List<ArchivePeriod>();
             this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
@@ -74,6 +75,7 @@ namespace Core.DomainModel.ItSystem
         public virtual BusinessType BusinessType { get; set; }
 
         public virtual ICollection<Wish> Wishes { get; set; }
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
@@ -110,6 +112,8 @@ namespace Core.DomainModel.ItSystem
         public bool IsDataTransferedToThirdCountries { get; set; }
 
         public string DataIsTransferedTo { get; set; }
+
+        public int ArchiveDuty { get; set; }
 
         public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
 

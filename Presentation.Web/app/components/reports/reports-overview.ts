@@ -209,7 +209,6 @@
                 batch: false,
                 sync: false,
                 columnMenu: true,
-                height: 900,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -275,8 +274,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [20],
-                    buttonCount: 20
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
@@ -288,7 +287,6 @@
                     mode: "row",
                 },
                 columnMenu: true,
-                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,

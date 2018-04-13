@@ -119,9 +119,9 @@
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
 
-                                if (user.isGlobalAdmin) {
-                                    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
-                                }
+                                //if (user.isGlobalAdmin) {
+                                //    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
+                                //}
                             }
 
                             return parameterMap;
@@ -134,7 +134,8 @@
                     schema: {
                         model: {
                             fields: {
-                                LastChanged: { type: "date" }
+                                LastChanged: { type: "date" },
+                                Disabled: { type: "boolean" }
                             }
                         }
                     },
@@ -193,7 +194,6 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -254,18 +254,18 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv) </a>`;
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled)
-                                    return dataItem.Name + " (Inaktiv)";
+                                    return dataItem.Name + " (Slettes)";
                                 else
                                     return dataItem.Name;
                             } else {
-                                return ""
+                                return "";
                             }
                         },
                         filterable: {
@@ -273,6 +273,25 @@
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Disabled", title: "Slettes", width: 120,
+                        persistId: "Disabled", // DON'T YOU DARE RENAME!
+                        template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },

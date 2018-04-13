@@ -67,7 +67,7 @@
                                         cvr: obj.cvr
                                     });
                                 });
-
+                                results = _.orderBy(results, x => x.text, 'asc');
                                 return { results: results };
                             }
                         }

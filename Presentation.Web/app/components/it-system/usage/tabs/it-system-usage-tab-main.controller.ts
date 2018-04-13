@@ -124,61 +124,62 @@
                     }
                 };
             }
+            $scope.patchDate = (field, value) => {
+                var date = moment(value, "DD-MM-YYYY");
+                var today = moment();
+
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                }
+                else {
+                    if (today.isBetween(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day'), moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day'), null, '[]') ||
+                        (today.isSameOrAfter(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day')) && $scope.usage.expirationDate == null) ||
+                        (today.isSameOrBefore(moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day')) && $scope.usage.concluded == null) ||
+                        ($scope.usage.expirationDate == null && $scope.usage.concluded == null)) {
+                        $scope.usage.isActive = true;
+                    }
+                    else {
+                        if ($scope.usage.active) {
+                            $scope.usage.isActive = true;
+                        }
+                        else {
+                            $scope.usage.isActive = false;
+                        }
+                    }
+                    var dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                }
+            }
+            function patch(payload, url) {
+                var msg = notify.addInfoMessage("Gemmer...", false);
+                $http({ method: 'PATCH', url: url, data: payload })
+                    .success(function () {
+                        msg.toSuccessMessage("Feltet er opdateret.");
+                    })
+                    .error(function () {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    });
+            }
 
             $scope.checkSystemValidity = () => {
-                var expirationDateObject, concludedObject;
-                var expirationDate = $scope.usage.expirationDate;
-                var concluded = $scope.usage.concluded;
-                var overrule = $scope.usage.active;
+                var today = moment();
 
-                var today = new Date();
-
-
-                if (expirationDate) {
-                    if (expirationDate.length > 10) {
-                        //ISO format
-                        expirationDateObject = new Date(expirationDate);
-
-                    } else {
-                        var splitArray = expirationDate.split("-");
-                        expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                if (today.isBetween(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day'), moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day'), null, '[]') ||
+                    (today > moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day') && $scope.usage.expirationDate == null) ||
+                    (today < moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day') && $scope.usage.concluded == null) ||
+                    ($scope.usage.expirationDate == null && $scope.usage.concluded == null)) {
+                    $scope.usage.isActive = true;
+                }
+                else {
+                    if ($scope.usage.active) {
+                        $scope.usage.isActive = true;
+                    }
+                    else {
+                        $scope.usage.isActive = false;
                     }
                 }
-
-                if (concluded) {
-                    if (concluded.length > 10) {
-                        //ISO format
-                        concludedObject = new Date(concluded);
-
-                    } else {
-                        var splitArray = concluded.split("-");
-                        concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
-                    }
-                }
-
-                if (concluded && expirationDate) {
-
-                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today < expirationDateObject.setHours(23, 59, 59, 999));
-
-                }
-                else if (concluded && !expirationDate) {
-
-                    var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0));
-
-                }
-                else if (!concluded && !expirationDate) {
-                    isTodayBetween = true;
-
-                }
-                else if (!concluded && expirationDate) {
-
-                    var isTodayBetween = (today < expirationDateObject.setHours(23, 59, 59, 999));
-
-                }
-
-                var isSystemActive = (isTodayBetween || overrule);
-
-                $scope.usage.isActive = isSystemActive;
             }
         }
     ]);

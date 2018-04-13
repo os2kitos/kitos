@@ -25,7 +25,7 @@
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!projectEditVm.hasWriteAccess"
                                data-ng-model="goalStatus.statusDate"
-                               data-autosave="{{goalStatus.updateUrl}}"
+                               ng-blur="patchDate('statusDate', goalStatus.statusDate)"
                                data-field="statusDate">
                     </div>
                 </div>
