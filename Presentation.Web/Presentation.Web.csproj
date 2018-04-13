@@ -307,6 +307,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />

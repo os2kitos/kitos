@@ -128,7 +128,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Patch(int key, Delta<Organization> delta)
         {
-            var organization = delta.GetEntity();
+            var organization = delta.GetInstance();
 
             CheckOrgTypeRights(organization);
             return base.Patch(key, delta);

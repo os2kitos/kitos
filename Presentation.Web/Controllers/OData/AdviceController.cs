@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 try
                 {
-                    var advice = delta.GetEntity();
+                    var advice = delta.GetInstance();
 
                     switch (advice.Scheduling)
                     {

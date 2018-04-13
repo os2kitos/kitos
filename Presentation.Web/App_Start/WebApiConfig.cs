@@ -25,7 +25,9 @@ namespace Presentation.Web
 {
     using Controllers.OData.AttachedOptions;
     using DocumentFormat.OpenXml.Wordprocessing;
-
+    using Microsoft.OData;
+    using Microsoft.OData.UriParser;
+    using System;
     using DataType = Core.DomainModel.ItSystem.DataType;
     using HelpText = Core.DomainModel.HelpText;
 
@@ -46,15 +48,26 @@ namespace Presentation.Web
             // For more information, visit http://go.microsoft.com/fwlink/?LinkId=279712.
             //config.EnableQuerySupport();
 
+            Action<IContainerBuilder> configureAction = (builder => builder.AddService(ServiceLifetime.Transient, typeof(ODataUriResolver), sp => new StringAsEnumResolver() { EnableCaseInsensitive = true })
+            .AddService(ServiceLifetime.Transient, typeof(IEdmModel), sp => GetModel()));
+            
+
+
+
+
             //OData
             config.MapODataServiceRoute(
                 routeName: "odata",
                 routePrefix: "odata",
-                model: GetModel());
+                configureAction: configureAction);
 
-            config.EnableEnumPrefixFree(true);
-            config.EnableCaseInsensitive(true);
-            config.EnableUnqualifiedNameCall(true);
+            
+
+
+
+            //  config.EnableEnumPrefixFree(true);
+            //  config.EnableCaseInsensitive(true);
+            //  config.EnableUnqualifiedNameCall(true);
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
         }
