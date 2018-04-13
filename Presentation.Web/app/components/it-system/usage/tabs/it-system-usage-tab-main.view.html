@@ -23,18 +23,6 @@
                            data-field="localCallName"
                            data-autosave="api/itSystemUsage/{{usageId}}">
                 </div>
-                <!--<div class="form-group">
-                    <select-option data-id="sensitive"
-                                   data-label="Persondata"
-                                   data-placeholder="Vælg persondata"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="usage.sensitiveDataTypeId"
-                                   data-options="sensitiveDataTypes"
-                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                   data-field="sensitiveDataTypeId">
-                    </select-option>
-                </div>-->
-
                 <div class="form-group">
                     <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
                     <select class="form-control input-sm"
@@ -57,6 +45,25 @@
                               data-ng-disabled="!hasWriteAccess"
                               data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
                 </div>
+
+                <div class="form-group"  data-ng-hide="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
+                    <label for="datahandler-link" class="control-label small">Link til fortegnelse</label>
+                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                        <a target="_blank" id="datahandler-link" href="{{usage.linkToDirectoryUrl}}">
+                            {{usage.linkToDirectoryUrlName ? usage.linkToDirectoryUrlName : "Dokumentation" }}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="form-group"  data-ng-hide="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
+                    <label for="datahandler-link" class="control-label small">Link til risikovurdering</label>
+                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
+                        <a target="_blank" id="datahandler-link" href="{{usage.riskSupervisionDocumentationUrl}}">
+                            {{usage.riskSupervisionDocumentationUrlName ? usage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
+                        </a>
+                    </div>
+                </div>
+
             </div>
 
             <!-- 2nd column -->

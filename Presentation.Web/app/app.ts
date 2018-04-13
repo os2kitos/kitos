@@ -66,6 +66,13 @@ app.config([
         }));
     }
 ]);
+app.config([
+    '$compileProvider',
+    $compileProvider => {
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|chrome-extension|kmdsageraabn):/);
+        // Angular before v1.2 uses $compileProvider.urlSanitizationWhitelist(...)
+    }
+]);
 
 app.run([
     "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
