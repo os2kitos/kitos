@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class newentityaddedandorgupdatefornewentity : IMigrationMetadata
+    public sealed partial class ContactPersonAdded : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(newentityaddedandorgupdatefornewentity));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ContactPersonAdded));
         
         string IMigrationMetadata.Id
         {
-            get { return "201804041043216_new entity added and org update for new entity"; }
+            get { return "201804161323008_ContactPersonAdded"; }
         }
         
         string IMigrationMetadata.Source

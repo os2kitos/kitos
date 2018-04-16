@@ -3,12 +3,10 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class newentityaddedandorgupdatefornewentity : DbMigration
+    public partial class ContactPersonAdded : DbMigration
     {
         public override void Up()
         {
-            DropForeignKey("dbo.Organization", "ContactPersonId", "dbo.User");
-            DropIndex("dbo.Organization", new[] { "ContactPersonId" });
             CreateTable(
                 "dbo.ContactPersons",
                 c => new
@@ -29,6 +27,7 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
+            AddColumn("dbo.Organization", "ContactPersonId", c => c.Int());
             AddColumn("dbo.Organization", "ContactPerson_Id", c => c.Int());
             CreateIndex("dbo.Organization", "ContactPerson_Id");
             AddForeignKey("dbo.Organization", "ContactPerson_Id", "dbo.ContactPersons", "Id", cascadeDelete: true);
@@ -43,9 +42,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropIndex("dbo.ContactPersons", new[] { "ObjectOwnerId" });
             DropIndex("dbo.Organization", new[] { "ContactPerson_Id" });
             DropColumn("dbo.Organization", "ContactPerson_Id");
+            DropColumn("dbo.Organization", "ContactPersonId");
             DropTable("dbo.ContactPersons");
-            CreateIndex("dbo.Organization", "ContactPersonId");
-            AddForeignKey("dbo.Organization", "ContactPersonId", "dbo.User", "Id");
         }
     }
 }
