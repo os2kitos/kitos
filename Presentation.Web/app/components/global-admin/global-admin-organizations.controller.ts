@@ -79,6 +79,7 @@
                         excelTemplate: (dataItem) => dataItem.Name,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -92,6 +93,7 @@
                         excelTemplate: (dataItem) => dataItem.Cvr,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -126,6 +128,7 @@
                         excelTemplate: (dataItem) => dataItem.AccessModifier.toString(),
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -142,6 +145,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         private exportFlag = false;

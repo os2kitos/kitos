@@ -427,6 +427,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
@@ -446,6 +447,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -462,6 +464,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -492,6 +495,7 @@
                         template: dataItem => dataItem.Supplier ? dataItem.Supplier.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -549,6 +553,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
@@ -569,6 +574,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -583,6 +589,7 @@
                         template: "#: ContractType ? ContractType.Name : '' #",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -597,6 +604,7 @@
                         template: dataItem => dataItem.ContractTemplate ? dataItem.ContractTemplate.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -611,6 +619,7 @@
                         template: dataItem => dataItem.PurchaseForm ? dataItem.PurchaseForm.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -719,6 +728,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -793,6 +803,7 @@
                         template: dataItem => dataItem.ProcurementStrategy ? dataItem.ProcurementStrategy.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -811,6 +822,7 @@
                                 : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -819,7 +831,11 @@
                     }
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 

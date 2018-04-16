@@ -243,6 +243,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -255,6 +256,7 @@
                         template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -282,6 +284,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -327,6 +330,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -340,6 +344,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -352,6 +357,7 @@
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -366,6 +372,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -380,6 +387,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -403,6 +411,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -416,6 +425,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -429,6 +439,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -479,6 +490,7 @@
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -492,6 +504,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -500,6 +513,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         public createITSystem() {

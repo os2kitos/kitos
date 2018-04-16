@@ -306,6 +306,7 @@
                         excelTemplate: dataItem => dataItem.Name,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -320,6 +321,7 @@
                         excelTemplate: dataItem => dataItem.Description,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -334,6 +336,7 @@
                         menu: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "eq"
@@ -361,6 +364,7 @@
                         width: "60px",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -394,6 +398,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         // saves grid state to localStorage

@@ -193,6 +193,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.ItInterfaceId || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -222,6 +223,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -235,6 +237,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -259,6 +262,7 @@
                         template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -272,6 +276,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -292,6 +297,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -309,30 +315,20 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
                             }
                         }
                     },
-                    //{ TODO
-                    //    field: "", title: "Snitflader: Anvendes globalt", width: 115,
-                    //    persistId: "infglobalusage", // DON'T YOU DARE RENAME!
-                    //    template: "#: InterfaceLocalUsages.length #",
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains",
-                    //        }
-                    //    },
-                    //},
                     {
                         field: "Tsa.Name", title: "TSA", width: 90,
                         persistId: "tsa", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -346,6 +342,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -359,6 +356,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -388,6 +386,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -401,6 +400,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -414,6 +414,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -427,6 +428,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -459,6 +461,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -467,6 +470,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
 
