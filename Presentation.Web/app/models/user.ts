@@ -27,6 +27,13 @@
         SignerForContracts?: ItContract.IItContract[];
     }
 
+    export interface IContactPerson extends IEntity {
+        Name?: string;
+        LastName?: string;
+        PhoneNumber?: string;
+        Email?: string;
+    }
+
     export interface ICreateUser {
         Name: string;
         LastName: string;

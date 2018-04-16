@@ -21,5 +21,8 @@ namespace Presentation.Web.Models
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
         public Guid? Uuid { get; set; }
+
+        public virtual int? ContactPersonId { get; set; }
+        public virtual UserDTO ContactPerson { get; set; }
     }
 }

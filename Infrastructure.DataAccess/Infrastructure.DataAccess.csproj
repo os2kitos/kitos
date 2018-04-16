@@ -536,6 +536,14 @@
     <Compile Include="Migrations\201804111226032_OrganizationPropertyAdded.Designer.cs">
       <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803270839227_contact person added to organization.cs" />
+    <Compile Include="Migrations\201803270839227_contact person added to organization.Designer.cs">
+      <DependentUpon>201803270839227_contact person added to organization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804041043216_new entity added and org update for new entity.cs" />
+    <Compile Include="Migrations\201804041043216_new entity added and org update for new entity.Designer.cs">
+      <DependentUpon>201804041043216_new entity added and org update for new entity.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -821,6 +829,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804111226032_OrganizationPropertyAdded.resx">
       <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803270839227_contact person added to organization.resx">
+      <DependentUpon>201803270839227_contact person added to organization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804041043216_new entity added and org update for new entity.resx">
+      <DependentUpon>201804041043216_new entity added and org update for new entity.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

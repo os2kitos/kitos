@@ -40,6 +40,10 @@ namespace Presentation.Web
                   .ForMember(dest => dest.DataWorkerCvr, opt => opt.MapFrom(src => src.DataWorker.Cvr))
                   .ReverseMap();
 
+            Mapper.CreateMap<ContactPerson, ContactPersonDTO>()
+                 .ReverseMap();
+
+
             Mapper.CreateMap<ExternalReference, ExternalReferenceDTO>()
                   .ReverseMap();
 

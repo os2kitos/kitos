@@ -281,6 +281,7 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
@@ -293,8 +294,6 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\LogConfig.cs" />
     <Compile Include="App_Start\NinjectWebCommon.cs" />
-    <Compile Include="Controllers\API\ArchiveTestLocationController.cs" />
-    <Compile Include="Controllers\API\ArchivePeriodController.cs" />
     <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
@@ -468,7 +467,6 @@
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
-    <Compile Include="Models\ArchivePeriodDTO.cs" />
     <Compile Include="Models\DataResponsibleDTO.cs" />
     <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
@@ -1398,6 +1396,7 @@
     <Folder Include="Views\BaseAttachedOptions\" />
     <Folder Include="Views\BaseAttachedOption\" />
     <Folder Include="Views\BaseOdataAuthorization\" />
+    <Folder Include="Views\Contactperson\" />
     <Folder Include="Views\Dataworker\" />
     <Folder Include="Views\RegisterType\" />
     <Folder Include="Views\Test\" />
