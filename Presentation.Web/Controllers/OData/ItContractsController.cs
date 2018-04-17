@@ -28,12 +28,8 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ItContracts")]
         public override IHttpActionResult Get()
         {
-            return base.Get();
-            //if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-            //    return base.Get();
-
-            //var orgId = CurrentOrganizationId;
-            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
