@@ -110,9 +110,8 @@ module Kitos.Reports {
 
                     var addKitos = true;
                     var i;
-                    //console.log("DB's: " + this.stiReport.dictionary.databases.count);
+
                     for (i = 0; i < this.stiReport.dictionary.databases.count; i++) {
-                        //console.log("DB name: " + this.stiReport.dictionary.databases.getByIndex(i).name);
                         if (this.stiReport.dictionary.databases.getByIndex(i).name === "Kitos") {
                             addKitos = false;
                             this.stiReport.dictionary.databases.getByIndex(i).connectionString = window.location.origin + "/odata";
@@ -181,7 +180,6 @@ module Kitos.Reports {
                     this.viewer.report = this.stiReport;
                 })
                 .catch((result => {
-                    console.log(result);
                     alert("Ingen adgang til rapporten!");
                 }));
         }

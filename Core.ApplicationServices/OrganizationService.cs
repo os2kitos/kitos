@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -69,6 +70,14 @@ namespace Core.ApplicationServices
                 _orgRightRepository.DeleteByKey(right.Id);
             }
             _orgRightRepository.Save();
+        }
+
+        public void addContactPerson(int organizationId, int contactId)
+        {
+            var org = _orgRepository.Get(o => o.Id == organizationId).First();
+            org.ContactPersonId = contactId;
+            _orgRepository.Update(org);
+            _orgRepository.Save();
         }
     }
 }

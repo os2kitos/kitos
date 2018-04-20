@@ -11,6 +11,7 @@ namespace Presentation.Web.Models
         public string Adress { get; set; }
         public string Email { get; set; }
         public string Cvr { get; set; }
+        public string ForeignCvr { get; set; }
 
         public int TypeId { get; set; }
         public AccessModifier AccessModifier { get; set; }
@@ -20,5 +21,8 @@ namespace Presentation.Web.Models
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
         public Guid? Uuid { get; set; }
+
+        public virtual int? ContactPersonId { get; set; }
+        public virtual UserDTO ContactPerson { get; set; }
     }
 }

@@ -179,7 +179,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -208,7 +208,7 @@
 
                                 this._.forEach(sortedRoles, role => {
                                     parameterMap.$filter = this.fixRoleFilter(parameterMap.$filter, `role${role.Id}`, role.Id);
-                                
+
                                 });
 
                                 parameterMap.$filter = this.fixKleIdFilter(parameterMap.$filter, "ItSystem/TaskRefs/TaskKey");
@@ -222,8 +222,11 @@
                         }
                     },
                     sort: {
-                        field: "ItSystem.Name",
+                        field: "SystemName",
                         dir: "asc"
+                    },
+                    AutoComplete: {
+                        disabled: true
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -232,7 +235,13 @@
                     schema: {
                         model: {
                             fields: {
-                                LastChanged: { type: "date" }
+                                LastChanged: { type: "date" },
+                                Concluded: { type: "date" },
+                                ArchiveDuty: { type: "number" },
+                                Registertype: { type: "boolean" },
+                                EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
+                                SystemName: { from: "ItSystem.Name", type: "string" },
+                                IsActive: {type: "boolean"}
                             }
                         },
                         parse: response => {
@@ -300,9 +309,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -311,16 +319,47 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.IsActive) {
+                                return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
+                            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                        },
+                        excelTemplate: dataItem => {
+                            var isActive = this.isContractActive(dataItem);
+                            return isActive.toString();
+                        },
+                        attributes: { "class": "text-center" },
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                template: args => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    },
+                    {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => dataItem && dataItem.LocalSystemId || "",
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
-                            }
+                            },
+                            ignoreCase: true
                         }
                     },
                     {
@@ -330,6 +369,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -343,6 +383,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -350,26 +391,27 @@
                         }
                     },
                     {
-                        field: "ItSystem.Name", title: "IT System", width: 320,
+                        field: "SystemName", title: "IT System", width: 320,
                         persistId: "sysname", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItSystem.Disabled)
-                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Inaktiv) </a>`;
+                                return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name} (Slettes) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {
                                 if (dataItem.ItSystem.Disabled)
-                                    return dataItem.ItSystem.Name + " (Inaktiv)";
+                                    return dataItem.ItSystem.Name + " (Slettes)";
                                 else
                                     return dataItem.ItSystem.Name;
                             } else {
-                                return ""
+                                return "";
                             }
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -383,6 +425,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -396,6 +439,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -420,6 +464,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -433,6 +478,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -447,6 +493,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -461,6 +508,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -485,6 +533,7 @@
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -501,6 +550,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -517,19 +567,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "ArchiveType.Name", title: "Arkivering", width: 150,
-                        persistId: "archive", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ArchiveType ? dataItem.ArchiveType.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -543,35 +581,13 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
                             }
                         }
                     },
-                    //{
-                    //    field: "", title: "IT System: Anvendes af", width: 100,
-                    //    persistId: "sysusage", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
-                    //    persistId: "exhibit", // DON'T YOU DARE RENAME!
-                    //    template: "<a data-ng-click=\"systemOverviewVm.showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
-                    //    persistId: "canuse", // DON'T YOU DARE RENAME!
-                    //    template: "<a data-ng-click=\"systemOverviewVm.showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
@@ -607,6 +623,7 @@
                             dataItem.MainContract.ItContract.Supplier.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -620,6 +637,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -633,6 +651,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -646,6 +665,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -659,7 +679,6 @@
                             if (!dataItem || !dataItem.LastChanged) {
                                 return "";
                             }
-
                             return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
                         },
                         hidden: true,
@@ -669,6 +688,107 @@
                                 operator: "gte"
                             }
                         }
+                    },
+                    {
+                        field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
+                        persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
+                        hidden: false,
+                        filterable: 
+                        {
+                            operators: {
+                                date: {
+                                    gte: "Fra og med",
+                                    lte: "Til og med"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        field: "ArchiveDuty", title: "Arkiveringspligt", width: 160,
+                        persistId: "ArchiveDuty", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            switch (dataItem.ArchiveDuty) {
+                                case 1:
+                                    return "B";
+                                case 2:
+                                    return "K";
+                                case 3:
+                                    return "Ved ikke";
+                                default:
+                                    return "";
+                            }
+                        },
+                        excelTemplate: dataItem => {
+                            switch (dataItem.ArchiveDuty) {
+                                case 1:
+                                    return "B";
+                                case 2:
+                                    return "K";
+                                case 3:
+                                    return "Ved ikke";
+                                default:
+                                    return "";
+                            }
+                        },
+                        hidden: false,
+                        filterable:{
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "B", value: 1 }, { type: "K", value: 2 }, { type: "Ved ikke", value: 3 }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    },
+                    {
+                        field: "Registertype", title: "Er dokumentbærende", width: 160,
+                        persistId: "Registertype", // DON'T YOU DARE RENAME!
+                        template: dataItem => { return dataItem.Registertype ? "Ja" : "Nej"; },
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    },
+                    {
+                        field: "EndDate", title: "Journalperiode slutdato", format: "{0:dd-MM-yyyy}", width: 180,
+                        persistId: "ArchivePeriodsEndDate", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (!dataItem || !dataItem.ArchivePeriods) {
+                                return "";
+                            }
+                            let dateList;
+                            _.each(dataItem.ArchivePeriods, x => {
+                                if (moment().isBetween(moment(x.StartDate).startOf('day'), moment(x.EndDate).endOf('day'), null, '[]')) {
+                                    if (!dateList || dateList.StartDate > x.StartDate) {
+                                        dateList = x;
+                                    }
+                                } 
+                            });
+                            if (!dateList) {
+                                return "";
+                            } else {
+                                return this.moment(dateList.EndDate).format("DD-MM-YYYY");
+                            }
+                            
+                        },
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
                     }
                 ]
             };
@@ -676,6 +796,11 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.systemRoles, role => {
@@ -707,6 +832,7 @@
                     sortable: false,
                     filterable: {
                         cell: {
+                            template: customFilter,
                             dataSource: [],
                             showOperators: false,
                             operator: "contains"
@@ -775,100 +901,6 @@
             }
             return dataItem.Active;
         }
-
-        //// show exposureDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        //public showExposureDetails(usageId, systemName) {
-        //    // filter by usageId
-        //    this.exhibitGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-        //    // set title
-        //    this.exhibitModal.setOptions({ title: systemName + " udstiller følgende snitflader" });
-        //    // open modal
-        //    this.exhibitModal.center().open();
-        //}
-
-        //public exhibitDetailsGrid = {
-        //    dataSource: {
-        //        type: "odata-v4",
-        //        transport: {
-        //            read: {
-        //                url: "/odata/ItInterfaceExhibits?$expand=ItInterface",
-        //                dataType: "json"
-        //            }
-        //        },
-        //        serverPaging: true,
-        //        serverSorting: true,
-        //        serverFiltering: true
-        //    },
-        //    autoBind: false,
-        //    columns: [
-        //        {
-        //            field: "ItInterface.ItInterfaceId", title: "Snitflade ID"
-        //        },
-        //        {
-        //            field: "ItInterface.Name", title: "Snitflade"
-        //        }
-        //    ],
-        //    dataBound: this.exposureDetailsBound
-        //};
-
-        //// exposuredetails grid empty-grid handling
-        //private exposureDetailsBound(e) {
-        //    var grid = e.sender;
-        //    if (grid.dataSource.total() == 0) {
-        //        var colCount = grid.columns.length;
-        //        this.$(e.sender.wrapper)
-        //            .find("tbody")
-        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System udstiller ikke nogle snitflader</td></tr>`);
-        //    }
-        //}
-
-        //// show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        //private showUsageDetails(systemId, systemName) {
-        //    // filter by systemId
-        //    this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-        //    // set modal title
-        //    this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
-        //    // open modal
-        //    this.modal.center().open();
-        //}
-
-        //// usagedetails grid - shows which organizations has a given itsystem in local usage
-        //public usageDetailsGrid = {
-        //    dataSource: {
-        //        type: "odata-v4",
-        //        transport:
-        //        {
-        //            read: {
-        //                url: "/odata/ItInterfaceUses/?$expand=ItInterface",
-        //                dataType: "json"
-        //            },
-        //        },
-        //        serverPaging: true,
-        //        serverSorting: true,
-        //        serverFiltering: true
-        //    },
-        //    autoBind: false,
-        //    columns: [
-        //        {
-        //            field: "ItInterfaceId", title: "Snitflade ID"
-        //        },
-        //        {
-        //            field: "ItInterface.Name", title: "Snitflade"
-        //        }
-        //    ],
-        //    dataBound: this.detailsBound
-        //};
-
-        //// usagedetails grid empty-grid handling
-        //private detailsBound(e) {
-        //    var grid = e.sender;
-        //    if (grid.dataSource.total() == 0) {
-        //        var colCount = grid.columns.length;
-        //        this.$(e.sender.wrapper)
-        //            .find("tbody")
-        //            .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
-        //    }
-        //};
 
         private orgUnitDropDownList = (args) => {
             var self = this;

@@ -51,12 +51,12 @@
 
                             if (angular.isUndefined(dataItem.AssociatedInterfaceUsages)) {
                                 if (dataItem[scope.detailModelType].Disabled)
-                                    return dataItem[scope.detailModelType].Name + " (Inaktiv)";
+                                    return dataItem[scope.detailModelType].Name + " (Slettes)";
                                 else
                                     return dataItem[scope.detailModelType].Name;
                             } else {
                                 return `<table data-ng-repeat="item in dataItem.AssociatedInterfaceUsages">
-                                            <td>{{item.ItInterface.Name}} <span data-ng-if="item.ItInterface.Disabled"> (Inaktiv) </span></td>
+                                            <td>{{item.ItInterface.Name}} <span data-ng-if="item.ItInterface.Disabled"> (Slettes) </span></td>
                                         </table>`;
                             }
                         },

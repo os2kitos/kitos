@@ -8,8 +8,10 @@
                 <div class="form-group">
                     <div id="economyStream-visibility" class="btn-group"
                          data-ng-model="visibility">
-                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="0" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Lokal</label>
-                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="1" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Offentlig</label>
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="0" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Lokal 
+                            <span data-ng-show="visibility == 0">&nbsp;<i class="fa fa-check" aria-hidden="true"></i></span></label>
+                        <label class="btn btn-default" ng-model="visibility" uib-btn-radio="1" style="width: 100px;" data-ng-click="changeVisibility()" data-ng-disabled="!hasWriteAccess || noEconomyStreams">Offentlig
+                            <span data-ng-show="visibility == 1">&nbsp;<i class="fa fa-check" aria-hidden="true"></i></span></label>
                     </div>
                 </div>
             </form>
@@ -112,7 +114,7 @@
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
+                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 
@@ -246,7 +248,7 @@
                                data-k-options="datepickerOptions"
                                data-ng-disabled="!hasWriteAccess"
                                data-ng-model="stream.auditDate"
-                               data-autosave="{{stream.updateUrl}}"
+                               ng-blur="patchDate('auditDate', stream.auditDate, stream.id)"
                                data-field="auditDate">
                     </td>
 

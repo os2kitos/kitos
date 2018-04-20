@@ -38,7 +38,6 @@
             $scope.dataWorkers = theSystem.associatedDataWorkers;
             // select2 options for looking up organization as dataworkers
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
-            console.log($scope.system);
             $scope.updateDataLevel = function (OptionId, Checked, optionType) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);

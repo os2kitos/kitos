@@ -202,11 +202,15 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                //check for isreadonly here since no object has been created to check on yet
+                //if (!KitosUser.IsReadOnly) return Unauthorized();
+                var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+
+                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString()))) return Unauthorized();
+
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
                                             && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
-
-                var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
                 var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
