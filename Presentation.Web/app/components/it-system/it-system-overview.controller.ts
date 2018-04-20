@@ -564,19 +564,6 @@
                         }
                     },
                     {
-                        field: "ArchiveType.Name", title: "Arkivering", width: 150,
-                        persistId: "archive", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.ArchiveType ? dataItem.ArchiveType.Name : "",
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
                         field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
                         persistId: "sensitive", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.SensitiveDataType ? dataItem.SensitiveDataType.Name : "",
