@@ -35,8 +35,6 @@
                 if (user.isGlobalAdmin || (user.isLocalAdmin && (user.currentOrganizationId === itSystem.organizationId)) || ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId))) {
                     $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
                 }
-                console.log(user);
-                console.log(itSystem);
                 if (!user.isGlobalAdmin || (!user.isLocalAdmin && !(user.currentOrganizationId === itSystem.organizationId)) || (!$scope.hasWriteAccess && !(user.id === itSystem.objectOwnerId))) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
