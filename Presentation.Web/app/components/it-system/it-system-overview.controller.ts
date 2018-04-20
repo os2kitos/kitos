@@ -310,45 +310,43 @@
                 },
                 groupable: false,
                 columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
-                columns: [{
-
-                    field: "IsActive",
-                    title: "Gyldig/Ikke gyldig",
-                    width: 90,
-                    persistId: "isActive", // DON'T YOU DARE RENAME!
-                    template: dataItem => {
-                        if (dataItem.IsActive) {
-                            return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                columns: [
+                    {
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.IsActive) {
+                                return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
+                            return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
+                        },
+                        excelTemplate: dataItem => {
+                            var isActive = this.isContractActive(dataItem);
+                            return isActive.toString();
+                        },
+                        attributes: { "class": "text-center" },
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                template: args => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
                         }
-                        return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                     },
-                    excelTemplate: dataItem => {
-                        var isActive = this.isContractActive(dataItem);
-                        return isActive.toString();
-                    },
-                    attributes: { "class": "text-center" },
-                    sortable: false,
-                    filterable: {
-                        cell: {
-                            template: args => {
-                                args.element.kendoDropDownList({
-                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                                    dataTextField: "type",
-                                    dataValueField: "value",
-                                    valuePrimitive: true
-                                });
-                            },
-                            showOperators: false
-
-                        }
-                    }
-                },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
                         persistId: "localid", // DON'T YOU DARE RENAME!
@@ -356,6 +354,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -370,6 +369,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -383,6 +383,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -410,6 +411,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -423,6 +425,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -436,6 +439,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -460,6 +464,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -473,6 +478,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -487,6 +493,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -501,6 +508,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -525,6 +533,7 @@
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -541,6 +550,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -557,6 +567,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -570,35 +581,13 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
                             }
                         }
                     },
-                    //{
-                    //    field: "", title: "IT System: Anvendes af", width: 100,
-                    //    persistId: "sysusage", // DON'T YOU DARE RENAME!
-                    //    template: "TODO",
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "ItSystem.ItInterfaceExhibits", title: "Snitflader: Udstilles ???", width: 95,
-                    //    persistId: "exhibit", // DON'T YOU DARE RENAME!
-                    //    template: "<a data-ng-click=\"systemOverviewVm.showExposureDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.ItInterfaceExhibits.length #</a>",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
-                    //{
-                    //    field: "ItSystem.CanUseInterfaces", title: "Snitflader: Anvendes ???", width: 95,
-                    //    persistId: "canuse", // DON'T YOU DARE RENAME!
-                    //    template: "<a data-ng-click=\"systemOverviewVm.showUsageDetails(#: ItSystem.Id #,'#: ItSystem.Name #')\">#: ItSystem.CanUseInterfaces.length #</a>",
-                    //    hidden: true,
-                    //    filterable: false,
-                    //    sortable: false
-                    //},
                     {
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
@@ -634,6 +623,7 @@
                             dataItem.MainContract.ItContract.Supplier.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -647,6 +637,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -660,6 +651,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -673,6 +665,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -803,6 +796,11 @@
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.systemRoles, role => {
@@ -834,6 +832,7 @@
                     sortable: false,
                     filterable: {
                         cell: {
+                            template: customFilter,
                             dataSource: [],
                             showOperators: false,
                             operator: "contains"

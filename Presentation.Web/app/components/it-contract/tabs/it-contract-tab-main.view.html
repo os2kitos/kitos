@@ -262,8 +262,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.concluded"
-                                   data-autosave="{{ autosaveUrl2 }}"
-                                   data-ng-blur="checkContractValidity()"
+                                   data-ng-blur="checkContractValidity('concluded', contract.concluded)"
                                    data-field="concluded">
                             <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                             <input type="text" class="form-control" id="agreement-expiration"
@@ -271,8 +270,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.expirationDate"
-                                   data-ng-blur="checkContractValidity()"
-                                   data-autosave="{{ autosaveUrl2 }}"
+                                   data-ng-blur="checkContractValidity('expirationDate', contract.expirationDate)"
                                    data-field="expirationDate">
                         </div>
                     </div>
@@ -285,7 +283,7 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{ autoSaveUrl }}"
                                data-field="active"
-                               data-ng-change="checkContractValidity()" />
+                               data-ng-change="checkContractValidity('active', contract.active)" />
                         <label for="contractIsActive">
                             <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
                             <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>

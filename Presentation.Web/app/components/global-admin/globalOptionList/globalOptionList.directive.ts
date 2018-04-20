@@ -110,8 +110,9 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: true,
-                height: 900,
+                columnMenu: {
+                    filterable: false
+                }
             };
 
             if (this.dirId === "reportCategoryTypeId") {
@@ -125,6 +126,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -140,6 +142,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -196,6 +199,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -211,6 +215,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -226,8 +231,12 @@
                     } as any
                 ];
             }
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
-
         public createOption = () => {
             this.$scope.$state.go(this.editState, { id: 0, optionsUrl: this.optionsUrl, optionType: this.optionType });
         };

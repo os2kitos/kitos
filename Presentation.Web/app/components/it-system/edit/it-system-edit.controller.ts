@@ -32,10 +32,10 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
                 
                 $scope.hasWriteAccess = hasWriteAccess;
-                if ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId)) {
+                if (user.isGlobalAdmin || (user.isLocalAdmin && (user.currentOrganizationId === itSystem.organizationId)) || ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId))) {
                     $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
                 }
-                if (!$scope.hasWriteAccess && !(user.id === itSystem.objectOwnerId)) {
+                if (!user.isGlobalAdmin || (!user.isLocalAdmin && !(user.currentOrganizationId === itSystem.organizationId)) || (!$scope.hasWriteAccess && !(user.id === itSystem.objectOwnerId))) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
                     });

@@ -417,6 +417,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -464,6 +465,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -478,6 +480,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -491,6 +494,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -528,6 +532,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -542,6 +547,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -565,6 +571,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -581,6 +588,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -662,6 +670,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -675,6 +684,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -709,16 +719,13 @@
                         sortable: false,
                         filterable: false
                     }
-                    //{
-                    //    field: "Advices.AlarmDate", title: "Dato for næste advis", width: 150,
-                    //    persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                    //    template: nextAdviceTemplate,
-                    //    sortable: false,
-                    //    filterable: false,
-                    //},
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 

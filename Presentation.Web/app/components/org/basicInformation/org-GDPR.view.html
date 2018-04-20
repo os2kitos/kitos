@@ -142,8 +142,8 @@
                            class="form-control input-sm"
                            data-field="cvr"
                            data-ng-model="ctrl.dataProtectionAdvisor.cvr"
-                           data-placeholder="CVR-nummer" 
-                           maxlength="10"/>
+                           data-placeholder="CVR-nummer"
+                           maxlength="10" />
                 </div>
 
                 <div class="form-group">
@@ -177,6 +177,69 @@
                            data-field="email"
                            data-ng-model="ctrl.dataProtectionAdvisor.email"
                            data-placeholder="E-mail" />
+                </div>
+            </div>
+        </div>
+       </div>
+    </div>
+
+
+
+
+<!--Contact person-->
+<div class="object-section-container">
+    <h4>Kontaktperson</h4>
+    <div class="panel panel-default">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label small">Navn</label>
+                    <input type="text"
+                           data-ng-disabled="!ctrl.hasWriteAccess || _emailExists"
+                           data-autosave="{{ctrl.updateContactPersonUrl}}"
+                           class="form-control input-sm"
+                           data-field="name"
+                           data-ng-model="ctrl._contactPerson.name"
+                           data-placeholder="Navn" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label small">EfterNavn</label>
+                    <input type="text"
+                           data-ng-disabled="!ctrl.hasWriteAccess || _emailExists"
+                           data-autosave="{{ctrl.updateContactPersonUrl}}"
+                           class="form-control input-sm"
+                           data-field="lastName"
+                           data-ng-model="ctrl.contactPerson.lastName"
+                           data-placeholder="Efternavn"/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="system-name" class="control-label small">Telefonnummer</label>
+                    <input type="text"
+                           data-ng-disabled="!ctrl.hasWriteAccess || _emailExists"
+                           data-autosave="{{ctrl.updateContactPersonUrl}}"
+                           class="form-control input-sm"
+                           data-field="phoneNumber"
+                           data-ng-model="ctrl._contactPerson.phoneNumber"
+                           data-placeholder="Telefonnummer" />
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="control-label small">
+                        E-mail (Fremsøg eksisterende bruger)
+                    </label>
+                    <div>
+                        <input type="text" 
+                               data-ng-disabled="!ctrl.hasWriteAccess"
+                               name="contactPersonEmail" 
+                               data-ng-model="ctrl._contactPerson.email" 
+                               class="form-control" 
+                               data-unique-email-contactperson 
+                               data-autosave="{{ctrl.updateContactPersonUrl}}"
+                               data-field="email">
+                        <span class="glyphicon form-control-feedback"></span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -34,7 +34,7 @@
                             <input type="hidden" id="contract-parent" class="form-control input-sm" style="overflow-y: auto;"
                                    data-ui-select2="itContractsSelectOptions"
                                    data-ng-model="contract.parent"
-                                   data-autosave="{{ autoSaveUrl }}"
+                                   ng-click="updateHierarchy('parentId', contract.parent)"
                                    data-field="parentId"
                                    data-ng-disabled="!hasWriteAccess">
                         </div>
