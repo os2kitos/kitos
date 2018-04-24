@@ -179,7 +179,7 @@
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -241,7 +241,7 @@
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 SystemName: { from: "ItSystem.Name", type: "string" },
-                                IsActive: {type: "boolean"}
+                                IsActive: { type: "boolean" },
                             }
                         },
                         parse: response => {
@@ -786,6 +786,80 @@
                             }
                             
                         },
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
+                        field: "RiskSupervisionDocumentationUrlName", title: "Risikovurdering", width: 150,
+                        persistId: "riskSupervisionDocumentationUrlName", // DON'T YOU DARE RENAME!
+                        template: dataItem => 
+                        {
+                            if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
+                            }
+                            else if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName == null) {
+                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
+                            }
+                            else if (dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return dataItem.RiskSupervisionDocumentationUrlName;
+                            } else {
+                                return "";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LinkToDirectoryUrlName", title: "Fortegnelse", width: 150,
+                        persistId: "LinkToDirectoryUrlName", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
+                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
+                            }
+                            else if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName == null) {
+                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
+                            }
+                            else if (dataItem.LinkToDirectoryUrlName != null) {
+                                return dataItem.LinkToDirectoryUrlName;
+                            } else {
+                                return "";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
+                        persistId: "ItContractDataHandler", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.Contracts != null) {
+                                if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {
+                                    return "Ja";
+                                } else {
+                                    return "Nej";
+                                }
+                            } else {
+                                return "Nej";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
                         hidden: true,
                         filterable: false,
                         sortable: false

@@ -32,15 +32,22 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
                 
                 $scope.hasWriteAccess = hasWriteAccess;
-                if (user.isGlobalAdmin || (user.isLocalAdmin && (user.currentOrganizationId === itSystem.organizationId)) || ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId))) {
+                console.log(itSystem);
+                console.log();
+                if (user.isGlobalAdmin) {
+                    if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
+                        $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
+                    }
+                } else if ((hasWriteAccess && (user.currentOrganizationId === itSystem.organizationId) && itSystem.accessModifier === 0) || ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId) && itSystem.accessModifier === 0)) {
+                    if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
                     $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
-                }
-                if (!user.isGlobalAdmin || (!user.isLocalAdmin && !(user.currentOrganizationId === itSystem.organizationId)) || (!$scope.hasWriteAccess && !(user.id === itSystem.objectOwnerId))) {
+                    }
+                } else {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
                     });
-                    
-                } else if (user.isGlobalAdmin) {
+                }
+                if (user.isGlobalAdmin) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Deaktivér IT System";
                     });
@@ -61,8 +68,6 @@
                         }
                     }
                 }
-                
-
                 function disableSystem() {
                     if (!confirm('Er du sikker på du vil deaktivere systemet?')) {
                         return;

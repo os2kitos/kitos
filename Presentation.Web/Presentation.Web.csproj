@@ -279,6 +279,7 @@
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />

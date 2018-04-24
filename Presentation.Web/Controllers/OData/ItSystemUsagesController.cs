@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         // GET /Organizations(1)/ItSystemUsages
-        [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
+        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {

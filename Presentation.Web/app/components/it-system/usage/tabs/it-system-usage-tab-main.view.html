@@ -36,7 +36,6 @@
                         <option value="2">Persondata og følsomme persondata</option>
                     </select>
                 </div>
-
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">
                     <label for="note" class="control-label small">Note</label>
@@ -45,25 +44,6 @@
                               data-ng-disabled="!hasWriteAccess"
                               data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
                 </div>
-
-                <div class="form-group"  data-ng-hide="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
-                    <label for="datahandler-link" class="control-label small">Link til fortegnelse</label>
-                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a target="_blank" id="datahandler-link" href="{{usage.linkToDirectoryUrl}}">
-                            {{usage.linkToDirectoryUrlName ? usage.linkToDirectoryUrlName : "Dokumentation" }}
-                        </a>
-                    </div>
-                </div>
-
-                <div class="form-group"  data-ng-hide="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
-                    <label for="datahandler-link" class="control-label small">Link til risikovurdering</label>
-                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a target="_blank" id="datahandler-link" href="{{usage.riskSupervisionDocumentationUrl}}">
-                            {{usage.riskSupervisionDocumentationUrlName ? usage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
-                        </a>
-                    </div>
-                </div>
-
             </div>
 
             <!-- 2nd column -->
