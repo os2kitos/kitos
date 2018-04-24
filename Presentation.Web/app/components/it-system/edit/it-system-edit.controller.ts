@@ -32,8 +32,7 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
                 
                 $scope.hasWriteAccess = hasWriteAccess;
-                console.log(itSystem);
-                console.log();
+
                 if (user.isGlobalAdmin) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
                         $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
