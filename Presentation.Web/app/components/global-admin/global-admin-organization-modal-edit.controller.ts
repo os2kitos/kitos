@@ -18,7 +18,8 @@
                 name: this.org.name,
                 accessModifier: this.org.accessModifier,
                 cvr: this.org.cvr,
-                typeId: this.org.typeId
+                typeId: this.org.typeId,
+                foreignCvr: this.org.foreignCvr
             };
 
             this.$http({

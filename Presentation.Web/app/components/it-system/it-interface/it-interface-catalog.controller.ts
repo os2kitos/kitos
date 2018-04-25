@@ -178,9 +178,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -194,6 +193,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.ItInterfaceId || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -205,7 +205,7 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled) {
-                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv)</a>`;
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes)</a>`;
                             } else {
                                 return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                             }
@@ -213,7 +213,7 @@
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled) {
-                                    return dataItem.Name + " (Inaktiv)";
+                                    return dataItem.Name + " (Slettes)";
                                 } else {
                                     return dataItem.Name;
                                 }
@@ -223,6 +223,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -236,6 +237,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -260,6 +262,7 @@
                         template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -273,6 +276,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -293,6 +297,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -304,36 +309,26 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
-                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
+                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Slettes)" : dataItem.ExhibitedBy.ItSystem.Name;
                             else
                                 return "";
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
                             }
                         }
                     },
-                    //{ TODO
-                    //    field: "", title: "Snitflader: Anvendes globalt", width: 115,
-                    //    persistId: "infglobalusage", // DON'T YOU DARE RENAME!
-                    //    template: "#: InterfaceLocalUsages.length #",
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains",
-                    //        }
-                    //    },
-                    //},
                     {
                         field: "Tsa.Name", title: "TSA", width: 90,
                         persistId: "tsa", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -347,6 +342,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -360,6 +356,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -389,6 +386,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -402,6 +400,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -415,6 +414,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -428,6 +428,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -460,6 +461,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -468,6 +470,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
 

@@ -13,12 +13,14 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IAuthenticationService _authService;
         private readonly IUserService _userService;
+        private readonly IGenericRepository<User> _repository;
 
         public UsersController(IGenericRepository<User> repository, IAuthenticationService authService, IUserService userService)
             : base(repository, authService)
         {
             _authService = authService;
             _userService = userService;
+            _repository = repository;
         }
 
         public override IHttpActionResult Post(User entity)
@@ -92,6 +94,22 @@ namespace Presentation.Web.Controllers.OData
                 return Ok(false);
             else
                 return Ok(true);
+        }
+
+        [ODataRoute("GetUserByEmail(email={email})")]
+        public IHttpActionResult GetUserByEmail(string email)
+        {
+            // strip strange single quotes from parameter
+            // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
+            var strippedEmail = email.Remove(0, 1);
+            strippedEmail = strippedEmail.Remove(strippedEmail.Length - 1);
+
+            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == strippedEmail.ToLower());
+            if(userToReturn != null)
+            {
+                return Ok(userToReturn);
+            }
+            return NotFound();
         }
 
         //GET /Organizations(1)/DefaultOrganizationForUsers

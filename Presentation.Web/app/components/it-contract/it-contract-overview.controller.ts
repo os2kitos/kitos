@@ -305,7 +305,8 @@
                                 Terminated: { type: "date" },
                                 Acquisition: { type: "number" },
                                 Operation: { type: "number" },
-                                Other: { type: "number" }
+                                Other: { type: "number" },
+                                IsActive: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -415,9 +416,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -426,13 +426,12 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "isActive", title: "Aktiv", width: 50,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 150,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-
-                            if (isActive)
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
@@ -444,7 +443,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                template: args => {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                           
+                            }
+                        }
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -453,6 +465,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -467,6 +480,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -480,6 +494,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -504,7 +519,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Inaktiv)";
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Slettes)";
                                 else
                                     value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
                             }
@@ -517,6 +532,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -531,6 +547,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -554,6 +571,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -570,6 +588,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -651,6 +670,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -664,6 +684,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -698,16 +719,13 @@
                         sortable: false,
                         filterable: false
                     }
-                    //{
-                    //    field: "Advices.AlarmDate", title: "Dato for næste advis", width: 150,
-                    //    persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                    //    template: nextAdviceTemplate,
-                    //    sortable: false,
-                    //    filterable: false,
-                    //},
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 
@@ -801,7 +819,6 @@
                 return today >= startDate && today <= endDate;
             }
             return dataItem.Active;
-
         }
 
         private exportFlag = false;

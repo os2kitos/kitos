@@ -67,7 +67,8 @@
             if (dateObject.isValid()) {
                 startDate = dateObject.format("YYYY-MM-DD");
             } else {
-                startDate = null;
+                this.notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                return;
             }
             // update start date of the current phase
             var firstPayload = {};

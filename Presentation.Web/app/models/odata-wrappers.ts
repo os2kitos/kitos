@@ -5,6 +5,12 @@
         value: T[];
     }
 
+    export interface IODataSingleResult<T> extends IODataMetadata {
+        // if $count=true
+        "@odata.count"?: number;
+        value: T;
+    }
+
     export interface IODataMetadata {
         // odata.metadata=minimal
         "@odata.context"?: string;

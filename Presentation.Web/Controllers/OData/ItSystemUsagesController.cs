@@ -29,15 +29,15 @@ namespace Presentation.Web.Controllers.OData
         }
 
         // GET /Organizations(1)/ItSystemUsages
-        [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
+        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({key})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
                 return StatusCode(HttpStatusCode.Forbidden);
-
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            //Tolist() is required for filtering on computed values in odata.
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key).ToList();
             return Ok(result);
         }
 

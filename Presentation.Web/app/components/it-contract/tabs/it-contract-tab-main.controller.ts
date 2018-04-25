@@ -55,7 +55,7 @@
                                         Id: data.User.Id
                                     });
                                 });
-
+                                results = _.orderBy(results, x => x.Name, 'asc');
                                 return results;
                             });
                         }
@@ -67,8 +67,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
-            function ($scope, $http, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
+            '$scope', '$http', '_', '$stateParams','$uibModal', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', '$timeout', 'kitosUsers',
+            function ($scope, $http, _, $stateParams, $uibModal, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits, hasWriteAccess, user, autofocus, $timeout, kitosUsers) {
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
@@ -84,7 +84,6 @@
                 $scope.orgUnits = orgUnits;
                 var today = new Date();
                 $scope.dataHandlerLink = '';
-
                 
                 if ($scope.contract.dataHandler != null) {
                     $scope.dataHandlerLink = '#/contract/edit/' + $scope.contract.dataHandlerId + '/main';
@@ -145,6 +144,19 @@
                         var plan = { id: $scope.procurementPlans.length, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
                         $scope.contract.procurementPlan = plan.id; // select it
+                    }
+                }
+                $scope.patchDate = (field, value) => {
+                    var date = moment(moment(value, "DD-MM-YYYY", true).format());
+
+                    if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                    } else {
+                        var dateString = date.format("YYYY-MM-DD");
+                        var payload = {};
+                        payload[field] = dateString;
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                     }
                 }
 
@@ -308,59 +320,49 @@
                     };
                 }
 
-                $scope.checkContractValidity = function () {
-                    var expirationDateObject, concludedObject;
+                $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
                     var overrule = $scope.contract.active;
-                    var today = new Date();
-
-
-                    if (expirationDate) {
-                        if (expirationDate.length > 10) {
-                            //ISO format
-                            expirationDateObject = new Date(expirationDate);
-
-                        } else {
-                            var splitArray = expirationDate.split("-");
-                            expirationDateObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
+                    var today = moment();
+                    var formatString = "DD-MM-YYYY";
+                    var formatDateString = "YYYY-MM-DD";
+                    var dateObjectStart = moment(concluded, [formatString, formatDateString]).startOf('day');
+                    var dateObjectEnd = moment(expirationDate, [formatString, formatDateString]).endOf('day');
+                    console.log(dateObjectStart);
+                    console.log(dateObjectEnd);
+                    if (!dateObjectStart.isValid() || isNaN(dateObjectStart.valueOf()) || dateObjectStart.year() < 1000 || dateObjectStart.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                    }
+                    else if (!dateObjectEnd.isValid() || isNaN(dateObjectEnd.valueOf()) || dateObjectEnd.year() < 1000 || dateObjectEnd.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                    }
+                    else if (dateObjectStart >= dateObjectEnd) {
+                        notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
+                    }
+                    else {
+                        var isContractActive = false;
+                        if (concluded && !expirationDate) {
+                            isContractActive = (today > dateObjectStart) || overrule;
+                        }
+                        else if (!concluded && !expirationDate) {
+                            isContractActive = true;
+                        }
+                        else if (!concluded && expirationDate) {
+                            isContractActive = (today < dateObjectEnd) || overrule;
+                        }
+                        else {
+                            isContractActive = (moment().isBetween(dateObjectStart, dateObjectEnd, null, '[]') || overrule);
+                        }
+                        $scope.contract.isActive = isContractActive;
+                        if (field !== 'active') {
+                            var date = moment(moment(value, "DD-MM-YYYY", true).format());
+                            var dateString = date.format("YYYY-MM-DD");
+                            var payload = {};
+                            payload[field] = dateString;
+                            patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         }
                     }
-
-                    if (concluded) {
-                        if (concluded.length > 10) {
-                            //ISO format
-                            concludedObject = new Date(concluded);
-
-                        } else {
-                            var splitArray = concluded.split("-");
-                            concludedObject = new Date(splitArray[2], parseInt(splitArray[1], 10) - 1, splitArray[0]);
-                        }
-                    }
-
-                    if (concluded && expirationDate) {
-
-                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0) && today <= expirationDateObject.setHours(23, 59, 59, 999));
-
-                    }
-                    else if (concluded && !expirationDate) {
-
-                        var isTodayBetween = (today > concludedObject.setHours(0, 0, 0, 0));
-
-                    }
-                    else if (!concluded && !expirationDate) {
-                        isTodayBetween = true;
-
-                    }
-                    else if (!concluded && expirationDate) {
-
-                        var isTodayBetween = (today < expirationDateObject.setHours(23, 59, 59, 999));
-
-                    }
-
-                    var isContractActive = (isTodayBetween || overrule);
-
-                    $scope.contract.isActive = isContractActive;
                 }
             }]);
 })(angular, app);

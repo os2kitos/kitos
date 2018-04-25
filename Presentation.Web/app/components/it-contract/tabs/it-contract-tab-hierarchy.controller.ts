@@ -11,13 +11,12 @@
     }]);
 
     app.controller("contract.EditHierarchyCtrl",
-        ["$scope", "_", "hierarchyFlat", "$stateParams", "notify", "contract", "hasWriteAccess", "$http", "user",
-            ($scope, _, hierarchyFlat, $stateParams, notify, contract, hasWriteAccess, $http, user) => {
+        ["$scope", "_", "$state", "$timeout", "hierarchyFlat", "$stateParams", "notify", "contract", "hasWriteAccess", "$http", "user",
+            ($scope, _, $state, $timeout, hierarchyFlat, $stateParams, notify, contract, hasWriteAccess, $http, user) => {
                 $scope.hierarchy = _.toHierarchy(hierarchyFlat, "id", "parentId", "children");
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.contract = contract;
                 $scope.hasWriteAccess = hasWriteAccess;
-
                 $scope.itContractsSelectOptions = selectLazyLoading('api/itcontract', true, formatContract, ['orgId=' + user.currentOrganizationId]);
 
                 function formatContract(supplier) {
@@ -30,7 +29,30 @@
                         text: contract.parentName
                     };
                 }
-
+                $scope.updateHierarchy = (field, value) => {
+                    let id;
+                    if (value == null) {
+                        id = null;
+                    } else {
+                        id = value.id;
+                    }
+                    var payload = {};
+                    payload[field] = id;
+                    $http.patch($scope.autoSaveUrl + `?organizationId=${user.currentOrganizationId}`, payload)
+                        .then(() => {
+                            notify.addSuccessMessage("Feltet er opdateret!");
+                            reload();
+                        },
+                            () => notify.addErrorMessage("Fejl! Feltet kunne ikke opdateres!"));
+                }
+                function reload() {
+                    return $state.transitionTo($state.current, $stateParams, {
+                        reload: true
+                    }).then(() => {
+                        $scope.hideContent = true;
+                        return $timeout(() => $scope.hideContent = false, 1);
+                    });
+                };
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {
                         minimumInputLength: 1,
@@ -67,7 +89,7 @@
                                         cvr: obj.cvr
                                     });
                                 });
-
+                                results = _.orderBy(results, x => x.text, 'asc');
                                 return { results: results };
                             }
                         }

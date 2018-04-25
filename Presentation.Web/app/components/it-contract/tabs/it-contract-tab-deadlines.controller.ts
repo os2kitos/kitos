@@ -154,16 +154,19 @@
                 paymentMilestone.itContractId = $scope.contract.id;
 
                 var approvedDate = moment(paymentMilestone.approved, "DD-MM-YYYY");
-                if (approvedDate.isValid()) {
+                var expectedDate = moment(paymentMilestone.expected, "DD-MM-YYYY");
+                var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
+                var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
+                if (approvedDateValid) {
                     paymentMilestone.approved = approvedDate.format("YYYY-MM-DD");
                 } else {
+                    notify.addInfoMessage("Den indtastede forventet dato er ugyldig. Tom værdi indsættes");
                     paymentMilestone.approved = null;
                 }
-
-                var expectedDate = moment(paymentMilestone.expected, "DD-MM-YYYY");
-                if (expectedDate.isValid()) {
+                if (expectedDateValid) {
                     paymentMilestone.expected = expectedDate.format("YYYY-MM-DD");
                 } else {
+                    notify.addInfoMessage("Den indtastede godkendt dato er ugyldig. Tom værdi indsættes");
                     paymentMilestone.expected = null;
                 }
 
@@ -197,16 +200,21 @@
                 handoverTrial.itContractId = $scope.contract.id;
 
                 var approvedDate = moment(handoverTrial.approved, "DD-MM-YYYY");
-                if (approvedDate.isValid()) {
+                var expectedDate = moment(handoverTrial.expected, "DD-MM-YYYY");
+                var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
+                var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
+
+                if (approvedDateValid) {
                     handoverTrial.approved = approvedDate.format("YYYY-MM-DD");
                 } else {
+                    notify.addInfoMessage("Den indtastede forventet dato er ugyldig. Tom værdi indsættes");
                     handoverTrial.approved = null;
                 }
 
-                var expectedDate = moment(handoverTrial.expected, "DD-MM-YYYY");
-                if (expectedDate.isValid()) {
+                if (expectedDateValid) {
                     handoverTrial.expected = expectedDate.format("YYYY-MM-DD");
                 } else {
+                    notify.addInfoMessage("Den indtastede godkent dato er ugyldig. Tom værdi indsættes");
                     handoverTrial.expected = null;
                 }
 
@@ -236,6 +244,42 @@
                     });
             };
 
+            $scope.patchDate = (field, value) => {
+                var date = moment(value, "DD-MM-YYYY");
+
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                } else {
+                    var dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                }
+            }
+            $scope.patchDateProcurement = (field, value, id, url) => {
+                var date = moment(value, "DD-MM-YYYY");
+
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                } else {
+                    var dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patch(payload, url + id + '?organizationId=' + user.currentOrganizationId);
+                }
+            }
+            function patch(payload, url) {
+                var msg = notify.addInfoMessage("Gemmer...", false);
+                $http({ method: 'PATCH', url: url, data: payload })
+                    .success(function () {
+                        msg.toSuccessMessage("Feltet er opdateret.");
+                    })
+                    .error(function () {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    });
+            }
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582
             function reload() {

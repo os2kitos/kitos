@@ -163,6 +163,9 @@ namespace Presentation.Web
             var archiveLocation = builder.EntitySet<ArchiveLocation>(nameof(ArchiveLocationsController).Replace("Controller", string.Empty));
             archiveLocation.EntityType.HasKey(x => x.Id);
 
+            var archiveTestLocation = builder.EntitySet<ArchiveTestLocation>(nameof(ArchiveTestLocationsController).Replace("Controller", string.Empty));
+            archiveTestLocation.EntityType.HasKey(x => x.Id);
+
             var archiveOption = builder.EntitySet<ArchiveType>(nameof(ArchiveTypesController).Replace("Controller", string.Empty));
             archiveOption.EntityType.HasKey(x => x.Id);
 
@@ -229,6 +232,9 @@ namespace Presentation.Web
             orgUnits.EntityType.HasKey(x => x.Id);
             orgUnits.EntityType.HasMany(x => x.ResponsibleForItContracts).Name = "ItContracts";
             orgUnits.EntityType.HasMany(x => x.UsingItProjects).Name = "ItProjects";
+            //Add isActive to result form odata
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItContract)).AddProperty(typeof(ItContract).GetProperty("IsActive"));
+
 
             var userEntitySetName = nameof(UsersController).Replace("Controller", string.Empty);
             var users = builder.EntitySet<User>(userEntitySetName);
@@ -240,12 +246,16 @@ namespace Presentation.Web
             users.EntityType.Property(x => x.Email).IsRequired();
 
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
+
             userCreateAction.Parameter<User>("user").OptionalParameter = false;
             userCreateAction.Parameter<int>("organizationId").OptionalParameter = false;
             userCreateAction.Parameter<bool>("sendMailOnCreation").OptionalParameter = true;
 
             var userCheckEmailFunction = users.EntityType.Collection.Function("IsEmailAvailable").Returns<bool>();
             userCheckEmailFunction.Parameter<string>("email").OptionalParameter = false;
+
+            var userGetByMailFunction = builder.Function("GetUserByEmail").ReturnsFromEntitySet<User>(userEntitySetName);
+            userGetByMailFunction.Parameter<string>("email").OptionalParameter = false;
 
             var usages = builder.EntitySet<ItSystemUsage>(nameof(ItSystemUsagesController).Replace("Controller", string.Empty));
             usages.HasRequiredBinding(u => u.Organization, "Organizations");
@@ -264,6 +274,7 @@ namespace Presentation.Web
 
             var contractItSystemUsages = builder.EntitySet<ItContractItSystemUsage>("ItContractItSystemUsages"); // no controller yet
             contractItSystemUsages.EntityType.HasKey(x => x.ItContractId).HasKey(x => x.ItSystemUsageId);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(ItSystemUsage)).AddProperty(typeof(ItSystemUsage).GetProperty("IsActive"));
 
             var contracts = builder.EntitySet<ItContract>(nameof(ItContractsController).Replace("Controller", string.Empty));
             contracts.HasRequiredBinding(o => o.Organization, "Organizations");
@@ -274,8 +285,6 @@ namespace Presentation.Web
 
             // TODO this field is causing issues.
             // This query fails: /odata/Organizations(1)/ItSystemUsages?$expand=MainContract($expand=ItContract)
-            // if ItContract.Terminated has a value
-            contracts.EntityType.Ignore(x => x.IsActive);
 
             var interfaceTypes = builder.EntitySet<InterfaceType>(nameof(InterfaceTypesController).Replace("Controller", string.Empty));
             interfaceTypes.EntityType.HasKey(x => x.Id);
@@ -376,6 +385,10 @@ namespace Presentation.Web
             var LocalArchiveLocation = builder.EntitySet<LocalArchiveLocation>(nameof(LocalArchiveLocationsController).Replace("Controller", string.Empty));
             LocalArchiveLocation.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalArchiveLocation.EntityType.HasKey(x => x.Id);
+
+            var LocalArchiveTestLocation = builder.EntitySet<LocalArchiveTestLocation>(nameof(LocalArchiveTestLocationsController).Replace("Controller", string.Empty));
+            LocalArchiveTestLocation.HasRequiredBinding(u => u.Organization, "Organizations");
+            LocalArchiveTestLocation.EntityType.HasKey(x => x.Id);
 
             var LocalItSystemCategories = builder.EntitySet<LocalItSystemCategories>(nameof(LocalItSystemCategoriesController).Replace("Controller", string.Empty));
             LocalItSystemCategories.HasRequiredBinding(x => x.Organization, "Organizations");
@@ -551,6 +564,9 @@ namespace Presentation.Web
             var accessType = builder.EntitySet<AccessType>(nameof(AccessTypesController).Replace("Controller", string.Empty));
             accessType.HasRequiredBinding(a => a.ItSystem, "ItSystems");
             accessType.EntityType.HasKey(x => x.Id);
+
+            var archivePeriod = builder.EntitySet<ArchivePeriod>(nameof(ArchivePeriodsController).Replace("Controller", string.Empty));
+            archivePeriod.EntityType.HasKey(x => x.Id);
 
             //builder.EntitySet<TaskRef>("TaskRefs");
             //builder.EntitySet<TaskUsage>("TaskUsages");

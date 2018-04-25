@@ -35,6 +35,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(m => m.Organization)
                 .HasForeignKey(m => m.OrganizationId)
                 .WillCascadeOnDelete(false);
+
+            HasOptional(o => o.ContactPerson)
+                .WithOptionalDependent(c => c.Organization)
+                .WillCascadeOnDelete(true);
+                
         }
     }
 }

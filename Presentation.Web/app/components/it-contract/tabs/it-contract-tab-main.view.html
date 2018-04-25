@@ -125,7 +125,7 @@
                         <div class="form-group" data-ng-show="contract.containsDataHandlerAgreement == 1" >
                             <label for="datahandler-link" class="control-label small">Link til databehandleraftalen</label>
                             <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-hide="dataHandlerLink == ''"  data-ng-disabled="!hasWriteAccess">
-                                <a id="datahandler-link" href="{{dataHandlerLink}}">{{dataHandlerLinkName}}</a>
+                                <a target="_blank" id="datahandler-link" href="{{dataHandlerLink}}">{{dataHandlerLinkName}}</a>
                                 <button type="button" style="float:right; cursor:pointer;" data-ng-disabled="!hasWriteAccess" class="btn-link btn-editLink" title="Redigér link" data-ng-click="editLink()"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                             </div>
 
@@ -194,7 +194,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.supplierSignedDate"
-                                   data-autosave="{{ autoSaveUrl }}"
+                                   ng-blur="patchDate('supplierSignedDate', contract.supplierSignedDate)"
                                    data-field="supplierSignedDate">
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.signedDate"
-                                   data-autosave="{{ autoSaveUrl }}"
+                                   ng-blur="patchDate('signedDate', contract.signedDate)"
                                    data-field="signedDate">
                         </div>
                     </div>
@@ -262,8 +262,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.concluded"
-                                   data-autosave="{{ autosaveUrl2 }}"
-                                   data-ng-blur="checkContractValidity()"
+                                   data-ng-blur="checkContractValidity('concluded', contract.concluded)"
                                    data-field="concluded">
                             <label for="agreement-expiration" class="control-label small">Gyldig til</label>
                             <input type="text" class="form-control" id="agreement-expiration"
@@ -271,8 +270,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.expirationDate"
-                                   data-ng-blur="checkContractValidity()"
-                                   data-autosave="{{ autosaveUrl2 }}"
+                                   data-ng-blur="checkContractValidity('expirationDate', contract.expirationDate)"
                                    data-field="expirationDate">
                         </div>
                     </div>
@@ -285,7 +283,7 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{ autoSaveUrl }}"
                                data-field="active"
-                               data-ng-change="checkContractValidity()" />
+                               data-ng-change="checkContractValidity('active', contract.active)" />
                         <label for="contractIsActive">
                             <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
                             <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>

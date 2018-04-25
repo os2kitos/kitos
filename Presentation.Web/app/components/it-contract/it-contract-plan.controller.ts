@@ -281,7 +281,8 @@
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
                                 Terminated: { type: "date" },
-                                Duration: { type: "string" }
+                                Duration: { type: "string" },
+                                IsActive: {type: "boolean"}
                             }
                         },
                         parse: response => {
@@ -361,9 +362,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 detailTemplate: (dataItem) => {
                     //These might be candidates for refactoring. They are quite expensive
                     return `<uib-tabset active="0">
@@ -387,14 +387,12 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Active",
-                        title: "Aktiv",
-                        width: 45,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive",
+                        title: "Gyldig/Ikke gyldig",
+                        width: 90,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-
-                            if (isActive) {
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
                             }
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
@@ -405,7 +403,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: false,
+                        filterable: {
+                        cell: {
+                            template: args => {
+                                args.element.kendoDropDownList({
+                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                                    dataTextField: "type",
+                                    dataValueField: "value",
+                                    valuePrimitive: true
+                                });
+                            },
+                            showOperators: false
+
+                        }
+                    }
                     },
                     {
                         field: "ItContractId",
@@ -416,6 +427,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
@@ -435,6 +447,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -451,6 +464,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -481,6 +495,7 @@
                         template: dataItem => dataItem.Supplier ? dataItem.Supplier.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -538,6 +553,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains",
@@ -558,6 +574,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -572,6 +589,7 @@
                         template: "#: ContractType ? ContractType.Name : '' #",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -586,6 +604,7 @@
                         template: dataItem => dataItem.ContractTemplate ? dataItem.ContractTemplate.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -600,6 +619,7 @@
                         template: dataItem => dataItem.PurchaseForm ? dataItem.PurchaseForm.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -708,6 +728,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -782,6 +803,7 @@
                         template: dataItem => dataItem.ProcurementStrategy ? dataItem.ProcurementStrategy.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -800,6 +822,7 @@
                                 : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -808,7 +831,11 @@
                     }
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
