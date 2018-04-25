@@ -95,7 +95,7 @@ namespace Presentation.Web.Models
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
         public int? ReferenceId { get; set; }
         public ExternalReferenceDTO Reference;
-        
+        public int ArchiveDuty { get; set; }
         //GDPR
         public string GeneralPurpose { get; set; }
         public DataSensitivityLevel DataLevel { get; set; }

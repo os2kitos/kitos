@@ -1,8 +1,8 @@
 ﻿<div class="object-section-container">
-    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(inaktiv)</span></h4>
+    <h4>{{usage.itSystem.name}} <span ng-if="usage.itSystem.disabled">(Slettes)</span></h4>
     <div class="panel panel-default">
         <div class="row">
-            <!-- 3rd column -->
+            <!-- 1st column -->
             <div class="col-xs-6">
                 <!-- local sys id -->
                 <div class="form-group">
@@ -23,18 +23,6 @@
                            data-field="localCallName"
                            data-autosave="api/itSystemUsage/{{usageId}}">
                 </div>
-                <!--<div class="form-group">
-                    <select-option data-id="sensitive"
-                                   data-label="Persondata"
-                                   data-placeholder="Vælg persondata"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="usage.sensitiveDataTypeId"
-                                   data-options="sensitiveDataTypes"
-                                   data-auto-save-url="api/itSystemUsage/{{usageId}}"
-                                   data-field="sensitiveDataTypeId">
-                    </select-option>
-                </div>-->
-
                 <div class="form-group">
                     <label for="system-name" class="control-label small">Hvilke typer data indeholder systemet</label>
                     <select class="form-control input-sm"
@@ -48,7 +36,6 @@
                         <option value="2">Persondata og følsomme persondata</option>
                     </select>
                 </div>
-
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">
                     <label for="note" class="control-label small">Note</label>
@@ -59,7 +46,7 @@
                 </div>
             </div>
 
-            <!-- 4th column -->
+            <!-- 2nd column -->
             <div class="col-xs-6">
                 <div class="form-group">
                     <label for="system-name" class="control-label small">Hvor mange brugere benytter systemet i jeres kommune?</label>
@@ -101,8 +88,7 @@
                            data-k-options="datepickerOptions"
                            data-ng-disabled="!hasWriteAccess"
                            data-ng-model="usage.concluded"
-                           data-autosave="{{ autosaveUrl2 }}"
-                           data-ng-blur="checkSystemValidity()"
+                           ng-blur="patchDate('concluded', usage.concluded)"
                            data-field="concluded">
                 </div>
                 <div class="form-group">
@@ -112,8 +98,7 @@
                            data-k-options="datepickerOptions"
                            data-ng-model="usage.expirationDate"
                            data-ng-disabled="!hasWriteAccess"
-                           data-ng-blur="checkSystemValidity()"
-                           data-autosave="{{ autosaveUrl2 }}"
+                           ng-blur="patchDate('expirationDate', usage.expirationDate)"
                            data-field="expirationDate">
                 </div>
                 <div class="checkbox">
@@ -127,15 +112,15 @@
                     <label for="system-int-signed"  style="padding-left:0px;">
                         <i ng-hide="usage.active" class='glyphicon glyphicon-unchecked'></i>
                         <i ng-show="usage.active" class='glyphicon glyphicon-check'></i>
-                        <span class='label-content'>Gyldig: </span>
+                        <span class='label-content'>
+                            Gyldig: </span>
                     </label>
-                    <i ng-show="usage.isActive" class="fa fa-check" aria-hidden="true"></i>
+                    <i ng-show="usage.isActive || usage.active" class="fa fa-check" aria-hidden="true"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <div class="object-section-container">
     <h4>Produktdata</h4>
     <div class="panel panel-default">
@@ -150,19 +135,16 @@
                                    data-options="appTypeOptions">
                     </select-option>
                 </div>
-
                 <!--Name-->
                 <div class="form-group">
                     <label for="system-name" class="control-label small">IT System</label>
                     <input type="text" id="system-name" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.name">
                 </div>
-
                 <!--Parent system-->
                 <div class="form-group">
                     <label for="system-parent" class="control-label small">Overordnet system</label>
                     <input type="text" id="system-parent" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystemParentName">
                 </div>
-
                 <!--Business type-->
                 <div class="form-group">
                     <select-option data-id="system-business-type"
@@ -173,7 +155,6 @@
                     </select-option>
                 </div>
             </div>
-
             <!-- 2st column -->
             <div class="col-xs-6">
                 <!--Belongs to-->
@@ -181,12 +162,12 @@
                     <label for="system-belongs-to" class="control-label small">Rettighedshaver</label>
                     <input type="text" id="system-belongs-to" class="form-control input-sm" disabled="disabled" data-ng-model="usage.itSystem.belongsToName">
                 </div>
-
                 <!-- Object owner -->
                 <div class="form-group">
                     <label class="control-label small">Oprettet af</label>
-                    <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName}}" />
-                </div>
+                    <input class="form-control input-sm" disabled="disabled" type="text" value="{{usage.itSystem.objectOwnerFullName
+                            }}" />
+</div>
 
                 <!--Access modifier -->
                 <div class="form-group">

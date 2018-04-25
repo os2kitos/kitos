@@ -1,6 +1,6 @@
 ﻿module Kitos.Models.ItSystem {
     /** Dropdown option for ItSystem, whether it has been archived or not. */
-    export interface IArchiveLocation extends IEntity {
+    export interface IArchiveTestLocation extends IEntity {
         Name: string;
         IsActive: boolean;
         IsSuggestion: boolean;

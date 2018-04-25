@@ -43,6 +43,7 @@ namespace Core.DomainModel.Organization
         /// This is a string instead of int because it's much easier to do a partial search on strings
         /// </remarks>
         public string Cvr { get; set; }
+        public string ForeignCvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
         public Guid? Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
@@ -87,6 +88,9 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<User> DefaultOrganizationForUsers { get; set; }
 
         public virtual ICollection<Report> Reports { get; set; }
+
+        public virtual int? ContactPersonId { get; set; }
+        public virtual ContactPerson ContactPerson { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

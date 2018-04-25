@@ -279,9 +279,8 @@
                     }
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -296,6 +295,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -310,6 +310,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -323,6 +324,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -340,21 +342,6 @@
                             }
                         }
                     },
-                    // MySQL ERROR: String was not recognized as a valid Boolean
-                    //{
-                    //    field: "ItSystemUsages.ItSystem.Name", title: "IT System", width: 150,
-                    //    persistId: "sysnames", // DON'T YOU DARE RENAME!
-                    //    template: "#: Parent ? Parent.Name : '' #",
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
-                    // TODO Reference skal muligvis indføres som i it-project-overview
                     {
                         // TODO Skal muligvis slettes
                         field: "Esdh", title: "ESDH ref", width: 150,
@@ -365,6 +352,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -381,6 +369,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -393,6 +382,7 @@
                         template: dataItem => dataItem.ItProjectType && dataItem.ItProjectType.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -654,7 +644,11 @@
                     }
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 

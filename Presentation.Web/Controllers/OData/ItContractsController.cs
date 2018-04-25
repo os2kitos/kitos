@@ -9,6 +9,7 @@ using Core.DomainServices;
 using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using System;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -71,7 +72,9 @@ namespace Presentation.Web.Controllers.OData
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
                 return StatusCode(HttpStatusCode.Forbidden);
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            //tolist requried to handle filtering on computed fields
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key).ToList();
+            
             return Ok(result);
         }
 

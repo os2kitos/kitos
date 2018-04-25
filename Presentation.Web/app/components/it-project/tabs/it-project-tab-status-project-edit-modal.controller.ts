@@ -43,32 +43,32 @@
                 $scope.dismiss = () => {
                     $scope.$dismiss();
                 };
-               
                 $scope.save = (obj) => {
                     var payload = {
                         Created: obj.Created,
                         LastChanged: moment()
                     };
-
-
-
                     var created = moment(payload.Created, "DD-MM-YYYY");
-                    if (created.isValid()) {
-                        payload.Created = created.format("YYYY-MM-DD");
+                    if (!created.isValid() || isNaN(created.valueOf()) || created.year() < 1000 || created.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     } else {
-                        payload.Created = null;
+                        if (created.isValid()) {
+                            payload.Created = created.format("YYYY-MM-DD");
+                        } else {
+                            payload.Created = null;
+                        }
+                        var msg = notify.addInfoMessage("Gemmer ændringer...", false);
+                        $http({
+                            method: "PATCH",
+                            url: `odata/ItProjectStatusUpdates(${obj.Id})`,
+                            data: payload
+                        }).success(() => {
+                            msg.toSuccessMessage("Ændringerne er gemt!");
+                            $scope.$close(true);
+                        }).error(() => {
+                            msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
+                        });
                     }
-                    var msg = notify.addInfoMessage("Gemmer ændringer...", false);
-                    $http({
-                        method: "PATCH",
-                        url: `odata/ItProjectStatusUpdates(${obj.Id})`,
-                        data: payload
-                    }).success(() => {
-                        msg.toSuccessMessage("Ændringerne er gemt!");
-                        $scope.$close(true);
-                    }).error(() => {
-                        msg.toErrorMessage("Ændringerne kunne ikke gemmes!");
-                    });
                 };
 
             }]);

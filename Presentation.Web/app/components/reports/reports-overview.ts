@@ -208,7 +208,7 @@
                 },
                 batch: false,
                 sync: false,
-                columnMenu: false,
+                columnMenu: true,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -239,7 +239,6 @@
                 },
                 dataSource: dataSource,
                 editable: "popup",
-                height: 550,
                 toolbar: [
                     {
                         name: "createReport",
@@ -275,8 +274,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [20],
-                    buttonCount: 20
+                    pageSizes: [10, 25, 50, 100, 200],
+                    buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
@@ -287,9 +286,8 @@
                 filterable: {
                     mode: "row",
                 },
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: 900,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -308,6 +306,7 @@
                         excelTemplate: dataItem => dataItem.Name,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -322,6 +321,7 @@
                         excelTemplate: dataItem => dataItem.Description,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -336,6 +336,7 @@
                         menu: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "eq"
@@ -363,6 +364,7 @@
                         width: "60px",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -396,6 +398,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         // saves grid state to localStorage

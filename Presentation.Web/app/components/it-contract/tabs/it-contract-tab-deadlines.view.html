@@ -37,7 +37,7 @@
                                                data-k-options="datepickerOptions"
                                                data-ng-disabled="!hasWriteAccess"
                                                data-ng-model="ht.expected"
-                                               data-autosave="api/handoverTrial/{{ ht.id }}"
+                                               ng-blur="patchDateProcurement('expected', ht.expected, ht.id, 'api/handoverTrial/')"
                                                data-field="expected">
                                     </td>
                                     <td>
@@ -47,7 +47,7 @@
                                                data-k-options="datepickerOptions"
                                                data-ng-disabled="!hasWriteAccess"
                                                data-ng-model="ht.approved"
-                                               data-autosave="api/handoverTrial/{{ ht.id }}"
+                                               ng-blur="patchDateProcurement('approved', ht.approved, ht.id, 'api/handoverTrial/')"
                                                data-field="approved">
                                     </td>
                                     <td>
@@ -92,8 +92,9 @@
                                     <td>
                                         <button id="handover-trial-add"
                                                 class="btn btn-success btn-sm"
+                                                ng-disabled="!(handoverTrial.handoverTrialTypeId != undefined)"
                                                 data-ng-click="saveTrial(handoverTrial)">
-                                            Gem
+                                            Gem {{handoverTrial.handoverTrialTypeId}}
                                         </button>
                                     </td>
                                 </tr>
@@ -119,7 +120,7 @@
                                                data-ng-disabled="!hasWriteAccess"
                                                data-ng-model="item.title"
                                                data-autosave="api/paymentMilestone/{{item.id}}"
-                                               data-field="title">
+                                               data-field="title" required>
                                     </td>
                                     <td>
                                         <input type="text"
@@ -128,7 +129,7 @@
                                                data-k-options="datepickerOptions"
                                                data-ng-disabled="!hasWriteAccess"
                                                data-ng-model="item.expected"
-                                               data-autosave="api/paymentMilestone/{{ item.id }}"
+                                               ng-blur="patchDateProcurement('expected', item.expected, item.id, 'api/paymentMilestone/')"
                                                data-field="expected">
                                     </td>
                                     <td>
@@ -138,7 +139,7 @@
                                                data-k-options="datepickerOptions"
                                                data-ng-disabled="!hasWriteAccess"
                                                data-ng-model="item.approved"
-                                               data-autosave="api/paymentMilestone/{{ item.id }}"
+                                               ng-blur="patchDateProcurement('approved', item.approved, item.id, 'api/paymentMilestone/')"
                                                data-field="approved">
                                     </td>
                                     <td>
@@ -180,8 +181,9 @@
                                     <td>
                                         <button id="payment-milestone-add"
                                                 class="btn btn-success btn-sm"
+                                                ng-disabled="!(paymentMilestone.title != undefined && paymentMilestone.title.length > 0)"
                                                 data-ng-click="saveMilestone(paymentMilestone)">
-                                            Gem
+                                            Gem 
                                         </button>
                                     </td>
                                 </tr>
@@ -265,7 +267,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.irrevocableTo"
-                                   data-autosave="{{autosaveUrl}}"
+                                   ng-blur="patchDate('irrevocableTo', contract.irrevocableTo)"
                                    data-field="irrevocableTo">
                         </div>
                         <!--div class="form-group">
@@ -294,7 +296,7 @@
                                    data-k-options="datepickerOptions"
                                    data-ng-disabled="!hasWriteAccess"
                                    data-ng-model="contract.terminated"
-                                   data-autosave="{{autosaveUrl}}"
+                                   ng-blur="patchDate('terminated', contract.terminated)"
                                    data-field="terminated">
                         </div>
 

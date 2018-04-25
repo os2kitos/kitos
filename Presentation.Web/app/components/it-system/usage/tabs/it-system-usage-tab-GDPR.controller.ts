@@ -78,8 +78,9 @@
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
-
-
+                console.log(systemUsage.LinkToDirectoryUrl);
+                console.log(encodeURI(systemUsage.LinkToDirectoryUrl));
+                $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
             $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);

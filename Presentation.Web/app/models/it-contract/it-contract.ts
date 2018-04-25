@@ -130,5 +130,6 @@
 
         ReferenceId: number;
         Reference: IReference;
+        AssociatedAgreementElementTypes: Array<IAssociatedAgreementElementTypes>;
     }
 }
