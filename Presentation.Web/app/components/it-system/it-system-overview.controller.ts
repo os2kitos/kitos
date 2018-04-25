@@ -575,16 +575,30 @@
                         }
                     },
                     {
-                        field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
-                        persistId: "sensitive", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.SensitiveDataType ? dataItem.SensitiveDataType.Name : "",
+                        field: "DataLevel", title: "Datatype", width: 150,
+                        persistId: "dataLevel", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            switch (dataItem.DataLevel) {
+                                case "PERSONALDATA":
+                                    return "Persondata";
+                                case "PERSONALDATANDSENSITIVEDATA":
+                                    return "Persondata og følsomme persondata";
+                            default:
+                                return "Ingen persondata";
+                            }
+                        },
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },
