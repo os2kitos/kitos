@@ -587,6 +587,7 @@
                                 return "Ingen persondata";
                             }
                         },
+                        attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
