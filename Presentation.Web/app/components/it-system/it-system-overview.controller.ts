@@ -712,6 +712,7 @@
                         {
                             operators: {
                                 date: {
+                                    eq: "Lig med",
                                     gte: "Fra og med",
                                     lte: "Til og med"
                                 }

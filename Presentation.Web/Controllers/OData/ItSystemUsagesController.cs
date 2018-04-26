@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
-        [EnableQuery(MaxExpansionDepth = 3)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
+        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
