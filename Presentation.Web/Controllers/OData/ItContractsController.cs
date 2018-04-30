@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.OData
                 return StatusCode(HttpStatusCode.Forbidden);
 
             //tolist requried to handle filtering on computed fields
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key).ToList();
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             
             return Ok(result);
         }
