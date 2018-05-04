@@ -355,6 +355,12 @@
                                             contract.roles[right.RoleId]
                                                 .push([right.User.Name, right.User.LastName].join(" "));
                                         });
+                                    if (!contract.Parent) { contract.Parent = { Name: "" }; }
+                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" }; }
+                                    if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "" }; }
+                                    if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
+                                    if (!contract.PaymentFreqency) { contract.PaymentFreqency = { Name: "" }; }
                                 });
                             return response;
                         }

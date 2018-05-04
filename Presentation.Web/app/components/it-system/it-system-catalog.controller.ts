@@ -144,8 +144,16 @@
                         },
                         parse: response => {
                             // iterrate each usage
-                            this._.forEach(response.value, usage => {
-                                if (!usage.Reference) { usage.Reference = { Title: "" }; }
+                            this._.forEach(response.value, system => {
+                                if (!system.References) { system.References = { Title: "" }; }
+                                if (!system.Parent) { system.Parent = { Name: "" }; }
+                                if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
+                                if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
+                                if (!system.BelongsTo) { system.BelongsTo = { Name: "" }; }
+                                if (!system.Usages) { system.Usages = []; }
+                                if (!system.Organization) { system.Organization = { Name: "" }; }
+
+
                             });
                             return response;
                         }                    

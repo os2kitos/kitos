@@ -302,6 +302,13 @@
                                             contract.roles[right.RoleId]
                                                 .push([right.User.Name, right.User.LastName].join(" "));
                                         });
+                                    if (!contract.Parent) { contract.Parent = { Name: "" }; }
+                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" }; }
+                                    if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
+                                    if (!contract.ContractType) { contract.ContractType = { Name: "" }; }
+                                    if (!contract.ContractTemplate) { contract.ContractTemplate = { Name: "" }; }
+                                    if (!contract.PurchaseForm) { contract.PurchaseForm = { Name: "" }; }
+                                    if (!contract.TerminationDeadline) { contract.TerminationDeadline = { Name: "" }; }
                                 });
                             return response;
                         }

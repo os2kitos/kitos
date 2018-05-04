@@ -288,7 +288,7 @@
                                 IsTransversal: { type: "boolean" },
                                 IsStrategy: { type: "boolean" },
                                 IsArchived: { type: "boolean" }
-                            }
+                            },
                         },
                         parse: response => {
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
@@ -314,6 +314,12 @@
                                 } else {
                                     project.hasWriteAccess = false;
                                 }
+
+                                if (!project.Parent) { project.Parent = { Name: "" }; }
+                                if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
+                                if (!project.Reference) { project.Reference = { Title: "" }; }
+                                if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
+                                if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                             });
 
                             return response;
@@ -532,7 +538,7 @@
                         filterable: false
                     },
                     {
-                        field: "CurrentPhaseobj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
+                        field: "CurrentPhaseObj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // handles null cases

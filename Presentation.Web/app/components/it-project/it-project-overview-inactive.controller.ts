@@ -224,8 +224,12 @@
                                 if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
                                     project.hasWriteAccess = true;
                                 }
+                                if (!project.Parent) { project.Parent = { Name: "" }; }
+                                if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
+                                if (!project.Reference) { project.Reference = { Title: "" }; }
+                                if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
+                                if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                             });
-
                             return response;
                         }
                     }

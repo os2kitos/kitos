@@ -124,8 +124,21 @@
                             fields: {
                                 LastChanged: { type: "date" }
                             }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, ItInterface => {
+                                if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
+                                if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
+                                if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
+                                if (!ItInterface.Tsa) { ItInterface.Tsa = { Name: "" }; }
+                                if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
+                                if (!ItInterface.Method) { ItInterface.Method = { Name: "" }; }
+                                if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
+                            });
+                            return response;
                         }
-                    },
+                    },                
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
