@@ -141,7 +141,14 @@
                                 LastChanged: { type: "date" },
                                 Disabled: { type: "boolean" }
                             }
-                        }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, usage => {
+                                if (!usage.Reference) { usage.Reference = { Title: "" }; }
+                            });
+                            return response;
+                        }                    
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -684,7 +691,7 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+        private exportToExcel = (e) => {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {

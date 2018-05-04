@@ -246,7 +246,7 @@
                         },
                         parse: response => {
                             // HACK to flattens the Rights on usage so they can be displayed as single columns
-
+                            
                             // iterrate each usage
                             this._.forEach(response.value, usage => {
                                 usage.roles = [];
@@ -259,6 +259,18 @@
                                     // push username to the role array
                                     usage.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
                                 });
+
+                                
+
+                                if (!usage.ItSystem.Parent) { usage.ItSystem.Parent = { Name: "" }; }
+                                if (!usage.ResponsibleUsage) { usage.ResponsibleUsage = { OrganizationUnit: { Name: "" } }; }
+                                if (!usage.ItSystem.BusinessType) { usage.ItSystem.BusinessType = { Name: "" }; }
+                                if (!usage.ItSystem.AppTypeOption) { usage.ItSystem.AppTypeOption = { Name: "" }; }
+                                if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
+                                if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; } 
+                                if (!usage.Reference) { usage.Reference = { Title: "" }; } 
+
+                                
                             });
                             return response;
                         }
