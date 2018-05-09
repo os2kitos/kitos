@@ -66,6 +66,7 @@
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
+
                     this.mainGrid.dataSource.read();
 
                     // find the access modifier filter row section
@@ -169,11 +170,6 @@
                         text: "Opret IT System",
                         template:
                             "<button ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
-                    },
-                    {
-                        name: "excel",
-                        text: "Eksportér til Excel",
-                        className: "pull-right"
                     },
                     {
                         name: "clearFilter",
@@ -619,6 +615,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 

@@ -151,6 +151,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -321,7 +325,6 @@
                         text: "Opret IT Kontrakt",
                         template: "<button ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewPlanVm.canCreate\">#: text #</button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
