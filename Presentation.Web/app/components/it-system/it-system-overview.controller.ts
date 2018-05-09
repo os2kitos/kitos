@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewController {
-        mainGrid: IKendoGrid<IItSystemUsageOverview>;
+        mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: kendo.ui.DropDownListOptions;
         //modal: kendo.ui.Window;
@@ -24,7 +24,7 @@
         private orgUnitStorageKey = "it-system-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
 
-        public mainGrid: IKendoGrid<IItSystemUsageOverview>;
+        public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
         //public usageGrid: kendo.ui.Grid;
@@ -172,7 +172,7 @@
         };
         private activate() {
             // overview grid options
-            var mainGridOptions: IKendoGridOptions<IItSystemUsageOverview> = {
+            var mainGridOptions: Kitos.IKendoGridOptions<IItSystemUsageOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
@@ -224,9 +224,6 @@
                     sort: {
                         field: "SystemName",
                         dir: "asc"
-                    },
-                    AutoComplete: {
-                        disabled: true
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -344,19 +341,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: {
-                            cell: {
-                                template: args => {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
-                            }
-                        }
+                        filterable: false
+                        //{
+                        //    cell: {
+                        //        template: args => {
+                        //            args.element.kendoDropDownList({
+                        //                dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                        //                dataTextField: "type",
+                        //                dataValueField: "value",
+                        //                valuePrimitive: true
+                        //            });
+                        //        },
+                        //        showOperators: false
+                        //    }
+                        //}
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
@@ -586,16 +584,31 @@
                         }
                     },
                     {
-                        field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
-                        persistId: "sensitive", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.SensitiveDataType ? dataItem.SensitiveDataType.Name : "",
+                        field: "DataLevel", title: "Datatype", width: 150,
+                        persistId: "dataLevel", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            switch (dataItem.DataLevel) {
+                                case "PERSONALDATA":
+                                    return "Persondata";
+                                case "PERSONALDATANDSENSITIVEDATA":
+                                    return "Persondata og følsomme persondata";
+                            default:
+                                return "Ingen persondata";
+                            }
+                        },
+                        attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },
@@ -708,6 +721,7 @@
                         {
                             operators: {
                                 date: {
+                                    eq: "Lig med",
                                     gte: "Fra og med",
                                     lte: "Til og med"
                                 }

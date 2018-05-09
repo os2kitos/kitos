@@ -74,5 +74,7 @@
         RiskSupervisionDocumentationUrlName: string;
         LinkToDirectoryUrl: string;
         LinkToDirectoryUrlName: string;
+
+        DataLevel: string;
     }
 }

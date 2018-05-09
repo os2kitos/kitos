@@ -411,18 +411,19 @@
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: {
-                        cell: {
-                            template: args => {
-                                args.element.kendoDropDownList({
-                                    dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                                    dataTextField: "type",
-                                    dataValueField: "value",
-                                    valuePrimitive: true
-                                });
-                            },
-                            showOperators: false
+                            cell: false
+                        //    {
+                        //    template: args => {
+                        //        args.element.kendoDropDownList({
+                        //            dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                        //            dataTextField: "type",
+                        //            dataValueField: "value",
+                        //            valuePrimitive: true
+                        //        });
+                        //    },
+                        //    showOperators: false
 
-                        }
+                        //}
                     }
                     },
                     {
