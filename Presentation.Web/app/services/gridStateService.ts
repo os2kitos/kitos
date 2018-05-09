@@ -138,8 +138,6 @@
                 });
 
                 grid.setOptions(gridOptions);
-
-                //   this.mainGrid.dataSource.pageSize(this.mainGrid.dataSource.options.pageSize)
                 grid.dataSource.pageSize(grid.dataSource.options.pageSize);
             }
 
