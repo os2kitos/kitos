@@ -117,7 +117,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -131,7 +131,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
                     <uib-tab index="1" heading="Projekt roller"><user-project-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-project-roles></uib-tab>
