@@ -329,12 +329,11 @@
                     var formatDateString = "YYYY-MM-DD";
                     var dateObjectStart = moment(concluded, [formatString, formatDateString]).startOf('day');
                     var dateObjectEnd = moment(expirationDate, [formatString, formatDateString]).endOf('day');
-                    console.log(dateObjectStart);
-                    console.log(dateObjectEnd);
-                    if (!dateObjectStart.isValid() || isNaN(dateObjectStart.valueOf()) || dateObjectStart.year() < 1000 || dateObjectStart.year() > 2099) {
+
+                    if (field === 'concluded' && (!dateObjectStart.isValid() || isNaN(dateObjectStart.valueOf()) || dateObjectStart.year() < 1000 || dateObjectStart.year() > 2099)) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     }
-                    else if (!dateObjectEnd.isValid() || isNaN(dateObjectEnd.valueOf()) || dateObjectEnd.year() < 1000 || dateObjectEnd.year() > 2099) {
+                    else if (field === 'expirationDate' && (!dateObjectEnd.isValid() || isNaN(dateObjectEnd.valueOf()) || dateObjectEnd.year() < 1000 || dateObjectEnd.year() > 2099)) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     }
                     else if (dateObjectStart >= dateObjectEnd) {
