@@ -788,6 +788,7 @@
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\fonts\tinymce-small.svg" />
     <Content Include="Content\css\fonts\tinymce.svg" />
+    <Content Include="Content\css\kendo.default.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
