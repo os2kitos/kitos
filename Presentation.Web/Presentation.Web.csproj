@@ -788,7 +788,6 @@
     <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\fonts\tinymce-small.svg" />
     <Content Include="Content\css\fonts\tinymce.svg" />
-    <Content Include="Content\css\kendo.default.min.css" />
     <Content Include="Content\css\select2-spinner.gif" />
     <Content Include="Content\css\select2.png" />
     <Content Include="Content\css\select2x2.png" />
@@ -837,6 +836,7 @@
     <Content Include="Content\img\Systemforside_white.svg" />
     <Content Include="Content\img\Systemroller.svg" />
     <Content Include="Content\img\VisIOverblik.svg" />
+    <Content Include="Content\kendo.default.min.css" />
     <Content Include="Content\notify\notify.css" />
     <Content Include="Content\css\fonts\tinymce-small.eot" />
     <Content Include="Content\css\fonts\tinymce-small.ttf" />
