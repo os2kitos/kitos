@@ -270,7 +270,7 @@
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                                 if (!usage.Reference) { usage.Reference = { Title: "" }; } 
-                                
+                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                             });
                             return response;
                         }
