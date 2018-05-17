@@ -266,10 +266,9 @@
                                 if (!usage.ItSystem.BusinessType) { usage.ItSystem.BusinessType = { Name: "" }; }
                                 if (!usage.ItSystem.AppTypeOption) { usage.ItSystem.AppTypeOption = { Name: "" }; }
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
-                             
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
-                                if (!usage.Reference) { usage.Reference = { Title: "" }; } 
+                                if (!usage.Reference) { usage.Reference = { Title: "" }; }
                                 if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                             });
                             return response;
