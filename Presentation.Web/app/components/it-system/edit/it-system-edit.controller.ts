@@ -46,16 +46,15 @@
                         return o.text === "Slet IT System";
                     });
                 }
-                if (user.isGlobalAdmin) {
+                if (itSystem.accessModifier === 1 || user.isGlobalAdmin || user.isLocalAdmin) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Deaktivér IT System";
                     });
-
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Aktivér IT System";
                     });
 
-                    if (itSystem.accessModifier === 1) {
+                    if (itSystem.accessModifier === 1 || user.isGlobalAdmin || user.isLocalAdmin) {
                         if (!itSystem.disabled) {
                             $rootScope.page.subnav.buttons.push(
                                 { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
