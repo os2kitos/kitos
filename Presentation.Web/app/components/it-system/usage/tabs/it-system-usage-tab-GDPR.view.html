@@ -41,19 +41,6 @@
                            data-field="isBusinessCritical">
                     <label class="control-label small" for="businesscriticalDunno">Ved ikke</label>
                 </div>
-                <!-- Category of data -->
-                <div class="form-group">
-                    <select-option data-id="categories"
-                                   data-label="Klassifikation af data i systemet"
-                                   data-placeholder="Vælg kategori"
-                                   data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
-                                   data-ng-disabled="!hasWriteAccess"
-                                   data-ng-model="systemUsage.ItSystemCategoriesId"
-                                   data-options="systemCategories"
-                                   data-auto-save-url="{{updateUrl}}"
-                                   data-field="itSystemCategoriesId">
-                    </select-option>
-                </div>
                 <!-- Data processor -->
                 <div class="form-group">
                     <label for="dataProcessor" class="control-label small">Dataansvarlig</label>
