@@ -61,7 +61,6 @@
             $scope.systemCategories = systemCategories;
             autofocus();
             var today = new Date();
-            console.log(itSystemUsage);
             if (!itSystemUsage.active) {
                 if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
                     $scope.displayActive = true;
@@ -131,29 +130,42 @@
             $scope.patchDate = (field, value) => {
                 var date = moment(value, "DD-MM-YYYY");
                 var today = moment();
-
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                var payload = {};
+                if (value === "") {
+                    payload[field] = null;
+                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                    isActive(today);
+                    console.log(value);
+                    console.log($scope.usage.expirationDate);
+                    console.log($scope.usage.concluded);
+                }
+                else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
                 else {
-                    if (today.isBetween(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day'), moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day'), null, '[]') ||
-                        (today.isSameOrAfter(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day')) && $scope.usage.expirationDate == null) ||
-                        (today.isSameOrBefore(moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day')) && $scope.usage.concluded == null) ||
-                        ($scope.usage.expirationDate == null && $scope.usage.concluded == null)) {
+                    var dateString = date.format("YYYY-MM-DD");
+                    payload[field] = dateString;
+                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                    isActive(today);
+                }
+            }
+
+            function isActive(today) {
+                let fromDate = moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day');
+                let endDate = moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day');
+                if (today.isBetween(fromDate, endDate, null, '[]') ||
+                    (today.isSameOrAfter(fromDate) && !endDate.isValid()) ||
+                    (today.isSameOrBefore(endDate) && !fromDate.isValid()) ||
+                    (!fromDate.isValid() && !endDate.isValid())) {
+                    $scope.usage.isActive = true;
+                }
+                else {
+                    if ($scope.usage.active) {
                         $scope.usage.isActive = true;
                     }
                     else {
-                        if ($scope.usage.active) {
-                            $scope.usage.isActive = true;
-                        }
-                        else {
-                            $scope.usage.isActive = false;
-                        }
+                        $scope.usage.isActive = false;
                     }
-                    var dateString = date.format("YYYY-MM-DD");
-                    var payload = {};
-                    payload[field] = dateString;
-                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                 }
             }
             function patch(payload, url) {
