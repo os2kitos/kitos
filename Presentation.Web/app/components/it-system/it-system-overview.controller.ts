@@ -220,6 +220,8 @@
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'""'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq false`);
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'alt'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq true`);
                             }
 
                             return parameterMap;
