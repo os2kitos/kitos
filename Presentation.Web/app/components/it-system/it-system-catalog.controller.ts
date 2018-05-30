@@ -491,7 +491,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }

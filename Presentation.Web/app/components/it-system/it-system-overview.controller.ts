@@ -270,7 +270,7 @@
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
-                                if (!usage.Reference) { usage.Reference = { Title: "" }; }
+                                //if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                             });
                             return response;
@@ -536,7 +536,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -555,10 +555,23 @@
                     },
                     {
                         // TODO Skal muligvis slettes
-                        field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.DirectoryOrUrlRef || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.URL) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -570,23 +583,23 @@
                             }
                         }
                     },
-                    {
-                        // TODO Skal muligvis slettes
-                        field: "CmdbRef", title: "CMDB ref", width: 150,
-                        persistId: "cmdb", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
+                    //{
+                    //    // TODO Skal muligvis slettes
+                    //    field: "CmdbRef", title: "CMDB ref", width: 150,
+                    //    persistId: "cmdb", // DON'T YOU DARE RENAME!
+                    //    template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
+                    //    excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
+                    //    attributes: { "class": "text-center" },
+                    //    hidden: true,
+                    //    filterable: {
+                    //        cell: {
+                    //            template: customFilter,
+                    //            dataSource: [],
+                    //            showOperators: false,
+                    //            operator: "contains"
+                    //        }
+                    //    }
+                    //},
                     {
                         field: "DataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel", // DON'T YOU DARE RENAME!
