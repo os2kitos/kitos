@@ -7,6 +7,7 @@ using Swashbuckle.OData;
 using WebActivatorEx;
 using SwashbuckleODataSample;
 using System.Linq;
+using Presentation.Web.app.shared.filters;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -76,6 +77,7 @@ namespace SwashbuckleODataSample
                 //        scopes.Add("read", "Read access to protected resources");
                 //        scopes.Add("write", "Write access to protected resources");
                 //    });
+                c.DocumentFilter<RemovePatchPostFilter>();
 
                 // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
                 //c.IgnoreObsoleteActions();

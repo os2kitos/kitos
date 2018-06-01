@@ -188,9 +188,9 @@ namespace Presentation.Web.Controllers.OData
             return response;
         }
 
-        [EnableQuery]
+       /* [EnableQuery]
         [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
-        public IHttpActionResult GetByObjectID(int id,ObjectType type)
+        public IHttpActionResult GetAdvicesByObjectID(int id,ObjectType type)
         {
             if (UserId == 0)
                 return Unauthorized();
@@ -202,7 +202,7 @@ namespace Presentation.Web.Controllers.OData
 
             return Ok(Repository.AsQueryable()
                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
-        }
+        }*/
 
         [EnableQuery]
         [ODataRoute("Advice")]
