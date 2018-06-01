@@ -46,7 +46,7 @@
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
-            $scope.regularSensitiveData = regularSensitiveData;
+            $scope.regularSensitiveData = _.orderBy(regularSensitiveData, "Priority", "desc");
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
@@ -73,9 +73,7 @@
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
-                console.log(systemUsage.LinkToDirectoryUrl);
-                console.log(encodeURI(systemUsage.LinkToDirectoryUrl));
-                $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
+            $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
             $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);

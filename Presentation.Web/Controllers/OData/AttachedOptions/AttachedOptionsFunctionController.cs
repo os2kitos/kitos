@@ -39,9 +39,10 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         {
             if (UserId == 0)
                 return Unauthorized();
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
 
-            var globalOptionData = _OptionRepository.AsQueryable().Where(s => s.IsEnabled || (s.IsEnabled && s.IsObligatory));
-            var localpersonalData = _LocalOptionRepository.AsQueryable().Where(p => p.IsActive).ToList();
+            var globalOptionData = _OptionRepository.AsQueryable().Where(s => s.IsEnabled);
+            var localpersonalData = _LocalOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
 
             List<TOption> result = new List<TOption>();
             result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));
