@@ -82,11 +82,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        public IHttpActionResult Put(int key, T entity)
-        {
-            return StatusCode(HttpStatusCode.NotImplemented);
-        }
-
+        [System.Web.Http.Description.ApiExplorerSettings(IgnoreApi = true)]
         public virtual IHttpActionResult Post(T entity)
         {
             if (!ModelState.IsValid)
@@ -118,6 +114,7 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        [System.Web.Http.Description.ApiExplorerSettings(IgnoreApi = true)]
         public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);

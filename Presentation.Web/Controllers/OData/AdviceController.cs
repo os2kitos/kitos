@@ -205,8 +205,8 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Advice")]
-        public IHttpActionResult GetByOrganization(int orgKey)
+        [ODataRoute("Advice")]
+        public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
             if (UserId == 0)
                 return Unauthorized();

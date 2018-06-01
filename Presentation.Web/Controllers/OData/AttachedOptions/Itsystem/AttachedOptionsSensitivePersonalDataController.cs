@@ -14,7 +14,9 @@ using System.Web.OData.Routing;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     using System.Net;
+    using System.Web.Http.Description;
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
         public AttachedOptionsSensitivePersonalDataController(IGenericRepository<AttachedOption> repository,

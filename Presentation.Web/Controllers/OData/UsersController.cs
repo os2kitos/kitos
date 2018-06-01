@@ -28,8 +28,8 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
-        [ODataRoute("Users/Create")]
-        public IHttpActionResult PostCreate(ODataActionParameters parameters)
+        [HttpPost]
+        public IHttpActionResult Create(ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
             {
@@ -81,9 +81,8 @@ namespace Presentation.Web.Controllers.OData
 
             return Created(createdUser);
         }
-
-        [ODataRoute("Users/IsEmailAvailable(email={email})")]
-        public IHttpActionResult GetIsEmailAvailable(string email)
+        
+        public IHttpActionResult IsEmailAvailable(string email)
         {
             // strip strange single quotes from parameter
             // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
@@ -127,8 +126,7 @@ namespace Presentation.Web.Controllers.OData
 
         //GET /Organizations(1)/Users
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Users")]
-        public IHttpActionResult GetByOrganization(int orgKey)
+        public IHttpActionResult Users([FromODataUri]int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))

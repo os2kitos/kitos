@@ -28,8 +28,8 @@ namespace Presentation.Web.Controllers.OData
             _userRepository = userRepository;
         }
 
-        [ODataRoute("Organizations({orgKey})/RemoveUser")]
-        public IHttpActionResult DeleteRemoveUserFromOrganization(int orgKey, ODataActionParameters parameters)
+        [HttpPost]
+        public IHttpActionResult RemoveUser([FromODataUri]int orgKey, ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
