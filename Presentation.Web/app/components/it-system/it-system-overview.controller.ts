@@ -270,7 +270,7 @@
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
-                                //if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                             });
                             return response;
@@ -633,10 +633,9 @@
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract) {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || dataItem.MainContract.ItContract.Supplier.Name === "") {
                                 return "";
                             }
-
                             if (this.isContractActive(dataItem.MainContract.ItContract)) {
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>`;
                             } else {
@@ -996,24 +995,22 @@
         }
 
         private isContractActive(dataItem) {
-         
-        if (!dataItem.Active) {
+            if (!dataItem.Active) {
                 var today = this.moment().startOf('day');
                 var startDate = dataItem.Concluded ? moment(dataItem.Concluded).startOf('day') : today;
                 var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
 
-            if (dataItem.Terminated) {
-                var terminationDate = moment(dataItem.Terminated);
-                if (dataItem.TerminationDeadline) {
-                    terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                if (dataItem.Terminated) {
+                    var terminationDate = moment(dataItem.Terminated);
+                    if (dataItem.TerminationDeadline) {
+                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                    }
+                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                    return today >= startDate && today <= terminationDate;
                 }
-                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                return today >= startDate && today <= terminationDate;
-            }
-        
-            // indgået-dato <= dags dato <= udløbs-dato
-            return today >= startDate && today <= endDate;
-            }
+                // indgået-dato <= dags dato <= udløbs-dato
+                return today >= startDate && today <= endDate;
+                }
             return dataItem.Active;
         }
 
