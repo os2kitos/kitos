@@ -483,7 +483,7 @@
                         }
                     },
                     {
-                        field: "References.Title",
+                        field: "Reference.Title",
                         title: "Reference",
                         width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
