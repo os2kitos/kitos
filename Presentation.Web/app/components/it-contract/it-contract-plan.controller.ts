@@ -550,9 +550,7 @@
                         sortable: false,
                         filterable: false
                     },
-                    // TODO Reference skal muligvis indføres som i it-contract-overview
                     {
-                        // TODO Skal muligvis slettes
                         field: "Reference.Title",
                         title: "Reference",
                         width: 150,
@@ -580,7 +578,6 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
                         field: "Reference.ExternalReferenceId",
                         title: "Mappe ref",
                         width: 150,
@@ -588,7 +585,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (reference.ExternalReferenceId) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +

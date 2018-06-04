@@ -554,13 +554,12 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
                         field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (reference.ExternalReferenceId) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +
@@ -583,23 +582,6 @@
                             }
                         }
                     },
-                    //{
-                    //    // TODO Skal muligvis slettes
-                    //    field: "CmdbRef", title: "CMDB ref", width: 150,
-                    //    persistId: "cmdb", // DON'T YOU DARE RENAME!
-                    //    template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                    //    excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
-                    //    attributes: { "class": "text-center" },
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            template: customFilter,
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
                     {
                         field: "DataLevel", title: "Datatype", width: 150,
                         persistId: "dataLevel", // DON'T YOU DARE RENAME!

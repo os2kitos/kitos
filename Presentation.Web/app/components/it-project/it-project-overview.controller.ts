@@ -480,13 +480,12 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
                         field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (reference.ExternalReferenceId) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
                                         reference.ExternalReferenceId +
                                         "\">" +

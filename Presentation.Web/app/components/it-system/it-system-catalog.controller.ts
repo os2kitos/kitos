@@ -146,7 +146,7 @@
                         parse: response => {
                             // iterrate each usage
                             this._.forEach(response.value, system => {
-                                if (!system.References) { system.References = { Title: "" }; }
+                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!system.Parent) { system.Parent = { Name: "" }; }
                                 if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
                                 if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
@@ -499,6 +499,35 @@
                             return "";
                         },
                         attributes: { "class": "text-left" },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        hidden: true,
                         filterable: {
                             cell: {
                                 template: customFilter,
