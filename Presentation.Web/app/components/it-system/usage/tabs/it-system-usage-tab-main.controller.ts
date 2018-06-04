@@ -70,7 +70,9 @@
             } else {
                 $scope.displayActive = false;
             }
-
+            if (!$scope.usage.dataLevel) {
+                $scope.usage.dataLevel = itSystemUsage.itSystem.dataLevel;
+            }
             if (itSystemUsage.overviewId) {
                 $scope.usage.overview = {
                     id: itSystemUsage.overviewId,
