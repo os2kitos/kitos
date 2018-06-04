@@ -283,7 +283,7 @@
                                data-ng-disabled="!hasWriteAccess"
                                data-autosave="{{ autoSaveUrl }}"
                                data-field="active"
-                               data-ng-change="checkContractValidity('active', contract.active)" />
+                               data-ng-change="override()" />
                         <label for="contractIsActive">
                             <i ng-hide="contract.active" class='glyphicon glyphicon-unchecked'></i>
                             <i ng-show="contract.active" class='glyphicon glyphicon-check'></i>
