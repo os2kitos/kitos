@@ -331,7 +331,7 @@
                         (today.isSameOrAfter(fromDate) && !endDate.isValid()) ||
                         (today.isSameOrBefore(endDate) && !fromDate.isValid()) ||
                         (!fromDate.isValid() && !endDate.isValid())) {
-                        console.log($scope.contract.isActive);
+                        $scope.contract.isActive = true;
                     }
                     else {
                         $scope.contract.isActive = false;
