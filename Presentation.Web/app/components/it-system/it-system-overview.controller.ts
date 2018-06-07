@@ -269,7 +269,7 @@
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
                                 if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
-                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
+                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract.ItContract.Supplier = { Name: "" }; }
                             });
                             return response;
                         }
@@ -618,8 +618,7 @@
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            console.log(dataItem);
-                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || dataItem.MainContract.ItContract.Supplier.Name === "") {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
                             }
                             if (this.isContractActive(dataItem.MainContract.ItContract)) {
@@ -982,9 +981,9 @@
 
         private isContractActive(dataItem) {
             if (!dataItem.Active) {
-                var today = this.moment();
-                var startDate = dataItem.Concluded ? moment(dataItem.Concluded, "YYYY-MM-DD").startOf('day') : today.startOf('day');
-                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate, "YYYY-MM-DD").endOf('day') : this.moment("9999-12-30").endOf('day');
+                var today = moment();
+                var startDate = dataItem.Concluded ? moment(dataItem.Concluded, "YYYY-MM-DD").startOf('day') : moment().startOf('day');
+                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate, "YYYY-MM-DD").endOf('day') : this.moment("9999-12-30", "YYYY-MM-DD").endOf('day');
                 if (dataItem.Terminated) {
                     var terminationDate = moment(dataItem.Terminated, "YYYY-MM-DD").endOf('day');
                     if (dataItem.TerminationDeadline) {
