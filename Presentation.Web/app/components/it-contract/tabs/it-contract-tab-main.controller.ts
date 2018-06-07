@@ -338,18 +338,22 @@
                     }
                 }
                 $scope.checkContractValidity = (field, value) => {
+                    console.log(value);
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
                     var formatString = "DD-MM-YYYY";
                     var formatDateString = "YYYY-MM-DD";
                     var fromDate = moment(concluded, [formatString, formatDateString]).startOf('day');
                     var endDate = moment(expirationDate, [formatString, formatDateString]).endOf('day');
-                    var date = moment(value, "DD-MM-YYYY");
+                    var date = moment(value, ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
                     if (value === "") {
                         payload[field] = null;
                         patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                         isActive();
+                    }
+                    else if (value == null) {
+                        //made to prevent error message on empty value i.e. open close datepicker
                     }
                     else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
