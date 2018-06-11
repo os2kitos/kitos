@@ -31,10 +31,24 @@
                             data-ng-disabled="!hasWriteAccess"
                             data-field="dataLevel"
                             data-autosave="api/itSystemUsage/{{usageId}}">
-                        <option value="0">Ingen persondata</option>
-                        <option value="1">Persondata</option>
-                        <option value="2">Persondata og følsomme persondata</option>
+                        <option value="0">Ikke udfyldt</option>
+                        <option value="1">Ingen persondata</option>
+                        <option value="2">Persondata</option>
+                        <option value="3">Persondata og følsomme persondata</option>
                     </select>
+                </div>
+                <!-- Category of data -->
+                <div class="form-group">
+                    <select-option data-id="categories"
+                                   data-label="Klassifikation af data i systemet"
+                                   data-placeholder="Vælg kategori"
+                                   data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="usage.itSystemCategoriesId"
+                                   data-options="systemCategories"
+                                   data-auto-save-url="{{updateUrl}}"
+                                   data-field="itSystemCategoriesId">
+                    </select-option>
                 </div>
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">

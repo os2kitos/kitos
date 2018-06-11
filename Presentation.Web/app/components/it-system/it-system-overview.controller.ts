@@ -220,6 +220,8 @@
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'""'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq false`);
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'alt'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq true`);
                             }
 
                             return parameterMap;
@@ -307,7 +309,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -320,7 +322,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -534,7 +536,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -552,28 +554,23 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.DirectoryOrUrlRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
                             }
-                        }
-                    },
-                    {
-                        // TODO Skal muligvis slettes
-                        field: "CmdbRef", title: "CMDB ref", width: 150,
-                        persistId: "cmdb", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
