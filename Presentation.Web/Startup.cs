@@ -1,7 +1,7 @@
 ﻿using Microsoft.Owin;
 using Owin;
 using Hangfire;
-using IdentityServer3.AccessTokenValidation;
+using IdentityServer3;
 using System.IdentityModel.Tokens;
 using Presentation.Web.Infrastructure;
 using System.Text;
