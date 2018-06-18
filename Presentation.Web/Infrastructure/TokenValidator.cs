@@ -73,8 +73,6 @@ namespace Presentation.Web.Infrastructure
                 Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
                 SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
             });
-
-
                 return handler.WriteToken(securityToken);
             }
             catch(Exception E) {
