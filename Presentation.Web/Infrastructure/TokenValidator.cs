@@ -8,10 +8,12 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Web;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.IdentityModel.Tokens;
+using System.Security.Principal;
+using System.Text;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -28,7 +30,7 @@ namespace Presentation.Web.Infrastructure
                     Logger.Error("TokenValidator: Could not load SSOConfig");
                     return null;
                 }
-                var tokenhandler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+                var tokenhandler = new System.IdentityModel.Tokens.JwtSecurityTokenHandler();
                 SecurityToken sToken;
                 var tokenValidationParameters = new TokenValidationParameters
                 {
@@ -45,7 +47,44 @@ namespace Presentation.Web.Infrastructure
             }
         }
 
-        private SsoConfig GetKeyFromConfig()
+        public string CreateToken(Core.DomainModel.User user) {
+
+            var ssoConfig = GetKeyFromConfig();
+
+            var handler = new JwtSecurityTokenHandler();
+
+            ClaimsIdentity identity = new ClaimsIdentity(
+                new GenericIdentity(user.Id.ToString(), "TokenAuth")/*,
+                Add claims here:
+                new[] {
+                }*/
+            );
+            string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
+
+           // Create Security key  using private key above:
+           var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+              
+            // securityKey length should be >256b
+            try { 
+            var securityToken = handler.CreateToken(new SecurityTokenDescriptor
+            { 
+                Subject = identity,
+                TokenIssuerName = ssoConfig.Issuer,
+                Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
+                SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
+            });
+
+
+                return handler.WriteToken(securityToken);
+            }
+            catch(Exception E) {
+                Logger.Error("TokenValidator: Exception creating token. Message: " + E.Message);
+                return null;
+            }
+            return null;
+        }
+
+        public SsoConfig GetKeyFromConfig()
         {
             var result = new SsoConfig();
             var configUrl = ConfigurationManager.AppSettings["SSOGateway"];
@@ -75,7 +114,7 @@ namespace Presentation.Web.Infrastructure
         }
     }
 
-    internal class SsoConfig
+    public class SsoConfig
     {
         public SecurityKey SigningKey { get; set; }
         public string Issuer { get; set; }
