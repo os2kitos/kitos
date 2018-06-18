@@ -12,13 +12,13 @@
                         });
                 }],
                 regularSensitiveData: ['$http', '$stateParams','theSystem', function ($http, $stateParams, theSystem) {
-                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
+                    return $http.get("odata/GetRegularPersonalDataBysystemId(id=" + $stateParams.id + ")")
                         .then(function (result) {
                             return result.data.value;
                         });
                 }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
+                    return $http.get("odata/GetSensitivePersonalDataBySystemId(id=" + $stateParams.id+ ")")
                         .then(function (result) {
                             return result.data.value;
                         });

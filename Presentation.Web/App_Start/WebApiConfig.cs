@@ -52,21 +52,16 @@ namespace Presentation.Web
             var routeName = "odata";
 
             var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: "odata", configureAction: (builder => builder
-            .AddService(ServiceLifetime.Singleton, sp => new StringAsEnumResolver() { EnableCaseInsensitive = true })
             .AddService(ServiceLifetime.Singleton, sp => GetModel())
+            .AddService(ServiceLifetime.Singleton, sp => new StringAsEnumResolver())
             .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new CaseInsensitiveResolver())
             .AddService(ServiceLifetime.Singleton, sp => new UnqualifiedODataUriResolver())
             .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp =>
                         ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
-
-
-
-
-        //  config.EnableEnumPrefixFree(true);
-        //  config.EnableCaseInsensitive(true);
-        //  config.EnableUnqualifiedNameCall(true);
-        config.Formatters.Remove(config.Formatters.XmlFormatter);
+            
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
+            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
         }
 
         public static IEdmModel GetModel()
@@ -80,6 +75,10 @@ namespace Presentation.Web
             accessMod.Namespace = "Kitos";
             var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
             orgRoles.Namespace = "Kitos";
+            var ObjectTypes = builder.AddEnumType(typeof(ObjectType));
+            ObjectTypes.Namespace = "Kitos";
+            var Schedulings = builder.AddEnumType(typeof(Scheduling));
+            Schedulings.Namespace = "Kitos";
 
             var organizationRightEntitySetName = nameof(OrganizationRightsController).Replace("Controller", string.Empty);
             var organizationRights = builder.EntitySet<OrganizationRight>(organizationRightEntitySetName);
@@ -231,6 +230,8 @@ namespace Presentation.Web
             var organizations = builder.EntitySet<Organization>(organizationEntitySetName);
             organizations.EntityType.HasKey(x => x.Id);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
+            organizations.EntityType.Property(p => p.Uuid).IsOptional();
+
             organizations.HasManyBinding(o => o.ItSystems, "ItSystems");
             organizations.HasManyBinding(o => o.BelongingSystems, "ItSystems");
             
@@ -238,15 +239,11 @@ namespace Presentation.Web
             removeUserAction.Parameter<int>("orgKey").OptionalParameter = false;
             removeUserAction.Parameter<int>("userId").OptionalParameter = false;
             removeUserAction.Namespace = orgNameSpace;
-
-
-            var getAdviceByOrgFunction = organizations.EntityType.Collection.Function("Advice").ReturnsCollectionFromEntitySet<Advice>("Advice");
+            
+            var getAdviceByOrgFunction = organizations.EntityType.Collection.Function("GetByOrganization").ReturnsCollectionFromEntitySet<Advice>("Advice");
             getAdviceByOrgFunction.Parameter<int>("userId").OptionalParameter = false;
             getAdviceByOrgFunction.ReturnsCollectionFromEntitySet<Advice>(nameof(Controllers.OData.AdviceController).Replace("Controller", string.Empty));
             getAdviceByOrgFunction.Namespace = orgNameSpace;
-            
-            var userFunction = organizations.EntityType.Collection.Function("Users").ReturnsCollectionFromEntitySet<User>("Users");
-            userFunction.Namespace = orgNameSpace;
 
             var orgUnits = builder.EntitySet<OrganizationUnit>(nameof(OrganizationUnitsController).Replace("Controller", string.Empty));
             orgUnits.HasRequiredBinding(o => o.Organization, "Organizations");
@@ -265,6 +262,9 @@ namespace Presentation.Web
             users.EntityType.Ignore(x => x.Salt);
             users.EntityType.Property(x => x.Name).IsRequired();
             users.EntityType.Property(x => x.Email).IsRequired();
+            
+            var orgGetUsersFunction = organizations.EntityType.Function("GetUsers").ReturnsCollectionFromEntitySet<User>(userEntitySetName);
+            orgGetUsersFunction.Namespace = orgNameSpace;
 
             var userCreateAction = users.EntityType.Collection.Action("Create").ReturnsFromEntitySet<User>(userEntitySetName);
             userCreateAction.Namespace = userNameSpace;
@@ -504,42 +504,52 @@ namespace Presentation.Web
             LocalReportCategoryType.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalReportCategoryType.EntityType.HasKey(x => x.Id);
 
-            /* var RemoveOption = builder.Function("RemoveOption");
+             var RemoveOption = builder.Function("RemoveOption");
              RemoveOption.Parameter<int>("id");
              RemoveOption.Parameter<int>("objectId");
              RemoveOption.Parameter<OptionType>("type");
              RemoveOption.Parameter<EntityType>("entityType");
              RemoveOption.Returns<IHttpActionResult>();
-
-              var GetSensitivePersonalDataByObjectID = builder.Function("GetSensitivePersonalDataByObjectID");
-             GetSensitivePersonalDataByObjectID.Parameter<int>("id");
-             GetSensitivePersonalDataByObjectID.Parameter<EntityType>("entitytype");
-             GetSensitivePersonalDataByObjectID.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
+            
+            var GetSensitivePersonalDataByUsageId = builder.Function("GetSensitivePersonalDataByUsageId");
+            GetSensitivePersonalDataByUsageId.Parameter<int>("id");
+            GetSensitivePersonalDataByUsageId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
              builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty("Checked"));
-             */
-            /* var GetRegularPersonalDataByObjectID = builder.Function("GetRegularPersonalDataByObjectID");
-             GetRegularPersonalDataByObjectID.Parameter<int>("id");
-             GetRegularPersonalDataByObjectID.Parameter<EntityType>("entitytype");
-             GetRegularPersonalDataByObjectID.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes");
+            GetSensitivePersonalDataByUsageId.Namespace = "gdpr";
+
+            var GetSensitivePersonalDataBySystemId = builder.Function("GetSensitivePersonalDataBySystemId");
+            GetSensitivePersonalDataBySystemId.Parameter<int>("id");
+            GetSensitivePersonalDataBySystemId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty("Checked"));
+            GetSensitivePersonalDataBySystemId.Namespace = "gdpr";
+
+            var GetRegularPersonalDataBySystemId = builder.Function("GetRegularPersonalDataBySystemId");
+            GetRegularPersonalDataBySystemId.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes")
+                .Parameter<int>("id");
              builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
-             */
-            /*var GetRegisterTypeByObjectID = builder.Function("GetRegisterTypesByObjectID");
-           GetRegisterTypeByObjectID.Parameter<int>("id");
-           GetRegisterTypeByObjectID.ReturnsCollectionFromEntitySet<RegisterType>("RegisterTypes");
-           builder.StructuralTypes.First(t => t.ClrType == typeof(RegisterType)).AddProperty(typeof(RegisterType).GetProperty("Checked"));
 
-           var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
-           LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
-           LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
+            var GetRegularPersonalDataByUsageId = builder.Function("GetRegularPersonalDataByUsageId");
+            GetRegularPersonalDataByUsageId.ReturnsCollectionFromEntitySet<RegularPersonalDataType>("RegularPersonalDataTypes")
+                .Parameter<int>("id");
+            builder.StructuralTypes.First(t => t.ClrType == typeof(RegularPersonalDataType)).AddProperty(typeof(RegularPersonalDataType).GetProperty("Checked"));
 
-           var LocalSensistivePersonalDataTypes = builder.EntitySet<LocalSensitivePersonalDataType>(nameof(LocalSensistivePersonalDataTypesController).Replace("Controller", string.Empty));
-           LocalSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
-           LocalSensistivePersonalDataTypes.EntityType.HasKey(x => x.Id);
+            var GetRegisterTypeByObjectID = builder.Function("GetRegisterTypesByObjectID");
+             GetRegisterTypeByObjectID.Parameter<int>("id");
+             GetRegisterTypeByObjectID.ReturnsCollectionFromEntitySet<RegisterType>("RegisterTypes");
+             builder.StructuralTypes.First(t => t.ClrType == typeof(RegisterType)).AddProperty(typeof(RegisterType).GetProperty("Checked"));
 
-           var LocalRegularPersonalDataTypes = builder.EntitySet<LocalRegularPersonalDataType>(nameof(LocalRegularPersonalDataTypesController).Replace("Controller", string.Empty));
-           LocalRegularPersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
-           LocalRegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
-           */
+             var LocalSensitiveDataType = builder.EntitySet<LocalSensitiveDataType>(nameof(LocalSensitiveDataTypesController).Replace("Controller", string.Empty));
+             LocalSensitiveDataType.HasRequiredBinding(u => u.Organization, "Organizations");
+             LocalSensitiveDataType.EntityType.HasKey(x => x.Id);
+
+             var LocalSensistivePersonalDataTypes = builder.EntitySet<LocalSensitivePersonalDataType>(nameof(LocalSensistivePersonalDataTypesController).Replace("Controller", string.Empty));
+             LocalSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
+             LocalSensistivePersonalDataTypes.EntityType.HasKey(x => x.Id);
+
+             var LocalRegularPersonalDataTypes = builder.EntitySet<LocalRegularPersonalDataType>(nameof(LocalRegularPersonalDataTypesController).Replace("Controller", string.Empty));
+             LocalRegularPersonalDataTypes.HasRequiredBinding(u => u.Organization, "Organizations");
+             LocalRegularPersonalDataTypes.EntityType.HasKey(x => x.Id);
+           
             var LocalRegisterTypes = builder.EntitySet<LocalRegisterType>(nameof(LocalRegisterTypesController).Replace("Controller", string.Empty));
             LocalRegisterTypes.HasRequiredBinding(u => u.Organization, "Organizations");
             LocalRegisterTypes.EntityType.HasKey(x => x.Id);

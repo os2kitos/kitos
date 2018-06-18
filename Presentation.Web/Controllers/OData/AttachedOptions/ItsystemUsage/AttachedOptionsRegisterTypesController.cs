@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             [System.Web.Http.HttpGet]
             [EnableQuery]
             [ODataRoute("GetRegisterTypesByObjectID(id={id})")]
-            public IHttpActionResult GetOptionsByObjectID(int id)
+            public IHttpActionResult GetRegisterTypesByObjectID(int id)
             {
             return base.GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGISTERTYPEDATA);
             }

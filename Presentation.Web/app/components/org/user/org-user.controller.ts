@@ -34,7 +34,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Users`,
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Organizations.GetUsers`,
                             dataType: "json",
                             data: {
                                 $expand: `ObjectOwner,OrganizationUnitRights($expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`

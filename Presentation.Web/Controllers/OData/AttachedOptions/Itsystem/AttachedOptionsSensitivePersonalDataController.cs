@@ -27,10 +27,18 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        [ODataRoute("GetSensitivePersonalDataByObjectID(id={id}, entitytype={entitytype})")]
-        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
+        [ODataRoute("GetSensitivePersonalDataByUsageId(id={id})")]
+        public IHttpActionResult GetSensitivePersonalDataByUsageId(int id)
         {
-            return base.GetOptionsByObjectIDAndType(id,entitytype, OptionType.SENSITIVEPERSONALDATA);
+            return base.GetOptionsByObjectIDAndType(id,EntityType.ITSYSTEMUSAGE, OptionType.SENSITIVEPERSONALDATA);
+        }
+
+        [System.Web.Http.HttpGet]
+        [EnableQuery]
+        [ODataRoute("GetSensitivePersonalDataBySystemId(id={id})")]
+        public IHttpActionResult GetSensitivePersonalDataBySystemId(int id)
+        {
+            return base.GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEM, OptionType.SENSITIVEPERSONALDATA);
         }
     }
 }

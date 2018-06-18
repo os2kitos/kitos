@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
+using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -124,6 +125,17 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return Created(organization);
+        }
+
+        [EnableQuery]
+        public IHttpActionResult GetUsers([FromODataUri] int key)
+        {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
+            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
+            return Ok(result);
         }
 
         public override IHttpActionResult Patch(int key, Delta<Organization> delta)

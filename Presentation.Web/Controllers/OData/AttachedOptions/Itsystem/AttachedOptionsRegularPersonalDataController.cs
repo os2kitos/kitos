@@ -27,10 +27,18 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         [System.Web.Http.HttpGet]
         [EnableQuery]
-        [ODataRoute("GetRegularPersonalDataByObjectID(id={id},entitytype={entitytype})")]
-        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
+        [ODataRoute("GetRegularPersonalDataBySystemId(id={id})")]
+        public IHttpActionResult GetRegularPersonalDataBySystemId(int id)
         {
-            return base.GetOptionsByObjectIDAndType(id, entitytype, OptionType.REGULARPERSONALDATA);
+            return base.GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEM, OptionType.REGULARPERSONALDATA);
+        }
+
+        [System.Web.Http.HttpGet]
+        [EnableQuery]
+        [ODataRoute("GetRegularPersonalDataByUsageId(id={id})")]
+        public IHttpActionResult GetRegularPersonalDataByUsageId(int id)
+        {
+            return base.GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGULARPERSONALDATA);
         }
     }
 }

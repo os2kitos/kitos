@@ -15,13 +15,13 @@
                     .then(result => result.data)
                 ],
                 regularSensitiveData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEMUSAGE')")
+                    return $http.get("odata/GetRegularPersonalDataByUsageId(id=" + $stateParams.id + ")")
                         .then(function (result) {
                             return result.data.value;
                         });
                 }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEMUSAGE')")
+                    return $http.get("odata/GetSensitivePersonalDataByUsageId(id=" + $stateParams.id + ")")
                         .then(function (result) {
                             return result.data.value;
                         });

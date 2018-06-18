@@ -125,10 +125,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, OrganizationRight right)
+        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, OrganizationRightDTO dto)
         {
             try
             {
+                var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
                 // if user has any role within the organization (or global admin) they should be able to add new adminrights
                 if (!KitosUser.IsGlobalAdmin)
                     if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())

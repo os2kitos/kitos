@@ -11,7 +11,9 @@ namespace Presentation.Web.app.shared.filters
         {
             public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
             {
-                foreach(var path in swaggerDoc.paths.Where(p => p.Key.Substring(0, 7) == "/odata/"))
+            var test = swaggerDoc.paths.Where(p => p.Key.Substring(0, 7) == "/odata/" && p.Key.Contains("."));
+
+                foreach (var path in swaggerDoc.paths.Where(p => p.Key.Substring(0, 7) == "/odata/"))
                 {
                     path.Value.patch = null;
                     path.Value.post = null;

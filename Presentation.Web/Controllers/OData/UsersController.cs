@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.OData
 
             return Created(createdUser);
         }
-        
+        [HttpGet]
         public IHttpActionResult IsEmailAvailable(string email)
         {
             // strip strange single quotes from parameter
@@ -121,18 +121,6 @@ namespace Presentation.Web.Controllers.OData
                 return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
-            return Ok(result);
-        }
-
-        //GET /Organizations(1)/Users
-        [EnableQuery]
-        public IHttpActionResult Users([FromODataUri]int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            var result = Repository.AsQueryable().Where(m => m.OrganizationRights.Any(r=> r.OrganizationId == orgKey));
             return Ok(result);
         }
 

@@ -188,8 +188,7 @@ namespace Presentation.Web.Controllers.OData
             return response;
         }
 
-       /* [EnableQuery]
-        [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
+        [EnableQuery]
         public IHttpActionResult GetAdvicesByObjectID(int id,ObjectType type)
         {
             if (UserId == 0)
@@ -202,10 +201,9 @@ namespace Presentation.Web.Controllers.OData
 
             return Ok(Repository.AsQueryable()
                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
-        }*/
+        }
 
         [EnableQuery]
-        [ODataRoute("Advice")]
         public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
             if (UserId == 0)
