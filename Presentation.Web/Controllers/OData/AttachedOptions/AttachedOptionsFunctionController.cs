@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             _OptionRepository = OptionRepository;
             _LocalOptionRepository = LocalOptionRepository;
         }
-        /*
+        
         [System.Web.Http.HttpDelete]
         [EnableQuery]
         [ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
@@ -64,6 +64,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             }
 
             return StatusCode(HttpStatusCode.NoContent);
-        }*/
+        }
     }
 }
