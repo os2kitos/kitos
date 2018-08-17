@@ -414,21 +414,7 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: {
-                            cell: false
-                        //    {
-                        //    template: args => {
-                        //        args.element.kendoDropDownList({
-                        //            dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                        //            dataTextField: "type",
-                        //            dataValueField: "value",
-                        //            valuePrimitive: true
-                        //        });
-                        //    },
-                        //    showOperators: false
-
-                        //}
-                    }
+                        filterable: false
                     },
                     {
                         field: "ItContractId",
