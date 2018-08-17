@@ -38,11 +38,6 @@ namespace Presentation.Web.Controllers.API
 
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
-                {
-                    return Unauthorized();
-                }
-
                 //create object if it doesnt exsist
                 if (item == null)
                 {
@@ -63,6 +58,11 @@ namespace Presentation.Web.Controllers.API
                         return LogError(e);
                     }
                 };
+
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
 
                 var dto = Map(item);
 
