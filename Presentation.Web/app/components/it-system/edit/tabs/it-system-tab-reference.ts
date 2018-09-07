@@ -77,7 +77,7 @@
                     title: "Dokumenttitel",
                     template: data => {
                         if (data.URL) {
-                            return "<a href=\"" + data.Url + "\">" + data.Title + "</a>";
+                            return "<a target=\"_blank\" href=\"" + data.Url + "\">" + data.Title + "</a>";
                         } else {
                             return data.Title;
                         }

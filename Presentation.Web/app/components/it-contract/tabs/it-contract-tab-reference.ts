@@ -80,10 +80,10 @@
                     },
                     columns: [{
                         field: "title",
-                        title: "Dokumenttitel",
-                        template: function (data) {
+                        title: "Dokumenttitel test",
+                        template: data => {
                             if (data.url) {
-                                return "<a href=\"" + data.url + "\">" + data.title + "</a>";
+                                return "<a target=\"_blank\" href=\"" + data.url + "\">" + data.title + "</a>";
                             } else {
                                 return data.title;
                             }

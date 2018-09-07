@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
         //modal: kendo.ui.Window;
         //usageGrid: kendo.ui.Grid;
         //usageDetailsGrid: kendo.ui.GridOptions;

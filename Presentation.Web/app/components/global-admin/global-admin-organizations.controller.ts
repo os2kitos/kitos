@@ -61,7 +61,7 @@
                 sortable: {
                     mode: "single"
                 },
-                editable: "popup",
+                editable: true,
                 reorderable: true,
                 resizable: true,
                 filterable: {

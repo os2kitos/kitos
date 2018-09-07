@@ -33,8 +33,8 @@
     }
 
     export interface IUserService {
-        reAuthorize(): ng.IPromise<IUser>;
-        getUser(): ng.IPromise<IUser>;
+        reAuthorize(): any;
+        getUser(): any;
         login(email: string, password: string, rememberMe: boolean): ng.IPromise<any>;
         logout(): ng.IHttpPromise<any>;
         auth(adminRoles): ng.IPromise<any>;
