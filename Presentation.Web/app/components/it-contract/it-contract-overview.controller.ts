@@ -169,6 +169,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -355,6 +359,13 @@
                                             contract.roles[right.RoleId]
                                                 .push([right.User.Name, right.User.LastName].join(" "));
                                         });
+                                    if (!contract.Parent) { contract.Parent = { Name: "" }; }
+                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" }; }
+                                    if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
+                                    if (!contract.PaymentFreqency) { contract.PaymentFreqency = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 });
                             return response;
                         }
@@ -368,7 +379,6 @@
                         template:
                         "<button ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -404,7 +414,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -417,7 +427,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -443,20 +453,21 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: {
-                            cell: {
-                                template: args => {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
+                        filterable: false
+                        //{
+                        //    cell: {
+                        //        template: args => {
+                        //            args.element.kendoDropDownList({
+                        //                dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
+                        //                dataTextField: "type",
+                        //                dataValueField: "value",
+                        //                valuePrimitive: true
+                        //            });
+                        //        },
+                        //        showOperators: false
                            
-                            }
-                        }
+                        //    }
+                        //}
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -561,7 +572,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -579,11 +590,23 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title + 
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {

@@ -68,33 +68,31 @@
                 function selectLazyLoading(url, allowClear, paramAry) {
                     return {
                         minimumInputLength: 1,
-                        initSelection: function (elem, callback) {
+                        initSelection: (elem, callback) => {
                         },
                         allowClear: allowClear,
                         ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
+                            data: (term, page) => ({ query: term }),
                             quietMillis: 500,
-                            transport: function (queryParams) {
+                            transport: (queryParams) => {
                                 var extraParams = paramAry ? '&' + paramAry.join('&') : '';
                                 var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
-
                                 return res;
                             },
 
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (obj: { id; name; }) {
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name
-                                    });
+                                _.each(data.data.response, function (obj: { id; name; disabled;}) {
+                                    if (obj.disabled === false) {
+                                        results.push({
+                                            id: obj.id,
+                                            text: obj.name
+                                        });
+                                    }
                                 });
 
                                 return { results: results };

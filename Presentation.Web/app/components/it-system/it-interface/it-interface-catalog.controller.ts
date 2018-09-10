@@ -124,8 +124,21 @@
                             fields: {
                                 LastChanged: { type: "date" }
                             }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, ItInterface => {
+                                if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
+                                if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
+                                if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
+                                if (!ItInterface.Tsa) { ItInterface.Tsa = { Name: "" }; }
+                                if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
+                                if (!ItInterface.Method) { ItInterface.Method = { Name: "" }; }
+                                if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
+                            });
+                            return response;
                         }
-                    },
+                    },                
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
@@ -137,7 +150,6 @@
                         text: "Opret Snitflade",
                         template: "<button ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -166,7 +178,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -179,7 +191,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -535,6 +547,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 

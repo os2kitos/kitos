@@ -319,49 +319,53 @@
                         }
                     };
                 }
-
+                $scope.override = () =>
+                {
+                    isActive();
+                }
+                function isActive() {
+                    var today = moment();
+                    let fromDate = moment($scope.contract.concluded, "DD-MM-YYYY").startOf('day');
+                    let endDate = moment($scope.contract.expirationDate, "DD-MM-YYYY").endOf('day');
+                    if ($scope.contract.active || today.isBetween(fromDate, endDate, null, '[]') ||
+                        (today.isSameOrAfter(fromDate) && !endDate.isValid()) ||
+                        (today.isSameOrBefore(endDate) && !fromDate.isValid()) ||
+                        (!fromDate.isValid() && !endDate.isValid())) {
+                        $scope.contract.isActive = true;
+                    }
+                    else {
+                        $scope.contract.isActive = false;
+                    }
+                }
                 $scope.checkContractValidity = (field, value) => {
+                    console.log(value);
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
-                    var overrule = $scope.contract.active;
-                    var today = moment();
                     var formatString = "DD-MM-YYYY";
                     var formatDateString = "YYYY-MM-DD";
-                    var dateObjectStart = moment(concluded, [formatString, formatDateString]).startOf('day');
-                    var dateObjectEnd = moment(expirationDate, [formatString, formatDateString]).endOf('day');
-                    console.log(dateObjectStart);
-                    console.log(dateObjectEnd);
-                    if (!dateObjectStart.isValid() || isNaN(dateObjectStart.valueOf()) || dateObjectStart.year() < 1000 || dateObjectStart.year() > 2099) {
+                    var fromDate = moment(concluded, [formatString, formatDateString]).startOf('day');
+                    var endDate = moment(expirationDate, [formatString, formatDateString]).endOf('day');
+                    var date = moment(value, ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ"], true);
+                    var payload = {};
+                    if (value === "") {
+                        payload[field] = null;
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                        isActive();
+                    }
+                    else if (value == null) {
+                        //made to prevent error message on empty value i.e. open close datepicker
+                    }
+                    else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     }
-                    else if (!dateObjectEnd.isValid() || isNaN(dateObjectEnd.valueOf()) || dateObjectEnd.year() < 1000 || dateObjectEnd.year() > 2099) {
-                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
-                    }
-                    else if (dateObjectStart >= dateObjectEnd) {
+                    else if (fromDate >= endDate) {
                         notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                     }
                     else {
-                        var isContractActive = false;
-                        if (concluded && !expirationDate) {
-                            isContractActive = (today > dateObjectStart) || overrule;
-                        }
-                        else if (!concluded && !expirationDate) {
-                            isContractActive = true;
-                        }
-                        else if (!concluded && expirationDate) {
-                            isContractActive = (today < dateObjectEnd) || overrule;
-                        }
-                        else {
-                            isContractActive = (moment().isBetween(dateObjectStart, dateObjectEnd, null, '[]') || overrule);
-                        }
-                        $scope.contract.isActive = isContractActive;
-                        if (field !== 'active') {
-                            var date = moment(moment(value, "DD-MM-YYYY", true).format());
-                            var dateString = date.format("YYYY-MM-DD");
-                            var payload = {};
-                            payload[field] = dateString;
-                            patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
-                        }
+                        var dateString = date.format("YYYY-MM-DD");
+                        payload[field] = dateString;
+                        patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                        isActive();
                     }
                 }
             }]);

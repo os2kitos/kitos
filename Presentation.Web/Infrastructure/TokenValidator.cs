@@ -47,7 +47,8 @@ namespace Presentation.Web.Infrastructure
             }
         }
 
-        public string CreateToken(Core.DomainModel.User user) {
+        public string CreateToken(Core.DomainModel.User user)
+        {
 
             var ssoConfig = GetKeyFromConfig();
 
@@ -59,23 +60,28 @@ namespace Presentation.Web.Infrastructure
                 new[] {
                 }*/
             );
-            string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
 
-           // Create Security key  using private key above:
-           var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-              
+            //string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
+            string key = System.Web.Configuration.WebConfigurationManager.AppSettings["SecurityKeyString"];
+
+
+            // Create Security key  using private key above:
+            var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
+
             // securityKey length should be >256b
-            try { 
-            var securityToken = handler.CreateToken(new SecurityTokenDescriptor
-            { 
-                Subject = identity,
-                TokenIssuerName = ssoConfig.Issuer,
-                Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
-                SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
-            });
+            try
+            {
+                var securityToken = handler.CreateToken(new SecurityTokenDescriptor
+                {
+                    Subject = identity,
+                    TokenIssuerName = ssoConfig.Issuer,
+                    Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
+                    SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
+                });
                 return handler.WriteToken(securityToken);
             }
-            catch(Exception E) {
+            catch (Exception E)
+            {
                 Logger.Error("TokenValidator: Exception creating token. Message: " + E.Message);
                 return null;
             }

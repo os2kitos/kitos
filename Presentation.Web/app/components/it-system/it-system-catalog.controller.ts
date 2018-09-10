@@ -66,6 +66,7 @@
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
+
                     this.mainGrid.dataSource.read();
 
                     // find the access modifier filter row section
@@ -141,7 +142,22 @@
                                 LastChanged: { type: "date" },
                                 Disabled: { type: "boolean" }
                             }
-                        }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, system => {
+                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!system.Parent) { system.Parent = { Name: "" }; }
+                                if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
+                                if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
+                                if (!system.BelongsTo) { system.BelongsTo = { Name: "" }; }
+                                if (!system.Usages) { system.Usages = []; }
+                                if (!system.Organization) { system.Organization = { Name: "" }; }
+
+
+                            });
+                            return response;
+                        }                    
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -154,11 +170,6 @@
                         text: "Opret IT System",
                         template:
                             "<button ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
-                    },
-                    {
-                        name: "excel",
-                        text: "Eksportér til Excel",
-                        className: "pull-right"
                     },
                     {
                         name: "clearFilter",
@@ -192,7 +203,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -205,7 +216,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -472,7 +483,7 @@
                         }
                     },
                     {
-                        field: "References.Title",
+                        field: "Reference.Title",
                         title: "Reference",
                         width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
@@ -480,7 +491,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -488,6 +499,35 @@
                             return "";
                         },
                         attributes: { "class": "text-left" },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        hidden: true,
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -604,6 +644,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -684,7 +728,7 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+        private exportToExcel = (e) => {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {

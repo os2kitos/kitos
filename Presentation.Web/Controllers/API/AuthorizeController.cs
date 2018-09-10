@@ -150,7 +150,7 @@ namespace Presentation.Web.Controllers.API
             var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
 
             if (loginDto != null)
-                loginInfo = new { Token = loginInfo.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+                loginInfo = new { Token = loginDto.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
 
             try
             {
@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
-                loginInfo = new {loginInfo.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
+                loginInfo = new { loginDto.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);

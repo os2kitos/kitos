@@ -31,12 +31,25 @@
                             data-ng-disabled="!hasWriteAccess"
                             data-field="dataLevel"
                             data-autosave="api/itSystemUsage/{{usageId}}">
-                        <option value="0">Ingen persondata</option>
-                        <option value="1">Persondata</option>
-                        <option value="2">Persondata og følsomme persondata</option>
+                        <option value="0">Ikke udfyldt</option>
+                        <option value="1">Ingen persondata</option>
+                        <option value="2">Persondata</option>
+                        <option value="3">Persondata og følsomme persondata</option>
                     </select>
                 </div>
-
+                <!-- Category of data -->
+                <div class="form-group">
+                    <select-option data-id="categories"
+                                   data-label="Klassifikation af data i systemet"
+                                   data-placeholder="Vælg kategori"
+                                   data-selected-text="{{ systemUsage.ItSystemCategoriesName }}"
+                                   data-ng-disabled="!hasWriteAccess"
+                                   data-ng-model="usage.itSystemCategoriesId"
+                                   data-options="systemCategories"
+                                   data-auto-save-url="{{updateUrl}}"
+                                   data-field="itSystemCategoriesId">
+                    </select-option>
+                </div>
                 <!-- note -->
                 <div class="form-group" data-ng-hide="!hasViewAccess">
                     <label for="note" class="control-label small">Note</label>
@@ -45,25 +58,6 @@
                               data-ng-disabled="!hasWriteAccess"
                               data-field="note" data-autosave="api/itSystemUsage/{{usageId}}"></textarea>
                 </div>
-
-                <div class="form-group"  data-ng-hide="usage.linkToDirectoryUrl == '' || usage.linkToDirectoryUrl == null">
-                    <label for="datahandler-link" class="control-label small">Link til fortegnelse</label>
-                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a target="_blank" id="datahandler-link" href="{{usage.linkToDirectoryUrl}}">
-                            {{usage.linkToDirectoryUrlName ? usage.linkToDirectoryUrlName : "Dokumentation" }}
-                        </a>
-                    </div>
-                </div>
-
-                <div class="form-group"  data-ng-hide="usage.riskSupervisionDocumentationUrl == '' || usage.riskSupervisionDocumentationUrl == null">
-                    <label for="datahandler-link" class="control-label small">Link til risikovurdering</label>
-                    <div class="form-control" style="height:30px; padding: 1px 10px; min-width:20%;" data-ng-disabled="!hasWriteAccess">
-                        <a target="_blank" id="datahandler-link" href="{{usage.riskSupervisionDocumentationUrl}}">
-                            {{usage.riskSupervisionDocumentationUrlName ? usage.riskSupervisionDocumentationUrlName : "Dokumentation" }}
-                        </a>
-                    </div>
-                </div>
-
             </div>
 
             <!-- 2nd column -->
