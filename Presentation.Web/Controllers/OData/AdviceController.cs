@@ -189,7 +189,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        public IHttpActionResult GetAdvicesByObjectID(int id,ObjectType type)
+        public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
             if (UserId == 0)
                 return Unauthorized();

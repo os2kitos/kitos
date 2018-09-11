@@ -79,6 +79,8 @@ namespace Presentation.Web
             ObjectTypes.Namespace = "Kitos";
             var Schedulings = builder.AddEnumType(typeof(Scheduling));
             Schedulings.Namespace = "Kitos";
+            var OptionsTypes = builder.AddEnumType(typeof(OptionType));
+            OptionsTypes.Namespace = "Kitos";
 
             var organizationRightEntitySetName = nameof(OrganizationRightsController).Replace("Controller", string.Empty);
             var organizationRights = builder.EntitySet<OrganizationRight>(organizationRightEntitySetName);
@@ -507,8 +509,8 @@ namespace Presentation.Web
              var RemoveOption = builder.Function("RemoveOption");
              RemoveOption.Parameter<int>("id");
              RemoveOption.Parameter<int>("objectId");
-             RemoveOption.Parameter<OptionType>("type");
-             RemoveOption.Parameter<EntityType>("entityType");
+             RemoveOption.Parameter<int>("type");
+             RemoveOption.Parameter<int>("entityType");
              RemoveOption.Returns<IHttpActionResult>();
             
             var GetSensitivePersonalDataByUsageId = builder.Function("GetSensitivePersonalDataByUsageId");
