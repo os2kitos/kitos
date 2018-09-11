@@ -169,6 +169,11 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
+
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -288,7 +293,7 @@
                                 IsTransversal: { type: "boolean" },
                                 IsStrategy: { type: "boolean" },
                                 IsArchived: { type: "boolean" }
-                            }
+                            },
                         },
                         parse: response => {
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
@@ -314,6 +319,12 @@
                                 } else {
                                     project.hasWriteAccess = false;
                                 }
+
+                                if (!project.Parent) { project.Parent = { Name: "" }; }
+                                if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
+                                if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
+                                if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                             });
 
                             return response;
@@ -327,7 +338,6 @@
                         text: "Opret IT Projekt",
                         template: "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -359,7 +369,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -376,7 +386,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -443,10 +453,9 @@
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
-
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -471,11 +480,23 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },                       
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -532,7 +553,7 @@
                         filterable: false
                     },
                     {
-                        field: "CurrentPhaseobj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
+                        field: "CurrentPhaseObj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // handles null cases

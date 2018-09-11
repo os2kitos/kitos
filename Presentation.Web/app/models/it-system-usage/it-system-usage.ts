@@ -69,5 +69,12 @@
         Registertype: boolean;
 
         IsActive: boolean;
+
+        RiskSupervisionDocumentationUrl: string;
+        RiskSupervisionDocumentationUrlName: string;
+        LinkToDirectoryUrl: string;
+        LinkToDirectoryUrlName: string;
+
+        DataLevel: string;
     }
 }

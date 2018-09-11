@@ -120,7 +120,7 @@
 
                 <button type="submit" class="pull-left btn btn-primary" ng-click="send()" ng-hide="hideSend" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && !hasWriteAccess)">Send</button>
 
-            <button type="button" class="btn btn-warning" ng-click="$dismiss()">Anuller</button>
+                <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
             <button type="submit" class="btn btn-primary" ng-click="save()" data-ng-disabled="!((externalTo || selectedRecievers.length > 0) && subject && repitionPattern && stopDate &&  startDate && checkErrStart(startDate,stopDate) && checkErrEnd(startDate,stopDate) && !hasWriteAccess)">Gem</button>
             <input type="hidden" ng-model="hiddenForjob"/>
         </div>

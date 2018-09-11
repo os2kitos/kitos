@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IOverviewController {
-        mainGrid: IKendoGrid<IItSystemUsageOverview>;
+        mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: kendo.ui.DropDownListOptions;
         //modal: kendo.ui.Window;
@@ -24,7 +24,7 @@
         private orgUnitStorageKey = "it-system-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey);
 
-        public mainGrid: IKendoGrid<IItSystemUsageOverview>;
+        public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
 
         //public usageGrid: kendo.ui.Grid;
@@ -111,6 +111,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -172,14 +176,14 @@
         };
         private activate() {
             // overview grid options
-            var mainGridOptions: IKendoGridOptions<IItSystemUsageOverview> = {
+            var mainGridOptions: Kitos.IKendoGridOptions<IItSystemUsageOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
                     type: "odata-v4",
                     transport: {
                         read: {
                             url: (options) => {
-                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
+                                var urlParameters = `?$expand=ItSystem($expand=AppTypeOption,BusinessType,Parent,TaskRefs),ArchivePeriods,Reference,Organization,ResponsibleUsage($expand=OrganizationUnit),MainContract($expand=ItContract($expand=Supplier)),Contracts($expand=ItContract($expand=ContractType,AssociatedAgreementElementTypes($expand=AgreementElementType))),Rights($expand=User,Role),ArchiveType,SensitiveDataType,ObjectOwner,LastChangedByUser,ItProjects($select=Name)`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -216,6 +220,8 @@
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'""'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq false`);
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'alt'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq true`);
                             }
 
                             return parameterMap;
@@ -224,9 +230,6 @@
                     sort: {
                         field: "SystemName",
                         dir: "asc"
-                    },
-                    AutoComplete: {
-                        disabled: true
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -241,12 +244,12 @@
                                 Registertype: { type: "boolean" },
                                 EndDate: { from: "ArchivePeriods.EndDate", type: "date" },
                                 SystemName: { from: "ItSystem.Name", type: "string" },
-                                IsActive: {type: "boolean"}
+                                IsActive: { type: "boolean" },
                             }
                         },
                         parse: response => {
                             // HACK to flattens the Rights on usage so they can be displayed as single columns
-
+                            
                             // iterrate each usage
                             this._.forEach(response.value, usage => {
                                 usage.roles = [];
@@ -259,13 +262,22 @@
                                     // push username to the role array
                                     usage.roles[right.RoleId].push([right.User.Name, right.User.LastName].join(" "));
                                 });
+
+                                if (!usage.ItSystem.Parent) { usage.ItSystem.Parent = { Name: "" }; }
+                                if (!usage.ResponsibleUsage) { usage.ResponsibleUsage = { OrganizationUnit: { Name: "" } }; }
+                                if (!usage.ItSystem.BusinessType) { usage.ItSystem.BusinessType = { Name: "" }; }
+                                if (!usage.ItSystem.AppTypeOption) { usage.ItSystem.AppTypeOption = { Name: "" }; }
+                                if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
+                                if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
+                                if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
+                                if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract.ItContract.Supplier = { Name: "" }; }
                             });
                             return response;
                         }
                     }
                 },
                 toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -297,7 +309,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -310,7 +322,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: 750,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -333,19 +345,20 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: {
-                            cell: {
-                                template: args => {
-                                    args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                                        dataTextField: "type",
-                                        dataValueField: "value",
-                                        valuePrimitive: true
-                                    });
-                                },
-                                showOperators: false
-                            }
-                        }
+                        filterable: false
+                        //{
+                        //    cell: {
+                        //        template: args => {
+                        //            args.element.kendoDropDownList({
+                        //                dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
+                        //                dataTextField: "type",
+                        //                dataValueField: "value",
+                        //                valuePrimitive: true
+                        //            });
+                        //        },
+                        //        showOperators: false
+                        //    }
+                        //}
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,
@@ -523,7 +536,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -541,11 +554,23 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.DirectoryOrUrlRef || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -558,33 +583,31 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "CmdbRef", title: "CMDB ref", width: 150,
-                        persistId: "cmdb", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                        field: "DataLevel", title: "Datatype", width: 150,
+                        persistId: "dataLevel", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            switch (dataItem.DataLevel) {
+                                case "PERSONALDATA":
+                                    return "Persondata";
+                                case "PERSONALDATANDSENSITIVEDATA":
+                                    return "Persondata og følsomme persondata";
+                            default:
+                                return "Ingen persondata";
                             }
-                        }
-                    },
-                    {
-                        field: "SensitiveDataType.Name", title: "Personfølsom", width: 150,
-                        persistId: "sensitive", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.SensitiveDataType ? dataItem.SensitiveDataType.Name : "",
+                        },
+                        attributes: { "class": "might-overflow" },
                         hidden: true,
                         filterable: {
                             cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ingen persondata", value: "NONE" }, { type: "Persondata", value: "PERSONALDATA" }, { type: "Persondata og følsomme persondata", value: "PERSONALDATANDSENSITIVEDATA" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },
@@ -592,10 +615,9 @@
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract) {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
                             }
-
                             if (this.isContractActive(dataItem.MainContract.ItContract)) {
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>`;
                             } else {
@@ -697,6 +719,7 @@
                         {
                             operators: {
                                 date: {
+                                    eq: "Lig med",
                                     gte: "Fra og med",
                                     lte: "Til og med"
                                 }
@@ -789,6 +812,80 @@
                         hidden: true,
                         filterable: false,
                         sortable: false
+                    },
+                    {
+                        field: "RiskSupervisionDocumentationUrlName", title: "Risikovurdering", width: 150,
+                        persistId: "riskSupervisionDocumentationUrlName", // DON'T YOU DARE RENAME!
+                        template: dataItem => 
+                        {
+                            if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrlName + "</a>";
+                            }
+                            else if (dataItem.RiskSupervisionDocumentationUrl != null && dataItem.RiskSupervisionDocumentationUrlName == null) {
+                                return "<a href=\"" + dataItem.RiskSupervisionDocumentationUrl + "\">" + dataItem.RiskSupervisionDocumentationUrl + "</a>";
+                            }
+                            else if (dataItem.RiskSupervisionDocumentationUrlName != null) {
+                                return dataItem.RiskSupervisionDocumentationUrlName;
+                            } else {
+                                return "";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LinkToDirectoryUrlName", title: "Fortegnelse", width: 150,
+                        persistId: "LinkToDirectoryUrlName", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName != null) {
+                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrlName + "</a>";
+                            }
+                            else if (dataItem.LinkToDirectoryUrl != null && dataItem.LinkToDirectoryUrlName == null) {
+                                return "<a href=\"" + dataItem.LinkToDirectoryUrl + "\">" + dataItem.LinkToDirectoryUrl + "</a>";
+                            }
+                            else if (dataItem.LinkToDirectoryUrlName != null) {
+                                return dataItem.LinkToDirectoryUrlName;
+                            } else {
+                                return "";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "ItContractDataHandler", title: "Databehandleraftale", width: 150,
+                        persistId: "ItContractDataHandler", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            if (dataItem.Contracts != null) {
+                                if (dataItem.Contracts.some(x => x.ItContract.ContractType !== null && x.ItContract.ContractType.Name === "Databehandleraftale") || dataItem.Contracts.some(x => x.ItContract.AssociatedAgreementElementTypes !== null && x.ItContract.AssociatedAgreementElementTypes.some(x => x.AgreementElementType.Name === "Databehandleraftale"))) {
+                                    return "Ja";
+                                } else {
+                                    return "Nej";
+                                }
+                            } else {
+                                return "Nej";
+                            }
+                        },
+                        attributes: { "class": "text-left" },
+                        hidden: true,
+                        filterable: false,
+                        sortable: false
                     }
                 ]
             };
@@ -843,7 +940,6 @@
                 // insert the generated column at the correct location
                 mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
             });
-
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
         }
@@ -881,23 +977,20 @@
         }
 
         private isContractActive(dataItem) {
-         
-        if (!dataItem.Active) {
-                var today = this.moment().startOf('day');
-                var startDate = dataItem.Concluded ? moment(dataItem.Concluded).startOf('day') : today;
-                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
-
-            if (dataItem.Terminated) {
-                var terminationDate = moment(dataItem.Terminated);
-                if (dataItem.TerminationDeadline) {
-                    terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+            if (!dataItem.Active) {
+                var today = moment();
+                var startDate = dataItem.Concluded ? moment(dataItem.Concluded, "YYYY-MM-DD").startOf('day') : moment().startOf('day');
+                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate, "YYYY-MM-DD").endOf('day') : this.moment("9999-12-30", "YYYY-MM-DD").endOf('day');
+                if (dataItem.Terminated) {
+                    var terminationDate = moment(dataItem.Terminated, "YYYY-MM-DD").endOf('day');
+                    if (dataItem.TerminationDeadline) {
+                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                    }
+                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                    return today.isBetween(startDate, terminationDate, null, '[]');
                 }
-                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                return today >= startDate && today <= terminationDate;
-            }
-        
-            // indgået-dato <= dags dato <= udløbs-dato
-            return today >= startDate && today <= endDate;
+                // indgået-dato <= dags dato <= udløbs-dato
+                return today.isBetween(startDate, endDate, null, '[]');
             }
             return dataItem.Active;
         }

@@ -11,21 +11,22 @@
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.rtl.min.css">
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.min.css">
     <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.mobile.all.min.css">
-    <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
     @Styles.Render("~/Content/css/css")
 
     @Scripts.Render("~/Scripts/vendor")
     @Scripts.Render("~/Scripts/angular")
-   
+    @*<script src="https://kendo.cdn.telerik.com/2018.1.221/js/angular.min.js"></script>*@
     <script src="https://kendo.cdn.telerik.com/2018.1.221/js/jszip.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.web.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.all.min.js"></script>
+    @*<script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.web.min.js"></script>*@
     <!-- Kendo localization -->
     <script src="https://kendo.cdn.telerik.com/2018.1.221/js/messages/kendo.messages.da-DK.min.js"></script>
     <!-- Kendo globalization -->
     <script src="https://kendo.cdn.telerik.com/2018.1.221/js/cultures/kendo.culture.da-DK.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.all.min.js"></script>
-    @*<script src="https://kendo.cdn.telerik.com/2018.1.221/js/angular.min.js"></script>*@
+
+
 
 
     @if (ViewBag.Environment != "Prod")

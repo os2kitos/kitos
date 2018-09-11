@@ -35,14 +35,18 @@
                             return result.data.value;
                         });
                     }
+                ],
+                systemCategories: [
+                    "$http", $http => $http.get("odata/LocalItSystemCategories?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
+                    .then(result => result.data.value)
                 ]
             }
         });
     }]);
 
-    app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage','user',
+    app.controller('system.EditMain', ['$rootScope', '$scope', '$http', '$stateParams', 'notify', 'itSystemUsage', 'user', 'systemCategories',
         'businessTypes', 'archiveTypes', 'sensitiveDataTypes', 'autofocus', 'hasWriteAccess', 'appTypeOptions',
-        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage,user, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
+        function ($rootScope, $scope, $http, $stateParams, notify, itSystemUsage, user, systemCategories, businessTypes, archiveTypes, sensitiveDataTypes, autofocus, hasWriteAccess, appTypeOptions) {
             $rootScope.page.title = 'IT System - Anvendelse';
             $scope.autoSaveUrl = 'api/itsystemusage/' + $stateParams.id;
             $scope.autosaveUrl2 = 'api/itsystemusage/' + $scope.usage.id;
@@ -54,10 +58,10 @@
             $scope.sensitiveDataTypes = sensitiveDataTypes;
             $scope.appTypeOptions = appTypeOptions;
             $scope.hasViewAccess = user.currentOrganizationId == itSystemUsage.organizationId;
+            $scope.systemCategories = systemCategories;
             autofocus();
-            console.log($scope.usage);
             var today = new Date();
-
+            console.log(itSystemUsage);
             if (!itSystemUsage.active) {
                 if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
                     $scope.displayActive = true;
@@ -67,7 +71,9 @@
             } else {
                 $scope.displayActive = false;
             }
-
+            if (!$scope.usage.dataLevel) {
+                $scope.usage.dataLevel = itSystemUsage.itSystem.dataLevel;
+            }
             if (itSystemUsage.overviewId) {
                 $scope.usage.overview = {
                     id: itSystemUsage.overviewId,
