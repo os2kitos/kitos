@@ -61,9 +61,7 @@ namespace Presentation.Web.Infrastructure
                 }*/
             );
 
-            //string key = "s7j4HFxlsMJ1HzNt0BMKvuuiTV8BFVTiZgtj3NPkxFnbJ9uzbtTxkYP0waZemiT1wDtggxtcSApCmiPgTl8oAVjFJZTc3xHbN1HPXIAHFDe576uCFpPntezPUYQj2V65n8LdqBhAGSlkHPzulk7YSWUmOb2bkaRODedE45m2t6Tr2PBxaI1cdSx03wviXgDAsUdJDWvfkBG8BZe7982jT9ImdVgi2nZBHv0HNjtyOkBNLxIbiLmASQNXld";
             string key = System.Web.Configuration.WebConfigurationManager.AppSettings["SecurityKeyString"];
-
 
             // Create Security key  using private key above:
             var securityKey = new System.IdentityModel.Tokens.InMemorySymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
