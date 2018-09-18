@@ -238,7 +238,7 @@
                     }
                 },
                 dataSource: dataSource,
-                editable: "popup",
+                editable: true,
                 toolbar: [
                     {
                         name: "createReport",

@@ -4,7 +4,7 @@
     export interface IOverviewInactiveController {
         mainGrid: IKendoGrid<IItProjectInactiveOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;

@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItContractOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;

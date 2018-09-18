@@ -4,7 +4,7 @@
     export interface IOverviewPlanController {
         mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
