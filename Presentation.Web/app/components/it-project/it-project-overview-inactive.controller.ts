@@ -287,7 +287,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 750,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,

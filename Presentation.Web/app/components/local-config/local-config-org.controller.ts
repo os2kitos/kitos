@@ -55,7 +55,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 750,
+                height: window.innerHeight - 200,
                 excelExport: this.exportToExcel,
                 columns: [
                     {
