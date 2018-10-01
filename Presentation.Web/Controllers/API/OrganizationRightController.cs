@@ -19,7 +19,9 @@ namespace Presentation.Web.Controllers.API
         {
             _rightRepository = rightRepository;
             _objectRepository = objectRepository;
+            GroupName = "test";
         }
+        public string GroupName { get; set; }
 
         public virtual HttpResponseMessage GetAllRights()
         {

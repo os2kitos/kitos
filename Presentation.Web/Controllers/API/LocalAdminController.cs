@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using System.Web.Http.Description;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -7,6 +8,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LocalAdminController : BaseApiController
     {
         private readonly IOrganizationRoleService _organizationRoleService;

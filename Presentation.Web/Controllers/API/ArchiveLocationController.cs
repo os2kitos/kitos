@@ -13,6 +13,10 @@ namespace Presentation.Web.Controllers.API
 
     public class ArchiveLocationController : GenericOptionApiController<ArchiveLocation, ItSystemUsage, OptionDTO>
     {
+        /// <summary>
+        /// Archive location(arkiveringssted) for it system usage pane archiving 
+        /// </summary>
+        /// <param name="repository"></param>
         public ArchiveLocationController(IGenericRepository<ArchiveLocation> repository)
             : base(repository)
         {

@@ -8,12 +8,14 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Mvc;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AttachedOptionsController : BaseEntityController<AttachedOption>
     {
         public AttachedOptionsController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService)

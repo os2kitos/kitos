@@ -7,7 +7,10 @@ using Swashbuckle.OData;
 using WebActivatorEx;
 using SwashbuckleODataSample;
 using System.Linq;
+using AutoMapper.Internal;
 using Presentation.Web.app.shared.filters;
+using Presentation.Web.Controllers.API;
+using Swashbuckle.Swagger;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -35,9 +38,11 @@ namespace SwashbuckleODataSample
                 // hold additional metadata for an API. Version and title are required but you can also provide
                 // additional fields by chaining methods off SingleApiVersion.
                 //
-                c.SingleApiVersion("v1", "OS2Kitos API & OData");
-                    //.Contact(contactBuilder => contactBuilder
-                    //.Url("https://github.com/rbeauchamp/Swashbuckle.OData"));
+                c.SingleApiVersion("v1", "OS2Kitos dokumentation af API & OData")
+                    .Description("Denne dokumentaion udstiller de forskellige kald der kan laves til api'et såvel som OData api'et i kitos. \n" +
+                                 "Mange kald bliver oprettet gennem en gernerisk kontroller disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller.");
+                //.Contact(contactBuilder => contactBuilder
+                //.Url("https://github.com/rbeauchamp/Swashbuckle.OData"));
 
                 // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                 // In this case, you must provide a lambda that tells Swashbuckle which actions should be
@@ -77,6 +82,7 @@ namespace SwashbuckleODataSample
                 //        scopes.Add("read", "Read access to protected resources");
                 //        scopes.Add("write", "Write access to protected resources");
                 //    });
+
                 c.DocumentFilter<RemovePatchPostFilter>();
 
                 // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
@@ -87,7 +93,15 @@ namespace SwashbuckleODataSample
                 // By default, this will be controller name but you can use the "GroupActionsBy" option to
                 // override with any value.
                 //
-                //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
+                c.GroupActionsBy(apiDesc =>
+                        {
+                            if (apiDesc.RelativePath.Contains("api"))
+                            {
+                                return "API - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            }
+                            return "ODATA - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                        }
+                    );
 
                 // You can also specify a custom sort order for groups (as defined by "GroupActionsBy") to dictate
                 // the order in which operations are listed. For example, if the default grouping is in place
