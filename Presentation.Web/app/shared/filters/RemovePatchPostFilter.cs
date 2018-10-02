@@ -41,5 +41,4 @@ namespace Presentation.Web.app.shared.filters
                 }
             }
         }
-        }
-    } 
+}
