@@ -74,7 +74,7 @@
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<Models.IUser>("odata/Users/Create", userPayload, { handleBusy: true })
+            this.$http.post<Models.IUser>("odata/Users/Users.Create", userPayload, { handleBusy: true })
                 .then((response) => {
                     var userResult = response.data;
 
