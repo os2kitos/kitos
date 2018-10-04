@@ -22,7 +22,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     where TLocalOption : LocalOptionEntity<TOption>
     {
         IGenericRepository<AttachedOption> _AttachedOptionRepository;
-        IAuthenticationService _authService;
         IGenericRepository<TOption> _OptionRepository;
         IGenericRepository<TLocalOption> _LocalOptionRepository;
 
@@ -31,7 +30,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             IGenericRepository<TLocalOption> LocalOptionRepository)
                : base(repository, authService)
         {
-            _authService = authService;
             _AttachedOptionRepository = repository;
             _OptionRepository = OptionRepository;
             _LocalOptionRepository = LocalOptionRepository;

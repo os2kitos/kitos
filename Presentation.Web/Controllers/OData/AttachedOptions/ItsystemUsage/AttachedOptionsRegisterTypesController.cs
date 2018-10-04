@@ -21,7 +21,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     {
         IGenericRepository<RegisterType> _regularPersonalDataTypeRepository;
         IGenericRepository<LocalRegisterType> _localregularPersonalDataTypeRepository;
-        IAuthenticationService _authService;
         IGenericRepository<AttachedOption> _AttachedOptionRepository;
 
         public AttachedOptionsRegisterTypesController(IGenericRepository<AttachedOption> repository,
