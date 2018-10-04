@@ -12,7 +12,7 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
     {
-        private readonly IAuthenticationService _authService;
+        protected readonly IAuthenticationService _authService;
 
         protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
             : base(repository)
