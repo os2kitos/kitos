@@ -123,7 +123,7 @@ namespace Presentation.Web.Controllers.API
 
             return insertedItem;
         }
-        
+
         /// <summary>
         /// Post from base entity controller
         /// </summary>
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                // Check write access rights
+                // Check write access rights  
                 if (!HasWriteAccess(item, organizationId: 0))
                 {
                     return Unauthorized();
