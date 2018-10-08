@@ -134,9 +134,14 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Map<TDto, TModel>(dto);
-
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
+
+                // Check write access rights
+                if (!HasWriteAccess(item, organizationId: 0))
+                {
+                    return Unauthorized();
+                }
 
                 var savedItem = PostQuery(item);
 
@@ -309,6 +314,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
                 if (item == null) return NotFound();
+
                 if (!HasWriteAccess(item, organizationId)) return Unauthorized();
 
                 var result = PatchQuery(item, obj);
@@ -341,7 +347,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="obj">The object</param>
         /// <param name="user">The user</param>
         /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to obj</returns>
+        /// <returns>True if user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
             return AuthenticationService.HasWriteAccess(user.Id, obj);
@@ -352,7 +358,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to the object with objId</returns>
+        /// <returns>True if user has write access to the object with objId</returns>
         protected bool HasWriteAccess(int objId, int organizationId)
         {
             return HasWriteAccess(objId, KitosUser, organizationId);
