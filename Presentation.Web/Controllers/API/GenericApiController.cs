@@ -159,8 +159,12 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException?.InnerException != null)
+                {
                     if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
                         return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
 
                 return LogError(e);
             }
@@ -205,7 +209,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+
+                if (!HasWriteAccess(item, organizationId))
+                {
+                    return Unauthorized();
+                }
 
                 DeleteQuery(item);
 
@@ -230,13 +238,17 @@ namespace Presentation.Web.Controllers.API
                 {
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                     if (mapMember == null)
+                    {
                         continue; // abort if no map found
+                    }
 
                     var destName = mapMember.DestinationProperty.Name;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
+                    {
                         continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                    }
 
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
@@ -263,6 +275,7 @@ namespace Presentation.Web.Controllers.API
                             propRef.SetValue(item, null);
                         }
                     }
+
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
                     else if (t.IsEquivalentTo(typeof(Guid)))
@@ -313,9 +326,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(item, organizationId))
+                {
+                    return Unauthorized();
+                }
 
                 var result = PatchQuery(item, obj);
                 return Ok(Map(result));
@@ -324,9 +343,15 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException != null)
+                {
                     if (e.InnerException.InnerException != null)
+                    {
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                        {
                             return Conflict(e.InnerException.InnerException.Message);
+                        }
+                    }
+                }
 
                 return LogError(e);
             }
