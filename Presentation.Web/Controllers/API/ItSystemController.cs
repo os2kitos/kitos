@@ -245,7 +245,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Unauthorized();
                 }
-
                 if (!IsAvailable(dto.Name, dto.OrganizationId))
                     return Conflict("Name is already taken!");
 
@@ -254,6 +253,11 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
+
+                if(!base.HasWriteAccess(item, KitosUser, organizationId: 0))
+                {
+                    return Unauthorized();
+                }
 
                 foreach (var id in dto.TaskRefIds)
                 {
