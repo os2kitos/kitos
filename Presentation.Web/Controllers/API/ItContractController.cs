@@ -148,6 +148,16 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public override HttpResponseMessage Post(ItContractDTO dto)
+        {   
+            if(KitosUser.IsReadOnly)
+            {
+                return Unauthorized();
+            }
+
+            return base.Post(dto);
+        }
+
         /// <summary>
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>

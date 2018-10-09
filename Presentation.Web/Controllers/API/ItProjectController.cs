@@ -710,7 +710,7 @@ namespace Presentation.Web.Controllers.API
         public override HttpResponseMessage Post(ItProjectDTO dto)
         {
             // only global admin can set access mod to public
-            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
+            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic) || KitosUser.IsReadOnly)
             {
                 return Unauthorized();
             }

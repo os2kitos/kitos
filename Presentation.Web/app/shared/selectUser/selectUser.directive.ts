@@ -123,7 +123,7 @@
                                     { ignoreLoadingBar: true });
                             } else {
                                 result = $http
-                                    .get(`/odata/Organizations(${$scope.orgId})/Users` + urlAddition,
+                                    .get(`/odata/Organizations(${$scope.orgId})/Organizations.GetUsers` + urlAddition,
 
                                     //.get(`/odata/Organizations(${$scope.orgId})/Users?$filter=contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[0]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[1]}')) and contains(concat(concat(concat(concat(tolower(Name), ' '), tolower(LastName)), ' '), tolower(Email)), tolower('${userInputString[2]}'))`,
                                     { ignoreLoadingBar: true });

@@ -84,12 +84,7 @@ namespace Presentation.Web.Controllers.OData
         [HttpGet]
         public IHttpActionResult IsEmailAvailable(string email)
         {
-            // strip strange single quotes from parameter
-            // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
-            var strippedEmail = email.Remove(0, 1);
-            strippedEmail = strippedEmail.Remove(strippedEmail.Length-1);
-
-            if (EmailExists(strippedEmail))
+            if (EmailExists(email))
                 return Ok(false);
             else
                 return Ok(true);
@@ -98,12 +93,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("GetUserByEmail(email={email})")]
         public IHttpActionResult GetUserByEmail(string email)
         {
-            // strip strange single quotes from parameter
-            // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
-            var strippedEmail = email.Remove(0, 1);
-            strippedEmail = strippedEmail.Remove(strippedEmail.Length - 1);
-
-            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == strippedEmail.ToLower());
+            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
             if(userToReturn != null)
             {
                 return Ok(userToReturn);
