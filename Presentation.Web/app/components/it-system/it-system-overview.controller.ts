@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
         //modal: kendo.ui.Window;
         //usageGrid: kendo.ui.Grid;
         //usageDetailsGrid: kendo.ui.GridOptions;
@@ -220,6 +220,8 @@
 
                                 // replaces "contains(ItSystem/Uuid,'11')" with "contains(CAST(ItSystem/Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(ItSystem\/Uuid,/, "contains(CAST(ItSystem/Uuid, 'Edm.String'),");
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'""'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq false`);
+                                parameterMap.$filter = parameterMap.$filter.replace(`ItSystem/TaskRefs/any(c: startswith(c/TaskKey,'alt'))`, `ItSystem/TaskRefs/any(c: contains(c/TaskKey,'')) eq true`);
                             }
 
                             return parameterMap;
@@ -268,8 +270,8 @@
                                 if (!usage.ItSystem.TaskRefs) { usage.ItSystem.TaskRefs = { TaskKey: "", Description: "" }; }
                                 if (!usage.SensitiveDataType) { usage.SensitiveDataType = { Name: "" }; }
                                 if (!usage.MainContract) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
-                                if (!usage.Reference) { usage.Reference = { Title: "" }; }
-                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract = { ItContract: { Supplier: { Name: "" } } }; }
+                                if (!usage.Reference) { usage.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!usage.MainContract.ItContract.Supplier) { usage.MainContract.ItContract.Supplier = { Name: "" }; }
                             });
                             return response;
                         }
@@ -307,7 +309,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -320,7 +322,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -534,7 +536,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -552,28 +554,23 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "DirectoryOrUrlRef", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.DirectoryOrUrlRef ? `<a target="_blank" href="${dataItem.DirectoryOrUrlRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.DirectoryOrUrlRef || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
                             }
-                        }
-                    },
-                    {
-                        // TODO Skal muligvis slettes
-                        field: "CmdbRef", title: "CMDB ref", width: 150,
-                        persistId: "cmdb", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.CmdbRef ? `<a target="_blank" href="${dataItem.CmdbRef}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.CmdbRef || "",
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -618,10 +615,9 @@
                         field: "MainContract", title: "Kontrakt", width: 120,
                         persistId: "contract", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract) {
+                            if (!dataItem.MainContract || !dataItem.MainContract.ItContract || !dataItem.MainContract.ItContract.Name) {
                                 return "";
                             }
-
                             if (this.isContractActive(dataItem.MainContract.ItContract)) {
                                 return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa fa-file text-success" aria-hidden="true"></span></a>`;
                             } else {
@@ -981,23 +977,20 @@
         }
 
         private isContractActive(dataItem) {
-         
-        if (!dataItem.Active) {
-                var today = this.moment().startOf('day');
-                var startDate = dataItem.Concluded ? moment(dataItem.Concluded).startOf('day') : today;
-                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
-
-            if (dataItem.Terminated) {
-                var terminationDate = moment(dataItem.Terminated);
-                if (dataItem.TerminationDeadline) {
-                    terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+            if (!dataItem.Active) {
+                var today = moment();
+                var startDate = dataItem.Concluded ? moment(dataItem.Concluded, "YYYY-MM-DD").startOf('day') : moment().startOf('day');
+                var endDate = dataItem.ExpirationDate ? moment(dataItem.ExpirationDate, "YYYY-MM-DD").endOf('day') : this.moment("9999-12-30", "YYYY-MM-DD").endOf('day');
+                if (dataItem.Terminated) {
+                    var terminationDate = moment(dataItem.Terminated, "YYYY-MM-DD").endOf('day');
+                    if (dataItem.TerminationDeadline) {
+                        terminationDate.add(dataItem.TerminationDeadline.Name, "months");
+                    }
+                    // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
+                    return today.isBetween(startDate, terminationDate, null, '[]');
                 }
-                // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                return today >= startDate && today <= terminationDate;
-            }
-        
-            // indgået-dato <= dags dato <= udløbs-dato
-            return today >= startDate && today <= endDate;
+                // indgået-dato <= dags dato <= udløbs-dato
+                return today.isBetween(startDate, endDate, null, '[]');
             }
             return dataItem.Active;
         }

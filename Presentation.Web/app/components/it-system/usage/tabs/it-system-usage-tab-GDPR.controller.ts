@@ -5,10 +5,6 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-GDPR.view.html",
             controller: "system.GDPR",
             resolve: {
-                systemCategories: [
-                    "$http", $http => $http.get("odata/LocalItSystemCategories?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
-                    .then(result => result.data.value)
-                ],
                 systemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) =>
                     $http.get(`odata/itSystemUsages(${$stateParams.id})`)
@@ -43,15 +39,14 @@
 
     app.controller("system.GDPR",
         [
-            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "systemCategories", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
-            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, systemCategories, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
+            "$scope", "$http", "$state", "$uibModal", "$stateParams", "$timeout", "itSystemUsage", "itSystemUsageService", "systemUsage", "moment", "notify", "registerTypes", "regularSensitiveData", "sensitivePersonalData", "user", "dataResponsible",
+            ($scope, $http, $state, $uibModal, $stateParams, $timeout, itSystemUsage, itSystemUsageService, systemUsage, moment, notify, registerTypes, regularSensitiveData, sensitivePersonalData, user, dataResponsible) => {
 
             $scope.usage = itSystemUsage;
             $scope.registerTypes = registerTypes;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
-            $scope.systemCategories = systemCategories;
-            $scope.regularSensitiveData = regularSensitiveData;
+            $scope.regularSensitiveData = _.orderBy(regularSensitiveData, "Priority", "desc");
             $scope.sensitivePersonalData = sensitivePersonalData;
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
@@ -78,9 +73,7 @@
             $scope.updateUrl = '/api/itsystemusage/' + $scope.usage.id;
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
-                console.log(systemUsage.LinkToDirectoryUrl);
-                console.log(encodeURI(systemUsage.LinkToDirectoryUrl));
-                $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
+            $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
             $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);

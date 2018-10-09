@@ -146,7 +146,7 @@
                         parse: response => {
                             // iterrate each usage
                             this._.forEach(response.value, system => {
-                                if (!system.References) { system.References = { Title: "" }; }
+                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 if (!system.Parent) { system.Parent = { Name: "" }; }
                                 if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
                                 if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
@@ -203,7 +203,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -216,7 +216,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -483,7 +483,7 @@
                         }
                     },
                     {
-                        field: "References.Title",
+                        field: "Reference.Title",
                         title: "Reference",
                         width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
@@ -491,7 +491,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -499,6 +499,35 @@
                             return "";
                         },
                         attributes: { "class": "text-left" },
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        hidden: true,
                         filterable: {
                             cell: {
                                 template: customFilter,

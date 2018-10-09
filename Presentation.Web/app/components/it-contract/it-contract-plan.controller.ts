@@ -4,7 +4,7 @@
     export interface IOverviewPlanController {
         mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -228,7 +228,7 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures`;
+                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedInterfaceUsages,AssociatedInterfaceExposures,Reference`;
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -313,6 +313,7 @@
                                     if (!contract.ContractTemplate) { contract.ContractTemplate = { Name: "" }; }
                                     if (!contract.PurchaseForm) { contract.PurchaseForm = { Name: "" }; }
                                     if (!contract.TerminationDeadline) { contract.TerminationDeadline = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 });
                             return response;
                         }
@@ -360,7 +361,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -373,7 +374,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => {
                     //These might be candidates for refactoring. They are quite expensive
                     return `<uib-tabset active="0">
@@ -413,21 +414,7 @@
                         },
                         attributes: { "class": "text-center" },
                         sortable: false,
-                        filterable: {
-                            cell: false
-                        //    {
-                        //    template: args => {
-                        //        args.element.kendoDropDownList({
-                        //            dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                        //            dataTextField: "type",
-                        //            dataValueField: "value",
-                        //            valuePrimitive: true
-                        //        });
-                        //    },
-                        //    showOperators: false
-
-                        //}
-                    }
+                        filterable: false
                     },
                     {
                         field: "ItContractId",
@@ -549,17 +536,22 @@
                         sortable: false,
                         filterable: false
                     },
-                    // TODO Reference skal muligvis indføres som i it-contract-overview
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Esdh",
-                        title: "ESDH ref",
+                        field: "Reference.Title",
+                        title: "Reference",
                         width: 150,
-                        persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh
-                            ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>`
-                            : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.URL) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
@@ -572,15 +564,25 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder",
+                        field: "Reference.ExternalReferenceId",
                         title: "Mappe ref",
                         width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder
-                            ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>`
-                            : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {

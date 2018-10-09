@@ -55,13 +55,13 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
                 },
-                editable: "popup",
+                editable: true,
                 reorderable: true,
                 resizable: true,
                 filterable: {
@@ -69,7 +69,7 @@
                 },
                 groupable: false,
                 columnMenu: true,
-                height: 900,
+                height: window.innerHeight - 200,
                 excelExport: this.exportToExcel,
                 columns: [
                     {
