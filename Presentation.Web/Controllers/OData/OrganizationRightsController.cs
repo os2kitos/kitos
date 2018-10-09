@@ -38,13 +38,13 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            entity.OrganizationId = orgKey;
-            entity.ObjectOwnerId = UserId;
-            entity.LastChangedByUserId = UserId;
-
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
                 return StatusCode(HttpStatusCode.Forbidden);
 
+            entity.OrganizationId = orgKey;
+            entity.ObjectOwnerId = UserId;
+            entity.LastChangedByUserId = UserId;
+            
             try
             {
                 entity = Repository.Insert(entity);
