@@ -217,7 +217,7 @@ namespace Core.ApplicationServices
                 return true;
 
             // check if user is object owner
-            if (entity.ObjectOwnerId == user.Id)
+            if (entity.ObjectOwner != null && entity.ObjectOwner.Id == user.Id && (entity is IProjectModule || entity is ISystemModule || entity is ItContract))
             {
                 // object owners have write access to their objects if they're within the context,
                 // else they'll have to switch to the correct context and try again
