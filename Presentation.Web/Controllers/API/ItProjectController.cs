@@ -710,7 +710,7 @@ namespace Presentation.Web.Controllers.API
         public override HttpResponseMessage Post(ItProjectDTO dto)
         {
             // only global admin can set access mod to public
-            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic) || KitosUser.IsReadOnly)
+            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic) || !FeatureChecker.CanExecute(KitosUser, Feature.CanModifyProjects))
             {
                 return Unauthorized();
             }
@@ -783,9 +783,6 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItProject obj, User user, int organizationId)
         {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ProjectModuleAdmin)))

@@ -144,10 +144,6 @@ namespace Core.ApplicationServices
                 // global admin always have access
                 return true;
             }
-            //check if user is readonly
-            if (user.IsReadOnly) {
-                return false;
-            }
 
             //User has access if user created entity
             //if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
@@ -210,10 +206,6 @@ namespace Core.ApplicationServices
                 return true;
 
             if (_featureChecker.CanExecute(user, Feature.CanModifyReports) && entity is IReportModule)
-                return true;
-
-            // check if user has a write role on the target entity
-            if (entity.HasUserWriteAccess(user))
                 return true;
 
             // check if user is object owner

@@ -241,7 +241,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 // only global admin can set access mod to public
-                if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin) || KitosUser.IsReadOnly)
+                if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin) || !FeatureChecker.CanExecute(KitosUser, Feature.CanModifySystems))
                 {
                     return Unauthorized();
                 }
