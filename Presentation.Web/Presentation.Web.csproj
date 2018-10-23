@@ -1404,7 +1404,6 @@
     <Content Include="Tests\mocks\advice.json" />
     <Content Include="Tests\mocks\interfaceUsage.json" />
     <Content Include="Scripts\angular-bundle.min.js" />
-    <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\appReport-bundle.min.js" />
     <Content Include="Scripts\langs\da.js" />
     <Content Include="Scripts\library-bundle.min.js" />
