@@ -693,7 +693,7 @@
 
                         roles = this.concatRoles(dataItem.roles[role.Id]);
 
-                        var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                        var link = `<a data-ui-sref='it-project.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
                         return link;
                     },
