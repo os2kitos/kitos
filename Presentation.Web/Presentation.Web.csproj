@@ -792,10 +792,13 @@
     <Content Include="app\shared\tinyMCE_lang_da.js" />
     <Content Include="app\shared\typeahead\typeahead.view.html" />
     <Content Include="Content\css\app.css" />
+    <Content Include="Content\css\app.min.css" />
     <Content Include="Content\css\fonts\tinymce-small.eot" />
+    <Content Include="Content\css\fonts\tinymce-small.svg" />
     <Content Include="Content\css\fonts\tinymce-small.ttf" />
     <Content Include="Content\css\fonts\tinymce-small.woff" />
     <Content Include="Content\css\fonts\tinymce.eot" />
+    <Content Include="Content\css\fonts\tinymce.svg" />
     <Content Include="Content\css\fonts\tinymce.ttf" />
     <Content Include="Content\css\fonts\tinymce.woff" />
     <Content Include="Content\css\maps\app.min.css.map" />
@@ -804,6 +807,8 @@
     <Content Include="Content\css\select2x2.png" />
     <Content Include="Content\Default\loading-image.gif" />
     <Content Include="Content\Default\loading.gif" />
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\img\Accesscontrol.svg" />
     <Content Include="Content\img\Advis.svg" />
     <Content Include="Content\img\Aendringsoenske.svg" />
@@ -1234,6 +1239,10 @@
     </None>
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
+    <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
+    <Content Include="Scripts\appReport-bundle.min.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
     <Content Include="Web.config">
