@@ -131,8 +131,11 @@
             $scope.patchDate = (field, value) => {
                 var date = moment(value, "DD-MM-YYYY");
                 var today = moment();
-
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                if (value === "") {
+                    var payload = {};
+                    payload[field] = null;
+                    patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
+                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
                 else {
