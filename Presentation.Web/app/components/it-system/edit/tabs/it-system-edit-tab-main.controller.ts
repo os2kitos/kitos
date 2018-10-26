@@ -82,19 +82,27 @@
                                 };
                                 return res;
                             },
-
-                            results: function (data, page) {
+                            
+                            results: (data, page) => {
                                 var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; disabled;}) {
-                                    if (obj.disabled === false) {
+                                if (url === 'api/itsystem') {
+                                    _.each(data.data.response, (obj: { id; name; disabled; }) => {
+                                        if (obj.disabled === false) {
+                                            results.push({
+                                                id: obj.id,
+                                                text: obj.name
+                                            });
+                                        }
+                                    });
+                                }
+                                else {
+                                    _.each(data.data.response, (obj: { id; name; }) => {
                                         results.push({
                                             id: obj.id,
                                             text: obj.name
                                         });
-                                    }
-                                });
-
+                                    }); 
+                                }
                                 return { results: results };
                             }
                         }
