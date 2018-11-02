@@ -84,8 +84,19 @@
             };
             $scope.checkDate = (field, value) => {
                 var date = moment(value, "DD-MM-YYYY");
-
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                if (value === "") {
+                    switch (field) {
+                        case "subGoalDate1":
+                            $scope.subGoalDate1 = false;
+                            break;
+                        case "subGoalDate2":
+                            $scope.subGoalDate2 = false;
+                            break;
+                        case "subGoalDate3":
+                            $scope.subGoalDate3 = false;
+                            break;
+                    } 
+                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     switch (field) {
                     case "subGoalDate1":
