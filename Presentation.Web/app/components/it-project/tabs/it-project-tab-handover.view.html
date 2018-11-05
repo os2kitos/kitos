@@ -35,7 +35,7 @@
                                 data-ng-model="participants"
                                 data-placeholder="Vælg deltagere">
                             <option value=""></option>
-                            <option value="{{ user.id }}" data-ng-repeat="user in usersWithRoles">{{user.name}}</option>
+                            <option value="{{ user.id }}" data-ng-repeat="user in usersWithRoles">{{user.fullName}}</option>
                         </select>
                     </div>
 

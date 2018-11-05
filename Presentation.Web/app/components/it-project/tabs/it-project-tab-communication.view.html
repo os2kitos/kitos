@@ -12,7 +12,7 @@
                                 <th>Budskab</th>
                                 <th>Medie</th>
                                 <th class="col-xs-2">Hvornår</th>
-                                <th>Ansvarlig</th>
+                                <th class="col-xs-2">Ansvarlig</th>
                                 <th><!-- control --></th>
                             </tr>
                         </thead>
@@ -71,7 +71,7 @@
                                                 data-autosave="api/communication/{{c.id}}"
                                                 data-ng-model="c.responsibleUserId"
                                                 data-ng-disabled="!projectEditVm.hasWriteAccess">
-                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
                                         </select>
                                     </div>
                                 </td>
@@ -128,7 +128,7 @@
                                                 required
                                                 data-ui-select2=""
                                                 data-ng-model="comm.responsibleUserId">
-                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.name}}</option>
+                                            <option data-ng-repeat="usersWithRole in usersWithRoles" value="{{usersWithRole.id}}">{{usersWithRole.fullName}}</option>
                                         </select>
                                     </div>
                                 </td>
