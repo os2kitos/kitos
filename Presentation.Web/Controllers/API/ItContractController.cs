@@ -149,12 +149,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         public override HttpResponseMessage Post(ItContractDTO dto)
-        {   
-            if(!FeatureChecker.CanExecute(KitosUser, Feature.CanModifyContracts))
-            {
-                return Unauthorized();
-            }
-
+        { 
             return base.Post(dto);
         }
 
