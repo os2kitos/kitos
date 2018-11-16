@@ -84,7 +84,7 @@
             };
             $scope.checkDate = (field, value) => {
                 var date = moment(value, "DD-MM-YYYY");
-                if (value === "") {
+                if (value === "" || value == undefined) {
                     switch (field) {
                         case "subGoalDate1":
                             $scope.subGoalDate1 = false;
