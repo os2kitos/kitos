@@ -138,6 +138,12 @@ namespace Core.ApplicationServices
             AssertUserIsNotNull(user);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
+            // check ReadOnly
+            if(user.IsReadOnly)
+            {
+                return false;
+            }
+
             // check if global admin
             if (user.IsGlobalAdmin)
             {
@@ -209,7 +215,7 @@ namespace Core.ApplicationServices
                 return true;
 
             // check if user is object owner
-            if (entity.ObjectOwner != null && entity.ObjectOwner.Id == user.Id && (entity is IProjectModule || entity is ISystemModule || entity is ItContract))
+            if (entity.ObjectOwner != null && entity.ObjectOwner.Id == user.Id && (entity is IProjectModule || entity is ISystemModule || entity is ItContract || entity is IReportModule))
             {
                 // object owners have write access to their objects if they're within the context,
                 // else they'll have to switch to the correct context and try again

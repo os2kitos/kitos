@@ -480,7 +480,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return true;
             }
-            return HasWriteAccess();
+            return base.HasWriteAccess(obj, user, organizationId);
         }
 
         protected bool HasWriteAccess()

@@ -10,12 +10,12 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class OrganizationRightController : BaseApiController
+    public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
         private readonly IGenericRepository<Organization> _objectRepository;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository)
+        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository) : base (rightRepository)
         {
             _rightRepository = rightRepository;
             _objectRepository = objectRepository;
@@ -132,10 +132,16 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
-                // if user has any role within the organization (or global admin) they should be able to add new adminrights
-                if (!KitosUser.IsGlobalAdmin)
-                    if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())
-                        return Unauthorized();
+
+                if(!base.HasWriteAccess(right, KitosUser, organizationId))
+                {
+                    return Unauthorized();
+                }
+
+                //// if user has any role within the organization (or global admin) they should be able to add new adminrights
+                //if (!KitosUser.IsGlobalAdmin)
+                //    if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())
+                //        return Unauthorized();
 
                 right.OrganizationId = organizationId;
                 right.ObjectOwner = KitosUser;
