@@ -131,7 +131,10 @@
             $scope.patchDate = (field, value) => {
                 var date = moment(value, "DD-MM-YYYY");
                 var today = moment();
-                if (value === "") {
+                if (value == "0001-01-01T00:00:00Z") {
+
+                }
+                else if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
