@@ -241,7 +241,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 // only global admin can set access mod to public
-                if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin) || !FeatureChecker.CanExecute(KitosUser, Feature.CanModifySystems))
+                if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin))
                 {
                     return Unauthorized();
                 }
@@ -480,7 +480,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return true;
             }
-            return HasWriteAccess();
+            return base.HasWriteAccess(obj, user, organizationId);
         }
 
         protected bool HasWriteAccess()

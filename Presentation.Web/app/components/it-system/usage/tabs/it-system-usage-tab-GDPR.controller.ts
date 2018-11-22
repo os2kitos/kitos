@@ -110,8 +110,11 @@
 
             $scope.patchDate = (field, value) => {
                 var date = moment(moment(value, "DD-MM-YYYY", true).format());
-
-                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                if (value === "" || value == undefined) {
+                    var payload = {};
+                    payload[field] = null;
+                    itSystemUsageService.patchSystem($scope.usageId, payload);
+                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     $scope.ArchivedDate = systemUsage.ArchivedDate;
                 } else {
