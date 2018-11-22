@@ -21,7 +21,6 @@
     "browser-sync": "^2.13.0",
     "browserstacktunnel-wrapper": "^1.4.2",
     "del": "^2.2.0",
-    "eslint": "^3.4.0",
     "gulp": "^3.9.0",
     "gulp-angular-protractor": "*",
     "gulp-bower": "0.0.13",
