@@ -143,7 +143,7 @@ namespace Presentation.Web.Controllers.API
                 // Only local and global admins can make users local admins
                 if(right.Role == OrganizationRole.LocalAdmin)
                 {
-                    if(!KitosUser.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+                    if(!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
                         return Unauthorized();
                 }
 
@@ -281,7 +281,7 @@ namespace Presentation.Web.Controllers.API
                 // Only local and global admins can make users local admins
                 if (right.Role == OrganizationRole.LocalAdmin)
                 {
-                    if (!KitosUser.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+                    if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
                         return Unauthorized();
                 }
 

@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.OData
 
             if(entity.Role == OrganizationRole.LocalAdmin)
             {
-                if(!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
                     return Unauthorized();
                 }
@@ -77,6 +77,11 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        /// <summary>
+        /// Always Unauthorized 401. Use POST /Organizations(orgKey)/Rights instead
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
             return Unauthorized();
@@ -103,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (entity.Role == OrganizationRole.LocalAdmin)
             {
-                if (!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
                     return Unauthorized();
                 }
@@ -146,7 +151,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (entity.Role == OrganizationRole.LocalAdmin)
             {
-                if (!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
                     return Unauthorized();
                 }
