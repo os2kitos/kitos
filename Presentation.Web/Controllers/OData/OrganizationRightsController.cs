@@ -38,11 +38,30 @@ namespace Presentation.Web.Controllers.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            var user = _userService.GetUserById(UserId);
+
+            if(entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if(!user.IsGlobalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
+
+            if(entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if(!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
 
             entity.OrganizationId = orgKey;
             entity.ObjectOwnerId = UserId;
+
+            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
             entity.LastChangedByUserId = UserId;
             
             try
@@ -58,6 +77,12 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        public override IHttpActionResult Post(OrganizationRight entity)
+        {
+            return Unauthorized();
+            //return base.Post(entity);
+        }
+
         // DELETE /Organizations(1)/Rights(1)
         [ODataRoute("Organizations({orgKey})/Rights({key})")]
         public IHttpActionResult DeleteRights(int orgKey, int key)
@@ -65,6 +90,24 @@ namespace Presentation.Web.Controllers.OData
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
             if (entity == null)
                 return NotFound();
+
+            var user = _userService.GetUserById(UserId);
+
+            if (entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (!user.IsGlobalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
+
+            if (entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if (!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
                 return StatusCode(HttpStatusCode.Forbidden);
@@ -90,6 +133,24 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
                 return Unauthorized();
+
+            var user = _userService.GetUserById(UserId);
+
+            if (entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (!user.IsGlobalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
+
+            if (entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if (!user.IsGlobalAdmin || !user.IsLocalAdmin)
+                {
+                    return Unauthorized();
+                }
+            }
 
             try
             {
