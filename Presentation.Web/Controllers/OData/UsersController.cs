@@ -101,6 +101,16 @@ namespace Presentation.Web.Controllers.OData
             return NotFound();
         }
 
+        /// <summary>
+        /// Always returns 401 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override IHttpActionResult Delete(int key)
+        {
+            return Unauthorized();
+        }
+
         //GET /Organizations(1)/DefaultOrganizationForUsers
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
