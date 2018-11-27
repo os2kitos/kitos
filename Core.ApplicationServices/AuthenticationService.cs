@@ -138,8 +138,14 @@ namespace Core.ApplicationServices
             AssertUserIsNotNull(user);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
+            // check "Forretningsroller" for the entity
+            if (entity.HasUserWriteAccess(user))
+            {
+                return true;
+            }
+
             // check ReadOnly
-            if(user.IsReadOnly)
+            if (user.IsReadOnly)
             {
                 return false;
             }
@@ -220,12 +226,7 @@ namespace Core.ApplicationServices
                 // object owners have write access to their objects if they're within the context,
                 // else they'll have to switch to the correct context and try again
                 return true;
-
-            }
-
-            // check "Forretningsroller" for the entity
-            if (entity.HasUserWriteAccess(user))
-                return true;
+            }            
 
             // User is a special case
             if (entity is User && (entity.Id == user.Id || _featureChecker.CanExecute(user, Feature.CanModifyUsers)))
