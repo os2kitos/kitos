@@ -416,7 +416,12 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId">Not used in this case. Should remain empty</param>
         /// <returns></returns>
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
-        {
+        {            
+            if(!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
+            {
+                return Unauthorized();
+            }
+
             return base.Delete(id, organizationId);
         }
     }

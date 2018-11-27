@@ -223,6 +223,10 @@ namespace Core.ApplicationServices
 
             }
 
+            // check "Forretningsroller" for the entity
+            if (entity.HasUserWriteAccess(user))
+                return true;
+
             // User is a special case
             if (entity is User && (entity.Id == user.Id || _featureChecker.CanExecute(user, Feature.CanModifyUsers)))
                 return true;
