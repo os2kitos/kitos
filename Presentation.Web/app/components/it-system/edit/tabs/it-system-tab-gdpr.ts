@@ -58,7 +58,19 @@
                     });
                 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type='" + optionType + "', entitytype='ITSYSTEM')").success(function () {
+                    let OptType = 0;
+                    switch (optionType) {
+                    case "REGULARPERSONALDATA":
+                        OptType = 0;
+                        break;
+                    case "SENSITIVEPERSONALDATA":
+                        OptType = 1;
+                        break;
+                    case "REGISTERTYPEDATA":
+                        OptType = 2;
+                        break;
+                    }
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type=" + OptType + ", entitytype=0)").success(function () {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");
