@@ -47,7 +47,7 @@
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
             $scope.regularSensitiveData = _.orderBy(regularSensitiveData, "Priority", "desc");
-            $scope.sensitivePersonalData = sensitivePersonalData;
+                $scope.sensitivePersonalData = _.orderBy(sensitivePersonalData, "Priority", "desc");
             $scope.contracts = itSystemUsage.contracts.filter(x => (x.contractTypeName === "Databehandleraftale" || x.agreementElements.some(y => y.name === "Databehandleraftale")));
             $scope.filterDataProcessor = $scope.contracts.length > 0;
 
@@ -74,6 +74,7 @@
             $scope.dataWorkerSelectOptions = selectLazyLoading('api/organization', false, ['public=true', 'orgId=' + user.currentOrganizationId]);
 
             $scope.systemUsage.LinkToDirectoryUrl = encodeURI(systemUsage.LinkToDirectoryUrl);
+                
             $scope.updateDataLevel = function (OptionId, Checked, optionType, entitytype) {
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
@@ -87,14 +88,26 @@
                         ObjectType: 'ITSYSTEMUSAGE'
                     };
 
-                    $http.post("Odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
+                    $http.post("odata/AttachedOptions/", data, { handleBusy: true }).success(result => {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(() => {
                         msg.toErrorMessage("Fejl!");
                     });
 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type='" + optionType + "', entityType='ITSYSTEMUSAGE')").success(() => {
+                    let OptType = 0;
+                    switch (optionType) {
+                        case "REGULARPERSONALDATA":
+                            OptType = 0; 
+                            break;
+                        case "SENSITIVEPERSONALDATA":
+                            OptType = 1; 
+                            break;
+                        case "REGISTERTYPEDATA":
+                            OptType = 2; 
+                            break;
+                    }
+                    $http.delete("odata/RemoveOption(id=" + OptionId + ", objectId=" + itSystemUsage.id + ",type=" + OptType + ", entityType=1)").success(() => {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(() => {
                         msg.toErrorMessage("Fejl!");

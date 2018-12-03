@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        [System.Web.Http.Description.ApiExplorerSettings(IgnoreApi = true)]
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Post(T entity)
         {
             if (!ModelState.IsValid)
@@ -114,7 +114,7 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
-        [System.Web.Http.Description.ApiExplorerSettings(IgnoreApi = true)]
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);

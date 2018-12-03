@@ -83,7 +83,7 @@ namespace SwashbuckleODataSample
                 //        scopes.Add("write", "Write access to protected resources");
                 //    });
 
-                c.DocumentFilter<RemovePatchPostFilter>();
+                //c.DocumentFilter<RemovePatchPostFilter>();
 
                 // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
                 //c.IgnoreObsoleteActions();

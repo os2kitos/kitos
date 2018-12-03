@@ -16,7 +16,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     using System.Net;
     using System.Web.Http.Description;
 
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class AttachedOptionsRegularPersonalDataController : AttachedOptionsFunctionController<ItSystem, RegularPersonalDataType, LocalRegularPersonalDataType>
     {
         IGenericRepository<RegularPersonalDataType> _regularPersonalDataTypeRepository;
@@ -50,16 +49,14 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.REGULARPERSONALDATA);
         }
 
-
-
-
         private IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
             if (UserId == 0)
                 return Unauthorized();
+            var orgId = _authService.GetCurrentOrganizationId(UserId);
 
-            var globalOptionData = _regularPersonalDataTypeRepository.AsQueryable().Where(s => s.IsEnabled || (s.IsEnabled && s.IsObligatory));
-            var localpersonalData = _localregularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive).ToList();
+            var globalOptionData = _regularPersonalDataTypeRepository.AsQueryable().Where(s => s.IsEnabled);
+            var localpersonalData = _localregularPersonalDataTypeRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
 
             List<RegularPersonalDataType> result = new List<RegularPersonalDataType>();
             result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));

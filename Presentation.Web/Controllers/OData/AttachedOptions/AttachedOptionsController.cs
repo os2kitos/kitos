@@ -15,7 +15,6 @@ using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
     public class AttachedOptionsController : BaseEntityController<AttachedOption>
     {
         public AttachedOptionsController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService)

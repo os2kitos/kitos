@@ -23,7 +23,7 @@ using System.Linq;
 
 namespace Presentation.Web
 {
-    //using Controllers.OData.AttachedOptions;
+    using Controllers.OData.AttachedOptions;
     using DocumentFormat.OpenXml.Wordprocessing;
     using Microsoft.OData;
     using Microsoft.OData.UriParser;
@@ -151,10 +151,10 @@ namespace Presentation.Web
 
             var itProjectRoles = builder.EntitySet<ItProjectRole>(nameof(ItProjectRolesController).Replace("Controller", string.Empty));
             itProjectRoles.EntityType.HasKey(x => x.Id);
-            
-            /*var AttachedOptions = builder.EntitySet<AttachedOption>(nameof(AttachedOptionsController).Replace("Controller", string.Empty));
+
+            var AttachedOptions = builder.EntitySet<AttachedOption>(nameof(AttachedOptionsController).Replace("Controller", string.Empty));
             AttachedOptions.EntityType.HasKey(x => x.Id);
-            */
+
             var itProjectOrgUnitUsage = builder.EntitySet<ItProjectOrgUnitUsage>("ItProjectOrgUnitUsages"); // no controller yet
             itProjectOrgUnitUsage.EntityType.HasKey(x => new { x.ItProjectId, x.OrganizationUnitId });
 
