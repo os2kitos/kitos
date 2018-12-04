@@ -122,7 +122,7 @@
             }
 
             $scope.patchDate = (field, value) => {
-                var date = moment(moment(value, "DD-MM-YYYY", true).format());
+                var date = moment(value, "DD-MM-YYYY");
                 if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;

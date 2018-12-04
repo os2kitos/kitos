@@ -61,7 +61,6 @@
             $scope.systemCategories = systemCategories;
             autofocus();
             var today = new Date();
-            console.log(itSystemUsage);
             if (!itSystemUsage.active) {
                 if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
                     $scope.displayActive = true;

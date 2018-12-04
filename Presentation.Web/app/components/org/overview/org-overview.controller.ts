@@ -22,7 +22,6 @@
         '$rootScope', '$scope', '$http', 'notify', '$uibModal', 'user',
         function($rootScope, $scope, $http, notify, $modal, user) {
             $rootScope.page.title = 'Organisation - Overblik';
-            console.log(user)
             function checkForDefaultUnit() {
                 if (!user.currentOrganizationUnitId) return;
 
