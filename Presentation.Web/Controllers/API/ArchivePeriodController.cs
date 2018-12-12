@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API
     {
         // GET: ArchivePeriod
         /// <summary>
-        /// Archive period(arkiveringssted) for it system usage pane archiving  
+        /// Arkiveringsperiode for it system anvedelse på fanen arkivering
         /// </summary>
         /// <param name="repository"></param>
         public ArchivePeriodController(IGenericRepository<ArchivePeriod> repository)
@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.API
         {
         }
         /// <summary>
-        /// Get single item of archive period from it system usage
+        /// Henter en enkelt enhed fra it system anvendelsens arkiv periode 
         /// </summary>
         /// <param name="id"></param>
         /// <param name="system"></param>

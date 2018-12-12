@@ -7,7 +7,7 @@ namespace Presentation.Web.Controllers.API
     public class AgreementElementController : GenericOptionApiController<AgreementElementType, ItContract, OptionDTO>
     {
         /// <summary>
-        /// Inherits from base controller, provides Agreement elements(aftaleelementer) for it contracts
+        /// Nedarver fra base controlleren, udstiller Aftaleelementer of it kontrakter
         /// </summary>
         /// <param name="repository"></param>
         public AgreementElementController(IGenericRepository<AgreementElementType> repository)

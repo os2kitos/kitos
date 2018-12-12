@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.API
     public class ArchiveTestLocationController : GenericOptionApiController<ArchiveTestLocation, ItSystemUsage, OptionDTO>
     {
         /// <summary>
-        /// Archive test location(Arkiveringsteststed) from it system usage, archiving pane 
+        /// Arkiveringsteststed fra it system anvendelsen, arkiverings fanen
         /// </summary>
         /// <param name="repository"></param>
         public ArchiveTestLocationController(IGenericRepository<ArchiveTestLocation> repository)

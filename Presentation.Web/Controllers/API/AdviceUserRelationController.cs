@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.API
             _repository = repository;
         }
         /// <summary>
-        /// Deletes advices with the corresponding id from generic advis
+        /// Sletter adviser med det specificerede id fra en genereisk advis
         /// </summary>
         /// <param name="adviceId"></param>
         /// <returns></returns>

@@ -38,9 +38,10 @@ namespace SwashbuckleODataSample
                 // hold additional metadata for an API. Version and title are required but you can also provide
                 // additional fields by chaining methods off SingleApiVersion.
                 //
-                c.SingleApiVersion("v1", "OS2Kitos dokumentation af API & OData")
+                c.SingleApiVersion("1.0.0", "OS2Kitos dokumentation af API & OData")
                     .Description("Denne dokumentaion udstiller de forskellige kald der kan laves til api'et såvel som OData api'et i kitos. \n" +
-                                 "Mange kald bliver oprettet gennem en gernerisk kontroller disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller.");
+                                 "Mange kald bliver oprettet gennem en gernerisk kontroller disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller. \n \n" +
+                                 "Til information er det ikke alle parametre der skal bruges når API'et tilgås ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk");
                 //.Contact(contactBuilder => contactBuilder
                 //.Url("https://github.com/rbeauchamp/Swashbuckle.OData"));
 
@@ -156,7 +157,7 @@ namespace SwashbuckleODataSample
                 // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
                 // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
                 // 
-                //c.DescribeAllEnumsAsStrings();
+                c.DescribeAllEnumsAsStrings();
 
                 // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
                 //
