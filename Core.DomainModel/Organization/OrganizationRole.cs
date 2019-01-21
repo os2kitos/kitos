@@ -32,6 +32,10 @@
         /// </summary>
         ReportModuleAdmin,
         /// <summary>
+        /// Has only read access.
+        /// </summary>
+        ReadOnly,
+        /// <summary>
         /// God mode
         /// </summary>
         GlobalAdmin

@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -25,6 +25,7 @@
         private gridState = this.gridStateService.getService(this.storageKey);
         public mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -168,6 +169,11 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
+
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -237,8 +243,8 @@
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
                 return regexp.test(Url.toLowerCase());
         };
-
         private activate() {
+            this.canCreate = !this.user.isReadOnly;
             var mainGridOptions: Kitos.IKendoGridOptions<IItProjectOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
                 dataSource: {
@@ -287,7 +293,7 @@
                                 IsTransversal: { type: "boolean" },
                                 IsStrategy: { type: "boolean" },
                                 IsArchived: { type: "boolean" }
-                            }
+                            },
                         },
                         parse: response => {
                             // HACK to flatten the Rights on usage so they can be displayed as single columns
@@ -313,6 +319,12 @@
                                 } else {
                                     project.hasWriteAccess = false;
                                 }
+
+                                if (!project.Parent) { project.Parent = { Name: "" }; }
+                                if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
+                                if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
+                                if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
                             });
 
                             return response;
@@ -324,9 +336,8 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
-                        template: "<a ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -358,7 +369,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -374,9 +385,8 @@
                     }
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -391,6 +401,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -405,6 +416,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -418,6 +430,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -440,10 +453,9 @@
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             var reference = dataItem.Reference;
-
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -460,6 +472,7 @@
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -467,15 +480,28 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folder", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },                       
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -488,6 +514,7 @@
                         template: dataItem => dataItem.ItProjectType ? dataItem.ItProjectType.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -526,7 +553,7 @@
                         filterable: false
                     },
                     {
-                        field: "CurrentPhaseobj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
+                        field: "CurrentPhaseObj.EndDate", title: "Fase: Slutdato", format: "{0:dd-MM-yyyy}", width: 85,
                         persistId: "phaseenddate", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             // handles null cases
@@ -602,7 +629,7 @@
                     },
                     {
                         field: "ItProjectTimeStatus", title: "Status: Tid", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojtime", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -626,7 +653,7 @@
                     },
                     {
                         field: "ItProjectQualityStatus", title: "Status: Kvalitet", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojqual", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -650,7 +677,7 @@
                     },
                     {
                         field: "ItProjectResourcesStatus", title: "Status: Ressourcer", width: 100,
-                        persistId: "statusproj", // DON'T YOU DARE RENAME!
+                        persistId: "statusprojress", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ItProjectStatusUpdates.length > 0) {
                                 var latestStatus = dataItem.ItProjectStatusUpdates[0];
@@ -817,7 +844,11 @@
                     }
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
@@ -836,7 +867,7 @@
 
                         roles = this.concatRoles(dataItem.roles[role.Id]);
 
-                        var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                        var link = `<a data-ui-sref='it-project.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
                         return link;
                     },
@@ -905,7 +936,7 @@
                 var selectedIndex = kendoElem.select();
                 var selectedId = self._.parseInt(kendoElem.value());
 
-                if (selectedIndex > 0) {
+                          if (selectedIndex > 0) {
                     // filter by selected
                     self.$window.sessionStorage.setItem(self.orgUnitStorageKey, selectedId.toString());
                 } else {

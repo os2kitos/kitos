@@ -24,6 +24,7 @@
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -65,6 +66,7 @@
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
+
                     this.mainGrid.dataSource.read();
 
                     // find the access modifier filter row section
@@ -93,8 +95,8 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
-
+            var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
+            this.canCreate = !this.user.isReadOnly;
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -110,17 +112,21 @@
 
                             if (parameterMap.$filter) {
                                 // replaces 'Kitos.AccessModifier0' with Kitos.AccessModifier'0'
-                                parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/, "Kitos.AccessModifier'$2'");
+                                parameterMap.$filter = parameterMap.$filter.replace(/('Kitos\.AccessModifier([0-9])')/,
+                                    "Kitos.AccessModifier'$2'");
                                 // replaces "startswith(TaskKey,'11')" with "TaskRefs/any(c: startswith(c/TaskKey),'11')"
-                                parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
+                                parameterMap.$filter =
+                                    parameterMap.$filter.replace(/(\w+\()(TaskKey.*\))/, "TaskRefs/any(c: $1c/$2)");
                                 // replaces "startswith(TaskName,'11')" with "TaskRefs/any(c: startswith(c/Description),'11')"
-                                parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/, "TaskRefs/any(c: $1c/Description$2)");
+                                parameterMap.$filter = parameterMap.$filter.replace(/(\w+\()TaskName(.*\))/,
+                                    "TaskRefs/any(c: $1c/Description$2)");
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
-                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/, "contains(CAST(Uuid, 'Edm.String'),");
+                                parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/,
+                                    "contains(CAST(Uuid, 'Edm.String'),");
 
-                                if (user.isGlobalAdmin) {
-                                    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
-                                }
+                                //if (user.isGlobalAdmin) {
+                                //    parameterMap.$filter = parameterMap.$filter + "and Disabled eq false";
+                                //}
                             }
 
                             return parameterMap;
@@ -133,9 +139,25 @@
                     schema: {
                         model: {
                             fields: {
-                                LastChanged: { type: "date" }
+                                LastChanged: { type: "date" },
+                                Disabled: { type: "boolean" }
                             }
-                        }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, system => {
+                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                if (!system.Parent) { system.Parent = { Name: "" }; }
+                                if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
+                                if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
+                                if (!system.BelongsTo) { system.BelongsTo = { Name: "" }; }
+                                if (!system.Usages) { system.Usages = []; }
+                                if (!system.Organization) { system.Organization = { Name: "" }; }
+
+
+                            });
+                            return response;
+                        }                    
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -146,30 +168,32 @@
                     {
                         name: "createITSystem",
                         text: "Opret IT System",
-                        template: "<a ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right'>#: text #</a>"
-                    },
-                    {
-                        name: "excel", text: "Eksportér til Excel", className: "pull-right"
+                        template:
+                            "<button ng-click='systemCatalogVm.createITSystem()' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemCatalogVm.clearOptions()'>#: text #</button>"
+                        template:
+                            "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemCatalogVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="systemCatalogVm.saveGridProfile()">#: text #</button>'
+                        template:
+                            '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="systemCatalogVm.saveGridProfile()">#: text #</button>'
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="systemCatalogVm.loadGridProfile()" data-ng-disabled="!systemCatalogVm.doesGridProfileExist()">#: text #</button>'
+                        template:
+                            '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="systemCatalogVm.loadGridProfile()" data-ng-disabled="!systemCatalogVm.doesGridProfileExist()">#: text #</button>'
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemCatalogVm.clearGridProfile()' data-ng-disabled='!systemCatalogVm.doesGridProfileExist()'>#: text #</button>"
+                        template:
+                            "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemCatalogVm.clearGridProfile()' data-ng-disabled='!systemCatalogVm.doesGridProfileExist()'>#: text #</button>"
                     }
                 ],
                 excel: {
@@ -179,7 +203,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -191,9 +215,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -214,7 +237,7 @@
                             if (dataItem.Disabled)
                                 return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(${dataItem.Id})"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
@@ -231,6 +254,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -243,6 +267,7 @@
                         template: dataItem => dataItem.PreviousName != null ? dataItem.PreviousName : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -254,25 +279,45 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled)
-                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv) </a>`;
+                                return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes) </a>`;
                             else
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled)
-                                    return dataItem.Name + " (Inaktiv)";
+                                    return dataItem.Name + " (Slettes)";
                                 else
                                     return dataItem.Name;
                             } else {
-                                return ""
+                                return "";
                             }
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Disabled", title: "Slettes", width: 120,
+                        persistId: "Disabled", // DON'T YOU DARE RENAME!
+                        template: dataItem => { return dataItem.Disabled ? "Ja" : "Nej"; },
+                        hidden: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: true }, { type: "Nej", value: false }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
                             }
                         }
                     },
@@ -296,6 +341,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -309,6 +355,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -321,6 +368,7 @@
                         template: dataItem => dataItem.BelongsTo ? dataItem.BelongsTo.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -335,6 +383,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -349,6 +398,7 @@
                         attributes: { "class": "might-overflow" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "startswith"
@@ -372,6 +422,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -385,6 +436,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -398,6 +450,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -430,7 +483,7 @@
                         }
                     },
                     {
-                        field: "References.Title",
+                        field: "Reference.Title",
                         title: "Reference",
                         width: 150,
                         persistId: "ReferenceId", // DON'T YOU DARE RENAME!
@@ -438,7 +491,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -448,6 +501,36 @@
                         attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-center" },
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -461,6 +544,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -469,6 +553,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         public createITSystem() {
@@ -555,6 +644,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -635,7 +728,7 @@
         };
 
         private exportFlag = false;
-        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
+        private exportToExcel = (e) => {
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {
@@ -715,10 +808,13 @@
         }
 
         // adds system to usage within the current context
-        private addUsage(systemId) {
+        private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
-                itSystemId: systemId,
-                organizationId: this.user.currentOrganizationId
+                itSystemId: dataItem.Id,
+                organizationId: this.user.currentOrganizationId,
+                dataLevel: dataItem.DataLevel,
+                containsLegalInfo: dataItem.ContainsLegalInfo,
+                AssociatedDataWorkers: dataItem.AssociatedDataWorkers
             })
                 .success(() => this.notify.addSuccessMessage("Systemet er taget i anvendelse"))
                 .error(() => this.notify.addErrorMessage("Systemet kunne ikke tages i anvendelse!"));

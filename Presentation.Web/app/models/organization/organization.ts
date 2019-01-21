@@ -22,5 +22,8 @@
         /** Local configuration of KITOS */
         Config: IConfig;
         Type: OrganizationType;
+
+        ContactPersonId: number;
+        ContactPerson: IUser;
     }
 }

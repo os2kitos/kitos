@@ -2,10 +2,15 @@
 
 namespace Presentation.Web.Models
 {
+    using Core.DomainModel.ItSystem;
+    using Core.DomainModel.ItSystem.DataTypes;
     using System;
 
     public class ItSystemUsageDTO
     {
+        public ItSystemUsageDTO(){
+            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelationDTO>();
+        }
         public int Id { get; set; }
         public bool IsStatusActive { get; set; }
         public string Note { get; set; }
@@ -22,6 +27,13 @@ namespace Presentation.Web.Models
         public string ArchiveTypeName { get; set; }
         public int? ArchiveLocationId { get; set; }
         public string ArchiveLocationName { get; set; }
+
+        public int? ArchiveTestLocationId { get; set; }
+
+        public string ArchiveTestLocationName { get; set; }
+
+        public string ArchiveSupplier { get; set; }
+        public int SupplierId { get; set; }
 
         public string ResponsibleOrgUnitName { get; set; }
 
@@ -71,5 +83,51 @@ namespace Presentation.Web.Models
         public DateTime Concluded { get; set; }
 
         public DateTime ExpirationDate { get; set; }
+
+        public int? ItSystemCategoriesId { get; set; }
+
+        public string GeneralPurpose { get; set; }
+
+        public DataOptions isBusinessCritical { get; set; }
+
+        public DataSensitivityLevel DataLevel { get; set; }
+
+        public UserCount UserCount { get; set; }
+
+        public DataOptions ContainsLegalInfo { get; set; }
+        public virtual ICollection<ItSystemUsageDataWorkerRelationDTO> AssociatedDataWorkers { get; set; }
+
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
+
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+
+        public string UserSupervisionDocumentationUrlName { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+
+        public string RiskSupervisionDocumentationUrlName { get; set; }
+        public string RiskSupervisionDocumentationUrl { get; set; }
+
+        public string DPIASupervisionDocumentationUrlName { get; set; }
+        public string DPIASupervisionDocumentationUrl { get; set; }
+
+        public string DataHearingSupervisionDocumentationUrlName { get; set; }
+        public string DataHearingSupervisionDocumentationUrl { get; set; }
+
+        public DateTime UserSupervisionDate { get; set; }
+        public int UserSupervision { get; set; }
+
+        public string LinkToDirectoryUrlName { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+
+        public bool? Archived { get; set; }
+        public int? ArchiveDuty { get; set; }
+        public bool? ReportedToDPA { get; set; }
+        public string DocketNo { get; set; }
+        public string ArchiveNotes { get; set; }
+        public int? ArchiveFreq { get; set; }
+        public bool? Registertype { get; set; }
+        public bool? ArchiveFromSystem { get; set; }
     }
 }

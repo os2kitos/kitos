@@ -67,6 +67,10 @@
 
             this.canCreate = (canGlobalAdminOnlyEditReports.value === "true") ? user.isGlobalAdmin : user.isGlobalAdmin || user.isLocalAdmin || user.isReportAdmin;
 
+            if (!user.isGlobalAdmin && user.isReadOnly){
+                this.canCreate = false;
+            }
+
             this.categoryTypeValues = [];
             var self = this;
             this._.each(this.reportCategoryTypes, function (value) {
@@ -204,7 +208,7 @@
                 },
                 batch: false,
                 sync: false,
-                columnMenu: false,
+                columnMenu: true,
                 serverPaging: true,
                 serverSorting: true,
                 serverFiltering: true,
@@ -234,15 +238,13 @@
                     }
                 },
                 dataSource: dataSource,
-                editable: "popup",
-                height: 550,
+                editable: true,
                 toolbar: [
                     {
                         name: "createReport",
                         template:
                             `<button type="button" class="btn btn-success pull-right" title="Opret rapport" data-ng-click="vm.onCreate()" data-ng-disabled="!vm.canCreate">Opret rapport</button>`
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -271,8 +273,8 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [20],
-                    buttonCount: 20
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
+                    buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
@@ -283,9 +285,8 @@
                 filterable: {
                     mode: "row",
                 },
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -304,6 +305,7 @@
                         excelTemplate: dataItem => dataItem.Name,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -318,6 +320,7 @@
                         excelTemplate: dataItem => dataItem.Description,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -332,6 +335,7 @@
                         menu: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "eq"
@@ -359,6 +363,7 @@
                         width: "60px",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -392,6 +397,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         // saves grid state to localStorage
@@ -401,6 +411,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 

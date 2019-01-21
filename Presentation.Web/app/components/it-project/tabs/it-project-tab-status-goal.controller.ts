@@ -45,6 +45,33 @@
             };
 
             $scope.goals = [];
+            $scope.patchDate = (field, value) => {
+                var date = moment(value, "DD-MM-YYYY");
+                if (value === "") {
+                    var payload = {};
+                    payload[field] = null;
+                    patch(payload, $scope.goalStatus.updateUrl + '?organizationId=' + user.currentOrganizationId);
+                } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                }
+                else {
+                    var dateString = date.format("YYYY-MM-DD");
+                    var payload = {};
+                    payload[field] = dateString;
+                    patch(payload, $scope.goalStatus.updateUrl + '?organizationId=' + user.currentOrganizationId);
+                }
+            }
+            function patch(payload, url) {
+                var msg = notify.addInfoMessage("Gemmer...", false);
+                $http({ method: 'PATCH', url: url, data: payload })
+                    .success(function () {
+                        msg.toSuccessMessage("Feltet er opdateret.");
+                    })
+                    .error(function () {
+                        msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                    });
+            }
 
             function addGoal(goal) {
                 //add goals means show goal in list

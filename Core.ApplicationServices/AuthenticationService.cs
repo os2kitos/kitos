@@ -144,23 +144,33 @@ namespace Core.ApplicationServices
                 // global admin always have access
                 return true;
             }
+            //check if user is readonly
+            if (user.IsReadOnly) {
+                return false;
+            }
+
+            //User has access if user created entity
+            //if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
+            //{
+            //    return true;
+            //}
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
             if (accessModifier == AccessModifier.Public)
             {
-                // Special case for setting accessModifier for EconomyStream and ItContractRemark
-                if (entity is EconomyStream || entity is ItContractRemark)
+                // special case for organisation
+                if (entity is Organization)
                 {
-                    if (!(CanExecute(userId, Feature.CanSetContractElementsAccessModifierToPublic) || userId == entity.ObjectOwnerId))
+                    if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {
                         return false;
                     }
                 }
-                // special case for organisation
-                else if (entity is Organization)
+                //Economy stream can be modified by local admin and contractmodule admin which is why this is a special case.
+                if(entity is EconomyStream)
                 {
-                    if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
+                    if (!_featureChecker.CanExecute(user, Feature.CanSetContractElementsAccessModifierToPublic))
                     {
                         return false;
                     }

@@ -24,8 +24,8 @@
         });
     }]);
 
-    app.controller('contract.PaymentmodelCtrl', ['$scope', '$http', 'notify', 'contract', 'paymentFrequencies', 'paymentModels', 'priceRegulations',
-            function ($scope, $http, notify, contract, paymentFrequencies, paymentModels, priceRegulations) {
+    app.controller('contract.PaymentmodelCtrl', ['$scope', '$http', 'notify', 'user', 'contract', 'paymentFrequencies', 'paymentModels', 'priceRegulations',
+        function ($scope, $http, notify, user, contract, paymentFrequencies, paymentModels, priceRegulations) {
                 $scope.contract = contract;
                 $scope.autosaveUrl = 'api/itcontract/' + contract.id;
                 $scope.paymentFrequencies = paymentFrequencies;
@@ -36,5 +36,34 @@
                     format: "dd-MM-yyyy",
                     parseFormats: ["yyyy-MM-dd"]
                 };
+                $scope.patchDate = (field, value) => {
+                    var date = moment(value, "DD-MM-YYYY");
+                    if (value === "") {
+                        var payload = {};
+                        payload[field] = null;
+                        patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    } else if (value == null) {
+    
+                    } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                        notify.addErrorMessage("Den indtastede dato er ugyldig.");
+
+                    }
+                    else {
+                        var dateString = date.format("YYYY-MM-DD");
+                        var payload = {};
+                        payload[field] = dateString;
+                        patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
+                    }
+                }
+                function patch(payload, url) {
+                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    $http({ method: 'PATCH', url: url, data: payload })
+                        .success(function () {
+                            msg.toSuccessMessage("Feltet er opdateret.");
+                        })
+                        .error(function () {
+                            msg.toErrorMessage("Fejl! Feltet kunne ikke ændres!");
+                        });
+                }
             }]);
 })(angular, app);

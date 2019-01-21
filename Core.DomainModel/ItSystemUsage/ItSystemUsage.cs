@@ -5,6 +5,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystemUsage
 {
+    using ItSystem.DataTypes;
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,6 +20,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             this.Contracts = new List<ItContractItSystemUsage>();
             this.Wishes = new List<Wish>();
+            this.ArchivePeriods = new List<ArchivePeriod>();
             this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
@@ -28,6 +30,7 @@ namespace Core.DomainModel.ItSystemUsage
             this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
+            this.AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation>();
         }
 
         public bool IsActive
@@ -303,7 +306,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         
-        public bool? ArchiveDuty { get; set; }
+        public int? ArchiveDuty { get; set; }
 
         public bool? Archived { get; set; }
 
@@ -316,8 +319,104 @@ namespace Core.DomainModel.ItSystemUsage
 
         public string ArchiveNotes { get; set; }
 
+        public int? ArchiveFreq { get; set; }
+
+        public string ArchiveSupplier { get; set; }
+
+        public bool? Registertype { get; set; }
+
+        public int? SupplierId { get; set; }
+        /// <summary>
+        ///     Gets or sets the organization marked as supplier for this contract.
+        /// </summary>
+        /// <value>
+        ///     The organization.
+        /// </value>
         public int? ArchiveLocationId { get; set; }
 
         public virtual ArchiveLocation ArchiveLocation { get; set; }
+
+        public int? ArchiveTestLocationId { get; set; }
+
+        public virtual ArchiveTestLocation ArchiveTestLocation { get; set; }
+
+        public int? ItSystemCategoriesId { get; set; }
+
+        public virtual ItSystemCategories ItSystemCategories  { get; set; }
+
+        public string GeneralPurpose { get; set;}
+        public DataOptions isBusinessCritical { get; set; }
+        public DataOptions ContainsLegalInfo { get; set; }
+        public DataSensitivityLevel DataLevel { get; set; }
+        public UserCount UserCount { get; set; }
+
+        public string systemCategories { get; set; }
+
+        public string dataProcessor { get; set; }
+
+        public int dataProcessorControl { get; set; }
+
+        public DateTime? lastControl { get; set; }
+
+        public string noteUsage { get; set; }
+        
+        public int precautions { get; set; }
+
+        public int riskAssessment { get; set; }
+
+        public DateTime? riskAssesmentDate { get; set; }
+
+        public int preriskAssessment { get; set; }
+
+        public string noteRisks { get; set; }
+
+        public int DPIAhearing { get; set; }
+
+        public DateTime? DPIADate { get; set; }
+
+        public int DPIA { get; set; }
+
+        public DateTime? DPIADateFor { get; set; }
+
+        public int answeringDataDPIA { get; set; }
+
+        public DateTime? DPIAdeleteDate { get; set; }
+
+        public int numberDPIA { get; set; }
+
+        public bool precautionsOptionsEncryption { get; set; }
+        public bool precautionsOptionsPseudonomisering { get; set; }
+        public bool precautionsOptionsAccessControl { get; set; }
+        public bool precautionsOptionsLogning { get; set; }
+
+        public virtual ICollection<ItSystemUsageDataWorkerRelation> AssociatedDataWorkers { get; set; }
+
+        public string datahandlerSupervisionDocumentationUrlName { get; set; }
+        public string datahandlerSupervisionDocumentationUrl { get; set; }
+
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+
+        public string UserSupervisionDocumentationUrlName { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+
+        public string RiskSupervisionDocumentationUrlName { get; set; }
+        public string RiskSupervisionDocumentationUrl { get; set; }
+        
+        public string DPIASupervisionDocumentationUrlName { get; set; }
+        public string DPIASupervisionDocumentationUrl { get; set; }
+
+        public string DataHearingSupervisionDocumentationUrlName { get; set; }
+        public string DataHearingSupervisionDocumentationUrl { get; set; }
+
+        public DateTime UserSupervisionDate { get; set; }
+
+        public int UserSupervision { get; set; }
+        public string LinkToDirectoryUrl { get; set; }
+        public string LinkToDirectoryUrlName { get; set; }
+
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
+
+        public bool? ArchiveFromSystem { get; set; }
     }
 }

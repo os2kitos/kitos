@@ -64,10 +64,13 @@
         updatePhaseDate(phase: IPhase, num: number): void {
             var dateObject = moment(phase.startDate, "DD-MM-YYYY");
             var startDate;
-            if (dateObject.isValid()) {
+            if (phase.startDate === "") {
+                startDate = null;
+            } else if (dateObject.isValid()) {
                 startDate = dateObject.format("YYYY-MM-DD");
             } else {
-                startDate = null;
+                this.notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                return;
             }
             // update start date of the current phase
             var firstPayload = {};

@@ -3,7 +3,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.DomainModel.ItSystem
 {
-    using System;
+    using DataTypes;
 
     /// <summary>
     /// Represents an it system.
@@ -12,6 +12,7 @@ namespace Core.DomainModel.ItSystem
     {
         public ItSystem()
         {
+            this.ArchivePeriods = new List<ArchivePeriod>();
             this.ItInterfaceExhibits = new List<ItInterfaceExhibit>();
             this.Children = new List<ItSystem>();
             this.TaskRefs = new List<TaskRef>();
@@ -19,6 +20,7 @@ namespace Core.DomainModel.ItSystem
             this.Wishes = new List<Wish>();
             this.Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
+            this.AssociatedDataWorkers = new List<ItSystemDataWorkerRelation>();
 
         }
 
@@ -73,6 +75,7 @@ namespace Core.DomainModel.ItSystem
         public virtual BusinessType BusinessType { get; set; }
 
         public virtual ICollection<Wish> Wishes { get; set; }
+        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
@@ -89,10 +92,32 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<ItSystemUsage.ItSystemUsage> Usages { get; set; }
 
         /// <summary>
-        /// External references
+        /// Gets or sets the ExternalReferences.
         /// </summary>
+        /// <value>
+        /// The ExternalReferences.
+        /// </value>
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+
         public int? ReferenceId { get; set; }
+
         public virtual ExternalReference Reference { get; set; }
+        //GDPR
+        public string GeneralPurpose { get; set; }
+
+        public DataSensitivityLevel DataLevel { get; set; }
+
+        public DataOptions ContainsLegalInfo { get; set; }
+
+        public bool IsDataTransferedToThirdCountries { get; set; }
+
+        public string DataIsTransferedTo { get; set; }
+
+        public int ArchiveDuty { get; set; }
+
+        public virtual ICollection<ItSystemDataWorkerRelation> AssociatedDataWorkers { get; set; }
+
+        public string LinkToDirectoryAdminUrl { get; set; }
+        public string LinkToDirectoryAdminUrlName { get; set; }
     }
 }

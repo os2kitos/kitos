@@ -44,7 +44,7 @@
                                        data-k-options="projectPhasesVm.datepickerOptions"
                                        data-ng-disabled="!projectEditVm.hasWriteAccess"
                                        data-ng-model="phaseCrossDate.startDate"
-                                       data-ng-change="projectPhasesVm.updatePhaseDate(phaseCrossDate, $index + 1)">
+                                       data-ng-blur="projectPhasesVm.updatePhaseDate(phaseCrossDate, $index + 1)">
                             </span>
                         </div>
                     </div>

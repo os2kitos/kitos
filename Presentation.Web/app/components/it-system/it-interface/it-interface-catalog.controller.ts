@@ -18,6 +18,8 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
+        public canCreate: boolean;
+
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -86,6 +88,7 @@
             }
 
             var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,InterfaceType,ObjectOwner,BelongsTo,Organization,Tsa,ExhibitedBy($expand=ItSystem),Method,LastChangedByUser,DataRows($expand=DataType),InterfaceLocalUsages";
+            this.canCreate = !this.user.isReadOnly;
 
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -121,8 +124,21 @@
                             fields: {
                                 LastChanged: { type: "date" }
                             }
+                        },
+                        parse: response => {
+                            // iterrate each usage
+                            this._.forEach(response.value, ItInterface => {
+                                if (!ItInterface.InterfaceType) { ItInterface.InterfaceType = { Name: "" }; }
+                                if (!ItInterface.BelongsTo) { ItInterface.BelongsTo = { Name: "" }; }
+                                if (!ItInterface.ExhibitedBy) { ItInterface.ExhibitedBy = { ItSystem: { Name: "" } }; }
+                                if (!ItInterface.Tsa) { ItInterface.Tsa = { Name: "" }; }
+                                if (!ItInterface.Interface) { ItInterface.Interface = { Name: "" }; }
+                                if (!ItInterface.Method) { ItInterface.Method = { Name: "" }; }
+                                if (!ItInterface.Organization) { ItInterface.Organization = { Name: "" }; }
+                            });
+                            return response;
                         }
-                    },
+                    },                
                     pageSize: 100,
                     serverPaging: true,
                     serverSorting: true,
@@ -132,9 +148,8 @@
                     {
                         name: "createSnitflade",
                         text: "Opret Snitflade",
-                        template: "<a ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right'>#: text #</a>"
+                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -163,7 +178,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -175,9 +190,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -191,6 +205,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.ItInterfaceId || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -202,7 +217,7 @@
                         persistId: "name", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Disabled) {
-                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Inaktiv)</a>`;
+                                return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name} (Slettes)</a>`;
                             } else {
                                 return `<a data-ui-sref='it-system.interface-edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                             }
@@ -210,7 +225,7 @@
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
                                 if (dataItem.Disabled) {
-                                    return dataItem.Name + " (Inaktiv)";
+                                    return dataItem.Name + " (Slettes)";
                                 } else {
                                     return dataItem.Name;
                                 }
@@ -220,6 +235,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -233,6 +249,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -257,6 +274,7 @@
                         template: dataItem => dataItem.InterfaceType ? dataItem.InterfaceType.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -270,6 +288,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -290,6 +309,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -301,36 +321,26 @@
                         persistId: "exhibit", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.ExhibitedBy && dataItem.ExhibitedBy.ItSystem.Name)
-                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Inaktiv)" : dataItem.ExhibitedBy.ItSystem.Name;
+                                return (dataItem.ExhibitedBy.ItSystem.Disabled) ? dataItem.ExhibitedBy.ItSystem.Name + " (Slettes)" : dataItem.ExhibitedBy.ItSystem.Name;
                             else
                                 return "";
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
                             }
                         }
                     },
-                    //{ TODO
-                    //    field: "", title: "Snitflader: Anvendes globalt", width: 115,
-                    //    persistId: "infglobalusage", // DON'T YOU DARE RENAME!
-                    //    template: "#: InterfaceLocalUsages.length #",
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains",
-                    //        }
-                    //    },
-                    //},
                     {
                         field: "Tsa.Name", title: "TSA", width: 90,
                         persistId: "tsa", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Tsa ? dataItem.Tsa.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -344,6 +354,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -357,6 +368,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -386,6 +398,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -399,6 +412,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -412,6 +426,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -425,6 +440,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -457,6 +473,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -465,6 +482,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
 
@@ -525,6 +547,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 

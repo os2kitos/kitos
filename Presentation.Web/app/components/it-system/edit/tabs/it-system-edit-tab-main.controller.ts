@@ -48,41 +48,61 @@
                 $scope.businessTypes = businessTypes.data.value;
                 $scope.itSystemsSelectOptions = selectLazyLoading('api/itsystem', true, ['excludeId=' + itSystem.id, 'orgId=' + user.currentOrganizationId]);
                 $scope.organizationSelectOptions = selectLazyLoading('api/organization', true, ['orgId=' + user.currentOrganizationId]);
-
+            
                 $scope.hasWriteAccess = hasWriteAccess;
+
+
+                $scope.submitDataLevel = function () {
+                    var data = {
+                        DataLevel: $scope.system.dataLevel
+                    };
+                    $http.patch("api/itsystem/" + itSystem.id + "?organizationId=" + itSystem.organizationId, data).success(function (result) {
+                        notify.addSuccessMessage("Feltet er opdateret.");
+
+                    }).error(function (result) {
+                        notify.addErrorMessage('Fejl!');
+                    });
+                };
+
 
                 function selectLazyLoading(url, allowClear, paramAry) {
                     return {
                         minimumInputLength: 1,
-                        initSelection: function (elem, callback) {
+                        initSelection: (elem, callback) => {
                         },
                         allowClear: allowClear,
                         ajax: {
-                            data: function (term, page) {
-                                return { query: term };
-                            },
+                            data: (term, page) => ({ query: term }),
                             quietMillis: 500,
-                            transport: function (queryParams) {
+                            transport: (queryParams) => {
                                 var extraParams = paramAry ? '&' + paramAry.join('&') : '';
                                 var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
-
                                 return res;
                             },
-
-                            results: function (data, page) {
+                            
+                            results: (data, page) => {
                                 var results = [];
-
-                                _.each(data.data.response, function (obj: { id; name; }) {
-
-                                    results.push({
-                                        id: obj.id,
-                                        text: obj.name
+                                if (url === 'api/itsystem') {
+                                    _.each(data.data.response, (obj: { id; name; disabled; }) => {
+                                        if (obj.disabled === false) {
+                                            results.push({
+                                                id: obj.id,
+                                                text: obj.name
+                                            });
+                                        }
                                     });
-                                });
-
+                                }
+                                else {
+                                    _.each(data.data.response, (obj: { id; name; }) => {
+                                        results.push({
+                                            id: obj.id,
+                                            text: obj.name
+                                        });
+                                    }); 
+                                }
                                 return { results: results };
                             }
                         }

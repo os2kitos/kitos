@@ -9,6 +9,7 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
+        isReadOnly: boolean;
     }
 
     class OrganizationUserController {
@@ -86,9 +87,9 @@
                             // iterate each user
                             this._.forEach(response.value, (usr: IGridModel) => {
                                 // set if the user can edit
-                                if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this.user.isOrgAdmin) {
+                                if (this.user.isGlobalAdmin || ((this.user.isLocalAdmin || this.user.isOrgAdmin) && !this.user.isReadOnly)) {
                                     usr.canEdit = true;
-                                } else if (this.user.id === usr.Id) {
+                                } else if (this.user.id === usr.Id && !this.user.isReadOnly) {
                                     usr.canEdit = true;
                                 } else {
                                     usr.canEdit = false;
@@ -103,6 +104,7 @@
                                 usr.isSystemAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.SystemModuleAdmin) !== undefined;
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
+                                usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
                             });
                             return response;
                         }
@@ -115,22 +117,21 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
                     mode: "single"
                 },
-                editable: "popup",
+                editable: true,
                 reorderable: true,
                 resizable: true,
                 filterable: {
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 detailTemplate: (dataItem) => `<uib-tabset active="0">
                     <uib-tab index="0" heading="Organisation roller"><user-organization-unit-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-organization-unit-roles></uib-tab>
                     <uib-tab index="1" heading="Projekt roller"><user-project-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-project-roles></uib-tab>
@@ -147,6 +148,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -161,6 +163,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -183,6 +186,7 @@
                         hidden: false,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -200,6 +204,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -261,6 +266,15 @@
                         sortable: false
                     },
                     {
+                        field: "isReadOnly", title: "Bruger med læserettigheder", width: 112,
+                        persistId: "readonlyRole", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center" },
+                        template: (dataItem) => dataItem.isReadOnly ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: false,
+                        filterable: false,
+                        sortable: false
+                    },
+                    {
                         template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
                         title: " ",
                         width: 176,
@@ -268,6 +282,11 @@
                     }
                 ]
             };
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
         }
 
         public onEdit(entityId) {

@@ -16,6 +16,7 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
+        isReadOnly: boolean;
 
         orgAndDefaultUnit: any;
 
@@ -32,8 +33,8 @@
     }
 
     export interface IUserService {
-        reAuthorize(): ng.IPromise<IUser>;
-        getUser(): ng.IPromise<IUser>;
+        reAuthorize(): any;
+        getUser(): any;
         login(email: string, password: string, rememberMe: boolean): ng.IPromise<any>;
         logout(): ng.IHttpPromise<any>;
         auth(adminRoles): ng.IPromise<any>;
@@ -78,6 +79,9 @@
             var isReportAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.ReportModuleAdmin && userRight.organizationId == currOrg.id;
             });
+            var isReadOnly = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
+                return userRight.role == Kitos.API.Models.OrganizationRole.ReadOnly && userRight.organizationId == currOrg.id;
+            });
 
             // the current org unit is the default org unit for this organization if the user has selected one
             // otherwise it's the root of this organization
@@ -115,6 +119,7 @@
                 isSystemAdmin: isSystemAdmin,
                 isContractAdmin: isContractAdmin,
                 isReportAdmin: isReportAdmin,
+                isReadOnly: isReadOnly,
 
                 orgAndDefaultUnit: orgAndDefaultUnit,
 

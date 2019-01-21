@@ -124,9 +124,23 @@ namespace Core.DomainModel
 
         public bool IsGlobalAdmin { get; set; }
 
+        public bool IsReadOnly {
+            get
+            {
+                return OrganizationRights.Any(
+                    right => (right.Role == OrganizationRole.ReadOnly) &&
+                             (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
+            }
+        }
+
         public override bool HasUserWriteAccess(User user)
         {
-            return (Id == user.Id) || base.HasUserWriteAccess(user);
+            if (IsReadOnly) {
+                return (Id == user.Id) || base.HasUserWriteAccess(user);
+            }else
+            {
+                return IsReadOnly;
+            }
         }
 
         public bool IsLocalAdmin

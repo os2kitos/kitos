@@ -61,6 +61,9 @@
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserReportAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReportAdmin">Rapport admin</label>
                 </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserReportAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReadOnly">Bruger med læserettighed</label>
+                </div>
             </div>
         </div>
     </form>

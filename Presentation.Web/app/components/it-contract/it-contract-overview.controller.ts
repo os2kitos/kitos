@@ -4,7 +4,7 @@
     export interface IOverviewController {
         mainGrid: IKendoGrid<IItContractOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -18,6 +18,7 @@
         Operation: number;
         Other: number;
         AuditDate: string;
+        ContainsDataHandlerAgreement: string;
         status: {
             max: number;
             white: number;
@@ -35,6 +36,7 @@
         private roleSelectorDataSource;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
+        public canCreate: boolean;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -167,6 +169,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -222,6 +228,20 @@
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
+        
+
+        public parseOptionEnum(enumName: string): string {
+            switch (enumName) {
+                case "YES":
+                    return "Ja";
+                case "NO":
+                    return "Nej";
+                case "DONTKNOW":
+                    return "Ved ikke";
+                default:
+                    return "";
+            }
+        }      
 
         private activate() {
 
@@ -229,6 +249,8 @@
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
             this.roleSelectorDataSource = clonedItContractRoles;
+
+            this.canCreate = !this.user.isReadOnly;
 
             var mainGridOptions: IKendoGridOptions<IItContractOverview> = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -287,7 +309,8 @@
                                 Terminated: { type: "date" },
                                 Acquisition: { type: "number" },
                                 Operation: { type: "number" },
-                                Other: { type: "number" }
+                                Other: { type: "number" },
+                                IsActive: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -336,6 +359,13 @@
                                             contract.roles[right.RoleId]
                                                 .push([right.User.Name, right.User.LastName].join(" "));
                                         });
+                                    if (!contract.Parent) { contract.Parent = { Name: "" }; }
+                                    if (!contract.ResponsibleOrganizationUnit) { contract.ResponsibleOrganizationUnit = { Name: "" }; }
+                                    if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
+                                    if (!contract.PaymentFreqency) { contract.PaymentFreqency = { Name: "" }; }
+                                    if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
                                 });
                             return response;
                         }
@@ -347,9 +377,8 @@
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
-                        "<a ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right'>#: text #</a>"
+                        "<button ng-click='contractOverviewVm.opretITKontrakt()' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -385,7 +414,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -397,9 +426,8 @@
                     mode: "row"
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -408,13 +436,12 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "isActive", title: "Aktiv", width: 50,
-                        persistId: "active", // DON'T YOU DARE RENAME!
+                        field: "IsActive", title: "Gyldig/Ikke gyldig", width: 150,
+                        persistId: "isActive", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            var isActive = this.isContractActive(dataItem);
-
-                            if (isActive)
+                            if (dataItem.IsActive) {
                                 return '<span class="fa fa-file text-success" aria-hidden="true"></span>';
+                            }
                             return '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>';
                         },
                         excelTemplate: dataItem => {
@@ -427,6 +454,20 @@
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
+                        //{
+                        //    cell: {
+                        //        template: args => {
+                        //            args.element.kendoDropDownList({
+                        //                dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
+                        //                dataTextField: "type",
+                        //                dataValueField: "value",
+                        //                valuePrimitive: true
+                        //            });
+                        //        },
+                        //        showOperators: false
+                           
+                        //    }
+                        //}
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -435,6 +476,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -449,6 +491,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -462,6 +505,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -486,7 +530,7 @@
                             var value = "";
                             if (dataItem.AssociatedSystemUsages.length > 0) {
                                 if (this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Disabled)
-                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Inaktiv)";
+                                    value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name + " (Slettes)";
                                 else
                                     value = this._.first(dataItem.AssociatedSystemUsages).ItSystemUsage.ItSystem.Name;
                             }
@@ -499,6 +543,7 @@
                         },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -513,6 +558,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -526,7 +572,7 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 if (reference.URL) {
-                                    return "<a style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;
                                 }
@@ -536,6 +582,7 @@
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -543,15 +590,28 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder", title: "Mappe ref", width: 150,
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
                         persistId: "folderref", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title + 
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -587,6 +647,28 @@
                         filterable: false
                     },
                     {
+                        field: "ContainsDataHandlerAgreement", title: "Databehandleraftale", width: 150,
+                        persistId: "ContainsDataHandlerAgreement", // DON'T YOU DARE RENAME!
+                        excelTemplate: dataItem => dataItem && dataItem.ContainsDataHandlerAgreement || "",
+                        template: dataItem => this.parseOptionEnum(dataItem.ContainsDataHandlerAgreement),
+                        attributes: { "class": "text-right" },
+                        hidden: true,
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                template: function (args) {
+                                    args.element.kendoDropDownList({
+                                        dataSource: [{ type: "Ja", value: "YES" }, { type: "Nej", value: "NO" }, { type: "Ved ikke", value: "DONTKNOW" }],
+                                        dataTextField: "type",
+                                        dataValueField: "value",
+                                        valuePrimitive: true
+                                    });
+                                },
+                                showOperators: false
+                            }
+                        }
+                    },
+                    {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "opremun", // DON'T YOU DARE RENAME!
                         excelTemplate: dataItem => {
@@ -611,6 +693,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -624,6 +707,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -658,16 +742,13 @@
                         sortable: false,
                         filterable: false
                     }
-                    //{
-                    //    field: "Advices.AlarmDate", title: "Dato for næste advis", width: 150,
-                    //    persistId: "nextadvis", // DON'T YOU DARE RENAME!
-                    //    template: nextAdviceTemplate,
-                    //    sortable: false,
-                    //    filterable: false,
-                    //},
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': "orgunit" }) + 1;
 
@@ -688,7 +769,7 @@
                     }
                 }
             };
-            mainGridOptions.columns.splice(insertIndex, 0, signerRole);
+            mainGridOptions.columns.splice(insertIndex, 0, signerRole); 
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
@@ -747,9 +828,9 @@
 
 
             if (!dataItem.Active) {
-                var today = this.moment();
-                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded) : today;
-                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate) : this.moment("9999-12-30");
+                var today = this.moment().startOf('day');
+                var startDate = dataItem.Concluded ? this.moment(dataItem.Concluded).startOf('day') : today;
+                var endDate = dataItem.ExpirationDate ? this.moment(dataItem.ExpirationDate).startOf('day') : this.moment("9999-12-30").startOf('day');
 
                 if (dataItem.Terminated) {
                     var terminationDate = this.moment(dataItem.Terminated);
@@ -761,7 +842,6 @@
                 return today >= startDate && today <= endDate;
             }
             return dataItem.Active;
-
         }
 
         private exportFlag = false;

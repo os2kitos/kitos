@@ -398,6 +398,10 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(User obj, User user, int organizationId)
         {
+            //if user is readonly
+            if (user.IsReadOnly && !user.IsGlobalAdmin)
+                return false;
+
             var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
             if (isLocalAdmin)
                 return true;

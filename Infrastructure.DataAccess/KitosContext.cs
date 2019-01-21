@@ -1,4 +1,4 @@
-using System.Data.Entity;
+    using System.Data.Entity;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -29,11 +29,13 @@ namespace Infrastructure.DataAccess
             Database.Log = null;
         }
 
+        public DbSet<ItContractAgreementElementTypes> ItContractAgreementElementTypes { get; set; }
         public DbSet<OrganizationRight> OrganizationRights { get; set; }
         public DbSet<Core.DomainModel.Advice.Advice> Advices { get; set; }
         public DbSet<AgreementElementType> AgreementElementTypes { get; set; }
         public DbSet<ArchiveType> ArchiveTypes { get; set; }
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
+        public DbSet<ArchiveTestLocation> ArchiveTestLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
         public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
@@ -73,6 +75,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOrgUnitUsage> ItSystemUsageOrgUnitUsages { get; set; }
         public DbSet<ItSystem> ItSystems { get; set; }
         public DbSet<ItSystemUsage> ItSystemUsages { get; set; }
+        public DbSet<ItSystemCategories> ItSystemCategories { get; set; }
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
         public DbSet<ItSystemType> ItSystemTypes { get; set; }
@@ -103,10 +106,12 @@ namespace Infrastructure.DataAccess
         public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
+        public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
 
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
         public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
         public DbSet<LocalArchiveLocation> LocalArchiveLocation { get; set; }
+        public DbSet<LocalArchiveTestLocation> LocalArchiveTestLocation { get; set; }
         public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
         public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }
@@ -121,6 +126,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
         public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
+        public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
         public DbSet<LocalMethodType> LocalMethodTypes { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
         public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
@@ -131,12 +137,22 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalReportCategoryType> LocalReportCategoryTypes { get; set; }
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
+        public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
+        public DbSet<LocalRegularPersonalDataType> LocalRegularPersonalDataTypes { get; set; }
         public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
         public DbSet<AdviceSent> AdviceSent { get; set; }
-        public DbSet<ItContractRemark> ItContractNoteses { get; set; }
+        public DbSet<RegularPersonalDataType> RegularPersonalDataTypes { get; set; }
+        public DbSet<AttachedOption> AttachedOptions { get; set; }
+        public DbSet<SensitivePersonalDataType> SensitivePersonalDataTypes { get; set; }
+        public DbSet<ItSystemDataWorkerRelation> ItSystemWorkers { get; set; }
+        public DbSet<DataResponsible> DataResponsibles { get; set; }
+        public DbSet<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+        public DbSet<RegisterType> RegisterTypes { get; set; }
+        public DbSet<LocalRegisterType> LocalRegisterTypes { get; set; }
+        public DbSet<ContactPerson> ContactPersons { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -179,7 +195,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
-            modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
+    
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
@@ -215,11 +231,18 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());
+            modelBuilder.Configurations.Add(new ArchivePeriodMap());
             modelBuilder.Configurations.Add(new PriceRegulationTypeMap());
             modelBuilder.Configurations.Add(new PaymentModelTypeMap());
             modelBuilder.Configurations.Add(new PaymentFreqencyTypeMap());
             modelBuilder.Configurations.Add(new OptionExtendTypeMap());
-            modelBuilder.Configurations.Add(new ItContractRemarkMap());
+            modelBuilder.Configurations.Add(new ItContractItSystemUsageMap());
+            modelBuilder.Configurations.Add(new ItContractAgreementElementTypeMap());
+            modelBuilder.Configurations.Add(new RegularPersonalDataTypeMap()); 
+            modelBuilder.Configurations.Add(new ItSystemDataWorkerRelationMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
+            modelBuilder.Configurations.Add(new DataResponsibleMap());
+            modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
         }
     }
 }

@@ -42,8 +42,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ParentId)
                 .WillCascadeOnDelete(false);
 
-            HasMany(t => t.AgreementElements)
-                .WithMany(t => t.References);
+            HasMany(t => t.AssociatedAgreementElementTypes)
+               .WithRequired(t => t.ItContract)
+               .HasForeignKey(t=> t.ItContract_Id);
 
             HasOptional(t => t.ResponsibleOrganizationUnit)
                 .WithMany(t => t.ResponsibleForItContracts)
@@ -57,10 +58,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.OrganizationId)
                 .WillCascadeOnDelete(false);
-
-            HasOptional(c => c.Remark)
-                .WithRequired(r => r.ItContract)
-                .WillCascadeOnDelete(true);
         }
     }
 }

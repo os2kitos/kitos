@@ -4,7 +4,7 @@
     export interface IOverviewInactiveController {
         mainGrid: IKendoGrid<IItProjectInactiveOverview>;
         mainGridOptions: kendo.ui.GridOptions;
-        roleSelectorOptions: kendo.ui.DropDownListOptions;
+        roleSelectorOptions: any;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -95,6 +95,10 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
+            //Add only excel option if user is not readonly
+            if (!this.user.isReadOnly) {
+                this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
+            }
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -224,14 +228,17 @@
                                 if (this.user.isGlobalAdmin || this.user.isLocalAdmin || this._.find(project.Rights, { 'userId': this.user.id })) {
                                     project.hasWriteAccess = true;
                                 }
+                                if (!project.Parent) { project.Parent = { Name: "" }; }
+                                if (!project.ResponsibleUsage) { project.ResponsibleUsage = { OrganizationUnit: { Name: "" } } };
+                                if (!project.ItProjectType) { project.ItProjectType = { Name: "" }; }
+                                if (!project.GoalStatus) { project.GoalStatus = { Status: "" }; }
+                                if (!project.Reference) { project.Reference = { Title: "", ExternalReferenceId: "" }; }
                             });
-
                             return response;
                         }
                     }
                 },
                 toolbar: [
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
@@ -263,7 +270,7 @@
                 },
                 pageable: {
                     refresh: true,
-                    pageSizes: [10, 25, 50, 100, 200],
+                    pageSizes: [10, 25, 50, 100, 200, "all"],
                     buttonCount: 5
                 },
                 sortable: {
@@ -279,9 +286,8 @@
                     }
                 },
                 groupable: false,
-                columnMenu: {
-                    filterable: false
-                },
+                columnMenu: true,
+                height: window.innerHeight - 200,
                 dataBound: this.saveGridOptions,
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
@@ -296,6 +302,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -310,6 +317,7 @@
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -323,6 +331,7 @@
                         excelTemplate: dataItem => dataItem && dataItem.Name ? dataItem.Name : "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -340,31 +349,24 @@
                             }
                         }
                     },
-                    // MySQL ERROR: String was not recognized as a valid Boolean
-                    //{
-                    //    field: "ItSystemUsages.ItSystem.Name", title: "IT System", width: 150,
-                    //    persistId: "sysnames", // DON'T YOU DARE RENAME!
-                    //    template: "#: Parent ? Parent.Name : '' #",
-                    //    hidden: true,
-                    //    filterable: {
-                    //        cell: {
-                    //            dataSource: [],
-                    //            showOperators: false,
-                    //            operator: "contains"
-                    //        }
-                    //    }
-                    //},
-                    // TODO Reference skal muligvis indføres som i it-project-overview
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Esdh", title: "ESDH ref", width: 150,
-                        persistId: "esdh", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Esdh ? `<a target="_blank" href="${dataItem.Esdh}"><i class="fa fa-link"></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Esdh || "",
-                        attributes: { "class": "text-center" },
-                        hidden: true,
+                        field: "Reference.Title", title: "Reference", width: 150,
+                        persistId: "ReferenceId", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.URL) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
+                        attributes: { "class": "text-left" },
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -372,15 +374,28 @@
                         }
                     },
                     {
-                        // TODO Skal muligvis slettes
-                        field: "Folder", title: "Mappe ref", width: 150,
-                        persistId: "folder", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.Folder ? `<a target="_blank" href="${dataItem.Folder}"><i class="fa fa-link"></i></a>` : "",
-                        excelTemplate: dataItem => dataItem && dataItem.Folder || "",
+                        field: "Reference.ExternalReferenceId", title: "Mappe ref", width: 150,
+                        persistId: "folderref", // DON'T YOU DARE RENAME!
+                        template: dataItem => {
+                            var reference = dataItem.Reference;
+                            if (reference != null) {
+                                if (reference.ExternalReferenceId) {
+                                    return "<a target=\"_blank\" style=\"float:left;\" href=\"" +
+                                        reference.ExternalReferenceId +
+                                        "\">" +
+                                        reference.Title +
+                                        "</a>";
+                                } else {
+                                    return reference.Title;
+                                }
+                            }
+                            return "";
+                        },
                         attributes: { "class": "text-center" },
                         hidden: true,
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -393,6 +408,7 @@
                         template: dataItem => dataItem.ItProjectType && dataItem.ItProjectType.Name || "",
                         filterable: {
                             cell: {
+                                template: customFilter,
                                 dataSource: [],
                                 showOperators: false,
                                 operator: "contains"
@@ -654,7 +670,11 @@
                     }
                 ]
             };
-
+            function customFilter(args) {
+                args.element.kendoAutoComplete({
+                    noDataTemplate: ''
+                });
+            }
             // find the index of column where the role columns should be inserted
             var insertIndex = this._.findIndex(mainGridOptions.columns, { 'persistId': 'orgunit' }) + 1;
 
@@ -673,7 +693,7 @@
 
                         roles = this.concatRoles(dataItem.roles[role.Id]);
 
-                        var link = `<a data-ui-sref='it-system.usage.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                        var link = `<a data-ui-sref='it-project.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
                         return link;
                     },
@@ -700,7 +720,6 @@
                 // insert the generated column at the correct location
                 mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
             });
-
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
         }

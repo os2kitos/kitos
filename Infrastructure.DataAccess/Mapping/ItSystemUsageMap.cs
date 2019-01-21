@@ -62,6 +62,14 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.ArchiveLocation)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ArchiveLocationId);
+
+            this.HasOptional(t => t.ArchiveTestLocation)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ArchiveTestLocationId);
+
+            this.HasOptional(t => t.ItSystemCategories)
+                .WithMany(t => t.References)
+                .HasForeignKey(d => d.ItSystemCategoriesId);
         }
     }
 }

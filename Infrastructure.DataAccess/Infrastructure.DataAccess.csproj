@@ -96,6 +96,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -105,6 +107,12 @@
   <ItemGroup>
     <Compile Include="GenericRepository.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\DataResponsibleMap.cs" />
+    <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
+    <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
+    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
+    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
     <Compile Include="Mapping\AdviceSentMap.cs" />
     <Compile Include="Mapping\AgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ArchiveLocationMap.cs" />
@@ -112,9 +120,10 @@
     <Compile Include="Mapping\CommunicationMap.cs" />
     <Compile Include="Mapping\ConfigMap.cs" />
     <Compile Include="Mapping\ExternalReferenceMap.cs" />
-    <Compile Include="Mapping\ItContractRemarkMap.cs" />
+    <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
     <Compile Include="Mapping\ItContractTemplateMap.cs" />
     <Compile Include="Mapping\ItContractTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemCategoriesMap.cs" />
     <Compile Include="Mapping\OptionExtendTypeMap.cs" />
     <Compile Include="Mapping\OrganizationTypeMap.cs" />
     <Compile Include="Mapping\OrganizationRightMap.cs" />
@@ -177,6 +186,7 @@
     <Compile Include="Mapping\StakeholderMap.cs" />
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
+    <Compile Include="Mapping\ArchivePeriodMap.cs" />
     <Compile Include="Mapping\WishMap.cs" />
     <Compile Include="Migrations\201607110712126_Initial.cs" />
     <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
@@ -394,6 +404,142 @@
     <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.Designer.cs">
       <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.cs" />
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.Designer.cs">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.cs" />
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.Designer.cs">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.cs" />
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.Designer.cs">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.cs" />
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.Designer.cs">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.cs" />
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.Designer.cs">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.cs" />
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.Designer.cs">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.cs" />
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801041517268_new optionTypes added.cs" />
+    <Compile Include="Migrations\201801041517268_new optionTypes added.Designer.cs">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.cs" />
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.Designer.cs">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.cs" />
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.Designer.cs">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.cs" />
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.Designer.cs">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.cs" />
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.Designer.cs">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.cs" />
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.Designer.cs">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.cs" />
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.Designer.cs">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801241120532_register type option added.cs" />
+    <Compile Include="Migrations\201801241120532_register type option added.Designer.cs">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.cs" />
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.Designer.cs">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802070853146_Merge_issue.cs" />
+    <Compile Include="Migrations\201802070853146_Merge_issue.Designer.cs">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.cs" />
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.Designer.cs">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.cs" />
+    <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.Designer.cs">
+      <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs" />
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.Designer.cs">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.cs" />
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.Designer.cs">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.cs" />
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.Designer.cs">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802191216367_DPIAAdded.cs" />
+    <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.cs" />
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.Designer.cs">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.cs" />
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.Designer.cs">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803010908075_GDPRChanges.cs" />
+    <Compile Include="Migrations\201803010908075_GDPRChanges.Designer.cs">
+      <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.cs" />
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.Designer.cs">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803050825306_ArchivingNew.cs" />
+    <Compile Include="Migrations\201803050825306_ArchivingNew.Designer.cs">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804091133514_ArchiveFromSystemAdded.cs" />
+    <Compile Include="Migrations\201804091133514_ArchiveFromSystemAdded.Designer.cs">
+      <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.cs" />
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.Designer.cs">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804111226032_OrganizationPropertyAdded.cs" />
+    <Compile Include="Migrations\201804111226032_OrganizationPropertyAdded.Designer.cs">
+      <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804161323008_ContactPersonAdded.cs" />
+    <Compile Include="Migrations\201804161323008_ContactPersonAdded.Designer.cs">
+      <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -581,6 +727,108 @@
     <EmbeddedResource Include="Migrations\201708171252435_Added PreviousName to ItSystem.resx">
       <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710040651514_access modifier removed from itcontractremark.resx">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111321047_Removed itContractRemark entity.resx">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711221241038_Override of exisiting table.resx">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281114451_general purpose added to itsystem.resx">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281227026_data level added to itsystem.resx">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291105417_containslegalinfo added to itsystem.resx">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801041517268_new optionTypes added.resx">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801101135275_dataworkers added to system.resx">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191355102_added new fields to org and two new entities.resx">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191413299_1280_GDPRSystemUsage.resx">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191527385_general purpose added to usage.resx">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801230816140_isBusinessCritical added to system usage.resx">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231023532_dataLevel added to system usage.resx">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231236182_UserCount Added to Systemusage.resx">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.resx">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801241120532_register type option added.resx">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.resx">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802070853146_Merge_issue.resx">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802090900414_databehandlere added to itsystemusage.resx">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802091422355_objectType to make attachedoption more generic.resx">
+      <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.resx">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161445054_reference fields added to sysusage.resx">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161536558_user supervision info added to sysusage.resx">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.resx">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281250267_Name for url on itcontract added.resx">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803010908075_GDPRChanges.resx">
+      <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021222458_cascade delete added to itprojectusage.resx">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050825306_ArchivingNew.resx">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804091133514_ArchiveFromSystemAdded.resx">
+      <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804110855592_approved added to archiveperiod.resx">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804111226032_OrganizationPropertyAdded.resx">
+      <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804161323008_ContactPersonAdded.resx">
+      <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -596,13 +844,6 @@
     <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets" Condition="Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\GitVersionTask.3.6.3\build\dotnet\GitVersionTask.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

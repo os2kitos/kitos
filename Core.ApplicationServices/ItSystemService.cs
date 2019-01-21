@@ -10,10 +10,12 @@ namespace Core.ApplicationServices
     public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
+        private readonly IGenericRepository<ItSystemRight> _Rightsrepository;
 
-        public ItSystemService(IGenericRepository<ItSystem> repository)
+        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<ItSystemRight> rightsrepository)
         {
             _repository = repository;
+            _Rightsrepository = rightsrepository;
         }
 
 
@@ -107,5 +109,13 @@ namespace Core.ApplicationServices
             _repository.Delete(system);
             _repository.Save();
         }
+
+        public IEnumerable<ItSystem> ReportItSystemRights()
+        {
+            var rights = _Rightsrepository.Get();
+
+            return null;
+        }
+
     }
 }

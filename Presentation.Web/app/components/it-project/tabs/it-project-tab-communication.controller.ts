@@ -49,8 +49,8 @@
     }]);
 
     app.controller("project.EditCommunicationCtrl",
-    ["$scope", "$http", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user",
-        function ($scope, $http, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
+        ["$scope", "$http", "notify", "$timeout", "$state", "$stateParams", "comms", "usersWithRoles", "user",
+            function ($scope, $http, notify, $timeout, $state, $stateParams, comms, usersWithRoles, user) {
             $scope.comms = comms;
             $scope.usersWithRoles = _.values(usersWithRoles);
             $scope.datepickerOptions = {
@@ -81,6 +81,14 @@
                 $http.delete("api/communication/" + id + "?organizationId=" + user.currentOrganizationId).finally(reload);
             };
 
+            $scope.checkDate = (value) => {
+                var date = moment(value, "DD-MM-YYYY");
+                $scope.DateFailed = false;
+                if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
+                    notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                    $scope.DateFailed = true;
+                }
+            }
             // work around for $state.reload() not updating scope
             // https://github.com/angular-ui/ui-router/issues/582
             function reload() {

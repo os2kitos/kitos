@@ -16,6 +16,8 @@
         /** Has write access to everything within the contract module */
         ContractModuleAdmin,
         /** Has write access to organization reports. */
-        ReportModuleAdmin
+        ReportModuleAdmin,
+        /** Has read access only */
+        ReadOnly
     }
 }

@@ -138,6 +138,7 @@
                 });
 
                 grid.setOptions(gridOptions);
+                grid.dataSource.pageSize(grid.dataSource.options.pageSize);
             }
 
             // gets all the saved options, both session and local, and merges

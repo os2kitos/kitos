@@ -5,8 +5,8 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     /// It contract agreement elements options.
     /// </summary>
-    public class AgreementElementType : OptionEntity<ItContract>, IOptionReference<ItContract>
+    public class AgreementElementType : OptionEntity<ItContract>, IOptionReference<ItContractAgreementElementTypes>
     {
-        public virtual ICollection<ItContract> References { get; set; } = new HashSet<ItContract>();
+        public virtual ICollection<ItContractAgreementElementTypes> References { get; set; } = new HashSet<ItContractAgreementElementTypes>();
     }
 }

@@ -48,6 +48,11 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystem_Id)
                 //No cascading delete in order to avoid causing cycles or multiple cascade paths
                 .WillCascadeOnDelete(false);
+
+            this.HasMany(t => t.AssociatedDataWorkers)
+                .WithRequired(t => t.ItSystem)
+                .HasForeignKey(t => t.ItSystemId)
+                .WillCascadeOnDelete(true);
         }
     }
 }

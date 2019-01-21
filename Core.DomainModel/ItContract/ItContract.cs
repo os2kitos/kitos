@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.ItSystem.DataTypes;
 // ReSharper disable VirtualMemberCallInConstructor
 
 namespace Core.DomainModel.ItContract
@@ -13,8 +14,8 @@ namespace Core.DomainModel.ItContract
     {
         public ItContract()
         {
-            AgreementElements = new List<AgreementElementType>();
             Children = new List<ItContract>();
+            AssociatedAgreementElementTypes = new List<ItContractAgreementElementTypes>();
             AssociatedSystemUsages = new List<ItContractItSystemUsage>();
             AssociatedInterfaceUsages = new List<ItInterfaceUsage>();
             AssociatedInterfaceExposures = new List<ItInterfaceExhibitUsage>();
@@ -62,7 +63,6 @@ namespace Core.DomainModel.ItContract
             }
         }
 
-
         /// <summary>
         ///     Determines whether this instance is within a given organizational context.
         /// </summary>
@@ -76,7 +76,17 @@ namespace Core.DomainModel.ItContract
         }
 
         public int? ReferenceId { get; set; }
+
         public virtual ExternalReference Reference { get; set; }
+
+        public DataOptions ContainsDataHandlerAgreement { get; set; }
+
+        public string DataHandlerAgreementUrlName { get; set; }
+        public string DataHandlerAgreementUrl { get; set; }
+
+        public int? DataHandlerId { get; set; }
+        public virtual ItContract DataHandler { get; set; }
+
 
         #region Master
 
@@ -337,14 +347,6 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<ItContract> Children { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the chosen agreement elements.
-        /// </summary>
-        /// <value>
-        ///     Chosen agreement elements.
-        /// </value>
-        public virtual ICollection<AgreementElementType> AgreementElements { get; set; }
-
         #endregion
 
         #region Deadlines (aftalefrister)
@@ -521,6 +523,11 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
+        #region Elementtypes
+        
+        public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
+        #endregion
+
         #region IT Systems
 
         /// <summary>
@@ -571,6 +578,7 @@ namespace Core.DomainModel.ItContract
 
         #endregion
 
-        public virtual ItContractRemark Remark { get; set; }
+
+
     }
 }

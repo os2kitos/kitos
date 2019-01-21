@@ -26,18 +26,22 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IGenericRepository<ItSystemRole> _roleRepository;
+        private readonly IGenericRepository<AttachedOption> _attachedOptionsRepository;
+
 
         public ItSystemUsageController(IGenericRepository<ItSystemUsage> repository,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<ItSystemRole> roleRepository)
+            IGenericRepository<ItSystemRole> roleRepository,
+            IGenericRepository<AttachedOption> attachedOptionsRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
             _roleRepository = roleRepository;
+            _attachedOptionsRepository = attachedOptionsRepository;
         }
 
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
@@ -75,6 +79,35 @@ namespace Presentation.Web.Controllers.API
                 var usages = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(usages));
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
+        public override HttpResponseMessage GetSingle(int id)
+        {
+
+            try
+            {
+                var item = Repository.GetByKey(id);
+
+                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                {
+                    return Unauthorized();
+                }
+
+                if (item == null) return NotFound();
+
+                var dto = Map(item);
+
+                if (item.OrganizationId != KitosUser.DefaultOrganizationId)
+                {
+                    dto.Note = "";
+                }
+
+                return Ok(dto);
             }
             catch (Exception e)
             {
@@ -169,11 +202,29 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                //check for isreadonly here since no object has been created to check on yet
+                //if (!KitosUser.IsReadOnly) return Unauthorized();
+                var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+
+                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString()))) return Unauthorized();
+
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
                                             && usage.OrganizationId == dto.OrganizationId).Any())
                     return Conflict("Usage already exist");
 
-                var sysUsage = _itSystemUsageService.Add(dto.ItSystemId, dto.OrganizationId, KitosUser);
+                var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
+                sysUsage.DataLevel = dto.DataLevel;
+
+                //copy attached options from system to systemusage
+                var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
+                foreach (var option in attachedOptions)
+                {
+                    option.ObjectId = sysUsage.Id;
+                    option.ObjectType = EntityType.ITSYSTEMUSAGE;
+                    _attachedOptionsRepository.Insert(option);
+                }
+                _attachedOptionsRepository.Save();
+
 
                 return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
@@ -433,6 +484,9 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItSystemUsage obj, User user, int organizationId)
         {
+            //if readonly
+            if (user.IsReadOnly && !user.IsGlobalAdmin)
+                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))

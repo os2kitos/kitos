@@ -73,12 +73,12 @@
                 results: function (data, page) {
                     var results = [];
                     // for each system usages
-                    _.each(data.data.response, function (project: { id; name; }) {
+                    _.each(data.data.response, function (dataWorker: { id; name; }) {
                         results.push({
                             // the id of the system usage is the id, that is selected
-                            id: project.id,
+                            id: dataWorker.id,
                             // but the name of the system is the label for the select2
-                            text: project.name
+                            text: dataWorker.name
                         });
                     });
                     return { results: results };

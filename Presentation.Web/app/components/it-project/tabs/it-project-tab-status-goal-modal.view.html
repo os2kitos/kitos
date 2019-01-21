@@ -78,8 +78,9 @@
             <div class="form-group">
                 <label for="subGoalDate1" class="col-xs-1 control-label small">Dato</label>
                 <div class="col-xs-3">
-                    <input type="text" class="form-control" id="subGoalDate1"
+                    <input type="text" class="form-control" id="subGoalDate1" 
                            data-kendo-date-picker
+                           ng-blur="checkDate('subGoalDate1', goal.subGoalDate1)"
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate1">
                 </div>
@@ -104,7 +105,8 @@
             <div class="form-group">
                 <label for="subGoalDate2" class="col-xs-1 control-label small">Dato</label>
                 <div class="col-xs-3">
-                    <input type="text" class="form-control" id="subGoalDate2"
+                    <input type="text" class="form-control" id="subGoalDate2" 
+                           ng-blur="checkDate('subGoalDate2', goal.subGoalDate2)"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate2">
@@ -130,7 +132,8 @@
             <div class="form-group">
                 <label for="subGoalDate3" class="col-xs-1 control-label small">Dato</label>
                 <div class="col-xs-3">
-                    <input type="text" class="form-control" id="subGoalDate3"
+                    <input type="text" class="form-control" id="subGoalDate3" 
+                           ng-blur="checkDate('subGoalDate3', goal.subGoalDate3)"
                            data-kendo-date-picker
                            data-k-options="datepickerOptions"
                            data-ng-model="goal.subGoalDate3">
@@ -161,7 +164,7 @@
         </div>
 
         <div class="modal-footer">
-            <button type="submit" class="btn btn-success" data-disabled-on-busy="">Gem</button>
+            <button type="submit" class="btn btn-success" ng-disabled="dateFail" data-disabled-on-busy="">Gem</button>
             <button type="button" class="btn btn-warning" data-ng-click="dismiss()" data-disabled-on-busy="">Annuller</button>
         </div>
     </div>
