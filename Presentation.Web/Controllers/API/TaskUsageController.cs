@@ -65,6 +65,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/taskGroup")]
         public HttpResponseMessage PostTaskGroup(int orgUnitId, int? taskId)
         {
             try
@@ -118,31 +120,34 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route("api/taskUsage/")]
-        public HttpResponseMessage GetToken(TaskUsageDTO taskUsageDto)
+        public HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
         {
             try
             {
-                var orgUnit = _orgUnitRepository.GetByKey(taskUsageDto.OrgUnitId);
-                if (orgUnit == null)
-                    return NotFound();
+                var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
+                item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
 
-                Repository.Insert(new TaskUsage()
-                {
-                    OrgUnitId = taskUsageDto.OrgUnitId,
-                    TaskRefId = taskUsageDto.TaskRefId,
-                    ObjectOwner = KitosUser,
-                    LastChanged = DateTime.UtcNow,
-                    LastChangedByUser = KitosUser
-                });
-                Repository.Save();
-                return Ok();
+                var savedItem = PostQuery(item);
+
+                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
             }
             catch (Exception e)
             {
+                // check if inner message is a duplicate, if so return conflict
+                if (e.InnerException?.InnerException != null)
+                {
+                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
+                        return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
                 return LogError(e);
             }
         }
 
+        [HttpDelete]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage DeleteTaskGroup(int orgUnitId, int? taskId)
         {
             try
