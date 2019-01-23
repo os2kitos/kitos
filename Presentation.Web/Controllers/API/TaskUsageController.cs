@@ -116,6 +116,33 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/")]
+        public HttpResponseMessage GetToken(TaskUsageDTO taskUsageDto)
+        {
+            try
+            {
+                var orgUnit = _orgUnitRepository.GetByKey(taskUsageDto.OrgUnitId);
+                if (orgUnit == null)
+                    return NotFound();
+
+                Repository.Insert(new TaskUsage()
+                {
+                    OrgUnitId = taskUsageDto.OrgUnitId,
+                    TaskRefId = taskUsageDto.TaskRefId,
+                    ObjectOwner = KitosUser,
+                    LastChanged = DateTime.UtcNow,
+                    LastChangedByUser = KitosUser
+                });
+                Repository.Save();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
         public HttpResponseMessage DeleteTaskGroup(int orgUnitId, int? taskId)
         {
             try

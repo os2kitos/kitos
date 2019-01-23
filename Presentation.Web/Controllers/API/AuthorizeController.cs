@@ -117,7 +117,7 @@ namespace Presentation.Web.Controllers.API
 
                 user = _userRepository.GetByEmail(loginDto.Email);
 
-                var Token = "Bearer " + new TokenValidator().CreateToken(user);
+                var Token = new TokenValidator().CreateToken(user);
 
                 var Expires = DateTime.Now.AddDays(1).ToString();
 
