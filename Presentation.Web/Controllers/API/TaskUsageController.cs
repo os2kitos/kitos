@@ -36,6 +36,8 @@ namespace Presentation.Web.Controllers.API
             return Get(orgUnitId, organizationId, false, pagingModel);
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage Get(int orgUnitId, int organizationId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             try
