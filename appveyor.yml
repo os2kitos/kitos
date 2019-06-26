@@ -24,7 +24,7 @@ install:
   - npm install
 before_build:
   - nuget restore %APPVEYOR_BUILD_FOLDER%\KITOS.sln -verbosity quiet
-  - node_modules\.bin\gulp deploy
+  - node_modules\.bin\gulp deploy-prod
 build:
   project: KITOS.sln
   verbosity: quiet
