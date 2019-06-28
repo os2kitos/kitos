@@ -10,6 +10,7 @@ using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using System;
+using Infrastructure.DataAccess;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -30,7 +31,11 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Get()
         {
             var orgId = _authService.GetCurrentOrganizationId(UserId);
-            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+            var isGlobalAdmin = _authService.IsGlobalAdmin(UserId);
+
+            //TODO: Talk to ballerup about this and add it to the list of issues to clean up
+            //NOTE: This is a bad solution and caused by the fact that HasReadAccess is unable to extend an existing query - has not been modelled as a db query that can be reused.
+            return Ok(Repository.AsQueryable().Where(x => isGlobalAdmin || x.OrganizationId == orgId));
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
