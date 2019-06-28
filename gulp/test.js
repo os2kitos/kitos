@@ -3,7 +3,7 @@
 var gulp = require('gulp');
 var paths = require('../paths.config.js');
 var gutil = require('gulp-util');
-var protractor = require('gulp-angular-protractor');
+var protractor = require('gulp-protractor');
 var karma = require('karma');
 var browserSync = require('browser-sync');
 var $ = require('gulp-load-plugins')();
@@ -42,29 +42,28 @@ function runProtractor(done) {
 
     gutil.log('e2e arguments: ' + args);
 
-    var singleSpec = 'Presentation.Web/Tests/it-contract/Edit/Tabs/it-contract-tab-payment-model.e2e.spec.js';
+    var singleSpec = 'Presentation.Web/Tests/home.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
-      .pipe(protractor({
-          configFile: 'protractor.local.conf.js',
-          //args: args,
-          'autoStartStopServer': true,
-          'debug': false
-      }))
-      .on('error', function (err) {
-          gutil.log(gutil.colors.red('error: ' + err));
-          // Make sure failed tests cause gulp to exit non-zero
-          throw err;
-      })
-      .on('end', function () {
-          // Close browser sync server
-          browserSync.exit();
-          done();
-      });
+        .pipe(protractor.protractor({
+            configFile: 'protractor.local.conf.js',
+            //args: args,
+            'debug': false
+        }))
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red('error: ' + err));
+            // Make sure failed tests cause gulp to exit non-zero
+            throw err;
+        })
+        .on('end', function () {
+            // Close browser sync server
+            browserSync.exit();
+            done();
+        });
 }
 
 // run e2e tests with protractor with browserstack
 gulp.task('e2e:browserstack', function (done) {
-// ReSharper disable once InconsistentNaming
+    // ReSharper disable once InconsistentNaming
     var BrowserStackTunnel = require('browserstacktunnel-wrapper');
 
     var browserStackTunnel = new BrowserStackTunnel({
@@ -81,7 +80,7 @@ gulp.task('e2e:browserstack', function (done) {
 
     function tunnelRunning() {
         gulp.src(paths.e2eFiles)
-            .pipe(protractor({
+            .pipe(protractor.protractor({
                 configFile: 'protractor.conf.js'
             }))
             .on('end', function () {
