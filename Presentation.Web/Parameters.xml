@@ -30,17 +30,17 @@
 
   <!-- Presentation.Web.Properties.Settings -->
   <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value/text()">
     </parameterentry>
   </parameter>
 
   <parameter name="BaseUrl" description="" defaultvalue="__BaseUrl__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='BaseUrl']/value">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='BaseUrl']/value/text()">
     </parameterentry>
   </parameter>
 
   <parameter name="MailSuffix" description="" defaultvalue="__MailSuffix__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='MailSuffix']/value">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='MailSuffix']/value/text()">
     </parameterentry>
   </parameter>
 
