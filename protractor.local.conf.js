@@ -48,12 +48,11 @@ exports.config = {
                 color: true,
                 showStack: true
             }));
-        //jasmine.getEnv()
-        //    .addReporter(new reporters.JUnitXmlReporter({
-        //        consolidateAll: true,
-        //        savePath: '/testresults',
-        //        filePrefix: 'xmloutput'
-        //    }));
+
+        var HtmlReporter = require("protractor-beautiful-reporter");
+        jasmine.getEnv().addReporter(new HtmlReporter({
+            baseDirectory: 'tmp/screenshots'
+        }).getJasmine2Reporter());
     },
 
     jasmineNodeOpts: {

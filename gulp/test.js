@@ -7,6 +7,7 @@ var protractor = require('gulp-protractor');
 var karma = require('karma');
 var browserSync = require('browser-sync');
 var $ = require('gulp-load-plugins')();
+var del = require("del");
 
 
 // run unit tests with karma
@@ -33,8 +34,14 @@ gulp.task('unit', function (done) {
     }, done).start();
 });
 
+gulp.task("CleanProtractor", cleanProtractor);
+
+function cleanProtractor(done) {
+    return del("tmp");
+}
+
 // use protractor
-gulp.task('e2e:local', runProtractor);
+gulp.task('e2e:local', ['CleanProtractor'], runProtractor);
 
 function runProtractor(done) {
     var params = process.argv;
@@ -42,7 +49,7 @@ function runProtractor(done) {
 
     gutil.log('e2e arguments: ' + args);
 
-    var singleSpec = 'Presentation.Web/Tests/home.e2e.spec.js';
+    var singleSpec = 'Presentation.Web/Tests/HomePage/home.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
             configFile: 'protractor.local.conf.js',

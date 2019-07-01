@@ -88,3 +88,17 @@ export class Mock {
         return promise;
     }
 }
+
+export class Login {
+
+    login(usrName: string, pwd: string) {
+        browser.get("https://localhost:44300");
+        var emailField = element(by.model("email"));
+        var passwordField = element(by.model("password"));
+        var loginBtn = element(by.buttonText("Log ind"));
+
+        emailField.sendKeys(usrName);
+        passwordField.sendKeys(pwd);
+        loginBtn.click();
+    }
+}
