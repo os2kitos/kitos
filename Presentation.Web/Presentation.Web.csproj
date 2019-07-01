@@ -1238,6 +1238,7 @@
     </None>
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
+    <Content Include="Parameters.xml" />
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\appReport-bundle.min.js" />
