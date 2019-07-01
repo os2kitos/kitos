@@ -33,10 +33,6 @@ exports.config = {
     baseUrl: 'https://localhost:44300',
 
     onPrepare: function () {
-        require('protractor-http-mock').config = {
-            rootDirectory: __dirname,
-            protractorConfig: 'protractor.local.conf.js'
-        };
 
         require("jasmine-expect");
         require("require-dir")("./Presentation.Web/Tests/matchers");

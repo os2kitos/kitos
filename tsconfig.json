@@ -16,7 +16,8 @@
         "node_modules",
         "jspm_packages",
         "bower_components",
-        "typings"
+        "typings",
+		"Presentation.Web/_oldTests"
     ],
     "include": [
         "./Presentation.Web/**/*"

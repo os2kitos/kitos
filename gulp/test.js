@@ -36,7 +36,7 @@ gulp.task('unit', function (done) {
 
 gulp.task("CleanProtractor", cleanProtractor);
 
-function cleanProtractor(done) {
+function cleanProtractor() {
     return del("tmp");
 }
 
@@ -49,7 +49,7 @@ function runProtractor(done) {
 
     gutil.log('e2e arguments: ' + args);
 
-    var singleSpec = 'Presentation.Web/Tests/HomePage/home.e2e.spec.js';
+    var singleSpec = 'Presentation.Web/Tests/**/*.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
             configFile: 'protractor.local.conf.js',

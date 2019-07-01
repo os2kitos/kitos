@@ -632,6 +632,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="Tests\matchers\toBeChecked.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toHaveClass.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
+    <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\IPageObject.po.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
