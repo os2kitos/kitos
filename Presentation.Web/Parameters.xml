@@ -45,7 +45,7 @@
   </parameter>
 
   <parameter name="Environment" description="" defaultvalue="__Environment__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='Environment']/value">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='Environment']/value/text()">
     </parameterentry>
   </parameter>
 
