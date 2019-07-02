@@ -68,6 +68,33 @@ function runProtractor(done) {
         });
 }
 
+gulp.task('e2e:single', ['CleanProtractor'], runSingleTest);
+
+function runSingleTest(done) {
+    var params = process.argv;
+    var args = params.length > 3 ? [params[3], params[4]] : [];
+
+    gutil.log('e2e arguments: ' + args);
+
+    var singleSpec = 'Presentation.Web/Tests/it-system/regularUser.System.e2e.spec.js';
+    gulp.src(singleSpec) // paths.e2eSuites.itSystem
+        .pipe(protractor.protractor({
+            configFile: 'protractor.local.conf.js',
+            //args: args,
+            'debug': false
+        }))
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red('error: ' + err));
+            // Make sure failed tests cause gulp to exit non-zero
+            throw err;
+        })
+        .on('end', function () {
+            // Close browser sync server
+            browserSync.exit();
+            done();
+        });
+}
+
 // run e2e tests with protractor with browserstack
 gulp.task('e2e:browserstack', function (done) {
     // ReSharper disable once InconsistentNaming

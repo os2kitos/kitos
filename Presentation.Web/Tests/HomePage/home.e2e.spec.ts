@@ -11,7 +11,7 @@
         }
 
         get(): void {
-            browser.get("https://localhost:44300");
+            browser.get(browser.baseUrl);
         }
 
         get email(): string {

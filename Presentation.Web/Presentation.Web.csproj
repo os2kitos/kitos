@@ -632,6 +632,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="Tests\it-system\regularUser.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeChecked.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
@@ -644,6 +645,7 @@
     <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\it-system-overview.po.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
@@ -1214,19 +1216,9 @@
     <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
-    <Content Include="Tests\object-wrappers\IPageObject.po.js" />
-    <Content Include="Tests\object-wrappers\RepeaterWrapper.js" />
-    <Content Include="Tests\object-wrappers\Select2TagWrapper.js" />
-    <Content Include="Tests\object-wrappers\Select2Wrapper.js" />
-    <Content Include="Tests\object-wrappers\SelectStatus2Wrapper.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Tests\object-wrappers\IPageObject.po.js.map" />
-    <Content Include="Tests\object-wrappers\RepeaterWrapper.js.map" />
-    <Content Include="Tests\object-wrappers\Select2TagWrapper.js.map" />
-    <Content Include="Tests\object-wrappers\Select2Wrapper.js.map" />
-    <Content Include="Tests\object-wrappers\SelectStatus2Wrapper.js.map" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
