@@ -92,7 +92,7 @@ export class Mock {
 export class Login {
 
     login(usrName: string, pwd: string) {
-        browser.get("https://localhost:44300");
+        browser.get(browser.baseUrl);
         var emailField = element(by.model("email"));
         var passwordField = element(by.model("password"));
         var loginBtn = element(by.buttonText("Log ind"));
