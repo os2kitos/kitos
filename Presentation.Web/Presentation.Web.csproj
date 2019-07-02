@@ -308,6 +308,7 @@
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
     <Compile Include="Controllers\API\ArchiveLocationController.cs" />
+    <Compile Include="Controllers\API\HealthCheckController.cs" />
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
@@ -1238,7 +1239,9 @@
     </None>
     <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\home.e2e.spec.ts" />
-    <None Include="Parameters.xml" />
+    <None Include="Parameters.xml">
+      <SubType>Designer</SubType>
+    </None>
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
     <Content Include="Scripts\appReport-bundle.min.js" />
@@ -1250,6 +1253,7 @@
     </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Web.Prod.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -1262,6 +1266,7 @@
     <None Include="Web.Test.config">
       <DependentUpon>Web.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Images\accent.png" />
     <Content Include="Images\bullet.png" />
