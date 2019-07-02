@@ -190,3 +190,5 @@ $RECYCLE.BIN/
 
 # deploy folder
 deploy/
+*.mdf
+Database/kitosdb_log.ldf
