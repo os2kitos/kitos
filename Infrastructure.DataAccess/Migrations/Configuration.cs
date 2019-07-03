@@ -34,7 +34,11 @@ namespace Infrastructure.DataAccess.Migrations
         {
 
             //set true if there is no existing database that needs to be updated
-            var newBuild = Environment.GetEnvironmentVariable("PerformInitialSeed") == "yes";
+            var newBuild = Environment.GetEnvironmentVariable("PerformInitialSeed", EnvironmentVariableTarget.Process) == "yes";
+            if (newBuild)
+            {
+                Console.Out.WriteLine("Seeding initial data into kitos database");
+            }
 
             #region USERS
 
@@ -62,7 +66,7 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
             if (newBuild == true)
             {
                 #region OPTIONS
