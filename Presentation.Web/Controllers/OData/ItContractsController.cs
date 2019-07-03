@@ -30,7 +30,9 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Get()
         {
             var orgId = _authService.GetCurrentOrganizationId(UserId);
-            return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
+            var isGlobalAdmin = _authService.IsGlobalAdmin(UserId);
+
+            return Ok(Repository.AsQueryable().Where(x => isGlobalAdmin || x.OrganizationId == orgId));
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
