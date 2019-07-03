@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
@@ -31,9 +32,10 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
+
             //set true if there is no existing database that needs to be updated
-            bool newBuild = false;
-            
+            var newBuild = Environment.GetEnvironmentVariable("CreateIntegrationEnvironment") == "yes";
+
             #region USERS
 
             // don't overwrite global admin if it already exists
