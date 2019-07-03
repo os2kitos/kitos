@@ -85,6 +85,7 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 #region OPTIONS
 
+                Console.Out.WriteLine("Initializing options");
 
                 AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
 
@@ -145,6 +146,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORG ROLES
+                Console.Out.WriteLine("Initializing org roles");
 
                 var boss = new OrganizationUnitRole()
                 {
@@ -243,6 +245,8 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region PROJECT ROLES
+
+                Console.Out.WriteLine("Initializing project roles");
 
                 context.ItProjectRoles.AddOrUpdate(r => r.Name,
                     new ItProjectRole()
@@ -438,6 +442,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region SYSTEM ROLES
+                Console.Out.WriteLine("Initializing system roles");
 
                 var systemOwnerRole = new ItSystemRole()
                 {
@@ -552,6 +557,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region CONTRACT ROLES
+                Console.Out.WriteLine("Initializing contract roles");
 
                 context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
                 {
@@ -621,6 +627,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORGANIZATIONS
+                Console.Out.WriteLine("Initializing organizatopms");
 
                 var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
                 var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
@@ -650,6 +657,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region TEXTS
+                Console.Out.WriteLine("Initializing texts");
 
                 if (!context.Texts.Any(x => x.Id == 1))
                 {
