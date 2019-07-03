@@ -641,6 +641,7 @@
     <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
     <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\IPageObject.po.ts" />
+    <TypeScriptCompile Include="Tests\object-wrappers\kendoToolbarWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2TagWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
@@ -1216,6 +1217,7 @@
     <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
+    <Content Include="Tests\it-system\test.e2e.spec.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

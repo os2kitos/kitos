@@ -43,4 +43,12 @@ describe("Regular user tests", () => {
         expect(pageObject.exportButton.getText()).toEqual("Eksportér til Excel");
     });
 
+    it("Delete filter is disabled", () => {
+        //Arrange
+        //Act 
+        //Assert
+        expect(pageObject.columnHeaderValidity.getText()).toEqual("Gyldig/Ikke gyldig");
+    });
+
+
 });
