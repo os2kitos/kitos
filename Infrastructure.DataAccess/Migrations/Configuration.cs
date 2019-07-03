@@ -18,12 +18,20 @@ namespace Infrastructure.DataAccess.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<KitosContext>
     {
+        private static readonly bool CreateCleanDb = GetEnvironmentVariable("CreateCleanDatabase") == "yes";
+
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
 
             // New timeout in seconds
             this.CommandTimeout = 60 * 5;
+
+            if (CreateCleanDb)
+            {
+                Console.Out.WriteLine("Dropping existing database before running migrations and performing seed");
+                Database.SetInitializer(new DropCreateDatabaseAlways<KitosContext>());
+            }
         }
 
         /// <summary>
@@ -32,9 +40,8 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
-
             //set true if there is no existing database that needs to be updated
-            var newBuild = Environment.GetEnvironmentVariable("PerformInitialSeed") == "yes";
+            var newBuild = CreateCleanDb;
             if (newBuild)
             {
                 Console.Out.WriteLine("Seeding initial data into kitos database");
@@ -54,6 +61,13 @@ namespace Infrastructure.DataAccess.Migrations
                     Password = "h3hNNY9J3SBUNCgaoccGo1WCRDxt4v9oUjD5uZhQ78M1",
                     IsGlobalAdmin = true
                 });
+
+            var newPassword = GetEnvironmentVariable("ChangeGlobalAdminPasswordTo");
+            if (newPassword != null)
+            {
+                var cryptoService = new CryptoService();
+                globalAdmin.Password = cryptoService.Encrypt(newPassword + globalAdmin.Salt);
+            }
 
             //var cryptoService = new CryptoService();
             //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
@@ -735,6 +749,11 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 //#endregion
             }
+        }
+
+        private static string GetEnvironmentVariable(string key)
+        {
+            return Environment.GetEnvironmentVariable(key);
         }
 
         #region Helper methods
