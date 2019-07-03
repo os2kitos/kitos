@@ -34,7 +34,7 @@ namespace Infrastructure.DataAccess.Migrations
         {
 
             //set true if there is no existing database that needs to be updated
-            var newBuild = Environment.GetEnvironmentVariable("PerformInitialSeed", EnvironmentVariableTarget.Process) == "yes";
+            var newBuild = Environment.GetEnvironmentVariable("PerformInitialSeed") == "yes";
             if (newBuild)
             {
                 Console.Out.WriteLine("Seeding initial data into kitos database");
