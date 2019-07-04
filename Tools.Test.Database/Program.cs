@@ -41,21 +41,31 @@ namespace Tools.Test.Database
                 case "CreateCleanDatabase":
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
 
-                    var connectionString = additionalArgs[0].Trim('"');
+                    var connectionString = GetArgument(additionalArgs, 0);
                     return new DropDatabaseTask(connectionString);
                 case "CreateTestUser":
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
                     var createUserArgs = new
                     {
-                        ConnectionString = additionalArgs[0],
-                        Email = additionalArgs[1],
-                        Password = additionalArgs[2],
-                        Role = additionalArgs[3]
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        Email = GetArgument(additionalArgs, 1),
+                        Password = GetArgument(additionalArgs, 2),
+                        Role = GetArgument(additionalArgs, 3),
                     };
                     return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }
+        }
+
+        private static string GetArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)
+        {
+            var arg = additionalArgs[index];
+            if (trimEnclosingQuotes)
+            {
+                arg = arg.Trim('"');
+            }
+            return arg;
         }
     }
 }
