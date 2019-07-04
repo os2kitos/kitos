@@ -7,7 +7,7 @@ $Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$Env:EnvironmentName
 $Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "KitosDbConnectionStringForIIsApp"
 $Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "HangfireDbConnectionStringForIIsApp"
 
-Presentation.Web.csproj.deploy.cmd `
+.\Presentation.Web.csproj.deploy.cmd `
 /Y `
 /A:Basic `
 /M:$Env:MsDeployServiceUrl `
