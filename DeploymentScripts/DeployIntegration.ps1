@@ -3,8 +3,8 @@ $Env:EnvironmentName="integration"
 
 # Set access keys passed by user
 
-$Env:AWS_ACCESS_KEY_ID=$Env:IntegrationEnvironment.AwsAccessKeyId
-$Env:AWS_SECRET_ACCESS_KEY=$Env:IntegrationEnvironment.AwsSecretAccessKey
+$Env:AWS_ACCESS_KEY_ID=$Env:AwsAccessKeyId
+$Env:AWS_SECRET_ACCESS_KEY=$Env:AwsSecretAccessKey
 
 Write-Host "Using Acces Key ID: $Env:AWS_ACCESS_KEY_ID in environment $Env:EnvironmentName"
 
