@@ -53,15 +53,6 @@ namespace Tools.Test.Database
                         Role = GetArgument(additionalArgs, 3),
                     };
                     return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
-                case "ChangeUserPassword":
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password>");
-                    var changePasswordArgs = new
-                    {
-                        ConnectionString = GetArgument(additionalArgs, 0),
-                        Email = GetArgument(additionalArgs, 1),
-                        Password = GetArgument(additionalArgs, 2),
-                    };
-                    return new ChangeUserPasswordTask(changePasswordArgs.ConnectionString, changePasswordArgs.Email, changePasswordArgs.Password);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }
