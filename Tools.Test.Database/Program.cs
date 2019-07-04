@@ -53,13 +53,13 @@ namespace Tools.Test.Database
                         Role = GetArgument(additionalArgs, 3),
                     };
                     return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
-                case "EnableAllLocalOptions":
+                case "EnableAllOptions":
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
                     var enableAllArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                     };
-                    return new EnableAllLocalOptionsTask(enableAllArgs.ConnectionString);
+                    return new EnableAllOptionsTask(enableAllArgs.ConnectionString);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }
