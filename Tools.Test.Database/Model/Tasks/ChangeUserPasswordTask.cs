@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Core.ApplicationServices;
+using Tools.Test.Database.Model.Extensions;
 
 namespace Tools.Test.Database.Model.Tasks
 {
@@ -25,9 +25,7 @@ namespace Tools.Test.Database.Model.Tasks
                 {
                     throw new ArgumentException($"No user found with email:{_email}");
                 }
-
-                var cryptoService = new CryptoService();
-                user.Password = cryptoService.Encrypt(_newPassword + user.Salt);
+                user.SetPassword(_newPassword);
                 context.SaveChanges();
             }
 

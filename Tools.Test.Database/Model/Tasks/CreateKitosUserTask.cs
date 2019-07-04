@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data.Entity.Migrations;
 using System.Linq;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
+using Tools.Test.Database.Model.Extensions;
 
 namespace Tools.Test.Database.Model.Tasks
 {
@@ -18,9 +18,9 @@ namespace Tools.Test.Database.Model.Tasks
         public CreateKitosUserTask(string connectionString, string email, string password, string role)
             : base(connectionString)
         {
-            _email = email;
-            _password = password;
-            _role = ParseRole(role);
+            _email = email ?? throw new ArgumentNullException(nameof(email));
+            _password = password ?? throw new ArgumentNullException(nameof(password)); ;
+            _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
         }
 
@@ -32,7 +32,7 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var commonOrg = FindCommonOrganization(context);
+                var commonOrg = context.GetCommonOrganization();
 
                 var newUser = CreateUser(commonOrg, context);
 
@@ -44,28 +44,21 @@ namespace Tools.Test.Database.Model.Tasks
             return true;
         }
 
-        private static Organization FindCommonOrganization(KitosContext context)
-        {
-            var commonOrg = context.Organizations.First(x => x.Name == "Fælles Kommune");
-            return commonOrg;
-        }
-
         private User CreateUser(Organization commonOrg, KitosContext context)
         {
-            var cryptoService = new CryptoService();
-            var globalAdmin = GetGlobalAdmin(context);
+            var globalAdmin = context.GetGlobalAdmin();
 
             var newUser = new User
             {
                 Name = "Automatisk oprettet testbruger",
                 LastName = $"({_role:G})",
-                Password = CreatePasswordValue(cryptoService),
                 Salt = _salt,
                 Email = _email,
                 DefaultOrganizationId = commonOrg.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
+            newUser.SetPassword(_password);
 
             context.Users.AddOrUpdate(x => x.Email, newUser);
             context.SaveChanges();
@@ -74,7 +67,7 @@ namespace Tools.Test.Database.Model.Tasks
 
         private void AssignOrganizationRole(KitosContext context, User newUser, Organization commonOrg)
         {
-            var globalAdmin = GetGlobalAdmin(context);
+            var globalAdmin = context.GetGlobalAdmin();
             var newRight = new OrganizationRight
             {
                 UserId = newUser.Id,
@@ -84,18 +77,8 @@ namespace Tools.Test.Database.Model.Tasks
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            context.OrganizationRights.AddOrUpdate(x=>x.UserId,newRight);
+            context.OrganizationRights.AddOrUpdate(x => x.UserId, newRight);
             context.SaveChanges();
-        }
-
-        private static User GetGlobalAdmin(KitosContext context)
-        {
-            return context.Users.First(x => x.IsGlobalAdmin);
-        }
-
-        private string CreatePasswordValue(CryptoService cryptoService)
-        {
-            return cryptoService.Encrypt(_password + _salt);
         }
 
         private OrganizationRole ParseRole(string role)
