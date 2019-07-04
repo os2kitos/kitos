@@ -55,7 +55,8 @@ namespace Tools.Test.Database.Model.Tasks
         {
             foreach (dynamic localOption in contextLocalGoalTypes)
             {
-                localOption.IsActive = true;
+                localOption.IsLocallyAvailable = true;
+                localOption.IsEnabled = true;
             }
 
         }

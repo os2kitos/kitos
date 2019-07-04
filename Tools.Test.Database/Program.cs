@@ -38,7 +38,7 @@ namespace Tools.Test.Database
         {
             switch (task)
             {
-                case "CreateCleanDatabase":
+                case "DropDatabase":
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
 
                     var connectionString = GetArgument(additionalArgs, 0);
