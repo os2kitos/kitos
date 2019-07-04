@@ -105,6 +105,12 @@ namespace Tools.Test.Database.Model.Tasks
             {
                 throw new ArgumentException($"{nameof(role)} must be one of [{string.Join(",", organizationRoles.Keys)}]");
             }
+
+            if (actualRole == OrganizationRole.GlobalAdmin)
+            {
+                throw new NotSupportedException("Only one global admin allowed");
+            }
+
             return actualRole;
         }
     }
