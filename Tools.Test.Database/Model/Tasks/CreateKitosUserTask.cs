@@ -25,7 +25,7 @@ namespace Tools.Test.Database.Model.Tasks
         }
 
         /// <summary>
-        /// Create a user the same way as the steps prescribed in Core.ApplicationServices.UserService.cs::AddUser
+        /// Replicates the actions carried out by both org-user-create.controller.ts, UsersController::Post and UserService
         /// </summary>
         /// <returns></returns>
         public override bool Execute()
@@ -53,14 +53,18 @@ namespace Tools.Test.Database.Model.Tasks
         private User CreateUser(Organization commonOrg, KitosContext context)
         {
             var cryptoService = new CryptoService();
+            var globalAdmin = GetGlobalAdmin(context);
 
             var newUser = new User
             {
                 Name = "Automatisk oprettet testbruger",
                 LastName = $"({_role:G})",
                 Password = CreatePasswordValue(cryptoService),
+                Salt = _salt,
                 Email = _email,
-                DefaultOrganizationId = commonOrg.Id
+                DefaultOrganizationId = commonOrg.Id,
+                ObjectOwnerId = globalAdmin.Id,
+                LastChangedByUserId = globalAdmin.Id
             };
 
             context.Users.AddOrUpdate(x => x.Email, newUser);
@@ -70,7 +74,7 @@ namespace Tools.Test.Database.Model.Tasks
 
         private void AssignOrganizationRole(KitosContext context, User newUser, Organization commonOrg)
         {
-            var globalAdmin = context.Users.First(x => x.IsGlobalAdmin);
+            var globalAdmin = GetGlobalAdmin(context);
             var newRight = new OrganizationRight
             {
                 UserId = newUser.Id,
@@ -82,6 +86,11 @@ namespace Tools.Test.Database.Model.Tasks
 
             context.OrganizationRights.AddOrUpdate(x=>x.UserId,newRight);
             context.SaveChanges();
+        }
+
+        private static User GetGlobalAdmin(KitosContext context)
+        {
+            return context.Users.First(x => x.IsGlobalAdmin);
         }
 
         private string CreatePasswordValue(CryptoService cryptoService)
