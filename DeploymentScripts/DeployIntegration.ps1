@@ -1,6 +1,9 @@
 # Set EnvironmentName
 $Env:EnvironmentName="integration"
 
+#Load helper library
+.$PSScriptRoot\AwsApi.ps1
+
 # Set access keys passed by user
 Write-Host "TODO: Get keys from user"
 $Env:AWS_ACCESS_KEY_ID=$Env:IntegrationEnvironment.AwsAccessKeyId
@@ -25,5 +28,4 @@ $Env:MailSuffix="(SAW CI)"
 $Env:KitosEnvironmentName="dev"
 
 # Execute the deployment script
-# TODO: Consider refactoring to function
 .$PSScriptRoot\DeployWebsite.ps1
