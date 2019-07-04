@@ -1,7 +1,4 @@
-﻿using System.Data.Entity;
-using Infrastructure.DataAccess;
-
-namespace Tools.Test.Database.Model.Tasks
+﻿namespace Tools.Test.Database.Model.Tasks
 {
     public class DropDatabaseTask : DatabaseTask
     {
@@ -15,12 +12,7 @@ namespace Tools.Test.Database.Model.Tasks
 
         public override bool Execute()
         {
-            System.Data.Entity.Database.SetInitializer(new DropCreateDatabaseAlways<KitosContext>());
-
-            using (var context = CreateKitosContext())
-            {
-                context.Database.Initialize(true);
-            }
+            System.Data.Entity.Database.Delete(_connectionString);
 
             return true;
         }
