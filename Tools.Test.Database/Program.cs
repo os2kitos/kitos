@@ -8,7 +8,7 @@ namespace Tools.Test.Database
     {
         static int Main(string[] args)
         {
-            var task = args[0];
+            var task = GetArgument(args, 0);
             var additionalArgs = args.Skip(1).ToArray();
 
             var databaseTask = CreateTask(task, additionalArgs);
