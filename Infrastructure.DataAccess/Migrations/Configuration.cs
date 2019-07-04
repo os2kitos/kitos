@@ -18,20 +18,12 @@ namespace Infrastructure.DataAccess.Migrations
 
     internal sealed class Configuration : DbMigrationsConfiguration<KitosContext>
     {
-        private static readonly bool CreateCleanDb = GetEnvironmentVariable("CreateCleanDatabase") == "yes";
-
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
 
             // New timeout in seconds
             this.CommandTimeout = 60 * 5;
-
-            if (CreateCleanDb)
-            {
-                Console.Out.WriteLine("Dropping existing database before running migrations and performing seed");
-                Database.SetInitializer(new DropCreateDatabaseAlways<KitosContext>());
-            }
         }
 
         /// <summary>
@@ -40,8 +32,7 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
-            //set true if there is no existing database that needs to be updated
-            var newBuild = CreateCleanDb;
+            var newBuild = GetEnvironmentVariable("SeedNewDb") == "yes";
             if (newBuild)
             {
                 Console.Out.WriteLine("Seeding initial data into kitos database");
