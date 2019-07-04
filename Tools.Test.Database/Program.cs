@@ -34,13 +34,25 @@ namespace Tools.Test.Database
             return 0;
         }
 
-        private static IDatabaseTask CreateTask(string task, string[] additionalArgs)
+        private static DatabaseTask CreateTask(string task, string[] additionalArgs)
         {
             switch (task)
             {
                 case "CreateCleanDatabase":
+                    Console.WriteLine("Expecting the following arguments: <connectionString>");
+
                     var connectionString = additionalArgs[0].Trim('"');
                     return new DropDatabaseTask(connectionString);
+                case "CreateTestUser":
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
+                    var createUserArgs = new
+                    {
+                        ConnectionString = additionalArgs[0],
+                        Email = additionalArgs[1],
+                        Password = additionalArgs[2],
+                        Role = additionalArgs[3]
+                    };
+                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }
