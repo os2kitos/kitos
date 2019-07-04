@@ -53,13 +53,6 @@ namespace Infrastructure.DataAccess.Migrations
                     IsGlobalAdmin = true
                 });
 
-            var newPassword = GetEnvironmentVariable("ChangeGlobalAdminPasswordTo");
-            if (newPassword != null)
-            {
-                var cryptoService = new CryptoService();
-                globalAdmin.Password = cryptoService.Encrypt(newPassword + globalAdmin.Salt);
-            }
-
             //var cryptoService = new CryptoService();
             //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
             //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);

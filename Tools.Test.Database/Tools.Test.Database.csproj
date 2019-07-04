@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Tasks\ChangeUserPasswordTask.cs" />
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
     <Compile Include="Model\Tasks\DatabaseTask.cs" />
     <Compile Include="Model\Tasks\DropDatabaseTask.cs" />
