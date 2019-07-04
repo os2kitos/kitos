@@ -56,7 +56,8 @@ namespace Tools.Test.Database.Model.Tasks
                 Email = _email,
                 DefaultOrganizationId = commonOrg.Id,
                 ObjectOwnerId = globalAdmin.Id,
-                LastChangedByUserId = globalAdmin.Id
+                LastChangedByUserId = globalAdmin.Id,
+                IsGlobalAdmin = _role == OrganizationRole.GlobalAdmin
             };
             newUser.SetPassword(_password);
 
