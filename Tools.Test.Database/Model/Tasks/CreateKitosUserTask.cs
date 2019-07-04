@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -31,25 +32,25 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var userRepository = new GenericRepository<User>(context);
                 var commonOrg = FindCommonOrganization(context);
 
-                var newUser = CreateUser(commonOrg, userRepository);
+                var newUser = CreateUser(commonOrg, context);
 
-                AssignOrganizationRole(userRepository, newUser, commonOrg, context);
+                AssignOrganizationRole(context, newUser, commonOrg);
 
                 context.SaveChanges();
             }
+
+            return true;
         }
 
         private static Organization FindCommonOrganization(KitosContext context)
         {
-            var orgRepository = new GenericRepository<Organization>(context);
-            var commonOrg = orgRepository.AsQueryable().First(x => x.Name == "Fælles Kommune");
+            var commonOrg = context.Organizations.First(x => x.Name == "Fælles Kommune");
             return commonOrg;
         }
 
-        private User CreateUser(Organization commonOrg, GenericRepository<User> userRepository)
+        private User CreateUser(Organization commonOrg, KitosContext context)
         {
             var cryptoService = new CryptoService();
 
@@ -62,15 +63,14 @@ namespace Tools.Test.Database.Model.Tasks
                 DefaultOrganizationId = commonOrg.Id
             };
 
-            userRepository.Insert(newUser);
-            userRepository.Save();
+            context.Users.AddOrUpdate(x => x.Email, newUser);
+            context.SaveChanges();
             return newUser;
         }
 
-        private void AssignOrganizationRole(GenericRepository<User> userRepository, User newUser, Organization commonOrg,
-            KitosContext context)
+        private void AssignOrganizationRole(KitosContext context, User newUser, Organization commonOrg)
         {
-            var globalAdmin = userRepository.AsQueryable().First(x => x.IsGlobalAdmin);
+            var globalAdmin = context.Users.First(x => x.IsGlobalAdmin);
             var newRight = new OrganizationRight
             {
                 UserId = newUser.Id,
@@ -80,9 +80,8 @@ namespace Tools.Test.Database.Model.Tasks
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            var orgRightRepository = new GenericRepository<OrganizationRight>(context);
-            orgRightRepository.Insert(newRight);
-            orgRightRepository.Save();
+            context.OrganizationRights.AddOrUpdate(x=>x.UserId,newRight);
+            context.SaveChanges();
         }
 
         private string CreatePasswordValue(CryptoService cryptoService)
@@ -92,7 +91,7 @@ namespace Tools.Test.Database.Model.Tasks
 
         private OrganizationRole ParseRole(string role)
         {
-            var organizationRoles = Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>().ToDictionary(x=>x.ToString("G"),StringComparer.OrdinalIgnoreCase);
+            var organizationRoles = Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>().ToDictionary(x => x.ToString("G"), StringComparer.OrdinalIgnoreCase);
             if (!organizationRoles.TryGetValue(role, out var actualRole))
             {
                 throw new ArgumentException($"{nameof(role)} must be one of [{string.Join(",", organizationRoles.Keys)}]");
