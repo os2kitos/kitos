@@ -21,6 +21,7 @@ Function Configure-Aws-From-User-Input() {
 Function Get-SSM-Parameter($environmentName, $parameterName) {
     Write-Host "Getting $parameterName from SSM"
 	(aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
+	if($LASTEXITCODE -ne 0)	{ throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
 
 Function Load-Environment-Secrets-From-Aws($envName) {

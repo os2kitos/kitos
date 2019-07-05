@@ -23,4 +23,6 @@ Function Deploy-Website($msDeployUrl, $msDeployUser, $msDeployPassword, $logLeve
 		-setParam:name="DeploymentVersion",value="$buildNumber" `
 		-setParam:name="KitosContext-Web.config Connection String",value="$kitosDbConnectionString" `
 		-setParam:name="kitos_HangfireDB-Web.config Connection String",value="$hangfireConnectionString"
+	
+	if($LASTEXITCODE -ne 0)	{ throw "FAILED TO DEPLOY" } 
 }
