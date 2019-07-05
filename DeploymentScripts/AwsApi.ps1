@@ -1,5 +1,6 @@
 Function Configure-Aws-From-User-Input() {
-    # Check for missing vars
+    Write-Host "Configuring AWS based on inputs from Teamcity user"
+	
 	if (-Not (Test-Path 'env:AwsAccessKeyId')) { 
 		throw "Error: Remember to set the AwsAccessKeyId input before starting the build"
 	} 
@@ -13,16 +14,22 @@ Function Configure-Aws-From-User-Input() {
 	# Set access keys passed by user
 	$Env:AWS_ACCESS_KEY_ID=$Env:AwsAccessKeyId
 	$Env:AWS_SECRET_ACCESS_KEY=$Env:AwsSecretAccessKey
+	
+	Write-Host "Finished configuring AWS. Active Key Id: $Env:AWS_ACCESS_KEY_ID"
 }
 
 Function Get-SSM-Parameter($environmentName, $parameterName) {
-    (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
+    Write-Host "Getting $parameterName from SSM"
+	(aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
 }
 
 Function Load-Environment-Secrets-From-Aws($envName) {
-	# Load Secrets from parameterstore
+	Write-Host "Loading environment secrets from SSM"
+	
 	$Env:MsDeployUserName = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployUserName"
 	$Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployPassword"
 	$Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForIIsApp"
 	$Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForIIsApp"
+	
+	Write-Host "Finished loading environment secrets from SSM"
 }
