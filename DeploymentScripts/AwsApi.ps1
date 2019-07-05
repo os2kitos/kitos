@@ -21,7 +21,7 @@ Function Configure-Aws-From-User-Input() {
 Function Get-SSM-Parameter($environmentName, $parameterName) {
     Write-Host "Getting $parameterName from SSM"
 	(aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
-	if($LASTEXITCODE -ne 0)	{ throw "FAILED TO LOAD $parameterName from $environmentName" }
+	if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
 
 Function Load-Environment-Secrets-From-Aws($envName) {
@@ -31,6 +31,8 @@ Function Load-Environment-Secrets-From-Aws($envName) {
 	$Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployPassword"
 	$Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForIIsApp"
 	$Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForIIsApp"
+	$Env:KitosDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForTeamCity"
+	$Env:HangfireDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForTeamCity"
 	
 	Write-Host "Finished loading environment secrets from SSM"
 }
