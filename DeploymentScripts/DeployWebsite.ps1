@@ -7,8 +7,8 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
 		-disableLink:AppPoolExtension `
 		-disableLink:ContentExtension `
 		-disableLink:CertificateExtension `
-		-skip:objectname="dirPath",absolutepath="C:\kitos_tmp\app\App_Data$" `
-		-skip:objectname="dirPath",absolutepath="Default Web Site\App_Data$" `
+		-skip:objectname="dirPath",absolutepath="C:\\kitos_tmp\\app\\App_Data$" `
+		-skip:objectname="dirPath",absolutepath="Default Web \Site\\App_Data$" `
 		-setParamFile:"$packageDirectory\Presentation.Web.csproj.SetParameters.xml"  `
 		-allowUntrusted `
 		-setParam:name="serilog:minimum-level",value="$logLevel" `
