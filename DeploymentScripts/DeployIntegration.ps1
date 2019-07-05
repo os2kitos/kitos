@@ -1,17 +1,11 @@
-# Set EnvironmentName
-$Env:EnvironmentName="integration"
+# Stop on first error
+$ErrorActionPreference = "Stop"
 
-# Check for missing vars
-if (-Not (Test-Path 'env:AwsAccessKeyId')) { 
-    throw "Error: Remember to set the AwsAccessKeyId input before starting the build"
-} 
-if (-Not (Test-Path 'env:AwsSecretAccessKey')) { 
-    throw "Error: Remember to set the AwsSecretAccessKey input before starting the build"
-} 
+# Load helper library
+.$PSScriptRoot\AwsApi.ps1
 
-# Set access keys passed by user
-$Env:AWS_ACCESS_KEY_ID=$Env:AwsAccessKeyId
-$Env:AWS_SECRET_ACCESS_KEY=$Env:AwsSecretAccessKey
+Configure-Aws-From-User-Input
+Load-Environment-Secrets-From-Aws -envName "integration"
 
 # Non-secret configuration parameters
 $Env:MsDeployServiceUrl="https://172.26.2.34:8172/msdeploy.axd"

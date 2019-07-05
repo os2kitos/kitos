@@ -1,12 +1,3 @@
-# Load helper library
-.$PSScriptRoot\AwsApi.ps1
-
-# Load Secrets from parameterstore
-$Env:MsDeployUserName = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "MsDeployUserName"
-$Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "MsDeployPassword"
-$Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "KitosDbConnectionStringForIIsApp"
-$Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$Env:EnvironmentName" -parameterName "HangfireDbConnectionStringForIIsApp"
-
 .\WebPackage\Presentation.Web.csproj.deploy.cmd `
 /Y `
 /A:Basic `
