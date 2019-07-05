@@ -1,6 +1,14 @@
 # Set EnvironmentName
 $Env:EnvironmentName="integration"
 
+# Check for missing vars
+if (-Not (Test-Path 'env:AwsAccessKeyId')) { 
+    throw "Error: Remember to set the AwsAccessKeyId input before starting the build"
+} 
+if (-Not (Test-Path 'env:AwsSecretAccessKey')) { 
+    throw "Error: Remember to set the AwsSecretAccessKey input before starting the build"
+} 
+
 # Set access keys passed by user
 $Env:AWS_ACCESS_KEY_ID=$Env:AwsAccessKeyId
 $Env:AWS_SECRET_ACCESS_KEY=$Env:AwsSecretAccessKey
