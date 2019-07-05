@@ -1,15 +1,13 @@
-# Stop on first error
-$ErrorActionPreference = "Stop"
-
 Function Check-Website-Version($hostName, $expectedVersion) {
-	$response = Invoke-WebRequest -uri "$https://root/api/HealthCheck" –UseBasicParsing
-	if($response.StatusCode -ne 200) {
-		Throw "Invalid response code received $response.StatusCode"
+    $response = Invoke-WebRequest -uri "https://$hostName/api/HealthCheck" -UseBasicParsing
+	
+	if($response.StatusCode -ne 200) { 
+		Throw "Invalid response code: $response.StatusCode"
 	}
-
+	
 	if($response.Content.Trim('"') -ne ($expectedVersion).ToString()) {
-		Throw "Invalid Deployment version received $response.Content. Expected $expectedVersion"
+		Throw "Invalid version detected. Expected $expectedVersion but got $response.Content"
 	}
-
-	Write-Host "All good - website is deployed in the selected version"
+	
+	Write-Host "All good - expected version ($expectedVersion) was found at $hostName"
 }
