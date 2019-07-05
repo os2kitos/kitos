@@ -7,7 +7,6 @@ $ErrorActionPreference = "Stop"
 # Load helper libraries
 #-------------------------------------------------------------
 .$PSScriptRoot\AwsApi.ps1
-.$PSScriptRoot\DeployWebsite.ps1
 
 Configure-Aws-From-User-Input
 Load-Environment-Secrets-From-Aws -envName "integration"
@@ -28,9 +27,8 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environment
 #-------------------------------------------------------------
 Write-Host "Running migrations"
 #-------------------------------------------------------------
-Set-Location $MigrationsFolder
 $Env:SeedNewDb="yes"
-& "migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose
+& "$MigrationsFolder\migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose /startupDirectory="$MigrationsFolder"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
 
 #-------------------------------------------------------------
