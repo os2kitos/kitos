@@ -28,9 +28,9 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environment
 #-------------------------------------------------------------
 Write-Host "Running migrations"
 #-------------------------------------------------------------
-
+Set-Location $MigrationsFolder
 $Env:SeedNewDb="yes"
-& "$MigrationsFolder\migrate.exe" "$MigrationsFolder\Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose
+& "migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
 
 #-------------------------------------------------------------
