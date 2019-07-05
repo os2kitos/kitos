@@ -23,6 +23,3 @@ Deploy-Website  -msDeployUrl "https://172.26.2.34:8172/msdeploy.axd" `
 				-buildNumber $Env:BUILD_NUMBER `
 				-kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `
 				-hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp
-
-
-exit $lastexitcode
