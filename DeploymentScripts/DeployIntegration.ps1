@@ -8,7 +8,8 @@ $ErrorActionPreference = "Stop"
 Configure-Aws-From-User-Input
 Load-Environment-Secrets-From-Aws -envName "integration"
 
-Deploy-Website  -msDeployUrl "https://172.26.2.34:8172/msdeploy.axd" `
+Deploy-Website  -packageDirectory "$PSScriptRoot\..\WebPackage" `
+				-msDeployUrl "https://172.26.2.34:8172/msdeploy.axd" `
 				-msDeployUser $Env:MsDeployUserName `
 				-msDeployPassword $Env:MsDeployPassword `
 				-logLevel "verbose" `
