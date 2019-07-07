@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Tools.Test.Database.Model.Cli;
+using Tools.Test.Database.Model.Environment;
 using Tools.Test.Database.Model.Tasks;
 
 namespace Tools.Test.Database
@@ -38,12 +40,14 @@ namespace Tools.Test.Database
         {
             switch (task)
             {
-                case "DropDatabase":
+                case CliTargets.DropDatabase:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
 
                     var connectionString = GetArgument(additionalArgs, 0);
+                    FailOnConnectionToProd(connectionString);
                     return new DropDatabaseTask(connectionString);
-                case "CreateTestUser":
+
+                case CliTargets.CreateTestUser:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
                     var createUserArgs = new
                     {
@@ -52,16 +56,28 @@ namespace Tools.Test.Database
                         Password = GetArgument(additionalArgs, 2),
                         Role = GetArgument(additionalArgs, 3),
                     };
+
                     return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
-                case "EnableAllOptions":
+
+                case CliTargets.EnableAllOptions:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
                     var enableAllArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                     };
+
+                    FailOnConnectionToProd(enableAllArgs.ConnectionString);
                     return new EnableAllOptionsTask(enableAllArgs.ConnectionString);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
+            }
+        }
+
+        private static void FailOnConnectionToProd(string connectionString)
+        {
+            if (Production.ContainsProductionIp(connectionString))
+            {
+                throw new NotSupportedException("This operation is not allowed in prod.");
             }
         }
 

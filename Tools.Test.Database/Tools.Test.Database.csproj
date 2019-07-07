@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Cli\CliTargets.cs" />
+    <Compile Include="Model\Environment\Production.cs" />
     <Compile Include="Model\Extensions\KitosContextExtensions.cs" />
     <Compile Include="Model\Extensions\UserExtensions.cs" />
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
