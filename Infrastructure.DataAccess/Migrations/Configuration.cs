@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
@@ -31,9 +32,12 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
-            //set true if there is no existing database that needs to be updated
-            bool newBuild = false;
-            
+            var newBuild = GetEnvironmentVariable("SeedNewDb") == "yes";
+            if (newBuild)
+            {
+                Console.Out.WriteLine("Seeding initial data into kitos database");
+            }
+
             #region USERS
 
             // don't overwrite global admin if it already exists
@@ -60,11 +64,12 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
             if (newBuild == true)
             {
                 #region OPTIONS
 
+                Console.Out.WriteLine("Initializing options");
 
                 AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
 
@@ -125,6 +130,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORG ROLES
+                Console.Out.WriteLine("Initializing org roles");
 
                 var boss = new OrganizationUnitRole()
                 {
@@ -223,6 +229,8 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region PROJECT ROLES
+
+                Console.Out.WriteLine("Initializing project roles");
 
                 context.ItProjectRoles.AddOrUpdate(r => r.Name,
                     new ItProjectRole()
@@ -418,6 +426,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region SYSTEM ROLES
+                Console.Out.WriteLine("Initializing system roles");
 
                 var systemOwnerRole = new ItSystemRole()
                 {
@@ -532,6 +541,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region CONTRACT ROLES
+                Console.Out.WriteLine("Initializing contract roles");
 
                 context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
                 {
@@ -601,6 +611,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORGANIZATIONS
+                Console.Out.WriteLine("Initializing organizatopms");
 
                 var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
                 var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
@@ -630,6 +641,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region TEXTS
+                Console.Out.WriteLine("Initializing texts");
 
                 if (!context.Texts.Any(x => x.Id == 1))
                 {
@@ -729,6 +741,11 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 //#endregion
             }
+        }
+
+        private static string GetEnvironmentVariable(string key)
+        {
+            return Environment.GetEnvironmentVariable(key);
         }
 
         #region Helper methods

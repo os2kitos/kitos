@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<parameters>
+  <!-- SERILOG -->
+  <parameter name="serilog:minimum-level" description="" defaultvalue="__SerilogMinimumLogLevel__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:minimum-level']/@value">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="serilog:write-to:Elasticsearch.nodeUris" description="" defaultvalue="__ElasticSearchNodeUri__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
+    </parameterentry>
+  </parameter>
+  
+  <!-- SSO -->
+  <parameter name="SSOGateway" description="" defaultvalue="__SSOGateway__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SSOGateway']/@value">
+    </parameterentry>
+  </parameter>
+
+  <!-- Email -->
+  <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="SmtpNetworkHost" description="" defaultvalue="__SmtpNetworkHost__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@host">
+    </parameterentry>
+  </parameter>
+
+  <!-- Presentation.Web.Properties.Settings -->
+  <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="BaseUrl" description="" defaultvalue="__BaseUrl__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='BaseUrl']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="MailSuffix" description="" defaultvalue="__MailSuffix__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='MailSuffix']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="Environment" description="" defaultvalue="__Environment__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='Environment']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="DeploymentVersion" description="" defaultvalue="__DeploymentVersion__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DeploymentVersion']/value/text()">
+    </parameterentry>
+  </parameter>
+
+</parameters>

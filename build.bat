@@ -1,1 +1,0 @@
-"C:\Program Files (x86)\MSBuild\14.0\Bin\msbuild.exe" Presentation.Web\Presentation.Web.csproj /p:DeployOnBuild=true;PublishProfile=Local /p:Configuration=Release /t:build

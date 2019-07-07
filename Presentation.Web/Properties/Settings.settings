@@ -14,5 +14,8 @@
     <Setting Name="Environment" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Dev</Value>
     </Setting>
+    <Setting Name="DeploymentVersion" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">unknown</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
