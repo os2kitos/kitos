@@ -19,7 +19,7 @@ Write-Host "Dropping existing databases (kitos and hangfire)"
 #-------------------------------------------------------------
 
 & $TestToolsPath "DropDatabase" "$Env:KitosDbConnectionStringForTeamCity"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO DROP KITOS DB }
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO DROP KITOS DB" }
 
 & $TestToolsPath "DropDatabase" "$Env:HangfireDbConnectionStringForTeamCity"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO DROP HANGFIRE DB" }
