@@ -2,11 +2,10 @@
 $ErrorActionPreference = "Stop"
 
 # Load helper libraries
-.$PSScriptRoot\AwsApi.ps1
+.$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DeployWebsite.ps1
 
-Configure-Aws-From-User-Input
-Load-Environment-Secrets-From-Aws -envName "integration"
+Setup-Environment -environmentName "integration"
 
 Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
 				-msDeployUrl "https://172.26.2.34:8172/msdeploy.axd" `
