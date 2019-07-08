@@ -77,6 +77,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\AwsApi.ps1 = DeploymentScripts\AwsApi.ps1
 		DeploymentScripts\CheckWebsiteVersion.ps1 = DeploymentScripts\CheckWebsiteVersion.ps1
 		DeploymentScripts\DeployIntegration.ps1 = DeploymentScripts\DeployIntegration.ps1
+		DeploymentScripts\DeploymentSetup.ps1 = DeploymentScripts\DeploymentSetup.ps1
 		DeploymentScripts\DeployWebsite.ps1 = DeploymentScripts\DeployWebsite.ps1
 		DeploymentScripts\PrepareIntegrationDatabase.ps1 = DeploymentScripts\PrepareIntegrationDatabase.ps1
 	EndProjectSection

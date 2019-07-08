@@ -6,10 +6,9 @@ $ErrorActionPreference = "Stop"
 #-------------------------------------------------------------
 # Load helper libraries
 #-------------------------------------------------------------
-.$PSScriptRoot\AwsApi.ps1
+.$PSScriptRoot\DeploymentSetup.ps1
 
-Configure-Aws-From-User-Input
-Load-Environment-Secrets-From-Aws -envName "integration"
+Setup-Environment -environmentName "integration"
 
 $TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
 $MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
