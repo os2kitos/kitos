@@ -35,8 +35,6 @@ param(
     
     try {
         Write-Host "Starting selenium server"
-        & webdriver-manager "update"
-        if($LASTEXITCODE -ne 0)	{ Throw "Webdriver update failed" }
 
         $app = Start-Process powershell.exe -ArgumentList "webdriver-manager start" -PassThru -WindowStyle Hidden
     
