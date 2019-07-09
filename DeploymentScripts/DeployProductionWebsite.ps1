@@ -18,7 +18,7 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -smtpNwHost "10.7.99.81" `
                 -resetPwTtl "10.00:00:00" `
                 -mailSuffix "" `
-                -baseUrl "https://www.kitos.dk/" `
+                -baseUrl "https://$Env:KitosHostName/" `
                 -kitosEnvName "Prod" `
                 -buildNumber $Env:BUILD_NUMBER `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `

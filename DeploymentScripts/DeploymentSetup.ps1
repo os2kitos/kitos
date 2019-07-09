@@ -1,9 +1,10 @@
 # Load helper
 .$PSScriptRoot\AwsApi.ps1
 
-Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUserPasswords = $true) {
-    Write-Host "Loading environment secrets from SSM"
+Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUsers = $true) {
+    Write-Host "Loading environment configuration from SSM"
     
+    $Env:KitosHostName = Get-SSM-Parameter -environmentName "$envName" -parameterName "HostName"
     $Env:MsDeployUserName = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployUserName"
     $Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployPassword"
     $Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForIIsApp"
@@ -14,14 +15,19 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
         $Env:HangfireDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForTeamCity"
     }
     
-    if($loadTestUserPasswords -eq $true) {
+    if($loadTestUsers -eq $true) {
+        $Env:TestUserGlobalAdmin = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserGlobalAdmin"
         $Env:TestUserGlobalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserGlobalAdminPw"
+
+        $Env:TestUserLocalAdmin = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserLocalAdmin"
         $Env:TestUserLocalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserLocalAdminPw"
+
+        $Env:TestUserNormalUser = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserNormalUser"
         $Env:TestUserNormalUserPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserNormalUserPw"
     }
     
     
-    Write-Host "Finished loading environment secrets from SSM"
+    Write-Host "Finished loading environment configuration from SSM"
 }
 
 Function Setup-Environment([String] $environmentName) {
@@ -39,26 +45,26 @@ Function Setup-Environment([String] $environmentName) {
         "integration" 
         {
             $loadTcHangfireConnectionString = $true
-            $loadTestUserPasswords = $true
+            $loadTestUsers = $true
             break;
         }
         "test"
         {
             $loadTcHangfireConnectionString = $false
-            $loadTestUserPasswords = $false
+            $loadTestUsers = $false
             break;
         }
         "production"
         {
             $loadTcHangfireConnectionString = $false
-            $loadTestUserPasswords = $false
+            $loadTestUsers = $false
             break;
         }
         default { Throw "Error: Unknnown environment provided: $environmentName" }
     }
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"
-    Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUserPasswords $loadTestUserPasswords
+    Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUsers $loadTestUsers
     
     Write-Host "Finished configuring $environmentName"
 }
