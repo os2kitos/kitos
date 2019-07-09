@@ -10,6 +10,7 @@ using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using System;
+using Infrastructure.DataAccess;
 
 namespace Presentation.Web.Controllers.OData
 {
