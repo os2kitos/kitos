@@ -47,8 +47,6 @@ function runProtractorHeadless(done) {
     var params = process.argv;
     var args = params.length > 3 ? [params[3], params[4], params[5]] : [];
 
-    gutil.log('e2e arguments: ' + args);
-
     var singleSpec = 'Presentation.Web/Tests/**/*.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
