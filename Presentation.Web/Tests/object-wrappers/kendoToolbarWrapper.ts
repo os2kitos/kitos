@@ -1,5 +1,5 @@
 import CSSLocator = require("./CSSLocatorHelper");
-import Constants = require("../../app/utility/Constants");
+import Constants = require("../Utility/Constants");
 
 type HeaderButtons = {
     resetFilter: protractor.ElementFinder, saveFilter: protractor.ElementFinder, useFilter: protractor.ElementFinder, deleteFilter: protractor.ElementFinder,
