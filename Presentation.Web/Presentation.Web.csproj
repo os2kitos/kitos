@@ -633,7 +633,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <TypeScriptCompile Include="app\utility\Constants.ts" />
+    <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ITSystemHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
@@ -1263,7 +1263,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Scripts\langs\da.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
@@ -1301,7 +1300,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Tests\it-contract\" />
-    <Folder Include="Scripts\langs\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
@@ -1369,10 +1367,6 @@
   </Target>
   <Target Name="AfterBuild">
   </Target> -->
-  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <TransformXml Source="Web.config" Transform="Web.Test.config" Destination="$(OutputPath)\Web.Test.config" />
-    <TransformXml Source="Web.config" Transform="Web.Prod.config" Destination="$(OutputPath)\Web.Prod.config" />
-  </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
