@@ -38,22 +38,14 @@ try {
     $app = Start-Process powershell.exe -ArgumentList "webdriver-manager start" -PassThru -WindowStyle Hidden
 
     Write-Host "Starting E2E test. This might take a while..."
-    $gulpApp = Start-Process powershell.exe -ArgumentList "gulp e2e:headless --params.login.email='$usrname' --params.login.pwd='$pwd' --baseUrl='$url'" -PassThru -Wait -WindowStyle Hidden -RedirectStandardOutput testOutput.txt
+    & gulp e2e:headless --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
     
-    If($gulpApp.ExitCode.Equals(0)){
-        Write-Host "All tests succeeded :D"
-    }
-    If ($gulpApp.ExitCode.Equals(1)){
-        Get-Content -Path testOutput.txt
-        throw "At least 1 E2E test failed, check tmp folder for detailed report"
-    }
+    if($LASTEXITCODE -ne 0)	{ Throw "Integration tests failed" }
 }
 catch{
     throw $_.Exception
 }
 finally{
-    Remove-Item -Path testOutput.txt
-
     Write-Host "Testing done, shutting down selenium server as clean up"
     Stop-Process $app.Id
 
