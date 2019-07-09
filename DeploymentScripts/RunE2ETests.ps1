@@ -35,10 +35,10 @@ param(
     
     try {
         Write-Host "Starting selenium server"
-        & "$PSScriptRoot\..\node_modules\.bin\webdriver-manager" "update"
+        & webdriver-manager "update"
         if($LASTEXITCODE -ne 0)	{ Throw "Webdriver update failed" }
 
-        $app = Start-Process powershell.exe -ArgumentList "$PSScriptRoot\..\node_modules\.bin\webdriver-manager start" -PassThru -WindowStyle Hidden
+        $app = Start-Process powershell.exe -ArgumentList "webdriver-manager start" -PassThru -WindowStyle Hidden
     
         Write-Host "Starting E2E test. This might take a while..."
         & gulp e2e:headless --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
