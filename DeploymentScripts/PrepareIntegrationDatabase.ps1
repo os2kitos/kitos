@@ -7,11 +7,11 @@ $ErrorActionPreference = "Stop"
 # Load helper libraries
 #-------------------------------------------------------------
 .$PSScriptRoot\DeploymentSetup.ps1
+.$PSScriptRoot\DbMigrations.ps1
 
 Setup-Environment -environmentName "integration"
 
 $TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
-$MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
 
 #-------------------------------------------------------------
 Write-Host "Dropping existing databases (kitos and hangfire)"
@@ -26,9 +26,7 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO DROP HANGFIRE DB" }
 #-------------------------------------------------------------
 Write-Host "Running migrations"
 #-------------------------------------------------------------
-$Env:SeedNewDb="yes"
-& "$MigrationsFolder\migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose /startupDirectory="$MigrationsFolder"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO MIGRATE DB" }
+Run-DB-Migrations -newDb $true
 
 #-------------------------------------------------------------
 Write-Host "Enabling custom options"
