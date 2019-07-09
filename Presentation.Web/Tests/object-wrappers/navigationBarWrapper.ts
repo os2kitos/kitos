@@ -1,21 +1,44 @@
-﻿class navigationBarWrapper {
+import cssLocator = require("./cssLocatorHelper");
 
-    public mainNavigationElement = element(by.id("navbar-top"));
-
-    public navBarkitosLogo = this.mainNavigationElement.element(by.css("a.navbar-brand"));
-
-    public navBarOrg = this.mainNavigationElement.element(by.css("ul.nav.navbar-nav")).all(by.css("a.ng-scope")).get(0);
-
-    public navBarProj = this.mainNavigationElement.element(by.css("ul.nav.navbar-nav")).all(by.css("a.ng-scope")).get(1);
-
-    public navBarSys = this.mainNavigationElement.element(by.css("ul.nav.navbar-nav")).all(by.css("a.ng-scope")).get(2);
-
-    public navBarCon = this.mainNavigationElement.element(by.css("ul.nav.navbar-nav")).all(by.css("a.ng-scope")).get(3);
-
-    public navBarRep = this.mainNavigationElement.element(by.css("ul.nav.navbar-nav")).all(by.css("a.ng-scope")).get(4);
+type navigations = {
+    logo: protractor.ElementFinder, organization: protractor.ElementFinder, project: protractor.ElementFinder, system: protractor.ElementFinder,
+    contract: protractor.ElementFinder, reports: protractor.ElementFinder
+}
+type userDropdown = {
+    dropDownElement: protractor.ElementFinder, myProfile: protractor.ElementFinder, localAdmin: protractor.ElementFinder, globalAdming: protractor.ElementFinder,
+    changeOrg: protractor.ElementFinder, logOut: protractor.ElementFinder
+}
 
 
 
+var byHook = new cssLocator().byDataHook;
+
+class navigationBarWrapper {
+    
+
+    public headerNavigations(): navigations {
+        var nav: navigations = {
+            logo: element(byHook("kitosLogo")),
+            organization: element(byHook("organizationButton")),
+            project: element(byHook("projectButton")),
+            system: element(byHook("systemButton")),
+            contract: element(byHook("contractButton")),
+            reports: element(byHook("reportButton"))
+        };
+        return nav;
+    }
+
+    public dropDown(): userDropdown {
+        var drop: userDropdown = {
+            dropDownElement: element(by.id("dropdown-button")),
+            myProfile: element(byHook("myProfile")),
+            localAdmin: element(byHook("localAdmin")),
+            globalAdming: element(byHook("globalAdmin")),
+            changeOrg: element(byHook("changeOrganization")),
+            logOut: element(byHook("logout"))
+        };
+        return drop;
+    }
 
 }
 

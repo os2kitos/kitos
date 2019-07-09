@@ -45,6 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		package.json = package.json
 		paths.config.js = paths.config.js
 		protractor.conf.js = protractor.conf.js
+		protractor.headless.conf.js = protractor.headless.conf.js
 		protractor.local.conf.js = protractor.local.conf.js
 		README.md = README.md
 		run-coverage.bat = run-coverage.bat

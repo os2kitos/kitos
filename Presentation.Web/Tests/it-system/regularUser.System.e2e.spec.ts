@@ -1,13 +1,16 @@
-﻿import Helper = require("../helper");
-import ItSystemEditPo = require("../PageObjects/it-system/it-system-overview.po");
+﻿import login = require("../Helpers/LoginHelper");
+import ItSystemEditPo = require("../PageObjects/it-system/ItSystemOverview.po");
 
 describe("Regular user tests", () => {
 
-    var loginHelper = new Helper.Login();
-    var pageObject = new ItSystemEditPo();
+    var loginHelper = new login.Login();
+    var pageObject = new ItSystemEditPo(); 
+    var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
+    var columnHeaders = pageObject.kendoToolbarWrapper.columnHeaders();
+    var columnObject = pageObject.kendoToolbarWrapper.columnObjects();
 
     beforeAll(() => {
-        loginHelper.login("support@kitos.dk", "testpwrd"); //TODO change user info.
+        loginHelper.loginAsRegularUser();
         browser.waitForAngular();
     });
 
@@ -16,38 +19,28 @@ describe("Regular user tests", () => {
         browser.waitForAngular();
     });
 
-    it("Use filter is disabled", () => {
-        //Arrange
-
-        //Act 
-
-        //Assert
-        expect(pageObject.useFiltersButton.getAttribute("disabled")).toEqual("true");
+    it("Apply and delete filter buttons are disabled", () => {       
+        expect(headerButtons.useFilter.getAttribute("disabled")).toEqual("true");
+        expect(headerButtons.deleteFilter.getAttribute("disabled")).toEqual("true");
     });
 
-    it("Delete filter is disabled", () => {
-        //Arrange
+    //it("IT systems can be sorted by name", () => {
+    //    browser.wait(protractor.ExpectedConditions.visibilityOf(columnObject.systemName.first()));
+    //    columnHeaders.systemName.click();
+    //    browser.wait(protractor.ExpectedConditions.visibilityOf(columnObject.systemName.first()));
+    //    var firstItemName = columnObject.systemName.first().getText();
 
-        //Act 
+    //    columnHeaders.systemName.click();
+    //    browser.wait(protractor.ExpectedConditions.visibilityOf(columnObject.systemName.first()));
 
-        //Assert
-        expect(pageObject.useFiltersButton.getAttribute("disabled")).toEqual("true");
-    });
+    //    expect(columnObject.systemName.last().getText()).toEqual(firstItemName);
+    //});
 
-    it("Delete filter is disabled", () => {
-        //Arrange
+    it("IT system can be opened", () => {
 
-        //Act 
+        columnObject.systemName.first().click();
 
-        //Assert
-        expect(pageObject.exportButton.getText()).toEqual("Eksportér til Excel");
-    });
-
-    it("Delete filter is disabled", () => {
-        //Arrange
-        //Act 
-        //Assert
-        expect(pageObject.columnHeaderValidity.getText()).toEqual("Gyldig/Ikke gyldig");
+        expect(browser.getCurrentUrl()).toContain("#/system/usage/");
     });
 
 

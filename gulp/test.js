@@ -41,11 +41,42 @@ function cleanProtractor() {
 }
 
 // use protractor
-gulp.task('e2e:local', ['CleanProtractor'], runProtractor);
+gulp.task('e2e:headless', ['CleanProtractor'], runProtractorHeadless);
 
-function runProtractor(done) {
+function runProtractorHeadless(done) {
     var params = process.argv;
-    var args = params.length > 3 ? [params[3], params[4]] : [];
+    var args = params.length > 3 ? [params[3], params[4], params[5]] : [];
+
+    gutil.log('e2e arguments: ' + args);
+
+    var singleSpec = 'Presentation.Web/Tests/**/*.e2e.spec.js';
+    gulp.src(singleSpec) // paths.e2eSuites.itSystem
+        .pipe(protractor.protractor({
+            configFile: 'protractor.headless.conf.js',
+            args: [
+                '--params.login.email', args[0],
+                '--params.login.pwd', args[1],
+                '--baseUrl', args[2]
+            ],
+            'debug': false
+        }))
+        .on('error', function (err) {
+            gutil.log(gutil.colors.red('error: ' + err));
+            // Make sure failed tests cause gulp to exit non-zero
+            throw err;
+        })
+        .on('end', function () {
+            // Close browser sync server
+            browserSync.exit();
+            done();
+        });
+}
+
+gulp.task('e2e:local', ['CleanProtractor'], runProtractorLocal);
+
+function runProtractorLocal(done) {
+    var params = process.argv;
+    var args = params.length > 3 ? [params[3], params[4], params[5]] : [];
 
     gutil.log('e2e arguments: ' + args);
 
@@ -53,7 +84,11 @@ function runProtractor(done) {
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
             configFile: 'protractor.local.conf.js',
-            //args: args,
+            args: [
+                '--params.login.email', args[0],
+                '--params.login.pwd', args[1],
+                '--baseUrl', args[2]
+            ],
             'debug': false
         }))
         .on('error', function (err) {
@@ -72,15 +107,19 @@ gulp.task('e2e:single', ['CleanProtractor'], runSingleTest);
 
 function runSingleTest(done) {
     var params = process.argv;
-    var args = params.length > 3 ? [params[3], params[4]] : [];
+    var args = params.length > 3 ? [params[3], params[4], params[5]] : [];
 
     gutil.log('e2e arguments: ' + args);
 
-    var singleSpec = 'Presentation.Web/Tests/it-system/regularUser.System.e2e.spec.js';
+    var singleSpec = ['Presentation.Web/Tests/HomePage/Home.e2e.spec.js'];
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
             configFile: 'protractor.local.conf.js',
-            //args: args,
+            args: [
+                '--params.login.email', args[0],
+                '--params.login.pwd', args[1],
+                '--baseUrl', args[2]
+            ],
             'debug': false
         }))
         .on('error', function (err) {
@@ -95,39 +134,6 @@ function runSingleTest(done) {
         });
 }
 
-// run e2e tests with protractor with browserstack
-gulp.task('e2e:browserstack', function (done) {
-    // ReSharper disable once InconsistentNaming
-    var BrowserStackTunnel = require('browserstacktunnel-wrapper');
-
-    var browserStackTunnel = new BrowserStackTunnel({
-        key: process.env.BROWSERSTACK_KEY
-    });
-
-    browserStackTunnel.start(function (error) {
-        if (error) {
-            gutil.log(gutil.colors.red(error));
-        } else {
-            tunnelRunning();
-        }
-    });
-
-    function tunnelRunning() {
-        gulp.src(paths.e2eFiles)
-            .pipe(protractor.protractor({
-                configFile: 'protractor.conf.js'
-            }))
-            .on('end', function () {
-                browserStackTunnel.stop(function (error) {
-                    if (error) {
-                        gutil.log(gutil.colors.red(error));
-                    } else {
-                        done();
-                    }
-                });
-            });
-    }
-});
 
 // map karma coverage results from js to ts source
 gulp.task('mapCoverage', function (done) {

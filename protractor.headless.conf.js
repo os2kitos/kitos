@@ -10,10 +10,13 @@ exports.config = {
     capabilities: {
         browserName: 'chrome',
         shardTestFiles: true,
-        maxInstances: 1
+        maxInstances: 1,  //Can be changed depending on the system capabilities.
+        chromeOptions: {
+            args: ['--headless', '--disable-gpu']
+        }
     },
 
-
+    
 
     //specs: ['Presentation.Web/Test/it-contract/it-contract-edit.e2e.spec.js'],
 
