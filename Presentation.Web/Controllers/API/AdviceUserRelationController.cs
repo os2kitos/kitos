@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
+using SwashbuckleODataSample;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -17,7 +18,11 @@ namespace Presentation.Web.Controllers.API
         {
             _repository = repository;
         }
-
+        /// <summary>
+        /// Sletter adviser med det specificerede id fra en genereisk advis
+        /// </summary>
+        /// <param name="adviceId"></param>
+        /// <returns></returns>
         [HttpDelete]
         public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
         {

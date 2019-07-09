@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Http.Description;
 
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
@@ -11,6 +12,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     using Core.DomainModel.LocalOptions;
     using Core.DomainServices;
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class LocalArchiveLocationsController : LocalOptionBaseController<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>
     {
         public LocalArchiveLocationsController(IGenericRepository<LocalArchiveLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveLocation> optionsRepository)

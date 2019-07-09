@@ -188,5 +188,11 @@ namespace Core.ApplicationServices
         {
             return password.Length >= 6;
         }
+
+        public User GetUserById(int id)
+        {
+            var user = _userRepository.GetByKey(id);
+            return user;
+        }
     }
 }

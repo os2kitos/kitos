@@ -36,6 +36,8 @@ namespace Presentation.Web.Controllers.API
             return Get(orgUnitId, organizationId, false, pagingModel);
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage Get(int orgUnitId, int organizationId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             try
@@ -65,6 +67,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/taskGroup")]
         public HttpResponseMessage PostTaskGroup(int orgUnitId, int? taskId)
         {
             try
@@ -116,6 +120,36 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/")]
+        public HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
+        {
+            try
+            {
+                var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
+                item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
+
+                var savedItem = PostQuery(item);
+
+                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+            }
+            catch (Exception e)
+            {
+                // check if inner message is a duplicate, if so return conflict
+                if (e.InnerException?.InnerException != null)
+                {
+                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
+                        return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
+                return LogError(e);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage DeleteTaskGroup(int orgUnitId, int? taskId)
         {
             try

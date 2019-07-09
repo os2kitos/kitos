@@ -140,7 +140,6 @@ Global
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Test|Any CPU.ActiveCfg = Test|Any CPU
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC}.Test|Any CPU.Build.0 = Test|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Prod|Any CPU.ActiveCfg = Prod|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Prod|Any CPU.Build.0 = Prod|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -148,7 +147,6 @@ Global
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Test|Any CPU.ActiveCfg = Test|Any CPU
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A}.Test|Any CPU.Build.0 = Test|Any CPU
 		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Prod|Any CPU.ActiveCfg = Prod|Any CPU
 		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Prod|Any CPU.Build.0 = Prod|Any CPU
 		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -182,5 +180,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BD2A477D-1E55-45D1-8C0C-FBF9E8216B92}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}
 	EndGlobalSection
 EndGlobal

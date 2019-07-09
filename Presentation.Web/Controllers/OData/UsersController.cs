@@ -28,8 +28,8 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
-        [ODataRoute("Users/Create")]
-        public IHttpActionResult PostCreate(ODataActionParameters parameters)
+        [HttpPost]
+        public IHttpActionResult Create(ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
             {
@@ -81,16 +81,10 @@ namespace Presentation.Web.Controllers.OData
 
             return Created(createdUser);
         }
-
-        [ODataRoute("Users/IsEmailAvailable(email={email})")]
-        public IHttpActionResult GetIsEmailAvailable(string email)
+        [HttpGet]
+        public IHttpActionResult IsEmailAvailable(string email)
         {
-            // strip strange single quotes from parameter
-            // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
-            var strippedEmail = email.Remove(0, 1);
-            strippedEmail = strippedEmail.Remove(strippedEmail.Length-1);
-
-            if (EmailExists(strippedEmail))
+            if (EmailExists(email))
                 return Ok(false);
             else
                 return Ok(true);
@@ -99,17 +93,22 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("GetUserByEmail(email={email})")]
         public IHttpActionResult GetUserByEmail(string email)
         {
-            // strip strange single quotes from parameter
-            // http://stackoverflow.com/questions/39510551/string-parameter-to-bound-function-contains-single-quotes
-            var strippedEmail = email.Remove(0, 1);
-            strippedEmail = strippedEmail.Remove(strippedEmail.Length - 1);
-
-            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == strippedEmail.ToLower());
+            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
             if(userToReturn != null)
             {
                 return Ok(userToReturn);
             }
             return NotFound();
+        }
+
+        /// <summary>
+        /// Always returns 401 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public override IHttpActionResult Delete(int key)
+        {
+            return Unauthorized();
         }
 
         //GET /Organizations(1)/DefaultOrganizationForUsers
@@ -122,19 +121,6 @@ namespace Presentation.Web.Controllers.OData
                 return StatusCode(HttpStatusCode.Forbidden);
 
             var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
-            return Ok(result);
-        }
-
-        //GET /Organizations(1)/Users
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Users")]
-        public IHttpActionResult GetByOrganization(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            var result = Repository.AsQueryable().Where(m => m.OrganizationRights.Any(r=> r.OrganizationId == orgKey));
             return Ok(result);
         }
 

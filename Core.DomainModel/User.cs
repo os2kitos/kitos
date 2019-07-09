@@ -14,7 +14,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity
+    public class User : Entity, IContextAware
     {
         public User()
         {
@@ -141,6 +141,11 @@ namespace Core.DomainModel
             {
                 return IsReadOnly;
             }
+        }
+
+        public bool IsInContext(int organizationId)
+        {
+            return DefaultOrganizationId == organizationId;
         }
 
         public bool IsLocalAdmin

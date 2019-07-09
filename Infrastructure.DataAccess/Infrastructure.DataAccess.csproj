@@ -540,6 +540,10 @@
     <Compile Include="Migrations\201804161323008_ContactPersonAdded.Designer.cs">
       <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs" />
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.Designer.cs">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -828,6 +832,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804161323008_ContactPersonAdded.resx">
       <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.resx">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

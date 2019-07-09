@@ -27,6 +27,11 @@ namespace Presentation.Web.Controllers.API
             return Repository.AsQueryable();
         }
 
+        /// <summary>
+        /// Get all from base entity controller
+        /// </summary>
+        /// <param name="paging"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
@@ -64,6 +69,11 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET api/T
+        /// <summary>
+        /// Get single from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Single object from database related to the controller</returns>
         public virtual HttpResponseMessage GetSingle(int id)
         {
             try
@@ -106,7 +116,6 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
         protected virtual TModel PostQuery(TModel item)
         {
             var insertedItem = Repository.Insert(item);
@@ -115,15 +124,24 @@ namespace Presentation.Web.Controllers.API
             return insertedItem;
         }
 
-        // POST api/T
+        /// <summary>
+        /// Post from base entity controller
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>HTML code for success or failure</returns>
         public virtual HttpResponseMessage Post(TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
-
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
+
+                // Check write access rights  
+                if (!HasWriteAccess(item, organizationId: 0))
+                {
+                    return Unauthorized();
+                }
 
                 var savedItem = PostQuery(item);
 
@@ -141,8 +159,12 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException?.InnerException != null)
+                {
                     if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
                         return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
 
                 return LogError(e);
             }
@@ -157,6 +179,13 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PUT api/T
+        /// <summary>
+        /// Put from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Put(int id, int organizationId, JObject obj)
         {
             return Patch(id, organizationId, obj);
@@ -169,12 +198,22 @@ namespace Presentation.Web.Controllers.API
         }
 
         // DELETE api/T
+        /// <summary>
+        /// Delete from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+
+                if (!HasWriteAccess(item, organizationId))
+                {
+                    return Unauthorized();
+                }
 
                 DeleteQuery(item);
 
@@ -199,13 +238,17 @@ namespace Presentation.Web.Controllers.API
                 {
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                     if (mapMember == null)
+                    {
                         continue; // abort if no map found
+                    }
 
                     var destName = mapMember.DestinationProperty.Name;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
+                    {
                         continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                    }
 
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
@@ -232,6 +275,7 @@ namespace Presentation.Web.Controllers.API
                             propRef.SetValue(item, null);
                         }
                     }
+
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
                     else if (t.IsEquivalentTo(typeof(Guid)))
@@ -270,13 +314,27 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PATCH api/T
+        /// <summary>
+        /// Patch from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
                 var item = Repository.GetByKey(id);
-                if (item == null) return NotFound();
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(item, organizationId))
+                {
+                    return Unauthorized();
+                }
 
                 var result = PatchQuery(item, obj);
                 return Ok(Map(result));
@@ -285,9 +343,15 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException != null)
+                {
                     if (e.InnerException.InnerException != null)
+                    {
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                        {
                             return Conflict(e.InnerException.InnerException.Message);
+                        }
+                    }
+                }
 
                 return LogError(e);
             }
@@ -308,7 +372,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="obj">The object</param>
         /// <param name="user">The user</param>
         /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to obj</returns>
+        /// <returns>True if user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
             return AuthenticationService.HasWriteAccess(user.Id, obj);
@@ -319,7 +383,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="objId">The id of object</param>
         /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to the object with objId</returns>
+        /// <returns>True if user has write access to the object with objId</returns>
         protected bool HasWriteAccess(int objId, int organizationId)
         {
             return HasWriteAccess(objId, KitosUser, organizationId);

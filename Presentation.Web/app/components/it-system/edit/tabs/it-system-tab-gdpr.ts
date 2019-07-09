@@ -12,13 +12,13 @@
                         });
                 }],
                 regularSensitiveData: ['$http', '$stateParams','theSystem', function ($http, $stateParams, theSystem) {
-                    return $http.get("odata/GetRegularPersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
+                    return $http.get("odata/GetRegularPersonalDataBysystemId(id=" + $stateParams.id + ")")
                         .then(function (result) {
                             return result.data.value;
                         });
                 }],
                 sensitivePersonalData: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("odata/GetSensitivePersonalDataByObjectID(id=" + $stateParams.id + ", entitytype='ITSYSTEM')")
+                    return $http.get("odata/GetSensitivePersonalDataBySystemId(id=" + $stateParams.id+ ")")
                         .then(function (result) {
                             return result.data.value;
                         });
@@ -58,7 +58,19 @@
                     });
                 
                 } else {
-                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type='" + optionType + "', entitytype='ITSYSTEM')").success(function () {
+                    let OptType = 0;
+                    switch (optionType) {
+                    case "REGULARPERSONALDATA":
+                        OptType = 0;
+                        break;
+                    case "SENSITIVEPERSONALDATA":
+                        OptType = 1;
+                        break;
+                    case "REGISTERTYPEDATA":
+                        OptType = 2;
+                        break;
+                    }
+                    $http.delete("Odata/RemoveOption(id=" + OptionId + ", objectId=" + theSystem.id + ",type=" + OptType + ", entitytype=0)").success(function () {
                         msg.toSuccessMessage("Feltet er Opdateret.");
                     }).error(function () {
                         msg.toErrorMessage("Fejl!");

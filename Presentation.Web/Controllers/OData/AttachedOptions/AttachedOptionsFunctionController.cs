@@ -6,21 +6,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Mvc;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AttachedOptionsFunctionController<TEntity, TOption, TLocalOption> : AttachedOptionsController
     where TEntity : Entity
     where TOption : OptionHasChecked<TEntity>
     where TLocalOption : LocalOptionEntity<TOption>
     {
         IGenericRepository<AttachedOption> _AttachedOptionRepository;
-        IAuthenticationService _authService;
         IGenericRepository<TOption> _OptionRepository;
         IGenericRepository<TLocalOption> _LocalOptionRepository;
 
@@ -29,7 +31,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             IGenericRepository<TLocalOption> LocalOptionRepository)
                : base(repository, authService)
         {
-            _authService = authService;
             _AttachedOptionRepository = repository;
             _OptionRepository = OptionRepository;
             _LocalOptionRepository = LocalOptionRepository;
@@ -117,25 +118,23 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         private List<AttachedOption> GetAttachedOptions(OptionType type, int id, EntityType objectType)
         {
-                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
 
-                if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-                {
-                    //tolist so we can operate with open datareaders in the following foreach loop.
-                    return _AttachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
-                    && x.OptionType == type
-                    && x.ObjectType == objectType).ToList();
-                }
-                else
-                {
-                    return _AttachedOptionRepository.AsQueryable()
-                     .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) 
-                     && x.ObjectId == id 
-                     && x.OptionType == type
-                     && x.ObjectType == objectType).ToList();
-                }
+            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            {
+                //tolist so we can operate with open datareaders in the following foreach loop.
+                return _AttachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
+                && x.OptionType == type
+                && x.ObjectType == objectType).ToList();
             }
+            else
+            {
+                return _AttachedOptionRepository.AsQueryable()
+                 .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)
+                 && x.ObjectId == id
+                 && x.OptionType == type
+                 && x.ObjectType == objectType).ToList();
+            }
+        }
     }
-
-
 }

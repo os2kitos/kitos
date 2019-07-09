@@ -11,7 +11,7 @@
                             user = result;
                         });
                         var validateAsync = _.debounce(function (viewValue) {
-                            $http.get<Kitos.Models.IODataResult<boolean>>(`/odata/Users/IsEmailAvailable(email='${viewValue}')`)
+                            $http.get<Kitos.Models.IODataResult<boolean>>(`/odata/Users/Users.IsEmailAvailable(email='${viewValue}')`)
                                 .then((response) => {
                                     if (response.data.value) {
                                         // email is available

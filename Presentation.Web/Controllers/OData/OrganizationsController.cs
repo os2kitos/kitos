@@ -9,6 +9,7 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
+using System.Linq;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -28,8 +29,8 @@ namespace Presentation.Web.Controllers.OData
             _userRepository = userRepository;
         }
 
-        [ODataRoute("Organizations({orgKey})/RemoveUser")]
-        public IHttpActionResult DeleteRemoveUserFromOrganization(int orgKey, ODataActionParameters parameters)
+        [HttpPost]
+        public IHttpActionResult RemoveUser([FromODataUri]int orgKey, ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -126,9 +127,20 @@ namespace Presentation.Web.Controllers.OData
             return Created(organization);
         }
 
+        [EnableQuery]
+        public IHttpActionResult GetUsers([FromODataUri] int key)
+        {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+                return StatusCode(HttpStatusCode.Forbidden);
+
+            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
+            return Ok(result);
+        }
+
         public override IHttpActionResult Patch(int key, Delta<Organization> delta)
         {
-            var organization = delta.GetEntity();
+            var organization = delta.GetInstance();
 
             CheckOrgTypeRights(organization);
             return base.Patch(key, delta);

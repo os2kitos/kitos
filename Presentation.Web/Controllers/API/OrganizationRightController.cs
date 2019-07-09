@@ -10,16 +10,18 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API
 {
-    public class OrganizationRightController : BaseApiController
+    public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
         private readonly IGenericRepository<Organization> _objectRepository;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository)
+        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository, IGenericRepository<Organization> objectRepository) : base (rightRepository)
         {
             _rightRepository = rightRepository;
             _objectRepository = objectRepository;
+            GroupName = "test";
         }
+        public string GroupName { get; set; }
 
         public virtual HttpResponseMessage GetAllRights()
         {
@@ -125,17 +127,39 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, int userId, OrganizationRight right)
+        public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, OrganizationRightDTO dto)
         {
             try
             {
-                // if user has any role within the organization (or global admin) they should be able to add new adminrights
-                if (!KitosUser.IsGlobalAdmin)
-                    if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())
+                var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
+
+                // Only global admin can set other users as global admins
+                if(right.Role == OrganizationRole.GlobalAdmin)
+                {
+                    if (!KitosUser.IsGlobalAdmin)
                         return Unauthorized();
+                }
+
+                // Only local and global admins can make users local admins
+                if(right.Role == OrganizationRole.LocalAdmin)
+                {
+                    if(!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
+                        return Unauthorized();
+                }
 
                 right.OrganizationId = organizationId;
                 right.ObjectOwner = KitosUser;
+
+                if (!base.HasWriteAccess(right, KitosUser, organizationId))
+                {
+                    return Unauthorized();
+                }
+
+                //// if user has any role within the organization (or global admin) they should be able to add new adminrights
+                //if (!KitosUser.IsGlobalAdmin)
+                //    if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())
+                //        return Unauthorized();
+
                 right.LastChangedByUser = KitosUser;
                 right.LastChanged = DateTime.UtcNow;
 
@@ -180,41 +204,58 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Post a new right to the object
-        /// </summary>
-        /// <param name="id">The id of the object</param>
-        /// <param name="organizationId"></param>
-        /// <param name="dto">DTO of right</param>
-        /// <returns></returns>
-        public HttpResponseMessage PostRight(int id, int organizationId, OrganizationRightDTO dto)
-        {
-            try
-            {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
+        ///// <summary>
+        ///// Post a new right to the object
+        ///// </summary>
+        ///// <param name="id">The id of the object</param>
+        ///// <param name="organizationId"></param>
+        ///// <param name="dto">DTO of right</param>
+        ///// <returns></returns>
+        //public HttpResponseMessage PostRight(int id, int organizationId, OrganizationRightDTO dto)
+        //{
+        //    try
+        //    {
+        //        var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
+        //        right.OrganizationId = id;
+        //        right.ObjectOwner = KitosUser;
 
-                var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
-                right.OrganizationId = id;
-                right.ObjectOwner = KitosUser;
-                right.LastChangedByUser = KitosUser;
-                right.LastChanged = DateTime.UtcNow;
+        //        // Only global admin can set other users as global admins
+        //        if (right.Role == OrganizationRole.GlobalAdmin)
+        //        {
+        //            if (!KitosUser.IsGlobalAdmin)
+        //                return Unauthorized();
+        //        }
 
-                right = _rightRepository.Insert(right);
-                _rightRepository.Save();
+        //        // Only local and global admins can make users local admins
+        //        if (right.Role == OrganizationRole.LocalAdmin)
+        //        {
+        //            if (!KitosUser.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+        //                return Unauthorized();
+        //        }
 
-                //TODO: FIX navigation properties not loading properly!!!
-                right.User = UserRepository.GetByKey(right.UserId);
+        //        if (!base.HasWriteAccess(right, KitosUser, organizationId))
+        //        {
+        //            return Unauthorized();
+        //        }
 
-                var outputDTO = AutoMapper.Mapper.Map<OrganizationRight, OrganizationRightDTO>(right);
+        //        right.LastChangedByUser = KitosUser;
+        //        right.LastChanged = DateTime.UtcNow;
 
-                return Created(outputDTO);
-            }
-            catch (Exception e)
-            {
-                return Error(e);
-            }
-        }
+        //        right = _rightRepository.Insert(right);
+        //        _rightRepository.Save();
+
+        //        //TODO: FIX navigation properties not loading properly!!!
+        //        right.User = UserRepository.GetByKey(right.UserId);
+
+        //        var outputDTO = AutoMapper.Mapper.Map<OrganizationRight, OrganizationRightDTO>(right);
+
+        //        return Created(outputDTO);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return Error(e);
+        //    }
+        //}
 
         /// <summary>
         /// Delete a right from the object
@@ -228,10 +269,26 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
-
                 var right = _rightRepository.Get(r => r.OrganizationId == id && r.Role == (OrganizationRole)rId && r.UserId == uId).FirstOrDefault();
+
+                // Only global admin can set other users as global admins
+                if (right.Role == OrganizationRole.GlobalAdmin)
+                {
+                    if (!KitosUser.IsGlobalAdmin)
+                        return Unauthorized();
+                }
+
+                // Only local and global admins can make users local admins
+                if (right.Role == OrganizationRole.LocalAdmin)
+                {
+                    if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
+                        return Unauthorized();
+                }
+
+                if(!base.HasWriteAccess(right, KitosUser, organizationId))
+                {
+                    return Unauthorized();
+                }
 
                 if (right == null) return NotFound();
 

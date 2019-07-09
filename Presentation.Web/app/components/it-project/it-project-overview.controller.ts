@@ -792,10 +792,10 @@
                             }
                         },
                         values: [
-                            { text: "Ingen", value: 0 },
-                            { text: "Lav", value: 1 },
-                            { text: "Mellem", value: 2 },
-                            { text: "Høj", value: 3 }
+                            { text: "Ingen", value: "None" },
+                            { text: "Lav", value: "Low" },
+                            { text: "Mellem", value: "Mid" },
+                            { text: "Høj", value: "High" }
                         ]
                     },
                     {

@@ -409,7 +409,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string DataHearingSupervisionDocumentationUrlName { get; set; }
         public string DataHearingSupervisionDocumentationUrl { get; set; }
 
-        public DateTime UserSupervisionDate { get; set; }
+        public DateTime? UserSupervisionDate { get; set; }
 
         public int UserSupervision { get; set; }
         public string LinkToDirectoryUrl { get; set; }

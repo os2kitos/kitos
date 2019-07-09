@@ -148,6 +148,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        public override HttpResponseMessage Post(ItContractDTO dto)
+        { 
+            return base.Post(dto);
+        }
+
         /// <summary>
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>
@@ -439,9 +444,6 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItContract obj, User user, int organizationId)
         {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ContractModuleAdmin)))

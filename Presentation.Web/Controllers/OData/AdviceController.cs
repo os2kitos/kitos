@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 try
                 {
-                    var advice = delta.GetEntity();
+                    var advice = delta.GetInstance();
 
                     switch (advice.Scheduling)
                     {
@@ -189,8 +189,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
-        public IHttpActionResult GetByObjectID(int id,ObjectType type)
+        public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
             if (UserId == 0)
                 return Unauthorized();
@@ -205,8 +204,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Advice")]
-        public IHttpActionResult GetByOrganization(int orgKey)
+        public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
             if (UserId == 0)
                 return Unauthorized();

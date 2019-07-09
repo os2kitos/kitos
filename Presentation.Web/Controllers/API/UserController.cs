@@ -402,11 +402,27 @@ namespace Presentation.Web.Controllers.API
             if (user.IsReadOnly && !user.IsGlobalAdmin)
                 return false;
 
-            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
-            if (isLocalAdmin)
-                return true;
+            //var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == user.DefaultOrganizationId && x.Role == OrganizationRole.LocalAdmin);
+            //if (isLocalAdmin)
+            //    return true;
 
             return base.HasWriteAccess(obj, user, organizationId);
+        }
+
+        /// <summary>
+        /// Deletes user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <param name="organizationId">Not used in this case. Should remain empty</param>
+        /// <returns></returns>
+        public override HttpResponseMessage Delete(int id, int organizationId = 0)
+        {            
+            if(!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
+            {
+                return Unauthorized();
+            }
+
+            return base.Delete(id, organizationId);
         }
     }
 }

@@ -61,7 +61,6 @@
             $scope.systemCategories = systemCategories;
             autofocus();
             var today = new Date();
-            console.log(itSystemUsage);
             if (!itSystemUsage.active) {
                 if (itSystemUsage.concluded < today && today < itSystemUsage.expirationDate) {
                     $scope.displayActive = true;
@@ -129,14 +128,26 @@
                 };
             }
             $scope.patchDate = (field, value) => {
+                var expirationDate = $scope.usage.expirationDate;
+                var concluded = $scope.usage.concluded;
+                var formatString = "DD-MM-YYYY";
+                var formatDateString = "YYYY-MM-DD";
+                var fromDate = moment(concluded, [formatString, formatDateString]).startOf('day');
+                var endDate = moment(expirationDate, [formatString, formatDateString]).endOf('day');
                 var date = moment(value, "DD-MM-YYYY");
                 var today = moment();
-                if (value === "") {
+                if (value == "0001-01-01T00:00:00Z") {
+
+                }
+                else if (value === "" || value == undefined) {
                     var payload = {};
                     payload[field] = null;
                     patch(payload, $scope.autosaveUrl2 + '?organizationId=' + user.currentOrganizationId);
                 } else if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
+                }
+                else if (fromDate >= endDate) {
+                    notify.addErrorMessage("Den indtastede slutdato er før startdatoen.");
                 }
                 else {
                     if (today.isBetween(moment($scope.usage.concluded, "DD-MM-YYYY").startOf('day'), moment($scope.usage.expirationDate, "DD-MM-YYYY").endOf('day'), null, '[]') ||

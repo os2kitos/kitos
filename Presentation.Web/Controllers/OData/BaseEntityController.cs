@@ -12,7 +12,7 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
     {
-        private readonly IAuthenticationService _authService;
+        protected readonly IAuthenticationService _authService;
 
         protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
             : base(repository)
@@ -82,11 +82,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        public IHttpActionResult Put(int key, T entity)
-        {
-            return StatusCode(HttpStatusCode.NotImplemented);
-        }
-
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Post(T entity)
         {
             if (!ModelState.IsValid)
@@ -118,6 +114,7 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);
