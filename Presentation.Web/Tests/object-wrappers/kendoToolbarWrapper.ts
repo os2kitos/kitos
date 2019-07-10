@@ -13,7 +13,7 @@ type ClickableColumnHeaders = {
     externalReference: protractor.ElementFinder, dataType: protractor.ElementFinder, contract: protractor.ElementFinder, supplier: protractor.ElementFinder,
     project: protractor.ElementFinder, usedBy: protractor.ElementFinder, lastEditedBy: protractor.ElementFinder, lastEditedAt: protractor.ElementFinder,
     dateOfUse: protractor.ElementFinder, archiveDuty: protractor.ElementFinder, holdsDocument: protractor.ElementFinder, endDate: protractor.ElementFinder,
-    riskEvaluation: protractor.ElementFinder, urlListing: protractor.ElementFinder, dataProcessingAgreement: protractor.ElementFinder
+    riskEvaluation: protractor.ElementFinder, urlListing: protractor.ElementFinder, dataProcessingAgreement: protractor.ElementFinder,contractName: protractor.ElementFinder
 };
 
 type ColumnObjects = {
@@ -23,7 +23,7 @@ type ColumnObjects = {
     externalReference: protractor.ElementArrayFinder, dataType: protractor.ElementArrayFinder, contract: protractor.ElementArrayFinder, supplier: protractor.ElementArrayFinder,
     project: protractor.ElementArrayFinder, usedBy: protractor.ElementArrayFinder, lastEditedBy: protractor.ElementArrayFinder, lastEditedAt: protractor.ElementArrayFinder,
     dateOfUse: protractor.ElementArrayFinder, archiveDuty: protractor.ElementArrayFinder, holdsDocument: protractor.ElementArrayFinder, endDate: protractor.ElementArrayFinder,
-    riskEvaluation: protractor.ElementArrayFinder, urlListing: protractor.ElementArrayFinder, dataProcessingAgreement: protractor.ElementArrayFinder
+    riskEvaluation: protractor.ElementArrayFinder, urlListing: protractor.ElementArrayFinder, dataProcessingAgreement: protractor.ElementArrayFinder, contractName: protractor.ElementArrayFinder,
 };
 
 type footerNavigationButtons = {
@@ -37,11 +37,13 @@ var byHook = new CSSLocator().byDataHook;
 class kendoToolbarWrapper {
 
     public headerButtons(): HeaderButtons {
+
+        // TODO change to use byHook once kendo objects in app are refactored.
         var buttons: HeaderButtons = {
-            resetFilter: element(byHook("resetFilter")),
-            saveFilter: element(byHook("saveFilter")),
-            useFilter: element(byHook("useFilter")),
-            deleteFilter: element(byHook("removeFilter")),
+            resetFilter: element(by.buttonText("Nulstil")),
+            saveFilter: element(by.buttonText("Gem filter")),
+            useFilter: element(by.buttonText("Anvend filter")),
+            deleteFilter: element(by.buttonText("Slet filter")),
             export: this.notYetAHook()
         };
         return buttons;
@@ -56,6 +58,7 @@ class kendoToolbarWrapper {
             systemUUID: this.notYetAHook(),
             parentSystem: this.notYetAHook(),
             systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
+            contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             systemVersion: this.notYetAHook(),
             localCallName: this.notYetAHook(),
             reponsibleOrganization: this.notYetAHook(),
@@ -114,7 +117,9 @@ class kendoToolbarWrapper {
             endDate: this.notYetAHook2(),
             riskEvaluation: this.notYetAHook2(),
             urlListing: this.notYetAHook2(),
-            dataProcessingAgreement: this.notYetAHook2()
+            dataProcessingAgreement: this.notYetAHook2(),
+            contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
+            
         };
         return columns;
     }

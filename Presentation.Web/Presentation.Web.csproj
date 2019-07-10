@@ -636,6 +636,7 @@
     <TypeScriptCompile Include="app\utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ITSystemHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
+    <TypeScriptCompile Include="Tests\It-Contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeChecked.ts" />
     <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
@@ -653,6 +654,7 @@
     <TypeScriptCompile Include="Tests\object-wrappers\Select2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SelectStatus2Wrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\SubNavigationBarWrapper.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-contract\ItContractOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\ItSystemOverview.po.ts" />
   </ItemGroup>
   <ItemGroup>
@@ -1300,8 +1302,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Tests\it-contract\" />
-    <Folder Include="Scripts\langs\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
@@ -1338,6 +1338,10 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
