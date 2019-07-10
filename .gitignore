@@ -27,6 +27,7 @@ Presentation.Web/Scripts/maps/
 Presentation.Web/Tests/**/*.js
 Presentation.Web/Tests/**/*.js.map
 Presentation.Web/typescriptOutput
+Presentation.Web/Scripts/app-bundle.min.js
 
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
@@ -192,3 +193,6 @@ $RECYCLE.BIN/
 deploy/
 *.mdf
 Database/kitosdb_log.ldf
+
+# tmp folder from protractor beautiful reporter
+tmp/
