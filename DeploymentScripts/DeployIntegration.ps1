@@ -18,7 +18,7 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -smtpNwHost "127.0.0.1" `
                 -resetPwTtl "10.00:00:00" `
                 -mailSuffix "(SAW CI)" `
-                -baseUrl "https://kitos-integration.strongminds.dk/" `
+                -baseUrl "https://$Env:KitosHostName/" `
                 -kitosEnvName "Dev" `
                 -buildNumber $Env:BUILD_NUMBER `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `

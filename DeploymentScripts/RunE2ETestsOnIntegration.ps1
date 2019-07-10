@@ -7,6 +7,6 @@ $ErrorActionPreference = "Stop"
 Setup-Environment -environmentName "integration"
 
 .$PSScriptRoot\RunE2ETests.ps1 `
-                            -url "https://kitos-integration.strongminds.dk" `
-                            -usrname "[kitos-integration-globaladmin@strongminds.dk, kitos-integration-localadmin@strongminds.dk, kitos-integration-normal-user@strongminds.dk]" `
+                            -url "https://$Env:KitosHostName" `
+                            -usrname "[$Env:TestUserGlobalAdmin, $Env:TestUserLocalAdmin, $Env:TestUserNormalUser]" `
                             -pwd "[$Env:TestUserGlobalAdminPw, $Env:TestUserLocalAdminPw, $Env:TestUserNormalUserPw]"

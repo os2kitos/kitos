@@ -39,7 +39,7 @@ param(
         $app = Start-Process powershell.exe -ArgumentList "webdriver-manager start" -PassThru -WindowStyle Hidden
     
         Write-Host "Starting E2E test. This might take a while..."
-        gulp "e2e:headless" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+        gulp "e2e:single" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
         
         if($LASTEXITCODE -ne 0)	{ Throw "Integration tests failed" }
     }

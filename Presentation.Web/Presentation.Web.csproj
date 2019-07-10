@@ -633,20 +633,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
-    <TypeScriptCompile Include="app\utility\Constants.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\ITSystemHelper.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\It-Contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toBeChecked.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toBeDisabled.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toBeSelect2Disabled.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toBeVisible.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toHaveClass.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toMatchInRequests.ts" />
-    <TypeScriptCompile Include="Tests\matchers\toMatchRequest.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\CSSLocatorHelper.ts" />
-    <TypeScriptCompile Include="Tests\object-wrappers\IPageObject.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\IPageObject.po.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\KendoToolbarWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\NavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\RepeaterWrapper.ts" />
@@ -986,24 +979,6 @@
     <TypeScriptCompile Include="app\components\global-admin\global-admin-org.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
     <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-details.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\it-system-usage.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-org.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.po.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.po.ts" />
-    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.po.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
@@ -1016,23 +991,7 @@
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\it-project-edit.po.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-handover.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-communication.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-risk.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-stakeholders.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-modal.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.po.ts" />
-    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.po.ts" />
     <TypeScriptCompile Include="app\kitos.ts" />
     <TypeScriptCompile Include="app\models\access-modifier.ts" />
     <TypeScriptCompile Include="app\models\config.ts" />
@@ -1218,7 +1177,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <TypeScriptCompile Include="Tests\helper.ts" />
     <TypeScriptCompile Include="Tests\HomePage\Home.e2e.spec.ts" />
     <None Include="Parameters.xml">
       <SubType>Designer</SubType>
@@ -1265,7 +1223,6 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Scripts\langs\da.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">
@@ -1302,6 +1259,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Tests\it-contract\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
@@ -1373,10 +1331,6 @@
   </Target>
   <Target Name="AfterBuild">
   </Target> -->
-  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <TransformXml Source="Web.config" Transform="Web.Test.config" Destination="$(OutputPath)\Web.Test.config" />
-    <TransformXml Source="Web.config" Transform="Web.Prod.config" Destination="$(OutputPath)\Web.Prod.config" />
-  </Target>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>

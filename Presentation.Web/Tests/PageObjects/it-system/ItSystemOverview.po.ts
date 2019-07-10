@@ -1,4 +1,4 @@
-﻿import IPageObject = require("../../object-wrappers/IPageObject.po");
+﻿import IPageObject = require("../IPageObject.po");
 import kendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
 import navigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
 import subNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
