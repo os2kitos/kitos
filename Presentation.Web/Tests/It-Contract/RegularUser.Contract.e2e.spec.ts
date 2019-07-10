@@ -12,7 +12,6 @@ describe("Regular user tests", () => {
 
     beforeAll(() => {
         loginHelper.loginAsRegularUser();
-        browser.waitForAngular();
     });
 
     beforeEach(() => {
@@ -20,8 +19,5 @@ describe("Regular user tests", () => {
         browser.waitForAngular();
     });
 
-    it("Reset filter and Save filter is active", () => {
-        expect(EC.elementToBeClickable(headerButtons.resetFilter));
-        expect(EC.elementToBeClickable(headerButtons.saveFilter));
-    });
+
 });

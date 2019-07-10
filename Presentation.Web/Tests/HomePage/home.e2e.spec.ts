@@ -11,16 +11,16 @@ describe("home view", () => {
 
     it("should mark invalid email in field", () => {
 
-        pageObject.emailField.sendKeys("invalid-email")
+        pageObject.emailField.sendKeys("invalid-email");
 
-        expect(pageObject.emailField.getAttribute("class")).toMatch("ng-invalid");
+        expect(pageObject.emailField.getAttribute("class")).toContain(" ng-invalid ");
     });
 
     it("should mark valid email in field", () => {
 
-        pageObject.emailField.sendKeys("valid-email@valid.dk")
+        pageObject.emailField.sendKeys("valid-email@valid.dk");
 
-        expect(pageObject.emailField.getAttribute("class")).toMatch("ng-invalid");
+        expect(pageObject.emailField.getAttribute("class")).toContain(" ng-valid ");
     });
 });
 

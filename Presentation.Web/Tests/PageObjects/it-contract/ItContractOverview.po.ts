@@ -13,7 +13,5 @@ class ItSystemEditPo implements PageObject {
     navigationBarWrapper = new navigationBarWrapper();
     subNavigationBarWrapper = new subNavigationBarWrapper();
 
-    createItContract = element(by.buttonText("Opret IT Kontrakt"));
-
 }
 export = ItSystemEditPo;

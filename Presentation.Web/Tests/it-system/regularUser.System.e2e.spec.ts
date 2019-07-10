@@ -11,7 +11,6 @@ describe("Regular user tests", () => {
 
     beforeAll(() => {
         loginHelper.loginAsRegularUser();
-        browser.waitForAngular();
     });
 
     beforeEach(() => {

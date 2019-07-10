@@ -5,7 +5,7 @@ var pageObject = new homePage();
 var navigationDropdown = pageObject.navigationDropdownMenu();
 var loginHelper = new login();
 
-describe("As global admin ", () => { 
+describe("Can login succesfully", () => { 
 
     beforeEach(() => {
         pageObject.getPage();
@@ -15,7 +15,7 @@ describe("As global admin ", () => {
         navigationDropdown.logOut.click();
     })
 
-    it("Can login succesfully", () => {
+    it("As global admin", () => {
         loginHelper.loginAsGlobalAdmin();
         navigationDropdown.dropDownElement.click();
         expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");

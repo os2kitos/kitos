@@ -5,7 +5,7 @@ type HeaderButtons = {
     resetFilter: protractor.ElementFinder, saveFilter: protractor.ElementFinder, useFilter: protractor.ElementFinder, deleteFilter: protractor.ElementFinder
 };
 
-type ClickableColumnHeaders = {
+type ColumnHeaders = {
     systemName: protractor.ElementFinder
 };
 
@@ -20,7 +20,6 @@ class kendoToolbarWrapper {
 
     public headerButtons(): HeaderButtons {
 
-        // TODO change to use byHook once kendo objects in app are refactored.
         var buttons: HeaderButtons = {
             resetFilter: element(byHook("resetFilter")),
             saveFilter: element(byHook("saveFilter")),
@@ -30,11 +29,11 @@ class kendoToolbarWrapper {
         return buttons;
     }
 
-    public columnHeaders(): ClickableColumnHeaders {
+    public columnHeaders(): ColumnHeaders {
         var kendo = new kendoHelper();
         var consts = new Constants();
 
-        var columns: ClickableColumnHeaders = {
+        var columns: ColumnHeaders = {
             systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader)
             
         };

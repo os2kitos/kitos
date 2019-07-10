@@ -2,7 +2,7 @@
 // Using modules is preferable in larger applications as this provides modularity and maintainability as there is no
 // global namespace pollution.
 
-// So currently this class only works for the test part, but when possible the app part should be refactored to use modules rather than the Kitos namespace
+// This class cannot currently be added to the app project
 
 class constants {
     readonly kendoSystemNameHeader = "systemNameHeader";

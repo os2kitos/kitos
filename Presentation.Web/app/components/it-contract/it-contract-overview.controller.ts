@@ -510,13 +510,7 @@
                                 showOperators: false,
                                 operator: "contains"
                             }
-                        },
-                        attributes: {
-                            "data-hook": "contractName"
-                        },
-                        headerAttributes: {
-                            "data-hook": "contractNameHeader"
-                        },
+                        }
                     },
                     {
                         field: "ResponsibleOrganizationUnit.Name", title: "Ansv. organisationsenhed", width: 245,

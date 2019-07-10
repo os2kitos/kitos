@@ -13,10 +13,6 @@ exports.config = {
         maxInstances: 1
     },
 
-
-
-    //specs: ['Presentation.Web/Test/it-contract/it-contract-edit.e2e.spec.js'],
-
     baseUrl: 'https://localhost:44300',
 
     onPrepare: function () {
