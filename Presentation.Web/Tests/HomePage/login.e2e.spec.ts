@@ -12,7 +12,7 @@ describe("Can login succesfully", () => {
     });
 
     afterEach(() => {
-        navigationDropdown.logOut.click();
+        browser.driver.manage().deleteAllCookies();
     })
 
     it("As global admin", () => {
