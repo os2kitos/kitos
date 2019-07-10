@@ -24,13 +24,4 @@ describe("Regular user tests", () => {
         expect(headerButtons.deleteFilter.getAttribute("disabled")).toEqual("true");
     });
 
-    it("IT system can be opened", () => {
-        browser.wait(protractor.ExpectedConditions.visibilityOf(columnObject.systemName.first()));
-
-        columnObject.systemName.first().click();
-
-        expect(browser.getCurrentUrl()).toContain("#/system/usage/");
-    });
-
-
 });
