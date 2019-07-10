@@ -20,10 +20,6 @@ describe("Regular user tests", () => {
         browser.waitForAngular();
     });
 
-    it("Create Contract button is disabled", () => {
-        expect(pageObject.createItContract.getAttribute("disabled")).toBe("true");
-    });
-
     it("Reset filter and Save filter is active", () => {
         expect(EC.elementToBeClickable(headerButtons.resetFilter));
         expect(EC.elementToBeClickable(headerButtons.saveFilter));
