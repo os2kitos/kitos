@@ -1,9 +1,9 @@
-﻿import IPageObject = require("../../object-wrappers/IPageObject.po");
-import kendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
+﻿import kendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
 import navigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
 import subNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
+import PageObject = require("../IPageObject.po");
 
-class ItSystemEditPo implements IPageObject {
+class ItSystemEditPo implements PageObject {
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get(browser.baseUrl + "/#/contract/overview");
