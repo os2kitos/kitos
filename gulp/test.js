@@ -81,7 +81,7 @@ function runProtractorLocal(done) {
     var singleSpec = 'Presentation.Web/Tests/**/*.e2e.spec.js';
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
-            configFile: 'protractor.local.conf.js',
+            configFile: 'protractor.conf.js',
             args: [
                 '--params.login.email', args[0],
                 '--params.login.pwd', args[1],
@@ -109,10 +109,10 @@ function runSingleTest(done) {
 
     gutil.log('e2e arguments: ' + args);
 
-    var singleSpec = ['Presentation.Web/Tests/HomePage/Home.e2e.spec.js'];
+    var singleSpec = ['Presentation.Web/Tests/HomePage/Login.e2e.spec.js'];
     gulp.src(singleSpec) // paths.e2eSuites.itSystem
         .pipe(protractor.protractor({
-            configFile: 'protractor.local.conf.js',
+            configFile: 'protractor.conf.js',
             args: [
                 '--params.login.email', args[0],
                 '--params.login.pwd', args[1],

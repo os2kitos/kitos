@@ -1,7 +1,5 @@
-﻿export class Login {
-
+﻿class Login {
     
-
     public logout() {
         var logoutBtn = element(by.linkText("Log ud"));
         logoutBtn.click();
@@ -35,3 +33,5 @@
         loginBtn.click();
     }
 }
+
+export = Login;

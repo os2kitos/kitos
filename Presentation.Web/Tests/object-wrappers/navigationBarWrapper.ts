@@ -35,7 +35,7 @@ class navigationBarWrapper {
             localAdmin: element(byHook("localAdmin")),
             globalAdming: element(byHook("globalAdmin")),
             changeOrg: element(byHook("changeOrganization")),
-            logOut: element(byHook("logout"))
+            logOut: element(byHook("logOut"))
         };
         return drop;
     }

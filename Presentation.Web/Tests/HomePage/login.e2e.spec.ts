@@ -1,30 +1,36 @@
 ﻿import login = require("../Helpers/LoginHelper");
+import homePage = require("../PageObjects/HomePage/HomePage.po")
 
-describe("Can login succesfully", () => { 
+var pageObject = new homePage();
+var navigationDropdown = pageObject.navigationDropdownMenu();
+var loginHelper = new login();
 
-    var loginHelper = new login.Login();
+describe("As global admin ", () => { 
 
-    beforeAll(() => {
+    beforeEach(() => {
+        pageObject.getPage();
+    });
+
+    afterEach(() => {
+        navigationDropdown.logOut.click();
+    })
+
+    it("Can login succesfully", () => {
         loginHelper.loginAsGlobalAdmin();
-        browser.waitForAngular();
+        navigationDropdown.dropDownElement.click();
+        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
     });
 
-    it("Is succesfully logged in", () => {
-        //Arrange
-
-        //Act 
-
-        //Assert
-        expect(browser.params.login.email.substring(1, browser.params.login.email.length - 1).split(", ")[0]).toEqual("support@kitos.dk");
+    it("As local admin", () => {
+        loginHelper.loginAsLocalAdmin();
+        navigationDropdown.dropDownElement.click();
+        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
     });
 
-    it("Is succesfully logged in", () => {
-        //Arrange
-
-        //Act 
-
-        //Assert
-        expect(element(by.binding("user.fullName")).getText()).toEqual("Global admin");
+    it("As regular user", () => {
+        loginHelper.loginAsRegularUser();
+        navigationDropdown.dropDownElement.click();
+        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
     });
 
 });

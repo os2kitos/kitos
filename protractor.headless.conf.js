@@ -25,7 +25,6 @@ exports.config = {
     onPrepare: function () {
 
         require("jasmine-expect");
-        require("require-dir")("./Presentation.Web/Tests/matchers");
 
         var reporters = require("jasmine-reporters");
         jasmine.getEnv()
