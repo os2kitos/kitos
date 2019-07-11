@@ -281,22 +281,22 @@
                     {
                         name: "clearFilter",
                         text: "Nulstil",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemOverviewVm.clearOptions()' data-hook='resetFilter'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='systemOverviewVm.clearOptions()' data-element-type='resetFilter'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='systemOverviewVm.saveGridProfile()' data-hook='saveFilter'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='systemOverviewVm.saveGridProfile()' data-element-type='saveFilter'>#: text #</button>"
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='systemOverviewVm.loadGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-hook='useFilter'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='systemOverviewVm.loadGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-element-type='useFilter'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemOverviewVm.clearGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-hook='removeFilter'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='systemOverviewVm.clearGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-element-type='removeFilter'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -413,10 +413,10 @@
                                 return `<a data-ui-sref='it-system.usage.main({id: ${dataItem.Id}})'>${dataItem.ItSystem.Name}</a>`;
                         },
                         attributes: {
-                            "data-hook": "systemName"
+                            "data-element-type": "systemNameKendoObject"
                         },
                         headerAttributes: {
-                            "data-hook": "systemNameHeader"
+                            "data-element-type": "systemNameKendoHeader"
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.ItSystem && dataItem.ItSystem.Name) {

@@ -1,36 +1,42 @@
 ﻿import login = require("../Helpers/LoginHelper");
-import homePage = require("../PageObjects/HomePage/HomePage.po")
+import loginPage = require("../PageObjects/HomePage/LoginPage.po")
 
-var pageObject = new homePage();
-var navigationDropdown = pageObject.navigationDropdownMenu();
+var pageObject = new loginPage;
+var navigationBar = pageObject.navigationBarHelper;
 var loginHelper = new login();
 
-describe("Can login succesfully", () => { 
+describe("Being logged out, it is possible to login ", () => { 
 
     beforeEach(() => {
-        pageObject.getPage();
+
     });
 
     afterEach(() => {
         browser.driver.manage().deleteAllCookies();
-    })
+    });
 
     it("As global admin", () => {
         loginHelper.loginAsGlobalAdmin();
-        navigationDropdown.dropDownElement.click();
-        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
+        navigationBar.dropDownExpand();
+        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBar.isGlobalAdminDisplayed()).toBeTruthy();
+        expect(navigationBar.isLocalAdminDisplayed()).toBeFalsy();
     });
 
     it("As local admin", () => {
         loginHelper.loginAsLocalAdmin();
-        navigationDropdown.dropDownElement.click();
-        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
+        navigationBar.dropDownExpand();
+        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBar.isGlobalAdminDisplayed()).toBeFalsy();
+        expect(navigationBar.isLocalAdminDisplayed()).toBeTruthy();
     });
 
     it("As regular user", () => {
         loginHelper.loginAsRegularUser();
-        navigationDropdown.dropDownElement.click();
-        expect(navigationDropdown.myProfile.getText()).toEqual("Min profil");
+        navigationBar.dropDownExpand();
+        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBar.isGlobalAdminDisplayed()).toBeFalsy();
+        expect(navigationBar.isLocalAdminDisplayed()).toBeFalsy();
     });
 
 });

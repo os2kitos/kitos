@@ -1,7 +1,7 @@
 ﻿class CSSLocatorHelper {
 
-    public byDataHook(value: string) {
-        return by.css("[data-hook='" + value + "']");
+    public byDataElementType(value: string) {
+        return by.css("[data-element-type='" + value + "']");
     }
 
 }

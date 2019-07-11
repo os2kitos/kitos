@@ -1,19 +1,17 @@
-﻿'use strict';
-
-var paths = require('./paths.config.js');
+﻿"use strict";
 
 exports.config = {
-    framework: 'jasmine2',
+    framework: "jasmine2",
 
-    seleniumAddress: 'http://localhost:4444/wd/hub',
+    seleniumAddress: "http://localhost:4444/wd/hub",
 
     capabilities: {
-        browserName: 'chrome',
+        browserName: "chrome",
         shardTestFiles: true,
         maxInstances: 1
     },
 
-    baseUrl: 'https://localhost:44300',
+    baseUrl: "https://localhost:44300",
 
     onPrepare: function () {
 
@@ -29,7 +27,7 @@ exports.config = {
 
         var HtmlReporter = require("protractor-beautiful-reporter");
         jasmine.getEnv().addReporter(new HtmlReporter({
-            baseDirectory: 'tmp/screenshots'
+            baseDirectory: "tmp/screenshots"
         }).getJasmine2Reporter());
     },
 
@@ -37,17 +35,5 @@ exports.config = {
         print: function () { },
         showColors: true,
         defaultTimeoutInterval: 30000
-    },
-
-    mocks: {
-        default: ['authorize'],
-        dir: paths.source + '/Tests/mocks'
-    },
-
-    params: {
-        login: {
-            email: 'default@kitos.dk',
-            pwd: 'default'
-        }
     }
 };

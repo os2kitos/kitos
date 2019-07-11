@@ -1,36 +1,35 @@
-﻿class Login {
+﻿import HomePage = require("../PageObjects/HomePage/HomePage.po");
+import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
+
+class Login {
     
     public logout() {
-        var logoutBtn = element(by.linkText("Log ud"));
-        logoutBtn.click();
+        var navigationBarHelper = new LoginPage().navigationBarHelper;
+        navigationBarHelper.logout();
     }
 
     public loginAsGlobalAdmin() {
-        this.login(this.parseStringAsArrayAndGetIndex(browser.params.login.email, 0), this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, 0));
+        this.login(0);
     }
 
     public loginAsLocalAdmin() {
-        this.login(this.parseStringAsArrayAndGetIndex(browser.params.login.email, 1), this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, 1));
+        this.login(1);
     }
 
     public loginAsRegularUser() {
-        this.login(this.parseStringAsArrayAndGetIndex(browser.params.login.email, 2), this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, 2));
+        this.login(2);
     }
 
-    private parseStringAsArrayAndGetIndex(input: string, index:number) {
+    private login(credentialsIndex: number) {
+        var homePage = new HomePage();
+        homePage.getPage();
+        homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
+        homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
+        homePage.loginButton.click();
+    }
+
+    private parseStringAsArrayAndGetIndex(input: string, index: number) {
         return input.substring(1, input.length - 1).split(", ")[index];
-    }
-
-
-    private login(usrName: string, pwd: string) {
-        browser.get(browser.baseUrl);
-        var emailField = element(by.model("email"));
-        var passwordField = element(by.model("password"));
-        var loginBtn = element(by.buttonText("Log ind"));
-
-        emailField.sendKeys(usrName);
-        passwordField.sendKeys(pwd);
-        loginBtn.click();
     }
 }
 

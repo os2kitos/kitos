@@ -2,7 +2,9 @@
 param(
     [Parameter(Mandatory=$true)][string]$usrname,
     [Parameter(Mandatory=$true)][string]$pwd,
-    [Parameter(Mandatory=$true)][string]$url
+    [Parameter(Mandatory=$true)][string]$url,
+	[Parameter(Mandatory=$true)][string]$testType,
+	[string]$testToRun
     )
     
     Try 
@@ -39,20 +41,43 @@ param(
         $app = Start-Process powershell.exe -ArgumentList "webdriver-manager start" -PassThru -WindowStyle Hidden
     
         Write-Host "Starting E2E test. This might take a while..."
-        gulp "e2e:headless" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+		switch($testType){
+			"headless" {
+				gulp "e2e:headless" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+			}
+			"local" {
+				gulp "e2e:local" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+			}
+			"single" {
+				gulp "e2e:single" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url" --testToRun="$testToRun"
+			}
+		}
+		
+        
         
         if($LASTEXITCODE -ne 0)	{ Throw "Integration tests failed" }
     }
     catch{
+		Write-Host $_.Exception
         throw $_.Exception
     }
     finally{
         Write-Host "Testing done, shutting down selenium server as clean up"
-        Stop-Process $app.Id
-    
-        $seleniumServer = Get-Process -Id (Get-NetTCPConnection -LocalPort 4444).OwningProcess | Where-Object {$_.ProcessName.Equals("java")}
-    
-        Stop-Process -Id $seleniumServer.Id
+		try{
+			Stop-Process $app.Id
+		}catch{
+			Write-Host "Failed to stop process that started selenium server, trying to stop the selenium server now"
+			Write-Host $_.Exception
+		}
+        
+		try{
+			$seleniumServer = Get-Process -Id (Get-NetTCPConnection -LocalPort 4444).OwningProcess | Where-Object {$_.ProcessName.Equals("java")}
+			Stop-Process -Id $seleniumServer.Id
+		}catch{
+			Write-Host "Failed to stop selenium server"
+			Write-Host $_.Exception
+		}
+		
     }
     
     
