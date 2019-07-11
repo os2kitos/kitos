@@ -23,7 +23,7 @@ Function Get-SSM-Parameters($environmentName) {
 
     $parameters = (aws ssm get-parameters-by-path --with-decryption --path "$prefix" | ConvertFrom-Json).Parameters
     
-    if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
+    if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD SSM parameters from $environmentName" }
 
     # Convert structure to map
     $table = new-object System.Collections.Hashtable
