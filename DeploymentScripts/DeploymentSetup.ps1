@@ -4,26 +4,28 @@
 Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUsers = $true) {
     Write-Host "Loading environment configuration from SSM"
     
-    $Env:KitosHostName = Get-SSM-Parameter -environmentName "$envName" -parameterName "HostName"
-    $Env:MsDeployUserName = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployUserName"
-    $Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployPassword"
-    $Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForIIsApp"
-    $Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForIIsApp"
-    $Env:KitosDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForTeamCity"
+    $parameters = Get-SSM-Parameters -environmentName "$envName"
+
+    $Env:KitosHostName = $parameters["HostName"]
+    $Env:MsDeployUserName = $parameters["MsDeployUserName"]
+    $Env:MsDeployPassword = $parameters["MsDeployPassword"]
+    $Env:KitosDbConnectionStringForIIsApp = $parameters["KitosDbConnectionStringForIIsApp"]
+    $Env:HangfireDbConnectionStringForIIsApp = $parameters["HangfireDbConnectionStringForIIsApp"]
+    $Env:KitosDbConnectionStringForTeamCity = $parameters["KitosDbConnectionStringForTeamCity"]
     
     if($loadTcHangfireConnectionString -eq $true) {
-        $Env:HangfireDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForTeamCity"
+        $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]
     }
     
     if($loadTestUsers -eq $true) {
-        $Env:TestUserGlobalAdmin = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserGlobalAdmin"
-        $Env:TestUserGlobalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserGlobalAdminPw"
+        $Env:TestUserGlobalAdmin = $parameters["TestUserGlobalAdmin"]
+        $Env:TestUserGlobalAdminPw = $parameters["TestUserGlobalAdminPw"]
 
-        $Env:TestUserLocalAdmin = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserLocalAdmin"
-        $Env:TestUserLocalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserLocalAdminPw"
+        $Env:TestUserLocalAdmin = $parameters["TestUserLocalAdmin"]
+        $Env:TestUserLocalAdminPw = $parameters["TestUserLocalAdminPw"]
 
-        $Env:TestUserNormalUser = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserNormalUser"
-        $Env:TestUserNormalUserPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserNormalUserPw"
+        $Env:TestUserNormalUser = $parameters["TestUserNormalUser"]
+        $Env:TestUserNormalUserPw = $parameters["TestUserNormalUserPw"]
     }
     
     
