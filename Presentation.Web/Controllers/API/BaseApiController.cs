@@ -141,16 +141,6 @@ namespace Presentation.Web.Controllers.API
             {
                 try
                 {
-                    // backdoor for Erik to publish his data
-                    // TODO remove when the REST api no longer uses cookies for login
-                    IEnumerable<string> header;
-                    Request.Headers.TryGetValues("X-Auth", out header);
-                    if (header != null)
-                    {
-                        var xauth = header.First();
-                        return UserRepository.Get(u => u.UniqueId == xauth).First();
-                    }
-
                     var id = Convert.ToInt32(User.Identity.Name);
                     var user = UserRepository.GetByKey(id);
 

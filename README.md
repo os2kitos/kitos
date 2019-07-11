@@ -1,6 +1,6 @@
 # OS2KITOS
 
-The OS2KITOS is delivered by Miracle A/S (http://www.miracle.dk)
+The OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)
 for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).
 
 Copyright (c) 2014, OS2 - Offentligt digitaliseringsfællesskab.
