@@ -18,8 +18,8 @@ Function Get-SSM-Parameter($environmentName, $parameterName) {
 }
 
 Function Get-SSM-Parameters($environmentName) {
-    Write-Host "Getting $parameterName from SSM"
     $prefix = "/kitos/$environmentName/"
+    Write-Host "Getting all SSM Parameters from $prefix"
 
     $parameters = (aws ssm get-parameters-by-path --with-decryption --path "$prefix" | ConvertFrom-Json).Parameters
     
