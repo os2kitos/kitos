@@ -1,28 +1,28 @@
-'use strict';
+"use strict";
 
-var gulp = require('gulp');
-var paths = require('../paths.config.js');
-var gutil = require('gulp-util');
-var protractor = require('gulp-protractor');
-var karma = require('karma');
-var browserSync = require('browser-sync');
-var $ = require('gulp-load-plugins')();
+var gulp = require("gulp");
+var paths = require("../paths.config.js");
+var gutil = require("gulp-util");
+var protractor = require("gulp-protractor");
+var karma = require("karma");
+var $ = require("gulp-load-plugins")();
+var del = require("del");
 
 
 // run unit tests with karma
-gulp.task('unit', function (done) {
+gulp.task("unit", function (done) {
     new karma.Server({
         configFile: paths.karmaConf,
         singleRun: true,
-        browsers: ['IE', 'Chrome'],
-        reporters: ['progress', 'coverage', 'teamcity'],
+        browsers: ["IE", "Chrome"],
+        reporters: ["progress", "coverage", "teamcity"],
         coverageReporter: {
-            type: 'json',
-            subdir: '.',
+            type: "json",
+            subdir: ".",
             file: paths.tempFrontendCoverageReport
         },
         preprocessors: {
-            'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
+            "Presentation.Web/app/**/!(*.spec|*.po).js": ["coverage"]
         },
         autoWatch: false,
 
@@ -33,113 +33,141 @@ gulp.task('unit', function (done) {
     }, done).start();
 });
 
-// use protractor
-gulp.task('e2e:local', runProtractor);
+gulp.task("CleanProtractor", cleanProtractor);
 
-function runProtractor(done) {
+function cleanProtractor() {
+    return del("tmp");
+}
+
+gulp.task("e2e:headless", ["CleanProtractor"], runProtractorHeadless);
+
+function runProtractorHeadless(done) {
     var params = process.argv;
-    var args = params.length > 3 ? [params[3], params[4]] : [];
+    var args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
-    gutil.log('e2e arguments: ' + args);
-
-    var singleSpec = 'Presentation.Web/Tests/home.e2e.spec.js';
-    gulp.src(singleSpec) // paths.e2eSuites.itSystem
+    var singleSpec = "Presentation.Web/Tests/**/*.e2e.spec.js";
+    gulp.src(singleSpec) 
         .pipe(protractor.protractor({
-            configFile: 'protractor.local.conf.js',
-            //args: args,
-            'debug': false
+            configFile: "protractor.headless.conf.js",
+            args: [
+                "--params.login.email", args[0],
+                "--params.login.pwd", args[1],
+                "--baseUrl", args[2]
+            ],
+            "debug": false
         }))
-        .on('error', function (err) {
-            gutil.log(gutil.colors.red('error: ' + err));
-            // Make sure failed tests cause gulp to exit non-zero
+        .on("error", function (err) {
+            gutil.log(gutil.colors.red("error: " + err));
             throw err;
         })
-        .on('end', function () {
-            // Close browser sync server
-            browserSync.exit();
+        .on("end", function () {
             done();
         });
 }
 
-// run e2e tests with protractor with browserstack
-gulp.task('e2e:browserstack', function (done) {
-    // ReSharper disable once InconsistentNaming
-    var BrowserStackTunnel = require('browserstacktunnel-wrapper');
+gulp.task("e2e:local", ["CleanProtractor"], runProtractorLocal);
 
-    var browserStackTunnel = new BrowserStackTunnel({
-        key: process.env.BROWSERSTACK_KEY
-    });
+function runProtractorLocal(done) {
+    var params = process.argv;
+    var args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
-    browserStackTunnel.start(function (error) {
-        if (error) {
-            gutil.log(gutil.colors.red(error));
-        } else {
-            tunnelRunning();
-        }
-    });
+    gutil.log("e2e arguments: " + args);
 
-    function tunnelRunning() {
-        gulp.src(paths.e2eFiles)
-            .pipe(protractor.protractor({
-                configFile: 'protractor.conf.js'
-            }))
-            .on('end', function () {
-                browserStackTunnel.stop(function (error) {
-                    if (error) {
-                        gutil.log(gutil.colors.red(error));
-                    } else {
-                        done();
-                    }
-                });
-            });
-    }
-});
+    var singleSpec = "Presentation.Web/Tests/**/*.e2e.spec.js";
+    gulp.src(singleSpec) 
+        .pipe(protractor.protractor({
+            configFile: "protractor.conf.js",
+            args: [
+                "--params.login.email", args[0],
+                "--params.login.pwd", args[1],
+                "--baseUrl", args[2]
+            ],
+            "debug": false
+        }))
+        .on("error", function (err) {
+            gutil.log(gutil.colors.red("error: " + err));
+            throw err;
+        })
+        .on("end", function () {
+            done();
+        });
+}
+
+gulp.task("e2e:single", ["CleanProtractor"], runSingleTest);
+
+function runSingleTest(done) {
+    var params = process.argv;
+    var args = params.length === 7 ? [params[3], params[4], params[5]] : [];
+
+    gutil.log("e2e arguments: " + args);
+
+    var singleSpec = "Presentation.Web/Tests/" + gutil.env.testToRun;
+    gutil.log(singleSpec);
+    gulp.src(singleSpec) 
+        .pipe(protractor.protractor({
+            configFile: "protractor.conf.js",
+            args: [
+                "--params.login.email", args[0],
+                "--params.login.pwd", args[1],
+                "--baseUrl", args[2]
+            ],
+            "debug": false
+        }))
+        .on("error", function (err) {
+            gutil.log(gutil.colors.red("error: " + err));
+            throw err;
+        })
+        .on("end", function () {
+            done();
+        });
+}
+
 
 // map karma coverage results from js to ts source
-gulp.task('mapCoverage', function (done) {
-    var exec = require('child_process').exec;
-    var del = require('del');
+gulp.task("mapCoverage", function (done) {
+    var exec = require("child_process").exec;
+    var del = require("del");
 
-    exec('node_modules\\.bin\\remap-istanbul -i ' + paths.coverage + '/' + paths.tempFrontendCoverageReport + ' -o ' + paths.coverage + '/' + paths.frontendCoverageReport, function (err, stdout, stderr) {
+    exec("node_modules\\.bin\\remap-istanbul -i " + paths.coverage + "/" + paths.tempFrontendCoverageReport + " -o " + paths.coverage + "/" + paths.frontendCoverageReport, function (err, stdout, stderr) {
         gutil.log(stdout);
         gutil.log(gutil.colors.red(stderr));
 
-        del([paths.coverage + '/' + paths.tempFrontendCoverageReport]);
+        del([paths.coverage + "/" + paths.tempFrontendCoverageReport]);
         done();
     });
 });
 
 // publish coverage to codecov
-gulp.task('codecov', ['mapCoverage'], function () {
-    var codecov = require('gulp-codecov.io');
+gulp.task("codecov", ["mapCoverage"], function () {
+    var codecov = require("gulp-codecov.io");
 
-    return gulp.src(paths.coverage + '/?(frontend.json|backend.xml)')
+    return gulp.src(paths.coverage + "/?(frontend.json|backend.xml)")
         .pipe(codecov());
 });
 
 // run local unit tests and coverage report generator
-gulp.task('localUnit', function (done) {
+gulp.task("localUnit", function (done) {
     new karma.Server({
         configFile: paths.karmaConf,
         singleRun: true,
-        reporters: ['progress', 'coverage'],
+        reporters: ["progress", "coverage"],
         coverageReporter: {
-            type: 'html',
+            type: "html",
             dir: paths.coverage
         },
         preprocessors: {
-            'Presentation.Web/app/**/!(*.spec|*.po).js': ['coverage']
+            "Presentation.Web/app/**/!(*.spec|*.po).js": ["coverage"]
         },
         autoWatch: false
     }, done).start();
 });
 
 // open coverage results.
-gulp.task('localCover', ['localUnit'], function () {
-    var open = require('gulp-open');
+gulp.task("localCover", ["localUnit"], function () {
+    var open = require("gulp-open");
 
-    gulp.src(paths.coverage + '/Phantom*/index.html')
+    gulp.src(paths.coverage + "/Phantom*/index.html")
         .pipe(open({
-            app: 'chrome'
+            app: "chrome"
         }));
 });
