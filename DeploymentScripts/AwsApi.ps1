@@ -16,3 +16,23 @@ Function Get-SSM-Parameter($environmentName, $parameterName) {
     (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
+
+Function Get-SSM-Parameters($environmentName) {
+    Write-Host "Getting $parameterName from SSM"
+    $prefix = "/kitos/$environmentName/"
+
+    $parameters = (aws ssm get-parameters-by-path --with-decryption --path "$prefix" | ConvertFrom-Json).Parameters
+    
+    if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
+
+    # Convert structure to map
+    $table = new-object System.Collections.Hashtable
+    for($i = 0 ; $i -lt $parameters.Length; $i++) {
+        $name = $parameters[$i].Name
+        $value = $parameters[$i].Value
+        $table.Add(($name).Replace($prefix,""),$value)
+    }
+
+    #return map
+    $table
+}
