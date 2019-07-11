@@ -633,10 +633,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
-    <TypeScriptCompile Include="Tests\It-Contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\object-wrappers\CSSLocatorHelper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\IPageObject.po.ts" />

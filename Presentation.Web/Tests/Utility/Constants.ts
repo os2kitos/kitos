@@ -5,8 +5,8 @@
 // This class cannot currently be added to the app project
 
 class constants {
-    readonly kendoSystemNameHeader = "systemNameHeader";
-    readonly kendoSystemNameObjects = "systemName";
+    readonly kendoSystemNameHeader = "systemNameKendoHeader";
+    readonly kendoSystemNameObjects = "systemNameKendoObject";
     readonly kendoContractNameHeader = "contractNameHeader";
     readonly kendoContractNameObjects = "contractName"
 }

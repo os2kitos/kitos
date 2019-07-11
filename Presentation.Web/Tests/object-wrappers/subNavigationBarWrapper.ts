@@ -1,5 +1,9 @@
 ﻿
-type iconLinks = { bell: protractor.ElementFinder, chart: protractor.ElementFinder, help: protractor.ElementFinder }
+type iconLinks = {
+    bell: protractor.ElementFinder,
+    chart: protractor.ElementFinder,
+    help: protractor.ElementFinder
+}
 
 
 class subNavigationBarWrapper {
