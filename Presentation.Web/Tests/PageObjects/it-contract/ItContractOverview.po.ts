@@ -13,5 +13,7 @@ class ItSystemEditPo implements PageObject {
     navigationBarWrapper = new navigationBarWrapper();
     subNavigationBarWrapper = new subNavigationBarWrapper();
 
+    contractName = element(by.id("name"));
+    saveContractBtn = element(by.buttonText("Gem"));
 }
 export = ItSystemEditPo;

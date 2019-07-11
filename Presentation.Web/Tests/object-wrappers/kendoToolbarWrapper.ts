@@ -2,18 +2,19 @@ import CSSLocator = require("./CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 
 type HeaderButtons = {
-    resetFilter: protractor.ElementFinder, saveFilter: protractor.ElementFinder, useFilter: protractor.ElementFinder, deleteFilter: protractor.ElementFinder
-};
+    resetFilter: protractor.ElementFinder, saveFilter: protractor.ElementFinder, useFilter: protractor.ElementFinder, deleteFilter: protractor.ElementFinder,
+    createContract: protractor.ElementFinder,
+
+    }
 
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder
+    systemName: protractor.ElementFinder,contractName: protractor.ElementFinder,
 };
 
 type ColumnObjects = {
-    systemName: protractor.ElementArrayFinder
+    systemName: protractor.ElementArrayFinder, contractName: protractor.ElementArrayFinder,
 
 };
-
 var byHook = new CSSLocator().byDataHook;
 
 class kendoToolbarWrapper {
@@ -24,7 +25,10 @@ class kendoToolbarWrapper {
             resetFilter: element(byHook("resetFilter")),
             saveFilter: element(byHook("saveFilter")),
             useFilter: element(byHook("useFilter")),
-            deleteFilter: element(byHook("removeFilter"))
+            deleteFilter: element(byHook("removeFilter")),
+            createContract: element(byHook("createContract")),
+
+
         };
         return buttons;
     }
@@ -34,8 +38,9 @@ class kendoToolbarWrapper {
         var consts = new Constants();
 
         var columns: ColumnHeaders = {
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader)
-            
+            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
+            contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
+
         };
         return columns;
     }
@@ -45,7 +50,8 @@ class kendoToolbarWrapper {
         var consts = new Constants();
 
         var columns: ColumnObjects = {
-            systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects)
+            systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
+            contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
         };
         return columns;
     }

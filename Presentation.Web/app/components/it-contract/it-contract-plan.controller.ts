@@ -324,31 +324,31 @@
                         //TODO ng-show='hasWriteAccess'
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
-                        template: "<button ng-click='contractOverviewPlanVm.opretITKontrakt()' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewPlanVm.canCreate\">#: text #</button>"
+                        template: "<button ng-click='contractOverviewPlanVm.opretITKontrakt()' data-hook='CreateContract' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewPlanVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
                         text: "Nulstil",
                         template:
-                        "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
+                        "<button type='button' data-hook='resetFilter' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                        '<button type="button" class="k-button k-button-icontext" title="Gem filtre og sortering" data-ng-click="contractOverviewPlanVm.saveGridProfile()">#: text #</button>'
+                        "<button type='button' data-hook='saveFilter' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewPlanVm.saveGridProfile()'>#: text #</button>"
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                        '<button type="button" class="k-button k-button-icontext" title="Anvend gemte filtre og sortering" data-ng-click="contractOverviewPlanVm.loadGridProfile()" data-ng-disabled="!contractOverviewPlanVm.doesGridProfileExist()">#: text #</button>'
+                        "<button type='button' data-hook='useFilter' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewPlanVm.loadGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                        "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                        "<button type='button' data-hook='removeFilter' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
