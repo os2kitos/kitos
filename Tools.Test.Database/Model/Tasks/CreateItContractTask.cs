@@ -32,9 +32,9 @@ namespace Tools.Test.Database.Model.Tasks
                 var itContract = new ItContract
                 {
                     Name = _name,
-                    ObjectOwner = globalAdmin,
+                    ObjectOwnerId = globalAdmin.Id,
                     OrganizationId = commonOrg.Id,
-                    LastChangedByUser = globalAdmin
+                    LastChangedByUserId = globalAdmin.Id,
                 };
 
                 context.ItContracts.Add(itContract);

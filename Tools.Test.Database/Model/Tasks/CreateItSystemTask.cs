@@ -34,9 +34,9 @@ namespace Tools.Test.Database.Model.Tasks
                 var itSystem = new ItSystem
                 {
                     Name = _name,
-                    BelongsToId = globalAdmin.Id,
+                    ObjectOwnerId = globalAdmin.Id,
                     OrganizationId = commonOrg.Id,
-                    LastChangedByUser = globalAdmin,
+                    LastChangedByUserId = globalAdmin.Id,
                     Uuid = Guid.NewGuid()
                 };
 
