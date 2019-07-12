@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItContract;
 using Tools.Test.Database.Model.Extensions;
 
 namespace Tools.Test.Database.Model.Tasks
@@ -29,16 +29,15 @@ namespace Tools.Test.Database.Model.Tasks
                     return false;
                 }
 
-                var itSystem = new ItSystem
+                var itContract = new ItContract
                 {
                     Name = _name,
                     ObjectOwner = globalAdmin,
                     OrganizationId = commonOrg.Id,
-                    LastChangedByUser = globalAdmin,
-                    Uuid = Guid.NewGuid()
+                    LastChangedByUser = globalAdmin
                 };
 
-                context.ItSystems.Add(itSystem);
+                context.ItContracts.Add(itContract);
                 context.SaveChanges();
             }
 
