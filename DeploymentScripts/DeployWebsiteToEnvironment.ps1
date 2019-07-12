@@ -1,3 +1,7 @@
+param(
+    [Parameter(Mandatory=$true)][string]$targetEnvironment
+    )
+
 # Stop on first error
 $ErrorActionPreference = "Stop"
 
@@ -5,21 +9,21 @@ $ErrorActionPreference = "Stop"
 .$PSScriptRoot\DeploymentSetup.ps1
 .$PSScriptRoot\DeployWebsite.ps1
 
-Setup-Environment -environmentName "integration"
+Setup-Environment -environmentName $targetEnvironment
 
 Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
-                -msDeployUrl "https://172.26.2.34:8172/msdeploy.axd" `
+                -msDeployUrl "$Env:MsDeployUrl" `
                 -msDeployUser $Env:MsDeployUserName `
                 -msDeployPassword $Env:MsDeployPassword `
-                -logLevel "verbose" `
-                -esUrl "http://localhost:9200" `
-                -ssoGateway "https://os2sso-test.miracle.dk/.well-known/openid-configuration" `
-                -smtpFromMail "ci-kitos@strongminds.dk" `
-                -smtpNwHost "127.0.0.1" `
-                -resetPwTtl "10.00:00:00" `
-                -mailSuffix "(SAW CI)" `
+                -logLevel "$Env:LogLevel" `
+                -esUrl "$Env:EsUrl" `
+                -ssoGateway "$Env:SsoGateway" `
+                -smtpFromMail "$Env:SmtpFromMail" `
+                -smtpNwHost "$Env:SmtpNetworkHost" `
+                -resetPwTtl "$Env:ResetPasswordTtl" `
+                -mailSuffix "$Env:MailSuffix" `
                 -baseUrl "https://$Env:KitosHostName/" `
-                -kitosEnvName "Dev" `
+                -kitosEnvName "$Env:KitosEnvName" `
                 -buildNumber $Env:BUILD_NUMBER `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `
                 -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp

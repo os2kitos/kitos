@@ -1,8 +1,8 @@
 {
   "name": "kitos",
-  "description": "The OS2KITOS is delivered by Miracle A/S (http://www.miracle.dk)\r for OS2 - Offentligt digitaliseringsf�llesskab (http://os2web.dk).",
+  "description": "The OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)\r for OS2 - Offentligt digitaliseringsf�llesskab (http://os2web.dk).",
   "author": [
-    "Miracle A/S"
+    "STRONGMINDS ApS"
   ],
   "license": "MPL-2.0",
   "ignore": [
