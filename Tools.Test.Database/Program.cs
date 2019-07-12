@@ -23,6 +23,7 @@ namespace Tools.Test.Database
                 if (success == false)
                 {
                     Console.WriteLine($"Failed to execute {taskName}");
+                    return -1;
                 }
 
             }
@@ -68,6 +69,17 @@ namespace Tools.Test.Database
 
                     FailOnConnectionToProd(enableAllArgs.ConnectionString);
                     return new EnableAllOptionsTask(enableAllArgs.ConnectionString);
+
+                case CliTargets.CreateItSystem:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
+                    var createSystemArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        ItSystemName = GetArgument(additionalArgs, 1)
+                    };
+
+                    FailOnConnectionToProd(createSystemArgs.ConnectionString);
+                    return new CreateItSystemTask(createSystemArgs.ConnectionString, createSystemArgs.ItSystemName);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }

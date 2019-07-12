@@ -47,3 +47,9 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE LOCAL ADMIN" }
 
 & $TestToolsPath "CreateTestUser" "$Env:KitosDbConnectionStringForTeamCity" "$Env:TestUserNormalUser" "$Env:TestUserNormalUserPw" "User"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
+
+#-------------------------------------------------------------
+Write-Host "Create IT System"
+#-------------------------------------------------------------
+& $TestToolsPath "CreateItSystem" "$Env:KitosDbConnectionStringForTeamCity" "DefaultTestItSystem"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO IT SYSTEM" }
