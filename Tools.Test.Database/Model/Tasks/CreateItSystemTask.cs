@@ -31,7 +31,7 @@ namespace Tools.Test.Database.Model.Tasks
                     return false;
                 }
 
-                var itSystem = new ItSystem()
+                var itSystem = new ItSystem
                 {
                     Name = _name,
                     BelongsToId = globalAdmin.Id,

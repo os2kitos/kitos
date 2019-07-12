@@ -80,6 +80,17 @@ namespace Tools.Test.Database
 
                     FailOnConnectionToProd(createSystemArgs.ConnectionString);
                     return new CreateItSystemTask(createSystemArgs.ConnectionString, createSystemArgs.ItSystemName);
+
+                case CliTargets.CreateItContract:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
+                    var createContractArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        ItSystemName = GetArgument(additionalArgs, 1)
+                    };
+
+                    FailOnConnectionToProd(createContractArgs.ConnectionString);
+                    return new CreateItContractTask(createContractArgs.ConnectionString, createContractArgs.ItSystemName);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }

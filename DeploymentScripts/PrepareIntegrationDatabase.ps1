@@ -53,3 +53,9 @@ Write-Host "Create IT System"
 #-------------------------------------------------------------
 & $TestToolsPath "CreateItSystem" "$Env:KitosDbConnectionStringForTeamCity" "DefaultTestItSystem"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO IT SYSTEM" }
+
+#-------------------------------------------------------------
+Write-Host "Create IT Contract"
+#-------------------------------------------------------------
+& $TestToolsPath "CreateItContract" "$Env:KitosDbConnectionStringForTeamCity" "DefaultTestItContract"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO IT CONTRACT" }

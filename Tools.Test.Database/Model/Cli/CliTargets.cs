@@ -6,5 +6,6 @@
         public const string CreateTestUser = "CreateTestUser";
         public const string EnableAllOptions = "EnableAllOptions";
         public const string CreateItSystem = "CreateItSystem";
+        public const string CreateItContract = "CreateItContract";
     }
 }
