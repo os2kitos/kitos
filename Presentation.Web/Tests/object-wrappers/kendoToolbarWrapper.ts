@@ -33,7 +33,7 @@ class kendoToolbarWrapper {
             saveFilter: element(byDataElementType("saveFilter")),
             useFilter: element(byDataElementType("useFilter")),
             deleteFilter: element(byDataElementType("removeFilter")),
-            createContract: element(byDataElementType("createContract")),
+            createContract: element(byDataElementType("CreateContract")),
         };
         return buttons;
     }
