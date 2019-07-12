@@ -7,8 +7,10 @@ namespace Tools.Test.Database.Model.Extensions
     {
         public static void SetPassword(this User target, string password)
         {
-            var cryptoService = new CryptoService();
-            target.Password = cryptoService.Encrypt(password + target.Salt);
+            using (var cryptoService = new CryptoService())
+            {
+                target.Password = cryptoService.Encrypt(password + target.Salt);
+            }
         }
     }
 }
