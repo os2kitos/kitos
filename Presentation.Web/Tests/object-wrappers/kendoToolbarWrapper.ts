@@ -5,17 +5,20 @@ type HeaderButtons = {
     resetFilter: protractor.ElementFinder,
     saveFilter: protractor.ElementFinder,
     useFilter: protractor.ElementFinder,
-    deleteFilter: protractor.ElementFinder
+    deleteFilter: protractor.ElementFinder,
+    createContract: protractor.ElementFinder
 };
 
-    }
+    
 
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder,contractName: protractor.ElementFinder,
+    systemName: protractor.ElementFinder,
+    contractName: protractor.ElementFinder
 };
 
 type ColumnObjects = {
-    systemName: protractor.ElementArrayFinder, contractName: protractor.ElementArrayFinder,
+    systemName: protractor.ElementArrayFinder,
+    contractName: protractor.ElementArrayFinder
 
 };
 
@@ -29,7 +32,8 @@ class kendoToolbarWrapper {
             resetFilter: element(byDataElementType("resetFilter")),
             saveFilter: element(byDataElementType("saveFilter")),
             useFilter: element(byDataElementType("useFilter")),
-            deleteFilter: element(byDataElementType("removeFilter"))
+            deleteFilter: element(byDataElementType("removeFilter")),
+            createContract: element(byDataElementType("createContract")),
         };
         return buttons;
     }

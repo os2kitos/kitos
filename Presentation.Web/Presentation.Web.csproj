@@ -635,6 +635,7 @@
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
