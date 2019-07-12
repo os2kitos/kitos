@@ -25,6 +25,7 @@ namespace Tools.Test.Database.Model.Tasks
                 var commonOrg = context.GetCommonOrganization();
                 var globalAdmin = context.GetGlobalAdmin();
 
+                //Create the new it system
                 var systemWithSameName = GetItSystemnByName(context);
                 if (systemWithSameName != null)
                 {
