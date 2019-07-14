@@ -1,7 +1,7 @@
 {
   "name": "kitos",
   "version": "1.0.0",
-  "description": "The OS2KITOS is delivered by Miracle A/S (http://www.miracle.dk)\r for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).",
+  "description": "The OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)\r for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).",
   "main": "Presentation.Web\\Scripts\\app\\app.js",
   "directories": {
     "doc": "docs"
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/os2kitos/kitos.git"
   },
-  "author": "Miracle A/S",
+  "author": "STRONGMINDS ApS",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/os2kitos/kitos/issues"
@@ -56,6 +56,7 @@
     "path": "^0.12.7",
     "phantomjs-prebuilt": "^2.1.7",
     "protractor": "~4.0.11",
+    "protractor-beautiful-reporter": "^1.2.8",
     "protractor-http-mock": "~0.9.0",
     "remap-istanbul": "^0.6.4",
     "require-dir": "^0.3.0",

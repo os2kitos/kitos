@@ -8,7 +8,10 @@ exports.config = {
     capabilities: {
         browserName: "chrome",
         shardTestFiles: true,
-        maxInstances: 1
+        maxInstances: 1, 
+        chromeOptions: {
+            args: ["--headless", "--disable-gpu"]
+        }
     },
 
     baseUrl: "https://localhost:44300",
@@ -36,4 +39,5 @@ exports.config = {
         showColors: true,
         defaultTimeoutInterval: 30000
     }
+
 };

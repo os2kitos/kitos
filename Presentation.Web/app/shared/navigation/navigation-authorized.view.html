@@ -1,20 +1,20 @@
 ﻿<div class="col-xs-8">
     <ul class="nav navbar-nav">
         <li>
-            <a data-ui-sref="organization.overview" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="user.currentConfig.showTabOverview">Organisation</a>
-            <a data-ui-sref="organization.structure" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="!user.currentConfig.showTabOverview">Organisation</a>
+            <a data-ui-sref="organization.overview" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="user.currentConfig.showTabOverview" data-element-type="organizationButton">Organisation </a>
+            <a data-ui-sref="organization.structure" data-ng-class="{'active': $state.includes('organization')}" data-ng-if="!user.currentConfig.showTabOverview" data-element-type="organizationButton">Organisation</a>
         </li>
         <li data-ng-if="user.currentConfig.showItProjectModule">
-            <a data-ui-sref="it-project.overview" data-ng-class="{'active': $state.includes('it-project')}"><span ng-if="user.currentConfig.showItProjectPrefix">IT </span>Projekter</a>
+            <a data-ui-sref="it-project.overview" data-ng-class="{'active': $state.includes('it-project')}" data-element-type="projectButton"><span ng-if="user.currentConfig.showItProjectPrefix">IT </span>Projekter</a>
         </li>
         <li data-ng-if="user.currentConfig.showItSystemModule">
-            <a data-ui-sref="it-system.overview"  data-ng-class="{'active': $state.includes('it-system')}"><span ng-if="user.currentConfig.showItSystemPrefix">IT </span>Systemer</a>
+            <a data-ui-sref="it-system.overview"  data-ng-class="{'active': $state.includes('it-system')}" data-element-type="systemButton"><span ng-if="user.currentConfig.showItSystemPrefix">IT </span>Systemer</a>
         </li>
         <li data-ng-if="user.currentConfig.showItContractModule">
-            <a data-ui-sref="it-contract.overview" data-ng-class="{'active': $state.includes('it-contract')}"><span ng-if="user.currentConfig.showItContractPrefix">IT </span>Kontrakter</a>
+            <a data-ui-sref="it-contract.overview" data-ng-class="{'active': $state.includes('it-contract')}" data-element-type="contractButton"><span ng-if="user.currentConfig.showItContractPrefix">IT </span>Kontrakter</a>
         </li>
         <li>
-            <a data-ui-sref="reports.overview" data-ng-class="{'active': $state.includes('reports')}">Rapporter</a>
+            <a data-ui-sref="reports.overview" data-ng-class="{'active': $state.includes('reports')}" data-element-type="reportButton">Rapporter</a>
         </li>
     </ul>
 </div>
@@ -42,11 +42,11 @@
             </div>
         </a>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="dropdown-button">
-            <li><a data-ui-sref="edit-user" data-ui-sref-active="active">Min profil</a> </li>
-            <li><a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config.org" data-ui-sref-active="active">Lokal admin</a></li>
-            <li><a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin.organizations" data-ui-sref-active="active">Global admin</a></li>
-            <li><a data-ng-show="userHasOrgChoices" data-ng-click="changeOrganization()">Skift organisation</a></li>
-            <li><a data-ng-click="logout()">Log ud</a></li>
+            <li><a data-ui-sref="edit-user" data-ui-sref-active="active" data-element-type="myProfileAnchor">Min profil</a> </li>
+            <li><a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config.org" data-ui-sref-active="active" data-element-type="localAdminAnchor">Lokal admin</a></li>
+            <li><a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin.organizations" data-ui-sref-active="active" data-element-type="globalAdminAnchor">Global admin</a></li>
+            <li><a data-ng-show="userHasOrgChoices" data-ng-click="changeOrganization()" data-element-type="changeOrganizationAnchor">Skift organisation</a></li>
+            <li><a data-ng-click="logout()" data-element-type="logOutAnchor">Log ud</a></li>
         </ul>
     </div>
 </div>

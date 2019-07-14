@@ -1,27 +1,44 @@
 # Load helper
 .$PSScriptRoot\AwsApi.ps1
 
-Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUserPasswords = $true) {
-    Write-Host "Loading environment secrets from SSM"
+Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUsers = $true) {
+    Write-Host "Loading environment configuration from SSM"
     
-    $Env:MsDeployUserName = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployUserName"
-    $Env:MsDeployPassword = Get-SSM-Parameter -environmentName "$envName" -parameterName "MsDeployPassword"
-    $Env:KitosDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForIIsApp"
-    $Env:HangfireDbConnectionStringForIIsApp = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForIIsApp"
-    $Env:KitosDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "KitosDbConnectionStringForTeamCity"
+    $parameters = Get-SSM-Parameters -environmentName "$envName"
+
+    $Env:KitosHostName = $parameters["HostName"]
+    $Env:MsDeployUserName = $parameters["MsDeployUserName"]
+    $Env:MsDeployPassword = $parameters["MsDeployPassword"]
+    $Env:MsDeployUrl = $parameters["MsDeployUrl"]
+    $Env:LogLevel = $parameters["LogLevel"]
+    $Env:EsUrl = $parameters["EsUrl"]
+    $Env:SsoGateway = $parameters["SsoGateway"]
+    $Env:SmtpFromMail = $parameters["SmtpFromMail"]
+    $Env:SmtpNetworkHost = $parameters["SmtpNetworkHost"]
+    $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]
+    $Env:MailSuffix = $parameters["MailSuffix"]
+    $Env:KitosEnvName = $parameters["KitosEnvName"]
+    $Env:KitosDbConnectionStringForIIsApp = $parameters["KitosDbConnectionStringForIIsApp"]
+    $Env:HangfireDbConnectionStringForIIsApp = $parameters["HangfireDbConnectionStringForIIsApp"]
+    $Env:KitosDbConnectionStringForTeamCity = $parameters["KitosDbConnectionStringForTeamCity"]
     
     if($loadTcHangfireConnectionString -eq $true) {
-        $Env:HangfireDbConnectionStringForTeamCity = Get-SSM-Parameter -environmentName "$envName" -parameterName "HangfireDbConnectionStringForTeamCity"
+        $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]
     }
     
-    if($loadTestUserPasswords -eq $true) {
-        $Env:TestUserGlobalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserGlobalAdminPw"
-        $Env:TestUserLocalAdminPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserLocalAdminPw"
-        $Env:TestUserNormalUserPw = Get-SSM-Parameter -environmentName "$envName" -parameterName "TestUserNormalUserPw"
+    if($loadTestUsers -eq $true) {
+        $Env:TestUserGlobalAdmin = $parameters["TestUserGlobalAdmin"]
+        $Env:TestUserGlobalAdminPw = $parameters["TestUserGlobalAdminPw"]
+
+        $Env:TestUserLocalAdmin = $parameters["TestUserLocalAdmin"]
+        $Env:TestUserLocalAdminPw = $parameters["TestUserLocalAdminPw"]
+
+        $Env:TestUserNormalUser = $parameters["TestUserNormalUser"]
+        $Env:TestUserNormalUserPw = $parameters["TestUserNormalUserPw"]
     }
     
     
-    Write-Host "Finished loading environment secrets from SSM"
+    Write-Host "Finished loading environment configuration from SSM"
 }
 
 Function Setup-Environment([String] $environmentName) {
@@ -39,26 +56,26 @@ Function Setup-Environment([String] $environmentName) {
         "integration" 
         {
             $loadTcHangfireConnectionString = $true
-            $loadTestUserPasswords = $true
+            $loadTestUsers = $true
             break;
         }
         "test"
         {
             $loadTcHangfireConnectionString = $false
-            $loadTestUserPasswords = $false
+            $loadTestUsers = $false
             break;
         }
         "production"
         {
             $loadTcHangfireConnectionString = $false
-            $loadTestUserPasswords = $false
+            $loadTestUsers = $false
             break;
         }
         default { Throw "Error: Unknnown environment provided: $environmentName" }
     }
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"
-    Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUserPasswords $loadTestUserPasswords
+    Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUsers $loadTestUsers
     
     Write-Host "Finished configuring $environmentName"
 }

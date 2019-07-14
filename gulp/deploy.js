@@ -142,10 +142,10 @@ gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
 
 // bundle and deploy scripts and styles
 gulp.task("deploy", function (callback) {
-    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback)
+    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback);
 });
 
 // bundle and deploy scripts and styles
 gulp.task("deploy-prod", function (callback) {
-    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback)
+    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback);
 });
