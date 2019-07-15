@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -11,8 +10,6 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -140,10 +137,12 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
+            var loginInfo = new { Email = "", LoginSuccessful = false };
 
             if (loginDto != null)
-                loginInfo = new { Token = loginDto.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+            {
+                loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
+            }
 
             try
             {
@@ -169,7 +168,7 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
-                loginInfo = new { loginDto.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
+                loginInfo = new { loginDto.Email, LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
@@ -217,31 +216,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        // helper function
-        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
-        {
-            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
-
-            // getting the default org units (one or null for each organization)
-            var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
-
-            // creating DTOs
-            var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
-            {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
-            });
-
-
-            var response = new LoginResponseDTO()
-            {
-                User = userDto,
-                Organizations = orgsDto
-            };
-
-            return response;
         }
     }
 }
