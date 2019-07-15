@@ -105,43 +105,36 @@ namespace Presentation.Web.Controllers.API
         [Route("api/authorize/GetToken")]
         public HttpResponseMessage GetToken(LoginDTO loginDto) {
 
-            var Response = new { Token = "", Expires = "", Email = "", LoginSuccessful = false };
             try
             {
-                User user;
-
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                 {
-                    throw new ArgumentException();
+                    Logger.Info("Attempt to login with bad credentials");
+                    return Unauthorized("Bad credentials");
                 }
 
-                user = _userRepository.GetByEmail(loginDto.Email);
+                var user = _userRepository.GetByEmail(loginDto.Email);
 
-                var Token = new TokenValidator().CreateToken(user);
+                var token = new TokenValidator().CreateToken(user);
 
-                var Expires = DateTime.Now.AddDays(1).ToString();
+                var response = new GetTokenResponseDTO
+                {
+                    Token = token.Value,
+                    Email = loginDto.Email,
+                    LoginSuccessful = true,
+                    Expires = token.Expiration
+                };
 
-                Response = new { Token, Expires, loginDto.Email, LoginSuccessful = true };
+                Logger.Info($"Created token for user with Id {user.Id}");
 
-                Logger.Info($"Uservalidation: Successful {Response}");
-
-                return Created(Response);
-            }
-            catch (ArgumentException)
-            {
-                Logger.Info($"Uservalidation: Unsuccessful. {Response}");
-
-                return Unauthorized("Bad credentials");
+                return Ok(response);
             }
             catch (Exception e)
             {
-                Logger.Info($"Uservalidation: Error. {Response}");
-
+                Logger.Error(e,"Failed to create token");
                 return LogError(e);
             }
         }
-    
-
 
         // POST api/Authorize
         [AllowAnonymous]

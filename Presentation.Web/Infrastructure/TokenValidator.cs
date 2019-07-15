@@ -14,6 +14,7 @@ using Serilog;
 using System.IdentityModel.Tokens;
 using System.Security.Principal;
 using System.Text;
+using Presentation.Web.Infrastructure.Model;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -47,7 +48,7 @@ namespace Presentation.Web.Infrastructure
             }
         }
 
-        public string CreateToken(Core.DomainModel.User user)
+        public KitosApiToken CreateToken(Core.DomainModel.User user)
         {
 
             var ssoConfig = GetKeyFromConfig();
@@ -69,21 +70,23 @@ namespace Presentation.Web.Infrastructure
             // securityKey length should be >256b
             try
             {
+                var validFrom = DateTime.UtcNow;
+                var expires = validFrom.AddDays(1);
                 var securityToken = handler.CreateToken(new SecurityTokenDescriptor
                 {
                     Subject = identity,
                     TokenIssuerName = ssoConfig.Issuer,
-                    Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(DateTime.Now, DateTime.Now.AddDays(1)),
-                    SigningCredentials = new System.IdentityModel.Tokens.SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
+                    Lifetime = new System.IdentityModel.Protocols.WSTrust.Lifetime(validFrom, expires),
+                    SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
                 });
-                return handler.WriteToken(securityToken);
+                var tokenString = handler.WriteToken(securityToken);
+                return new KitosApiToken(user, tokenString, expires);
             }
-            catch (Exception E)
+            catch (Exception exn)
             {
-                Logger.Error("TokenValidator: Exception creating token. Message: " + E.Message);
-                return null;
+                Logger.Error("TokenValidator: Exception creating token. Message: " + exn.Message);
+                throw;
             }
-            return null;
         }
 
         public SsoConfig GetKeyFromConfig()
@@ -99,10 +102,10 @@ namespace Presentation.Web.Infrastructure
                     var openidConfig = JsonConvert.DeserializeObject<dynamic>(json);
                     result.Issuer = openidConfig.issuer;
 
-                    var jwksuri = (string) openidConfig.jwks_uri;
+                    var jwksuri = (string)openidConfig.jwks_uri;
                     var jwksjson = wc.DownloadString(jwksuri);
                     var jwks = JsonConvert.DeserializeObject<dynamic>(jwksjson);
-                    var keys = (JArray) jwks.keys;
+                    var keys = (JArray)jwks.keys;
                     var cert = keys.First.Single(t => t.Path.Contains("x5c")).First.First.ToString();
                     result.SigningKey = new X509SecurityKey(new X509Certificate2(Convert.FromBase64String(cert)));
                 }

@@ -523,6 +523,7 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
@@ -534,6 +535,7 @@
     <Compile Include="Models\ExternalReferenceDTO.cs" />
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
+    <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
