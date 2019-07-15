@@ -34,7 +34,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoFixture, Version=4.11.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.11.0\lib\net452\AutoFixture.dll</HintPath>
+    </Reference>
+    <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -65,19 +75,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\AuthorizationTests.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
+    <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
+    <Compile Include="Tools\WithAutoFixture.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
+      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
+      <Name>Presentation.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

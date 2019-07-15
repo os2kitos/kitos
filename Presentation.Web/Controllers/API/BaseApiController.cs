@@ -85,6 +85,11 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
+        protected virtual HttpResponseMessage BadRequest()
+        {
+            return CreateResponse(HttpStatusCode.BadRequest);
+        }
+
         protected virtual HttpResponseMessage Unauthorized()
         {
             return CreateResponse(HttpStatusCode.Unauthorized);

@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -11,8 +10,6 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -105,52 +102,48 @@ namespace Presentation.Web.Controllers.API
         [Route("api/authorize/GetToken")]
         public HttpResponseMessage GetToken(LoginDTO loginDto) {
 
-            var Response = new { Token = "", Expires = "", Email = "", LoginSuccessful = false };
             try
             {
-                User user;
-
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                 {
-                    throw new ArgumentException();
+                    Logger.Info("Attempt to login with bad credentials");
+                    return Unauthorized("Bad credentials");
                 }
 
-                user = _userRepository.GetByEmail(loginDto.Email);
+                var user = _userRepository.GetByEmail(loginDto.Email);
 
-                var Token = new TokenValidator().CreateToken(user);
+                var token = new TokenValidator().CreateToken(user);
 
-                var Expires = DateTime.Now.AddDays(1).ToString();
+                var response = new GetTokenResponseDTO
+                {
+                    Token = token.Value,
+                    Email = loginDto.Email,
+                    LoginSuccessful = true,
+                    Expires = token.Expiration
+                };
 
-                Response = new { Token, Expires, loginDto.Email, LoginSuccessful = true };
+                Logger.Info($"Created token for user with Id {user.Id}");
 
-                Logger.Info($"Uservalidation: Successful {Response}");
-
-                return Created(Response);
-            }
-            catch (ArgumentException)
-            {
-                Logger.Info($"Uservalidation: Unsuccessful. {Response}");
-
-                return Unauthorized("Bad credentials");
+                return Ok(response);
             }
             catch (Exception e)
             {
-                Logger.Info($"Uservalidation: Error. {Response}");
-
+                Logger.Error(e,"Failed to create token");
                 return LogError(e);
             }
         }
-    
-
 
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
+            var loginInfo = new { Email = "", LoginSuccessful = false };
 
-            if (loginDto != null)
-                loginInfo = new { Token = loginDto.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+            if (loginDto == null)
+            {
+                return BadRequest();
+            }
+            loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
 
             try
             {
@@ -160,15 +153,16 @@ namespace Presentation.Web.Controllers.API
                     user = LoginWithToken(loginDto.Token);
                     if (user == null)
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with token. {loginInfo}");
+                        return Unauthorized("Invalid token");
                     }
-
                 }
                 else
                 {
                     if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with credentials. {loginInfo}");
+                        return Unauthorized("Bad credentials");
                     }
 
                     user = _userRepository.GetByEmail(loginDto.Email);
@@ -176,16 +170,10 @@ namespace Presentation.Web.Controllers.API
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
-                loginInfo = new { loginDto.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
+                loginInfo = new { loginDto.Email, LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
-            }
-            catch (ArgumentException)
-            {
-                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
-
-                return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
@@ -224,31 +212,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        // helper function
-        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
-        {
-            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
-
-            // getting the default org units (one or null for each organization)
-            var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
-
-            // creating DTOs
-            var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
-            {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
-            });
-
-
-            var response = new LoginResponseDTO()
-            {
-                User = userDto,
-                Organizations = orgsDto
-            };
-
-            return response;
         }
     }
 }

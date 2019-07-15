@@ -73,10 +73,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 	ProjectSection(SolutionItems) = preProject
 		DeploymentScripts\AwsApi.ps1 = DeploymentScripts\AwsApi.ps1
 		DeploymentScripts\CheckWebsiteVersion.ps1 = DeploymentScripts\CheckWebsiteVersion.ps1
+		DeploymentScripts\DbMigrations.ps1 = DeploymentScripts\DbMigrations.ps1
 		DeploymentScripts\DeployIntegration.ps1 = DeploymentScripts\DeployIntegration.ps1
 		DeploymentScripts\DeploymentSetup.ps1 = DeploymentScripts\DeploymentSetup.ps1
 		DeploymentScripts\DeployWebsite.ps1 = DeploymentScripts\DeployWebsite.ps1
+		DeploymentScripts\DeployWebsiteToEnvironment.ps1 = DeploymentScripts\DeployWebsiteToEnvironment.ps1
 		DeploymentScripts\PrepareIntegrationDatabase.ps1 = DeploymentScripts\PrepareIntegrationDatabase.ps1
+		DeploymentScripts\PrepareLocalDatabase.ps1 = DeploymentScripts\PrepareLocalDatabase.ps1
+		DeploymentScripts\PrepareLocalDeveloperDatabase.ps1 = DeploymentScripts\PrepareLocalDeveloperDatabase.ps1
+		DeploymentScripts\PrepareProductionDatabase.ps1 = DeploymentScripts\PrepareProductionDatabase.ps1
+		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
+		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration.Presentation.Web", "Tests.Integration.Presentation.Web\Tests.Integration.Presentation.Web.csproj", "{46D4551A-7301-456B-A9BA-1E0621C09112}"
@@ -212,9 +219,6 @@ Global
 		{46D4551A-7301-456B-A9BA-1E0621C09112} = {28A9664B-E3E1-4362-8E2D-6C5A0DED0517}
 		{8FD29D91-1CAC-4A14-B085-7631FA4E81DB} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
 		{28A9664B-E3E1-4362-8E2D-6C5A0DED0517} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BD2A477D-1E55-45D1-8C0C-FBF9E8216B92}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}

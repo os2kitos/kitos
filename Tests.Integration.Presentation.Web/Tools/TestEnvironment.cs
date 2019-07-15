@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -27,27 +26,29 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 //Expecting the following users to be available to local testing
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
+                const string localDevUserPassword = "localNoSecret";
+
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
                         OrganizationRole.User,
                         new KitosCredentials(
-                            "local-regular-user@strongminds.dk", 
-                            "localNoSecret",
+                            "local-regular-user@kitos.dk", 
+                            localDevUserPassword,
                             OrganizationRole.User)
                     },
                     {
                         OrganizationRole.LocalAdmin,
                         new KitosCredentials(
-                            "local-local-admin-user@strongminds.dk", 
-                            "localNoSecret",
+                            "local-local-admin-user@kitos.dk", 
+                            localDevUserPassword,
                             OrganizationRole.LocalAdmin)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
-                            "local-global-admin-user@strongminds.dk", 
-                            "localNoSecret",
+                            "local-global-admin-user@kitos.dk", 
+                            localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
                     }
                 };
@@ -113,6 +114,24 @@ namespace Tests.Integration.Presentation.Web.Tools
                 return credentials;
             }
             throw new ArgumentNullException($"No environment user configured for role:{role:G}");
+        }
+
+        public static string GetBaseUrl()
+        {
+            switch (ActiveEnvironment)
+            {
+                case KitosTestEnvironment.Local:
+                    return "https://localhost:44300";
+                case KitosTestEnvironment.Integration:
+                    return $"https://{GetEnvironmentVariable("KitosHostName")}";
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static Uri CreateUrl(string pathAndQuery)
+        {
+            return new Uri($"{GetBaseUrl()}/{pathAndQuery.TrimStart('/')}");
         }
     }
 }
