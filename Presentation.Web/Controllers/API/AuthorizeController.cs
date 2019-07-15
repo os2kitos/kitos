@@ -139,10 +139,11 @@ namespace Presentation.Web.Controllers.API
         {
             var loginInfo = new { Email = "", LoginSuccessful = false };
 
-            if (loginDto != null)
+            if (loginDto == null)
             {
-                loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
+                return BadRequest();
             }
+            loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
 
             try
             {
@@ -152,7 +153,8 @@ namespace Presentation.Web.Controllers.API
                     user = LoginWithToken(loginDto.Token);
                     if (user == null)
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with token. {loginInfo}");
+                        return Unauthorized("Invalid token");
                     }
 
                 }
@@ -160,7 +162,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with credentials. {loginInfo}");
+                        return Unauthorized("Bad credentials");
                     }
 
                     user = _userRepository.GetByEmail(loginDto.Email);
@@ -172,12 +175,6 @@ namespace Presentation.Web.Controllers.API
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
-            }
-            catch (ArgumentException)
-            {
-                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
-
-                return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
