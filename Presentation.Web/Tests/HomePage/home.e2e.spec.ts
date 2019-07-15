@@ -2,28 +2,20 @@
 
 describe("home view", () => {
 
-    var pageObject = new homePage(); 
+    var pageObject = new homePage();
 
     beforeEach(() => {
         pageObject.getPage();
     });
 
+    afterEach(() => {
+        browser.driver.manage().deleteAllCookies();
+    });
+
     it("should mark invalid email in field", () => {
-
-        pageObject.emailField.sendKeys("invalid-email");
-
-        pageObject.pwdField.sendKeys("");
+        pageObject.emailField.sendKeys("invalid-email.com");
 
         expect(pageObject.emailField.getAttribute("class")).toContain(" ng-invalid ");
     });
 
-    it("should mark valid email in field", () => {
-
-        pageObject.emailField.sendKeys("valid-email@valid.dk");
-
-        pageObject.pwdField.sendKeys("");
-
-        expect(pageObject.emailField.getAttribute("class")).toContain(" ng-valid ");
-    });
 });
-

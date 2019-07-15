@@ -2,41 +2,48 @@
 import loginPage = require("../PageObjects/HomePage/LoginPage.po")
 
 var pageObject = new loginPage;
-var navigationBar = pageObject.navigationBarHelper;
+var navigationBarHelper = pageObject.navigationBarHelper;
+var navigationBar = pageObject.navigationBar;
 var loginHelper = new login();
+
+var ec = protractor.ExpectedConditions;
 
 describe("Being logged out, it is possible to login ", () => { 
 
     beforeEach(() => {
-
+        browser.ignoreSynchronization = true;
     });
 
     afterEach(() => {
+        browser.ignoreSynchronization = false;
         browser.driver.manage().deleteAllCookies();
     });
 
     it("As global admin", () => {
         loginHelper.loginAsGlobalAdmin();
-        navigationBar.dropDownExpand();
-        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
-        expect(navigationBar.isGlobalAdminDisplayed()).toBeTruthy();
-        expect(navigationBar.isLocalAdminDisplayed()).toBeFalsy();
+        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
+        navigationBarHelper.dropDownExpand();
+        expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeTruthy();
+        expect(navigationBarHelper.isLocalAdminDisplayed()).toBeFalsy();
     });
 
     it("As local admin", () => {
         loginHelper.loginAsLocalAdmin();
-        navigationBar.dropDownExpand();
-        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
-        expect(navigationBar.isGlobalAdminDisplayed()).toBeFalsy();
-        expect(navigationBar.isLocalAdminDisplayed()).toBeTruthy();
+        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
+        navigationBarHelper.dropDownExpand();
+        expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeFalsy();
+        expect(navigationBarHelper.isLocalAdminDisplayed()).toBeTruthy();
     });
 
     it("As regular user", () => {
         loginHelper.loginAsRegularUser();
-        navigationBar.dropDownExpand();
-        expect(navigationBar.isMyProfileDisplayed()).toBeTruthy();
-        expect(navigationBar.isGlobalAdminDisplayed()).toBeFalsy();
-        expect(navigationBar.isLocalAdminDisplayed()).toBeFalsy();
+        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
+        navigationBarHelper.dropDownExpand();
+        expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
+        expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeFalsy();
+        expect(navigationBarHelper.isLocalAdminDisplayed()).toBeFalsy();
     });
 
 });
