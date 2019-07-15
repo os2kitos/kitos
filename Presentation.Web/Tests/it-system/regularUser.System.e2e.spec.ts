@@ -24,7 +24,7 @@ describe("Regular user IT Systems tests", () => {
     });
 
     it("Can open IT system",() => {
-        browser.wait(ec.visibilityOf(gridObjects.systemName.first()), 10000);
+        browser.wait(ec.visibilityOf(gridObjects.systemName.first()), 20000);
         gridObjects.systemName.first().click();
         expect(browser.getCurrentUrl()).toContain("system/usage");
     });
