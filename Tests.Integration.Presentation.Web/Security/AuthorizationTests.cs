@@ -12,42 +12,34 @@ namespace Tests.Integration.Presentation.Web.Security
     public class AuthorizationTests : WithAutoFixture
     {
         private readonly KitosCredentials _localAdmin;
+        private readonly Uri _getTokenUrl;
 
         public AuthorizationTests()
         {
             _localAdmin = TestEnvironment.GetCredentials(OrganizationRole.LocalAdmin);
+            _getTokenUrl = TestEnvironment.CreateUrl("api/authorize/GetToken");
         }
 
         [Fact]
         public async Task Can_Get_Token()
         {
             //Arrange
-            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var loginDto = new LoginDTO
-            {
-                Email = _localAdmin.Username,
-                Password = _localAdmin.Password
-            };
+            var role = _localAdmin.Role;
 
             //Act
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
-            {
-                //Assert the correct status code and expected content.
-                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>();
+            var tokenResponse = await HttpApi.GetTokenAsync(role);
 
-                Assert.Equal(loginDto.Email, tokenResponse.Email);
-                Assert.True(tokenResponse.LoginSuccessful);
-                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
-                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
-            }
+            //Assert
+            Assert.NotNull(tokenResponse);
+            Assert.True(tokenResponse.LoginSuccessful);
+            Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+            Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
         }
 
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Password()
         {
             //Arrange
-            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
             var loginDto = new LoginDTO
             {
                 Email = _localAdmin.Username,
@@ -55,7 +47,7 @@ namespace Tests.Integration.Presentation.Web.Security
             };
 
             //Act
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
@@ -66,7 +58,6 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Get_Token_Returns_401_On_Invalid_Username()
         {
             //Arrange
-            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
             var loginDto = new LoginDTO
             {
                 Email = A<string>(),
@@ -74,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Security
             };
 
             //Act
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);

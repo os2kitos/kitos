@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Models;
+using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {
@@ -30,6 +33,30 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var apiReturnFormat = await response.ReadResponseBodyAs<ApiReturnDTO<T>>().ConfigureAwait(false);
             return apiReturnFormat.Response;
+        }
+
+        public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
+        {
+            var userCredentials = TestEnvironment.GetCredentials(role);
+            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+            var loginDto = new LoginDTO
+            {
+                Email = userCredentials.Username,
+                Password = userCredentials.Password
+            };
+
+            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            {
+                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
+
+                Assert.Equal(loginDto.Email, tokenResponse.Email);
+                Assert.True(tokenResponse.LoginSuccessful);
+                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
+
+                return tokenResponse;
+            }
         }
     }
 }
