@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -27,27 +26,29 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 //Expecting the following users to be available to local testing
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
+                const string localDevUserPassword = "localNoSecret";
+
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
                         OrganizationRole.User,
                         new KitosCredentials(
                             "local-regular-user@kitos.dk", 
-                            "localNoSecret",
+                            localDevUserPassword,
                             OrganizationRole.User)
                     },
                     {
                         OrganizationRole.LocalAdmin,
                         new KitosCredentials(
                             "local-local-admin-user@kitos.dk", 
-                            "localNoSecret",
+                            localDevUserPassword,
                             OrganizationRole.LocalAdmin)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
                             "local-global-admin-user@kitos.dk", 
-                            "localNoSecret",
+                            localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
                     }
                 };
