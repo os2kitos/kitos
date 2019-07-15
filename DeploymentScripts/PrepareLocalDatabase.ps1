@@ -13,14 +13,14 @@ $ErrorActionPreference = "Stop"
 .$PSScriptRoot\DbMigrations.ps1
 
 $migrationsFolder = Resolve-Path "$PSScriptRoot\..\Output\DataAccess"
-$testToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\bin\release\Tools.Test.Database.exe"
+$testToolsPath = Resolve-Path "$PSScriptRoot\..\Output\Tools\TestDatabase\Tools.Test.Database.exe"
 
-if(Test-Path $migrationsFolder -eq $false) {
-    Throw "Failed to locate $migrationsFolder . Please build the solution in release mode!"
+if((Test-Path "$migrationsFolder") -eq $false) {
+    Throw "Failed to locate $migrationsFolder . Please build the solution!"
 } 
 
-if(Test-Path $testToolsPath -eq $false) {
-    Throw "Failed to locate $testToolsPath . Please build the solution in release mode!"
+if((Test-Path "$testToolsPath") -eq $false) {
+    Throw "Failed to locate $testToolsPath . Please build the solution!"
 }
 
 $localUserPassword = "localNoSecret"
