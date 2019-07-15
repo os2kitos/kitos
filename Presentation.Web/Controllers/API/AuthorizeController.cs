@@ -156,7 +156,6 @@ namespace Presentation.Web.Controllers.API
                         Logger.Info($"Uservalidation: Unsuccessful login with token. {loginInfo}");
                         return Unauthorized("Invalid token");
                     }
-
                 }
                 else
                 {
