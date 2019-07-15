@@ -1,8 +1,3 @@
-#-------------------------------------------------------------
-# Stop on first error
-#-------------------------------------------------------------
-$ErrorActionPreference = "Stop"
-
 param(
     [Parameter(Mandatory=$true)][string]$testToolsExePath,
     [Parameter(Mandatory=$true)][string]$migrationsFolderPath,
@@ -15,6 +10,11 @@ param(
     [Parameter(Mandatory=$true)][string]$normalUserUserName,
     [Parameter(Mandatory=$true)][string]$normalUserPw
     )
+    
+#-------------------------------------------------------------
+# Stop on first error
+#-------------------------------------------------------------
+$ErrorActionPreference = "Stop"
 
 #-------------------------------------------------------------
 # Load helper libraries
