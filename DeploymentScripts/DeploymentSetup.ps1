@@ -50,7 +50,10 @@ Function Setup-Environment([String] $environmentName) {
     if (-Not (Test-Path 'env:AwsSecretAccessKey')) { 
     	throw "Error: Remember to set the AwsSecretAccessKey input before starting the build"
     }
-    
+
+    $Env:MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
+    $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
+
     switch( $environmentName ) 
     {
         "integration" 

@@ -1,7 +1,5 @@
-Function Run-DB-Migrations([bool]$newDb = $false) {
+Function Run-DB-Migrations([bool]$newDb = $false, [string]$migrationsFolder, [string]$connectionString) {
     Write-Host "Executing db migrations"
-    
-    $MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
 
     if($newDb -eq $true) {
         Write-Host "Enabling seed for new database"
@@ -11,7 +9,7 @@ Function Run-DB-Migrations([bool]$newDb = $false) {
         $Env:SeedNewDb="no"
     }
     
-    & "$MigrationsFolder\migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$Env:KitosDbConnectionStringForTeamCity" /connectionProviderName="System.Data.SqlClient" /verbose /startupDirectory="$MigrationsFolder"
+    & "$migrationsFolder\migrate.exe" "Infrastructure.DataAccess.dll" /connectionString="$connectionString" /connectionProviderName="System.Data.SqlClient" /verbose /startupDirectory="$migrationsFolder"
     
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO MIGRATE DB" }
 }
