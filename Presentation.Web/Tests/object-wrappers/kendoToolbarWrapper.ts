@@ -6,20 +6,24 @@ type HeaderButtons = {
     saveFilter: protractor.ElementFinder,
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
-    createContract: protractor.ElementFinder
+    createContract: protractor.ElementFinder,
+    systemKatalogCreate: protractor.ElementFinder
 };
 
     
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
-    contractName: protractor.ElementFinder
+    contractName: protractor.ElementFinder,
+    catalogName: protractor.ElementFinder,
+    catalogUsage: protractor.ElementFinder
 };
 
 type ColumnObjects = {
     systemName: protractor.ElementArrayFinder,
-    contractName: protractor.ElementArrayFinder
-
+    contractName: protractor.ElementArrayFinder,
+    catalogName: protractor.ElementArrayFinder,
+    catalogUsage: protractor.ElementArrayFinder
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
@@ -34,6 +38,8 @@ class kendoToolbarWrapper {
             useFilter: element(byDataElementType("useFilter")),
             deleteFilter: element(byDataElementType("removeFilter")),
             createContract: element(byDataElementType("CreateContract")),
+            systemKatalogCreate: element(byDataElementType("CreateITSystemButton"))
+
         };
         return buttons;
     }
@@ -45,6 +51,8 @@ class kendoToolbarWrapper {
         var columns: ColumnHeaders = {
             systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
+            catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
+            catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
 
         };
         return columns;
@@ -57,6 +65,8 @@ class kendoToolbarWrapper {
         var columns: ColumnObjects = {
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
+            catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),
+            catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
         };
         return columns;
     }

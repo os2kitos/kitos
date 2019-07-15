@@ -8,7 +8,11 @@ class constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractName"
+    readonly kendoContractNameObjects = "contractName";
+    readonly kendoCatalogNameHeader = "CatalogNameHeader";
+    readonly kendoCatalogNameObjects = "CatalogName";
+    readonly kendoCatalogUsageHeader = "CatalogUsageHeader";
+    readonly kendoCatalogUsageObjects = "CatalogUsage";
 }
 
 export = constants;
