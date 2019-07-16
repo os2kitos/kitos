@@ -18,7 +18,7 @@
   </parameter>
 
   <!-- Kitos token configuration -->
-  <parameter name="SecurityKeyString" description="" tags="">
+  <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
     </parameterentry>
   </parameter>
