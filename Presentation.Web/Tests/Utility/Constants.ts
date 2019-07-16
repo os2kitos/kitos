@@ -7,12 +7,18 @@
 class constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoSystemButtonCreate = "CreateITSystemButton";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractName";
+    readonly kendoContractNameObjects = "contractNameObject";
+    readonly kendoButtonResetFilter = "resetFilterButton";
+    readonly kendoButtonSaveFilter = "saveFilterButton";
+    readonly kendoButtonUseFilter = "useFilterButton";
+    readonly kendoButtonDeleteFilter = "removeFilterButton";
+    readonly kendoContractButtonCreateContract = "CreateContractButton";
     readonly kendoCatalogNameHeader = "CatalogNameHeader";
-    readonly kendoCatalogNameObjects = "CatalogName";
+    readonly kendoCatalogNameObjects = "CatalogNameObject";
     readonly kendoCatalogUsageHeader = "CatalogUsageHeader";
-    readonly kendoCatalogUsageObjects = "CatalogUsage";
+    readonly kendoCatalogUsageObjects = "CatalogUsageObject";
 }
 
 export = constants;

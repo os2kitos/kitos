@@ -30,15 +30,18 @@ var byDataElementType = new CSSLocator().byDataElementType;
 
 class kendoToolbarWrapper {
 
+    
+
     public headerButtons(): HeaderButtons {
+        var consts = new Constants();
 
         var buttons: HeaderButtons = {
-            resetFilter: element(byDataElementType("resetFilter")),
-            saveFilter: element(byDataElementType("saveFilter")),
-            useFilter: element(byDataElementType("useFilter")),
-            deleteFilter: element(byDataElementType("removeFilter")),
-            createContract: element(byDataElementType("CreateContract")),
-            systemKatalogCreate: element(byDataElementType("CreateITSystemButton"))
+            resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
+            saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
+            useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
+            deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
+            createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
+            systemKatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate))
 
         };
         return buttons;

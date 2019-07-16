@@ -240,7 +240,7 @@
                             return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
-                            "data-element-type": "CatalogUsage"
+                            "data-element-type": "CatalogUsageObject"
                         },
                         headerAttributes: {
                             "data-element-type": "CatalogUsageHeader"
@@ -290,7 +290,7 @@
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                         },
                         attributes: {
-                            "data-element-type": "CatalogName"
+                            "data-element-type": "CatalogNameObject"
                         },
                         headerAttributes: {
                             "data-element-type": "CatalogNameHeader"
