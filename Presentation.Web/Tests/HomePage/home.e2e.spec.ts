@@ -1,15 +1,17 @@
 ﻿import homePage = require("../PageObjects/HomePage/HomePage.po");
+import testFixtureWrapper = require("../Utility/TestFixtureWrapper");
+
+var testFixture = new testFixtureWrapper();
+var pageObject = new homePage();
 
 describe("home view", () => {
-
-    var pageObject = new homePage();
 
     beforeEach(() => {
         pageObject.getPage();
     });
 
     afterEach(() => {
-        browser.driver.manage().deleteAllCookies();
+        testFixture.cleanupState();
     });
 
     it("should mark invalid email in field", () => {
