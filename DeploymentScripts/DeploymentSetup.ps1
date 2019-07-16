@@ -53,12 +53,12 @@ Function Setup-Environment([String] $environmentName) {
     }
 
     $Env:MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
-    $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
 
     switch( $environmentName ) 
     {
         "integration" 
         {
+            $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
             break;
