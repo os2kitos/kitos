@@ -13,6 +13,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:LogLevel = $parameters["LogLevel"]
     $Env:EsUrl = $parameters["EsUrl"]
     $Env:SsoGateway = $parameters["SsoGateway"]
+    $Env:SecurityKeyString = $parameters["SecurityKeyString"]
     $Env:SmtpFromMail = $parameters["SmtpFromMail"]
     $Env:SmtpNetworkHost = $parameters["SmtpNetworkHost"]
     $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]

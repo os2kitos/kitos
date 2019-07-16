@@ -78,10 +78,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\DeploymentSetup.ps1 = DeploymentScripts\DeploymentSetup.ps1
 		DeploymentScripts\DeployWebsite.ps1 = DeploymentScripts\DeployWebsite.ps1
 		DeploymentScripts\DeployWebsiteToEnvironment.ps1 = DeploymentScripts\DeployWebsiteToEnvironment.ps1
+		DeploymentScripts\PrepareCleanDeveloperDatabase.ps1 = DeploymentScripts\PrepareCleanDeveloperDatabase.ps1
 		DeploymentScripts\PrepareIntegrationDatabase.ps1 = DeploymentScripts\PrepareIntegrationDatabase.ps1
 		DeploymentScripts\PrepareLocalDatabase.ps1 = DeploymentScripts\PrepareLocalDatabase.ps1
 		DeploymentScripts\PrepareLocalDeveloperDatabase.ps1 = DeploymentScripts\PrepareLocalDeveloperDatabase.ps1
 		DeploymentScripts\PrepareProductionDatabase.ps1 = DeploymentScripts\PrepareProductionDatabase.ps1
+		DeploymentScripts\PrepareTestDatabase.ps1 = DeploymentScripts\PrepareTestDatabase.ps1
 		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
 		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
 	EndProjectSection
