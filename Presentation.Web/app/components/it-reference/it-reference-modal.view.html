@@ -11,7 +11,7 @@
                 Dokumenttitel
             </label>
             <div class="col-xs-7">
-                <input type="text" id="documentTitle" ng-model="reference.title" class="form-control input-sm" required />
+                <input type="text" id="documentTitle" ng-model="reference.title" data-element-type="referenceDocTitle" class="form-control input-sm" required />
             </div>
         </div>
         <div class="form-group">
@@ -19,7 +19,7 @@
                 Evt. DokumentID/sagsnr./Anden Reference
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" class="form-inline form-control input-sm" />
+                <input type="text" id="DokomentID" ng-model="reference.externalReferenceId" data-element-type="referenceDocId" class="form-inline form-control input-sm" />
             </div>
         </div>
         <div class="form-group">
@@ -27,7 +27,7 @@
                 URL, hvis dokumenttitel skal virke som link
             </label>
             <div class="col-xs-7">
-                <input type="text" id="DokomentID" ng-model="reference.url" class="form-control form-inline input-sm" aria-describedby="helpBlock"/>
+                <input type="text" id="DokomentID" ng-model="reference.url" data-element-type="referenceDocUrl" class="form-control form-inline input-sm" aria-describedby="helpBlock"/>
             </div>
         </div>
         <div class="modal-footer">
@@ -42,7 +42,8 @@
                     type="submit"
                     class="btn btn-success"
                     data-disabled-on-busy=""
-                    data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)">
+                    data-ng-disabled="!((!!reference.externalReferenceId || !!reference.url) && !!reference.title)"
+                    data-element-type="editSaveReference">
                 Gem
             </button>
         </div>

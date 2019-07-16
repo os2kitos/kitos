@@ -5,15 +5,26 @@ type HeaderButtons = {
     resetFilter: protractor.ElementFinder,
     saveFilter: protractor.ElementFinder,
     useFilter: protractor.ElementFinder,
-    deleteFilter: protractor.ElementFinder
+    deleteFilter: protractor.ElementFinder,
+    editReference: protractor.ElementFinder,
+    editSaveReference: protractor.ElementFinder
 };
 
+type InputFields =
+{
+        referenceDocTitle: protractor.ElementFinder,
+        referenceDocId: protractor.ElementFinder,
+        referenceDocUrl: protractor.ElementFinder
+}
+
 type ColumnHeaders = {
-    systemName: protractor.ElementFinder
+    systemName: protractor.ElementFinder,
+    referenceName: protractor.ElementFinder
 };
 
 type ColumnObjects = {
-    systemName: protractor.ElementArrayFinder
+    systemName: protractor.ElementArrayFinder,
+    referenceName: protractor.ElementArrayFinder
 
 };
 
@@ -27,9 +38,21 @@ class kendoToolbarWrapper {
             resetFilter: element(byDataElementType("resetFilter")),
             saveFilter: element(byDataElementType("saveFilter")),
             useFilter: element(byDataElementType("useFilter")),
-            deleteFilter: element(byDataElementType("removeFilter"))
+            deleteFilter: element(byDataElementType("removeFilter")),
+            editReference: element(byDataElementType("EditReference")),
+            editSaveReference: element(byDataElementType("editSaveReference"))
         };
         return buttons;
+    }
+
+    public inputFields(): InputFields {
+
+        var inputs: InputFields = {
+            referenceDocTitle: element(byDataElementType("referenceDocTitle")),
+            referenceDocId: element(byDataElementType("referenceDocId")),
+            referenceDocUrl: element(byDataElementType("referenceDocUrl"))
+        };
+        return inputs;
     }
 
     public columnHeaders(): ColumnHeaders {
@@ -37,8 +60,9 @@ class kendoToolbarWrapper {
         var consts = new Constants();
 
         var columns: ColumnHeaders = {
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader)
-            
+            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
+            referenceName: kendo.getColumnHeaderClickable(consts.kendoReferencetNameHeader)
+
         };
         return columns;
     }
@@ -48,7 +72,8 @@ class kendoToolbarWrapper {
         var consts = new Constants();
 
         var columns: ColumnObjects = {
-            systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects)
+            systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
+            referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects)
         };
         return columns;
     }
