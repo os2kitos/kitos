@@ -19,6 +19,19 @@ class constants {
     readonly kendoCatalogNameObjects = "CatalogNameObject";
     readonly kendoCatalogUsageHeader = "CatalogUsageHeader";
     readonly kendoCatalogUsageObjects = "CatalogUsageObject";
+
+
+
+    //Testing eviroment variables
+    readonly defaultItContractName = "DefaultTestItContract";
+    readonly contractNameVariable = "Name";
+    readonly defaultCatalog = "katalog123";
+    readonly nameOfSystemInput = "nameOfItSystemInput";
+    readonly saveKatalogButton = "itKatalogSaveButton"
+
+
+
+
 }
 
 export = constants;

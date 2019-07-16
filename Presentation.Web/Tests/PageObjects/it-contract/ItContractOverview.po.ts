@@ -2,6 +2,9 @@
 import navigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
 import subNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
 import PageObject = require("../IPageObject.po");
+import constants = require("../../Utility/Constants");
+
+var consts = new constants();
 
 class ItSystemEditPo implements PageObject {
 
@@ -13,7 +16,5 @@ class ItSystemEditPo implements PageObject {
     navigationBarWrapper = new navigationBarWrapper();
     subNavigationBarWrapper = new subNavigationBarWrapper();
 
-    contractName = element(by.id("name"));
-    saveContractBtn = element(by.buttonText("Gem"));
 }
 export = ItSystemEditPo;

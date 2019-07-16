@@ -1,9 +1,11 @@
 ﻿import login = require("../Helpers/LoginHelper");
 import ItSystemEditPo = require("../PageObjects/it-contract/ItContractOverview.po");
+import constants = require("../Utility/Constants");
 
 describe("Regular user has access features in the contract overview", () => {
 
     var loginHelper = new login();
+    var consts = new constants();
     var pageObject = new ItSystemEditPo();
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var columnObject = pageObject.kendoToolbarWrapper.columnObjects();
@@ -40,8 +42,9 @@ describe("Regular user has access features in the contract overview", () => {
     });
 
     it("User can see contract ", () => {
-        var cName = "DefaultTestItContract";
-        expect(columnObject.contractName.get(0).getText()).toEqual(cName);
+     
+        expect(columnObject.contractName.get(0).getText()).toEqual(consts.defaultItContractName);
+
     });
 
 
