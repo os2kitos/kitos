@@ -13,6 +13,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:LogLevel = $parameters["LogLevel"]
     $Env:EsUrl = $parameters["EsUrl"]
     $Env:SsoGateway = $parameters["SsoGateway"]
+    $Env:SecurityKeyString = $parameters["SecurityKeyString"]
     $Env:SmtpFromMail = $parameters["SmtpFromMail"]
     $Env:SmtpNetworkHost = $parameters["SmtpNetworkHost"]
     $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]
@@ -52,12 +53,12 @@ Function Setup-Environment([String] $environmentName) {
     }
 
     $Env:MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
-    $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
 
     switch( $environmentName ) 
     {
         "integration" 
         {
+            $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
             break;

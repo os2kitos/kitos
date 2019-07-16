@@ -17,6 +17,12 @@
     </parameterentry>
   </parameter>
 
+  <!-- Kitos token configuration -->
+  <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
+    </parameterentry>
+  </parameter>
+
   <!-- Email -->
   <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">

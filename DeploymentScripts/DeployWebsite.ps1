@@ -1,4 +1,4 @@
-Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString) {
+Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString) {
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
     $fullCommand=$(("`"{0}`" " +  
@@ -14,16 +14,17 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"serilog:minimum-level`",value=`"{5}`" " + 
                     "-setParam:name=`"serilog:write-to:Elasticsearch.nodeUris`",value=`"{6}`" " + 
                     "-setParam:name=`"SSOGateway`",value=`"{7}`" " + 
-                    "-setParam:name=`"SmtpFromEmail`",value=`"{8}`" " + 
-                    "-setParam:name=`"SmtpNetworkHost`",value=`"{9}`" " + 
-                    "-setParam:name=`"ResetPasswordTTL`",value=`"{10}`" " + 
-                    "-setParam:name=`"BaseUrl`",value=`"{11}`" " + 
-                    "-setParam:name=`"MailSuffix`",value=`"{12}`" " + 
-                    "-setParam:name=`"Environment`",value=`"{13}`" " + 
-                    "-setParam:name=`"DeploymentVersion`",value=`"{14}`" " + 
-                    "-setParam:name=`"KitosContext-Web.config Connection String`",value=`"{15}`" " + 
-                    "-setParam:name=`"kitos_HangfireDB-Web.config Connection String`",value=`"{16}`"") `
-    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString )
+                    "-setParam:name=`"SecurityKeyString`",value=`"{8}`" " + 
+                    "-setParam:name=`"SmtpFromEmail`",value=`"{9}`" " + 
+                    "-setParam:name=`"SmtpNetworkHost`",value=`"{10}`" " + 
+                    "-setParam:name=`"ResetPasswordTTL`",value=`"{11}`" " + 
+                    "-setParam:name=`"BaseUrl`",value=`"{12}`" " + 
+                    "-setParam:name=`"MailSuffix`",value=`"{13}`" " + 
+                    "-setParam:name=`"Environment`",value=`"{14}`" " + 
+                    "-setParam:name=`"DeploymentVersion`",value=`"{15}`" " + 
+                    "-setParam:name=`"KitosContext-Web.config Connection String`",value=`"{16}`" " + 
+                    "-setParam:name=`"kitos_HangfireDB-Web.config Connection String`",value=`"{17}`"") `
+    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString )
     
     & cmd.exe /C $fullCommand
     
