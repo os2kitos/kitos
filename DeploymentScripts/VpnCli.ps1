@@ -8,12 +8,12 @@ Function Disconnect-VPN() {
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED DISCONNECT VPN" }
 }
 
-Function Connect-VPN([string]$host, [string]$username, [string]$pwd) {
-    Write-Host "Connecting VPN to $host"
+Function Connect-VPN([string]$remoteHost, [string]$username, [string]$pwd) {
+    Write-Host "Connecting VPN to $remoteHost"
     
     $AppFolder = Resolve-Path "$PSScriptRoot\..\CiscoAnyConnectTool"
     
-    & "$AppFolder\CiscoAnyConnectTool.exe" "connect" "$host" "$username" "$pwd"
+    & "$AppFolder\CiscoAnyConnectTool.exe" "connect" "$remoteHost" "$username" "$pwd"
     
-    if($LASTEXITCODE -ne 0)	{ Throw "FAILED CONNECTING TO VPN $host" }
+    if($LASTEXITCODE -ne 0)	{ Throw "FAILED CONNECTING TO VPN $remoteHost" }
 }
