@@ -17,7 +17,6 @@ describe("Regular user has access features in the contract overview", () => {
     beforeEach(() => {
         pageObject.getPage();
         browser.waitForAngular();
-        
     });
 
     it("Create IT contract is clickable", () => {
@@ -42,7 +41,6 @@ describe("Regular user has access features in the contract overview", () => {
     });
 
     it("User can see contract ", () => {
-     
         expect(columnObject.contractName.get(0).getText()).toEqual(consts.defaultItContractName);
 
     });
