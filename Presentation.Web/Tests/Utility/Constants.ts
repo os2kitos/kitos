@@ -3,8 +3,7 @@
 // global namespace pollution.
 
 // This class cannot currently be added to the app project
-
-class constants {
+class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
@@ -14,7 +13,7 @@ class constants {
     readonly kendoButtonSaveFilter = "saveFilterButton";
     readonly kendoButtonUseFilter = "useFilterButton";
     readonly kendoButtonDeleteFilter = "removeFilterButton";
-    readonly kendoContractButtonCreateContract = "CreateContractButton";
+    readonly kendoContractButtonCreateContract = "createContractButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
@@ -24,13 +23,14 @@ class constants {
     readonly kendoUseFilter = "useFilterButton";
     readonly kendoRemoveFilter = "removeFilterButton";
 
-    //Enviromental veriable
+    //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
     readonly defaultCatalog = "katalog123";
     readonly nameOfSystemInput = "nameOfItSystemInput";
     readonly saveCatalogButton = "itCatalogSaveButton";
     readonly loginFormField = "loginFormField";
+    readonly catalogCreateForm = "catalogCreateForm";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
@@ -46,5 +46,5 @@ class constants {
     readonly navigationDropdownLogOut = "logOutAnchor";
 }
 
-export = constants;
+export = Constants;
 

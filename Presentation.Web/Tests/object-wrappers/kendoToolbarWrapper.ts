@@ -11,7 +11,7 @@ type HeaderButtons = {
 };
 
 type FieldsForms = {
-    loginForm: protractor.ElementFinder,
+  
 };
 
 type ColumnHeaders = {
@@ -32,8 +32,6 @@ var byDataElementType = new CSSLocator().byDataElementType;
 var consts = new Constants();
 
 class kendoToolbarWrapper {
-
-    
 
     public headerButtons(): HeaderButtons {
      
@@ -73,14 +71,6 @@ class kendoToolbarWrapper {
             catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
         };
         return columns;
-    }
-
-    public FieldsForms(): FieldsForms {
-
-        var fieldsForms: FieldsForms = {
-            loginForm: element(byDataElementType(consts.loginFormField)),
-        };
-        return fieldsForms;
     }
 }
 

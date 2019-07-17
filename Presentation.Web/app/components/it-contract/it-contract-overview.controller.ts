@@ -377,7 +377,7 @@
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
-                        "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='CreateContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
+                        "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
                     {
                         name: "clearFilter",

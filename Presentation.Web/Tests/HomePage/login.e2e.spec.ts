@@ -1,14 +1,14 @@
-﻿import login = require("../Helpers/LoginHelper");
-import loginPage = require("../PageObjects/HomePage/LoginPage.po")
-import testFixtureWrapper = require("../Utility/TestFixtureWrapper");
-import waitTimers = require("../Utility/waitTimers");
+﻿import Login = require("../Helpers/LoginHelper");
+import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
+import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
+import WaitTimers = require("../Utility/waitTimers");
 
-var pageObject = new loginPage();
+var pageObject = new LoginPage();
 var navigationBarHelper = pageObject.navigationBarHelper;
 var navigationBar = pageObject.navigationBar;
-var testFixture = new testFixtureWrapper();
-var loginHelper = new login();
-var wait = new waitTimers();
+var testFixture = new TestFixtureWrapper();
+var loginHelper = new Login();
+var wait = new WaitTimers();
 var ec = protractor.ExpectedConditions;
 
 describe("Being logged out, it is possible to login ", () => { 

@@ -1,26 +1,28 @@
-﻿import KatalogPage = require("../PageObjects/it-system/Katalog/ItSystemKatalog.po");
+﻿import CatalogPage = require("../PageObjects/it-system/Catalog/ItSystemCatalog.po");
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
-import Constant = require("../Utility/Constants");
+import Constants = require("../Utility/Constants");
 
-var consts = new Constant();
 
-class KatalogHelper {
+var consts = new Constants();
 
-    public static createKatalog(name: string) {
-        var homePage = new KatalogPage();
+class CatalogHelper {
+    public static createCatalog(name: string) {
+        var homePage = new CatalogPage();
         var CSShelper = new CSSLocator();
         homePage.getPage();
+        browser.wait(homePage.isLoginAvailable());
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
         element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
         element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
     }
 
 
-    public static deleteKatalog(name: string)
+    public static deleteCatalog(name: string)
     {
-        var homePage = new KatalogPage();
+        var homePage = new CatalogPage();
         var CSShelper = new CSSLocator();
         homePage.getPage();
+        browser.wait(homePage.isLoginAvailable());
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
         element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
         element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
@@ -28,4 +30,4 @@ class KatalogHelper {
     }
 }
 
-export = KatalogHelper;
+export = CatalogHelper;

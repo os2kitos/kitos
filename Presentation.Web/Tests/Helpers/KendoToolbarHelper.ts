@@ -1,13 +1,13 @@
 ﻿import KendoToolbarWrapper = require("../object-wrappers/KendoToolbarWrapper");
 
 var kendoToolbarWrapper = new KendoToolbarWrapper();
-class KendoToolbarHelper {
 
-    public headerButtons = new headerButtons();
+class KendoToolbarHelper {
+    public headerButtons = new HeaderButtons();
    
 }
 
-class headerButtons {
+class HeaderButtons {
     public isDeleteDisabled(): webdriver.promise.Promise<String> {
         return kendoToolbarWrapper.headerButtons().deleteFilter.getAttribute("disabled");
     }
@@ -15,7 +15,6 @@ class headerButtons {
     public isUseDisabled(): webdriver.promise.Promise<String> {
         return kendoToolbarWrapper.headerButtons().useFilter.getAttribute("disabled");
     }
-
 }
 
 export = KendoToolbarHelper;

@@ -1,20 +1,16 @@
-﻿import kendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
-import navigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
-import subNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
+﻿import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
+import NavigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
+import SubNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
 import PageObject = require("../IPageObject.po");
-import constants = require("../../Utility/Constants");
 
-var consts = new constants();
-
-class ItSystemEditPo implements PageObject {
+class ItContractOverview implements PageObject {
 
     getPage(): webdriver.promise.Promise<void> {
         return browser.get(browser.baseUrl + "/#/contract/overview");
     }
 
-    kendoToolbarWrapper = new kendoToolbarWrapper();
-    navigationBarWrapper = new navigationBarWrapper();
-    subNavigationBarWrapper = new subNavigationBarWrapper();
-
+    kendoToolbarWrapper = new KendoToolbarWrapper();
+    navigationBarWrapper = new NavigationBarWrapper();
+    subNavigationBarWrapper = new SubNavigationBarWrapper();
 }
-export = ItSystemEditPo;
+export = ItContractOverview;

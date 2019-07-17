@@ -1,5 +1,4 @@
-﻿
-type iconLinks = {
+﻿type iconLinks = {
     bell: protractor.ElementFinder,
     chart: protractor.ElementFinder,
     help: protractor.ElementFinder

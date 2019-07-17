@@ -1,6 +1,4 @@
-﻿
-
-class TestFixtureWrapper {
+﻿class TestFixtureWrapper {
     public cleanupState() {
         browser.driver.manage().deleteAllCookies();
     }

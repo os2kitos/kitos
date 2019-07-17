@@ -1,7 +1,7 @@
 ﻿import HomePage = require("../PageObjects/HomePage/HomePage.po");
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
 
-var ec = protractor.ExpectedConditions;
+
 class Login {
     
     public logout() {
