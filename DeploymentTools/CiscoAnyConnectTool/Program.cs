@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace CiscoAnyConnectTool
 {
@@ -68,6 +69,8 @@ namespace CiscoAnyConnectTool
             var vpncli = CreateVpnProcess("-s"); //-s enables input from std in
             var start = vpncli.Start();
             vpncli.StandardInput.WriteLine($"connect {host}{Environment.NewLine}{username}{Environment.NewLine}{password}");
+            //Don't wait for exit - just allow it to boot
+            Thread.Sleep(TimeSpan.FromSeconds(5));
             return start;
         }
     }
