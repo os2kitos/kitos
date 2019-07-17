@@ -23,9 +23,8 @@ class Login {
 
     private login(credentialsIndex: number) {
         var homePage = new HomePage();
-
         homePage.getPage();
-        browser.wait(ec.visibilityOf(homePage.kendoToolbarWrapper.FieldsForms().loginForm),10000);
+        browser.wait(homePage.isLoginAvailable());
         homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
         homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
         homePage.loginButton.click();
