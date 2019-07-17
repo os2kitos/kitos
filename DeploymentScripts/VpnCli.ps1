@@ -1,4 +1,4 @@
-Function Disconnect() {
+Function Disconnect-VPN() {
     Write-Host "Disconnecting VPN sessions"
     
     $AppFolder = Resolve-Path "$PSScriptRoot\..\CiscoAnyConnectTool"
@@ -8,7 +8,7 @@ Function Disconnect() {
     if($LASTEXITCODE -ne 0)	{ Throw "FAILED DISCONNECT VPN" }
 }
 
-Function Connect([string]$host, [string]$username, [string]$pwd) {
+Function Connect-VPN([string]$host, [string]$username, [string]$pwd) {
     Write-Host "Connecting VPN to $host"
     
     $AppFolder = Resolve-Path "$PSScriptRoot\..\CiscoAnyConnectTool"
