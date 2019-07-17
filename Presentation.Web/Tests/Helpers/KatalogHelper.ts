@@ -12,7 +12,7 @@ class KatalogHelper {
         homePage.getPage();
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
         element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
-        element(CSShelper.byDataElementType(consts.saveKatalogButton)).click();
+        element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
     }
 
 
@@ -23,7 +23,7 @@ class KatalogHelper {
         homePage.getPage();
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
         element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
-        element(CSShelper.byDataElementType(consts.saveKatalogButton)).click();
+        element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
 
     }
 }

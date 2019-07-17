@@ -169,7 +169,7 @@
                         name: "createITSystem",
                         text: "Opret IT System",
                         template:
-                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='CreateITSystemButton' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
+                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='createITSystemButton' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
@@ -240,10 +240,10 @@
                             return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
-                            "data-element-type": "CatalogUsageObject"
+                            "data-element-type": "catalogUsageObject"
                         },
                         headerAttributes: {
-                            "data-element-type": "CatalogUsageHeader"
+                            "data-element-type": "catalogUsageHeader"
                         },
                         excelTemplate: dataItem => {
                             // true if system is being used by system within current context, else false
@@ -290,10 +290,10 @@
                                 return `<a data-ui-sref='it-system.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`;
                         },
                         attributes: {
-                            "data-element-type": "CatalogNameObject"
+                            "data-element-type": "catalogNameObject"
                         },
                         headerAttributes: {
-                            "data-element-type": "CatalogNameHeader"
+                            "data-element-type": "catalogNameHeader"
                         },
                         excelTemplate: dataItem => {
                             if (dataItem && dataItem.Name) {
