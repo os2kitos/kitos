@@ -24,7 +24,8 @@ class constants {
     readonly kendoUseFilter = "useFilterButton";
     readonly kendoRemoveFilter = "removeFilterButton";
 
-    readonly defaultItContractName = "defaultTestItContract";
+    //Enviromental veriable
+    readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
     readonly defaultCatalog = "katalog123";
     readonly nameOfSystemInput = "nameOfItSystemInput";
