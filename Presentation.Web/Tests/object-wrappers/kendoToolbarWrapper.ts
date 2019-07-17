@@ -18,23 +18,22 @@ type ColumnObjects = {
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
-
+var consts = new Constants();
 class kendoToolbarWrapper {
 
     public headerButtons(): HeaderButtons {
 
         var buttons: HeaderButtons = {
-            resetFilter: element(byDataElementType("resetFilter")),
-            saveFilter: element(byDataElementType("saveFilter")),
-            useFilter: element(byDataElementType("useFilter")),
-            deleteFilter: element(byDataElementType("removeFilter"))
+            resetFilter: element(byDataElementType(consts.kendoResetFilter)),
+            saveFilter: element(byDataElementType(consts.kendoSaveFilter)),
+            useFilter: element(byDataElementType(consts.kendoUseFilter)),
+            deleteFilter: element(byDataElementType(consts.kendoRemoveFilter))
         };
         return buttons;
     }
 
     public columnHeaders(): ColumnHeaders {
         var kendo = new kendoHelper();
-        var consts = new Constants();
 
         var columns: ColumnHeaders = {
             systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader)

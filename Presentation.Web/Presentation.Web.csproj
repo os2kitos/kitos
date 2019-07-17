@@ -701,6 +701,8 @@
     <TypeScriptCompile Include="Tests\object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-contract\ItContractOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
