@@ -29,7 +29,8 @@ class constants {
     readonly contractNameVariable = "Name";
     readonly defaultCatalog = "katalog123";
     readonly nameOfSystemInput = "nameOfItSystemInput";
-    readonly saveCatalogButton = "itCatalogSaveButton"
+    readonly saveCatalogButton = "itCatalogSaveButton";
+    readonly loginFormField = "loginFormField";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";

@@ -1,6 +1,7 @@
 ﻿import HomePage = require("../PageObjects/HomePage/HomePage.po");
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
 
+var ec = protractor.ExpectedConditions;
 class Login {
     
     public logout() {
@@ -22,7 +23,9 @@ class Login {
 
     private login(credentialsIndex: number) {
         var homePage = new HomePage();
+
         homePage.getPage();
+        browser.wait(ec.visibilityOf(homePage.kendoToolbarWrapper.FieldsForms().loginForm),10000);
         homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
         homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
         homePage.loginButton.click();

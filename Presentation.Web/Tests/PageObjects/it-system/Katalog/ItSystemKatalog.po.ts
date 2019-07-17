@@ -1,4 +1,4 @@
-﻿import IPageObject = require("../../IPageObject.po");
+﻿ import IPageObject = require("../../IPageObject.po");
 import KendoToolbarHelper = require("../../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
 

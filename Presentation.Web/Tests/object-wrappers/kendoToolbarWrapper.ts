@@ -10,7 +10,9 @@ type HeaderButtons = {
     systemKatalogCreate: protractor.ElementFinder
 };
 
-    
+type FieldsForms = {
+    loginForm: protractor.ElementFinder,
+};
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
@@ -28,13 +30,13 @@ type ColumnObjects = {
 
 var byDataElementType = new CSSLocator().byDataElementType;
 var consts = new Constants();
+
 class kendoToolbarWrapper {
 
     
 
     public headerButtons(): HeaderButtons {
-        var consts = new Constants();
-
+     
         var buttons: HeaderButtons = {
             resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
             saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
@@ -73,6 +75,13 @@ class kendoToolbarWrapper {
         return columns;
     }
 
+    public FieldsForms(): FieldsForms {
+
+        var fieldsForms: FieldsForms = {
+            loginForm: element(byDataElementType(consts.loginFormField)),
+        };
+        return fieldsForms;
+    }
 }
 
 class kendoHelper {

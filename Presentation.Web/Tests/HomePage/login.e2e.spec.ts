@@ -24,7 +24,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As global admin", () => {
         loginHelper.loginAsGlobalAdmin();
-        browser.sleep(wait.oneSecond);
         browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
@@ -34,7 +33,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As local admin", () => {
         loginHelper.loginAsLocalAdmin();
-        browser.sleep(wait.oneSecond);
         browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
@@ -44,7 +42,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As regular user", () => {
         loginHelper.loginAsRegularUser();
-        browser.sleep(wait.oneSecond);
         browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement));
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
