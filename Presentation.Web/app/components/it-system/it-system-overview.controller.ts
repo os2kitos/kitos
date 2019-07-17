@@ -286,7 +286,7 @@
                     {
                         name: "saveFilter",
                         text: "Gem filter",
-                        template: "<button type='button' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='systemOverviewVm.saveGridProfile()' data-element-type='saveFilter'>#: text #</button>"
+                        template: "<button type='button' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='systemOverviewVm.saveGridProfile()' data-element-type='saveFilterButton'>#: text #</button>"
                     },
                     {
                         name: "useFilter",

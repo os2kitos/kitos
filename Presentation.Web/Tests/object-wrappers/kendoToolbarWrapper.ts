@@ -27,7 +27,7 @@ type ColumnObjects = {
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
-
+var consts = new Constants();
 class kendoToolbarWrapper {
 
     
@@ -49,7 +49,6 @@ class kendoToolbarWrapper {
 
     public columnHeaders(): ColumnHeaders {
         var kendo = new kendoHelper();
-        var consts = new Constants();
 
         var columns: ColumnHeaders = {
             systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
