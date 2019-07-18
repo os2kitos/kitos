@@ -184,15 +184,19 @@ namespace Core.ApplicationServices
         }
 
 
-        private bool IsValidPassword(string password)
+        private static bool IsValidPassword(string password)
         {
             return password.Length >= 6;
         }
 
         public User GetUserById(int id)
         {
-            var user = _userRepository.GetByKey(id);
-            return user;
+            return _userRepository.GetByKey(id);
+        }
+
+        public void Dispose()
+        {
+            _crypt?.Dispose();
         }
     }
 }
