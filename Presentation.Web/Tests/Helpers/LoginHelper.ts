@@ -1,6 +1,8 @@
 ﻿import HomePage = require("../PageObjects/HomePage/HomePage.po");
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
+import WaitTimers = require("../Utility/WaitTimers");
 
+var waitUpTo = new WaitTimers();
 
 class Login {
     
@@ -24,7 +26,7 @@ class Login {
     private login(credentialsIndex: number) {
         var homePage = new HomePage();
         homePage.getPage();
-        browser.wait(homePage.isLoginAvailable());
+        browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
         homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
         homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
         homePage.loginButton.click();

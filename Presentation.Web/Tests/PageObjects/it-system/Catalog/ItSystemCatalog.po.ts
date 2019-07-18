@@ -23,6 +23,8 @@ class ItSystemCatalog implements IPageObject {
         return ec.visibilityOf(this.createCatalogForm);
     }
 
+    public 
+
 }
 
 export = ItSystemCatalog;
