@@ -1,16 +1,12 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Description;
-using System.Web.Mvc;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
@@ -22,30 +18,32 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     where TOption : OptionHasChecked<TEntity>
     where TLocalOption : LocalOptionEntity<TOption>
     {
-        IGenericRepository<AttachedOption> _AttachedOptionRepository;
-        IGenericRepository<TOption> _OptionRepository;
-        IGenericRepository<TLocalOption> _LocalOptionRepository;
+        private readonly IGenericRepository<AttachedOption> _attachedOptionRepository;
+        private readonly IGenericRepository<TOption> _optionRepository;
+        private readonly IGenericRepository<TLocalOption> _localOptionRepository;
 
-        public AttachedOptionsFunctionController(IGenericRepository<AttachedOption> repository, IAuthenticationService authService,
-            IGenericRepository<TOption> OptionRepository,
-            IGenericRepository<TLocalOption> LocalOptionRepository)
+        public AttachedOptionsFunctionController(
+            IGenericRepository<AttachedOption> repository, 
+            IAuthenticationService authService,
+            IGenericRepository<TOption> optionRepository,
+            IGenericRepository<TLocalOption> localOptionRepository)
                : base(repository, authService)
         {
-            _AttachedOptionRepository = repository;
-            _OptionRepository = OptionRepository;
-            _LocalOptionRepository = LocalOptionRepository;
+            _attachedOptionRepository = repository;
+            _optionRepository = optionRepository;
+            _localOptionRepository = localOptionRepository;
         }
 
-        public virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
+        protected virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
             if (UserId == 0)
                 return Unauthorized();
             var orgId = _authService.GetCurrentOrganizationId(UserId);
 
-            var globalOptionData = _OptionRepository.AsQueryable().Where(s => s.IsEnabled);
-            var localpersonalData = _LocalOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
+            var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
+            var localpersonalData = _localOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
 
-            List<TOption> result = new List<TOption>();
+            var result = new List<TOption>();
             result.AddRange(globalOptionData.AsQueryable().Where(s => s.IsObligatory));
 
             foreach (var p in localpersonalData)
@@ -57,42 +55,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 }
             }
 
-            var options = GetAttachedOptions(optiontype, id, entitytype);
-
-            if (options != null)
-            {
-                if (options.Count() <= 0)
-                {
-                    return Ok(result);
-                }
-                foreach (var o in options)
-                {
-                    var currentOption = result.FirstOrDefault(r => r.Id == o.OptionId);
-                    if (currentOption != null)
-                    {
-                        result.FirstOrDefault(r => r.Id == o.OptionId).Checked = true;
-                    }
-                    else
-                    {
-                        _AttachedOptionRepository.Delete(o);
-                        _AttachedOptionRepository.Save();
-                    }
-                }
-            }
-            else
-            {
-                return StatusCode(HttpStatusCode.NoContent);
-            }
-
-            return Ok(result);
+            return CreateOptionsResponse(id, entitytype, optiontype, result);
         }
 
-        [System.Web.Http.HttpDelete]
+        [HttpDelete]
         [EnableQuery]
         [ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
         public IHttpActionResult RemoveOption(int id, int objectId, OptionType type, EntityType entityType)
         {
-            var option = _AttachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id 
+            var option = _attachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id 
             && o.ObjectId == objectId 
             && o.OptionType == type
             && o.ObjectType == entityType);
@@ -116,25 +87,56 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        private List<AttachedOption> GetAttachedOptions(OptionType type, int id, EntityType objectType)
+        protected IHttpActionResult CreateOptionsResponse(int id, EntityType entitytype, OptionType optiontype, List<TOption> result)
+        {
+            var options = GetAttachedOptions(optiontype, id, entitytype);
+
+            if (options != null)
+            {
+                if (!options.Any())
+                {
+                    return Ok(result);
+                }
+
+                foreach (var o in options)
+                {
+                    var currentOption = result.FirstOrDefault(r => r.Id == o.OptionId);
+                    if (currentOption != null)
+                    {
+                        currentOption.Checked = true;
+                    }
+                    else
+                    {
+                        _attachedOptionRepository.Delete(o);
+                        _attachedOptionRepository.Save();
+                    }
+                }
+            }
+            else
+            {
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+
+            return Ok(result);
+        }
+
+        protected List<AttachedOption> GetAttachedOptions(OptionType type, int id, EntityType objectType)
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
                 //tolist so we can operate with open datareaders in the following foreach loop.
-                return _AttachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
+                return _attachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
                 && x.OptionType == type
                 && x.ObjectType == objectType).ToList();
             }
-            else
-            {
-                return _AttachedOptionRepository.AsQueryable()
-                 .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)
-                 && x.ObjectId == id
-                 && x.OptionType == type
-                 && x.ObjectType == objectType).ToList();
-            }
+
+            return _attachedOptionRepository.AsQueryable()
+                .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)
+                            && x.ObjectId == id
+                            && x.OptionType == type
+                            && x.ObjectType == objectType).ToList();
         }
     }
 }
