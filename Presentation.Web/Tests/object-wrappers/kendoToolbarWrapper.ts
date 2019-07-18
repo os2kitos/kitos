@@ -7,7 +7,7 @@ type HeaderButtons = {
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
-    systemKatalogCreate: protractor.ElementFinder
+    systemCatalogCreate: protractor.ElementFinder
 };
 
 type FieldsForms = {
@@ -41,7 +41,7 @@ class kendoToolbarWrapper {
             useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
             deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
-            systemKatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate))
+            systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate))
 
         };
         return buttons;

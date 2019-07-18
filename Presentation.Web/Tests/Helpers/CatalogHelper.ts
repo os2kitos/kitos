@@ -10,7 +10,7 @@ class CatalogHelper {
         var homePage = new CatalogPage();
 
         homePage.getPage();
-        homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
+        homePage.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
         browser.wait(homePage.isLoginAvailable());
         element(cssHelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
         element(cssHelper.byDataElementType(consts.saveCatalogButton)).click();
@@ -22,7 +22,7 @@ class CatalogHelper {
         var homePage = new CatalogPage();
         
         homePage.getPage();
-        homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
+        homePage.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
         browser.wait(homePage.isLoginAvailable());
         element(cssHelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
         element(cssHelper.byDataElementType(consts.saveCatalogButton)).click();
