@@ -1,37 +1,34 @@
 ﻿using Microsoft.Owin;
-using Ninject.Activation.Blocks;
+using Ninject;
 using Ninject.Web.Common;
 using Owin;
 
-namespace OwinNinjectExample.Ninject
+namespace Presentation.Web.Infrastructure
 {
     public static class OwinNinjectExtensions
     {
-        private const string ActivationBlock = nameof(OwinNinjectExtensions) + nameof(ActivationBlock);
+        private const string NinjectKernel = nameof(OwinNinjectExtensions) + nameof(NinjectKernel);
 
         public static IAppBuilder UseCustomScopeForRequest(this IAppBuilder app)
         {
             return app.Use(async (context, next) =>
             {
-                //Create a shared activationblock (for the next middleware in the chain) and add it to context
-                using (WithNewResolutionScope(context))
-                {
-                    await next();
-                }
+                //Add Ninject to the following middlewares
+                AddNinjectKernel(context);
+
+                await next();
             });
         }
 
-        private static IActivationBlock WithNewResolutionScope(IOwinContext context)
+        private static void AddNinjectKernel(IOwinContext context)
         {
             //Bootstrapper holds a singleton reference to the root kernel accessed through an instance property.
-            var activationBlock = new Bootstrapper().Kernel.BeginBlock();
-            context.Environment[ActivationBlock] = activationBlock;
-            return activationBlock;
+            context.Environment[NinjectKernel] = new Bootstrapper().Kernel;
         }
 
-        public static IActivationBlock GetResolutionScope(this IOwinContext context)
+        public static IKernel GetNinjectKernel(this IOwinContext context)
         {
-            return (IActivationBlock)context.Environment[ActivationBlock];
+            return (IKernel)context.Environment[NinjectKernel];
         }
 
     }
