@@ -7,8 +7,7 @@ type HeaderButtons = {
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
-    systemCatalogCreate: protractor.ElementFinder
-    deleteFilter: protractor.ElementFinder,
+    systemCatalogCreate: protractor.ElementFinder,
     editReference: protractor.ElementFinder,
     editSaveReference: protractor.ElementFinder
 };
@@ -26,8 +25,7 @@ type FieldsForms = {
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
-    referenceName: protractor.ElementFinder
-    systemName: protractor.ElementFinder,
+    referenceName: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
     catalogName: protractor.ElementFinder,
     catalogUsage: protractor.ElementFinder
@@ -35,9 +33,7 @@ type ColumnHeaders = {
 
 type ColumnObjects = {
     systemName: protractor.ElementArrayFinder,
-    referenceName: protractor.ElementArrayFinder
-
-    systemName: protractor.ElementArrayFinder,
+    referenceName: protractor.ElementArrayFinder,
     contractName: protractor.ElementArrayFinder,
     catalogName: protractor.ElementArrayFinder,
     catalogUsage: protractor.ElementArrayFinder
@@ -51,12 +47,8 @@ class kendoToolbarWrapper {
     public headerButtons(): HeaderButtons {
      
         var buttons: HeaderButtons = {
-            resetFilter: element(byDataElementType(consts.kendoResetFilter)),
-            saveFilter: element(byDataElementType(consts.kendoSaveFilter)),
-            useFilter: element(byDataElementType(consts.kendoUseFilter)),
-            deleteFilter: element(byDataElementType(consts.kendoRemoveFilter)),
             editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
-            editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton))
+            editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
             resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
             saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
             useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
@@ -86,8 +78,6 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
-
-            systemName: kendo.getColumnHeaderClickable(consts.kendoSystemNameHeader),
             referenceName: kendo.getColumnHeaderClickable(consts.kendoReferencetNameHeader)
 
         };
@@ -103,7 +93,6 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),
             catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
-            systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
             referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects)
         };
         return columns;
