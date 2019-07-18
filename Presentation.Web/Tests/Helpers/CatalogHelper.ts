@@ -4,28 +4,28 @@ import Constants = require("../Utility/Constants");
 
 
 var consts = new Constants();
-
+var cssHelper = new CSSLocator();
 class CatalogHelper {
     public static createCatalog(name: string) {
         var homePage = new CatalogPage();
-        var CSShelper = new CSSLocator();
+
         homePage.getPage();
-        browser.wait(homePage.isLoginAvailable());
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
-        element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
-        element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
+        browser.wait(homePage.isLoginAvailable());
+        element(cssHelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
+        element(cssHelper.byDataElementType(consts.saveCatalogButton)).click();
     }
 
 
     public static deleteCatalog(name: string)
     {
         var homePage = new CatalogPage();
-        var CSShelper = new CSSLocator();
+        
         homePage.getPage();
-        browser.wait(homePage.isLoginAvailable());
         homePage.kendoToolbarWrapper.headerButtons().systemKatalogCreate.click();
-        element(CSShelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
-        element(CSShelper.byDataElementType(consts.saveCatalogButton)).click();
+        browser.wait(homePage.isLoginAvailable());
+        element(cssHelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
+        element(cssHelper.byDataElementType(consts.saveCatalogButton)).click();
 
     }
 }
