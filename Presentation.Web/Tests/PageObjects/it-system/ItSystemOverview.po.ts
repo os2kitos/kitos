@@ -2,7 +2,7 @@
 import KendoToolbarHelper = require("../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper")
 
-class ItSystemEditPo implements IPageObject { 
+class ItSystemOverview implements IPageObject { 
 
     public getPage(): webdriver.promise.Promise<void> {
         return browser.get(browser.baseUrl + "/#/system/overview");
@@ -13,4 +13,4 @@ class ItSystemEditPo implements IPageObject {
 
 }
 
-export = ItSystemEditPo;
+export = ItSystemOverview;

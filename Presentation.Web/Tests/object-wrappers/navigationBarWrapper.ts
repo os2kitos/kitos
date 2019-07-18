@@ -1,4 +1,4 @@
-import cssLocator = require("./cssLocatorHelper");
+import CssLocator = require("./cssLocatorHelper");
 import Constants = require("../Utility/Constants");
 
 type navigations = {
@@ -17,7 +17,7 @@ type userDropdown = {
     logOut: protractor.ElementFinder
 }
 
-var byDataElementType = new cssLocator().byDataElementType;
+var byDataElementType = new CssLocator().byDataElementType;
 var consts = new Constants();
 
 class navigationBarWrapper {
