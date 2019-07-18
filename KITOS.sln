@@ -86,6 +86,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\PrepareTestDatabase.ps1 = DeploymentScripts\PrepareTestDatabase.ps1
 		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
 		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
+		DeploymentScripts\VpnCli.ps1 = DeploymentScripts\VpnCli.ps1
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration.Presentation.Web", "Tests.Integration.Presentation.Web\Tests.Integration.Presentation.Web.csproj", "{46D4551A-7301-456B-A9BA-1E0621C09112}"

@@ -105,11 +105,9 @@ namespace Presentation.Web
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
             kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
 
-            // Using this kills the logger once it has been called from the APIRequestLoggingMiddleware
-            // kernel.Bind<ILogger>().ToMethod(ctx => Log.Logger);
+            kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
 
             // This however works, though the class is a bit ugly
-            kernel.Bind<ILogger>().To<APILogger>();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
         }
     }

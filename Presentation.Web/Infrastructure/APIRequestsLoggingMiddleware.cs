@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.Security;
 using Microsoft.Owin;
 using Ninject;
-using OwinNinjectExample.Ninject;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure
@@ -21,7 +18,7 @@ namespace Presentation.Web.Infrastructure
 
         public override async Task Invoke(IOwinContext context)
         {
-            _logger = context.GetResolutionScope().Get<ILogger>();
+            _logger = context.GetNinjectKernel().Get<ILogger>();
             if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 var startTime = DateTime.Now;
