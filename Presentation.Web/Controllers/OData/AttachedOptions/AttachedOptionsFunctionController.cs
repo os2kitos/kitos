@@ -34,7 +34,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             _localOptionRepository = localOptionRepository;
         }
 
-        protected virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
+        public virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
             var orgId = AuthService.GetCurrentOrganizationId(UserId);
 

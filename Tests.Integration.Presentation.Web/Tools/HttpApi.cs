@@ -23,6 +23,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             return HttpClient.SendAsync(requestMessage);
         }
 
+        public static Task<HttpResponseMessage> GetAsync(Uri url)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            return HttpClient.SendAsync(requestMessage);
+        }
+
         public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

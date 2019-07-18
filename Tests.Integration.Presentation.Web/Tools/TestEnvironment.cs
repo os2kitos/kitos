@@ -33,21 +33,21 @@ namespace Tests.Integration.Presentation.Web.Tools
                     {
                         OrganizationRole.User,
                         new KitosCredentials(
-                            "local-regular-user@kitos.dk", 
+                            "local-regular-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.User)
                     },
                     {
                         OrganizationRole.LocalAdmin,
                         new KitosCredentials(
-                            "local-local-admin-user@kitos.dk", 
+                            "local-local-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.LocalAdmin)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
-                            "local-global-admin-user@kitos.dk", 
+                            "local-global-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
                     }
