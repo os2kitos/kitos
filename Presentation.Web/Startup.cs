@@ -5,6 +5,7 @@ using IdentityServer3;
 using System.IdentityModel.Tokens;
 using Presentation.Web.Infrastructure;
 using System.Text;
+using OwinNinjectExample.Ninject;
 using Serilog;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
@@ -16,7 +17,7 @@ namespace Presentation.Web
         public void Configuration(IAppBuilder app)
         {
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=316888
-
+            
             var ssoConfig = new TokenValidator().GetKeyFromConfig();
             string key = System.Web.Configuration.WebConfigurationManager.AppSettings["SecurityKeyString"];
 
@@ -46,9 +47,11 @@ namespace Presentation.Web
                     ValidateLifetime = true,
                 }
             });
-            
+
             // Initializing API Request Logging
-            app.Use<ApiRequestsLoggingMiddleware>(Log.Logger);
+
+            app.UseCustomScopeForRequest();
+            app.Use<ApiRequestsLoggingMiddleware>();
         }
     }
 }

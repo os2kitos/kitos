@@ -525,6 +525,7 @@
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
+    <Compile Include="Infrastructure\OwinNinjectExtensions.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
