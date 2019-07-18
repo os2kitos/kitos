@@ -22,8 +22,6 @@ namespace Presentation.Web.Infrastructure
         public override async Task Invoke(IOwinContext context)
         {
             _logger = context.GetResolutionScope().Get<ILogger>();
-            _logger.Information("This is a test");
-            Debug.WriteLine("TESTING");
             if (context.Request.Headers.ContainsKey("Authorization"))
             {
                 var startTime = DateTime.Now;
