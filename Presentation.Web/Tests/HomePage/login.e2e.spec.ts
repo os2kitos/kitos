@@ -14,7 +14,7 @@ var ec = protractor.ExpectedConditions;
 describe("Being logged out, it is possible to login ", () => { 
 
     beforeEach(() => {
-       // testFixture.disableAutoBrowserWaits();
+        testFixture.disableAutoBrowserWaits();
     });
 
     afterEach(() => {
