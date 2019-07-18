@@ -19,9 +19,6 @@ type InputFields =
         referenceDocUrl: protractor.ElementFinder
 }
 
-type FieldsForms = {
-  
-};
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
