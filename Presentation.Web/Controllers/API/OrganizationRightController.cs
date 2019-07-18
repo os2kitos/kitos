@@ -19,9 +19,7 @@ namespace Presentation.Web.Controllers.API
         {
             _rightRepository = rightRepository;
             _objectRepository = objectRepository;
-            GroupName = "test";
         }
-        public string GroupName { get; set; }
 
         public virtual HttpResponseMessage GetAllRights()
         {
@@ -154,12 +152,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Unauthorized();
                 }
-
-                //// if user has any role within the organization (or global admin) they should be able to add new adminrights
-                //if (!KitosUser.IsGlobalAdmin)
-                //    if (!_rightRepository.Get(r => r.UserId == userId && r.OrganizationId == organizationId).Any())
-                //        return Unauthorized();
-
+              
                 right.LastChangedByUser = KitosUser;
                 right.LastChanged = DateTime.UtcNow;
 
@@ -271,6 +264,11 @@ namespace Presentation.Web.Controllers.API
             {
                 var right = _rightRepository.Get(r => r.OrganizationId == id && r.Role == (OrganizationRole)rId && r.UserId == uId).FirstOrDefault();
 
+                if (right == null)
+                {
+                    return NotFound();
+                }
+
                 // Only global admin can set other users as global admins
                 if (right.Role == OrganizationRole.GlobalAdmin)
                 {
@@ -290,7 +288,6 @@ namespace Presentation.Web.Controllers.API
                     return Unauthorized();
                 }
 
-                if (right == null) return NotFound();
 
                 _rightRepository.DeleteByKey(right.Id);
                 _rightRepository.Save();
@@ -301,20 +298,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return Error(e);
             }
-        }
-
-        private bool HasWriteAccess(int objectId, User user, int organizationId)
-        {
-            if (user.IsGlobalAdmin)
-                return true;
-
-            var obj = _objectRepository.GetByKey(objectId);
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
-                return true;
-
-            return obj.HasUserWriteAccess(user);
         }
     }
 }

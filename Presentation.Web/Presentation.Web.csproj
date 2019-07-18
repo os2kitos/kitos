@@ -525,7 +525,10 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Model\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
+    <Compile Include="Infrastructure\Model\SsoConfig.cs" />
+    <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
     <Compile Include="Infrastructure\OwinNinjectExtensions.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
