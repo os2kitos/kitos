@@ -504,7 +504,7 @@ namespace Presentation.Web
 
         private static EntitySetConfiguration<TEntitySet> BindTypeSet<TEntitySet, TController>(ODataConventionModelBuilder builder) where TEntitySet : class
         {
-            return builder.EntitySet<TEntitySet>(nameof(TController).Replace(ControllerSuffix, string.Empty));
+            return builder.EntitySet<TEntitySet>(typeof(TController).Name.Replace(ControllerSuffix, string.Empty));
         }
     }
 }
