@@ -11,7 +11,6 @@ class SelectStatus2Wrapper {
      */
     constructor(cssLocator: string) {
         this.cssSelector = cssLocator;
-
         this.dropdownElement = $(this.cssSelector + " a.dropdown-toggle");
         this.options = element.all(by.css(cssLocator + " .traffic-light li a"));
     }
