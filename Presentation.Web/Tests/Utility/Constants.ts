@@ -27,7 +27,6 @@ class Constants {
     readonly saveCatalogButton = "itCatalogSaveButton";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
-    readonly refrenceEditButton = "EditReference";
     readonly validUrl = "https://strongminds.dk/";
     readonly invalidUrl = "invalidUrl";
 
@@ -46,7 +45,7 @@ class Constants {
     readonly kendoReferencetNameHeader = "referenceNameHeader";
     readonly kendoReferenceNameObjects = "referenceObject";
 
-    readonly kendoReferenceEditButton = "EditReference";
+    readonly kendoReferenceEditButton = "editReference";
     readonly kendoReferenceEditSaveButton = "editSaveReference";
 
     readonly kendoReferenceFieldTitle = "referenceDocTitle";

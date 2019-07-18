@@ -53,7 +53,7 @@
                 $state.go(".", null, { reload: true });
             };
 
-            $scope.isValidUrl = url => {
+            $scope.isValidUrl = function (url) {
                 if (url) {
                     var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
                     return regexp.test(url.toLowerCase());
@@ -106,7 +106,7 @@
                 }, {
                     title: "Rediger",
                     template: dataItem => {
-                        var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='EditReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+                        var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         if (dataItem.Id != theSystem.ReferenceId) {
                             HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
                         }
@@ -120,7 +120,7 @@
                             }
                         }
 
-                        return HTML + ""
+                        return HTML;
                     }
                 }],
                 toolbar: [

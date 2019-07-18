@@ -3,7 +3,7 @@ import homePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po
 import WaitUpTo = require("../../Utility/WaitTimers");
 import Constants = require("../../Utility/Constants");
 
-describe("Local admin tests", () => {
+describe("Local admin can edit reference URL", () => {
 
     var loginHelper = new login();
     var pageObject = new homePage();
@@ -17,12 +17,10 @@ describe("Local admin tests", () => {
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
-        browser.waitForAngular();
     });
 
     beforeEach(() => {
         pageObject.getPage();
-        browser.waitForAngular();
     });
 
     it("Able to edit references", () => {
@@ -36,7 +34,6 @@ describe("Local admin tests", () => {
         inputFields.referenceDocUrl.clear();
         inputFields.referenceDocUrl.sendKeys(consts.invalidUrl);
         headerButtons.editSaveReference.click();
-        // Need to rely on its position since i look at the collected <a attributes
         expect(colObjects.referenceName.get(0).isPresent()).toBeFalsy();
 
     });
@@ -47,7 +44,6 @@ describe("Local admin tests", () => {
         inputFields.referenceDocUrl.clear();
         inputFields.referenceDocUrl.sendKeys(consts.validUrl);
         headerButtons.editSaveReference.click();
-        // Need to rely on its position since i know where a valid url should be
         expect(colObjects.referenceName.get(0).getAttribute("href")).toEqual(consts.validUrl);
     });
 
