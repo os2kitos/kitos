@@ -82,7 +82,13 @@ namespace Core.ApplicationServices
         public bool HasReadAccess(int userId, IEntity entity)
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+
+            if (loggedIntoOrganizationId == -1)
+            {
+                return false;
+            }
+
             // check if global admin
             if (user.IsGlobalAdmin)
             {
@@ -136,7 +142,12 @@ namespace Core.ApplicationServices
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             AssertUserIsNotNull(user);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+
+            if (loggedIntoOrganizationId == -1)
+            {
+                return false;
+            }
 
             // check if global admin
             if (user.IsGlobalAdmin)
