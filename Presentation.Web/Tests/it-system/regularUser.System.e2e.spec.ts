@@ -1,15 +1,15 @@
-﻿import login = require("../Helpers/LoginHelper");
+﻿import Login = require("../Helpers/LoginHelper");
 import ItSystemEditPo = require("../PageObjects/it-system/ItSystemOverview.po");
-import waitTimers = require("../Utility/waitTimers");
+import WaitTimers = require("../Utility/waitTimers");
 
 describe("Regular user IT Systems tests", () => {
     var ec = protractor.ExpectedConditions;
-    var loginHelper = new login();
+    var loginHelper = new Login();
     var pageObject = new ItSystemEditPo(); 
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var headerButtonsHelper = pageObject.kendoToolbarHelper.headerButtons;
     var gridObjects = pageObject.kendoToolbarWrapper.columnObjects();
-    var waitUpTo = new waitTimers();
+    var waitUpTo = new WaitTimers();
 
     beforeAll(() => {
         loginHelper.loginAsRegularUser();

@@ -3,16 +3,34 @@
 // global namespace pollution.
 
 // This class cannot currently be added to the app project
-
-class constants {
+class Constants {
     readonly kendoSystemNameHeader = "systemNameKendoHeader";
     readonly kendoSystemNameObjects = "systemNameKendoObject";
+    readonly kendoSystemButtonCreate = "createITSystemButton";
     readonly kendoContractNameHeader = "contractNameHeader";
-    readonly kendoContractNameObjects = "contractName";
+    readonly kendoContractNameObjects = "contractNameObject";
+    readonly kendoButtonResetFilter = "resetFilterButton";
+    readonly kendoButtonSaveFilter = "saveFilterButton";
+    readonly kendoButtonUseFilter = "useFilterButton";
+    readonly kendoButtonDeleteFilter = "removeFilterButton";
+    readonly kendoContractButtonCreateContract = "createContractButton";
+    readonly kendoCatalogNameHeader = "catalogNameHeader";
+    readonly kendoCatalogNameObjects = "catalogNameObject";
+    readonly kendoCatalogUsageHeader = "catalogUsageHeader";
+    readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoResetFilter = "resetFilterButton";
     readonly kendoSaveFilter = "saveFilterButton";
     readonly kendoUseFilter = "useFilterButton";
     readonly kendoRemoveFilter = "removeFilterButton";
+
+    //Environmental variables
+    readonly defaultItContractName = "DefaultTestItContract";
+    readonly contractNameVariable = "Name";
+    readonly defaultCatalog = "katalog123";
+    readonly nameOfSystemInput = "nameOfItSystemInput";
+    readonly saveCatalogButton = "itCatalogSaveButton";
+    readonly loginFormField = "loginFormField";
+    readonly catalogCreateForm = "catalogCreateForm";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
@@ -40,5 +58,5 @@ class constants {
 
 }
 
-export = constants;
+export = Constants;
 
