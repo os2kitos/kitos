@@ -100,8 +100,17 @@ namespace Presentation.Web.Controllers.API
         [HttpPost]
         [AllowAnonymous]
         [Route("api/authorize/GetToken")]
-        public HttpResponseMessage GetToken(LoginDTO loginDto) {
+        public HttpResponseMessage GetToken(LoginDTO loginDto)
+        {
+            if (loginDto == null)
+            {
+                return BadRequest();
+            }
 
+            if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
+            {
+                return BadRequest();
+            }
             try
             {
                 if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
@@ -111,6 +120,11 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var user = _userRepository.GetByEmail(loginDto.Email);
+                if (user == null)
+                {
+                    Logger.Error($"User found during membership validation but could not be found by email: {loginDto.Email}");
+                    return BadRequest();
+                }
 
                 var token = new TokenValidator().CreateToken(user);
 
@@ -128,7 +142,7 @@ namespace Presentation.Web.Controllers.API
             }
             catch (Exception e)
             {
-                Logger.Error(e,"Failed to create token");
+                Logger.Error(e, "Failed to create token");
                 return LogError(e);
             }
         }
@@ -137,13 +151,12 @@ namespace Presentation.Web.Controllers.API
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { Email = "", LoginSuccessful = false };
-
             if (loginDto == null)
             {
                 return BadRequest();
             }
-            loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
+
+            var loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
 
             try
             {
@@ -166,6 +179,11 @@ namespace Presentation.Web.Controllers.API
                     }
 
                     user = _userRepository.GetByEmail(loginDto.Email);
+                    if (user == null)
+                    {
+                        Logger.Error($"User found during membership validation but could not be found by email: {loginDto.Email}");
+                        return BadRequest();
+                    }
                 }
 
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);

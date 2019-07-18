@@ -191,9 +191,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
 
             if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
@@ -206,9 +203,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (orgKey != currentOrgId)
                 return Unauthorized();

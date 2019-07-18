@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.OData
 
             //Check if user is allowed to set accessmodifier to public
             //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
+            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
             //{
             //    return Unauthorized();
             //}
