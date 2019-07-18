@@ -105,11 +105,4 @@ namespace Presentation.Web.Infrastructure
             return result;
         }
     }
-
-    public class SsoConfig
-    {
-        public SecurityKey SigningKey { get; set; }
-        public string Issuer { get; set; }
-        public string Audience { get; set; }
-    }
 }
