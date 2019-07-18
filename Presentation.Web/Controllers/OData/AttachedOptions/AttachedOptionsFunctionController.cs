@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         protected virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = AuthService.GetCurrentOrganizationId(UserId);
 
             var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
             var localpersonalData = _localOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
@@ -69,7 +69,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             if (option == null)
                 return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, option))
+            if (!AuthService.HasWriteAccess(UserId, option))
                 return Unauthorized();
 
             try
@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
                 //tolist so we can operate with open datareaders in the following foreach loop.
                 return _attachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             }
 
             return _attachedOptionRepository.AsQueryable()
-                .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)
+                .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)
                             && x.ObjectId == id
                             && x.OptionType == type
                             && x.ObjectType == objectType).ToList();

@@ -12,12 +12,12 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
     {
-        protected readonly IAuthenticationService _authService;
+        protected IAuthenticationService AuthService { get; }
 
         protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
             : base(repository)
         {
-            _authService = authService;
+            AuthService = authService;
         }
 
         [EnableQuery]
@@ -28,13 +28,13 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable();
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
-                if (hasAccessModifier && !_authService.IsGlobalAdmin(UserId))
+                if (hasAccessModifier && !AuthService.IsGlobalAdmin(UserId))
                 {
                     if (hasOrg)
                     {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
                     }
                     else
                     {
@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
             }
             else
             {
-                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
             }
 
             return Ok(result);
@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             var entity = result.First();
-            if (!_authService.HasReadAccess(UserId, entity))
+            if (!AuthService.HasReadAccess(UserId, entity))
                 return Unauthorized();
 
             return Ok(SingleResult.Create(result));
@@ -71,8 +71,8 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !AuthService.HasReadAccessOutsideContext(UserId))
                 return Unauthorized();
 
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
@@ -87,13 +87,13 @@ namespace Presentation.Web.Controllers.OData
 
             if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
             {
-                (entity as IHasOrganization).OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                (entity as IHasOrganization).OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
             }
 
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AuthService.HasWriteAccess(UserId, entity))
             {
                 return Unauthorized();
             }
@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AuthService.HasWriteAccess(UserId, entity))
                 return StatusCode(HttpStatusCode.Forbidden);
 
             // check model state
@@ -152,7 +152,7 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AuthService.HasWriteAccess(UserId, entity))
                 return Unauthorized();
 
             try
