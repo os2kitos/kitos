@@ -1,16 +1,19 @@
 ﻿import login = require("../../Helpers/LoginHelper");
-import ItSystemEditPo = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
+import homePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
+import WaitUpTo = require("../../Utility/WaitTimers");
+import Constants = require("../../Utility/Constants");
 
 describe("Local admin tests", () => {
 
-    var EC = protractor.ExpectedConditions;
     var loginHelper = new login();
-    var pageObject = new ItSystemEditPo();
+    var pageObject = new homePage();
+    var waitUpTo = new WaitUpTo();
+    var consts = new Constants();
+
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var inputFields = pageObject.kendoToolbarWrapper.inputFields();
     var colObjects = pageObject.kendoToolbarWrapper.columnObjects();
-    var headerButtonsHelper = pageObject.kendoToolbarHelper.headerButtons;
-    var validUrl = "https://strongminds.dk/";
+    
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
@@ -23,36 +26,29 @@ describe("Local admin tests", () => {
     });
 
     it("Able to edit references", () => {
+        browser.wait(pageObject.isReferenceLoaded(), waitUpTo.twentySeconds);
         expect(headerButtons.editReference.isEnabled()).toBe(true);
     });
 
     it("Able to insert invalid url", () => {
-
+        browser.wait(pageObject.isReferenceLoaded(), waitUpTo.twentySeconds);
         headerButtons.editReference.click();
-
         inputFields.referenceDocUrl.clear();
-
-        inputFields.referenceDocUrl.sendKeys("invalidurl.com");
-
+        inputFields.referenceDocUrl.sendKeys(consts.invalidUrl);
         headerButtons.editSaveReference.click();
-
+        // Need to rely on its position since i look at the collected <a attributes
         expect(colObjects.referenceName.get(0).isPresent()).toBeFalsy();
 
     });
 
     it("Able to insert valid url", () => {
-
+        browser.wait(pageObject.isReferenceLoaded(), waitUpTo.twentySeconds);
         headerButtons.editReference.click();
-
         inputFields.referenceDocUrl.clear();
-
-        inputFields.referenceDocUrl.sendKeys(validUrl);
-
+        inputFields.referenceDocUrl.sendKeys(consts.validUrl);
         headerButtons.editSaveReference.click();
-
-        expect(colObjects.referenceName.get(0).getAttribute("href")).toEqual(validUrl);
-
-
+        // Need to rely on its position since i know where a valid url should be
+        expect(colObjects.referenceName.get(0).getAttribute("href")).toEqual(consts.validUrl);
     });
 
 });

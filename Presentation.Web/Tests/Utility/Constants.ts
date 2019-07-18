@@ -27,6 +27,9 @@ class Constants {
     readonly saveCatalogButton = "itCatalogSaveButton";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
+    readonly refrenceEditButton = "EditReference";
+    readonly validUrl = "https://strongminds.dk/";
+    readonly invalidUrl = "invalidUrl";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
