@@ -402,10 +402,6 @@ namespace Presentation.Web.Controllers.API
             if (user.IsReadOnly && !user.IsGlobalAdmin)
                 return false;
 
-            //var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == user.DefaultOrganizationId && x.Role == OrganizationRole.LocalAdmin);
-            //if (isLocalAdmin)
-            //    return true;
-
             return base.HasWriteAccess(obj, user, organizationId);
         }
 

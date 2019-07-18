@@ -138,6 +138,13 @@ namespace Core.ApplicationServices
             AssertUserIsNotNull(user);
             var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
 
+            // check if global admin
+            if (user.IsGlobalAdmin)
+            {
+                // global admin always have access
+                return true;
+            }
+
             // check "Forretningsroller" for the entity
             if (entity.HasUserWriteAccess(user))
             {
@@ -149,19 +156,6 @@ namespace Core.ApplicationServices
             {
                 return false;
             }
-
-            // check if global admin
-            if (user.IsGlobalAdmin)
-            {
-                // global admin always have access
-                return true;
-            }
-
-            //User has access if user created entity
-            //if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
-            //{
-            //    return true;
-            //}
 
             //Check if user is allowed to set accessmodifier to public
             var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
