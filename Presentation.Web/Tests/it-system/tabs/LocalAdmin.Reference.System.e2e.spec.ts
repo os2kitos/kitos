@@ -23,9 +23,7 @@ describe("Local admin tests", () => {
     });
 
     it("Able to edit references", () => {
-
         expect(headerButtons.editReference.isEnabled()).toBe(true);
-
     });
 
     it("Able to insert invalid url", () => {
@@ -51,7 +49,6 @@ describe("Local admin tests", () => {
         inputFields.referenceDocUrl.sendKeys(validUrl);
 
         headerButtons.editSaveReference.click();
-
 
         expect(colObjects.referenceName.get(0).getAttribute("href")).toEqual(validUrl);
 
