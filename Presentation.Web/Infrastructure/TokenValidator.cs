@@ -53,6 +53,10 @@ namespace Presentation.Web.Infrastructure
             var handler = new JwtSecurityTokenHandler();
 
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
+            if (user.DefaultOrganizationId.HasValue)
+            {
+                identity.AddClaim(new Claim("DefaultOrganization", user.DefaultOrganizationId.Value.ToString("D")));
+            }
 
             // securityKey length should be >256b
             try
