@@ -26,9 +26,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var orgId = _authService.GetCurrentOrganizationId(UserId);
             var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
@@ -60,9 +57,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get(int key)
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var orgId = _authService.GetCurrentOrganizationId(UserId);
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 

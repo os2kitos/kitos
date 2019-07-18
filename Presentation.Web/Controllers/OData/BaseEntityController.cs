@@ -23,9 +23,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
 

@@ -36,8 +36,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         protected virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
-            if (UserId == 0)
-                return Unauthorized();
             var orgId = _authService.GetCurrentOrganizationId(UserId);
 
             var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
