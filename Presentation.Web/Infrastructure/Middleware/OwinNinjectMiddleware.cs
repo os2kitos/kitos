@@ -2,13 +2,12 @@
 using Ninject;
 using Ninject.Web.Common;
 using Owin;
+using Presentation.Web.Helpers;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
     public static class OwinNinjectMiddleware
     {
-        private const string NinjectKernel = nameof(OwinNinjectMiddleware) + nameof(NinjectKernel);
-
         public static IAppBuilder UseNinject(this IAppBuilder app)
         {
             return app.Use(async (context, next) =>
@@ -23,12 +22,12 @@ namespace Presentation.Web.Infrastructure.Middleware
         private static void AddNinjectKernel(IOwinContext context)
         {
             //Bootstrapper holds a singleton reference to the root kernel accessed through an instance property.
-            context.Environment[NinjectKernel] = new Bootstrapper().Kernel;
+            context.WithEnvironmentProperty(new Bootstrapper().Kernel);
         }
 
         public static IKernel GetNinjectKernel(this IOwinContext context)
         {
-            return (IKernel)context.Environment[NinjectKernel];
+            return context.GetEnvironmentProperty<IKernel>();
         }
 
     }
