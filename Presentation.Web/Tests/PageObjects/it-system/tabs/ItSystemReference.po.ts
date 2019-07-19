@@ -3,16 +3,30 @@ import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapp
 
 var ec = protractor.ExpectedConditions;
 
-class ItSystemEditPo implements IPageObject { 
+class ItSystemReference implements IPageObject { 
 
     public getPage(): webdriver.promise.Promise<void> {
         return browser.get(browser.baseUrl + "/#/system/edit/1/reference");
     }
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 
-    public isReferenceLoaded(): webdriver.until.Condition<boolean> {
+    public isReferenceCreateFormLoaded(): webdriver.until.Condition<boolean> {
+        return ec.visibilityOf(this.kendoToolbarWrapper.inputFields().referenceCreator);
+    }
+
+    public isEditReferenceLoaded(): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(this.kendoToolbarWrapper.headerButtons().editReference);
     }
+
+    public isCreateReferenceLoaded(): webdriver.until.Condition<boolean> {
+        return ec.visibilityOf(this.kendoToolbarWrapper.headerButtons().createReference);
+    }
+
+
+    public isElementLoaded(element: protractor.ElementFinder): webdriver.until.Condition<boolean> {
+        return ec.visibilityOf(element);
+    }
+
 }
 
-export = ItSystemEditPo;
+export = ItSystemReference;

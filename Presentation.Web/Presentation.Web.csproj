@@ -637,6 +637,7 @@
     <TypeScriptCompile Include="Tests\Helpers\CatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\RegularUser.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\LocalAdmin.Reference.System.e2e.spec.ts" />
@@ -1272,7 +1273,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-	<Folder Include="Tests\it-contract\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />

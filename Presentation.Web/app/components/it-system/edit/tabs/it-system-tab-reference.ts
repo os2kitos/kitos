@@ -92,7 +92,14 @@
                     width: 240
                 }, {
                     field: "ExternalReferenceId",
-                    title: "Evt. dokumentID/Sagsnr./anden referenceContact"
+                        title: "Evt. dokumentID/Sagsnr./anden referenceContact",
+                    headerAttributes: {
+                        "data-element-type": "referenceHeaderId"
+                    },
+                    attributes:
+                    {
+                        "data-element-type": "referenceIdObject"
+                    },
                 }, {
                     field: "Created",
                     title: "Oprettet",
@@ -108,7 +115,7 @@
                     template: dataItem => {
                         var HTML = "<button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='editReference' class='btn btn-link' title='Redigér reference' data-ng-click=\"edit(" + dataItem.Id + ")\"><i class='fa fa-pencil' aria-hidden='true'></i></button>";
                         if (dataItem.Id != theSystem.ReferenceId) {
-                            HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
+                            HTML += " <button type='button' data-ng-disabled='" + !$scope.hasWriteAccess + "' data-element-type='deleteReference' data-confirm-click=\"Er du sikker på at du vil slette?\" class='btn btn-link' title='Slet reference' data-confirmed-click='deleteReference(" + dataItem.Id + ")'><i class='fa fa-trash-o' aria-hidden='true'></i></button>";
                         }
 
                         if (Kitos.Utility.Validation.validateUrl(dataItem.URL)) {
@@ -129,7 +136,7 @@
                         text: "Tilføj reference",
                         template: () => {
                             if (hasWriteAccess) {
-                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" href=\"\\#/system/edit/" + theSystem.Id + "/reference/createReference/" + theSystem.Id + "\"'>Tilføj reference</a>";
+                                return "<a id=\"addReferenceItSystem\" class=\"btn btn-success btn-sm\" data-element-type=\"createReferenceButton\" href=\"\\#/system/edit/" + theSystem.Id + "/reference/createReference/" + theSystem.Id + "\"'>Tilføj reference</a>";
                             } else {
                                 return "";
                             }
