@@ -525,7 +525,6 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
-    <Compile Include="Infrastructure\Middleware\KitosContextMiddleware.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
     <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />

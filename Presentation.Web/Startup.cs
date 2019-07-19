@@ -2,9 +2,6 @@
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
-using Presentation.Web.Infrastructure.Model;
-using Presentation.Web.Infrastructure;
-using System.Text;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
@@ -43,7 +40,6 @@ namespace Presentation.Web
             // Initializing API Request Logging
 
             app.UseNinject();
-            app.Use<KitosContextMiddleware>();
             app.Use<ApiRequestsLoggingMiddleware>();
         }
     }

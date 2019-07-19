@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Ninject;
-using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
@@ -20,7 +19,7 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
             var kernel = context.GetNinjectKernel();
             var logger = kernel.Get<ILogger>();
-            var authenticationContext = context.GetEnvironmentProperty<IAuthenticationContext>();
+            var authenticationContext = kernel.Get<IAuthenticationContext>();
 
             if (authenticationContext.Method == AuthenticationMethod.KitosToken)
             {

@@ -10,15 +10,17 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
     public class AuthenticationContextFactory : IAuthenticationContextFactory
     {
         private readonly ILogger _logger;
+        private readonly IOwinContext _owinContext;
 
-        public AuthenticationContextFactory(ILogger logger)
+        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext)
         {
             _logger = logger;
+            _owinContext = owinContext;
         }
 
-        public IAuthenticationContext CreateFrom(IOwinContext context)
+        public IAuthenticationContext Create()
         {
-            var user = context.Authentication.User;
+            var user = _owinContext.Authentication.User;
             return IsAuthenticated(user)
                 ? new AuthenticationContext(MapAuthenticationMethod(user), MapUserId(user), MapOrganizationId(user))
                 : new AuthenticationContext(AuthenticationMethod.Anonymous);
