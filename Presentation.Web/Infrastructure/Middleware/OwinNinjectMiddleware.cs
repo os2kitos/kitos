@@ -3,13 +3,13 @@ using Ninject;
 using Ninject.Web.Common;
 using Owin;
 
-namespace Presentation.Web.Infrastructure
+namespace Presentation.Web.Infrastructure.Middleware
 {
-    public static class OwinNinjectExtensions
+    public static class OwinNinjectMiddleware
     {
-        private const string NinjectKernel = nameof(OwinNinjectExtensions) + nameof(NinjectKernel);
+        private const string NinjectKernel = nameof(OwinNinjectMiddleware) + nameof(NinjectKernel);
 
-        public static IAppBuilder UseCustomScopeForRequest(this IAppBuilder app)
+        public static IAppBuilder UseNinject(this IAppBuilder app)
         {
             return app.Use(async (context, next) =>
             {

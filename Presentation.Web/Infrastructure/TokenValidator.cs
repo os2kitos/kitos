@@ -10,6 +10,7 @@ using Serilog;
 using System.IdentityModel.Tokens;
 using System.Security.Principal;
 using Presentation.Web.Infrastructure.Model;
+using Presentation.Web.Infrastructure.Model.Authentication;
 
 namespace Presentation.Web.Infrastructure
 {
