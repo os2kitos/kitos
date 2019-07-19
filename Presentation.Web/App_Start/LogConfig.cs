@@ -22,6 +22,7 @@ namespace Presentation.Web
 
             return new LoggerConfiguration()
                 .ReadFrom.AppSettings()
+                .Enrich.FromLogContext()
                 .Enrich.With<HttpRequestIdEnricher>()
                 .Enrich.With<HttpSessionIdEnricher>()
                 .Enrich.With<UserNameEnricher>()

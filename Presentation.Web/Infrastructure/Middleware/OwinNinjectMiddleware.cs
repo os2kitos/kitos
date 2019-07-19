@@ -2,7 +2,7 @@
 using Ninject;
 using Ninject.Web.Common;
 using Owin;
-using Presentation.Web.Helpers;
+using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {

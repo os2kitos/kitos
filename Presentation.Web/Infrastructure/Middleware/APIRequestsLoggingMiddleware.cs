@@ -5,6 +5,7 @@ using Microsoft.Owin;
 using Ninject;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
+using Serilog.Context;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
@@ -20,20 +21,28 @@ namespace Presentation.Web.Infrastructure.Middleware
             var kernel = context.GetNinjectKernel();
             var logger = kernel.Get<ILogger>();
             var authenticationContext = kernel.Get<IAuthenticationContext>();
-
             if (authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
-                var startTime = DateTime.Now;
+                var guid = Guid.NewGuid();
+                var requestStart = DateTime.UtcNow;
                 var route = context.Request.Path;
                 var method = context.Request.Method;
                 var queryParameters = GetQueryParameters(context.Request.Query);
-
                 var userId = authenticationContext.UserId.GetValueOrDefault(INVALID_ID);
-                var activeOrganizationId = authenticationContext.ActiveOrganizationId.GetValueOrDefault(INVALID_ID);
-
-                await Next.Invoke(context);
-                var processingTime = DateTime.Now - startTime;
-                logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} ActiveOrganizationId: {activeOrganizationId} ProcessingTime: {processingTime}ms", route, method, queryParameters, userId, activeOrganizationId, processingTime.TotalMilliseconds);
+                var loggedIntoOrganizationId = authenticationContext.ActiveOrganizationId.GetValueOrDefault(INVALID_ID);
+                using (LogContext.PushProperty("CorrelationId", guid.ToString()))
+                {
+                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} LoggedIntoOrganizationId: {loggedIntoOrganizationId} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, loggedIntoOrganizationId, requestStart);
+                    try
+                    {
+                        await Next.Invoke(context);
+                    }
+                    finally
+                    {
+                        var requestEnd = DateTime.UtcNow;
+                        logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} LoggedIntoOrganizationId: {loggedIntoOrganizationId} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, loggedIntoOrganizationId, requestEnd);
+                    }
+                }
             }
             else
             {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Owin;
 
-namespace Presentation.Web.Helpers
+namespace Presentation.Web.Extensions
 {
     public static class OwinContextExtensions
     {

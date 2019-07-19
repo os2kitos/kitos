@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using Microsoft.Owin;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
@@ -10,6 +11,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
     {
         private readonly ILogger _logger;
         private readonly IOwinContext _owinContext;
+        private readonly IdentityClaimExtension identityClaimExtension = new IdentityClaimExtension();
 
         public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext)
         {
@@ -31,18 +33,15 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             if (method == AuthenticationMethod.KitosToken)
             {
                 // Create extension method for this
-                var orgID =
-                    (user.Identity as ClaimsIdentity)?
-                    .FindAll(x => x.Type == BearerTokenConfig.DefaultOrganizationClaimName)
-                    .FirstOrDefault();
+                var orgId = identityClaimExtension.GetClaimOrNull((user.Identity as ClaimsIdentity), BearerTokenConfig.DefaultOrganizationClaimName);
 
-                if (orgID != null)
+                if (orgId != null)
                 {
-                    if (int.TryParse(orgID.Value, out var id))
+                    if (int.TryParse(orgId.Value, out var id))
                     {
                         return id;
                     }
-                    _logger.Error("Found DefaultOrganizationClaim, but could not parse it to an integer: {orgIdValue}", orgID.Value);
+                    _logger.Error("Found Claim {claimName}, but could not parse it to an integer", BearerTokenConfig.DefaultOrganizationClaimName);
                 }
             }
             return default(int?);
