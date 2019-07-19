@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Ninject;
+using Presentation.Web.Infrastructure.Model;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure
@@ -11,6 +12,7 @@ namespace Presentation.Web.Infrastructure
     {
 
         private ILogger _logger = Log.Logger;
+        private readonly AuthenticationHelper _auth = new AuthenticationHelper();
 
         public ApiRequestsLoggingMiddleware(OwinMiddleware next) : base(next)
         {
@@ -19,12 +21,13 @@ namespace Presentation.Web.Infrastructure
         public override async Task Invoke(IOwinContext context)
         {
             _logger = context.GetNinjectKernel().Get<ILogger>();
-            if (context.Request.Headers.ContainsKey("Authorization"))
+            if (_auth.IsTokenAuthentication(context))
             {
                 var startTime = DateTime.Now;
                 var route = context.Request.Path;
                 var method = context.Request.Method;
                 var queryParameters = getQueryParameters(context.Request.Query);
+                
                 var userID = context.Request.User.Identity.Name;
                 await Next.Invoke(context);
                 var processingTime = DateTime.Now - startTime;

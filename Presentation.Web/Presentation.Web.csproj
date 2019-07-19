@@ -524,6 +524,7 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Model\AuthenticationHelper.cs" />
     <Compile Include="Infrastructure\Model\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Model\SsoConfig.cs" />
@@ -1322,7 +1323,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-	<Folder Include="Tests\it-contract\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
