@@ -33,7 +33,7 @@ namespace Presentation.Web.Infrastructure.Middleware
 
                 await Next.Invoke(context);
                 var processingTime = DateTime.Now - startTime;
-                logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} ProcessingTime: {processingTime}ms ActiveOrganizationId: {activeOrganizationId}", route, method, queryParameters, userId, processingTime.TotalMilliseconds, activeOrganizationId);
+                logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} ActiveOrganizationId: {activeOrganizationId} ProcessingTime: {processingTime}ms", route, method, queryParameters, userId, activeOrganizationId, processingTime.TotalMilliseconds);
             }
             else
             {

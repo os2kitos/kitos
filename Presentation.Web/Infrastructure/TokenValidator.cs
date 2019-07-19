@@ -56,7 +56,7 @@ namespace Presentation.Web.Infrastructure
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
             if (user.DefaultOrganizationId.HasValue)
             {
-                identity.AddClaim(new Claim("DefaultOrganization", user.DefaultOrganizationId.Value.ToString("D")));
+                identity.AddClaim(new Claim(BearerTokenConfig.DefaultOrganizationClaimName, user.DefaultOrganizationId.Value.ToString("D")));
             }
 
             // securityKey length should be >256b

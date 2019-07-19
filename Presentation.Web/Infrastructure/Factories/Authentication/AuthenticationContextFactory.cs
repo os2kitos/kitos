@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Linq;
 using System.Security.Claims;
-using IdentityServer3.Core.Extensions;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
@@ -28,26 +27,50 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 
         private int? MapOrganizationId(ClaimsPrincipal user)
         {
-            //TODO JMO
-            throw new NotImplementedException();
+            var method = MapAuthenticationMethod(user);
+            if (method == AuthenticationMethod.KitosToken)
+            {
+                // Create extension method for this
+                var orgID =
+                    (user.Identity as ClaimsIdentity)?
+                    .FindAll(x => x.Type == BearerTokenConfig.DefaultOrganizationClaimName)
+                    .FirstOrDefault();
+
+                if (orgID != null)
+                {
+                    if (int.TryParse(orgID.Value, out var id))
+                    {
+                        return id;
+                    }
+                    _logger.Error("Found DefaultOrganizationClaim, but could not parse it to an integer: {orgIdValue}", orgID.Value);
+                }
+            }
+            return default(int?);
         }
 
         private int? MapUserId(ClaimsPrincipal user)
         {
-            //TODO JMO
-            throw new NotImplementedException();
+            var userId = user.Identity.Name;
+            if (int.TryParse(userId, out var id))
+            {
+                return id;
+            }
+            
+            _logger.Error("Could not parse to int: {userId}", userId);
+            return default(int);
+            
         }
 
         private AuthenticationMethod MapAuthenticationMethod(ClaimsPrincipal user)
         {
-            var authenticationMethod = user.GetAuthenticationMethod();
+            var authenticationMethod = user.Identity.AuthenticationType;
             switch (authenticationMethod)
             {
                 case "JWT":
                     return AuthenticationMethod.KitosToken;
                     break;
-                case "Forms": //TODO JMO
-                    throw new NotImplementedException();
+                case "Forms":
+                    return AuthenticationMethod.Forms;
                     break;
                 default:
                     _logger.Error("Unknown authentication method {authenticationMethod}", authenticationMethod);
@@ -57,7 +80,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 
         private bool IsAuthenticated(ClaimsPrincipal user)
         {
-            throw new NotImplementedException();
+            return user.Identity.IsAuthenticated;
         }
     }
 }
