@@ -21,6 +21,7 @@ describe("Local admin can edit reference URL", () => {
 
     beforeEach(() => {
         pageObject.getPage();
+        browser.waitForAngular();
     });
 
     it("Able to edit references", () => {
@@ -34,8 +35,8 @@ describe("Local admin can edit reference URL", () => {
         inputFields.referenceDocUrl.clear();
         inputFields.referenceDocUrl.sendKeys(consts.invalidUrl);
         headerButtons.editSaveReference.click();
-        expect(colObjects.referenceName.get(0).isPresent()).toBeFalsy();
 
+        expect(colObjects.referenceName.getAttribute("href")).not.toContain(consts.invalidUrl);
     });
 
     it("Able to insert valid url", () => {
@@ -44,7 +45,9 @@ describe("Local admin can edit reference URL", () => {
         inputFields.referenceDocUrl.clear();
         inputFields.referenceDocUrl.sendKeys(consts.validUrl);
         headerButtons.editSaveReference.click();
-        expect(colObjects.referenceName.get(0).getAttribute("href")).toEqual(consts.validUrl);
+
+       expect(colObjects.referenceName.getAttribute("href")).toContain(consts.validUrl);
+
     });
 
 });
