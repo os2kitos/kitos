@@ -32,7 +32,6 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             var method = MapAuthenticationMethod(user);
             if (method == AuthenticationMethod.KitosToken)
             {
-                // Create extension method for this
                 var orgId = identityClaimExtension.GetClaimOrNull((user.Identity as ClaimsIdentity), BearerTokenConfig.DefaultOrganizationClaimName);
 
                 if (orgId != null)
