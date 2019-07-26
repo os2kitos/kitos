@@ -22,7 +22,6 @@ class ItSystemReference implements IPageObject {
         return ec.visibilityOf(this.kendoToolbarWrapper.headerButtons().createReference);
     }
 
-
     public isElementLoaded(element: protractor.ElementFinder): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(element);
     }

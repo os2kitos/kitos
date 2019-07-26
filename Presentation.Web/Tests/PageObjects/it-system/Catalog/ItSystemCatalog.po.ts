@@ -18,8 +18,12 @@ class ItSystemCatalog implements IPageObject {
     public kendoToolbarWrapper = new KendoToolbarWrapper();
     public createCatalogForm = element(byDataElementType(consts.catalogCreateForm));
 
-    public isLoginAvailable(): webdriver.until.Condition<boolean> {
+    public isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(this.createCatalogForm);
+    }
+
+    public waitForKendoGrid(): webdriver.until.Condition<boolean> {
+        return ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
 }
 

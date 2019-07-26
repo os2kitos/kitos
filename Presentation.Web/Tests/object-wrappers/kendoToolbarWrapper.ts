@@ -105,6 +105,17 @@ class kendoToolbarWrapper {
         };
         return columns;
     }
+
+    public getFilteredColumnElement(column: protractor.ElementArrayFinder, textValue: string): protractor.ElementArrayFinder {
+        var test = column.filter((elem) => {
+            return elem.getText().then((val) => {
+                if (val === textValue) {
+                    return elem;
+                }
+            });
+        });
+        return test;
+    }
 }
 
 class kendoHelper {

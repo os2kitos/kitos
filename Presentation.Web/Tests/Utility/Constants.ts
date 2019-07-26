@@ -59,7 +59,7 @@ class Constants {
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
 
-
+    readonly kendoSystemDeleteButton = "deleteSystemButton";
 
 }
 

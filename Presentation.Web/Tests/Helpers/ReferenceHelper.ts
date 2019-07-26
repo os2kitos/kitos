@@ -1,14 +1,10 @@
 ﻿import RefePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
-import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
-import Constants = require("../Utility/Constants");
-import KendoToolBar = require("../object-wrappers/KendoToolbarWrapper")
 import WaitTimers = require("../Utility/WaitTimers");
 
 var homePage = new RefePage();
 var waitUpTo = new WaitTimers();
 var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
 var inputFields = homePage.kendoToolbarWrapper.inputFields();
-var objects = homePage.kendoToolbarWrapper.columnObjects();
 
 class ReferenceHelper {
 
