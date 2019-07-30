@@ -9,10 +9,6 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests
     {
-        public AccessibilityTests()
-        {
-
-        }
 
         [Theory]
         [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.User)]
