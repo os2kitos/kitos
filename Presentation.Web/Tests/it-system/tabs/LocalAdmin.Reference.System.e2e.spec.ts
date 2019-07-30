@@ -16,7 +16,7 @@ var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
 var inputFields = homePage.kendoToolbarWrapper.inputFields();
 var colObjects = homePage.kendoToolbarWrapper.columnObjects();
 
-describe("Local admin can add and remove reference",
+describe("Can add and remove reference",
     () => {
         beforeAll(() => {
             loginHelper.loginAsLocalAdmin();
@@ -42,7 +42,7 @@ describe("Local admin can add and remove reference",
 
     });
 
-describe("Local admin can edit reference URL",
+describe("Can edit reference URL",
     () => {
 
         beforeAll(() => {
