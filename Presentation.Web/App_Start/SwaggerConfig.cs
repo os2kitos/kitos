@@ -186,21 +186,6 @@ namespace SwashbuckleODataSample
                 //
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
-                // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
-                // alternative implementation for ISwaggerProvider with the CustomProvider option.
-                //
-                c.CustomProvider(defaultProvider => new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration).Configure(odataConfig =>
-                {
-                    // Set this flag to include navigation properties in your entity swagger models
-                    //
-                    //odataConfig.IncludeNavigationProperties();
-
-                    // Enable Cache for swagger doc requests
-                    odataConfig.EnableSwaggerRequestCaching();
-
-                    //Set custom AssembliesResolver
-                    // odataConfig.SetAssembliesResolver(new Utils.CustomAssembliesResolver());
-                }));
             })
                 .EnableSwaggerUi(c =>
                 {
