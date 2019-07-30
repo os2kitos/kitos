@@ -2,10 +2,12 @@
 using System.Net.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
     {
         public DataRowController(IGenericRepository<DataRow> repository)

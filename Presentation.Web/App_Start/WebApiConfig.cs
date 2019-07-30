@@ -19,6 +19,8 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Presentation.Web.Models;
 using System.Linq;
+using System.Web.Http.Description;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Odata;
 
 namespace Presentation.Web
@@ -63,6 +65,7 @@ namespace Presentation.Web
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
+            config.Services.Replace(typeof(IApiExplorer), new KITOSApiExplorer(config));
         }
 
         public static IEdmModel GetModel()

@@ -7,10 +7,12 @@ using System.Web.Http;
 using System.Web.Mvc;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class ArchivePeriodController : GenericApiController<ArchivePeriod, ArchivePeriodDTO>
     {
         // GET: ArchivePeriod

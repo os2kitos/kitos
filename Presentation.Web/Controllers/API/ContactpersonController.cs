@@ -9,9 +9,11 @@ using System.Web;
 using System.Web.Mvc;
 using System.Net.Http;
 using Core.DomainModel.Organization;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
         private readonly IAuthenticationService _authService;

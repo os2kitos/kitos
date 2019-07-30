@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -11,6 +12,7 @@ namespace Presentation.Web.Controllers.API
 
     using Presentation.Web.Models;
 
+    [InternalApi]
     public class ArchiveTestLocationController : GenericOptionApiController<ArchiveTestLocation, ItSystemUsage, OptionDTO>
     {
         /// <summary>

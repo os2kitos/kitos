@@ -6,10 +6,12 @@ using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class ExhibitController : GenericContextAwareApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;

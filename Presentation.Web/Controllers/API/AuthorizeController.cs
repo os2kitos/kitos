@@ -10,9 +10,11 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;

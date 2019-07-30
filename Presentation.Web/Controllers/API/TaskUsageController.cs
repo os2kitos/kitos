@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
+using System.Web.Http.Description;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
@@ -15,10 +16,12 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class TaskUsageController : GenericHierarchyApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;

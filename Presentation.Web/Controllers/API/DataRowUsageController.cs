@@ -3,9 +3,11 @@ using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class DataRowUsageController : BaseApiController
     {
         private readonly IGenericRepository<DataRowUsage> _repository;

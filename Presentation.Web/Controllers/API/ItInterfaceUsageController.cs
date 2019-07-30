@@ -4,10 +4,12 @@ using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class ItInterfaceUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceUsage> _repository;

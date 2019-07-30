@@ -1,10 +1,12 @@
 ﻿using System.Net.Http;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class HandoverTrialController : GenericContextAwareApiController<HandoverTrial, HandoverTrialDTO>
     {
         public HandoverTrialController(IGenericRepository<HandoverTrial> repository)

@@ -2,10 +2,12 @@
 using System.Web.Http;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class PaymentMilestoneController : GenericContextAwareApiController<PaymentMilestone, PaymentMilestoneDTO>
     {
         public PaymentMilestoneController(IGenericRepository<PaymentMilestone> repository) 

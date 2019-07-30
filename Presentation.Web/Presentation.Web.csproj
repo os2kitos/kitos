@@ -521,6 +521,10 @@
     <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemsController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Infrastructure\Attributes\ApiNotMarkedException.cs" />
+    <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\KITOSApiExplorer.cs" />
+    <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />

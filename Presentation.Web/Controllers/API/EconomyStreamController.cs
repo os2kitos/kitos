@@ -5,9 +5,11 @@ using Presentation.Web.Models;
 using System.Net.Http;
 using Core.DomainModel;
 using System;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;

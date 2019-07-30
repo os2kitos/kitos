@@ -8,9 +8,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class DataResponsibleController : GenericApiController<DataResponsible, DataResponsibleDTO>
     {
         IGenericRepository<DataResponsible> _repository;

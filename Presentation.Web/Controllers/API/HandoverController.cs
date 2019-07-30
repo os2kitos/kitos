@@ -4,10 +4,12 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class HandoverController : GenericContextAwareApiController<Handover, HandoverDTO>
     {
         private readonly IGenericRepository<User> _userRepository;

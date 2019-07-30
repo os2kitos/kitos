@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
     //TODO refactor this into OrganizationRightsController
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class GlobalAdminController : BaseApiController
     {
         public HttpResponseMessage Get()

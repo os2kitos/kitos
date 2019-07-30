@@ -4,10 +4,13 @@ using Presentation.Web.Models;
 using System;
 using System.Linq;
 using System.Net.Http;
+using System.Web.Http.Description;
 using System.Web.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
         IGenericRepository<AdviceUserRelation> _repository;
@@ -21,6 +24,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="adviceId"></param>
         /// <returns></returns>
         [HttpDelete]
+        [PublicApi]
         public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
         {
             try

@@ -2,10 +2,12 @@
 using System.Net.Http;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
     {
         public RiskController(IGenericRepository<Risk> repository) : base(repository)

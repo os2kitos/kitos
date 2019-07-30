@@ -7,12 +7,14 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
+    [InternalApi]
     public class TextController : GenericApiController<Text, TextDTO>
     {
         protected readonly IGenericRepository<Text> _repository;

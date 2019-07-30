@@ -13,12 +13,14 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
     using Core.DomainModel.Organization;
 
+    [InternalApi]
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;

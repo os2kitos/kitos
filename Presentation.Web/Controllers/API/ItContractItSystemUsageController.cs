@@ -2,9 +2,11 @@
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class ItContractItSystemUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItContractItSystemUsage> _repository;
