@@ -25,7 +25,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
                 var theRights = _rightRepository.Get();
                 var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<OrganizationRightDTO>>(theRights);
 
@@ -63,7 +66,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
                 var role = (OrganizationRole)Enum.Parse(typeof(OrganizationRole), roleName, true);
                 var theRights = _rightRepository.Get(x => x.Role == role);
                 var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<OrganizationRightDTO>>(theRights);
@@ -130,19 +136,19 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
-
+                
                 // Only global admin can set other users as global admins
                 if(right.Role == OrganizationRole.GlobalAdmin)
                 {
                     if (!KitosUser.IsGlobalAdmin)
-                        return Unauthorized();
+                        return Forbidden();
                 }
 
                 // Only local and global admins can make users local admins
                 if(right.Role == OrganizationRole.LocalAdmin)
                 {
                     if(!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
-                        return Unauthorized();
+                        return Forbidden();
                 }
 
                 right.OrganizationId = organizationId;
@@ -150,7 +156,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!base.HasWriteAccess(right, KitosUser, organizationId))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
               
                 right.LastChangedByUser = KitosUser;
@@ -273,19 +279,19 @@ namespace Presentation.Web.Controllers.API
                 if (right.Role == OrganizationRole.GlobalAdmin)
                 {
                     if (!KitosUser.IsGlobalAdmin)
-                        return Unauthorized();
+                        return Forbidden();
                 }
 
                 // Only local and global admins can make users local admins
                 if (right.Role == OrganizationRole.LocalAdmin)
                 {
                     if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
-                        return Unauthorized();
+                        return Forbidden();
                 }
 
                 if(!base.HasWriteAccess(right, KitosUser, organizationId))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
 

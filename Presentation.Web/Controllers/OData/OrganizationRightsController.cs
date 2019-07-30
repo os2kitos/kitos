@@ -36,7 +36,9 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             var user = _userService.GetUserById(UserId);
 
@@ -44,7 +46,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
@@ -52,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
@@ -60,7 +62,9 @@ namespace Presentation.Web.Controllers.OData
             entity.ObjectOwnerId = UserId;
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            {
                 return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             entity.LastChangedByUserId = UserId;
             
@@ -84,7 +88,7 @@ namespace Presentation.Web.Controllers.OData
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return Unauthorized();
+            return StatusCode(HttpStatusCode.NotImplemented);
             //return base.Post(entity);
         }
 
@@ -94,7 +98,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             var user = _userService.GetUserById(UserId);
 
@@ -102,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
@@ -110,12 +116,14 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            {
                 return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             try
             {
@@ -137,7 +145,9 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             var user = _userService.GetUserById(UserId);
 
@@ -145,7 +155,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
@@ -153,7 +163,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return StatusCode(HttpStatusCode.Forbidden);
                 }
             }
 
@@ -176,22 +186,28 @@ namespace Presentation.Web.Controllers.OData
             
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            {
                 return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             //Check if user is allowed to set accessmodifier to public
             //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
             //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
             //{
             //    return Unauthorized();
-            //}
+            //} 
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {

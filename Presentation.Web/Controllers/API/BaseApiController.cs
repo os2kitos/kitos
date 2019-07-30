@@ -80,7 +80,10 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual HttpResponseMessage Error<T>(T response)
         {
-            if (response is SecurityException) return Unauthorized();
+            if (response is SecurityException)
+            {
+                return Unauthorized();
+            }
 
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }

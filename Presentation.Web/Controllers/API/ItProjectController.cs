@@ -369,7 +369,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
                 var dtos =
                     Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(
@@ -388,12 +391,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
                 project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
 
@@ -422,12 +434,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var entity = project.UsedByOrgUnits.SingleOrDefault(x => x.ItProjectId == id && x.OrganizationUnitId == organizationUnit);
-                if (entity == null) return NotFound();
+                if (entity == null)
+                {
+                    return NotFound();
+                }
                 project.UsedByOrgUnits.Remove(entity);
 
                 project.LastChanged = DateTime.UtcNow;
@@ -448,8 +469,14 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (project == null)
+                {
+                    return NotFound();
+                }
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -472,7 +499,9 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 if (!tasks.Any())
+                {
                     return NotFound();
+                }
 
                 foreach (var task in tasks)
                 {
@@ -494,8 +523,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -514,7 +550,9 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 if (!tasks.Any())
+                {
                     return NotFound();
+                }
 
                 foreach (var task in tasks)
                 {
@@ -601,13 +639,22 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 //TODO: should also we check for write access to the system usage?
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
-                if (systemUsage == null) return NotFound();
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
 
                 project.ItSystemUsages.Add(systemUsage);
 
@@ -629,14 +676,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
                 if (!HasWriteAccess(project, organizationId))
-                    return Unauthorized();
+                {
+                    return Forbidden();
+                }
 
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
                 if (systemUsage == null)
+                {
                     return NotFound();
+                }
 
                 project.ItSystemUsages.Remove(systemUsage);
                 project.LastChanged = DateTime.UtcNow;
@@ -712,7 +766,7 @@ namespace Presentation.Web.Controllers.API
             // only global admin can set access mod to public
             if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
-                return Unauthorized();
+                return Forbidden();
             }
             //force set access modifier to 0
             dto.AccessModifier = 0;
@@ -723,8 +777,14 @@ namespace Presentation.Web.Controllers.API
         {
             var project = Repository.GetByKey(id);
 
-            if (project == null) return NotFound();
-            if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (!HasWriteAccess(project, organizationId))
+            {
+                return Forbidden();
+            }
 
             const string propertyName = "Phase";
             var phaseRef = project.GetType().GetProperty(propertyName + phaseNum);
@@ -776,7 +836,7 @@ namespace Presentation.Web.Controllers.API
             if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public &&
                 !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
-                return Unauthorized();
+                return Forbidden();
             }
             return base.Patch(id, organizationId, obj);
         }

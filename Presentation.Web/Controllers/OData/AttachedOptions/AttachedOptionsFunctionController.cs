@@ -67,10 +67,14 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             && o.ObjectType == entityType);
 
             if (option == null)
+            {
                 return NotFound();
+            }
 
             if (!AuthService.HasWriteAccess(UserId, option))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             try
             {

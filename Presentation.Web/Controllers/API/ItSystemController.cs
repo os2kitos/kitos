@@ -243,7 +243,7 @@ namespace Presentation.Web.Controllers.API
                 // only global admin can set access mod to public
                 if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
                 if (!IsAvailable(dto.Name, dto.OrganizationId))
                     return Conflict("Name is already taken!");
@@ -256,7 +256,7 @@ namespace Presentation.Web.Controllers.API
 
                 if(!base.HasWriteAccess(item, KitosUser, organizationId: 0))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 foreach (var id in dto.TaskRefIds)
@@ -295,7 +295,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(system, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -340,8 +343,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var system = Repository.GetByKey(id);
-                if (system == null) return NotFound();
-                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
+                if (system == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(system, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -435,7 +445,7 @@ namespace Presentation.Web.Controllers.API
             // only global admin can set access mod to public
             if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             // try get name value

@@ -415,7 +415,7 @@ namespace Presentation.Web.Controllers.API
         {            
             if(!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             return base.Delete(id, organizationId);

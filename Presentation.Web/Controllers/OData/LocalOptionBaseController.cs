@@ -87,13 +87,15 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Post(TLocalModelType entity)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             entity.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
 
             if (!_authService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return StatusCode(HttpStatusCode.Forbidden);
             }
 
             var orgId = _authService.GetCurrentOrganizationId(UserId);
@@ -201,7 +203,9 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, localOption))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             try
             {

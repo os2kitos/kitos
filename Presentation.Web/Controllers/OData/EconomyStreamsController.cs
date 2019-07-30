@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
@@ -41,10 +42,14 @@ namespace Presentation.Web.Controllers.OData
                 var contractId = economyStream.ExternPaymentFor.Id;
 
                 if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
-                    return Unauthorized();
+                {
+                    return StatusCode(HttpStatusCode.Forbidden);
+                }
             }
             else if (!HasAccessWithinOrganization(orgKey))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             return Ok(result);
         }
@@ -55,7 +60,9 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetAllExtern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             var result =
                 _repository.AsQueryable()
@@ -72,7 +79,9 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetAllIntern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             var result =
                 _repository.AsQueryable()
@@ -89,7 +98,9 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetSingleExtern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             var result =
                 _repository.AsQueryable()
@@ -107,7 +118,9 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetSingleIntern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             var result =
                 _repository.AsQueryable()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -26,6 +27,14 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Task<HttpResponseMessage> GetAsync(Uri url)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            return HttpClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> GetAsyncWithToken(Uri url, string tokenvalue)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
+            Debug.WriteLine(": - "+ requestMessage.Headers.Authorization);
             return HttpClient.SendAsync(requestMessage);
         }
 

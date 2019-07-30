@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.API
         {
             var reference = Repository.GetByKey(id);
             if (!CanModifyReference(reference))
-                return Unauthorized();
+                return Forbidden();
 
             var result = base.PatchQuery(reference, obj);
             return Ok(Map(result));

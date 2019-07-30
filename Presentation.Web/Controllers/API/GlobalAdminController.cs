@@ -15,7 +15,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
 
                 var users = UserRepository.Get(u => u.IsGlobalAdmin);
 
@@ -34,7 +37,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
 
                 var user = UserRepository.GetByKey(dto.UserId);
 
@@ -61,7 +67,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
 
                 var user = UserRepository.GetByKey(userId);
 

@@ -48,7 +48,9 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return Unauthorized();
+            {
+                return StatusCode(HttpStatusCode.Forbidden);
+            }
 
             try
             {
