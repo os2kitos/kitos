@@ -13,6 +13,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        hasApi: boolean;
     }
 
     class EditOrganizationUserController {
@@ -25,6 +26,7 @@
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
         public isUserReadOnly = false;
+        public hasUserApi = false;
 
         private userId: number;
         private originalVm;
@@ -51,7 +53,7 @@
                 isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
                 isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined,
-                hasApi: _.find(user.OrganizationRights, {Role: Models.OrganizationRole.ApiAccess }) !== undefined
+                hasApi: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ApiAccess }) !== undefined
             };
             this.originalVm = _.clone(userVm);
             this.vm = userVm;
@@ -64,6 +66,7 @@
             this.isUserContractAdmin = currentUser.isContractAdmin;
             this.isUserReportAdmin = currentUser.isReportAdmin;
             this.isUserReadOnly = currentUser.isReadOnly;
+            this.hasUserApi = currentUser.hasApi;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
