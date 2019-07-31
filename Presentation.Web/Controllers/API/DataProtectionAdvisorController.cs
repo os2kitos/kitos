@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
+using Presentation.Web.Helpers;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -49,7 +50,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Forbidden("You don't have access to this feature");
+                    return Forbidden();
                 }
 
                 var dto = Map(item);

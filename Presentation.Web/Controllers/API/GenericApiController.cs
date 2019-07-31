@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API
 
                 if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Forbidden("You don't have access to this feature");
+                    return Forbidden();
                 }
 
                 if (item == null)

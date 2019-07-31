@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
             {
                 if (!IsGlobalAdmin())
                 {
-                    return Forbidden("Only Global Admins can use this feature");
+                    return Forbidden();
                 }
 
                 var users = UserRepository.Get(u => u.IsGlobalAdmin);
@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API
                     return Ok(outDto);
                 }
 
-                return Forbidden("Only Global Admins can access this feature");
+                return Forbidden();
 
             }
             catch (Exception e)

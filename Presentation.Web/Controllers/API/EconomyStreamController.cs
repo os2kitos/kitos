@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.ExternPaymentFor.OrganizationId == currentOrgId);
                     if (!result.Any())
                         //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
-                        return Forbidden("You don't have access to this feature");
+                        return Forbidden();
                 }
             }
             else
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API
                     if (!result.Any())
                         //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
                     {
-                        return Forbidden("You are not allowed to view this information");
+                        return Forbidden();
                     }
                 }
             }
@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API
 
             if (!AuthenticationService.HasWriteAccess(KitosUser.Id, stream))
             {
-                return Forbidden("You don't have access to this feature");
+                return Forbidden();
             }
 
             stream.ObjectOwner = KitosUser;
