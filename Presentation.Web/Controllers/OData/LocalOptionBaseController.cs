@@ -204,7 +204,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, localOption))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             try
