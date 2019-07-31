@@ -50,7 +50,8 @@
                 isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
                 isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
-                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined
+                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined,
+                hasApi: _.find(user.OrganizationRights, {Role: Models.OrganizationRole.ApiAccess }) !== undefined
             };
             this.originalVm = _.clone(userVm);
             this.vm = userVm;
@@ -97,6 +98,7 @@
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReadOnly", Models.OrganizationRole.ReadOnly));
+            promises.push(this.changeRight(diffRights, "hasApi", Models.OrganizationRole.ApiAccess));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,

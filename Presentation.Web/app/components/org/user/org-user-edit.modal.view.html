@@ -65,6 +65,14 @@
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReadOnly">Bruger med læserettighed</label>
                 </div>
             </div>
+            <label for="roller" class="col-xs-3 control-label">
+                API
+            </label>
+            <div class="col-xs-8">
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+                </div>
+            </div>
         </div>
     </form>
 </div>
