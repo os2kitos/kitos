@@ -528,6 +528,7 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Middleware\ApiOdataRequestsFilterMiddleware.cs" />
     <Compile Include="Infrastructure\Model\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Model\SsoConfig.cs" />

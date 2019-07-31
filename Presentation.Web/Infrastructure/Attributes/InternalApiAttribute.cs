@@ -1,10 +1,33 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Web.Http.Description;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
-    public class InternalApiAttribute : Attribute
+    public class InternalApiAttribute : ActionFilterAttribute
     {
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            if (actionContext.Request.Headers.Contains("Authorization"))
+            {
+                actionContext.Response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Content = new StringContent("Det er ikke tilladt at benytte dette endpoint")
+                };
+                Debug.WriteLine("bla");
+
+            }
+            base.OnActionExecuting(actionContext);
+
+
+        }
+
     }
 }
