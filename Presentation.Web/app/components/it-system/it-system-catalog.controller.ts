@@ -502,7 +502,7 @@
                         template: dataItem => {
                             var reference = dataItem.Reference;
                             if (reference != null) {
-                                if (reference.URL) {
+                                if (Utility.Validation.validateUrl(reference.URL)) {
                                     return "<a target=\"_blank\" style=\"float:left;\" href=\"" + reference.URL + "\">" + reference.Title + "</a>";
                                 } else {
                                     return reference.Title;

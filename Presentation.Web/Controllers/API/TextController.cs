@@ -28,7 +28,6 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var result = _repository.AsQueryable();
-
                 var query = Page(result, paging);
                 var dtos = Map(query);
                 return Ok(dtos);
