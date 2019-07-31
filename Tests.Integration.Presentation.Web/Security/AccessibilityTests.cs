@@ -1,6 +1,10 @@
-﻿using System.Net;
+﻿using System;
+using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using Newtonsoft.Json.Linq;
+using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -9,7 +13,6 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests
     {
-
         [Theory]
         [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.User)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.User)]
@@ -22,11 +25,13 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
-        public async Task LoggedInApiCalls(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
         {
             var token = await HttpApi.GetTokenAsync(role);
-            var httpResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), token.Token);
-            Assert.Equal(httpCode, httpResponse.StatusCode);
+            using (var httpResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), token.Token))
+            {
+                Assert.Equal(httpCode, httpResponse.StatusCode);
+            }
         }
 
         [Theory]
@@ -35,10 +40,24 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.Unauthorized)]
         public async Task AnonymousApiCalls(string apiUrl, HttpStatusCode httpCode)
         {
-            var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl));
-            Assert.Equal(httpCode, httpResponse.StatusCode);
+            using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))
+            {
+                Assert.Equal(httpCode, httpResponse.StatusCode);
+            }
+        } 
+
+        [Theory] 
+        [InlineData("/api/Reference", HttpStatusCode.Created, OrganizationRole.GlobalAdmin)]
+        public async Task LoggedInApiPostRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        {
+            var jobj = new JObject {{"Title", "STRONGMINDS"}, {"ExternalReferenceId", "1338"}, {"URL", "https://strongminds.dk/" },{"Display","0"} };
+
+            var token = await HttpApi.GetTokenAsync(role);
+            using (var httpResponse = await HttpApi.PostAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), jobj, token.Token))
+            {
+                Debug.WriteLine("Response " + httpResponse);
+                Assert.Equal(httpCode, httpResponse.StatusCode);
+            }
         }
-
-
     }
 }

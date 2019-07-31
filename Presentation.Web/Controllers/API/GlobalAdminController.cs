@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
             {
                 if (!IsGlobalAdmin())
                 {
-                    return Forbidden();
+                    return Forbidden("Only Global Admins can use this feature");
                 }
 
                 var users = UserRepository.Get(u => u.IsGlobalAdmin);
@@ -45,7 +45,10 @@ namespace Presentation.Web.Controllers.API
                 var user = UserRepository.GetByKey(dto.UserId);
 
                 //if already global admin, return conflict
-                if (user.IsGlobalAdmin) return Conflict(user.Name + " is already global admin");
+                if (user.IsGlobalAdmin)
+                {
+                    return Conflict(user.Name + " is already global admin");
+                }
 
                 user.IsGlobalAdmin = true;
                 user.LastChanged = DateTime.UtcNow;
@@ -67,19 +70,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin())
+                if (IsGlobalAdmin())
                 {
-                    return Forbidden();
+                    var user = UserRepository.GetByKey(userId);
+
+                    user.IsGlobalAdmin = false;
+                    UserRepository.Save();
+
+                    var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
+
+                    return Ok(outDto);
                 }
 
-                var user = UserRepository.GetByKey(userId);
-
-                user.IsGlobalAdmin = false;
-                UserRepository.Save();
-
-                var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
-
-                return Ok(outDto);
+                return Forbidden("Only Global Admins can access this feature");
 
             }
             catch (Exception e)

@@ -597,7 +597,7 @@
                         self.$http.post('api/itsystem', payload)
                             .success(function (result: any) {
                                 msg.toSuccessMessage('Et nyt system er oprettet!');
-                                var systemId = result.response.id;
+                                var systemId = result.response.id;  
                                 $modalInstance.close(systemId);
                                 if (systemId) {
                                     self.$state.go('it-system.edit.main', { id: systemId });

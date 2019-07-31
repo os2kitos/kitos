@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Forbidden();
+                    return Forbidden("You don't have access to this feature");
                 }
 
                 var dto = Map(item);

@@ -128,6 +128,11 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.Forbidden);
         }
 
+        protected HttpResponseMessage Forbidden(string msg)
+        {
+            return CreateResponse(HttpStatusCode.Forbidden, msg);
+        }
+
         protected bool IsGlobalAdmin()
         {
             try
