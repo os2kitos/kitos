@@ -29,7 +29,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var organization = _orgRepository.GetByKey(id);
 
-                if (organization == null) return NotFound();
+                if (organization == null)
+                {
+                    return NotFound();
+                }
 
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 

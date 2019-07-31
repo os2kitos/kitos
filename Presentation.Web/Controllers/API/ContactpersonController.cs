@@ -9,7 +9,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Net.Http;
 using Core.DomainModel.Organization;
-using Presentation.Web.Helpers;
 
 namespace Presentation.Web.Controllers.API
 {
