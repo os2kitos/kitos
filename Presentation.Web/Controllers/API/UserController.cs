@@ -243,7 +243,7 @@ namespace Presentation.Web.Controllers.API
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
-                header.Add("OrgRoller", "Organisations roller"); s
+                header.Add("OrgRoller", "Organisations roller"); 
                 header.Add("ITProjektRoller", "ITProjekt roller");
                 header.Add("ITSystemRoller", "ITSystem roller");
                 header.Add("ITKontraktRoller", "ITKontrakt roller");
