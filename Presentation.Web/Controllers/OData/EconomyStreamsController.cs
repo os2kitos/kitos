@@ -43,12 +43,12 @@ namespace Presentation.Web.Controllers.OData
 
                 if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
             else if (!HasAccessWithinOrganization(orgKey))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             return Ok(result);
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             var result =
@@ -80,7 +80,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             var result =
@@ -99,7 +99,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             var result =
@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             var result =

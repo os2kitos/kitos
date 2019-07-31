@@ -206,7 +206,7 @@ namespace Presentation.Web.Controllers.OData
             var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (orgKey != currentOrgId)
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             var result = _adviceService.GetAdvicesForOrg(orgKey);

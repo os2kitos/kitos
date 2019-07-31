@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
         /// <returns></returns>
         public override IHttpActionResult Delete(int key)
         {
-            return StatusCode(HttpStatusCode.NotImplemented);
+            return Unauthorized();
         }
 
         //GET /Organizations(1)/DefaultOrganizationForUsers

@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 
@@ -88,7 +88,7 @@ namespace Presentation.Web.Controllers.OData
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return StatusCode(HttpStatusCode.NotImplemented);
+            return Unauthorized();
             //return base.Post(entity);
         }
 
@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 
@@ -116,7 +116,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 
@@ -155,7 +155,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return StatusCode(HttpStatusCode.Forbidden);
+                    return Unauthorized();
                 }
             }
 

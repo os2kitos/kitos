@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
             if (!AuthService.HasWriteAccess(UserId, option))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             try

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Unauthorized();
             }
 
             try
