@@ -18,6 +18,8 @@ class Constants {
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
+    readonly kendoUserApiHeader = "userHeader";
+    readonly kendoUserApiObject = "userObject";
     readonly kendoResetFilter = "resetFilterButton";
     readonly kendoSaveFilter = "saveFilterButton";
     readonly kendoUseFilter = "useFilterButton";

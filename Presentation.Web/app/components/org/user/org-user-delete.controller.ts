@@ -314,7 +314,8 @@
         }
 
         public deleteSelectedRoles() {
-            if (!confirm('Er du sikker på du vil slette de valgte roller?')) {
+            if (!confirm('Er du sikker på du vil slette de valgte roller?'))
+            {
                 return;
             }
 

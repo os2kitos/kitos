@@ -72,7 +72,9 @@
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
             // check if the requested property exsists in the diff
             if (Object.keys(diffRights).indexOf(property) === -1)
+            {
                 return; // if it doesn't then it wasn't changed and we abort
+            }
 
             if (diffRights[property]) {
                 // add role to user

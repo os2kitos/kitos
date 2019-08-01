@@ -18,14 +18,16 @@ type ColumnHeaders = {
     systemName: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
     catalogName: protractor.ElementFinder,
-    catalogUsage: protractor.ElementFinder
+    catalogUsage: protractor.ElementFinder,
+    userApi: protractor.ElementFinder
 };
 
 type ColumnObjects = {
     systemName: protractor.ElementArrayFinder,
     contractName: protractor.ElementArrayFinder,
     catalogName: protractor.ElementArrayFinder,
-    catalogUsage: protractor.ElementArrayFinder
+    catalogUsage: protractor.ElementArrayFinder,
+    userApi: protractor.ElementArrayFinder
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
@@ -55,6 +57,7 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
+            userApi: kendo.getColumnHeaderClickable(consts.kendoUserApiHeader),
 
         };
         return columns;
@@ -69,6 +72,7 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),
             catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
+            userApi: kendo.getColumnItemLinks(consts.kendoUserApiObject),
         };
         return columns;
     }
