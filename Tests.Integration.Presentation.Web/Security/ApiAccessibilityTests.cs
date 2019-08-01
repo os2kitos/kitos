@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.Security
 
             Assert.NotNull(requestResponse);
             Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
-            //Assert.Equal("Det er ikke tilladt at benytte dette endpoint", contentAsString);
+            Assert.Equal("Det er ikke tilladt at benytte dette endpoint", contentAsString);
         }
 
         [Fact]
