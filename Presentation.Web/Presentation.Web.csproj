@@ -531,9 +531,6 @@
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Middleware\ApiOdataRequestsFilterMiddleware.cs" />
-    <Compile Include="Infrastructure\Model\BearerTokenConfig.cs" />
-    <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
-    <Compile Include="Infrastructure\Model\SsoConfig.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
     <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />

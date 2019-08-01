@@ -4,11 +4,8 @@ using Hangfire;
 using System.IdentityModel.Tokens;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
-using Presentation.Web.Infrastructure.Middleware;
-using Presentation.Web.Infrastructure.Model;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
-
 namespace Presentation.Web
 {
     public class Startup
