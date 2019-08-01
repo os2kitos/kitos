@@ -7,7 +7,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class CommunicationController : GenericContextAwareApiController<Communication, CommunicationDTO>
     {
         public CommunicationController(IGenericRepository<Communication> repository) 

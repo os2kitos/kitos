@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class GoalController : GenericApiController<Goal, GoalDTO>
     {
         public GoalController(IGenericRepository<Goal> repository) : base(repository)

@@ -9,7 +9,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;

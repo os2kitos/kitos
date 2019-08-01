@@ -7,7 +7,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
     {
         public DataRowController(IGenericRepository<DataRow> repository)

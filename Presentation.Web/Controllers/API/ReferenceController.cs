@@ -13,7 +13,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
         public readonly IFeatureChecker _featureChecker;

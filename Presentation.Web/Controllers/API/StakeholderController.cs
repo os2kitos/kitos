@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class StakeholderController : GenericContextAwareApiController<Stakeholder, StakeholderDTO>
     {
         public StakeholderController(IGenericRepository<Stakeholder> repository) : base(repository)

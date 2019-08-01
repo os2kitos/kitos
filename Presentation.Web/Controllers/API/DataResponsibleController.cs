@@ -12,7 +12,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class DataResponsibleController : GenericApiController<DataResponsible, DataResponsibleDTO>
     {
         IGenericRepository<DataResponsible> _repository;

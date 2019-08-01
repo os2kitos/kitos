@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ItProjectOrgUnitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;

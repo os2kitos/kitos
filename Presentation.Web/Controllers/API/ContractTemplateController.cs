@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ContractTemplateController : GenericOptionApiController<ItContractTemplateType, ItContract, OptionDTO>
     {
         public ContractTemplateController(IGenericRepository<ItContractTemplateType> repository)

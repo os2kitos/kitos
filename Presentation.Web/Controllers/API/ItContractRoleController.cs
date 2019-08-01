@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ItContractRoleController : GenericOptionApiController<ItContractRole, ItContractRight, RoleDTO>
     {
         public ItContractRoleController(IGenericRepository<ItContractRole> repository) 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Web;
+﻿using System.Threading.Tasks;
 using Microsoft.Owin;
 
 namespace Presentation.Web.Infrastructure.Middleware
@@ -24,7 +20,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                 if (context.Request.Path.ToString().Contains("odata/"))
                 {
                     context.Response.StatusCode = 403;
-                    context.Response.WriteAsync("Calling odata functions is forbidden");
+                    context.Response.WriteAsync("Det er ikke tilladt at kalde odata endpoints");
                 }
                 else
                 {

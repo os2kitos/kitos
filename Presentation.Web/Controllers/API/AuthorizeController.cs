@@ -14,7 +14,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;

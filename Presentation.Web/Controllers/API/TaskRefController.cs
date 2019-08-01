@@ -8,7 +8,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
         public TaskRefController(IGenericRepository<TaskRef> repository)

@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class PaymentModelController : GenericOptionApiController<PaymentModelType, ItContract, OptionDTO>
     {
         public PaymentModelController(IGenericRepository<PaymentModelType> repository)

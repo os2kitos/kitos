@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class GoalStatusController : GenericContextAwareApiController<GoalStatus, GoalStatusDTO>
     {
         public GoalStatusController(IGenericRepository<GoalStatus> repository) : base(repository)

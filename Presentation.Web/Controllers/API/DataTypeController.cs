@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class DataTypeController : GenericOptionApiController<DataType, DataRow, OptionDTO>
     {
 

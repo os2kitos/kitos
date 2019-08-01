@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class MethodController : GenericOptionApiController<MethodType, ItInterface, OptionDTO>
     {
         public MethodController(IGenericRepository<MethodType> repository)

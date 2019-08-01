@@ -14,7 +14,7 @@ using Presentation.Web.Models.Exceptions;
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
-    [InternalApi]
+    [PublicApi]
     public class TextController : GenericApiController<Text, TextDTO>
     {
         protected readonly IGenericRepository<Text> _repository;

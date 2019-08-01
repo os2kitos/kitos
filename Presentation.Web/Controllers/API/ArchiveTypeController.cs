@@ -6,7 +6,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ArchiveTypeController : GenericOptionApiController<ArchiveType, ItSystemUsage, OptionDTO>
     {
         public ArchiveTypeController(IGenericRepository<ArchiveType> repository) 

@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API
     using Core.DomainModel;
     using Core.DomainModel.Organization;
 
-    [InternalApi]
+    [PublicApi]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
 
     {

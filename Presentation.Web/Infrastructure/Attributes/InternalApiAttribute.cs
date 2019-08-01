@@ -21,7 +21,6 @@ namespace Presentation.Web.Infrastructure.Attributes
                     StatusCode = HttpStatusCode.Forbidden,
                     Content = new StringContent("Det er ikke tilladt at benytte dette endpoint")
                 };
-                Debug.WriteLine("bla");
 
             }
             base.OnActionExecuting(actionContext);

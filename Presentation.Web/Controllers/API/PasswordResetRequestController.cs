@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
-    [InternalApi]
+    [PublicApi]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;

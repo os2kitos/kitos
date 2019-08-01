@@ -7,7 +7,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class PaymentMilestoneController : GenericContextAwareApiController<PaymentMilestone, PaymentMilestoneDTO>
     {
         public PaymentMilestoneController(IGenericRepository<PaymentMilestone> repository) 

@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ProcurementStrategyController : GenericOptionApiController<ProcurementStrategyType, ItContract, OptionDTO>
     {
         public ProcurementStrategyController(IGenericRepository<ProcurementStrategyType> repository)

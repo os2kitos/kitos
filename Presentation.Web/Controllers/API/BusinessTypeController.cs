@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class BusinessTypeController : GenericOptionApiController<BusinessType, ItSystem, OptionDTO>
     {
         public BusinessTypeController(IGenericRepository<BusinessType> repository) : base(repository)

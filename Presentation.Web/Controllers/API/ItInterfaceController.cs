@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.API
 {
     using Core.DomainModel.Organization;
 
-    [InternalApi]
+    [PublicApi]
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;

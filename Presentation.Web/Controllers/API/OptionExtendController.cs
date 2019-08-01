@@ -5,7 +5,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class OptionExtendController : GenericOptionApiController<OptionExtendType, ItContract, OptionDTO>
     {
         public OptionExtendController(IGenericRepository<OptionExtendType> repository)

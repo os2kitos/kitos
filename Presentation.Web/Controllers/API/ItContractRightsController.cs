@@ -9,7 +9,7 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [InternalApi]
+    [PublicApi]
     public class ItContractRightController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
     {
         private readonly IGenericRepository<ItContract> _objectRepository;
