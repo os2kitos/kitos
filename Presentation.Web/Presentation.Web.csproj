@@ -521,6 +521,9 @@
     <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemsController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Extensions\IdentityClaimExtension.cs" />
+    <Compile Include="Extensions\OwinContextExtensions.cs" />
+    <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\KITOSApiExplorer.cs" />
     <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
@@ -531,7 +534,16 @@
     <Compile Include="Infrastructure\Model\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Model\SsoConfig.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\IAuthenticationContext.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
     <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
+    <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />

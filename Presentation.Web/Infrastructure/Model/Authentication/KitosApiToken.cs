@@ -1,7 +1,7 @@
 ﻿using System;
 using Core.DomainModel;
 
-namespace Presentation.Web.Infrastructure.Model
+namespace Presentation.Web.Infrastructure.Model.Authentication
 {
     public class KitosApiToken
     {
