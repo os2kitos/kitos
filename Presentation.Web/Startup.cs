@@ -2,7 +2,8 @@
 using Owin;
 using Hangfire;
 using System.IdentityModel.Tokens;
-using Presentation.Web.Infrastructure.Model;
+using Presentation.Web.Infrastructure.Middleware;
+using Presentation.Web.Infrastructure.Model.Authentication;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 
@@ -18,6 +19,7 @@ namespace Presentation.Web
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
             app.UseHangfireDashboard();
             app.UseHangfireServer();
+
             //setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
@@ -34,6 +36,11 @@ namespace Presentation.Web
                     ValidateLifetime = true,
                 }
             });
+
+            // Initializing API Request Logging
+
+            app.UseNinject(); 
+            app.Use<ApiRequestsLoggingMiddleware>();
         }
     }
 }

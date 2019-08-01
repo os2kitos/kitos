@@ -13,6 +13,10 @@ using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
+using Microsoft.Owin;
+using Presentation.Web.Infrastructure.Factories.Authentication;
+using Presentation.Web.Infrastructure.Model.Authentication;
+using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -103,7 +107,12 @@ namespace Presentation.Web
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
             kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
+
+            kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
+            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
+            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InRequestScope();
         }
     }
 }
