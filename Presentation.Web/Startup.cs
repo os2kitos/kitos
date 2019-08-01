@@ -39,7 +39,7 @@ namespace Presentation.Web
 
             // Initializing API Request Logging
 
-            app.UseNinject();
+            app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();
         }
     }
