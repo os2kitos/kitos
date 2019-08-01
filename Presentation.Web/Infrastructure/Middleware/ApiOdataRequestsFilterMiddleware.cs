@@ -20,7 +20,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                 if (context.Request.Path.ToString().Contains("odata/"))
                 {
                     context.Response.StatusCode = 403;
-                    context.Response.WriteAsync("Det er ikke tilladt at kalde odata endpoints");
+                    context.Response.Write("Det er ikke tilladt at kalde odata endpoints");
                 }
                 else
                 {
