@@ -57,7 +57,7 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
-            userApi: kendo.getColumnHeaderClickable(consts.kendoUserApiHeader),
+            userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
 
         };
         return columns;
@@ -83,6 +83,10 @@ class kendoHelper {
     public getColumnHeaderClickable(headerHook: string) {
         return element(byDataElementType(headerHook)).element(by.css("a[class=k-link]"));
     }
+
+    public getUserColumnHeaderClickable(headerHook: string) {
+            return element(byDataElementType(headerHook)).element(by.css("a[class=k-header-column-menu]"));
+        }
 
     public getColumnItemLinks(itemHook: string) {
         return element.all(byDataElementType(itemHook)).all(by.tagName("a"));

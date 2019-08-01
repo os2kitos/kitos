@@ -16,22 +16,23 @@ describe("Only Global Admins can enable and disable API access on a user", () =>
     });
 
     afterEach(() => {
-        testFixture.cleanupState();
-        
+        testFixture.cleanupState()
     });
 
     it("Global Admin only have access to API access attribute in overview", () =>
     {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
-        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isPresent()).toBeTruthy();
+        browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
+        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
     });
 
     it("Local Admin and down cannot see API access attribute in overview", () =>
     {
         loginHelper.loginAsLocalAdmin();
         pageObject.getPage();
-        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isPresent()).toBeFalsy();
+        browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
+        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeFalsy();
     });
 
 });
