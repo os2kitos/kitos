@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens;
 
-namespace Presentation.Web.Infrastructure.Model
+namespace Presentation.Web.Infrastructure.Model.Authentication
 {
     public class SsoConfig
     {
