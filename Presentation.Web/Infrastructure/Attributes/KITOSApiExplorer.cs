@@ -10,7 +10,6 @@ namespace Presentation.Web.Infrastructure.Attributes
     {
         public KITOSApiExplorer(HttpConfiguration configuration) : base(configuration)
         {
-
         }
 
         public override bool ShouldExploreController(string controllerVariableValue,
