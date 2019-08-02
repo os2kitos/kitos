@@ -15,10 +15,12 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;

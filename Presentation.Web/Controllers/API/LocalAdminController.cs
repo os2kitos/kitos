@@ -4,11 +4,12 @@ using System.Web.Http.Description;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class LocalAdminController : BaseApiController
     {
         private readonly IOrganizationRoleService _organizationRoleService;

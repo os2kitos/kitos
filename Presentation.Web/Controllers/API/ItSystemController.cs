@@ -14,10 +14,12 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;

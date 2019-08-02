@@ -4,10 +4,12 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItProjectStatusController : GenericContextAwareApiController<ItProjectStatus, ItProjectStatusDTO>
     {
         public ItProjectStatusController(IGenericRepository<ItProjectStatus> repository) 
