@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;

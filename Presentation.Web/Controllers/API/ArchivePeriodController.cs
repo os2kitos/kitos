@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Web;
+﻿using System.Net.Http;
 using System.Web.Http;
-using System.Web.Mvc;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ArchivePeriodController : GenericApiController<ArchivePeriod, ArchivePeriodDTO>
     {
         // GET: ArchivePeriod

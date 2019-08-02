@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
-
 namespace Presentation.Web
 {
     public class Startup
@@ -41,6 +40,8 @@ namespace Presentation.Web
 
             app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();
+
+            app.Use<ApiOdataRequestsFilterMiddleware>();
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
         }
     }

@@ -525,9 +525,13 @@
     <Compile Include="Extensions\OwinContextExtensions.cs" />
     <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
+    <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\KITOSApiExplorer.cs" />
+    <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Middleware\ApiOdataRequestsFilterMiddleware.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
     <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
     <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />

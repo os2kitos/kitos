@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class SSOConfigController : BaseApiController
     {
         [AllowAnonymous]
