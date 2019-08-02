@@ -18,12 +18,15 @@ class Constants {
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
+    readonly kendoUserEmailHeader = "userHeaderEmail";
+    readonly kendoUserEmailObject = "userEmailObject";
     readonly kendoUserApiHeader = "userHeader";
     readonly kendoUserApiObject = "userObject";
     readonly kendoResetFilter = "resetFilterButton";
     readonly kendoSaveFilter = "saveFilterButton";
     readonly kendoUseFilter = "useFilterButton";
     readonly kendoRemoveFilter = "removeFilterButton";
+    readonly kendoUserDeleteButton = "userDeleteButton";
 
     //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";

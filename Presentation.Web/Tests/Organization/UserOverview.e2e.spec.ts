@@ -16,7 +16,7 @@ describe("Only Global Admins can enable and disable API access on a user", () =>
     });
 
     afterEach(() => {
-        testFixture.cleanupState()
+        testFixture.cleanupState();
     });
 
     it("Global Admin only have access to API access attribute in overview", () =>
