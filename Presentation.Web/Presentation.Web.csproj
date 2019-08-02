@@ -523,6 +523,7 @@
     <Compile Include="Controllers\OData\UsersController.cs" />
     <Compile Include="Extensions\IdentityClaimExtension.cs" />
     <Compile Include="Extensions\OwinContextExtensions.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />

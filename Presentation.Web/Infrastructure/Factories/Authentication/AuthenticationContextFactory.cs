@@ -1,5 +1,5 @@
-﻿using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using Core.DomainServices;
 using Microsoft.Owin;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Model.Authentication;
@@ -11,20 +11,28 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
     {
         private readonly ILogger _logger;
         private readonly IOwinContext _owinContext;
+        private readonly IUserRepository _userRepository;
         private readonly IdentityClaimExtension identityClaimExtension = new IdentityClaimExtension();
 
-        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext)
+        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
         {
             _logger = logger;
             _owinContext = owinContext;
+            _userRepository = userRepository;
         }
 
         public IAuthenticationContext Create()
         {
             var user = _owinContext.Authentication.User;
             return IsAuthenticated(user)
-                ? new AuthenticationContext(MapAuthenticationMethod(user), MapUserId(user), MapOrganizationId(user))
-                : new AuthenticationContext(AuthenticationMethod.Anonymous);
+                ? new AuthenticationContext(MapAuthenticationMethod(user), MapApiAccess(user), MapUserId(user), MapOrganizationId(user))
+                : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
+        }
+
+        private bool MapApiAccess(ClaimsPrincipal user)
+        {
+            var dbUser = _userRepository.GetById(int.Parse(user.Identity.Name));
+            return dbUser.HasApiAccess;
         }
 
         private int? MapOrganizationId(ClaimsPrincipal user)

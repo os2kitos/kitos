@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -155,6 +154,15 @@ namespace Core.DomainModel
                 return OrganizationRights.Any(
                     right => (right.Role == OrganizationRole.LocalAdmin) &&
                              (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
+            }
+        }
+
+        public bool HasApiAccess
+        {
+            get
+            {
+                return OrganizationRights.Any(
+                    right => (right.Role == OrganizationRole.ApiAccess));
             }
         }
 

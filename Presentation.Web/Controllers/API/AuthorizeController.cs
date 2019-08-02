@@ -126,6 +126,12 @@ namespace Presentation.Web.Controllers.API
                     return BadRequest();
                 }
 
+                if (!user.HasApiAccess)
+                {
+                    Logger.Error($"User without API Access tried to access API, userID is : {user.Id}");
+                    return Forbidden();
+                }
+
                 var token = new TokenValidator().CreateToken(user);
 
                 var response = new GetTokenResponseDTO

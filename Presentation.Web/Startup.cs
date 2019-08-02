@@ -41,6 +41,7 @@ namespace Presentation.Web
 
             app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();
+            app.Use<DenyUsersWithoutApiAccessMiddleware>();
         }
     }
 }
