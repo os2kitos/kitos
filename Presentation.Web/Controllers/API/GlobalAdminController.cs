@@ -8,7 +8,6 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    //TODO refactor this into OrganizationRightsController
     [InternalApi]
     public class GlobalAdminController : BaseApiController
     {
