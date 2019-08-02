@@ -9,8 +9,8 @@ namespace Presentation.Web.Helpers
     {
         public static class StatusCodeMessages
         {
-            public const string ForbiddenErrorMessage = "You Don't have permission to use this feature";
-            public const string UnauthorizedErrorMessage = "You are not authorized to use this feature please login";
+            public const string ForbiddenErrorMessage = "Du har ikke rettigheder til at bruge denne funktion";
+            public const string UnauthorizedErrorMessage = "Du har ikke adgang til denne funktion log ind med en bruger og prøv igen";
 
         }
     }

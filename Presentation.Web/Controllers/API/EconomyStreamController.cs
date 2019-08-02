@@ -29,8 +29,11 @@ namespace Presentation.Web.Controllers.API
                     // all users may view economy streams marked Public or if they are part of the organization
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.ExternPaymentFor.OrganizationId == currentOrgId);
                     if (!result.Any())
-                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
+                    {
+                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not allowed to view the data
                         return Forbidden();
+
+                    }
                 }
             }
             else

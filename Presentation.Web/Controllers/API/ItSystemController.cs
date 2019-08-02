@@ -241,12 +241,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 // only global admin can set access mod to public
-                if ((dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin))
+                if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
                 {
                     return Forbidden();
                 }
+
                 if (!IsAvailable(dto.Name, dto.OrganizationId))
+                {
                     return Conflict("Name is already taken!");
+                }
 
                 var item = Map(dto);
 

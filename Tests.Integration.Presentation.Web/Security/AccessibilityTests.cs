@@ -55,7 +55,6 @@ namespace Tests.Integration.Presentation.Web.Security
             var token = await HttpApi.GetTokenAsync(role);
             using (var httpResponse = await HttpApi.PostAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), jobj, token.Token))
             {
-                Debug.WriteLine("Response " + httpResponse);
                 Assert.Equal(httpCode, httpResponse.StatusCode);
             }
         }

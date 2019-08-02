@@ -45,7 +45,6 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
-            Debug.WriteLine(": - "+ requestMessage.Headers.Authorization);
             return HttpClient.SendAsync(requestMessage);
         }
 

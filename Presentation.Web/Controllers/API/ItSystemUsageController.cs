@@ -98,7 +98,10 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
 
