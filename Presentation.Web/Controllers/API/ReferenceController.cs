@@ -29,9 +29,9 @@ namespace Presentation.Web.Controllers.API
             }
 
             var result = base.PatchQuery(reference, obj);
-            {
-                return Ok(Map(result));
-            }
+            
+            return Ok(Map(result));
+            
         }
 
         private bool CanModifyReference(ExternalReference entity)
