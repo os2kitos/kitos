@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.OData;
@@ -76,5 +77,11 @@ namespace Presentation.Web.Controllers.OData
             var value = keySegment.Keys.FirstOrDefault().Value;
             return (TKey)value;
         }
+
+        protected virtual IHttpActionResult Forbidden()
+        {
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.Forbidden));
+        }
+
     }
 }

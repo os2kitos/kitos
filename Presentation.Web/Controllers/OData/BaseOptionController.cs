@@ -110,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var liste = _repository.Get().Where(o => o.Id != key).OrderBy(o => o.Priority);

@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var userId = 0;

@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             entity.LastChangedByUserId = UserId;
@@ -88,7 +88,7 @@ namespace Presentation.Web.Controllers.OData
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return Unauthorized();
+            return StatusCode(HttpStatusCode.NotImplemented);
             //return base.Post(entity);
         }
 
@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
@@ -116,13 +116,13 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             try
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var user = _userService.GetUserById(UserId);
@@ -155,7 +155,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 
@@ -193,7 +193,7 @@ namespace Presentation.Web.Controllers.OData
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             //Check if user is allowed to set accessmodifier to public

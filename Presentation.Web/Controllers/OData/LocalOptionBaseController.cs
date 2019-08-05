@@ -95,7 +95,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var orgId = _authService.GetCurrentOrganizationId(UserId);
@@ -204,7 +204,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!_authService.HasWriteAccess(UserId, localOption))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try

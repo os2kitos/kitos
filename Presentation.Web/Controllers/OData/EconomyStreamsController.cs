@@ -5,19 +5,22 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
 using System.Web.OData.Routing;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Presentation.Web.Controllers.API;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
-    public class EconomyStreamsController : ODataController // doesn't derive from BaseEntityController because we need absolute control over what is exposed here
+    public class EconomyStreamsController : BaseEntityController<EconomyStream>
+// doesn't derive from BaseEntityController because we need absolute control over what is exposed here
     {
         private readonly IGenericRepository<EconomyStream> _repository;
         private readonly IGenericRepository<User> _userRepository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IGenericRepository<User> userRepository)
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IAuthenticationService authService, IGenericRepository<User> userRepository) : base(repository, authService)
         {
             _repository = repository;
             _userRepository = userRepository;
@@ -43,12 +46,12 @@ namespace Presentation.Web.Controllers.OData
 
                 if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
             else if (!HasAccessWithinOrganization(orgKey))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             return Ok(result);
@@ -61,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var result =
@@ -80,7 +83,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var result =
@@ -99,7 +102,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var result =
@@ -119,7 +122,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var result =
