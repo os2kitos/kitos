@@ -13,7 +13,7 @@ using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
-using ResponseMessageResult = System.Web.Http.Results.ResponseMessageResult;
+using System.Web.Http.Results;
 
 namespace Tests.Unit.Presentation.Web.OData
 {
