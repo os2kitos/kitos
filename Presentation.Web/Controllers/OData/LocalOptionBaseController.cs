@@ -148,15 +148,21 @@ namespace Presentation.Web.Controllers.OData
                 var localOption = localOptionSearch.First();
                 // does the entity exist?
                 if (localOption == null)
+                {
                     return NotFound();
+                }
 
                 // check if user is allowed to write to the entity
                 if (!_authService.HasWriteAccess(UserId, localOption))
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
                 // check model state
                 if (!ModelState.IsValid)
+                {
                     return BadRequest(ModelState);
+                }
 
                 try
                 {

@@ -226,11 +226,11 @@ namespace Presentation.Web.Controllers.OData
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
             if (anySents) {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             if (!_authService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
 
 
             try

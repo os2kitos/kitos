@@ -13,7 +13,6 @@ using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
-using System.Web.Http.Results;
 
 namespace Tests.Unit.Presentation.Web.OData
 {

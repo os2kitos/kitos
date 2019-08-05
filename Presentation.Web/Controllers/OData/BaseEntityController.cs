@@ -134,7 +134,7 @@ namespace Presentation.Web.Controllers.OData
             // check if user is allowed to write to the entity
             if (!AuthService.HasWriteAccess(UserId, entity))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             // check model state

@@ -71,11 +71,15 @@ namespace Presentation.Web.Controllers.OData
 
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             //Check if user is allowed to set accessmodifier to public
             //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
@@ -86,7 +90,9 @@ namespace Presentation.Web.Controllers.OData
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {

@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.GetByKey(orgKey).LastChangedByUser;
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.GetByKey(orgKey).ObjectOwner;
@@ -95,7 +95,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.GetByKey(orgKey).Type;
@@ -108,7 +108,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var user = _userRepository.GetByKey(UserId);
@@ -141,7 +141,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
