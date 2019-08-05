@@ -7,22 +7,36 @@ type HeaderButtons = {
     useFilter: protractor.ElementFinder,
     deleteFilter: protractor.ElementFinder,
     createContract: protractor.ElementFinder,
-    systemCatalogCreate: protractor.ElementFinder
+    systemCatalogCreate: protractor.ElementFinder,
+    editReference: protractor.ElementFinder,
+    deleteReference: protractor.ElementFinder,
+    editSaveReference: protractor.ElementFinder,
+    createReference: protractor.ElementFinder
 };
 
-type FieldsForms = {
-  
-};
+type InputFields =
+{
+        referenceDocTitle: protractor.ElementFinder,
+        referenceDocId: protractor.ElementFinder,
+        referenceDocUrl: protractor.ElementFinder,
+        referenceCreator: protractor.ElementFinder
+}
+
 
 type ColumnHeaders = {
     systemName: protractor.ElementFinder,
+    referenceName: protractor.ElementFinder,
+    referenceId: protractor.ElementFinder,
     contractName: protractor.ElementFinder,
     catalogName: protractor.ElementFinder,
     catalogUsage: protractor.ElementFinder
+
 };
 
 type ColumnObjects = {
     systemName: protractor.ElementArrayFinder,
+    referenceName: protractor.ElementArrayFinder,
+    referenceId: protractor.ElementArrayFinder,
     contractName: protractor.ElementArrayFinder,
     catalogName: protractor.ElementArrayFinder,
     catalogUsage: protractor.ElementArrayFinder
@@ -36,15 +50,30 @@ class kendoToolbarWrapper {
     public headerButtons(): HeaderButtons {
      
         var buttons: HeaderButtons = {
+            editReference: element(byDataElementType(consts.kendoReferenceEditButton)),
+            editSaveReference: element(byDataElementType(consts.kendoReferenceEditSaveButton)),
             resetFilter: element(byDataElementType(consts.kendoButtonResetFilter)),
             saveFilter: element(byDataElementType(consts.kendoButtonSaveFilter)),
             useFilter: element(byDataElementType(consts.kendoButtonUseFilter)),
             deleteFilter: element(byDataElementType(consts.kendoButtonDeleteFilter)),
             createContract: element(byDataElementType(consts.kendoContractButtonCreateContract)),
-            systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate))
+            systemCatalogCreate: element(byDataElementType(consts.kendoSystemButtonCreate)),
+            createReference: element(byDataElementType(consts.kendoCreateReferenceButton)),
+            deleteReference: element(byDataElementType(consts.kendoReferenceDeleteButton))
 
         };
         return buttons;
+    }
+
+    public inputFields(): InputFields {
+
+        var inputs: InputFields = {
+            referenceDocTitle: element(byDataElementType(consts.kendoReferenceFieldTitle)),
+            referenceDocId: element(byDataElementType(consts.kendoReferenceFieldId)),
+            referenceDocUrl: element(byDataElementType(consts.kendoReferenceFieldUrl)),
+            referenceCreator: element(byDataElementType(consts.createReferenceForm))
+        };
+        return inputs;
     }
 
     public columnHeaders(): ColumnHeaders {
@@ -55,6 +84,8 @@ class kendoToolbarWrapper {
             contractName: kendo.getColumnHeaderClickable(consts.kendoContractNameHeader),
             catalogName: kendo.getColumnHeaderClickable(consts.kendoCatalogNameHeader),
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
+            referenceName: kendo.getColumnHeaderClickable(consts.kendoReferencetNameHeader),
+            referenceId: kendo.getColumnHeaderClickable(consts.kendoReferenceHeaderId)
 
         };
         return columns;
@@ -62,15 +93,28 @@ class kendoToolbarWrapper {
 
     public columnObjects(): ColumnObjects {
         var kendo = new kendoHelper();
-        var consts = new Constants();
+        
 
         var columns: ColumnObjects = {
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),
             contractName: kendo.getColumnItemLinks(consts.kendoContractNameObjects),
             catalogName: kendo.getColumnItemLinks(consts.kendoCatalogNameObjects),
             catalogUsage: kendo.getColumnItemLinks(consts.kendoCatalogUsageObjects),
+            referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects),
+            referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects)
         };
         return columns;
+    }
+
+    public getFilteredColumnElement(column: protractor.ElementArrayFinder, textValue: string): protractor.ElementArrayFinder {
+        var test = column.filter((elem) => {
+            return elem.getText().then((val) => {
+                if (val === textValue) {
+                    return elem;
+                }
+            });
+        });
+        return test;
     }
 }
 
