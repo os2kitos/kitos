@@ -157,7 +157,7 @@ namespace Core.DomainModel
             }
         }
 
-        public bool HasApiAccess
+        public virtual bool HasApiAccess
         {
             get
             {
