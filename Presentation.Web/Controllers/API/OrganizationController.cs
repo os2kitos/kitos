@@ -9,10 +9,12 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;

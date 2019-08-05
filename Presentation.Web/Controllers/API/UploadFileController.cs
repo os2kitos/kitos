@@ -5,9 +5,11 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 using System.IO;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class UploadFileController : BaseApiController
     {
         public HttpResponseMessage Post()

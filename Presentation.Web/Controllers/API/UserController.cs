@@ -18,10 +18,12 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Ninject;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class UserController : GenericApiController<User, UserDTO>
     {
         private readonly IUserService _userService;
