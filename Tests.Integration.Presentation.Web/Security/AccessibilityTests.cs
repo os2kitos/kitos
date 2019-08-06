@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
@@ -7,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
+using Presentation.Web.Helpers;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Security
@@ -14,16 +16,16 @@ namespace Tests.Integration.Presentation.Web.Security
     public class AccessibilityTests
     {
         [Theory]
-        [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.User)]
+        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.User)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.User)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.User)]
 
-        [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.LocalAdmin)]
+        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.LocalAdmin)]
         
-        [InlineData("api/User", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
+        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
+        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
         public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
         {
@@ -58,5 +60,6 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.Equal(httpCode, httpResponse.StatusCode);
             }
         }
+
     }
 }
