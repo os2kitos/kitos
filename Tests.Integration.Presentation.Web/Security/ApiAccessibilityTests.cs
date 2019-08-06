@@ -11,9 +11,7 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class ApiAccessibilityTests : WithAutoFixture
     {
-
         private readonly KitosCredentials _globalAdmin;
-
         public ApiAccessibilityTests()
         {
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
@@ -57,10 +55,6 @@ namespace Tests.Integration.Presentation.Web.Security
             Assert.NotNull(requestResponse);
             Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             Assert.Equal("Det er ikke tilladt at kalde odata endpoints", contentAsString);
-        }
-
-
-
-
+        
     }
 }
