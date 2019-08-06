@@ -49,12 +49,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return HttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> GetAsyncWithToken(Uri url, string tokenvalue)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-            requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
-            return HttpClient.SendAsync(requestMessage);
-        }
 
         public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
         {
