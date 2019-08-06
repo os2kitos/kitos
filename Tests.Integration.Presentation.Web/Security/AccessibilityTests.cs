@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel.Organization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Presentation.Web.Helpers;
 using Xunit;
+using Core.DomainModel.Organization;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
