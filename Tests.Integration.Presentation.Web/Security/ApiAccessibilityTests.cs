@@ -59,16 +59,7 @@ namespace Tests.Integration.Presentation.Web.Security
             Assert.Equal("Det er ikke tilladt at kalde odata endpoints", contentAsString);
         }
 
-        [Fact]
-        public async Task getting_Correct_Error_Message()
-        {
-            var role = _globalAdmin.Role;
 
-            var tokenResponse = await HttpApi.GetTokenAsync(role);
-
-
-
-        }
 
 
     }
