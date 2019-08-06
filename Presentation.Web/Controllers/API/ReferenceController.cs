@@ -9,9 +9,11 @@ using System.Web.Mvc;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
         public readonly IFeatureChecker _featureChecker;

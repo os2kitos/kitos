@@ -18,10 +18,8 @@ class Constants {
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
-    readonly kendoResetFilter = "resetFilterButton";
-    readonly kendoSaveFilter = "saveFilterButton";
-    readonly kendoUseFilter = "useFilterButton";
-    readonly kendoRemoveFilter = "removeFilterButton";
+    readonly kendoCreateReferenceButton = "createReferenceButton";
+    
 
     //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";
@@ -31,6 +29,11 @@ class Constants {
     readonly saveCatalogButton = "itCatalogSaveButton";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
+    readonly createReferenceForm = "referenceCreatorForm";
+    readonly validUrl = "https://strongminds.dk/";
+    readonly invalidUrl = "invalidUrl";
+    readonly refId = "1337";
+    readonly refTitle = "STRONGMINDS";
 
     readonly navigationOrganizationButton = "organizationButton";
     readonly navigationProjectButton = "projectButton";
@@ -44,6 +47,20 @@ class Constants {
     readonly navigationDropdownGlobalAdmin = "globalAdminAnchor";
     readonly navigationDropdownChangeOrg = "changeOrganizationAnchor";
     readonly navigationDropdownLogOut = "logOutAnchor";
+    readonly kendoReferencetNameHeader = "referenceNameHeader";
+    readonly kendoReferenceNameObjects = "referenceObject";
+
+    readonly kendoReferenceHeaderId = "referenceHeaderId";
+    readonly kendoReferenceHeaderIdObjects = "referenceIdObject";
+    readonly kendoReferenceEditButton = "editReference";
+    readonly kendoReferenceDeleteButton = "deleteReference";
+    readonly kendoReferenceEditSaveButton = "editSaveReference";
+    readonly kendoReferenceFieldTitle = "referenceDocTitle";
+    readonly kendoReferenceFieldId = "referenceDocId";
+    readonly kendoReferenceFieldUrl = "referenceDocUrl";
+
+    readonly kendoSystemDeleteButton = "deleteSystemButton";
+
 }
 
 export = Constants;

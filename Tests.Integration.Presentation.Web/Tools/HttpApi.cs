@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
@@ -14,6 +15,13 @@ namespace Tests.Integration.Presentation.Web.Tools
     public static class HttpApi
     {
         private static readonly HttpClient HttpClient = new HttpClient();
+
+        public static Task<HttpResponseMessage> GetAsyncWithToken(Uri url, string token)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return HttpClient.SendAsync(requestMessage);
+        }
 
         public static Task<HttpResponseMessage> PostAsync(Uri url, object body)
         {

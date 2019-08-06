@@ -1,5 +1,5 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
+import LoginPage = require("../PageObjects/HomePage/LoginPage.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import WaitTimers = require("../Utility/waitTimers");
 

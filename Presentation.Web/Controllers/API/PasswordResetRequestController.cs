@@ -4,11 +4,13 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
+    [PublicApi]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;

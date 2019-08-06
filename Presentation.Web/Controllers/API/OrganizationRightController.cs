@@ -7,9 +7,11 @@ using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
 using Core.DomainModel.Organization;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
