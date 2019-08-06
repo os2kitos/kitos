@@ -17,20 +17,15 @@ class CreateUserHelper {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-
         pageObject.createUserButton.click();
-
         pageCreateObject.inputEmail.sendKeys(email);
-
         pageCreateObject.inputEmailRepeat.sendKeys(email);
-
         pageCreateObject.inputName.sendKeys(name);
-
         pageCreateObject.inputLastName.sendKeys(lastname);
-
         pageCreateObject.inputPhone.sendKeys(phoneNumber);
 
-        if (API) {
+        if (API)
+        {
             pageCreateObject.boolApi.click();
         }
 
@@ -44,7 +39,7 @@ class CreateUserHelper {
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
 
-        element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
+        pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
 
@@ -63,7 +58,7 @@ class CreateUserHelper {
 
         var res = null;
 
-        element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
+        pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
                     if (val === email) {
@@ -80,12 +75,12 @@ class CreateUserHelper {
     }
 
 
-    public updateApiOnUser(email: string, apiAccess: boolean, ) {
+    public updateApiOnUser(email: string, apiAccess: boolean) {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
 
-        element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
+        pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
                     if (val === email) {
