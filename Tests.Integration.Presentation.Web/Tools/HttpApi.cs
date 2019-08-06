@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Models;
@@ -72,5 +74,19 @@ namespace Tests.Integration.Presentation.Web.Tools
                 return tokenResponse;
             }
         }
+
+        public static async Task<HttpResponseMessage> NoApiGetTokenAsync(OrganizationRole role)
+        {
+            var userCredentials = TestEnvironment.GetCredentials(role);
+            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+            var loginDto = new LoginDTO
+            {
+                Email = userCredentials.Username,
+                Password = userCredentials.Password
+            };
+
+            return await HttpApi.PostAsync(url, loginDto);
+        }
+
     }
 }

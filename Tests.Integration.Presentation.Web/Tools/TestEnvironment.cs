@@ -50,6 +50,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                             "local-global-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
+                    },
+                    {
+                        OrganizationRole.ApiAccess,
+                        new KitosCredentials(
+                            "local-api-user@kitos.dk",
+                            localDevUserPassword,
+                            OrganizationRole.ApiAccess)
                     }
                 };
             }
@@ -61,7 +68,8 @@ namespace Tests.Integration.Presentation.Web.Tools
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
                     {OrganizationRole.LocalAdmin, LoadUserFromEnvironment(OrganizationRole.LocalAdmin)},
-                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)}
+                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)},
+                    {OrganizationRole.ApiAccess, LoadUserFromEnvironment(OrganizationRole.ApiAccess)}
                 };
             }
         }

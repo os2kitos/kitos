@@ -21,4 +21,6 @@ Setup-Environment -environmentName "integration"
                 -localAdminUserName "$Env:TestUserLocalAdmin" `
                 -localAdminPw "$Env:TestUserLocalAdminPw" `
                 -normalUserUserName "$Env:TestUserNormalUser" `
-                -normalUserPw "$Env:TestUserNormalUserPw"
+                -normalUserPw "$Env:TestUserNormalUserPw" `
+                -apiUserUserName "$Env:TestUserApiUser" `
+                -apiUserPw "$Env:TestUserApiUserPw"

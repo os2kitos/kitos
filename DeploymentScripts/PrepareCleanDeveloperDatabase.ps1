@@ -8,7 +8,9 @@ param(
     [Parameter(Mandatory=$true)][string]$localAdminUserName,
     [Parameter(Mandatory=$true)][string]$localAdminPw,
     [Parameter(Mandatory=$true)][string]$normalUserUserName,
-    [Parameter(Mandatory=$true)][string]$normalUserPw
+    [Parameter(Mandatory=$true)][string]$normalUserPw,
+    [Parameter(Mandatory=$true)][string]$apiUserUserName,
+    [Parameter(Mandatory=$true)][string]$apiUserPw
     )
     
 #-------------------------------------------------------------
@@ -55,6 +57,9 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE LOCAL ADMIN" }
 
 & $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$normalUserUserName" "$normalUserPw" "User"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
+
+& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "ApiAccess"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
 
 #-------------------------------------------------------------
 Write-Host "Create IT System"
