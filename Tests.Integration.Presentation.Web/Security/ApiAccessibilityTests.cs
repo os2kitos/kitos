@@ -5,6 +5,7 @@ using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
@@ -57,6 +58,18 @@ namespace Tests.Integration.Presentation.Web.Security
             Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             Assert.Equal("Det er ikke tilladt at kalde odata endpoints", contentAsString);
         }
+
+        [Fact]
+        public async Task getting_Correct_Error_Message()
+        {
+            var role = _globalAdmin.Role;
+
+            var tokenResponse = await HttpApi.GetTokenAsync(role);
+
+
+
+        }
+
 
     }
 }

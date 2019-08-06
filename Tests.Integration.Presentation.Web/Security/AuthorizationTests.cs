@@ -67,6 +67,7 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
+
                 //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
