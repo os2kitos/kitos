@@ -165,6 +165,12 @@
                         persistId: "email", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
+                        headerAttributes: {
+                            "data-element-type": "userHeaderEmail"
+                        },
+                        attributes: {
+                             "data-element-type": "userEmailObject"
+                        },
                         hidden: false,
                         filterable: {
                             cell: {

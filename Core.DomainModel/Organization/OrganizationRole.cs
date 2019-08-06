@@ -42,6 +42,6 @@
         /// <summary>
         /// Has API access
         /// </summary>
-        ApiAccess,
+        ApiAccess
     }
 }

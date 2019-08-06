@@ -27,10 +27,8 @@ namespace Tests.Integration.Presentation.Web.Security
             //Arrange
             var role = _apiUser.Role;
 
-            //Act
             var tokenResponse = await HttpApi.GetTokenAsync(role);
 
-            //Assert
             Assert.NotNull(tokenResponse);
             Assert.True(tokenResponse.LoginSuccessful);
             Assert.True(tokenResponse.Expires > DateTime.UtcNow);
@@ -53,17 +51,14 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Password()
         {
-            //Arrange
             var loginDto = new LoginDTO
             {
                 Email = _apiUser.Username,
                 Password = A<string>()
             };
 
-            //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
-                //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
         }
@@ -71,17 +66,14 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Username()
         {
-            //Arrange
             var loginDto = new LoginDTO
             {
                 Email = A<string>(),
                 Password = _apiUser.Password
             };
 
-            //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
-                //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
         }
