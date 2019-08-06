@@ -23,12 +23,10 @@ class CreateUserHelper {
         pageCreateObject.inputName.sendKeys(name);
         pageCreateObject.inputLastName.sendKeys(lastname);
         pageCreateObject.inputPhone.sendKeys(phoneNumber);
-
         if (API)
         {
             pageCreateObject.boolApi.click();
         }
-
         pageCreateObject.createUserButton.click();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
     }
@@ -38,15 +36,12 @@ class CreateUserHelper {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-
         pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
-
                     if (val === email) {
                         ele.element(by.linkText("Slet")).click();
                         element(by.buttonText("Slet bruger")).click();
-
                     }
                 });
             });
@@ -55,8 +50,6 @@ class CreateUserHelper {
     }
 
     public checkApiRoleStatusOnUser(email: string, apiStatus : boolean) {
-
-        var res = null;
 
         pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
@@ -76,10 +69,10 @@ class CreateUserHelper {
 
 
     public updateApiOnUser(email: string, apiAccess: boolean) {
+
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-
         pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
@@ -109,14 +102,10 @@ class CreateUserHelper {
                                 }
                             });
                         }
-
                     }
                 });
             });
         });
-
-
     }
-
 }
 export = CreateUserHelper;
