@@ -14,14 +14,6 @@ var ec = protractor.ExpectedConditions;
 describe("Only Global Admins can create user with API access",
     () => {
 
-        beforeAll(() => {
-
-        });
-
-        beforeEach(() => {
-
-        });
-
         afterEach(() => {
             testFixture.cleanupState();
         });
@@ -31,25 +23,24 @@ describe("Only Global Admins can create user with API access",
             () => {
                 loginHelper.loginAsGlobalAdmin();
                 pageObject.getPage();
-                browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
-                element(by.linkText("Opret Bruger")).click();
-                expect(element(by.model("ctrl.vm.hasApi")).isDisplayed()).toBeTrue();
+                browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                pageObject.createUserButton.click();
+                expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
             });
 
         it("Local Admin cannot enable api access on new user",
             () => {
                 loginHelper.loginAsLocalAdmin();
                 pageObject.getPage();
-                browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
-                element(by.linkText("Opret Bruger")).click();
-                expect(element(by.model("ctrl.vm.hasApi")).isDisplayed()).toBeFalse();
+                browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                pageObject.createUserButton.click();
+                expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
             });
 
 
         it("Global admin is able to edit api access on existing user", () => {
 
                 userHelper.updateApiOnUser("local-regular-user@kitos.dk", true);
-                //Check på om brugern har fået API adgang ude i overview
                 browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
                 expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
                 userHelper.checkApiRoleStatusOnUser("local-regular-user@kitos.dk",true);

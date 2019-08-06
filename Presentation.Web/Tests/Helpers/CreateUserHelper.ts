@@ -1,4 +1,4 @@
-﻿import HomePage = require("../PageObjects/Organization/UsersPage.po");
+﻿import HomePageObjects = require("../PageObjects/Organization/UsersPage.po");
 import CreatePage = require("../PageObjects/Organization/CreateUserPage.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import Login = require("../Helpers/LoginHelper");
@@ -6,7 +6,7 @@ import WaitTimers = require("../Utility/waitTimers");
 
 var testFixture = new TestFixtureWrapper();
 var pageCreateObject = new CreatePage();
-var pageObject = new HomePage();
+var pageObject = new HomePageObjects();
 var loginHelper = new Login();
 var waitUpTo = new WaitTimers();
 var ec = protractor.ExpectedConditions;
@@ -16,9 +16,9 @@ class CreateUserHelper {
 
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
-        browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
+        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
 
-        element(by.linkText("Opret Bruger")).click();
+        pageObject.createUserButton.click();
 
         pageCreateObject.inputEmail.sendKeys(email);
 
@@ -35,14 +35,14 @@ class CreateUserHelper {
         }
 
         pageCreateObject.createUserButton.click();
-        browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
+        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
     }
 
 
     public deleteUser(email: string) {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
-        browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
+        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
 
         element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
@@ -68,7 +68,7 @@ class CreateUserHelper {
                 tdele.getText().then(val => {
                     if (val === email) {
                         ele.element(by.linkText("Redigér")).click();
-                        element(by.model("ctrl.vm.hasApi")).isSelected().then(selected => {
+                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
                             expect(selected).not.toBeNull();
                             expect(selected).toBe(apiStatus);
                             return;
@@ -83,7 +83,7 @@ class CreateUserHelper {
     public updateApiOnUser(email: string, apiAccess: boolean, ) {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
-        browser.wait(ec.presenceOf(element(by.linkText("Opret Bruger"))), waitUpTo.twentySeconds);
+        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
 
         element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
@@ -91,7 +91,7 @@ class CreateUserHelper {
                     if (val === email) {
                         ele.element(by.linkText("Redigér")).click();
                         if (apiAccess) {
-                            element(by.model("ctrl.vm.hasApi")).isSelected().then(selected => {
+                           pageObject.hasAPiCheckBox.isSelected().then(selected => {
                                 if (!selected) {
                                     pageCreateObject.boolApi.click();
                                     pageCreateObject.editUserButton.click();
@@ -103,8 +103,7 @@ class CreateUserHelper {
                             });
                         }
                         else {
-                            element(by.model("ctrl.vm.hasApi")).isSelected().then(selected => {
-                                console.debug("Checking checkbox API is : " + selected);
+                            pageObject.hasAPiCheckBox.isSelected().then(selected => {
                                 if (selected) {
                                     pageCreateObject.boolApi.click();
                                     pageCreateObject.editUserButton.click();

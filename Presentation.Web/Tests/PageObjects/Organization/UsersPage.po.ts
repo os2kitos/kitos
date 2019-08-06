@@ -10,6 +10,9 @@ class UsersPage implements IPageObject {
 
     public kendoToolbarHelper = new KendoToolbarHelper();
     public kendoToolbarWrapper = new KendoToolbarWrapper();
+    public createUserButton = element(by.linkText("Opret Bruger"));
+    public hasAPiCheckBox = element(by.model("ctrl.vm.hasApi"));
+
 
 }
 
