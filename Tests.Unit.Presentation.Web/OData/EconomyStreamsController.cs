@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Web.Http.Results;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -24,24 +26,25 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             _economyStreamRepository = Substitute.For<IGenericRepository<EconomyStream>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
-
-            _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _userRepository);
+            var _authenticator = Substitute.For<IAuthenticationService>();
+            _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _authenticator, _userRepository);
             var userMock = new UserMock(_economyStreamsController, "12345678");
             userMock.LogOn();
         }
 
         [Fact]
-        public void GetByOrganization_NoAccess_ReturnUnauthorized()
+        public void GetByOrganization_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
             SetAccess(false, orgKey);
 
             // Act
-            var result = _economyStreamsController.GetByOrganization(orgKey);
+            var result = _economyStreamsController.GetByOrganization(orgKey) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden,result.Response.StatusCode);
         }
 
         [Fact]
@@ -90,7 +93,7 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        public void GetByOrganizationWithLocal_NoAccess_ReturnUnauthorized()
+        public void GetByOrganizationWithLocal_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
@@ -101,14 +104,15 @@ namespace Tests.Unit.Presentation.Web.OData
                 .Returns(list);
 
             // Act
-            var result = _economyStreamsController.GetByOrganization(orgKey);
+            var result = _economyStreamsController.GetByOrganization(orgKey) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden, result.Response.StatusCode);
         }
 
         [Fact]
-        public void GetAllExtern_NoAccess_ReturnUnauthorized()
+        public void GetAllExtern_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
@@ -116,10 +120,11 @@ namespace Tests.Unit.Presentation.Web.OData
             SetAccess(false, orgKey);
 
             // Act
-            var result = _economyStreamsController.GetAllExtern(orgKey, contractKey);
+            var result = _economyStreamsController.GetAllExtern(orgKey, contractKey) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden, result.Response.StatusCode);
         }
 
         [Fact]
@@ -146,7 +151,7 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        public void GetAllIntern_NoAccess_ReturnUnauthorized()
+        public void GetAllIntern_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
@@ -154,10 +159,11 @@ namespace Tests.Unit.Presentation.Web.OData
             SetAccess(false, orgKey);
 
             // Act
-            var result = _economyStreamsController.GetAllIntern(orgKey, contractKey);
+            var result = _economyStreamsController.GetAllIntern(orgKey, contractKey) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden, result.Response.StatusCode);
         }
 
         [Fact]
@@ -184,7 +190,7 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        public void GetSingleExtern_NoAccess_ReturnUnauthorized()
+        public void GetSingleExtern_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
@@ -193,10 +199,11 @@ namespace Tests.Unit.Presentation.Web.OData
             SetAccess(false, orgKey);
 
             // Act
-            var result = _economyStreamsController.GetSingleExtern(orgKey, contractKey, key);
+            var result = _economyStreamsController.GetSingleExtern(orgKey, contractKey, key) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden, result.Response.StatusCode);
         }
 
         [Fact]
@@ -224,7 +231,7 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        public void GetSingleIntern_NoAccess_ReturnUnauthorized()
+        public void GetSingleIntern_NoAccess_ReturnForbidden()
         {
             // Arrange
             const int orgKey = 1;
@@ -233,10 +240,11 @@ namespace Tests.Unit.Presentation.Web.OData
             SetAccess(false, orgKey);
 
             // Act
-            var result = _economyStreamsController.GetSingleIntern(orgKey, contractKey, key);
+            var result = _economyStreamsController.GetSingleIntern(orgKey, contractKey, key) as ResponseMessageResult;
 
             // Assert
-            Assert.IsType<UnauthorizedResult>(result);
+            Assert.IsType<ResponseMessageResult>(result);
+            Assert.Equal(HttpStatusCode.Forbidden, result.Response.StatusCode);
         }
 
         [Fact]
