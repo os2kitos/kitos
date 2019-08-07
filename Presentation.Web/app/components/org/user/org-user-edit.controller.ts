@@ -13,6 +13,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        hasApi: boolean;
     }
 
     class EditOrganizationUserController {
@@ -25,6 +26,7 @@
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
         public isUserReadOnly = false;
+        public hasUserApi = false;
 
         private userId: number;
         private originalVm;
@@ -50,7 +52,8 @@
                 isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
                 isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
-                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined
+                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined,
+                hasApi: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ApiAccess }) !== undefined
             };
             this.originalVm = _.clone(userVm);
             this.vm = userVm;
@@ -63,12 +66,15 @@
             this.isUserContractAdmin = currentUser.isContractAdmin;
             this.isUserReportAdmin = currentUser.isReportAdmin;
             this.isUserReadOnly = currentUser.isReadOnly;
+            this.hasUserApi = currentUser.hasApi;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
             // check if the requested property exsists in the diff
             if (Object.keys(diffRights).indexOf(property) === -1)
+            {
                 return; // if it doesn't then it wasn't changed and we abort
+            }
 
             if (diffRights[property]) {
                 // add role to user
@@ -97,6 +103,7 @@
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReadOnly", Models.OrganizationRole.ReadOnly));
+            promises.push(this.changeRight(diffRights, "hasApi", Models.OrganizationRole.ApiAccess));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,

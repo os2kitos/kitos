@@ -18,6 +18,8 @@
         /** Has write access to everything within the report module */
         ReportModuleAdmin = "ReportModuleAdmin" as any,
         /** Has readonly access */
-        ReadOnly = "ReadOnly" as any
+        ReadOnly = "ReadOnly" as any,
+        /**  Has Access to APi call */
+        ApiAccess = "ApiAccess" as any
     }
 }

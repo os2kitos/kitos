@@ -5,14 +5,13 @@ using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
     public class ApiAccessibilityTests : WithAutoFixture
     {
-
         private readonly KitosCredentials _globalAdmin;
-
         public ApiAccessibilityTests()
         {
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
@@ -50,13 +49,13 @@ namespace Tests.Integration.Presentation.Web.Security
             var role = _globalAdmin.Role;
 
             var tokenResponse = await HttpApi.GetTokenAsync(role);
-            var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("odata/Organizations(1)/"), tokenResponse.Token);
+            var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("odata/Organizations(1)/"),
+                tokenResponse.Token);
             var contentAsString = await requestResponse.Content.ReadAsStringAsync();
 
             Assert.NotNull(requestResponse);
             Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             Assert.Equal("Det er ikke tilladt at kalde odata endpoints", contentAsString);
         }
-
     }
 }
