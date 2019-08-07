@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -21,6 +22,29 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return HttpClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> PostAsyncWithCookie(Uri url, Cookie cookie, object body)
+        {
+            HttpClientHandler handler = new HttpClientHandler();
+            handler.CookieContainer.Add(cookie);
+            HttpClient cookieClient = new HttpClient(handler);
+
+            var obj = JsonConvert.SerializeObject(body);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(obj, Encoding.UTF8, "application/json")
+            };
+
+            return cookieClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> DeleteAsyncWithCookie(Uri url, Cookie cookie)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
+            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
             return HttpClient.SendAsync(requestMessage);
         }
 
@@ -86,6 +110,28 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await HttpApi.PostAsync(url, loginDto);
+        }
+
+        public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
+        {
+            var userCredentials = TestEnvironment.GetCredentials(role);
+            var url = TestEnvironment.CreateUrl("api/authorize");
+            var loginDto = new LoginDTO
+            {
+                Email = userCredentials.Username,
+                Password = userCredentials.Password
+            };
+
+            var cookieResponse = await HttpApi.PostAsync(url, loginDto);
+            var cookieParts = cookieResponse.Headers.Where(x => x.Key == "Set-Cookie").First().Value.First().Split('=');
+            var cookieName = cookieParts[0];
+            var cookieValue = cookieParts[1].Split(';')[0];
+
+            return new Cookie(cookieName, cookieValue)
+            {
+                Domain = url.Host
+            };
+
         }
 
     }
