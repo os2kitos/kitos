@@ -1,34 +1,29 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.Model;
-using Presentation.Web.Helpers;
 using Xunit;
 using Core.DomainModel.Organization;
+using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-    public class AccessibilityTests
+    public class AccessibilityTests : WithAutoFixture
     {
-        [Theory]
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.User)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.User)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.User)]
+        private readonly KitosCredentials _apiUser;
 
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.LocalAdmin)]
-        
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
-        public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        public AccessibilityTests()
         {
+            _apiUser = TestEnvironment.GetCredentials(OrganizationRole.ApiAccess);
+        }
+
+        [Theory]
+        [InlineData("api/User", HttpStatusCode.Forbidden)]
+        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
+        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK)]
+        public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode)
+        {
+            var role = _apiUser.Role;
             var token = await HttpApi.GetTokenAsync(role);
             using (var httpResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), token.Token))
             {
@@ -49,12 +44,15 @@ namespace Tests.Integration.Presentation.Web.Security
         } 
 
         [Theory] 
-        [InlineData("/api/Reference", HttpStatusCode.Created, OrganizationRole.GlobalAdmin)]
-        public async Task LoggedInApiPostRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        [InlineData("/api/Reference", HttpStatusCode.Created)]
+        public async Task LoggedInApiPostRequests(string apiUrl, HttpStatusCode httpCode)
         {
+            var role = _apiUser.Role;
+
             var jobj = new JObject {{"Title", "STRONGMINDS"}, {"ExternalReferenceId", "1338"}, {"URL", "https://strongminds.dk/" },{"Display","0"} };
 
             var token = await HttpApi.GetTokenAsync(role);
+            var test = 0;
             using (var httpResponse = await HttpApi.PostAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), jobj, token.Token))
             {
                 Assert.Equal(httpCode, httpResponse.StatusCode);

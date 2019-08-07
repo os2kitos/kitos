@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Models;
@@ -31,11 +29,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             handler.CookieContainer.Add(cookie);
             HttpClient cookieClient = new HttpClient(handler);
 
-            var obj = JsonConvert.SerializeObject(body);
-
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
-                Content = new StringContent(obj, Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
 
             return cookieClient.SendAsync(requestMessage);
