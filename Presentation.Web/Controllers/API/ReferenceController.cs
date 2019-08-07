@@ -26,28 +26,42 @@ namespace Presentation.Web.Controllers.API
         {
             var reference = Repository.GetByKey(id);
             if (!CanModifyReference(reference))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             var result = base.PatchQuery(reference, obj);
+            
             return Ok(Map(result));
+            
         }
 
         private bool CanModifyReference(ExternalReference entity)
         {
             if (entity.ObjectOwnerId == KitosUser.Id)
+            {
                 return true;
+            }
 
-            if(_featureChecker.CanExecute(KitosUser, Feature.CanModifyContracts) && entity.ItContract != null)
+            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyContracts) && entity.ItContract != null)
+            {
                 return true;
+            }
 
             if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyProjects) && entity.ItProject != null)
+            {
                 return true;
+            }
 
             if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystem != null)
+            {
                 return true;
+            }
 
             if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystemUsage != null)
+            {
                 return true;
+            }
 
             return false;
         }

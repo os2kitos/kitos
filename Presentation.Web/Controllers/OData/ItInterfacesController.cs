@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.OData
             if (_authService.HasReadAccess(UserId, entity))
                 return Ok(entity);
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
     }
 }

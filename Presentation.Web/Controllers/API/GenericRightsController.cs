@@ -66,7 +66,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
+                {
+                    return Forbidden();
+                }
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
@@ -103,7 +105,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
+                {
+                    return Forbidden();
+                }
+
 
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
 

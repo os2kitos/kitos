@@ -245,14 +245,14 @@ namespace Presentation.Web.Controllers.API
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
-                header.Add("OrgRoller", "Organisations roller");
+                header.Add("OrgRoller", "Organisations roller"); 
                 header.Add("ITProjektRoller", "ITProjekt roller");
                 header.Add("ITSystemRoller", "ITSystem roller");
                 header.Add("ITKontraktRoller", "ITKontrakt roller");
                 list.Add(header);
 
                 foreach (var user in dtos)
-                    {
+                {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Fornavn", user.Name);
                     obj.Add("Efternavn", user.LastName);
@@ -414,10 +414,10 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId">Not used in this case. Should remain empty</param>
         /// <returns></returns>
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
-        {            
-            if(!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
+        {
+            if (!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             return base.Delete(id, organizationId);

@@ -43,12 +43,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
 
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
@@ -58,12 +62,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(contractKey).Organization;
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
 
         // GET /Organizations(1)/ItContracts
@@ -73,7 +81,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             //tolist requried to handle filtering on computed fields
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
@@ -88,7 +98,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             return Ok(result);
@@ -101,12 +113,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == contractKey);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
@@ -116,7 +132,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var contracts = new List<ItContract>();
 

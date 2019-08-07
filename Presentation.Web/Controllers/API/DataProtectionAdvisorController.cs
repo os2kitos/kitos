@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
+using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -30,7 +31,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var organization = _orgRepository.GetByKey(id);
 
-                if (organization == null) return NotFound();
+                if (organization == null)
+                {
+                    return NotFound();
+                }
 
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 
@@ -51,7 +55,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 var dto = Map(item);

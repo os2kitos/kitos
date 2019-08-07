@@ -198,10 +198,10 @@ namespace Tests.Unit.Presentation.Web.OData
             var result = _itContractsController.GetItContractsByOrgUnit(orgKey, 2);
 
             // assert
-            Assert.IsType<StatusCodeResult>(result);
-            var statusCode = result as StatusCodeResult;
+            Assert.IsType<ResponseMessageResult>(result);
+            var statusCode = result as ResponseMessageResult;
             // ReSharper disable once PossibleNullReferenceException
-            Assert.True(statusCode.StatusCode == HttpStatusCode.Forbidden);
+            Assert.True(statusCode.Response.StatusCode == HttpStatusCode.Forbidden);
         }
 
         [Fact]

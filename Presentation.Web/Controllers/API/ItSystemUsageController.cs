@@ -97,10 +97,13 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
 
@@ -208,11 +211,16 @@ namespace Presentation.Web.Controllers.API
                 //if (!KitosUser.IsReadOnly) return Unauthorized();
                 var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString()))) return Unauthorized();
+                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString())))
+                {
+                    return Forbidden();
+                }
 
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
                                             && usage.OrganizationId == dto.OrganizationId).Any())
+                {
                     return Conflict("Usage already exist");
+                }
 
                 var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
@@ -260,10 +268,16 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
 
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
@@ -286,15 +300,27 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
                 var entity = usage.UsedBy.SingleOrDefault(x => x.ItSystemUsageId == id && x.OrganizationUnitId == organizationUnit);
-                if (entity == null) return NotFound();
+                if (entity == null)
+                {
+                    return NotFound();
+                }
 
                 usage.UsedBy.Remove(entity);
 
@@ -317,7 +343,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(usage, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -370,8 +399,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(usage, organizationId))
+                {
+                    return Forbidden();
+                }
                 var optOut = false;
 
                 List<TaskRef> tasks;

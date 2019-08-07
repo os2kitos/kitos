@@ -205,7 +205,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (orgKey != currentOrgId)
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             var result = _adviceService.GetAdvicesForOrg(orgKey);
 
@@ -217,16 +219,18 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
             if (anySents) {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             if (!_authService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
 
 
             try

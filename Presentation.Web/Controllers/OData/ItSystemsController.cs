@@ -35,7 +35,9 @@ namespace Presentation.Web.Controllers.OData
             if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
                 var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
                 return Ok(result);
@@ -56,7 +58,9 @@ namespace Presentation.Web.Controllers.OData
             if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
                 var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
                 return Ok(result);
@@ -75,12 +79,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
     }
 }
