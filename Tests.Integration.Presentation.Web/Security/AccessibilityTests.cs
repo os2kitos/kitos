@@ -8,6 +8,7 @@ using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
+    [CollectionDefinition("Non-parallel Collection", DisableParallelization = true)]
     public class AccessibilityTests : WithAutoFixture
     {
         private readonly KitosCredentials _apiUser;
