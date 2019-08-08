@@ -36,6 +36,9 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
 
         $Env:TestUserNormalUser = $parameters["TestUserNormalUser"]
         $Env:TestUserNormalUserPw = $parameters["TestUserNormalUserPw"]
+        
+        $Env:TestUserApiUser = $parameters["TestUserApiUser"]
+        $Env:TestUserApiUserPw = $parameters["TestUserApiUserPw"]
     }
     
     
