@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-
+    [CollectionDefinition("Non-parallel Collection", DisableParallelization = true)]
     public class TokenInvalidationTests : WithAutoFixture
     {
         private readonly KitosCredentials _apiUser, _globalAdmin;
@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Security
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
         }
 
-        //[Fact]
+        [Fact]
         public async Task Token_Can_Be_Invalidated_After_Creation()
         {
             var globalRole = _globalAdmin.Role;
