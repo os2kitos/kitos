@@ -88,6 +88,9 @@ namespace Tests.Integration.Presentation.Web.Tools
                 case OrganizationRole.GlobalAdmin:
                     suffix = "GlobalAdmin";
                     break;
+                case OrganizationRole.ApiAccess:
+                    suffix = "ApiUser";
+                    break;
                 default:
                     throw new NotSupportedException($"{role} Not mapped in environment loader:{nameof(LoadUserFromEnvironment)}");
             }
