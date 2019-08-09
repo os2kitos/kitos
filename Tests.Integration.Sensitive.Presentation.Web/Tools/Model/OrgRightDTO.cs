@@ -1,4 +1,4 @@
-﻿namespace Tests.Integration.Presentation.Web.Tools.Model
+﻿namespace Tests.Integration.Sensitive.Presentation.Web.Tools.Model
 {
     class OrgRightDTO
     {

@@ -9,7 +9,6 @@ using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-    [CollectionDefinition("Non-parallel Collection", DisableParallelization = true)]
     public class ApiAccessibilityTests : WithAutoFixture
     {
 

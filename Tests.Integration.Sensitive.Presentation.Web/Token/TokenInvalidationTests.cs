@@ -1,14 +1,14 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json.Linq;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
+using Tests.Integration.Sensitive.Presentation.Web.Tools;
+using Tests.Integration.Sensitive.Presentation.Web.Tools.Model;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.Security
-{
-    [CollectionDefinition("Non-parallel Collection", DisableParallelization = true)]
+namespace Tests.Integration.Sensitive.Presentation.Web.Token
+{ 
     public class TokenInvalidationTests : WithAutoFixture
     {
         private readonly KitosCredentials _apiUser, _globalAdmin;
@@ -19,23 +19,23 @@ namespace Tests.Integration.Presentation.Web.Security
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
         }
 
-        //[Fact]
-        public async Task Token_Can_Be_Invalidated_After_Creation()
+        [Fact]
+        public void Token_Can_Be_Invalidated_After_Creation()
         {
             var globalRole = _globalAdmin.Role;
-            var cookie = await HttpApi.GetCookieAsync(globalRole);
+            var cookie = HttpApiSynch.GetCookieAsync(globalRole);
 
             var apiRole = _apiUser.Role;
-            var token = await HttpApi.GetTokenAsync(apiRole);
+            var token = HttpApiSynch.GetTokenAsync(apiRole);
 
             using (var requestResponse =
-                await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+                HttpApiSynch.GetWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
             };
 
-            var rights = await HttpApi.GetAsync(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"));
+            var rights = HttpApiSynch.Get(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"));
             var rightsAsString = rights.Content.ReadAsStringAsync();
             var json = JObject.Parse(rightsAsString.Result);
             var idOfRightToDelete = default(int);
@@ -46,12 +46,12 @@ namespace Tests.Integration.Presentation.Web.Security
                     idOfRightToDelete = rightsElements.Value<int>("Id");
                 }
             }
-            var delete = await HttpApi.DeleteAsyncWithCookie(TestEnvironment.CreateUrl($"odata/Organizations(1)/Rights({idOfRightToDelete})"), cookie);
+            var delete = HttpApiSynch.DeleteWithCookie(TestEnvironment.CreateUrl($"odata/Organizations(1)/Rights({idOfRightToDelete})"), cookie);
             Assert.Equal(HttpStatusCode.NoContent, delete.StatusCode);
 
 
             using (var requestResponse =
-                await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+                HttpApiSynch.GetWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
@@ -64,7 +64,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 OrganizationId = 1.ToString()
             };
 
-            var resp = await HttpApi.PostAsyncWithCookie(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie,
+            var resp = HttpApiSynch.PostWithCookie(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie,
                 orgRightDTO);
 
             Assert.Equal(HttpStatusCode.Created, resp.StatusCode);

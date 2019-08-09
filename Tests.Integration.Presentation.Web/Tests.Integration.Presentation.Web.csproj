@@ -90,13 +90,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
     <Compile Include="Security\AuthorizationTests.cs" />
-    <Compile Include="Security\TokenInvalidationTests.cs" />
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
-    <Compile Include="Tools\Model\OrgRightDTO.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\WithAutoFixture.cs" />
   </ItemGroup>
