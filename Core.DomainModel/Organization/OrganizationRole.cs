@@ -38,7 +38,7 @@
         /// <summary>
         /// God mode
         /// </summary>
-        GlobalAdmin,
+        GlobalAdmin
 
     }
 }
