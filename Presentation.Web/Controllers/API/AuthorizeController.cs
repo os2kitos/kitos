@@ -128,7 +128,7 @@ namespace Presentation.Web.Controllers.API
                     return BadRequest();
                 }
 
-                if (!user.HasApiAccess)
+                if (!user.HasApiAccess.GetValueOrDefault())
                 {
                     Logger.Error($"User without API Access tried to access API, userID is : {user.Id}");
                     return Forbidden();

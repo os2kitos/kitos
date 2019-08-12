@@ -45,6 +45,8 @@ namespace Core.DomainModel
 
         public string DefaultUserStartPreference { get; set; }
 
+        public bool? HasApiAccess { get; set; }
+
         /// <summary>
         ///     The organization the user will be automatically logged into.
         /// </summary>
@@ -157,14 +159,6 @@ namespace Core.DomainModel
             }
         }
 
-        public virtual bool HasApiAccess
-        {
-            get
-            {
-                return OrganizationRights.Any(
-                    right => (right.Role == OrganizationRole.ApiAccess));
-            }
-        }
 
         #endregion
     }

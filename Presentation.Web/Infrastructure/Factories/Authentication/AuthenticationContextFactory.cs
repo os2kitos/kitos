@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using System.Security.Principal;
 using Core.DomainServices;
 using Microsoft.Owin;
 using Presentation.Web.Extensions;
@@ -29,7 +30,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
                 : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
         }
 
-        private bool MapApiAccess(ClaimsPrincipal user)
+        private bool MapApiAccess(IPrincipal user)
         {
             var userId = user.Identity.Name;
             var id = parseInteger(userId);
@@ -39,10 +40,10 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
 
             var dbUser = _userRepository.GetById(id);
-            return dbUser.HasApiAccess;
+            return dbUser.HasApiAccess.GetValueOrDefault();
         }
 
-        private int? MapOrganizationId(ClaimsPrincipal user)
+        private int? MapOrganizationId(IPrincipal user)
         {
             var method = MapAuthenticationMethod(user);
             if (method == AuthenticationMethod.KitosToken)
@@ -61,13 +62,13 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             return default(int?);
         }
 
-        private int? MapUserId(ClaimsPrincipal user)
+        private int? MapUserId(IPrincipal user)
         {
             var userId = user.Identity.Name;
             return parseInteger(userId);
         }
 
-        private AuthenticationMethod MapAuthenticationMethod(ClaimsPrincipal user)
+        private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)
         {
             var authenticationMethod = user.Identity.AuthenticationType;
             switch (authenticationMethod)
@@ -84,7 +85,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
         }
 
-        private bool IsAuthenticated(ClaimsPrincipal user)
+        private bool IsAuthenticated(IPrincipal user)
         {
             return user.Identity.IsAuthenticated;
         }
