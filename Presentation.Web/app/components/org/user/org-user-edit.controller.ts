@@ -6,6 +6,7 @@
         email: string;
         lastName: string;
         phoneNumber: string;
+        hasApi: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
         isProjectAdmin: boolean;
@@ -13,7 +14,8 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
-        hasApi: boolean;
+        
+
     }
 
     class EditOrganizationUserController {
@@ -26,7 +28,7 @@
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
         public isUserReadOnly = false;
-        public hasUserApi = false;
+        public hasApi = false;
 
         private userId: number;
         private originalVm;
@@ -44,6 +46,7 @@
             var userVm: IEditViewModel = {
                 email: user.Email,
                 name: user.Name,
+                hasApi: user.HasApiAccess,
                 lastName: user.LastName,
                 phoneNumber: user.PhoneNumber,
                 isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
@@ -52,12 +55,12 @@
                 isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
                 isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
                 isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
-                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined,
-                hasApi: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ApiAccess }) !== undefined
+                isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined
             };
             this.originalVm = _.clone(userVm);
-            this.vm = userVm;
 
+            this.vm = userVm;
+            this.hasApi = currentUser.hasApi;
             this.isUserGlobalAdmin = currentUser.isGlobalAdmin;
             this.isUserLocalAdmin = currentUser.isLocalAdmin;
             this.isUserOrgAdmin = currentUser.isOrgAdmin;
@@ -66,7 +69,6 @@
             this.isUserContractAdmin = currentUser.isContractAdmin;
             this.isUserReportAdmin = currentUser.isReportAdmin;
             this.isUserReadOnly = currentUser.isReadOnly;
-            this.hasUserApi = currentUser.hasApi;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
@@ -103,14 +105,16 @@
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReadOnly", Models.OrganizationRole.ReadOnly));
-            promises.push(this.changeRight(diffRights, "hasApi", Models.OrganizationRole.ApiAccess));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,
                 LastName: this.vm.lastName,
                 PhoneNumber: this.vm.phoneNumber,
-                Email: this.vm.email
-            };
+                Email: this.vm.email,
+                HasApiAccess: this.vm.hasApi
+
+
+        };
             this.$http.patch(`/odata/Users(${this.userId})`, payload);
 
             // when all requests are done
