@@ -58,7 +58,7 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE LOCAL ADMIN" }
 & $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$normalUserUserName" "$normalUserPw" "User"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
 
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "ApiAccess"
+& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "User" "true"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
 
 #-------------------------------------------------------------

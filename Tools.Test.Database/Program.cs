@@ -58,7 +58,20 @@ namespace Tools.Test.Database
                         Role = GetArgument(additionalArgs, 3),
                     };
 
-                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
+                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role, "false");
+
+                case CliTargets.CreateApiTestUser:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
+                    var createApiUserArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        Email = GetArgument(additionalArgs, 1),
+                        Password = GetArgument(additionalArgs, 2),
+                        Role = GetArgument(additionalArgs, 3),
+                        ApiAccess = GetArgument(additionalArgs, 4),
+                    };
+
+                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, createApiUserArgs.ApiAccess);
 
                 case CliTargets.EnableAllOptions:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
