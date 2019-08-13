@@ -17,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.Security
 
         public AuthorizationTests()
         {
-            _apiUser = TestEnvironment.GetCredentials(OrganizationRole.ApiAccess);
+            _apiUser = TestEnvironment.getApiUser();
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
             _getTokenUrl = TestEnvironment.CreateUrl("api/authorize/GetToken");
         }
@@ -25,9 +25,13 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Api_Access_User_Can_Get_Token()
         {
-            var role = _apiUser.Role;
+            var loginDto = new LoginDTO
+            {
+                Email = _apiUser.Username,
+                Password = _apiUser.Password
+            };
 
-            var tokenResponse = await HttpApi.GetTokenAsync(role);
+            var tokenResponse = await HttpApi.GetTokenAsync(loginDto);
 
             Assert.NotNull(tokenResponse);
             Assert.True(tokenResponse.LoginSuccessful);
@@ -74,8 +78,6 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
         }
-
-        
 
     }
 }

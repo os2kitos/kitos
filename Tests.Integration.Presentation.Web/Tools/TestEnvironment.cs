@@ -9,6 +9,7 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
+        private static readonly KitosCredentials apiUser;
 
         static TestEnvironment()
         {
@@ -50,15 +51,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                             "local-global-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
-                    },
-                    {
-                        OrganizationRole.ApiAccess,
-                        new KitosCredentials(
-                            "local-api-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.ApiAccess)
                     }
                 };
+
+                apiUser = new KitosCredentials(
+                    "local-api-user@kitos.dk",
+                    localDevUserPassword,
+                    OrganizationRole.User);
             }
             else
             {
@@ -68,9 +67,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
                     {OrganizationRole.LocalAdmin, LoadUserFromEnvironment(OrganizationRole.LocalAdmin)},
-                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)},
-                    {OrganizationRole.ApiAccess, LoadUserFromEnvironment(OrganizationRole.ApiAccess)}
+                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)}
                 };
+
+                apiUser = new KitosCredentials(
+                    GetEnvironmentVariable($"TestUserApiUser"),
+                    GetEnvironmentVariable($"TestUserApiUserPw"),
+                    OrganizationRole.User);
             }
         }
 
@@ -87,9 +90,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                     break;
                 case OrganizationRole.GlobalAdmin:
                     suffix = "GlobalAdmin";
-                    break;
-                case OrganizationRole.ApiAccess:
-                    suffix = "ApiUser";
                     break;
                 default:
                     throw new NotSupportedException($"{role} Not mapped in environment loader:{nameof(LoadUserFromEnvironment)}");
@@ -143,6 +143,11 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Uri CreateUrl(string pathAndQuery)
         {
             return new Uri($"{GetBaseUrl()}/{pathAndQuery.TrimStart('/')}");
+        }
+
+        public static KitosCredentials getApiUser()
+        {
+            return apiUser;
         }
     }
 }
