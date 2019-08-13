@@ -223,7 +223,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AuthService.HasWriteAccess(UserId, entity))
             {
                 return Forbidden();
             }
