@@ -27,4 +27,6 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -kitosEnvName "$Env:KitosEnvName" `
                 -buildNumber $Env:BUILD_NUMBER `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `
-                -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp
+                -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp `
+                -defaultUserPassword $Env:DefaultUserPassword `
+                -useDefaultUserPassword $Env:UseDefaultUserPassword

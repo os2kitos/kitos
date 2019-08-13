@@ -39,6 +39,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
         
         $Env:TestUserApiUser = $parameters["TestUserApiUser"]
         $Env:TestUserApiUserPw = $parameters["TestUserApiUserPw"]
+        $Env:DefaultUserPassword = $parameters["DefaultUserPassword"]
     }
     
     
@@ -64,21 +65,24 @@ Function Setup-Environment([String] $environmentName) {
             $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
+            $Env:UseDefaultUserPassword = "true"
             break;
         }
         "test"
         {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
+            $Env:UseDefaultUserPassword = "false"
             break;
         }
         "production"
         {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
+            $Env:UseDefaultUserPassword = "false"
             break;
         }
-        default { Throw "Error: Unknnown environment provided: $environmentName" }
+        default { Throw "Error: Unknown environment provided: $environmentName" }
     }
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"

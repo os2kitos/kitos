@@ -96,7 +96,7 @@ namespace Tests.Unit.Presentation.Web.Context
         private IUserRepository MakeMockUserRepository(bool apiAccess)
         {
             var user = new Mock<User>();
-            user.Setup(x => x.HasApiAccess).Returns(apiAccess);
+            user.Object.HasApiAccess = apiAccess;
 
             var userRepo = new Mock<IUserRepository>();
             userRepo.Setup(_ => _.GetById(It.IsAny<int>())).Returns(user.Object);

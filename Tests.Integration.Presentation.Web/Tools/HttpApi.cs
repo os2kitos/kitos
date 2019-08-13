@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Models;
+using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -40,6 +41,16 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Task<HttpResponseMessage> DeleteAsyncWithCookie(Uri url, Cookie cookie)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
+            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
+            return HttpClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> PatchAsyncWithCookie(Uri url, Cookie cookie, object body)
+        {
+            var requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), url)
+            {
+                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+            };
             requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
             return HttpClient.SendAsync(requestMessage);
         }
@@ -107,6 +118,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<GetTokenResponseDTO> GetTokenAsync(LoginDTO loginDto)
+        {
+            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+
+            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            {
+                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
+
+                Assert.Equal(loginDto.Email, tokenResponse.Email);
+                Assert.True(tokenResponse.LoginSuccessful);
+                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
+
+                return tokenResponse;
+            }
+        }
+
         public static async Task<HttpResponseMessage> NoApiGetTokenAsync(OrganizationRole role)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
@@ -140,6 +169,52 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Domain = url.Host
             };
 
+        }
+
+        public static async Task<int> CreateOdataUser(ApiUserDTO userDto, string role)
+        {
+            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var createUserDto = new CreateUserDTO
+            {
+                user = userDto,
+                organizationId = 1,
+                sendMailOnCreation = false
+            };
+
+            int userId;
+            using (var createdResponse = await PostAsyncWithCookie(TestEnvironment.CreateUrl("odata/Users/Users.Create"), cookie, createUserDto))
+            {
+                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+                var response = await createdResponse.ReadResponseBodyAs<UserDTO>().ConfigureAwait(false);
+                userId = response.Id;
+
+                Assert.Equal(userDto.Email, response.Email);
+            }
+
+            var roleDto = new OrgRightDTO
+            {
+                UserId = userId,
+                Role = role
+            };
+
+            using (var addedRole = await PostAsyncWithCookie(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie, roleDto))
+            {
+                Assert.Equal(HttpStatusCode.Created, addedRole.StatusCode);
+            }
+
+            return userId;
+        }
+
+        public static async Task<HttpResponseMessage> PatchOdataUser(ApiUserDTO userDto, int userId)
+        {
+            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var patch = await PatchAsyncWithCookie(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto))
+            {
+                Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
+                return patch;
+            };
         }
 
     }

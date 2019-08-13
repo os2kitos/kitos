@@ -1,4 +1,4 @@
-Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString) {
+Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword) {
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
     $fullCommand=$(("`"{0}`" " +  
@@ -23,8 +23,10 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"Environment`",value=`"{14}`" " + 
                     "-setParam:name=`"DeploymentVersion`",value=`"{15}`" " + 
                     "-setParam:name=`"KitosContext-Web.config Connection String`",value=`"{16}`" " + 
-                    "-setParam:name=`"kitos_HangfireDB-Web.config Connection String`",value=`"{17}`"") `
-    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString )
+                    "-setParam:name=`"kitos_HangfireDB-Web.config Connection String`",value=`"{17}`" " +
+                    "-setParam:name=`"DefaultUserPassword`",value=`"{18}`" " +
+                    "-setParam:name=`"UseDefaultPassword`",value=`"{19}`"") `
+    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $ssoGateway, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword)
     
     & cmd.exe /C $fullCommand
     

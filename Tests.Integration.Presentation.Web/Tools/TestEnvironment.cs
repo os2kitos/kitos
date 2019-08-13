@@ -9,6 +9,8 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
+        private static readonly KitosCredentials ApiUser;
+        private static readonly string DefaultUserPassword;
 
         static TestEnvironment()
         {
@@ -27,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 //Expecting the following users to be available to local testing
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
                 const string localDevUserPassword = "localNoSecret";
-
+                DefaultUserPassword = "arne123";
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
@@ -50,27 +52,30 @@ namespace Tests.Integration.Presentation.Web.Tools
                             "local-global-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
-                    },
-                    {
-                        OrganizationRole.ApiAccess,
-                        new KitosCredentials(
-                            "local-api-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.ApiAccess)
                     }
                 };
+
+                ApiUser = new KitosCredentials(
+                    "local-api-user@kitos.dk",
+                    localDevUserPassword,
+                    OrganizationRole.User);
             }
             else
             {
                 //Loading users from environment
                 Console.Out.WriteLine("Tests running towards remote target. Loading configuration from environment.");
+                DefaultUserPassword = GetEnvironmentVariable("DefaultUserPassword");
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
                     {OrganizationRole.LocalAdmin, LoadUserFromEnvironment(OrganizationRole.LocalAdmin)},
-                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)},
-                    {OrganizationRole.ApiAccess, LoadUserFromEnvironment(OrganizationRole.ApiAccess)}
+                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)}
                 };
+
+                ApiUser = new KitosCredentials(
+                    GetEnvironmentVariable($"TestUserApiUser"),
+                    GetEnvironmentVariable($"TestUserApiUserPw"),
+                    OrganizationRole.User);
             }
         }
 
@@ -87,9 +92,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                     break;
                 case OrganizationRole.GlobalAdmin:
                     suffix = "GlobalAdmin";
-                    break;
-                case OrganizationRole.ApiAccess:
-                    suffix = "ApiUser";
                     break;
                 default:
                     throw new NotSupportedException($"{role} Not mapped in environment loader:{nameof(LoadUserFromEnvironment)}");
@@ -143,6 +145,16 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Uri CreateUrl(string pathAndQuery)
         {
             return new Uri($"{GetBaseUrl()}/{pathAndQuery.TrimStart('/')}");
+        }
+
+        public static KitosCredentials GetApiUser()
+        {
+            return ApiUser;
+        }
+
+        public static string GetDefaultUserPassword()
+        {
+            return DefaultUserPassword;
         }
     }
 }
