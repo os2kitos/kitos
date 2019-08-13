@@ -331,6 +331,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Access\IOrganizationContextFactory.cs" />
+    <Compile Include="Access\OrganizationContextFactory.cs" />
     <Compile Include="Tests\Access\TestAccess.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />

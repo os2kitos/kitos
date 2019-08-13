@@ -1,4 +1,6 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 
@@ -33,6 +35,27 @@ namespace Presentation.Web.Access
 
             var organization = _organizationRepository.GetByKey(_organizationId);
             if (organization.AccessModifier == AccessModifier.Public)
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        public override bool AllowReads(int userId, ItSystem entity)
+        {
+            var result = false;
+
+            var user = _userRepository.GetByKey(userId);
+            if (user.IsGlobalAdmin)
+            {
+                result = true;
+            }
+            else if (user.DefaultOrganizationId == _organizationId)
+            {
+                result = true;
+            }
+            else if (entity.AccessModifier == AccessModifier.Public)
             {
                 result = true;
             }
