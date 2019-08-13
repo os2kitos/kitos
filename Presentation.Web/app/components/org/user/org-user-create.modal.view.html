@@ -73,6 +73,9 @@
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserReportAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReadOnly">Bruger med læserettigheder</label>
                 </div>
+                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin">
+                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+                </div>
             </div>
         </div>
         <div class="form-group">

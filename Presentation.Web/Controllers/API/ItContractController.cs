@@ -60,10 +60,13 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
 
@@ -85,7 +88,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -111,7 +117,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -138,7 +147,7 @@ namespace Presentation.Web.Controllers.API
                 var contract = Repository.GetByKey(id);
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
                 var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
                 var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
@@ -167,11 +176,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (contract == null) return NotFound();
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (contract == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var usage = _usageRepository.GetByKey(systemUsageId);
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
                 if (_itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId }) != null)
                     return Conflict("The IT system usage is already associated with the contract");
@@ -202,7 +221,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var contractItSystemUsage = _itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId });
                 if (contractItSystemUsage == null)
@@ -233,7 +255,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, itContract))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
                 // this trick will put the first object in the result as well as the children
                 var children = new[] { itContract }.SelectNestedChildren(x => x.Children);
@@ -253,7 +275,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (KitosUser.DefaultOrganizationId != organizationId)
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try
@@ -345,7 +367,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (KitosUser.DefaultOrganizationId != organizationId)
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try

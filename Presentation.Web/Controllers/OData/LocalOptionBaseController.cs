@@ -87,13 +87,15 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Post(TLocalModelType entity)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             entity.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
 
             if (!_authService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             var orgId = _authService.GetCurrentOrganizationId(UserId);
@@ -146,15 +148,21 @@ namespace Presentation.Web.Controllers.OData
                 var localOption = localOptionSearch.First();
                 // does the entity exist?
                 if (localOption == null)
+                {
                     return NotFound();
+                }
 
                 // check if user is allowed to write to the entity
                 if (!_authService.HasWriteAccess(UserId, localOption))
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
                 // check model state
                 if (!ModelState.IsValid)
+                {
                     return BadRequest(ModelState);
+                }
 
                 try
                 {
@@ -201,7 +209,9 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, localOption))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             try
             {

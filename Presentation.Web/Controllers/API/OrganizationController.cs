@@ -152,7 +152,7 @@ namespace Presentation.Web.Controllers.API
                 if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
                 {
                     // only global admin is allowed to change the type of an organization
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 

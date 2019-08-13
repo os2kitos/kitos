@@ -35,7 +35,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
             //Tolist() is required for filtering on computed values in odata.
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
             return Ok(result);
@@ -48,7 +50,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var systemUsages = new List<ItSystemUsage>();
 

@@ -48,7 +48,9 @@ namespace Presentation.Web.Controllers.OData
             if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
                 var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
                 return Ok(result);
@@ -67,12 +69,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
 
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
@@ -83,7 +89,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var projects = new List<ItProject>();
 

@@ -10,6 +10,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        hasApi: boolean;
     }
 
     class OrganizationUserController {
@@ -105,6 +106,10 @@
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
                                 usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
+                                if (this.user.isGlobalAdmin)
+                                {
+                                    usr.hasApi = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ApiAccess) !== undefined;
+                                }
                             });
                             return response;
                         }
@@ -123,7 +128,7 @@
                 sortable: {
                     mode: "single"
                 },
-                editable: true,
+                editable: false,
                 reorderable: true,
                 resizable: true,
                 filterable: {
@@ -160,6 +165,12 @@
                         persistId: "email", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
+                        headerAttributes: {
+                            "data-element-type": "userHeaderEmail"
+                        },
+                        attributes: {
+                             "data-element-type": "userEmailObject"
+                        },
                         hidden: false,
                         filterable: {
                             cell: {
@@ -210,6 +221,20 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+
+                        field: "hasApi", title: "API adgang", width: 96, 
+                        persistId: "apiaccess", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center", "data-element-type": "userObject"},
+                        headerAttributes: {
+                            "data-element-type": "userHeader"
+                        },
+                        template: (dataItem) => dataItem.hasApi ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: !this.user.isGlobalAdmin,
+                        filterable: false,
+                        sortable: false,
+                        menu: this.user.isGlobalAdmin
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
@@ -303,6 +328,7 @@
                     case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
                     case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
                     case Models.OrganizationRole.ReportModuleAdmin: roleNames[index] = "Rapport Admin"; break;
+                    case Models.OrganizationRole.ApiAccess:roleNames[index] = "API Adgang"; break;
                 }
             });
             return roleNames.join(",");

@@ -118,7 +118,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
             return Ok(result);

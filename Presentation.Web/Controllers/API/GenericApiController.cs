@@ -82,10 +82,13 @@ namespace Presentation.Web.Controllers.API
 
                 if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
                 return Ok(dto);
@@ -140,7 +143,7 @@ namespace Presentation.Web.Controllers.API
                 // Check write access rights  
                 if (!HasWriteAccess(item, organizationId: 0))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 var savedItem = PostQuery(item);
@@ -212,7 +215,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!HasWriteAccess(item, organizationId))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 DeleteQuery(item);
@@ -333,7 +336,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!HasWriteAccess(item, organizationId))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 var result = PatchQuery(item, obj);

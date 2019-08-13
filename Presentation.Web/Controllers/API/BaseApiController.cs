@@ -13,6 +13,7 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using System.Runtime.Caching;
+using Presentation.Web.Helpers;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -80,7 +81,10 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual HttpResponseMessage Error<T>(T response)
         {
-            if (response is SecurityException) return Unauthorized();
+            if (response is SecurityException)
+            {
+                return Unauthorized();
+            }
 
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
@@ -92,7 +96,7 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual HttpResponseMessage Unauthorized()
         {
-            return CreateResponse(HttpStatusCode.Unauthorized);
+            return CreateResponse(HttpStatusCode.Unauthorized, Constants.StatusCodeMessages.UnauthorizedErrorMessage);
         }
 
         protected virtual HttpResponseMessage Unauthorized<T>(T response)
@@ -122,8 +126,14 @@ namespace Presentation.Web.Controllers.API
 
         protected HttpResponseMessage Forbidden()
         {
-            return CreateResponse(HttpStatusCode.Forbidden);
+            return CreateResponse(HttpStatusCode.Forbidden, Constants.StatusCodeMessages.ForbiddenErrorMessage);
         }
+
+        protected HttpResponseMessage Forbidden(string msg)
+        {
+            return CreateResponse(HttpStatusCode.Forbidden, msg);
+        }
+
 
         protected bool IsGlobalAdmin()
         {

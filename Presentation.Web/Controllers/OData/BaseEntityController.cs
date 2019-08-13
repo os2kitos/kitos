@@ -56,11 +56,15 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.AsQueryable().Where(p => p.Id == key);
 
             if (!result.Any())
+            {
                 return NotFound();
+            }
 
             var entity = result.First();
             if (!AuthService.HasReadAccess(UserId, entity))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             return Ok(SingleResult.Create(result));
         }
@@ -73,7 +77,9 @@ namespace Presentation.Web.Controllers.OData
 
             var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != key && !AuthService.HasReadAccessOutsideContext(UserId))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
             return Ok(result);
@@ -83,7 +89,9 @@ namespace Presentation.Web.Controllers.OData
         public virtual IHttpActionResult Post(T entity)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
             {
@@ -95,7 +103,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (!AuthService.HasWriteAccess(UserId, entity))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try
@@ -119,15 +127,21 @@ namespace Presentation.Web.Controllers.OData
 
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
             if (!AuthService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {
@@ -150,10 +164,14 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (!AuthService.HasWriteAccess(UserId, entity))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             try
             {

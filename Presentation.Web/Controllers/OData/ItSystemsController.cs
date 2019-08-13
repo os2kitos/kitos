@@ -29,15 +29,14 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-
             var organizationContext = _contextFactory.CreateOrganizationContext(loggedIntoOrgId);
             if (!organizationContext.AllowReads(UserId))
             { 
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-
+            
             return Ok(result);
         }
 
