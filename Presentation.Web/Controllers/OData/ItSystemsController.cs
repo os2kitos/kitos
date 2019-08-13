@@ -25,17 +25,16 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
-        [ODataRoute("Organizations({key})/ItSystems")]
-        public IHttpActionResult GetItSystems(int key)
+        [ODataRoute("Organizations({orgKey})/ItSystems")]
+        public IHttpActionResult GetItSystems(int orgKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            var organizationContext = _contextFactory.CreateOrganizationContext(loggedIntoOrgId);
+            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
             if (!organizationContext.AllowReads(UserId))
             { 
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public);
             
             return Ok(result);
         }
