@@ -6,24 +6,45 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Net;
+using System.Security.Principal;
 using Core.ApplicationServices;
+using Core.DomainModel.Organization;
+using Presentation.Web.Access;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public class ItSystemsController : BaseEntityController<ItSystem>
+    public interface IOrganizationContextFactory
+    {
+        OrganizationContext CreateOrganizationContext(int organizationId);
+    }
+
+    class OrganizationContextFactory : IOrganizationContextFactory
+    {
+        private readonly IGenericRepository<User> _userRepository;
+        private readonly IGenericRepository<Organization> _organizationRepository;
+
+        public OrganizationContextFactory(IGenericRepository<User> userRepository, IGenericRepository<Organization> organizationRepository)
+        {
+            _userRepository = userRepository;
+            _organizationRepository = organizationRepository;
+        }
+
+        public OrganizationContext CreateOrganizationContext(int organizationId)
+        {
+            return new OrganizationContext(_userRepository, _organizationRepository, organizationId);
+        }
+    }
+
+    public partial class ItSystemsController : BaseEntityController<ItSystem>
     {
         private readonly IAuthenticationService _authService;
+        private readonly IOrganizationContextFactory _contextFactory;
 
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService)
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IOrganizationContextFactory contextFactory)
             : base(repository, authService)
         {
             _authService = authService;
-        }
-        
-        [ODataRoute("ItSystems")]
-        public override IHttpActionResult Get()
-        {
-            return base.Get();
+            _contextFactory = contextFactory;
         }
 
         // GET /Organizations(1)/ItSystems
@@ -32,19 +53,22 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetItSystems(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
-            {
-                if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                return Ok(result);
+            var organizationContext = _contextFactory.CreateOrganizationContext(loggedIntoOrgId);
+            if (!organizationContext.AllowReads(UserId))
+            { 
+                return StatusCode(HttpStatusCode.Forbidden);
             }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-                return Ok(result);
-            }
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+
+            return Ok(result);
+        }
+
+        [ODataRoute("ItSystems")]
+        public override IHttpActionResult Get()
+        {
+            return base.Get();
         }
 
         // GET /Organizations(1)/BelongingSystems

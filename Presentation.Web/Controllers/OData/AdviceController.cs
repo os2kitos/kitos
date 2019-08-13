@@ -6,10 +6,8 @@ using Hangfire;
 using System;
 using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Results;
-using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -18,16 +16,13 @@ namespace Presentation.Web.Controllers.OData
 
     public class AdviceController : BaseEntityController<Advice>
     {
-
-        IAuthenticationService _authService;
-        IAdviceService _adviceService;
-        IGenericRepository<Advice> _repository;
-        IGenericRepository<AdviceSent> _sentRepository;
+        readonly IAdviceService _adviceService;
+        readonly IGenericRepository<Advice> _repository;
+        readonly IGenericRepository<AdviceSent> _sentRepository;
 
         public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
             : base(repository, authService)
         {
-            _authService = authService;
             _adviceService = adviceService;
             _repository = repository;
             _sentRepository = sentRepository;
@@ -36,7 +31,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Advice advice)
         {
-
             var response = base.Post(advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>)) {
@@ -193,17 +187,17 @@ namespace Presentation.Web.Controllers.OData
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
                 return Ok(Repository.AsQueryable().Where(x=> x.RelationId == id && x.Type == type));
 
             return Ok(Repository.AsQueryable()
-                    .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
+                    .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
         }
 
         [EnableQuery]
         public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
-            var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
+            var currentOrgId = AuthService.GetCurrentOrganizationId(UserId);
             if (orgKey != currentOrgId)
                 return Unauthorized();
 
@@ -225,8 +219,10 @@ namespace Presentation.Web.Controllers.OData
                 return StatusCode(HttpStatusCode.Forbidden);
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AuthService.HasWriteAccess(UserId, entity))
+            {
                 return StatusCode(HttpStatusCode.Forbidden);
+            }
 
 
             try

@@ -81,9 +81,9 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
         public bool HasReadAccess(int userId, IEntity entity)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+            var user = _userRepository.GetByKey(userId);
 
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
             if (loggedIntoOrganizationId == -1)
             {
                 return false;
