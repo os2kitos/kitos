@@ -61,4 +61,14 @@
     </parameterentry>
   </parameter>
 
+  <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DefaultUserPassword']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="UseDefaultPassword" description="" defaultvalue="__UseDefaultPassword__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='UseDefaultPassword']/value/text()">
+    </parameterentry>
+  </parameter>
+
 </parameters>

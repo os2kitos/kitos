@@ -17,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.Security
 
         public AuthorizationTests()
         {
-            _apiUser = TestEnvironment.getApiUser();
+            _apiUser = TestEnvironment.GetApiUser();
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
             _getTokenUrl = TestEnvironment.CreateUrl("api/authorize/GetToken");
         }
