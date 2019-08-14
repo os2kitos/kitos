@@ -17,35 +17,32 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         private static readonly HttpClient HttpClient = new HttpClient();
 
-        public static Task<HttpResponseMessage> GetAsyncWithToken(Uri url, string token)
+        public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return HttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PostAsyncWithCookie(Uri url, Cookie cookie, object body)
+        public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.CookieContainer.Add(cookie);
-            HttpClient cookieClient = new HttpClient(handler);
-
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
+            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
 
-            return cookieClient.SendAsync(requestMessage);
+            return HttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> DeleteAsyncWithCookie(Uri url, Cookie cookie)
+        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
             requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
             return HttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PatchAsyncWithCookie(Uri url, Cookie cookie, object body)
+        public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object body)
         {
             var requestMessage = new HttpRequestMessage(new HttpMethod("PATCH"), url)
             {
@@ -64,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return HttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PostAsyncWithToken(Uri url, object body, string tokenvalue)
+        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string tokenvalue)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
@@ -98,11 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var loginDto = new LoginDTO
-            {
-                Email = userCredentials.Username,
-                Password = userCredentials.Password
-            };
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
             using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
             {
@@ -136,28 +129,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<HttpResponseMessage> NoApiGetTokenAsync(OrganizationRole role)
-        {
-            var userCredentials = TestEnvironment.GetCredentials(role);
-            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var loginDto = new LoginDTO
-            {
-                Email = userCredentials.Username,
-                Password = userCredentials.Password
-            };
-
-            return await HttpApi.PostAsync(url, loginDto);
-        }
+        
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize");
-            var loginDto = new LoginDTO
-            {
-                Email = userCredentials.Username,
-                Password = userCredentials.Password
-            };
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
             var cookieResponse = await HttpApi.PostAsync(url, loginDto);
             var cookieParts = cookieResponse.Headers.Where(x => x.Key == "Set-Cookie").First().Value.First().Split('=');
@@ -171,19 +149,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         }
 
-        public static async Task<int> CreateOdataUser(ApiUserDTO userDto, string role)
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var createUserDto = new CreateUserDTO
-            {
-                user = userDto,
-                organizationId = 1,
-                sendMailOnCreation = false
-            };
+            var createUserDto = ObjectCreateHelper.MakeSimpleCreateUserDto(userDto);
 
             int userId;
-            using (var createdResponse = await PostAsyncWithCookie(TestEnvironment.CreateUrl("odata/Users/Users.Create"), cookie, createUserDto))
+            using (var createdResponse = await PostWithCookieAsync(TestEnvironment.CreateUrl("odata/Users/Users.Create"), cookie, createUserDto))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAs<UserDTO>().ConfigureAwait(false);
@@ -198,7 +171,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Role = role
             };
 
-            using (var addedRole = await PostAsyncWithCookie(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie, roleDto))
+            using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie, roleDto))
             {
                 Assert.Equal(HttpStatusCode.Created, addedRole.StatusCode);
             }
@@ -206,15 +179,23 @@ namespace Tests.Integration.Presentation.Web.Tools
             return userId;
         }
 
-        public static async Task<HttpResponseMessage> PatchOdataUser(ApiUserDTO userDto, int userId)
+        public static async Task<HttpResponseMessage> PatchOdataUserAsync(ApiUserDTO userDto, int userId)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var patch = await PatchAsyncWithCookie(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto))
+            using (var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto))
             {
                 Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
                 return patch;
             };
+        }
+
+        public static async Task<HttpResponseMessage> DeleteOdataUserAsync(int id)
+        {
+            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return response;
         }
 
     }

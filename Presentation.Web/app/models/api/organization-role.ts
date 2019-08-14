@@ -18,8 +18,6 @@
         /** Has write access to organization reports. */
         ReportModuleAdmin,
         /** Has read access only */
-        ReadOnly,
-        /** Has Api Access*/
-        ApiAccess
+        ReadOnly
     }
 }

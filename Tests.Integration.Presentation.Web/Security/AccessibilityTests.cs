@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Presentation.Web.Models;
+using System.Net.Http;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
@@ -26,17 +26,16 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/User", HttpStatusCode.Forbidden)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK)]
-        public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode)
+        public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
-            var loginDto = new LoginDTO
-            {
-                Email = _apiUser.Username,
-                Password = _apiUser.Password
-            };
 
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
-            using (var httpResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), token.Token))
+
+            //Act
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token))
             {
+                //Assert
                 Assert.Equal(httpCode, httpResponse.StatusCode);
             }
         }
@@ -45,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/User", HttpStatusCode.Unauthorized)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Unauthorized)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.Unauthorized)]
-        public async Task AnonymousApiCalls(string apiUrl, HttpStatusCode httpCode)
+        public async Task Anonymous_Api_Calls_Returns_401(string apiUrl, HttpStatusCode httpCode)
         {
             using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))
             {
@@ -53,27 +52,24 @@ namespace Tests.Integration.Presentation.Web.Security
             }
         }
 
-        [Theory]
-        [InlineData("/api/Reference", HttpStatusCode.Created)]
-        public async Task LoggedInApiPostRequests(string apiUrl, HttpStatusCode httpCode)
+        [Fact]
+        public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
-            var loginDto = new LoginDTO
-            {
-                Email = _apiUser.Username,
-                Password = _apiUser.Password
-            };
-
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var payload = new
             {
                 Title = A<string>(),
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-
             var token = await HttpApi.GetTokenAsync(loginDto);
-            using (var httpResponse = await HttpApi.PostAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), payload, token.Token))
+
+            //Act
+            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))
             {
-                Assert.Equal(httpCode, httpResponse.StatusCode);
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
             }
         }
 
@@ -81,53 +77,40 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Token_Can_Be_Invalidated_After_Creation()
         {
+            //Arrange
             var email = CreateEmail();
-            var loginDto = new LoginDTO
-            {
-                Email = email,
-                Password = _defaultPassword
-            };
-            var globalRole = _globalAdmin.Role;
-            var cookie = await HttpApi.GetCookieAsync(globalRole);
-
-            var userDto = new ApiUserDTO
-            {
-                Email = email,
-                Name = A<string>(),
-                LastName = A<string>(),
-                HasApiAccess = true
-            };
-
-            var createdUserId = await HttpApi.CreateOdataUser(userDto, "User");
-
+            var userDto = ObjectCreateHelper.MakeSimpleApiUserDto(email, true);
+            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, "User");
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
             var token = await HttpApi.GetTokenAsync(loginDto);
-
-            using (var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
             };
+            
+            //Act
+            await DisableApiAccessForUserAsync(userDto, createdUserId);
 
-
-            userDto.HasApiAccess = false;
-
-            var patch = await HttpApi.PatchOdataUser(userDto, createdUserId);
-
-
-            using (var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            //Assert
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             };
-
-            var deleteResponse = await HttpApi.DeleteAsyncWithCookie(TestEnvironment.CreateUrl("api/user/" + createdUserId), cookie);
-
-            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+            var deleteResponse = await HttpApi.DeleteOdataUserAsync(createdUserId);
         }
 
         private static string CreateEmail()
         {
             return $"{Guid.NewGuid():N}@test.dk";
         }
+
+        private async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
+        {
+            userDto.HasApiAccess = false;
+            await HttpApi.PatchOdataUserAsync(userDto, id);
+        }
+    
     }
 }

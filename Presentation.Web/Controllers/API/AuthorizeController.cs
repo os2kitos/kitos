@@ -124,13 +124,13 @@ namespace Presentation.Web.Controllers.API
                 var user = _userRepository.GetByEmail(loginDto.Email);
                 if (user == null)
                 {
-                    Logger.Error($"User found during membership validation but could not be found by email: {loginDto.Email}");
+                    Logger.Error("User found during membership validation but could not be found by email: {email}", loginDto.Email);
                     return BadRequest();
                 }
 
                 if (!user.HasApiAccess.GetValueOrDefault())
                 {
-                    Logger.Error($"User without API Access tried to access API, userID is : {user.Id}");
+                    Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
                     return Forbidden();
                 }
 

@@ -156,5 +156,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             return DefaultUserPassword;
         }
+
+        public static int GetDefaultOrganizationId()
+        {
+            return 1;
+        }
     }
 }

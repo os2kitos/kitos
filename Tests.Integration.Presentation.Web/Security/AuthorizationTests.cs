@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
-using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -25,14 +24,13 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Api_Access_User_Can_Get_Token()
         {
-            var loginDto = new LoginDTO
-            {
-                Email = _apiUser.Username,
-                Password = _apiUser.Password
-            };
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
 
+            //Act
             var tokenResponse = await HttpApi.GetTokenAsync(loginDto);
 
+            //Assert
             Assert.NotNull(tokenResponse);
             Assert.True(tokenResponse.LoginSuccessful);
             Assert.True(tokenResponse.Expires > DateTime.UtcNow);
@@ -40,26 +38,31 @@ namespace Tests.Integration.Presentation.Web.Security
         }
 
         [Fact]
-        public async Task Non_Api_Access_User_Can_Not_Get_Token()
+        public async Task User_Without_Api_Access_Can_Not_Get_Token()
         {
+            //Arrange
             var role = _globalAdmin.Role;
-            
-            var tokenResponse = await HttpApi.NoApiGetTokenAsync(role);
-            
+            var userCredentials = TestEnvironment.GetCredentials(role);
+            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
+
+            //Act
+            var tokenResponse = await HttpApi.PostAsync(url, loginDto);
+
+            //Assert
             Assert.Equal(HttpStatusCode.Forbidden, tokenResponse.StatusCode);
         }
 
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Password()
         {
-            var loginDto = new LoginDTO
-            {
-                Email = _apiUser.Username,
-                Password = A<string>()
-            };
-
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, A<string>());
+            
+            //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
+                //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
         }
@@ -67,14 +70,13 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Get_Token_Returns_401_On_Invalid_Username()
         {
-            var loginDto = new LoginDTO
-            {
-                Email = A<string>(),
-                Password = _apiUser.Password
-            };
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(A<string>(), _apiUser.Password);
 
+            //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
             {
+                //Assert
                 Assert.Equal(HttpStatusCode.Unauthorized, httpResponseMessage.StatusCode);
             }
         }

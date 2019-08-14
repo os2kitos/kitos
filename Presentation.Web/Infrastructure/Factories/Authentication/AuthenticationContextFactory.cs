@@ -33,14 +33,14 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
         private bool MapApiAccess(IPrincipal user)
         {
             var userId = user.Identity.Name;
-            var id = parseInteger(userId);
-            if (id == default(int))
+            var id = ParseInteger(userId);
+            if (id.HasValue)
             {
-                return false;
+                var dbUser = _userRepository.GetById(id.Value);
+                return dbUser.HasApiAccess.GetValueOrDefault();
             }
+            return false;
 
-            var dbUser = _userRepository.GetById(id);
-            return dbUser.HasApiAccess.GetValueOrDefault();
         }
 
         private int? MapOrganizationId(IPrincipal user)
@@ -65,7 +65,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
         private int? MapUserId(IPrincipal user)
         {
             var userId = user.Identity.Name;
-            return parseInteger(userId);
+            return ParseInteger(userId);
         }
 
         private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)
@@ -90,14 +90,14 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             return user.Identity.IsAuthenticated;
         }
 
-        private int parseInteger(string toParse)
+        private int? ParseInteger(string toParse)
         {
             if (int.TryParse(toParse, out var asInt))
             {
                 return asInt;
             }
             _logger.Error("Could not parse to int: {toParse}", toParse);
-            return default(int);
+            return null;
         }
     }
 }

@@ -16,13 +16,13 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly bool _apiAccess;
         private readonly string _salt;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role, string apiAccess)
+        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess)
             : base(connectionString)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _password = password ?? throw new ArgumentNullException(nameof(password)); ;
             _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
-            _apiAccess = ParseBool(apiAccess ?? throw new ArgumentNullException(nameof(apiAccess)));
+            _apiAccess = apiAccess;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
         }
 
@@ -95,15 +95,6 @@ namespace Tools.Test.Database.Model.Tasks
             }
 
             return actualRole;
-        }
-
-        private bool ParseBool(string apiAccess)
-        {
-            if(!bool.TryParse(apiAccess, out var result))
-            {
-                throw new ArgumentException($"{nameof(apiAccess)} must be one of [\"true\", \"false\"");
-            }
-            return result;
         }
     }
 }
