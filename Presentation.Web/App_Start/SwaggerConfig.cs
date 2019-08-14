@@ -3,14 +3,9 @@ using System.IO;
 using System.Reflection;
 using System.Web.Http;
 using Swashbuckle.Application;
-using Swashbuckle.OData;
 using WebActivatorEx;
 using SwashbuckleODataSample;
 using System.Linq;
-using AutoMapper.Internal;
-using Presentation.Web.app.shared.filters;
-using Presentation.Web.Controllers.API;
-using Swashbuckle.Swagger;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -38,9 +33,9 @@ namespace SwashbuckleODataSample
                 // hold additional metadata for an API. Version and title are required but you can also provide
                 // additional fields by chaining methods off SingleApiVersion.
                 //
-                c.SingleApiVersion("1.0.0", "OS2Kitos dokumentation af API & OData")
-                    .Description("Denne dokumentaion udstiller de forskellige kald der kan laves til api'et såvel som OData api'et i kitos. \n" +
-                                 "Mange kald bliver oprettet gennem en gernerisk kontroller disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller. \n \n" +
+                c.SingleApiVersion("1.0.0", "OS2Kitos dokumentation af API")
+                    .Description("Denne dokumentation udstiller de forskellige kald der kan laves til api'et i kitos. \n" +
+                                 "Mange kald bliver oprettet gennem en generisk kontroller, og disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller. \n \n" +
                                  "Til information er det ikke alle parametre der skal bruges når API'et tilgås ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk");
                 //.Contact(contactBuilder => contactBuilder
                 //.Url("https://github.com/rbeauchamp/Swashbuckle.OData"));

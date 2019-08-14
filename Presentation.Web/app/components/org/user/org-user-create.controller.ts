@@ -69,8 +69,9 @@
                     Name: this.vm.name,
                     LastName: this.vm.lastName,
                     Email: this.vm.email,
-                    PhoneNumber: this.vm.phoneNumber
-                },
+                    PhoneNumber: this.vm.phoneNumber,
+                    HasApiAccess: this.vm.hasApi
+        },
                 organizationId: this.user.currentOrganizationId,
                 sendMailOnCreation: sendMail
             };
@@ -97,8 +98,7 @@
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
                     if (this.vm.isReadOnly)
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
-                    if (this.vm.hasApi)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ApiAccess));
+
 
                     // when all requests are done
                     this.$q.all(promises).then(
@@ -145,8 +145,7 @@
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
                 if (this.vm.isReadOnly)
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
-                if (this.vm.hasApi)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ApiAccess));
+
                 // when all requests are done
                 this.$q.all(promises).then(
                     () => {

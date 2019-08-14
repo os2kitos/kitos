@@ -1,5 +1,4 @@
-﻿using System;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 
 namespace Core.DomainServices
 {
@@ -7,5 +6,6 @@ namespace Core.DomainServices
     {
         User GetByEmail(string email);
         User GetByUuid(string uniqueId);
+        User GetById(int id);
     }
 }

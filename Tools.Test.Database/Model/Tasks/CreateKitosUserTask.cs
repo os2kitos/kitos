@@ -13,16 +13,19 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _email;
         private readonly string _password;
         private readonly OrganizationRole _role;
+        private readonly bool _apiAccess;
         private readonly string _salt;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role)
+        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess)
             : base(connectionString)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _password = password ?? throw new ArgumentNullException(nameof(password)); ;
             _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
+            _apiAccess = apiAccess;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
         }
+
 
         /// <summary>
         /// Replicates the actions carried out by both org-user-create.controller.ts, UsersController::Post and UserService
@@ -47,17 +50,18 @@ namespace Tools.Test.Database.Model.Tasks
         private User CreateUser(Organization commonOrg, KitosContext context)
         {
             var globalAdmin = context.GetGlobalAdmin();
-
+            var apiUser = "Api ";
             var newUser = new User
             {
                 Name = "Automatisk oprettet testbruger",
-                LastName = $"({_role:G})",
+                LastName = $"({((_apiAccess) ? apiUser : "")}{_role:G})",
                 Salt = _salt,
                 Email = _email,
                 DefaultOrganizationId = commonOrg.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id,
-                IsGlobalAdmin = _role == OrganizationRole.GlobalAdmin
+                IsGlobalAdmin = _role == OrganizationRole.GlobalAdmin,
+                HasApiAccess = _apiAccess
             };
             newUser.SetPassword(_password);
 

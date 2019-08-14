@@ -42,6 +42,7 @@ namespace Presentation.Web
             app.Use<ApiRequestsLoggingMiddleware>();
 
             app.Use<ApiOdataRequestsFilterMiddleware>();
+            app.Use<DenyUsersWithoutApiAccessMiddleware>();
         }
     }
 }

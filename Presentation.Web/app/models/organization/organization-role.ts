@@ -19,7 +19,6 @@
         ReportModuleAdmin = "ReportModuleAdmin" as any,
         /** Has readonly access */
         ReadOnly = "ReadOnly" as any,
-        /**  Has Access to APi call */
-        ApiAccess = "ApiAccess" as any
+
     }
 }
