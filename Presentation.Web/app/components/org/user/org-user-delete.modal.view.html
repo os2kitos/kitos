@@ -6,8 +6,10 @@
         </button>
     </div>
     <h3 align="center">Slet bruger fra organisation</h3>
-    <h5> Roller for {{ctrl.firstName}} {{ctrl.lastName}}, {{ctrl.email}}
-    </h5></div>
+    <h5>
+        Roller for {{ctrl.firstName}} {{ctrl.lastName}}, {{ctrl.email}}
+    </h5>
+</div>
 <div class="modal-body">
     <h5 ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
         Der ønskes at fjerne <b>{{ctrl.firstName}} {{ctrl.lastName}}</b> fra organisationen <b>{{ctrl.curOrganization}}</b>, der er fundet roller for vedkommende.
@@ -18,7 +20,7 @@
     <div class="well" ng-bind-html="ctrl.vmText"></div>
 
     <h5 ng-hide="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">Brugeren har ikke nogen tildelte roller i denne organisation</h5>
-    
+
     <div ng-show="ctrl.vmProject.length || ctrl.vmSystem.length || ctrl.vmItContracts.length || ctrl.vmOrgUnits.length || ctrl.vmOrgAdmin.length">
         <div class="form-group">
             <label for="selectedUserId">Tildel roller til: &nbsp;</label>
@@ -44,7 +46,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="orgUnit in ctrl.vmOrgUnits | orderBy: 'Rolle'">
-            <!--<tr ng-repeat="orgUnit in ctrl.vmOrgRoles.items | orderBy: 'Role.Name'">-->  
+                <!--<tr ng-repeat="orgUnit in ctrl.vmOrgRoles.items | orderBy: 'Role.Name'">-->
                 <!--ng-true-value doesn't accept dynamically allocated values-->
                 <td><input type="checkbox" ng-model="orgUnitModel" ng-change="ctrl.collectionUpdate('OrganizationUnitRights', orgUnit, orgUnitModel)" /></td>
                 <td>{{orgUnit.Object.Name}}</td>
@@ -68,7 +70,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="project in ctrl.vmProject | orderBy: 'project.Role.Name'">
-                <td><input type="checkbox" ng-model="projUnitModel" ng-change="ctrl.collectionUpdate('ItProjectRights', project, projUnitModel)"/></td>
+                <td><input type="checkbox" ng-model="projUnitModel" ng-change="ctrl.collectionUpdate('ItProjectRights', project, projUnitModel)" /></td>
                 <td>{{project.Object.Name}}</td>
                 <td>{{project.Role.Name}}</td>
                 <td ng-show="projUnitModel">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>
@@ -155,9 +157,6 @@
                     </div>
                     <div ng-show="admin.Role === 'GlobalAdmin'">
                         Global admin
-                    </div>
-                    <div ng-show="admin.Role === 'ApiAccess'">
-                        API Adgang
                     </div>
                 </td>
                 <td ng-show="adminModel">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>

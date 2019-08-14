@@ -38,10 +38,7 @@
         /// <summary>
         /// God mode
         /// </summary>
-        GlobalAdmin,
-        /// <summary>
-        /// Has API access
-        /// </summary>
-        ApiAccess
+        GlobalAdmin
+
     }
 }

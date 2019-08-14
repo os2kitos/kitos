@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using System.Security.Principal;
+using Core.DomainServices;
 using Microsoft.Owin;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Model.Authentication;
@@ -11,23 +12,38 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
     {
         private readonly ILogger _logger;
         private readonly IOwinContext _owinContext;
+        private readonly IUserRepository _userRepository;
         private readonly IdentityClaimExtension identityClaimExtension = new IdentityClaimExtension();
 
-        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext)
+        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
         {
             _logger = logger;
             _owinContext = owinContext;
+            _userRepository = userRepository;
         }
 
         public IAuthenticationContext Create()
         {
             var user = _owinContext.Authentication.User;
             return IsAuthenticated(user)
-                ? new AuthenticationContext(MapAuthenticationMethod(user), MapUserId(user), MapOrganizationId(user))
-                : new AuthenticationContext(AuthenticationMethod.Anonymous);
+                ? new AuthenticationContext(MapAuthenticationMethod(user), MapApiAccess(user), MapUserId(user), MapOrganizationId(user))
+                : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
         }
 
-        private int? MapOrganizationId(ClaimsPrincipal user)
+        private bool MapApiAccess(IPrincipal user)
+        {
+            var userId = user.Identity.Name;
+            var id = ParseInteger(userId);
+            if (id.HasValue)
+            {
+                var dbUser = _userRepository.GetById(id.Value);
+                return dbUser.HasApiAccess == true;
+            }
+            return false;
+
+        }
+
+        private int? MapOrganizationId(IPrincipal user)
         {
             var method = MapAuthenticationMethod(user);
             if (method == AuthenticationMethod.KitosToken)
@@ -46,20 +62,13 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             return default(int?);
         }
 
-        private int? MapUserId(ClaimsPrincipal user)
+        private int? MapUserId(IPrincipal user)
         {
             var userId = user.Identity.Name;
-            if (int.TryParse(userId, out var id))
-            {
-                return id;
-            }
-            
-            _logger.Error("Could not parse to int: {userId}", userId);
-            return default(int);
-            
+            return ParseInteger(userId);
         }
 
-        private AuthenticationMethod MapAuthenticationMethod(ClaimsPrincipal user)
+        private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)
         {
             var authenticationMethod = user.Identity.AuthenticationType;
             switch (authenticationMethod)
@@ -76,9 +85,19 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
         }
 
-        private bool IsAuthenticated(ClaimsPrincipal user)
+        private bool IsAuthenticated(IPrincipal user)
         {
             return user.Identity.IsAuthenticated;
+        }
+
+        private int? ParseInteger(string toParse)
+        {
+            if (int.TryParse(toParse, out var asInt))
+            {
+                return asInt;
+            }
+            _logger.Error("Could not parse to int: {toParse}", toParse);
+            return null;
         }
     }
 }

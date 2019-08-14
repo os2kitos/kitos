@@ -4,6 +4,7 @@
     {
         public const string DropDatabase = "DropDatabase";
         public const string CreateTestUser = "CreateTestUser";
+        public const string CreateApiTestUser = "CreateApiTestUser";
         public const string EnableAllOptions = "EnableAllOptions";
         public const string CreateItSystem = "CreateItSystem";
         public const string CreateItContract = "CreateItContract";
