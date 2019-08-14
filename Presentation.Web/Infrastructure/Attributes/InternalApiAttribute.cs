@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Presentation.Web.Infrastructure.Model.Authentication;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
@@ -9,7 +10,9 @@ namespace Presentation.Web.Infrastructure.Attributes
     {
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            if (actionContext.Request.Headers.Contains("Authorization"))
+            var authContext = (IAuthenticationContext)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(IAuthenticationContext));
+
+            if (authContext.Method == AuthenticationMethod.KitosToken)
             {
                 actionContext.Response = new HttpResponseMessage()
                 {
