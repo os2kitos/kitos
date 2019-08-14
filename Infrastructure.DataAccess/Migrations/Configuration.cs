@@ -42,18 +42,26 @@ namespace Infrastructure.DataAccess.Migrations
 
             // don't overwrite global admin if it already exists
             // cause it'll overwrite UUID
-            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == "support@kitos.dk") ?? context.Users.Add(
+            var salt = $"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}";
+            string password;
+            using (var cryptoService = new CryptoService())
+            {
+                password = cryptoService.Encrypt($"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}" + salt);
+            }
+
+            const string rootUserEmail = "support@kitos.dk";
+            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == rootUserEmail) ?? context.Users.Add(
                 new User
                 {
                     Name = "Global",
                     LastName = "admin",
-                    Email = "support@kitos.dk",
-                    Salt = "uH3U0wqme2mc83FvSwkDrd9fm-3MycFR0ugaKtREJBw1",
-                    Password = "h3hNNY9J3SBUNCgaoccGo1WCRDxt4v9oUjD5uZhQ78M1",
+                    Email = rootUserEmail,
+                    Salt = salt,
+                    Password = password,
                     IsGlobalAdmin = true
                 });
 
-            //var cryptoService = new CryptoService();
+
             //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
             //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);
             //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
