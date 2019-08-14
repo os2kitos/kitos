@@ -37,7 +37,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             if (id.HasValue)
             {
                 var dbUser = _userRepository.GetById(id.Value);
-                return dbUser.HasApiAccess.GetValueOrDefault();
+                return dbUser.HasApiAccess == true;
             }
             return false;
 

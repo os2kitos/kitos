@@ -28,7 +28,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK)]
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
-
+            //Arrange
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
