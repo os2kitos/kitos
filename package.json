@@ -1,7 +1,7 @@
 {
   "name": "kitos",
   "version": "1.0.0",
-  "description": "The OS2KITOS is delivered by Miracle A/S (http://www.miracle.dk)\r for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).",
+  "description": "The OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)\r for OS2 - Offentligt digitaliseringsfællesskab (http://os2web.dk).",
   "main": "Presentation.Web\\Scripts\\app\\app.js",
   "directories": {
     "doc": "docs"
@@ -10,19 +10,18 @@
     "type": "git",
     "url": "git+https://github.com/os2kitos/kitos.git"
   },
-  "author": "Miracle A/S",
+  "author": "STRONGMINDS ApS",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/os2kitos/kitos/issues"
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "devDependencies": {
-    "bower": "^1.7.2",
+    "bower": "1.8.8",
     "browser-sync": "^2.13.0",
     "browserstacktunnel-wrapper": "^1.4.2",
     "del": "^2.2.0",
-    "gulp": "^3.9.0",
-    "gulp-angular-protractor": "*",
+    "gulp": "^3.9.1",
     "gulp-bower": "0.0.13",
     "gulp-codecov.io": "^1.0.1",
     "gulp-concat": "^2.6.0",
@@ -34,6 +33,7 @@
     "gulp-load-plugins": "^1.2.4",
     "gulp-minify-css": "^1.2.4",
     "gulp-open": "^2.0.0",
+    "gulp-protractor": "^4.1.1",
     "gulp-rename": "^1.2.2",
     "gulp-rev": "^7.1.2",
     "gulp-sourcemaps": "^1.6.0",
@@ -55,6 +55,7 @@
     "path": "^0.12.7",
     "phantomjs-prebuilt": "^2.1.7",
     "protractor": "~4.0.11",
+    "protractor-beautiful-reporter": "^1.2.8",
     "protractor-http-mock": "~0.9.0",
     "remap-istanbul": "^0.6.4",
     "require-dir": "^0.3.0",

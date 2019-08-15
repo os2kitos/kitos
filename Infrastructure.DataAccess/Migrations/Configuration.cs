@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
@@ -31,25 +32,36 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
-            //set true if there is no existing database that needs to be updated
-            bool newBuild = false;
-            
+            var newBuild = GetEnvironmentVariable("SeedNewDb") == "yes";
+            if (newBuild)
+            {
+                Console.Out.WriteLine("Seeding initial data into kitos database");
+            }
+
             #region USERS
 
             // don't overwrite global admin if it already exists
             // cause it'll overwrite UUID
-            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == "support@kitos.dk") ?? context.Users.Add(
+            var salt = $"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}";
+            string password;
+            using (var cryptoService = new CryptoService())
+            {
+                password = cryptoService.Encrypt($"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}" + salt);
+            }
+
+            const string rootUserEmail = "support@kitos.dk";
+            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == rootUserEmail) ?? context.Users.Add(
                 new User
                 {
                     Name = "Global",
                     LastName = "admin",
-                    Email = "support@kitos.dk",
-                    Salt = "uH3U0wqme2mc83FvSwkDrd9fm-3MycFR0ugaKtREJBw1",
-                    Password = "h3hNNY9J3SBUNCgaoccGo1WCRDxt4v9oUjD5uZhQ78M1",
+                    Email = rootUserEmail,
+                    Salt = salt,
+                    Password = password,
                     IsGlobalAdmin = true
                 });
 
-            //var cryptoService = new CryptoService();
+
             //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
             //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);
             //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
@@ -60,11 +72,12 @@ namespace Infrastructure.DataAccess.Migrations
             context.SaveChanges();
 
             #endregion
-            
+
             if (newBuild == true)
             {
                 #region OPTIONS
 
+                Console.Out.WriteLine("Initializing options");
 
                 AddOptions<ItProjectType, ItProject>(context.ItProjectTypes, globalAdmin, "Fællesoffentlig", "Fælleskommunal", "Lokal", "Tværkommunal", "SKAL", "Udvikling", "Implementering");
 
@@ -125,6 +138,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORG ROLES
+                Console.Out.WriteLine("Initializing org roles");
 
                 var boss = new OrganizationUnitRole()
                 {
@@ -223,6 +237,8 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region PROJECT ROLES
+
+                Console.Out.WriteLine("Initializing project roles");
 
                 context.ItProjectRoles.AddOrUpdate(r => r.Name,
                     new ItProjectRole()
@@ -418,6 +434,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region SYSTEM ROLES
+                Console.Out.WriteLine("Initializing system roles");
 
                 var systemOwnerRole = new ItSystemRole()
                 {
@@ -532,6 +549,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region CONTRACT ROLES
+                Console.Out.WriteLine("Initializing contract roles");
 
                 context.ItContractRoles.AddOrUpdate(x => x.Name, new ItContractRole()
                 {
@@ -601,6 +619,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORGANIZATIONS
+                Console.Out.WriteLine("Initializing organizatopms");
 
                 var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
                 var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
@@ -630,6 +649,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region TEXTS
+                Console.Out.WriteLine("Initializing texts");
 
                 if (!context.Texts.Any(x => x.Id == 1))
                 {
@@ -729,6 +749,11 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 //#endregion
             }
+        }
+
+        private static string GetEnvironmentVariable(string key)
+        {
+            return Environment.GetEnvironmentVariable(key);
         }
 
         #region Helper methods

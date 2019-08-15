@@ -21,5 +21,10 @@ namespace Core.ApplicationServices
 
             return HttpServerUtility.UrlTokenEncode(encrypted);
         }
+
+        public void Dispose()
+        {
+            _crypt?.Dispose();
+        }
     }
 }
