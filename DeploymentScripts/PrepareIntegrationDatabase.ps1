@@ -23,4 +23,6 @@ Setup-Environment -environmentName "integration"
                 -normalUserUserName "$Env:TestUserNormalUser" `
                 -normalUserPw "$Env:TestUserNormalUserPw" `
                 -apiUserUserName "$Env:TestUserApiUser" `
-                -apiUserPw "$Env:TestUserApiUserPw"
+                -apiUserPw "$Env:TestUserApiUserPw" `
+                -multiOrgApiGlobalAdminUserName "Env:TestUserMultiOrgApiGlobalAdmin" `
+                -multiOrgApiGlobalAdminPw "Env:TestUserMultiOrgApiGlobalAdminPw"

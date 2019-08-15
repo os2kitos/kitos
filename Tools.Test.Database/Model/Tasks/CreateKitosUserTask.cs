@@ -15,8 +15,9 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly OrganizationRole _role;
         private readonly bool _apiAccess;
         private readonly string _salt;
+        private readonly bool _multiOrganization;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess)
+        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess, bool multiOrganization)
             : base(connectionString)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
@@ -24,6 +25,7 @@ namespace Tools.Test.Database.Model.Tasks
             _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
             _apiAccess = apiAccess;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
+            _multiOrganization = multiOrganization;
         }
 
 
@@ -84,6 +86,12 @@ namespace Tools.Test.Database.Model.Tasks
 
             context.OrganizationRights.AddOrUpdate(x => x.UserId, newRight);
             context.SaveChanges();
+
+            if (_multiOrganization)
+            {
+                newRight.OrganizationId = context.GetMultiOrganization().Id;
+                context.OrganizationRights.Add(newRight);
+            }
         }
 
         private OrganizationRole ParseRole(string role)

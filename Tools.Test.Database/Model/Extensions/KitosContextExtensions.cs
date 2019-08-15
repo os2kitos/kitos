@@ -23,5 +23,12 @@ namespace Tools.Test.Database.Model.Extensions
                 .Organizations
                 .First(x => x.Name == "Fælles Kommune");
         }
+
+        public static Organization GetMultiOrganization(this KitosContext context)
+        {
+            return context
+                .Organizations
+                .First(x => x.Name == "DefaultTestOrganization");
+        }
     }
 }

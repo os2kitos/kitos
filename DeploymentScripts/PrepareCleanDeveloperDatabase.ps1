@@ -10,7 +10,9 @@ param(
     [Parameter(Mandatory=$true)][string]$normalUserUserName,
     [Parameter(Mandatory=$true)][string]$normalUserPw,
     [Parameter(Mandatory=$true)][string]$apiUserUserName,
-    [Parameter(Mandatory=$true)][string]$apiUserPw
+    [Parameter(Mandatory=$true)][string]$apiUserPw,
+    [Parameter(Mandatory=$true)][string]$multiOrgApiGlobalAdminUserName,
+    [Parameter(Mandatory=$true)][string]$multiOrgApiGlobalAdminPw
     )
     
 #-------------------------------------------------------------
@@ -67,6 +69,9 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
 
 & $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "User"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
+
+& $testToolsExePath "CreateMultiOrganizationApiTestUser" "$kitosDbConnectionString" "$multiOrgApiGlobalAdminUserName" "$multiOrgApiGlobalAdminPw" "GlobalAdmin"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE MULTI ORGANIZATION APIACCESS USER" }
 
 #-------------------------------------------------------------
 Write-Host "Create IT System"
