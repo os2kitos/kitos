@@ -24,7 +24,7 @@ namespace Presentation.Web.Access
 
         public OrganizationContext CreateOrganizationContext(int organizationId)
         {
-            return new OrganizationContext(_userRepository, _organizationRepository, _itSystemRoleRepository, organizationId);
+            return new OrganizationContext(_userRepository, _organizationRepository, organizationId);
         }
     }
 }

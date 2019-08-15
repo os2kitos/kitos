@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Web.DynamicData;
+﻿using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using NUnit.Framework.Constraints;
 
 namespace Presentation.Web.Access
 {
@@ -20,12 +17,10 @@ namespace Presentation.Web.Access
         public OrganizationContext(
             IGenericRepository<User> userRepository, 
             IGenericRepository<Organization> organizationRepository, 
-            IGenericRepository<ItSystemRole> systemRoleRepository,
             int organizationId)
         {
             _userRepository = userRepository;
             _organizationRepository = organizationRepository;
-            _systemRoleRepository = systemRoleRepository;
             _organizationId = organizationId;
         }
 
@@ -88,14 +83,7 @@ namespace Presentation.Web.Access
             }
             else
             {
-                var itSystemRolesWithWriteAccess = _systemRoleRepository.AsQueryable().Where(role => role.HasWriteAccess);
-                var itSystemUsersWithWriteAccess =
-                    from right in entity.Rights
-                    from role in itSystemRolesWithWriteAccess
-                    where right.RoleId.Equals(role.Id)
-                    where right.UserId.Equals(userId)
-                    select new {right.UserId};
-                if (itSystemUsersWithWriteAccess.Any())
+                if (user.ItSystemRights.Any(x => x.ObjectId == entity.Id && x.Role.HasWriteAccess))
                 {
                     result = true;
                 }

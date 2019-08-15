@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core.Objects.DataClasses;
-using System.Linq;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using NSubstitute;
-using NUnit.Framework;
 using Presentation.Web.Access;
+using Xunit;
 
-namespace Presentation.Web.Tests.Access
+namespace Tests.Unit.Presentation.Web.Access
 {
-    [TestFixture]
-    public class TestAccess
+    public class AccessTest
     {
         private const int ExpectedOrganizationId = 1;
         private const int DifferentOrganizationId = 2;
@@ -32,7 +27,7 @@ namespace Presentation.Web.Tests.Access
             return user;
         }
 
-        private static OrganizationContext SetupOrganizationContext(User user, AccessModifier organizationAccessModifier, IGenericRepository<ItSystemRole> mockSystemRoleRepository)
+        private static OrganizationContext SetupOrganizationContext(User user, AccessModifier organizationAccessModifier)
         {
             var mockUserRepository = Substitute.For<IGenericRepository<User>>();
             mockUserRepository.GetByKey(user.Id).Returns(user);
@@ -44,40 +39,36 @@ namespace Presentation.Web.Tests.Access
             mockExpectedOrganization.AccessModifier = organizationAccessModifier;
             mockOrganizationRepository.GetByKey(ExpectedOrganizationId).Returns(mockExpectedOrganization);
             mockOrganizationRepository.GetByKey(DifferentOrganizationId).Returns(mockDifferentOrganization);
-            return new OrganizationContext(mockUserRepository, mockOrganizationRepository, mockSystemRoleRepository, ExpectedOrganizationId);
-        }
-
-        private static OrganizationContext SetupOrganizationContext(User user, AccessModifier organizationAccessModifier)
-        {
-            var mockSystemRoleRepository = Substitute.For<IGenericRepository<ItSystemRole>>();
-            return SetupOrganizationContext(user, organizationAccessModifier, mockSystemRoleRepository);
+            return new OrganizationContext(mockUserRepository, mockOrganizationRepository, ExpectedOrganizationId);
         }
 
         #endregion
 
-        [TestCase(true, true, AccessModifier.Local, true)]
-        [TestCase(true, false, AccessModifier.Local, true)]
-        [TestCase(true, true, AccessModifier.Public, true)]
-        [TestCase(false, true, AccessModifier.Local, true)]
-        [TestCase(false, true, AccessModifier.Public, true)]
-        [TestCase(false, false, AccessModifier.Local, false)]
-        [TestCase(false, false, AccessModifier.Public, true)]
+        [Theory]
+        [InlineData(true, true, AccessModifier.Local, true)]
+        [InlineData(true, false, AccessModifier.Local, true)]
+        [InlineData(true, true, AccessModifier.Public, true)]
+        [InlineData(false, true, AccessModifier.Local, true)]
+        [InlineData(false, true, AccessModifier.Public, true)]
+        [InlineData(false, false, AccessModifier.Local, false)]
+        [InlineData(false, false, AccessModifier.Public, true)]
         public void AllowsRead_WhenUserInOrOutOfOrganization_Then_ReadAccessIsDeterminedCorrectly(
             bool isGlobalAdmin, bool inOrganization, AccessModifier organizationAccessModifier, bool expectedResult)
         {
             var user = SetupUser(isGlobalAdmin, inOrganization);
             var sut = SetupOrganizationContext(user, organizationAccessModifier);
 
-            Assert.AreEqual(expectedResult, sut.AllowReads(user.Id));
+            Assert.Equal(expectedResult, sut.AllowReads(user.Id));
         }
 
-        [TestCase(true, true, AccessModifier.Local, AccessModifier.Local, true)]
-        [TestCase(true, false, AccessModifier.Local, AccessModifier.Local, true)]
-        [TestCase(false, true, AccessModifier.Local, AccessModifier.Local, true)]
-        [TestCase(false, true, AccessModifier.Local, AccessModifier.Public, true)]
-        [TestCase(false, false, AccessModifier.Local, AccessModifier.Local, false)]
-        [TestCase(false, false, AccessModifier.Public, AccessModifier.Local, false)]
-        [TestCase(false, false, AccessModifier.Public, AccessModifier.Public, true)]
+        [Theory]
+        [InlineData(true, true, AccessModifier.Local, AccessModifier.Local, true)]
+        [InlineData(true, false, AccessModifier.Local, AccessModifier.Local, true)]
+        [InlineData(false, true, AccessModifier.Local, AccessModifier.Local, true)]
+        [InlineData(false, true, AccessModifier.Local, AccessModifier.Public, true)]
+        [InlineData(false, false, AccessModifier.Local, AccessModifier.Local, false)]
+        [InlineData(false, false, AccessModifier.Public, AccessModifier.Local, false)]
+        [InlineData(false, false, AccessModifier.Public, AccessModifier.Public, true)]
         public void AllowsReadOnSystem_WhenUserInOrOutOfOrganization_Then_ReadAccessIsDeterminedCorrectly(
             bool isGlobalAdmin, bool inOrganization, AccessModifier organizationAccessModifier, AccessModifier systemAccessModifier, bool expectedResult)
         {
@@ -88,13 +79,15 @@ namespace Presentation.Web.Tests.Access
             var user = SetupUser(isGlobalAdmin, inOrganization);
             var sut = SetupOrganizationContext(user, organizationAccessModifier);
 
-            Assert.AreEqual(expectedResult, sut.AllowReads(user.Id, system));
+            Assert.Equal(expectedResult, sut.AllowReads(user.Id, system));
         }
-
-        [Test]
-        public void AllowsUpdates_WhenUserInOrganization_Then_WriteAccessIsDeterminedCorrectly()
+        
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        public void AllowsUpdates_WhenUserInOrOutOfOrganization_Then_WriteAccessIsDeterminedCorrectly(bool inOrganization, bool expectedResult)
         {
-            var user = SetupUser(false, true);
+            var user = SetupUser(false, inOrganization);
             var itSystemRole = new ItSystemRole
             {
                 HasWriteAccess = true
@@ -107,16 +100,8 @@ namespace Presentation.Web.Tests.Access
             };
             var itSystemUsage = new ItSystemUsage();
             itSystemUsage.Rights.Add(itSystemRight);
-            var mockSystemRoleRepository = Substitute.For<IGenericRepository<ItSystemRole>>();
-            mockSystemRoleRepository.AsQueryable().Returns(new List<ItSystemRole>() { itSystemRole }.AsQueryable());
-            var sut = SetupOrganizationContext(user, AccessModifier.Local, mockSystemRoleRepository);
-            Assert.AreEqual(true, sut.AllowUpdates(user.Id, itSystemUsage));
-        }
-
-        [Test]
-        public void AllowsUpdates_WhenUserOutOfOrganization_Then_WriteAccessIsDeterminedCorrectly()
-        {
-            Assert.False(true);
+            var sut = SetupOrganizationContext(user, AccessModifier.Local);
+            Assert.Equal(expectedResult, sut.AllowUpdates(user.Id, itSystemUsage));
         }
     }
 }
