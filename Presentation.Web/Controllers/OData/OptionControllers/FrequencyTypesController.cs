@@ -1,12 +1,12 @@
-﻿using System.Web.Http.Description;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class FrequencyTypesController : BaseOptionController<FrequencyType, DataRowUsage>
     {
         public FrequencyTypesController(IGenericRepository<FrequencyType> repository, IAuthenticationService authService)

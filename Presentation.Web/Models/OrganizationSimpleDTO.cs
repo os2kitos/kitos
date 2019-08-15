@@ -1,7 +1,4 @@
-﻿using System;
-using Core.DomainModel;
-
-namespace Presentation.Web.Models
+﻿namespace Presentation.Web.Models
 {
     public class OrganizationSimpleDTO
     {

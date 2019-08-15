@@ -5,11 +5,12 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using System.Net;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
         private readonly IAuthenticationService _authService;

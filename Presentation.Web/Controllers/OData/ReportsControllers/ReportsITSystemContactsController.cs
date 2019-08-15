@@ -1,22 +1,19 @@
 ﻿using System;
 using Core.ApplicationServices;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
-using System.Security;
-using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
-using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Core.DomainModel.ItSystem;
 using System.Collections.Generic;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ReportsITSystemContactsController : BaseOdataAuthorizationController<ItSystemRight>
     {
         private readonly IAuthenticationService _authService;

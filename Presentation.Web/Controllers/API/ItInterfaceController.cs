@@ -18,8 +18,6 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    using Core.DomainModel.Organization;
-
     [PublicApi]
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {

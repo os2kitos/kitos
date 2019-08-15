@@ -7,13 +7,14 @@ using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [PublicApi]
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
