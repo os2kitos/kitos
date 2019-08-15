@@ -11,6 +11,7 @@ using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Access;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -18,47 +19,46 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
+        private readonly IOrganizationContextFactory _contextFactory;
         private readonly IAuthenticationService _authService;
 
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository )
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IOrganizationContextFactory contextFactory)
             : base(repository, authService)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
+            _contextFactory = contextFactory;
             _authService = authService;
         }
 
         // GET /Organizations(1)/ItSystemUsages
-        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        [ODataRoute("Organizations({key})/ItSystemUsages")]
-        public IHttpActionResult GetItSystems(int key)
+        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
+        [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
+        public IHttpActionResult GetItSystems(int orgKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
+            if (!organizationContext.AllowReads(UserId))
             {
                 return Forbidden();
             }
-            //Tolist() is required for filtering on computed values in odata.
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+
             return Ok(result);
         }
 
-        // TODO refactor this now that we are using MS Sql Server that has support for MARS
-        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 3 because we need to do MainContract($expand=ItContract($expand=Supplier))
+        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
+            if (!organizationContext.AllowReads(UserId))
             {
                 return Forbidden();
             }
 
             var systemUsages = new List<ItSystemUsage>();
-
-            // using iteration instead of recursion else we're running into
-            // an "multiple DataReaders open" issue and MySQL doesn't support MARS
-
             var queue = new Queue<int>();
             queue.Enqueue(unitKey);
             while (queue.Count > 0)
@@ -68,11 +68,9 @@ namespace Presentation.Web.Controllers.OData
                     .Include(x => x.Children)
                     .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
                     .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
-
                 var responsible =
                     orgUnit.Using.Select(x => x.ResponsibleItSystemUsage).Where(x => x != null).ToList();
                 systemUsages.AddRange(responsible);
-
                 var childIds = orgUnit.Children.Select(x => x.Id);
                 foreach (var childId in childIds)
                 {
@@ -84,13 +82,20 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [AcceptVerbs("POST", "PUT")]
-        public IHttpActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
+        public IHttpActionResult CreateRef([FromODataUri] int systemUsageKey, string navigationProperty, [FromBody] Uri link)
         {
-            var itSystemUsage = Repository.GetByKey(key);
+            var itSystemUsage = Repository.GetByKey(systemUsageKey);
             if (itSystemUsage == null)
             {
                 return NotFound();
             }
+
+            var organizationContext = _contextFactory.CreateOrganizationContext(itSystemUsage.OrganizationId);
+            if (!organizationContext.AllowUpdates(UserId, itSystemUsage))
+            {
+                return Forbidden();
+            }
+
             switch (navigationProperty)
             {
                 case "AccessTypes":

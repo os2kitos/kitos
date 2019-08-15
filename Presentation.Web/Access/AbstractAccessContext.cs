@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Presentation.Web.Access
 {
@@ -19,7 +20,7 @@ namespace Presentation.Web.Access
             return false;
         }
 
-        public virtual bool AllowUpdates(int userId)
+        public virtual bool AllowUpdates(int userId, ItSystemUsage entity)
         {
             return false;
         }
