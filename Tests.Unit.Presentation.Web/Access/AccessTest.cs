@@ -81,11 +81,8 @@ namespace Tests.Unit.Presentation.Web.Access
 
             Assert.Equal(expectedResult, sut.AllowReads(user.Id, system));
         }
-        
-        [Theory]
-        [InlineData(true, true)]
-        [InlineData(false, true)]
-        public void AllowsUpdates_WhenUserInOrOutOfOrganization_Then_WriteAccessIsDeterminedCorrectly(bool inOrganization, bool expectedResult)
+
+        private static void CheckModifications(bool inOrganization, bool expectedResult)
         {
             var user = SetupUser(false, inOrganization);
             var itSystemRole = new ItSystemRole
@@ -103,6 +100,23 @@ namespace Tests.Unit.Presentation.Web.Access
             user.ItSystemRights.Add(itSystemRight);
             var sut = SetupOrganizationContext(user, AccessModifier.Local);
             Assert.Equal(expectedResult, sut.AllowUpdates(user.Id, itSystemUsage));
+        }
+
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        public void AllowsUpdates_WhenUserInOrOutOfOrganization_Then_WriteAccessIsDeterminedCorrectly(bool inOrganization, bool expectedResult)
+        {
+            CheckModifications(inOrganization, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        public void AllowsDelete_WhenUserInOrOutOfOrganization_Then_WriteAccessIsDeterminedCorrectly(bool inOrganization, bool expectedResult)
+        {
+            CheckModifications(inOrganization, expectedResult);
         }
     }
 }

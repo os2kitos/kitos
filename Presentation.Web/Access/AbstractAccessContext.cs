@@ -24,5 +24,10 @@ namespace Presentation.Web.Access
         {
             return false;
         }
+
+        public virtual bool AllowDelete(int userId, ItSystemUsage entity)
+        {
+            return false;
+        }
     }
 }

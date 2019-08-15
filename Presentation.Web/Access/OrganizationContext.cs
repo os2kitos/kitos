@@ -15,8 +15,8 @@ namespace Presentation.Web.Access
         private readonly int _organizationId;
 
         public OrganizationContext(
-            IGenericRepository<User> userRepository, 
-            IGenericRepository<Organization> organizationRepository, 
+            IGenericRepository<User> userRepository,
+            IGenericRepository<Organization> organizationRepository,
             int organizationId)
         {
             _userRepository = userRepository;
@@ -68,7 +68,7 @@ namespace Presentation.Web.Access
             return result;
         }
 
-        public override bool AllowUpdates(int userId, ItSystemUsage entity)
+        private bool AllowOnEntityRole(int userId, ItSystemUsage entity)
         {
             var result = false;
 
@@ -90,6 +90,16 @@ namespace Presentation.Web.Access
             }
 
             return result;
+        }
+
+        public override bool AllowUpdates(int userId, ItSystemUsage entity)
+        {
+            return AllowOnEntityRole(userId, entity);
+        }
+
+        public override bool AllowDelete(int userId, ItSystemUsage entity)
+        {
+            return AllowOnEntityRole(userId, entity);
         }
     }
 }
