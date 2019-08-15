@@ -59,6 +59,7 @@
     <Compile Include="Model\Tasks\CreateItContractTask.cs" />
     <Compile Include="Model\Tasks\CreateItSystemTask.cs" />
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
+    <Compile Include="Model\Tasks\CreateOrganizationTask.cs" />
     <Compile Include="Model\Tasks\DatabaseTask.cs" />
     <Compile Include="Model\Tasks\DropDatabaseTask.cs" />
     <Compile Include="Model\Tasks\EnableAllOptionsTask.cs" />

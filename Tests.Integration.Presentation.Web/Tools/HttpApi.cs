@@ -86,16 +86,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             return JsonConvert.DeserializeObject<T>(responseAsJson);
         }
 
-        public static async Task<List<T>> ReadListResponseBodyAs<T>(this HttpResponseMessage response)
+        public static async Task<List<T>> ReadOdataListResponseBodyAs<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var list = JsonConvert.DeserializeObject<GenericListDTO>(responseAsJson);
-            var returnList = new List<T>();
-            foreach (var t in list.value)
-            {
-                returnList.Add(JsonConvert.DeserializeObject<T>(t.ToString()));
-            }
-            return returnList;
+            var spec = new {value = new List<T>()};
+            var result = JsonConvert.DeserializeAnonymousType(responseAsJson, spec);
+            return result.value;
         }
 
         public static async Task<T> ReadResponseBodyAsKitosApiResponse<T>(this HttpResponseMessage response)
