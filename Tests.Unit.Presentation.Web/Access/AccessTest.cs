@@ -100,6 +100,7 @@ namespace Tests.Unit.Presentation.Web.Access
             };
             var itSystemUsage = new ItSystemUsage();
             itSystemUsage.Rights.Add(itSystemRight);
+            user.ItSystemRights.Add(itSystemRight);
             var sut = SetupOrganizationContext(user, AccessModifier.Local);
             Assert.Equal(expectedResult, sut.AllowUpdates(user.Id, itSystemUsage));
         }
