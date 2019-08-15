@@ -9,7 +9,8 @@ var loginHelper = new Login();
 var waitUpTo = new WaitTimers();
 var ec = protractor.ExpectedConditions;
 
-describe("Only Global Admins can enable and disable API access on a user", () => {
+
+describe("Only Global and Local Admins can view API column in user overview", () => {
 
     beforeEach(() => {
        
@@ -19,20 +20,36 @@ describe("Only Global Admins can enable and disable API access on a user", () =>
         testFixture.cleanupState();
     });
 
-    it("Global Admin only have access to API access attribute in overview", () =>
+    it("Global Admin can see API access attribute in overview", () =>
     {
         loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
+        checkApiColumn(true);
     });
 
-    it("Local Admin and down cannot see API access attribute in overview", () =>
-    {
+    it("Local Admin can see API access attribute in overview", () => {
         loginHelper.loginAsLocalAdmin();
+        checkApiColumn(true);
+    });
+
+    it("Regular user cannot see API access attribute in overview", () =>
+    {
+        loginHelper.loginAsRegularUser();
+        checkApiColumn(false);
+    });
+
+    function checkApiColumn(isColumnVisible : boolean)
+    {
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeFalsy();
-    });
+
+        if (isColumnVisible)
+        {
+            expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
+        }
+        else
+        {
+            expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeFalsy();
+        }
+    }
 
 });
