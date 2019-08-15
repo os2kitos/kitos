@@ -4,13 +4,14 @@ using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
 using System.Web.OData;
+using Presentation.Web.Infrastructure.Attributes;
 using static System.String;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
     {
         private readonly IAuthenticationService _authService;

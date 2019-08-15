@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
@@ -9,11 +8,12 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using Presentation.Web.Controllers.API;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [PublicApi]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
 // doesn't derive from BaseEntityController because we need absolute control over what is exposed here
     {

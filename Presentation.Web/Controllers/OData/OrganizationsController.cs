@@ -10,9 +10,11 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
 using System.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class OrganizationsController : BaseEntityController<Organization>
     {
         private readonly IOrganizationService _organizationService;

@@ -3,12 +3,13 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainServices;
-using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
     {
         private readonly IAuthenticationService _authService;

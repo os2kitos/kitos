@@ -5,12 +5,14 @@ using System.Web.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.ItContract;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     using System;
     using System.Net;
 
+    [PublicApi]
     public class ItContractRightsController : BaseEntityController<ItContractRight>
     {
         private IAuthenticationService _authService;

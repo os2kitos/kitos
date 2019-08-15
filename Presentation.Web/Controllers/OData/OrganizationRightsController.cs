@@ -7,9 +7,11 @@ using System.Web.OData.Routing;
 using Core.ApplicationServices;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;

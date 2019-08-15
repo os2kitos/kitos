@@ -5,9 +5,11 @@ using Core.DomainServices;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
+    [InternalApi]
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
         public AttachedOptionsSensitivePersonalDataController(

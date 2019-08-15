@@ -1,11 +1,4 @@
-﻿using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Presentation.Web.Models
+﻿namespace Presentation.Web.Models
 {
     public class ItSystemDataWorkerRelationDTO
     {
