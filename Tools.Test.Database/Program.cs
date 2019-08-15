@@ -48,6 +48,16 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(connectionString);
                     return new DropDatabaseTask(connectionString);
 
+                case CliTargets.CreateOrganization:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <name>");
+                    var createOrganizationArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        Name = GetArgument(additionalArgs, 1)
+                    };
+
+                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString, createOrganizationArgs.Name);
+
                 case CliTargets.CreateTestUser:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
                     var createUserArgs = new

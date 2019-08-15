@@ -46,6 +46,13 @@ Write-Host "Enabling custom options"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO ENABLE ALL OPTIONS IN KITOS DB" }
 
 #-------------------------------------------------------------
+Write-Host "Configuring test organizations"
+#-------------------------------------------------------------
+
+& $testToolsExePath "CreateOrganization" "$kitosDbConnectionString" "DefaultTestOrganization"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE ORGANIZATION" }
+
+#-------------------------------------------------------------
 Write-Host "Configuring test users"
 #-------------------------------------------------------------
 
@@ -65,10 +72,10 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
 Write-Host "Create IT System"
 #-------------------------------------------------------------
 & $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "DefaultTestItSystem"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO IT SYSTEM" }
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
 #-------------------------------------------------------------
 Write-Host "Create IT Contract"
 #-------------------------------------------------------------
 & $testToolsExePath "CreateItContract" "$kitosDbConnectionString" "DefaultTestItContract"
-if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO IT CONTRACT" }
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT CONTRACT" }
