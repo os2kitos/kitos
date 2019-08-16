@@ -7,11 +7,9 @@ namespace Tools.Test.Database.Model.Tasks
 {
     public class CreateOrganizationTask : DatabaseTask
     {
-        private readonly string _name;
 
-        public CreateOrganizationTask(string connectionString, string name) : base(connectionString)
+        public CreateOrganizationTask(string connectionString) : base(connectionString)
         {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public override bool Execute()
@@ -22,7 +20,7 @@ namespace Tools.Test.Database.Model.Tasks
 
                 var organization = new Organization()
                 {
-                    Name = _name,
+                    Name = TestOrganizations.secondTestOrg,
                     AccessModifier = AccessModifier.Public,
                     TypeId = 1,
                     ObjectOwnerId = globalAdmin.Id,

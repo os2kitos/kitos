@@ -10,11 +10,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemCatalogTests : WithAutoFixture
     {
-        private readonly KitosCredentials _regularApiUser, _globalAdminApiUser;
-
-        public ItSystemCatalogTests()
-        {
-        }
 
         [Theory]
         [InlineData(OrganizationRole.User)]

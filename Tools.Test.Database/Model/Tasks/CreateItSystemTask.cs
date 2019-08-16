@@ -13,7 +13,7 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _name;
         private readonly bool _secondOrganization;
 
-        public CreateItSystemTask(string connectionString, string name, bool secondOrganization)
+        public CreateItSystemTask(string connectionString, string name, bool secondOrganization = false)
             : base(connectionString)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
@@ -24,7 +24,7 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var organization = _secondOrganization ? context.GetSecondOrganization() : context.GetCommonOrganization();
+                var organization = _secondOrganization ? context.GetOrganization(TestOrganizations.secondTestOrg) : context.GetOrganization(TestOrganizations.commonOrg);
                 var globalAdmin = context.GetGlobalAdmin();
 
                 //Create the new it system

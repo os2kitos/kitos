@@ -17,7 +17,7 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _salt;
         private readonly bool _multiOrganization;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess, bool multiOrganization)
+        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess = false, bool multiOrganization = false)
             : base(connectionString)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
@@ -37,7 +37,7 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var commonOrg = context.GetCommonOrganization();
+                var commonOrg = context.GetOrganization(TestOrganizations.commonOrg);
 
                 var newUser = CreateUser(commonOrg, context);
 
@@ -89,7 +89,7 @@ namespace Tools.Test.Database.Model.Tasks
 
             if (_multiOrganization)
             {
-                newRight.OrganizationId = context.GetSecondOrganization().Id;
+                newRight.OrganizationId = context.GetOrganization(TestOrganizations.secondTestOrg).Id;
                 context.OrganizationRights.Add(newRight);
             }
         }

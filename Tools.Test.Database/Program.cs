@@ -48,15 +48,14 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(connectionString);
                     return new DropDatabaseTask(connectionString);
 
-                case CliTargets.CreateOrganization:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <name>");
+                case CliTargets.CreateSecondOrganization:
+                    Console.WriteLine("Expecting the following arguments: <connectionString>");
                     var createOrganizationArgs = new
                     {
-                        ConnectionString = GetArgument(additionalArgs, 0),
-                        Name = GetArgument(additionalArgs, 1)
+                        ConnectionString = GetArgument(additionalArgs, 0)
                     };
 
-                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString, createOrganizationArgs.Name);
+                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString);
 
                 case CliTargets.CreateTestUser:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
@@ -68,7 +67,7 @@ namespace Tools.Test.Database
                         Role = GetArgument(additionalArgs, 3),
                     };
 
-                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role, false, false);
+                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
 
                 case CliTargets.CreateApiTestUser:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
@@ -80,7 +79,7 @@ namespace Tools.Test.Database
                         Role = GetArgument(additionalArgs, 3),
                     };
 
-                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, true, false);
+                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, true);
 
                 case CliTargets.CreateMultiOrganizationApiTestUser:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
@@ -113,7 +112,7 @@ namespace Tools.Test.Database
                     };
 
                     FailOnConnectionToProd(createDefaultOrganiztionSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createDefaultOrganiztionSystemArgs.ConnectionString, createDefaultOrganiztionSystemArgs.ItSystemName, false);
+                    return new CreateItSystemTask(createDefaultOrganiztionSystemArgs.ConnectionString, createDefaultOrganiztionSystemArgs.ItSystemName);
 
                 case CliTargets.CreateSecondOrganizationItSystem:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");

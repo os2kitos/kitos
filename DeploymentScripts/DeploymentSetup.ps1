@@ -40,8 +40,8 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
         $Env:TestUserApiUser = $parameters["TestUserApiUser"]
         $Env:TestUserApiUserPw = $parameters["TestUserApiUserPw"]
         
-        $Env:TestUserMultiOrgApiGlobalAdmin = $parameters["TestUserMultiOrgApiGlobalAdmin"]
-        $Env:TestUserMultiOrgApiGlobalAdminPw = $parameters["TestUserMultiOrgApiGlobalAdminPw"]
+        $Env:TestUserApiGlobalAdmin = $parameters["TestUserApiGlobalAdmin"]
+        $Env:TestUserApiGlobalAdminPw = $parameters["TestUserApiGlobalAdminPw"]
         $Env:DefaultUserPassword = $parameters["DefaultUserPassword"]
     }
     

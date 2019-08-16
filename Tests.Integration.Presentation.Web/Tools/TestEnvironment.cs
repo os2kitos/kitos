@@ -81,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
                     {OrganizationRole.LocalAdmin, LoadUserFromEnvironment(OrganizationRole.LocalAdmin)},
-                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)},
+                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)}
                 };
                 ApiUsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
@@ -141,22 +141,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static KitosCredentials GetCredentials(OrganizationRole role, bool apiAccess = false)
         {
-            if (apiAccess)
+            var userEnvironment = apiAccess ? ApiUsersFromEnvironment : UsersFromEnvironment;
+
+            if (userEnvironment.TryGetValue(role, out var credentials))
             {
-                if (ApiUsersFromEnvironment.TryGetValue(role, out var credentials))
-                {
-                    return credentials;
-                }
-                throw new ArgumentNullException($"No environment api user configured for role:{role:G}");
+                return credentials;
             }
-            else
-            {
-                if (UsersFromEnvironment.TryGetValue(role, out var credentials))
-                {
-                    return credentials;
-                }
-                throw new ArgumentNullException($"No environment user configured for role:{role:G}");
-            }
+            throw new ArgumentNullException($"No environment {(apiAccess ? "api " : "")}user configured for role:{role:G}");
         }
 
         public static string GetBaseUrl()
