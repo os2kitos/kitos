@@ -21,6 +21,12 @@
                         .then(function (result) {
                             return result.data.response;
                         });
+                }],
+                userAccessRights: ['$http', function ($http) {
+                    return $http.get("api/itsystem/GetAccessRights")
+                        .then(function (result) {
+                            return result.data.response;
+                        });
                 }]
             }
         });
@@ -28,25 +34,23 @@
 
     app.controller('system.EditCtrl',
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_',
-            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _) {
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_','userAccessRights',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
                 
                 $scope.hasWriteAccess = hasWriteAccess;
 
-                if (user.isGlobalAdmin) {
+                if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
                         $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
                     }
-                } else if ((hasWriteAccess && (user.currentOrganizationId === itSystem.organizationId) && itSystem.accessModifier === 0) || ($scope.hasWriteAccess && (user.id === itSystem.objectOwnerId) && itSystem.accessModifier === 0)) {
-                    if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
-                    $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
-                    }
-                } else {
+                }
+                else
+                {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
                     });
                 }
-                if (itSystem.accessModifier === 1 || user.isGlobalAdmin || user.isLocalAdmin) {
+                if (userAccessRights.canEdit) {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Deaktivér IT System";
                     });
@@ -54,7 +58,7 @@
                         return o.text === "Aktivér IT System";
                     });
 
-                    if (itSystem.accessModifier === 1 || user.isGlobalAdmin || user.isLocalAdmin) {
+                    if (userAccessRights.canEdit) {
                         if (!itSystem.disabled) {
                             $rootScope.page.subnav.buttons.push(
                                 { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }

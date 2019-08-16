@@ -259,7 +259,7 @@ namespace Presentation.Web.Controllers.API
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
 
-                if(!base.HasWriteAccess(item, KitosUser, organizationId: 0))
+                if (!base.HasWriteAccess(item, KitosUser, organizationId: 0))
                 {
                     return Forbidden();
                 }
@@ -440,6 +440,27 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [Route("api/itsystem/GetAccessRights")]
+        public HttpResponseMessage GetAccessRights()
+        {
+            var canCreate = false;
+            var canDelete = false;
+            var canEdit = false;
+            var canView = false;
+            if (KitosUser.IsGlobalAdmin || KitosUser.IsLocalAdmin && !KitosUser.IsReadOnly)
+            {
+                canCreate = true;
+                canDelete = true;
+                canEdit = true;
+                canView = true;
+            }
+            else if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin && KitosUser.IsInContext(KitosUser.DefaultOrganization.Id))
+            {
+                canView = true;
+            }
+            return Ok(new ItSystemAccessRightsDTO { CanCreate = canCreate, CanDelete = canDelete, CanEdit = canEdit, CanView = canView });
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
