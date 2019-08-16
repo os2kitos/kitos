@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -9,18 +10,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemCatalogTests : WithAutoFixture
     {
-        private readonly KitosCredentials _apiUser;
+        private readonly KitosCredentials _regularApiUser, _globalAdminApiUser;
 
         public ItSystemCatalogTests()
         {
-            _apiUser = TestEnvironment.GetApiUser();
         }
 
-        [Fact]
-        public async Task Api_User_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization()
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Api_Users_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization(OrganizationRole role)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
+            var user = TestEnvironment.GetCredentials(role, true);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(user.Username, user.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
@@ -33,11 +36,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_Data_From_Own_Organizations()
+        [Theory]
+        [InlineData(OrganizationRole.User, 1)]
+        [InlineData(OrganizationRole.GlobalAdmin, 2)]
+        public async Task Api_Users_Can_Get_All_IT_Systems_Data_From_Own_Organizations(OrganizationRole role, int minimumNumberOfItSystems)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
+            var user = TestEnvironment.GetCredentials(role, true);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(user.Username, user.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
@@ -47,6 +53,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotNull(response.Result.First().Name);
+                Assert.True(minimumNumberOfItSystems <= response.Result.Count);
             }
         }
     }

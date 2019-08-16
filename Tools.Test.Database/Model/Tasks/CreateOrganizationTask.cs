@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Migrations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Tools.Test.Database.Model.Extensions;
@@ -28,11 +23,19 @@ namespace Tools.Test.Database.Model.Tasks
                 var organization = new Organization()
                 {
                     Name = _name,
-                    ObjectOwnerId = globalAdmin.Id,
                     AccessModifier = AccessModifier.Public,
-                    LastChangedByUserId = globalAdmin.Id,
-                    TypeId = 1
+                    TypeId = 1,
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
                 };
+
+                organization.Config = Config.Default(globalAdmin);
+                organization.OrgUnits.Add(new OrganizationUnit()
+                {
+                    Name = organization.Name,
+                    ObjectOwnerId = globalAdmin.Id,
+                    LastChangedByUserId = globalAdmin.Id
+                });
 
                 context.Organizations.Add(organization);
                 context.SaveChanges();

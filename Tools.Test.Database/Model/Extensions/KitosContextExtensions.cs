@@ -24,7 +24,7 @@ namespace Tools.Test.Database.Model.Extensions
                 .First(x => x.Name == "Fælles Kommune");
         }
 
-        public static Organization GetMultiOrganization(this KitosContext context)
+        public static Organization GetSecondOrganization(this KitosContext context)
         {
             return context
                 .Organizations

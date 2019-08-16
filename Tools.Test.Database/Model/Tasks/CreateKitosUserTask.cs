@@ -89,7 +89,7 @@ namespace Tools.Test.Database.Model.Tasks
 
             if (_multiOrganization)
             {
-                newRight.OrganizationId = context.GetMultiOrganization().Id;
+                newRight.OrganizationId = context.GetSecondOrganization().Id;
                 context.OrganizationRights.Add(newRight);
             }
         }

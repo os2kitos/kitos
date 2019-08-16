@@ -76,7 +76,10 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE MULTI ORGANIZATION APIACCESS U
 #-------------------------------------------------------------
 Write-Host "Create IT System"
 #-------------------------------------------------------------
-& $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "DefaultTestItSystem"
+& $testToolsExePath "CreateDefaultOrganizationItSystem" "$kitosDbConnectionString" "DefaultTestItSystem"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
+
+& $testToolsExePath "CreateSecondOrganizationItSystem" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
 #-------------------------------------------------------------

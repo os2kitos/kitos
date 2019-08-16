@@ -8,7 +8,8 @@
         public const string CreateMultiOrganizationApiTestUser = "CreateMultiOrganizationApiTestUser";
         public const string CreateOrganization = "CreateOrganization";
         public const string EnableAllOptions = "EnableAllOptions";
-        public const string CreateItSystem = "CreateItSystem";
+        public const string CreateDefaultOrganizationItSystem = "CreateDefaultOrganizationItSystem";
+        public const string CreateSecondOrganizationItSystem = "CreateSecondOrganizationItSystem";
         public const string CreateItContract = "CreateItContract";
     }
 }

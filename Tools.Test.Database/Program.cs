@@ -104,16 +104,27 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(enableAllArgs.ConnectionString);
                     return new EnableAllOptionsTask(enableAllArgs.ConnectionString);
 
-                case CliTargets.CreateItSystem:
+                case CliTargets.CreateDefaultOrganizationItSystem:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
-                    var createSystemArgs = new
+                    var createDefaultOrganiztionSystemArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         ItSystemName = GetArgument(additionalArgs, 1)
                     };
 
-                    FailOnConnectionToProd(createSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createSystemArgs.ConnectionString, createSystemArgs.ItSystemName);
+                    FailOnConnectionToProd(createDefaultOrganiztionSystemArgs.ConnectionString);
+                    return new CreateItSystemTask(createDefaultOrganiztionSystemArgs.ConnectionString, createDefaultOrganiztionSystemArgs.ItSystemName, false);
+
+                case CliTargets.CreateSecondOrganizationItSystem:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
+                    var createSecondOrganizationSystemArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        ItSystemName = GetArgument(additionalArgs, 1)
+                    };
+
+                    FailOnConnectionToProd(createSecondOrganizationSystemArgs.ConnectionString);
+                    return new CreateItSystemTask(createSecondOrganizationSystemArgs.ConnectionString, createSecondOrganizationSystemArgs.ItSystemName, true);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
