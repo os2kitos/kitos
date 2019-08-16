@@ -68,7 +68,7 @@ namespace Presentation.Web.Access
             return result;
         }
 
-        private bool AllowOnEntityRole(int userId, ItSystemUsage entity)
+        private bool AllowChangesOnEntityRole(int userId, ItSystemUsage entity)
         {
             var result = false;
 
@@ -92,14 +92,19 @@ namespace Presentation.Web.Access
             return result;
         }
 
+        public override bool AllowCreate(int userId, ItSystemUsage entity)
+        {
+            return AllowChangesOnEntityRole(userId, entity);
+        }
+
         public override bool AllowUpdates(int userId, ItSystemUsage entity)
         {
-            return AllowOnEntityRole(userId, entity);
+            return AllowChangesOnEntityRole(userId, entity);
         }
 
         public override bool AllowDelete(int userId, ItSystemUsage entity)
         {
-            return AllowOnEntityRole(userId, entity);
+            return AllowChangesOnEntityRole(userId, entity);
         }
     }
 }
