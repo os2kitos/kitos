@@ -29,23 +29,6 @@ namespace Core.ApplicationServices
         }
 
         /// <summary>
-        /// Checks if the user is local admin in a respective organization.
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="organizationId"></param>
-        /// <returns></returns>
-        public bool IsLocalAdmin(int userId, int organizationId)
-        {
-            var user = _userRepository.AsQueryable()
-                .SingleOrDefault(x => x.Id == userId &&
-                    x.OrganizationRights.Any(
-                        right => right.Role == OrganizationRole.LocalAdmin &&
-                        right.OrganizationId == organizationId));
-
-            return user != null;
-        }
-
-        /// <summary>
         /// Checks if the user is local admin in the current organization.
         /// </summary>
         /// <param name="userId"></param>
@@ -168,12 +151,15 @@ namespace Core.ApplicationServices
                 return false;
             }
 
+            //TODO: This checks even if it is not changed. Seems very odd. Also it is too specific. Check should be where it happens....
+            //TODO: Add a rule for access modifier check in POST for ITSystem and ITSystemUsage. Then this is covered.
+            #region instane
             //Check if user is allowed to set accessmodifier to public
-            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
+            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier; //TODO: at this stage we cannot assume that the access modifier is "new". Could it not be the old value? It is a strange assumption.
             if (accessModifier == AccessModifier.Public)
             {
                 // special case for organisation
-                if (entity is Organization)
+                if (entity is Organization) //TODO: IOrganizationController (non-OData( checks for the generic "Can set access modifier"))
                 {
                     if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {
@@ -188,11 +174,13 @@ namespace Core.ApplicationServices
                         return false;
                     }
                 }
+
                 else if (!_featureChecker.CanExecute(user, Feature.CanSetAccessModifierToPublic))
                 {
                     return false;
                 }
             }
+            #endregion insane
 
             // check if entity is in context
             if (entity is IContextAware) // TODO I don't like this impl

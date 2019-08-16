@@ -320,6 +320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Access\IOrganizationContextFactory.cs" />
+    <Compile Include="Access\OrganizationAccessContext.cs" />
     <Compile Include="Access\OrganizationContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />

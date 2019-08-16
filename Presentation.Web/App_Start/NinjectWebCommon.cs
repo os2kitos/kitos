@@ -14,6 +14,7 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
 using Microsoft.Owin;
+using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
@@ -113,6 +114,7 @@ namespace Presentation.Web
             kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InRequestScope();
+            kernel.Bind<IOrganizationContextFactory>().To<OrganizationContextFactory>().InRequestScope();
         }
     }
 }
