@@ -65,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
-                            "local-multi-org-global-admin-user@kitos.dk",
+                            "local-api-global-admin-user@kitos.dk",
                             localDevUserPassword,
                             OrganizationRole.GlobalAdmin)
                     }
