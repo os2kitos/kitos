@@ -1,54 +1,52 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel.ItSystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    public class UsageTests : WithAutoFixture
+    public class ItSystemCatalogTests : WithAutoFixture
     {
         private readonly KitosCredentials _apiUser;
 
-        public UsageTests()
+        public ItSystemCatalogTests()
         {
             _apiUser = TestEnvironment.GetApiUser();
         }
 
         [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_In_Usage_Data_From_Own_Organization()
+        public async Task Api_User_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization()
         {
             //Arrange
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/Organizations(1)/ItSystemUsages"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems(1)"), token.Token))
             {
-                var response = httpResponse.ReadListResponseBodyAs<ItSystemUsage>();
+                var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.Equal(1, response.Result.First().Id);
-                Assert.Single(response.Result);
+                Assert.NotNull(response.Result.Name);
             }
         }
 
         [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_In_Usage_Data_From_Responsible_OrganizationUnit()
+        public async Task Api_User_Can_Get_All_IT_Systems_Data_From_Own_Organizations()
         {
             //Arrange
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/Organizations(1)/OrganizationUnits(1)/ItSystemUsages"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems"), token.Token))
             {
-                var response = httpResponse.ReadListResponseBodyAs<ItSystemUsage>();
+                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.Empty(response.Result);
+                Assert.NotNull(response.Result.First().Name);
             }
         }
     }
