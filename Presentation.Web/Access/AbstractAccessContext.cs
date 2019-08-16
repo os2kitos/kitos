@@ -5,11 +5,6 @@ namespace Presentation.Web.Access
 {
     public abstract class AbstractAccessContext
     {
-        public virtual bool AllowCreate(int userId)
-        {
-            return false;
-        }
-
         public virtual bool AllowReads(int userId)
         {
             return false;
@@ -20,7 +15,17 @@ namespace Presentation.Web.Access
             return false;
         }
 
+        public virtual bool AllowCreate(int userId, ItSystemUsage entity)
+        {
+            return false;
+        }
+
         public virtual bool AllowUpdates(int userId, ItSystemUsage entity)
+        {
+            return false;
+        }
+
+        public virtual bool AllowDelete(int userId, ItSystemUsage entity)
         {
             return false;
         }

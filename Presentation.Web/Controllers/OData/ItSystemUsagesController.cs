@@ -20,7 +20,6 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
         private readonly IOrganizationContextFactory _contextFactory;
-        private readonly IAuthenticationService _authService;
 
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
             IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IOrganizationContextFactory contextFactory)
@@ -29,7 +28,6 @@ namespace Presentation.Web.Controllers.OData
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
             _contextFactory = contextFactory;
-            _authService = authService;
         }
 
         // GET /Organizations(1)/ItSystemUsages
@@ -122,7 +120,13 @@ namespace Presentation.Web.Controllers.OData
             var itSystemUsage = Repository.GetByKey(key);
             if (itSystemUsage == null)
             {
-                return StatusCode(HttpStatusCode.NotFound);
+                return NotFound();
+            }
+
+            var organizationContext = _contextFactory.CreateOrganizationContext(itSystemUsage.OrganizationId);
+            if (!organizationContext.AllowDelete(UserId, itSystemUsage))
+            {
+                return Forbidden();
             }
 
             switch (navigationProperty)
