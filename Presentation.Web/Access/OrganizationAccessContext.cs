@@ -1,32 +1,21 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Model.Authentication;
 
 namespace Presentation.Web.Access
 {
     public class OrganizationAccessContext
     {
-        private readonly IGenericRepository<User> _userRepository;
-        private readonly IFeatureChecker _featureChecker;
-        private readonly IAuthenticationContext _authenticationContext;
+        private readonly IUserContextFactory _userContextFactory;
         private readonly IGenericRepository<ItSystemRole> _systemRoleRepository;
-        private readonly int _organizationId;
+        private readonly int _organizationId; //TODO: Consider if we should take it as input param in stead. This may lead to wrong answers
 
         public OrganizationAccessContext(
-            IGenericRepository<User> userRepository,
-            IFeatureChecker featureChecker,
-            IAuthenticationContext authenticationContext,
+            IUserContextFactory userContextFactory,
             int organizationId)
         {
-            _userRepository = userRepository;
-            _featureChecker = featureChecker;
-            _authenticationContext = authenticationContext;
+            _userContextFactory = userContextFactory;
             _organizationId = organizationId;
         }
 
@@ -34,17 +23,18 @@ namespace Presentation.Web.Access
         {
             var result = false;
 
-            var user = _userRepository.GetByKey(userId);
-            if (user.IsGlobalAdmin)
+            var userContext = _userContextFactory.Create(userId, _organizationId);
+
+            if (IsGlobalAdmin(userContext))
             {
                 result = true;
             }
-            else if (TargetOrganizationMatchesActiveOrganization())
+            else if (TargetOrganizationMatchesActiveOrganization(userContext))
             {
                 result = true;
             }
 
-            if (IsUserInMunicipality(user))
+            if (IsUserInMunicipality(userContext))
             {
                 result = true;
             }
@@ -55,27 +45,29 @@ namespace Presentation.Web.Access
         public bool AllowReads(int userId, IEntity entity)
         {
             var result = false;
+            //TODO: The "Active" context is always the left hand of the equation so maybe we should not model it this way or at least let the factory extract it from auth context (active user auth)
+            var userContext = _userContextFactory.Create(userId, _organizationId);
 
-            var user = _userRepository.GetByKey(userId);
-            if (user.IsGlobalAdmin)
+            var user = userContext.User;
+            if (IsGlobalAdmin(userContext))
             {
                 result = true;
             }
-            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity))
+            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity, userContext))
             {
                 if (HasOwnership(entity, user))
                 {
                     result = true;
                 }
-                else if (IsContextBound(entity) && ActiveContextIsEntityContext(entity))
+                else if (IsContextBound(entity) && ActiveContextIsEntityContext(entity, userContext))
                 {
                     result = true;
                 }
-                else if (IsUserInMunicipality(user) && HasAssignedPublicAccess(entity))
+                else if (IsUserInMunicipality(userContext) && HasAssignedPublicAccess(entity))
                 {
                     result = true;
                 }
-                else if (IsUserEntity(entity) && entity.Id == user.Id)
+                else if (IsUserEntity(entity) && entity.Id == userId)
                 {
                     result = true;
                 }
@@ -88,8 +80,10 @@ namespace Presentation.Web.Access
         {
             var result = false;
 
-            var user = _userRepository.GetByKey(userId);
-            if (IsGlobalAdmin(user))
+            //TODO: The "Active" context is always the left hand of the equation so maybe we should not model it this way or at least let the factory extract it from auth context (active user auth)
+            var userContext = _userContextFactory.Create(userId, _organizationId);
+            var user = userContext.User;
+            if (IsGlobalAdmin(userContext))
             {
                 result = true;
             }
@@ -97,13 +91,13 @@ namespace Presentation.Web.Access
             {
                 result = true;
             }
-            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity))
+            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity, userContext))
             {
-                if (IsLocalAdmin(user))
+                if (IsLocalAdmin(userContext))
                 {
                     result = true;
                 }
-                else if (HasModuleLevelWriteAccess(user, entity))
+                else if (HasModuleLevelWriteAccess(userContext, entity))
                 {
                     result = true;
                 }
@@ -111,43 +105,18 @@ namespace Presentation.Web.Access
                 {
                     result = true;
                 }
-                else if (IsUserEntity(entity) && (entity.Id == user.Id || CanModifyUsers(user)))
+                else if (IsUserEntity(entity) && (entity.Id == user.Id))
                 {
                     result = true;
                 }
             }
 
-            return result && user.IsReadOnly == false;
+            return result && IsReadOnly(userContext) == false;
         }
 
-        private bool HasModuleLevelWriteAccess(User user, IEntity entity)
+        private static bool HasModuleLevelWriteAccess(IOrganizationalUserContext user, IEntity entity)
         {
-            var featureToCheck = default(Feature?);
-            switch (entity)
-            {
-                case IContractModule _:
-                    featureToCheck = Feature.CanModifyContracts;
-                    break;
-                case IOrganizationModule _:
-                    featureToCheck = Feature.CanModifyOrganizations;
-                    break;
-                case IProjectModule _:
-                    featureToCheck = Feature.CanModifyProjects;
-                    break;
-                case ISystemModule _:
-                    featureToCheck = Feature.CanModifySystems;
-                    break;
-                case IReportModule _:
-                    featureToCheck = Feature.CanModifyReports;
-                    break;
-            }
-
-            return featureToCheck.HasValue && _featureChecker.CanExecute(user, featureToCheck.Value);
-        }
-
-        private bool CanModifyUsers(User user)
-        {
-            return _featureChecker.CanExecute(user, Feature.CanModifyUsers);
+            return user.HasModuleLevelAccessTo(entity);
         }
 
         private static bool IsUserEntity(IEntity entity)
@@ -160,19 +129,14 @@ namespace Presentation.Web.Access
             return (entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public;
         }
 
-        private static bool IsUserInMunicipality(User user)
+        private static bool IsUserInMunicipality(IOrganizationalUserContext user)
         {
-            return user.DefaultOrganization?.Type?.Category == OrganizationCategory.Municipality;
+            return user.IsActiveInOrganizationOfType(OrganizationCategory.Municipality);
         }
 
-        private bool TargetOrganizationMatchesActiveOrganization()
+        private bool TargetOrganizationMatchesActiveOrganization(IOrganizationalUserContext user)
         {
-            return _authenticationContext.ActiveOrganizationId == _organizationId;
-        }
-
-        private static bool IsGlobalAdmin(User user)
-        {
-            return user.IsGlobalAdmin;
+            return user.IsActiveInOrganization(_organizationId);
         }
 
         private static bool HasAssignedWriteAccess(IEntity entity, User user)
@@ -185,19 +149,29 @@ namespace Presentation.Web.Access
             return entity is IContextAware;
         }
 
-        private bool ActiveContextIsEntityContext(IEntity entity)
+        private static bool ActiveContextIsEntityContext(IEntity entity, IOrganizationalUserContext user)
         {
-            return ((IContextAware)entity).IsInContext(_authenticationContext.ActiveOrganizationId.GetValueOrDefault(-1));
-        }
-
-        private static bool IsLocalAdmin(User user)
-        {
-            return user.IsLocalAdmin;
+            return user.IsActiveInSameOrganizationAs((IContextAware)entity);
         }
 
         private static bool HasOwnership(IEntity ownedEntity, IEntity ownerEntity)
         {
             return ownedEntity.ObjectOwnerId == ownerEntity.Id;
+        }
+
+        private static bool IsGlobalAdmin(IOrganizationalUserContext user)
+        {
+            return user.HasRole(OrganizationRole.GlobalAdmin);
+        }
+
+        private static bool IsReadOnly(IOrganizationalUserContext user)
+        {
+            return user.HasRole(OrganizationRole.ReadOnly);
+        }
+
+        private static bool IsLocalAdmin(IOrganizationalUserContext user)
+        {
+            return user.HasRole(OrganizationRole.LocalAdmin);
         }
     }
 }

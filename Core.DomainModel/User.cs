@@ -124,23 +124,23 @@ namespace Core.DomainModel
 
         public bool IsGlobalAdmin { get; set; }
 
-        public bool IsReadOnly {
-            get
-            {
-                return OrganizationRights.Any(
-                    right => (right.Role == OrganizationRole.ReadOnly) &&
-                             (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
-            }
+        public bool IsReadOnly => IsReadOnlyInOrg(DefaultOrganizationId.GetValueOrDefault());
+
+        public bool IsReadOnlyInOrg(int organizationId)
+        {
+            return OrganizationRights.Any(
+                right => (right.Role == OrganizationRole.ReadOnly) &&
+                         (right.OrganizationId == organizationId));
         }
 
         public override bool HasUserWriteAccess(User user)
         {
-            if (IsReadOnly) {
-                return (Id == user.Id) || base.HasUserWriteAccess(user);
-            }else
+            if (IsReadOnly)
             {
-                return IsReadOnly;
+                return (Id == user.Id) || base.HasUserWriteAccess(user);
             }
+
+            return IsReadOnly;
         }
 
         public bool IsInContext(int organizationId)
@@ -148,14 +148,33 @@ namespace Core.DomainModel
             return DefaultOrganizationId == organizationId;
         }
 
-        public bool IsLocalAdmin
+        public bool IsLocalAdmin => IsLocalAdminInOrg(DefaultOrganizationId.GetValueOrDefault());
+
+        public bool IsLocalAdminInOrg(int organizationId)
         {
-            get
+            return OrganizationRights.Any(
+                right => (right.Role == OrganizationRole.LocalAdmin) &&
+                         right.OrganizationId == organizationId);
+        }
+
+        public IEnumerable<OrganizationRole> GetRolesInOrg(int organizationId)
+        {
+            var roles =
+                OrganizationRights
+                    .Where(or => or.OrganizationId == organizationId)
+                    .Select(x => x.Role)
+                    .ToList();
+
+            //NOTE: Use of this property is somewhat messy. In some cases it applies the IsGlobalAdmin boolean (the right way) and in other cases it uses the "right" with the role "Global admin" which is the wrong way
+            if (IsGlobalAdmin)
             {
-                return OrganizationRights.Any(
-                    right => (right.Role == OrganizationRole.LocalAdmin) &&
-                             (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
+                roles.Add(OrganizationRole.GlobalAdmin);
             }
+
+            return roles
+                .Distinct()
+                .ToList()
+                .AsReadOnly();
         }
 
         #endregion

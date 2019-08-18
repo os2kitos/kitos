@@ -319,7 +319,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Access\OrganizationalUserContext.cs" />
+    <Compile Include="Access\UserContextFactory.cs" />
+    <Compile Include="Access\IUserContextFactory.cs" />
     <Compile Include="Access\IOrganizationContextFactory.cs" />
+    <Compile Include="Access\IOrganizationalUserContext.cs" />
     <Compile Include="Access\OrganizationAccessContext.cs" />
     <Compile Include="Access\OrganizationContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />

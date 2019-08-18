@@ -115,6 +115,7 @@ namespace Presentation.Web
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InRequestScope();
             kernel.Bind<IOrganizationContextFactory>().To<OrganizationContextFactory>().InRequestScope();
+            kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
         }
     }
 }

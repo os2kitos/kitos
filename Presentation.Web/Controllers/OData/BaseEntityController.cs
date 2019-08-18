@@ -7,16 +7,22 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Ninject.Infrastructure.Language;
+using Presentation.Web.Access;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
+    public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        protected IAuthenticationService AuthService { get; }
+        private readonly IOrganizationContextFactory _organizationContextFactory;
+        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new aproach is validated
 
-        protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
+        protected BaseEntityController(
+            IGenericRepository<T> repository,
+            IAuthenticationService authService,
+            IOrganizationContextFactory organizationContextFactory = null)
             : base(repository)
         {
+            _organizationContextFactory = organizationContextFactory;
             AuthService = authService;
         }
 
@@ -26,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
 
-            var result = Repository.AsQueryable();
+            var result = Repository.AsQueryable().ToEnumerable();
 
             if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
@@ -34,20 +40,22 @@ namespace Presentation.Web.Controllers.OData
                 {
                     if (hasOrg)
                     {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
                     }
                     else
                     {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
                     }
                 }
             }
             else
             {
-                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            return Ok(result);
+            result = result.Where(AllowReadAccess);
+
+            return Ok(result.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -55,13 +63,13 @@ namespace Presentation.Web.Controllers.OData
         {
             var result = Repository.AsQueryable().Where(p => p.Id == key);
 
-            if (!result.Any())
+            if (result.Any() == false)
             {
                 return NotFound();
             }
 
             var entity = result.First();
-            if (!AuthService.HasReadAccess(UserId, entity))
+            if (AllowReadAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -75,8 +83,7 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !AuthService.HasReadAccessOutsideContext(UserId))
+            if (AllowOrganizationAccess(key) == false)
             {
                 return Forbidden();
             }
@@ -93,15 +100,10 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
-            {
-                (entity as IHasOrganization).OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
-            }
-
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -132,7 +134,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -168,7 +170,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -184,6 +186,64 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        protected bool AllowOrganizationAccess(int organizationId)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(organizationId);
+
+                return accessContext.AllowReads(UserId);
+            }
+            var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
+            return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);
+        }
+
+        private bool AllowReadAccess(T entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                var organizationId = AuthService.GetCurrentOrganizationId(UserId);
+                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(organizationId);
+                return accessContext.AllowReads(UserId, entity);
+            }
+            return AuthService.HasReadAccess(UserId, entity);
+        }
+
+        private bool AllowWriteAccess(T entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                var targetOrganization = GetTargetOrganization(entity);
+                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(targetOrganization);
+                return accessContext.AllowUpdates(UserId, entity);
+            }
+            return AuthService.HasWriteAccess(UserId, entity);
+        }
+
+        private bool ApplyNewAccessControlScheme()
+        {
+            return _organizationContextFactory != null;
+        }
+
+
+        protected int GetTargetOrganization(T entity)
+        {
+            var targetOrganization = AuthService.GetCurrentOrganizationId(UserId);
+            if (entity is IHasOrganization organization)
+            {
+                if (organization.OrganizationId == 0)
+                {
+                    organization.OrganizationId = targetOrganization;
+                }
+                else
+                {
+                    targetOrganization = organization.OrganizationId;
+                }
+            }
+
+            return targetOrganization;
         }
     }
 }
