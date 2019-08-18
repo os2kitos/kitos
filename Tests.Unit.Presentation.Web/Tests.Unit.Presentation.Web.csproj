@@ -202,7 +202,6 @@
     <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="OData\AuthenticationServiceTest.cs" />
-    <Compile Include="OData\RolesAndTypesPriorityTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

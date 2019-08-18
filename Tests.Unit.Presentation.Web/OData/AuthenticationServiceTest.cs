@@ -8,8 +8,6 @@ using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
@@ -18,8 +16,6 @@ using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
-
-//https://datatellblog.wordpress.com/2015/05/05/unit-testing-asp-net-mvc-authorization/
 
 namespace Tests.Unit.Presentation.Web.OData
 {

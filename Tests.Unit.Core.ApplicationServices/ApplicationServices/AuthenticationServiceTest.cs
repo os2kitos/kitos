@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -14,17 +12,13 @@ using Core.DomainModel.Reports;
 using Core.DomainServices;
 using FluentAssertions;
 using NSubstitute;
-using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
-
-//https://datatellblog.wordpress.com/2015/05/05/unit-testing-asp-net-mvc-authorization/
 
 namespace Tests.Unit.Core.ApplicationServices
 {
     public class AuthenticationServiceTest
     {
         private IGenericRepository<User> _userRepository;
-        private IGenericRepository<ItContract> _itContractRepository;
         private IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private AuthenticationService _authenticationService;
         private IFeatureChecker _featureChecker;
@@ -36,7 +30,6 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void SetUp()
         {
-            _itContractRepository = Substitute.For<IGenericRepository<ItContract>>();
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
             _featureChecker = new FeatureChecker();
