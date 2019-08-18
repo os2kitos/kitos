@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -12,7 +11,6 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
-using System.Runtime.Caching;
 using Presentation.Web.Helpers;
 
 namespace Presentation.Web.Controllers.API

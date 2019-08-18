@@ -228,10 +228,10 @@
                             "data-element-type": "userHeader"
                         },
                         template: (dataItem) => dataItem.HasApiAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
-                        hidden: !this.user.isGlobalAdmin,
+                        hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
-                        menu: this.user.isGlobalAdmin
+                        menu: (this.user.isGlobalAdmin || this.user.isLocalAdmin),
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,

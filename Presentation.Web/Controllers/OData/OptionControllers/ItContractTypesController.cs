@@ -1,11 +1,11 @@
-﻿using System.Web.Http.Description;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class ItContractTypesController : BaseOptionController<ItContractType, ItContract>
     {
         public ItContractTypesController(IGenericRepository<ItContractType> repository, IAuthenticationService authService)

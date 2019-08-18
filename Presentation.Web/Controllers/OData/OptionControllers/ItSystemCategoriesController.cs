@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http.Description;
+﻿using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
@@ -11,7 +7,7 @@ namespace Presentation.Web.Controllers.OData.OptionControllers
     using Core.DomainModel.ItSystemUsage;
     using Core.DomainServices;
 
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class ItSystemCategoriesController : BaseOptionController<ItSystemCategories, ItSystemUsage>
     {
         public ItSystemCategoriesController(

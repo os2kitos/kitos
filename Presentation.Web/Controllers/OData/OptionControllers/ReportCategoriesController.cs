@@ -1,11 +1,11 @@
-﻿using System.Web.Http.Description;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class ReportCategoriesController : BaseEntityController<ReportCategoryType>
     {
         public ReportCategoriesController(IGenericRepository<ReportCategoryType> repository, IAuthenticationService authService)

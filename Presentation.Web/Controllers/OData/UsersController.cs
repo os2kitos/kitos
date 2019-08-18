@@ -1,14 +1,17 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class UsersController : BaseEntityController<User>
     {
         private readonly IAuthenticationService _authService;

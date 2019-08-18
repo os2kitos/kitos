@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -83,6 +84,14 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<T>(responseAsJson);
+        }
+
+        public static async Task<List<T>> ReadOdataListResponseBodyAs<T>(this HttpResponseMessage response)
+        {
+            var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var spec = new {value = new List<T>()};
+            var result = JsonConvert.DeserializeAnonymousType(responseAsJson, spec);
+            return result.value;
         }
 
         public static async Task<T> ReadResponseBodyAsKitosApiResponse<T>(this HttpResponseMessage response)

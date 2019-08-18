@@ -1,15 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Web.Http;
+using Presentation.Web;
+using Presentation.Web.Helpers;
 using Swashbuckle.Application;
+using Swashbuckle.OData;
 using WebActivatorEx;
-using SwashbuckleODataSample;
-using System.Linq;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
-namespace SwashbuckleODataSample
+namespace Presentation.Web
 {
     public class SwaggerConfig
     {
@@ -80,7 +82,7 @@ namespace SwashbuckleODataSample
                 //    });
 
                 //c.DocumentFilter<RemovePatchPostFilter>();
-
+                c.DocumentFilter<InternalApiAttributeFilter>();
                 // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
                 //c.IgnoreObsoleteActions();
 
@@ -181,6 +183,24 @@ namespace SwashbuckleODataSample
                 //
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
+                // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
+                // alternative implementation for ISwaggerProvider with the CustomProvider option.
+                //
+                c.CustomProvider(defaultProvider => new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration).Configure(odataConfig =>
+                {
+                    // Set this flag to include navigation properties in your entity swagger models
+                    //
+                    //odataConfig.IncludeNavigationProperties();
+
+                    // Enable Cache for swagger doc requests
+                    odataConfig.EnableSwaggerRequestCaching();
+
+                    
+                    //Set custom AssembliesResolver
+                    // odataConfig.SetAssembliesResolver(new Utils.CustomAssembliesResolver());
+                }));
+                
+
             })
                 .EnableSwaggerUi(c =>
                 {
@@ -235,6 +255,7 @@ namespace SwashbuckleODataSample
                     //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
                     c.EnableApiKeySupport("Authorization", "header");
                 });
+            
         }
     }
 }

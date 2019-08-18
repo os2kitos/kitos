@@ -11,9 +11,11 @@ using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;

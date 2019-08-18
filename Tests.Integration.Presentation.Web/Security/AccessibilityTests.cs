@@ -3,22 +3,18 @@ using System.Net;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
-using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
-using Presentation.Web.Models;
-using System.Net.Http;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests : WithAutoFixture
     {
-        private readonly KitosCredentials _apiUser, _globalAdmin;
+        private readonly KitosCredentials _apiUser;
         private readonly string _defaultPassword;
 
         public AccessibilityTests()
         {
             _apiUser = TestEnvironment.GetApiUser();
-            _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
             _defaultPassword = TestEnvironment.GetDefaultUserPassword();
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Web.Http.Description;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;

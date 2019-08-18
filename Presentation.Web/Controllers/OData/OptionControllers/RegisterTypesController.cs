@@ -1,12 +1,12 @@
-﻿using System.Web.Http.Description;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [InternalApi]
     public class RegisterTypesController : BaseOptionController<RegisterType, ItSystemUsage>
     {
         public RegisterTypesController(IGenericRepository<RegisterType> repository, IAuthenticationService authService)
