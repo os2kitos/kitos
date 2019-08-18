@@ -14,15 +14,15 @@ namespace Presentation.Web.Controllers.OData
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new aproach is validated
-        protected OrganizationAccessContext AccessContext { get; }
+        private readonly IAccessContext _accessContext;
 
         protected BaseEntityController(
             IGenericRepository<T> repository,
             IAuthenticationService authService,
-            OrganizationAccessContext accessContext = null)
+            IAccessContext accessContext = null)
             : base(repository)
         {
-            AccessContext = accessContext;
+            _accessContext = accessContext;
             AuthService = authService;
         }
 
@@ -195,33 +195,33 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return AccessContext.AllowReads(organizationId);
+                return _accessContext.AllowReads(organizationId);
             }
             var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
             return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);
         }
 
-        private bool AllowReadAccess(T entity)
+        protected bool AllowReadAccess(T entity)
         {
             if (ApplyNewAccessControlScheme())
             {
-                return AccessContext.AllowReads(entity);
+                return _accessContext.AllowReads(entity);
             }
             return AuthService.HasReadAccess(UserId, entity);
         }
 
-        private bool AllowWriteAccess(T entity)
+        protected bool AllowWriteAccess(T entity)
         {
             if (ApplyNewAccessControlScheme())
             {
-                return AccessContext.AllowUpdates(entity);
+                return _accessContext.AllowUpdates(entity);
             }
             return AuthService.HasWriteAccess(UserId, entity);
         }
 
         private bool ApplyNewAccessControlScheme()
         {
-            return AccessContext != null;
+            return _accessContext != null;
         }
     }
 }

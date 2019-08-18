@@ -30,7 +30,7 @@ namespace Presentation.Web.Access
             return new OrganizationContext(_userRepository, _organizationRepository, organizationId);
         }
 
-        public OrganizationAccessContext CreateOrganizationAccessContext()
+        public IAccessContext CreateOrganizationAccessContext()
         {
             var activeUserContext = _userContextFactory.Create(
                 userId: _authenticationContext.UserId.GetValueOrDefault(-1),

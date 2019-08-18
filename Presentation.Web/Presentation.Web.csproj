@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Access\IAccessContext.cs" />
     <Compile Include="Access\OrganizationalUserContext.cs" />
     <Compile Include="Access\UserContextFactory.cs" />
     <Compile Include="Access\IUserContextFactory.cs" />

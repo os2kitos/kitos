@@ -20,8 +20,8 @@ namespace Presentation.Web.Controllers.OData
         public ItSystemRightsController(
             IGenericRepository<ItSystemRight> repository,
             IAuthenticationService authService,
-            IOrganizationContextFactory contextFactory)
-            : base(repository, authService, contextFactory.CreateOrganizationAccessContext())
+            IAccessContext accessContext)
+            : base(repository, authService, accessContext)
         {
         }
 
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (AccessContext.AllowUpdates(entity) == false)
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (AccessContext.AllowUpdates(entity) == false)
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -117,7 +117,7 @@ namespace Presentation.Web.Controllers.OData
 
         private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
         {
-            result = result.Where(AccessContext.AllowReads).ToList();
+            result = result.Where(AllowReadAccess).ToList();
             return result;
         }
     }

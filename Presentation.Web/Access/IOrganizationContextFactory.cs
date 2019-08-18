@@ -3,6 +3,6 @@
     public interface IOrganizationContextFactory
     {
         OrganizationContext CreateOrganizationContext(int organizationId);
-        OrganizationAccessContext CreateOrganizationAccessContext();
+        IAccessContext CreateOrganizationAccessContext();
     }
 }

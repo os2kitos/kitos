@@ -3,7 +3,7 @@ using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Access
 {
-    public class OrganizationAccessContext
+    public class OrganizationAccessContext : IAccessContext
     {
         private readonly IOrganizationalUserContext _activeUserContext;
 

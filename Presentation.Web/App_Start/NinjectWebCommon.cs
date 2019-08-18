@@ -113,11 +113,26 @@ namespace Presentation.Web
 
             kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
-            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
-            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InRequestScope();
+            RegisterAuthenticationContext(kernel);
+            RegisterAccessContext(kernel);
+        }
+
+        private static void RegisterAuthenticationContext(IKernel kernel)
+        {
+            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create())
+                .InRequestScope();
+        }
+
+        private static void RegisterAccessContext(IKernel kernel)
+        {
             kernel.Bind<IOrganizationContextFactory>().To<OrganizationContextFactory>().InRequestScope();
             kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
+            kernel.Bind<IAccessContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<IOrganizationContextFactory>().CreateOrganizationAccessContext())
+                .InRequestScope();
         }
     }
 }
