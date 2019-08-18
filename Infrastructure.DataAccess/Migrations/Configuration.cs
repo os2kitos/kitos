@@ -32,49 +32,38 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="context">The context.</param>
         protected override void Seed(KitosContext context)
         {
-            var newBuild = GetEnvironmentVariable("SeedNewDb") == "yes";
-            if (newBuild)
+            var cleanDatabase = GetEnvironmentVariable("SeedNewDb") == "yes";
+
+            if (cleanDatabase)
             {
                 Console.Out.WriteLine("Seeding initial data into kitos database");
-            }
+                #region USERS
 
-            #region USERS
-
-            // don't overwrite global admin if it already exists
-            // cause it'll overwrite UUID
-            var salt = $"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}";
-            string password;
-            using (var cryptoService = new CryptoService())
-            {
-                password = cryptoService.Encrypt($"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}" + salt);
-            }
-
-            const string rootUserEmail = "support@kitos.dk";
-            var globalAdmin = context.Users.FirstOrDefault(x => x.Email == rootUserEmail) ?? context.Users.Add(
-                new User
+                // don't overwrite global admin if it already exists
+                // cause it'll overwrite UUID
+                var salt = $"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}";
+                string password;
+                using (var cryptoService = new CryptoService())
                 {
-                    Name = "Global",
-                    LastName = "admin",
-                    Email = rootUserEmail,
-                    Salt = salt,
-                    Password = password,
-                    IsGlobalAdmin = true
-                });
+                    password = cryptoService.Encrypt($"{Guid.NewGuid()}{Guid.NewGuid()}{Guid.NewGuid()}" + salt);
+                }
 
+                const string rootUserEmail = "support@kitos.dk";
+                var globalAdmin = context.Users.FirstOrDefault(x => x.Email == rootUserEmail) ?? context.Users.Add(
+                                      new User
+                                      {
+                                          Name = "Global",
+                                          LastName = "admin",
+                                          Email = rootUserEmail,
+                                          Salt = salt,
+                                          Password = password,
+                                          IsGlobalAdmin = true
+                                      });
 
-            //var user1 = CreateUser("Test bruger1", "1@test", "test", cryptoService);
-            //var user2 = CreateUser("Test bruger2", "2@test", "test", cryptoService);
-            //var user3 = CreateUser("Test bruger3", "3@test", "test", cryptoService);
-            //var user4 = CreateUser("Test bruger4", "4@test", "test", cryptoService);
-            //var user5 = CreateUser("Test bruger5", "5@test", "test", cryptoService);
-            //context.Users.AddOrUpdate(x => x.Email, , user1, user2, user3, user4, user5);
+                context.SaveChanges();
 
-            context.SaveChanges();
+                #endregion
 
-            #endregion
-
-            if (newBuild == true)
-            {
                 #region OPTIONS
 
                 Console.Out.WriteLine("Initializing options");
