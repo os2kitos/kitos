@@ -6,14 +6,13 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
-using System;
-using Infrastructure.DataAccess;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;

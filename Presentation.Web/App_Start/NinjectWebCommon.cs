@@ -87,7 +87,9 @@ namespace Presentation.Web
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
                 .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl)
-                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix);
+                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
+                .WithConstructorArgument("defaultUserPassword", Settings.Default.DefaultUserPassword)
+                .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
             kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();

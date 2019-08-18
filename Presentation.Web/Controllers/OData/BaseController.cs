@@ -8,12 +8,10 @@ using System.Web.OData;
 using System.Web.OData.Extensions;
 using Core.DomainServices;
 using System.Web.OData.Routing;
-using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using Ninject;
 using Ninject.Extensions.Logging;
 using System.Web.Http.Routing;
-using Microsoft.OData.UriParser;
 
 namespace Presentation.Web.Controllers.OData
 {

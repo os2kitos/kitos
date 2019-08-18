@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -45,6 +44,8 @@ namespace Core.DomainModel
         public int? DefaultOrganizationId { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
+
+        public bool? HasApiAccess { get; set; }
 
         /// <summary>
         ///     The organization the user will be automatically logged into.
@@ -176,6 +177,7 @@ namespace Core.DomainModel
                 .ToList()
                 .AsReadOnly();
         }
+
 
         #endregion
     }

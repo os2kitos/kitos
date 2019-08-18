@@ -7,10 +7,12 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public partial class ItSystemsController : BaseEntityController<ItSystem>
+    [PublicApi]
+    public class ItSystemsController : BaseEntityController<ItSystem>
     {
         private readonly IOrganizationContextFactory _contextFactory;
 

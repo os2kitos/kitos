@@ -187,6 +187,7 @@
   <ItemGroup>
     <Compile Include="Access\AccessTest.cs" />
     <Compile Include="Context\AuthenticationContextTest.cs" />
+    <Compile Include="Context\AuthenticationContextFactoryTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Login\CustomMembershipProviderTest.cs" />

@@ -1,37 +1,37 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
-using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.Model;
-using Presentation.Web.Helpers;
 using Xunit;
-using Core.DomainModel.Organization;
+using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-    public class AccessibilityTests
+    public class AccessibilityTests : WithAutoFixture
     {
-        [Theory]
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.User)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.User)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.User)]
+        private readonly KitosCredentials _apiUser;
+        private readonly string _defaultPassword;
 
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.LocalAdmin)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.LocalAdmin)]
-        
-        [InlineData("api/User", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
-        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden, OrganizationRole.GlobalAdmin)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK, OrganizationRole.GlobalAdmin)]
-        public async Task LoggedInApiGetRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        public AccessibilityTests()
         {
-            var token = await HttpApi.GetTokenAsync(role);
-            using (var httpResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), token.Token))
+            _apiUser = TestEnvironment.GetApiUser();
+            _defaultPassword = TestEnvironment.GetDefaultUserPassword();
+        }
+
+        [Theory]
+        [InlineData("api/User", HttpStatusCode.Forbidden)]
+        [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
+        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK)]
+        public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
+        {
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
+            var token = await HttpApi.GetTokenAsync(loginDto);
+
+            //Act
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token))
             {
+                //Assert
                 Assert.Equal(httpCode, httpResponse.StatusCode);
             }
         }
@@ -40,26 +40,73 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/User", HttpStatusCode.Unauthorized)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Unauthorized)]
         [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.Unauthorized)]
-        public async Task AnonymousApiCalls(string apiUrl, HttpStatusCode httpCode)
+        public async Task Anonymous_Api_Calls_Returns_401(string apiUrl, HttpStatusCode httpCode)
         {
             using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))
             {
                 Assert.Equal(httpCode, httpResponse.StatusCode);
             }
-        } 
+        }
 
-        [Theory] 
-        [InlineData("/api/Reference", HttpStatusCode.Created, OrganizationRole.GlobalAdmin)]
-        public async Task LoggedInApiPostRequests(string apiUrl, HttpStatusCode httpCode, OrganizationRole role)
+        [Fact]
+        public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
-            var jobj = new JObject {{"Title", "STRONGMINDS"}, {"ExternalReferenceId", "1338"}, {"URL", "https://strongminds.dk/" },{"Display","0"} };
-
-            var token = await HttpApi.GetTokenAsync(role);
-            using (var httpResponse = await HttpApi.PostAsyncWithToken(TestEnvironment.CreateUrl(apiUrl), jobj, token.Token))
+            //Arrange
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
+            var payload = new
             {
-                Assert.Equal(httpCode, httpResponse.StatusCode);
+                Title = A<string>(),
+                ExternalReferenceId = A<string>(),
+                URL = "https://strongminds.dk/"
+            };
+            var token = await HttpApi.GetTokenAsync(loginDto);
+
+            //Act
+            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
             }
         }
 
+
+        [Fact]
+        public async Task Token_Can_Be_Invalidated_After_Creation()
+        {
+            //Arrange
+            var email = CreateEmail();
+            var userDto = ObjectCreateHelper.MakeSimpleApiUserDto(email, true);
+            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, "User");
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
+            var token = await HttpApi.GetTokenAsync(loginDto);
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            {
+                Assert.NotNull(requestResponse);
+                Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
+            };
+            
+            //Act
+            await DisableApiAccessForUserAsync(userDto, createdUserId);
+
+            //Assert
+            using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
+            {
+                Assert.NotNull(requestResponse);
+                Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
+            };
+            var deleteResponse = await HttpApi.DeleteOdataUserAsync(createdUserId);
+        }
+
+        private static string CreateEmail()
+        {
+            return $"{Guid.NewGuid():N}@test.dk";
+        }
+
+        private async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
+        {
+            userDto.HasApiAccess = false;
+            await HttpApi.PatchOdataUserAsync(userDto, id);
+        }
+    
     }
 }

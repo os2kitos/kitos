@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 

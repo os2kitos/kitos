@@ -1,7 +1,8 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IGridModel extends Models.IUser {
+    interface  IGridModel extends Models.IUser {
+        hasApi: boolean;
         canEdit: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
@@ -10,7 +11,6 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
-        hasApi: boolean;
     }
 
     class OrganizationUserController {
@@ -106,10 +106,7 @@
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
                                 usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
-                                if (this.user.isGlobalAdmin)
-                                {
-                                    usr.hasApi = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ApiAccess) !== undefined;
-                                }
+                                
                             });
                             return response;
                         }
@@ -230,11 +227,11 @@
                         headerAttributes: {
                             "data-element-type": "userHeader"
                         },
-                        template: (dataItem) => dataItem.hasApi ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
-                        hidden: !this.user.isGlobalAdmin,
+                        template: (dataItem) => dataItem.HasApiAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
                         filterable: false,
                         sortable: false,
-                        menu: this.user.isGlobalAdmin
+                        menu: (this.user.isGlobalAdmin || this.user.isLocalAdmin),
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,
@@ -328,7 +325,6 @@
                     case Models.OrganizationRole.SystemModuleAdmin: roleNames[index] = "System Admin"; break;
                     case Models.OrganizationRole.ContractModuleAdmin: roleNames[index] = "Kontrakt Admin"; break;
                     case Models.OrganizationRole.ReportModuleAdmin: roleNames[index] = "Rapport Admin"; break;
-                    case Models.OrganizationRole.ApiAccess:roleNames[index] = "API Adgang"; break;
                 }
             });
             return roleNames.join(",");

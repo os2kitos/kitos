@@ -5,6 +5,7 @@
         PhoneNumber?: string;
         Email?: string;
         IsGlobalAdmin?: boolean;
+        HasApiAccess?: boolean;
         Uuid?: any;
         LastAdvisDate?: Date;
         /** The admin rights of the user */
@@ -40,6 +41,7 @@
         Email: string;
         PhoneNumber?: string;
         IsGlobalAdmin?: boolean;
+        HasApiAccess?: boolean;
     }
 
     export interface ICreateUserPayload {

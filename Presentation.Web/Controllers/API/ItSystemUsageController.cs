@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
-using AutoMapper.Internal;
 using Castle.Core.Internal;
 using Core.ApplicationServices;
 using Core.DomainModel;

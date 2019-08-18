@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Presentation.Web.Models

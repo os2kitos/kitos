@@ -1,15 +1,11 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
-using Presentation.Web.Controllers.OData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class AdviceSentController : BaseEntityController<AdviceSent>
     {
         public AdviceSentController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService): 

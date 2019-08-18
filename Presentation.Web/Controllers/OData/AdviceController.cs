@@ -8,12 +8,14 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Results;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     using Core.DomainModel.AdviceSent;
     using System.Net;
 
+    [PublicApi]
     public class AdviceController : BaseEntityController<Advice>
     {
         readonly IAdviceService _adviceService;

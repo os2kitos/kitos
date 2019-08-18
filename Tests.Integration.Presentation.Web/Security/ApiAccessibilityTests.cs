@@ -11,16 +11,18 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class ApiAccessibilityTests : WithAutoFixture
     {
-        private readonly KitosCredentials _globalAdmin;
+
+        private readonly KitosCredentials _apiUser;
+
         public ApiAccessibilityTests()
         {
-            _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
+            _apiUser = TestEnvironment.GetCredentials(OrganizationRole.ApiAccess);
         }
 
         [Fact]
         public async Task Can_Access_PublicApi_Endpoint()
         {
-            var role = _globalAdmin.Role;
+            var role = _apiUser.Role;
 
             var tokenResponse = await HttpApi.GetTokenAsync(role);
             var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/ItSystem/"), tokenResponse.Token);
@@ -32,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Can_Not_Access_InternalApi_Endpoint()
         {
-            var role = _globalAdmin.Role;
+            var role = _apiUser.Role;
 
             var tokenResponse = await HttpApi.GetTokenAsync(role);
             var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("api/organization/"), tokenResponse.Token);
@@ -46,7 +48,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [Fact]
         public async Task Can_Not_Access_Odata_Endpoint()
         {
-            var role = _globalAdmin.Role;
+            var role = _apiUser.Role;
 
             var tokenResponse = await HttpApi.GetTokenAsync(role);
             var requestResponse = await HttpApi.GetAsyncWithToken(TestEnvironment.CreateUrl("odata/Organizations(1)/"),

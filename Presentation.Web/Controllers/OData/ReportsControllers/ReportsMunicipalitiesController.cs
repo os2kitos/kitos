@@ -1,19 +1,17 @@
-﻿using System;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
-using System.Security;
-using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ReportsMunicipalitiesController : BaseOdataAuthorizationController<Organization>
     {
         private readonly IAuthenticationService _authService;

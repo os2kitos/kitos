@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Core.DomainModel;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.API

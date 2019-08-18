@@ -5,12 +5,14 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.ApplicationServices;
+ using Presentation.Web.Infrastructure.Attributes;
 
-namespace Presentation.Web.Controllers.OData
+ namespace Presentation.Web.Controllers.OData
 {
     using System;
     using System.Net;
 
+    [PublicApi]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
         private IAuthenticationService _authService;

@@ -21,6 +21,7 @@ namespace Presentation.Web.Models
         public DateTime? LastAdvisDate { get; set; }
         public DateTime LastChanged { get; set; }
         public int? LastChangedByUserId { get; set; }
+        public bool? HasApiAccess { get; set; }
 
         public string FullName
         {

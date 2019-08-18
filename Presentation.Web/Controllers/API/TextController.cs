@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
-using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
-using Presentation.Web.Models.Exceptions;
 
 namespace Presentation.Web.Controllers.API
 {

@@ -1,14 +1,9 @@
-﻿using Core.DomainModel.Advice;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Web;
-using System.Web.Mvc;
-using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API

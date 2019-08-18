@@ -4,14 +4,14 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using System.Web.Http;
 using System.Linq;
+using System;
+using System.Net;
+using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    using System;
-    using System.Net;
-
-    using Core.ApplicationServices;
-
+    [InternalApi]
     public class OrganizationUnitRightsController : BaseEntityController<OrganizationUnitRight>
     {
         private readonly IAuthenticationService _authService;

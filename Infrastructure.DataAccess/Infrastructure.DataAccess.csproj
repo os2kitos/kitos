@@ -499,6 +499,10 @@
     <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.Designer.cs">
       <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.cs" />
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.Designer.cs">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
@@ -790,6 +794,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.resx">
       <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.resx">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

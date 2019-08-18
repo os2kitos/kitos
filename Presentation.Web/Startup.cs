@@ -40,8 +40,8 @@ namespace Presentation.Web
 
             app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();
-
-            app.Use<ApiOdataRequestsFilterMiddleware>();
+            
+            app.Use<DenyUsersWithoutApiAccessMiddleware>();
         }
     }
 }
