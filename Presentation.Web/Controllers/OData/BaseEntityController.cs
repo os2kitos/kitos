@@ -53,9 +53,9 @@ namespace Presentation.Web.Controllers.OData
                 result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            result = result.Where(AllowReadAccess).AsQueryable();
+            result = result.Where(AllowReadAccess);
 
-            return Ok(result);
+            return Ok(result.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
