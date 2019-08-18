@@ -27,7 +27,7 @@ namespace Presentation.Web.Access
             else if (IsUserInMunicipality())
             {
                 //TODO: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
-                result = true; 
+                result = true;
             }
 
             return result;
@@ -70,6 +70,8 @@ namespace Presentation.Web.Access
             var result = false;
 
             var user = _activeUserContext.User;
+            var ignoreReadOnlyRole = false;
+
             if (IsGlobalAdmin())
             {
                 result = true;
@@ -92,13 +94,18 @@ namespace Presentation.Web.Access
                 {
                     result = true;
                 }
-                else if (IsUserEntity(entity) && (entity.Id == user.Id))
+                else
                 {
-                    result = true;
+                    if (IsUserEntity(entity) && (entity.Id == user.Id))
+                    {
+                        ignoreReadOnlyRole = true; //Ignore read-only since user is editing own entity properties
+                        result = true;
+                    }
                 }
             }
 
-            return result && IsReadOnly() == false;
+            //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
+            return result && (ignoreReadOnlyRole || IsReadOnly() == false);
         }
 
         private bool HasModuleLevelWriteAccess(IEntity entity)
