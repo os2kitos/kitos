@@ -193,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Access\AccessTest.cs" />
+    <Compile Include="Access\OrganizationAccessContextTest.cs" />
     <Compile Include="Access\OrganizationalUserContextTest.cs" />
     <Compile Include="Context\AuthenticationContextFactoryTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />

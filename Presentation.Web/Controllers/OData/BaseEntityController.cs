@@ -195,7 +195,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowReads(organizationId);
+                return _accessContext.AllowReadsWithinOrganization(organizationId);
             }
             var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
             return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);

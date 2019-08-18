@@ -12,7 +12,7 @@ namespace Presentation.Web.Access
             _activeUserContext = activeUserContext;
         }
 
-        public bool AllowReads(int organizationId)
+        public bool AllowReadsWithinOrganization(int organizationId)
         {
             var result = false;
 
