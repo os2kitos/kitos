@@ -30,6 +30,7 @@ namespace Presentation.Web.Access
         }
 
         public User User { get; }
+
         public int ActiveOrganizationId { get; }
 
         public bool IsActiveInOrganizationOfType(OrganizationCategory category)
@@ -72,12 +73,12 @@ namespace Presentation.Web.Access
 
         public bool IsActiveInOrganization(int organizationId)
         {
-            return User.DefaultOrganizationId == organizationId;
+            return ActiveOrganizationId == organizationId;
         }
 
         public bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg)
         {
-            return User.DefaultOrganizationId.HasValue && contextAwareOrg.IsInContext(User.DefaultOrganizationId.Value);
+            return contextAwareOrg.IsInContext(ActiveOrganizationId);
         }
     }
 }
