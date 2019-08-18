@@ -20,14 +20,17 @@ namespace Presentation.Web.Access
         public OrganizationalUserContext(
             IEnumerable<Feature> supportedFeatures,
             IEnumerable<OrganizationRole> roles,
-            User user)
+            User user, 
+            int activeOrganizationId)
         {
             User = user;
+            ActiveOrganizationId = activeOrganizationId;
             _supportedFeatures = new HashSet<Feature>(supportedFeatures);
             _roles = new HashSet<OrganizationRole>(roles);
         }
 
         public User User { get; }
+        public int ActiveOrganizationId { get; }
 
         public bool IsActiveInOrganizationOfType(OrganizationCategory category)
         {

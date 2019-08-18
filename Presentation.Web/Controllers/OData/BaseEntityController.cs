@@ -13,16 +13,16 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        private readonly IOrganizationContextFactory _organizationContextFactory;
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new aproach is validated
+        protected OrganizationAccessContext AccessContext { get; }
 
         protected BaseEntityController(
             IGenericRepository<T> repository,
             IAuthenticationService authService,
-            IOrganizationContextFactory organizationContextFactory = null)
+            OrganizationAccessContext accessContext = null)
             : base(repository)
         {
-            _organizationContextFactory = organizationContextFactory;
+            AccessContext = accessContext;
             AuthService = authService;
         }
 
@@ -53,9 +53,9 @@ namespace Presentation.Web.Controllers.OData
                 result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            result = result.Where(AllowReadAccess);
+            result = result.Where(AllowReadAccess).AsQueryable();
 
-            return Ok(result.AsQueryable());
+            return Ok(result);
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -89,6 +89,9 @@ namespace Presentation.Web.Controllers.OData
             }
 
             var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
+
+            result = result.ToEnumerable().Where(AllowReadAccess).AsQueryable();
+
             return Ok(result);
         }
 
@@ -192,9 +195,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(organizationId);
-
-                return accessContext.AllowReads(UserId);
+                return AccessContext.AllowReads(organizationId);
             }
             var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
             return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);
@@ -204,9 +205,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                var organizationId = AuthService.GetCurrentOrganizationId(UserId);
-                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(organizationId);
-                return accessContext.AllowReads(UserId, entity);
+                return AccessContext.AllowReads(entity);
             }
             return AuthService.HasReadAccess(UserId, entity);
         }
@@ -215,35 +214,14 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                var targetOrganization = GetTargetOrganization(entity);
-                var accessContext = _organizationContextFactory.CreateOrganizationAccessContext(targetOrganization);
-                return accessContext.AllowUpdates(UserId, entity);
+                return AccessContext.AllowUpdates(entity);
             }
             return AuthService.HasWriteAccess(UserId, entity);
         }
 
         private bool ApplyNewAccessControlScheme()
         {
-            return _organizationContextFactory != null;
-        }
-
-
-        protected int GetTargetOrganization(T entity)
-        {
-            var targetOrganization = AuthService.GetCurrentOrganizationId(UserId);
-            if (entity is IHasOrganization organization)
-            {
-                if (organization.OrganizationId == 0)
-                {
-                    organization.OrganizationId = targetOrganization;
-                }
-                else
-                {
-                    targetOrganization = organization.OrganizationId;
-                }
-            }
-
-            return targetOrganization;
+            return AccessContext != null;
         }
     }
 }

@@ -10,7 +10,9 @@ namespace Presentation.Web.Access
         private readonly IUserRepository _userRepository;
         private readonly IFeatureChecker _featureChecker;
 
-        public UserContextFactory(IUserRepository userRepository, IFeatureChecker featureChecker)
+        public UserContextFactory(
+            IUserRepository userRepository,
+            IFeatureChecker featureChecker)
         {
             _userRepository = userRepository;
             _featureChecker = featureChecker;
@@ -33,7 +35,7 @@ namespace Presentation.Web.Access
                     .Where(x => _featureChecker.CanExecute(user, x))
                     .ToList();
 
-            return new OrganizationalUserContext(supportedFeatures, organizationRoles, user);
+            return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
         }
     }
 }

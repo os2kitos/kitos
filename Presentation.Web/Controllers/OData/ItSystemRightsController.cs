@@ -7,7 +7,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Presentation.Web.Access;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -18,18 +17,12 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
-        private readonly IOrganizationContextFactory _contextFactory;
-        private readonly IAuthenticationContext _authenticationContext;
-
         public ItSystemRightsController(
             IGenericRepository<ItSystemRight> repository,
             IAuthenticationService authService,
-            IOrganizationContextFactory contextFactory,
-            IAuthenticationContext authenticationContext)
-            : base(repository, authService)
+            IOrganizationContextFactory contextFactory)
+            : base(repository, authService, contextFactory.CreateOrganizationAccessContext())
         {
-            _contextFactory = contextFactory;
-            _authenticationContext = authenticationContext;
         }
 
         // GET /Organizations(1)/ItSystemUsages(1)/Rights
@@ -39,9 +32,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
 
-            result = FilterByAccessControl(orgId, result);
+            result = FilterByAccessControl(result);
 
-            return Ok(result);
+            return Ok(result.AsQueryable());
         }
 
         // GET /Users(1)/ItProjectRights
@@ -51,9 +44,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
 
-            result = FilterByAccessControl(_authenticationContext.ActiveOrganizationId.GetValueOrDefault(-1), result);
+            result = FilterByAccessControl(result);
 
-            return Ok(result);
+            return Ok(result.AsQueryable());
         }
 
         public override IHttpActionResult Patch(int key, Delta<ItSystemRight> delta)
@@ -73,8 +66,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            var accessContext = CreateAccessContext(entity);
-            if (accessContext.AllowUpdates(UserId, entity) == false)
+            if (AccessContext.AllowUpdates(entity) == false)
             {
                 return Forbidden();
             }
@@ -105,8 +97,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            var accessContext = CreateAccessContext(entity);
-            if (accessContext.AllowUpdates(UserId, entity) == false)
+            if (AccessContext.AllowUpdates(entity) == false)
             {
                 return Forbidden();
             }
@@ -124,19 +115,10 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        private List<ItSystemRight> FilterByAccessControl(int orgId, List<ItSystemRight> result)
+        private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
         {
-            //TODO: Org Id should always be the "active context" org ID from which access to certain entities is allowed.
-            var accessContext = _contextFactory.CreateOrganizationAccessContext(orgId);
-
-            result = result.Where(x => accessContext.AllowReads(UserId, x)).ToList();
+            result = result.Where(AccessContext.AllowReads).ToList();
             return result;
-        }
-
-        private OrganizationAccessContext CreateAccessContext(ItSystemRight entity)
-        {
-            var accessContext = _contextFactory.CreateOrganizationAccessContext(entity.Object.OrganizationId);
-            return accessContext;
         }
     }
 }
