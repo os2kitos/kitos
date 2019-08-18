@@ -16,9 +16,6 @@ namespace Tests.Unit.Presentation.Web.Context
     {
         private string _tokenAuth = "JWT";
         private string _formsAuth = "Forms";
-        public AuthenticationContextFactoryTest()
-        {
-        }
 
         [Fact]
         public void Unauthenticated_User_Should_Return_AuthenticationContext_With_Anonymous_AuthenticationMethod()
