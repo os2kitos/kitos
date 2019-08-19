@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.API
             {
                 try
                 {
-                    var id = Convert.ToInt32(User.Identity.Name);
+                    var id = UserId;
                     var user = UserRepository.GetByKey(id);
 
                     if (user == null)
@@ -169,6 +169,8 @@ namespace Presentation.Web.Controllers.API
                 }
             }
         }
+
+        protected int UserId => Convert.ToInt32(User.Identity.Name);
 
         protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
