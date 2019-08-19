@@ -8,7 +8,7 @@ namespace Presentation.Web.Controllers.API
         where TModel : Entity, IContextAware
     {
         public GenericContextAwareApiController(IGenericRepository<TModel> repository, IAccessContext accessContext = null)
-            : base(repository)
+            : base(repository, accessContext)
         {
         }
     }

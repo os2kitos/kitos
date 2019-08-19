@@ -14,5 +14,6 @@ namespace Presentation.Web.Access
         bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg);
         bool HasAssignedWriteAccess(IEntity entity);
         bool HasOwnership(IEntity entity);
+        bool CanChangeVisibilityOf(IEntity entity);
     }
 }

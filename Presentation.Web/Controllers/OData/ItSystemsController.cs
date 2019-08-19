@@ -59,8 +59,5 @@ namespace Presentation.Web.Controllers.OData
         {
             return base.Get();
         }
-
-        //TODO: If user tries to modify access modifier, check access control for that specifically (business rule)
-
     }
 }

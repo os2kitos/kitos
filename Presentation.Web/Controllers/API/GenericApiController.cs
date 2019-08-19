@@ -441,7 +441,7 @@ namespace Presentation.Web.Controllers.API
             return loggedIntoOrgId == organizationId || AuthenticationService.HasReadAccessOutsideContext(UserId);
         }
 
-        protected bool AllowReadAccess(TModel entity)
+        protected bool AllowReadAccess(IEntity entity)
         {
             if (ApplyNewAccessControlScheme())
             {
@@ -450,13 +450,22 @@ namespace Presentation.Web.Controllers.API
             return AuthenticationService.HasReadAccess(UserId, entity);
         }
 
-        protected bool AllowWriteAccess(TModel entity)
+        protected bool AllowWriteAccess(IEntity entity)
         {
             if (ApplyNewAccessControlScheme())
             {
                 return _accessContext.AllowUpdates(entity);
             }
             return AuthenticationService.HasWriteAccess(UserId, entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowEntityVisibilityControl(entity);
+            }
+            return KitosUser.IsGlobalAdmin;
         }
 
         private bool ApplyNewAccessControlScheme()

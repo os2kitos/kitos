@@ -110,6 +110,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
+            //TODO: Handle visibility control for the migrated controllers - this is now an explicit question
 
             try
             {
@@ -129,7 +130,6 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
 
-
             // does the entity exist?
             if (entity == null)
             {
@@ -141,6 +141,8 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
+
+            //TODO: Handle visibility control for the migrated controllers - this is now an explicit question
 
             // check model state
             if (!ModelState.IsValid)
@@ -217,6 +219,15 @@ namespace Presentation.Web.Controllers.OData
                 return _accessContext.AllowUpdates(entity);
             }
             return AuthService.HasWriteAccess(UserId, entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowEntityVisibilityControl(entity);
+            }
+            return AuthService.IsGlobalAdmin(UserId);
         }
 
         private bool ApplyNewAccessControlScheme()

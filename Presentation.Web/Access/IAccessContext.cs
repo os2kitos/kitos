@@ -23,5 +23,11 @@ namespace Presentation.Web.Access
         /// <param name="entity"></param>
         /// <returns></returns>
         bool AllowUpdates(IEntity entity);
+        /// <summary>
+        /// Determines if write-access is allowed to entity's visibility control
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool AllowEntityVisibilityControl(IEntity entity);
     }
 }
