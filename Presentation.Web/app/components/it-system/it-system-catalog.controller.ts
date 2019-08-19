@@ -25,7 +25,7 @@
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
-        public canCreate: boolean;
+        public canCreate = this.userAccessRights.canCreate;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -39,6 +39,7 @@
             "moment",
             "notify",
             "user",
+            "userAccessRights",
             "gridStateService",
             "$uibModal",
             "needsWidthFixService"
@@ -56,6 +57,7 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
+            private userAccessRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private needsWidthFixService) {
@@ -89,7 +91,9 @@
             });
 
 
-            this.checkUserAccessRights();
+            //this.checkUserAccessRights();
+            
+
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access
@@ -826,15 +830,6 @@
                 this.deleteUsage(dataItem).then(() => this.mainGrid.dataSource.fetch());
         }
 
-        private checkUserAccessRights() {
-            
-            this.$http.get("api/itsystem/GetAccessRights").then((result : any) => {
-                this.canCreate = result.data.response.canCreate;
-            });
-
-        }
-
-
         // adds system to usage within the current context
         private addUsage(dataItem) {
             return this.$http.post("api/itSystemUsage", {
@@ -925,7 +920,13 @@
                     resolve: {
                         user: [
                             "userService", userService => userService.getUser()
-                        ]
+                        ],
+                        userAccessRights: ['$http', function ($http) {
+                            return $http.get("api/itsystem/GetAccessRights")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }]
                     }
                 });
             }

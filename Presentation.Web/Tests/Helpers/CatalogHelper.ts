@@ -12,6 +12,12 @@ var waitUpTo = new WaitTimers();
 
 class CatalogHelper {
 
+
+    public static isCreateButtonVisible(vis: boolean) {
+        pageObject.getPage();
+        expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(vis);
+    }
+
     public static createCatalog(name: string) {
         pageObject.getPage();
         pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
