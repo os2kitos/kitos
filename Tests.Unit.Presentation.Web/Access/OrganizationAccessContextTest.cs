@@ -46,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Access
         [InlineData(false, false, false, true, AccessModifier.Public, true)]
         [InlineData(false, false, false, true, AccessModifier.Local, false)]
         [InlineData(false, false, false, false, AccessModifier.Public, false)]
-        public void AllowReads_For_Context_Bound_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool isInSameOrg, bool isUserActiveInMunicipality, AccessModifier accessModifier, bool expectedResult)
+        public void AllowReads_For_Context_Dependent_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool isInSameOrg, bool isUserActiveInMunicipality, AccessModifier accessModifier, bool expectedResult)
         {
             //Arrange
             var activeUser = CreateTestUser();
