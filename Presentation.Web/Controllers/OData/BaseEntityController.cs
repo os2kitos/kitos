@@ -13,7 +13,7 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new aproach is validated
+        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
         private readonly IAccessContext _accessContext;
 
         protected BaseEntityController(
