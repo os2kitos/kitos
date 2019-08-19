@@ -10,16 +10,7 @@ describe("LocalAdmin user tests", () => {
     var pageObject = new ItSystemEditPo();
     var consts = new Constants();
     var waitUpTo = new WaitTimers();
-    var testFixture = new TestFixtureWrapper();
-    var ec = protractor.ExpectedConditions;
-
-    beforeAll(() => {
-    //    browser.driver.manage().deleteAllCookies();
-    });
-
-    afterAll(() => {
-        testFixture.cleanupState();
-    });
+   
 
     it("Global Admin can create and delete It-system catalog", () => {
         loginHelper.loginAsGlobalAdmin();
