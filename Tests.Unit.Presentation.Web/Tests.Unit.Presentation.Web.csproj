@@ -192,7 +192,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Access\AccessTest.cs" />
     <Compile Include="Access\OrganizationAccessContextTest.cs" />
     <Compile Include="Access\OrganizationalUserContextTest.cs" />
     <Compile Include="Context\AuthenticationContextFactoryTest.cs" />
