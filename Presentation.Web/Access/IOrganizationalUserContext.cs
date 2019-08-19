@@ -12,5 +12,7 @@ namespace Presentation.Web.Access
         bool HasModuleLevelAccessTo(IEntity entity);
         bool IsActiveInOrganization(int organizationId);
         bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg);
+        bool HasAssignedWriteAccess(IEntity entity);
+        bool HasOwnership(IEntity entity);
     }
 }

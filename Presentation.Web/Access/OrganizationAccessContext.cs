@@ -64,14 +64,18 @@ namespace Presentation.Web.Access
         {
             var result = false;
 
-            var user = _activeUserContext.User;
             var ignoreReadOnlyRole = false;
 
             if (IsGlobalAdmin())
             {
                 result = true;
             }
-            else if (HasAssignedWriteAccess(entity, user)) //TODO: Ask question: Should it not be "in context" for "forretningsroller"?
+            else if (EntityEqualsActiveUser(entity))
+            {
+                ignoreReadOnlyRole = true;
+                result = true;
+            }
+            else if (HasAssignedWriteAccess(entity)) //TODO: Ask question: Should it not be "in context" for "forretningsroller"?
             {
                 result = true;
             }
@@ -79,27 +83,21 @@ namespace Presentation.Web.Access
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    var allow = AllowWritesToEntity(entity);
-                    result = allow.result;
-                    ignoreReadOnlyRole = allow.ignoreReadOnlyRole;
+                    result = AllowWritesToEntity(entity);
                 }
             }
             else
             {
-                var allow = AllowWritesToEntity(entity);
-                result = allow.result;
-                ignoreReadOnlyRole = allow.ignoreReadOnlyRole;
+                result = AllowWritesToEntity(entity);
             }
 
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
         }
 
-        private (bool result, bool ignoreReadOnlyRole) AllowWritesToEntity(IEntity entity)
+        private bool AllowWritesToEntity(IEntity entity)
         {
-            var ignoreReadOnlyRole = false;
             var result = false;
-            var user = _activeUserContext.User;
 
             if (IsLocalAdmin())
             {
@@ -109,17 +107,12 @@ namespace Presentation.Web.Access
             {
                 result = true;
             }
-            else if (IsUserEntity(entity) == false && HasOwnership(entity, user))
+            else if (IsUserEntity(entity) == false && HasOwnership(entity))
             {
-                result = true;
-            }
-            else if (EntityEqualsActiveUser(entity))
-            {
-                ignoreReadOnlyRole = true; //Ignore read-only since user is editing own entity properties
                 result = true;
             }
 
-            return (result, ignoreReadOnlyRole);
+            return result;
         }
 
         private bool HasModuleLevelWriteAccess(IEntity entity)
@@ -147,9 +140,9 @@ namespace Presentation.Web.Access
             return _activeUserContext.IsActiveInOrganization(targetOrganizationId);
         }
 
-        private static bool HasAssignedWriteAccess(IEntity entity, User user)
+        private bool HasAssignedWriteAccess(IEntity entity)
         {
-            return entity.HasUserWriteAccess(user);
+            return _activeUserContext.HasAssignedWriteAccess(entity);
         }
 
         private static bool IsContextBound(IEntity entity)
@@ -162,9 +155,9 @@ namespace Presentation.Web.Access
             return _activeUserContext.IsActiveInSameOrganizationAs((IContextAware)entity);
         }
 
-        private static bool HasOwnership(IEntity ownedEntity, IEntity ownerEntity)
+        private bool HasOwnership(IEntity ownedEntity)
         {
-            return ownedEntity.ObjectOwnerId == ownerEntity.Id;
+            return _activeUserContext.HasOwnership(ownedEntity);
         }
 
         private bool IsGlobalAdmin()

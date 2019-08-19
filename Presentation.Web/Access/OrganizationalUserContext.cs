@@ -20,7 +20,7 @@ namespace Presentation.Web.Access
         public OrganizationalUserContext(
             IEnumerable<Feature> supportedFeatures,
             IEnumerable<OrganizationRole> roles,
-            User user, 
+            User user,
             int activeOrganizationId)
         {
             User = user;
@@ -79,6 +79,16 @@ namespace Presentation.Web.Access
         public bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg)
         {
             return contextAwareOrg.IsInContext(ActiveOrganizationId);
+        }
+
+        public bool HasAssignedWriteAccess(IEntity entity)
+        {
+            return entity.HasUserWriteAccess(User);
+        }
+
+        public bool HasOwnership(IEntity entity)
+        {
+            return entity.ObjectOwnerId == User.Id;
         }
     }
 }

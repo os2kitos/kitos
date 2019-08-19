@@ -2,6 +2,7 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Moq;
+using Moq.Language.Flow;
 using Presentation.Web.Access;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -72,7 +73,7 @@ namespace Tests.Unit.Presentation.Web.Access
         {
             //Arrange
             var activeUser = CreateTestUser();
-            var inputEntity = inputIsActiveUser ? activeUser : CreateTestUser();
+            var inputEntity = inputIsActiveUser ? activeUser : Mock.Of<IEntity>();
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserReturns(activeUser);
@@ -82,6 +83,103 @@ namespace Tests.Unit.Presentation.Web.Access
 
             //Assert
             Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        //Checks not bound to context condition
+        [InlineData(true, false, false, false, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, false, false, true)]
+        [InlineData(false, false, true, false, false, false, false, false, true)]
+
+        //Same organization - positive matches
+        [InlineData(false, false, false, true, true, false, false, false, true)]
+        [InlineData(false, false, false, true, false, true, false, false, true)]
+        [InlineData(false, false, false, true, false, false, false, true, true)]
+
+        //Same organization - negative matches
+        [InlineData(false, false, false, true, false, false, false, false, false)]
+        [InlineData(false, false, false, true, false, false, true, true, false)]
+
+        //Different organization for context bound object
+        [InlineData(false, false, false, false, true, false, false, false, false)]
+        public void AllowUpdates_For_Context_Dependent_Object_Returns(
+            bool isGlobalAdmin,
+            bool inputIsActiveUser,
+            bool hasAssignedWriteAccess,
+            bool isInSameOrganization,
+            bool isLocalAdmin,
+            bool hasModuleLevelAccess,
+            bool inputIsAUser,
+            bool hasOwnership,
+            bool expectedResult)
+        {
+            //Arrange
+            var activeUser = CreateTestUser();
+            var inputEntity = inputIsActiveUser ? activeUser : inputIsAUser ? (IEntity)CreateTestUser() : CreateTestItSystem(AccessModifier.Public);
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserReturns(activeUser);
+            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
+            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
+            ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
+            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
+
+            //Act
+            var allowUpdates = _sut.AllowUpdates(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, true)]
+        [InlineData(false, false, true, false, false, false, true)]
+        [InlineData(false, false, false, true, false, false, true)]
+        [InlineData(false, false, false, false, true, false, true)]
+        [InlineData(false, false, false, false, false, true, true)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public void AllowUpdates_For_Context_Independent_Object_Returns(
+           bool isGlobalAdmin,
+           bool inputIsActiveUser,
+           bool hasAssignedWriteAccess,
+           bool isLocalAdmin,
+           bool hasModuleLevelAccess,
+           bool hasOwnership,
+           bool expectedResult)
+        {
+            //Arrange
+            var activeUser = CreateTestUser();
+            var inputEntity = inputIsActiveUser ? activeUser : Mock.Of<IEntity>();
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserReturns(activeUser);
+            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
+            ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
+            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
+
+            //Act
+            var allowUpdates = _sut.AllowUpdates(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        private void ExpectHasOwnershipReturns(IEntity inputEntity, bool value)
+        {
+            _userContextMock.Setup(x => x.HasOwnership(inputEntity)).Returns(value);
+        }
+
+        private void ExpectHasModuleLevelAccessReturns(IEntity inputEntity, bool hasModuleLevelAccess)
+        {
+            _userContextMock.Setup(x => x.HasModuleLevelAccessTo(inputEntity)).Returns(hasModuleLevelAccess);
+        }
+
+        private void ExpectHasAssignedWriteAccessReturns(IEntity inputEntity, bool value)
+        {
+            _userContextMock.Setup(x => x.HasAssignedWriteAccess(inputEntity)).Returns(value);
         }
 
         private static ItSystem CreateTestItSystem(AccessModifier accessModifier)
