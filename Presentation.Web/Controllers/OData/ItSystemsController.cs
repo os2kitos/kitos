@@ -5,6 +5,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Ninject.Infrastructure.Language;
 using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -30,7 +31,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
 
-            var systemsWithAllowedReadAccess  = result.AsEnumerable().Where(AllowReadAccess);
+            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowReadAccess);
 
             return Ok(systemsWithAllowedReadAccess);
         }
@@ -40,12 +41,11 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            var system = Repository.GetByKey(sysKey);
+            if (!AllowReadAccess(system))
             {
                 return Forbidden();
             }
-
-            var system = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);
             if (system == null)
             {
                 return NotFound();
@@ -59,5 +59,8 @@ namespace Presentation.Web.Controllers.OData
         {
             return base.Get();
         }
+
+        //TODO: If user tries to modify access modifier, check access control for that specifically (business rule)
+
     }
 }

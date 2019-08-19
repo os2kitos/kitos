@@ -11,6 +11,7 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
+using Ninject.Infrastructure.Language;
 using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -43,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
 
-            var itSystemUsages = result.AsEnumerable().Where(AllowReadAccess);
+            var itSystemUsages = result.ToEnumerable().Where(AllowReadAccess);
 
             return Ok(itSystemUsages);
         }
@@ -95,7 +96,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
-
+            
             switch (navigationProperty)
             {
                 case "AccessTypes":
