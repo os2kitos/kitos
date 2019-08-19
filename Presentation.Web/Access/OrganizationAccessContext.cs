@@ -26,7 +26,7 @@ namespace Presentation.Web.Access
             }
             else if (IsUserInMunicipality())
             {
-                //TODO: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
+                //TODO: Ask question: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
                 result = true;
             }
 
@@ -37,26 +37,21 @@ namespace Presentation.Web.Access
         {
             var result = false;
 
-            var user = _activeUserContext.User;
             if (IsGlobalAdmin())
             {
                 result = true;
             }
-            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity))
+            else if (EntityEqualsActiveUser(entity))
             {
-                if (HasOwnership(entity, user))
-                {
-                    result = true;
-                }
-                else if (IsContextBound(entity) && ActiveContextIsEntityContext(entity))
+                result = true;
+            }
+            else if (IsContextBound(entity))
+            {
+                if (ActiveContextIsEntityContext(entity))
                 {
                     result = true;
                 }
                 else if (IsUserInMunicipality() && HasAssignedPublicAccess(entity))
-                {
-                    result = true;
-                }
-                else if (IsUserEntity(entity) && entity.Id == _activeUserContext.User.Id)
                 {
                     result = true;
                 }
@@ -76,36 +71,55 @@ namespace Presentation.Web.Access
             {
                 result = true;
             }
-            else if (HasAssignedWriteAccess(entity, user))
+            else if (HasAssignedWriteAccess(entity, user)) //TODO: Ask question: Should it not be "in context" for "forretningsroller"?
             {
                 result = true;
             }
-            else if (IsContextBound(entity) == false || ActiveContextIsEntityContext(entity))
+            else if (IsContextBound(entity))
             {
-                if (IsLocalAdmin())
+                if (ActiveContextIsEntityContext(entity))
                 {
-                    result = true;
+                    var allow = AllowWritesToEntity(entity);
+                    result = allow.result;
+                    ignoreReadOnlyRole = allow.ignoreReadOnlyRole;
                 }
-                else if (HasModuleLevelWriteAccess(entity))
-                {
-                    result = true;
-                }
-                else if (IsUserEntity(entity) == false && HasOwnership(entity, user))
-                {
-                    result = true;
-                }
-                else
-                {
-                    if (IsUserEntity(entity) && (entity.Id == user.Id))
-                    {
-                        ignoreReadOnlyRole = true; //Ignore read-only since user is editing own entity properties
-                        result = true;
-                    }
-                }
+            }
+            else
+            {
+                var allow = AllowWritesToEntity(entity);
+                result = allow.result;
+                ignoreReadOnlyRole = allow.ignoreReadOnlyRole;
             }
 
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
+        }
+
+        private (bool result, bool ignoreReadOnlyRole) AllowWritesToEntity(IEntity entity)
+        {
+            var ignoreReadOnlyRole = false;
+            var result = false;
+            var user = _activeUserContext.User;
+
+            if (IsLocalAdmin())
+            {
+                result = true;
+            }
+            else if (HasModuleLevelWriteAccess(entity))
+            {
+                result = true;
+            }
+            else if (IsUserEntity(entity) == false && HasOwnership(entity, user))
+            {
+                result = true;
+            }
+            else if (EntityEqualsActiveUser(entity))
+            {
+                ignoreReadOnlyRole = true; //Ignore read-only since user is editing own entity properties
+                result = true;
+            }
+
+            return (result, ignoreReadOnlyRole);
         }
 
         private bool HasModuleLevelWriteAccess(IEntity entity)
@@ -166,6 +180,11 @@ namespace Presentation.Web.Access
         private bool IsLocalAdmin()
         {
             return _activeUserContext.HasRole(OrganizationRole.LocalAdmin);
+        }
+
+        private bool EntityEqualsActiveUser(IEntity entity)
+        {
+            return IsUserEntity(entity) && entity.Id == _activeUserContext.User.Id;
         }
     }
 }

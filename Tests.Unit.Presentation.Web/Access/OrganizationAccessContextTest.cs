@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.Organization;
+﻿using Core.DomainModel;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Moq;
 using Presentation.Web.Access;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -17,63 +19,84 @@ namespace Tests.Unit.Presentation.Web.Access
             _sut = new OrganizationAccessContext(_userContextMock.Object);
         }
 
-        [Fact]
-        public void AllowReadsWithinOrganization_Returns_True_For_GlobalAdmins()
+        [Theory]
+        [InlineData(true, false, false, true)]
+        [InlineData(false, true, false, true)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, false, false)]
+        public void AllowReadsWithinOrganization_Returns(bool isGlobalAdmin, bool isActiveInOrganization, bool isMunicipality, bool expectedResult)
         {
             //Arrange
             var targetOrganization = A<int>();
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, true);
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectIsActiveInOrganizationReturns(targetOrganization, isActiveInOrganization);
+            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isMunicipality);
 
             //Act
             var hasAccess = _sut.AllowReadsWithinOrganization(targetOrganization);
 
             //Assert
-            Assert.True(hasAccess);
+            Assert.Equal(expectedResult, hasAccess);
         }
 
-        [Fact]
-        public void AllowReadsWithinOrganization_Returns_True_If_Organization_Equals_ActiveOrganization()
+        [Theory]
+        [InlineData(true, false, false, false, AccessModifier.Local, true)]
+        [InlineData(false, true, false, false, AccessModifier.Local, true)]
+        [InlineData(false, false, true, false, AccessModifier.Local, true)]
+        [InlineData(false, false, false, true, AccessModifier.Public, true)]
+        [InlineData(false, false, false, true, AccessModifier.Local, false)]
+        [InlineData(false, false, false, false, AccessModifier.Public, false)]
+        public void AllowReads_For_Context_Bound_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool isInSameOrg, bool isUserActiveInMunicipality, AccessModifier accessModifier, bool expectedResult)
         {
             //Arrange
-            var targetOrganization = A<int>();
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, false);
-            ExpectIsActiveInOrganizationReturns(targetOrganization, true);
+            var activeUser = CreateTestUser();
+            var entity = inputIsActiveUser ? (IEntity)activeUser : CreateTestItSystem(accessModifier);
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserReturns(activeUser);
+            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)entity, isInSameOrg);
+            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isUserActiveInMunicipality);
 
             //Act
-            var hasAccess = _sut.AllowReadsWithinOrganization(targetOrganization);
+            var result = _sut.AllowReads(entity);
 
             //Assert
-            Assert.True(hasAccess);
+            Assert.Equal(expectedResult, result);
         }
 
-        [Fact]
-        public void AllowReadsWithinOrganization_Returns_True_If_Active_User_Organization_Equals_Municipality()
+        [Theory]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public void AllowReads_For_Context_Independent_Object_Returns(bool isGlobalAdmin, bool inputIsActiveUser, bool expectedResult)
         {
             //Arrange
-            var targetOrganization = A<int>();
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, false);
-            ExpectIsActiveInOrganizationReturns(targetOrganization, false);
-            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, false);
+            var activeUser = CreateTestUser();
+            var inputEntity = inputIsActiveUser ? activeUser : CreateTestUser();
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserReturns(activeUser);
 
             //Act
-            var hasAccess = _sut.AllowReadsWithinOrganization(targetOrganization);
+            var result = _sut.AllowReads(inputEntity);
 
             //Assert
-            Assert.False(hasAccess);
+            Assert.Equal(expectedResult, result);
         }
 
-        [Fact]
-        public void AllowReadsWithinOrganization_Returns_False()
+        private static ItSystem CreateTestItSystem(AccessModifier accessModifier)
         {
-            //Arrange
-            var targetOrganization = A<int>();
-            ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, true);
+            return new ItSystem { AccessModifier = accessModifier };
+        }
 
-            //Act
-            var hasAccess = _sut.AllowReadsWithinOrganization(targetOrganization);
+        private void ExpectIsActiveInSameOrganizationAsReturns(IContextAware entity, bool value)
+        {
+            _userContextMock.Setup(x => x.IsActiveInSameOrganizationAs(entity)).Returns(value);
+        }
 
-            //Assert
-            Assert.True(hasAccess);
+        private void ExpectGetUserReturns(User entity)
+        {
+            _userContextMock.Setup(x => x.User).Returns(entity);
         }
 
         private void ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory organizationCategory, bool value)
@@ -89,6 +112,14 @@ namespace Tests.Unit.Presentation.Web.Access
         private void ExpectHasRoleReturns(OrganizationRole role, bool value)
         {
             _userContextMock.Setup(x => x.HasRole(role)).Returns(value);
+        }
+
+        private User CreateTestUser()
+        {
+            return new User
+            {
+                Id = A<int>()
+            };
         }
     }
 }
