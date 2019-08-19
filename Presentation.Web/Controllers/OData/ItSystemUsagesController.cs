@@ -5,12 +5,12 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using System.Net;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using System.Net;
 using Core.DomainModel.Organization;
-using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
+using Core.ApplicationServices;
 using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -24,12 +24,11 @@ namespace Presentation.Web.Controllers.OData
         private readonly IOrganizationContextFactory _contextFactory;
 
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IOrganizationContextFactory contextFactory)
-            : base(repository, authService)
+            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAccessContext accessContext)
+            : base(repository, authService, accessContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
-            _contextFactory = contextFactory;
         }
 
         // GET /Organizations(1)/ItSystemUsages
@@ -37,23 +36,23 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
-            if (!organizationContext.AllowReads(UserId))
+            if (!AllowOrganizationAccess(orgKey))
             {
                 return Forbidden();
             }
 
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
 
-            return Ok(result);
+            var itSystemUsages = result.AsEnumerable().Where(AllowReadAccess);
+
+            return Ok(itSystemUsages);
         }
 
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
-            if (!organizationContext.AllowReads(UserId))
+            if (!AllowOrganizationAccess(orgKey))
             {
                 return Forbidden();
             }
@@ -78,7 +77,9 @@ namespace Presentation.Web.Controllers.OData
                 }
             }
 
-            return Ok(systemUsages);
+            var result = systemUsages.Where(AllowReadAccess);
+
+            return Ok(result);
         }
 
         [AcceptVerbs("POST", "PUT")]
@@ -90,8 +91,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            var organizationContext = _contextFactory.CreateOrganizationContext(itSystemUsage.OrganizationId);
-            if (!organizationContext.AllowUpdates(UserId, itSystemUsage))
+            if (!AllowWriteAccess(itSystemUsage))
             {
                 return Forbidden();
             }
@@ -114,6 +114,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             Repository.Save();
+
             return StatusCode(HttpStatusCode.NoContent);
         }
 
@@ -125,8 +126,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            var organizationContext = _contextFactory.CreateOrganizationContext(itSystemUsage.OrganizationId);
-            if (!organizationContext.AllowDelete(UserId, itSystemUsage))
+            if (!AllowWriteAccess(itSystemUsage))
             {
                 return Forbidden();
             }
@@ -147,6 +147,7 @@ namespace Presentation.Web.Controllers.OData
                     return StatusCode(HttpStatusCode.NotImplemented);
 
             }
+
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);

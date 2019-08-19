@@ -2,7 +2,6 @@
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
@@ -14,12 +13,9 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        private readonly IOrganizationContextFactory _contextFactory;
-
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IOrganizationContextFactory contextFactory)
-            : base(repository, authService)
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAccessContext accessContext)
+            : base(repository, authService, accessContext)
         {
-            _contextFactory = contextFactory;
         }
 
         // GET /Organizations(1)/ItSystems
@@ -27,15 +23,16 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems")]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
-            if (!organizationContext.AllowReads(UserId))
+            if (!AllowOrganizationAccess(orgKey))
             { 
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public);
-            
-            return Ok(result);
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+
+            var systemsWithAllowedReadAccess  = result.AsEnumerable().Where(AllowReadAccess);
+
+            return Ok(systemsWithAllowedReadAccess);
         }
 
         // GET /Organizations(1)/ItSystems(1)
@@ -43,16 +40,15 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
+            if (!AllowOrganizationAccess(orgKey))
+            {
+                return Forbidden();
+            }
+
             var system = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);
             if (system == null)
             {
                 return NotFound();
-            }
-
-            var organizationContext = _contextFactory.CreateOrganizationContext(orgKey);
-            if (!organizationContext.AllowReads(UserId, system))
-            {
-                return Forbidden();
             }
 
             return Ok(system);
