@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable();
+            return Repository.AsQueryable(readOnly:true);
         }
 
         /// <summary>

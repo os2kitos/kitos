@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.OData
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
 
-            var result = Repository.AsQueryable().ToEnumerable();
+            var result = Repository.AsQueryable(readOnly:true).ToEnumerable();
 
             if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery(MaxExpansionDepth = 4)]
         public override IHttpActionResult Get(int key)
         {
-            var result = Repository.AsQueryable().Where(p => p.Id == key);
+            var result = Repository.AsQueryable(readOnly:true).Where(p => p.Id == key);
 
             if (result.Any() == false)
             {
@@ -88,7 +88,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
+            var result = Repository.AsQueryable(readOnly:true).Where(m => ((IHasOrganization)m).OrganizationId == key);
 
             result = result.ToEnumerable().Where(AllowReadAccess).AsQueryable();
 

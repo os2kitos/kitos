@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+            var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
 
             var itSystemUsages = result.ToEnumerable().Where(AllowReadAccess);
 
@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.OData
             while (queue.Count > 0)
             {
                 var orgUnitKey = queue.Dequeue();
-                var orgUnit = _orgUnitRepository.AsQueryable()
+                var orgUnit = _orgUnitRepository.AsQueryable(readOnly:true)
                     .Include(x => x.Children)
                     .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
                     .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
