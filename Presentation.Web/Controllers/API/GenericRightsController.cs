@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Access;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -17,7 +18,11 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
-        protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository)
+        protected GenericRightsController(
+            IGenericRepository<TRight> rightRepository,
+            IGenericRepository<TObject> objectRepository,
+            IAccessContext accessContext = null)
+        : base(accessContext)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;
@@ -30,7 +35,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>List of all rights</returns>
         protected IEnumerable<TRight> GetRightsQuery(int id)
         {
-            return RightRepository.Get(right => right.ObjectId == id);
+            return RightRepository.Get(right => right.ObjectId == id, readOnly: true);
         }
 
         /// <summary>
@@ -43,6 +48,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = GetRightsQuery(id);
+                theRights = theRights.Where(AllowReadAccess);
                 var dtos = Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
@@ -64,7 +70,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
+                if (!HasWriteAccess(id))
                 {
                     return Forbidden();
                 }
@@ -103,7 +109,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
+                if (!HasWriteAccess(id))
                 {
                     return Forbidden();
                 }
@@ -124,23 +130,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private bool HasWriteAccess(int objectId, User user, int organizationId)
+        private bool HasWriteAccess(int objectId)
         {
-            
-            if (user.IsGlobalAdmin)
-                return true;
-
             var obj = _objectRepository.GetByKey(objectId);
 
-            return AuthenticationService.HasWriteAccess(user.Id, obj);
-
-
-            //// local admin have write access if the obj is in context
-            //if (obj.IsInContext(organizationId) &&
-            //    user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
-            //    return true;
-
-            //return obj.HasUserWriteAccess(user);
+            return AllowWriteAccess(obj);
         }
     }
 }
