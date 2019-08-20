@@ -75,7 +75,7 @@ namespace Presentation.Web.Access
                 ignoreReadOnlyRole = true;
                 result = true;
             }
-            else if (HasAssignedWriteAccess(entity)) //TODO: Ask question: Should it not be "in context" for "forretningsroller"?
+            else if (HasAssignedWriteAccess(entity))
             {
                 result = true;
             }
@@ -83,7 +83,7 @@ namespace Presentation.Web.Access
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    result = AllowWritesToEntity(entity);
+                    result = IsLocalAdmin() || AllowWritesToEntity(entity);
                 }
             }
             else
@@ -105,11 +105,7 @@ namespace Presentation.Web.Access
         {
             var result = false;
 
-            if (IsLocalAdmin())
-            {
-                result = true;
-            }
-            else if (HasModuleLevelWriteAccess(entity))
+            if (HasModuleLevelWriteAccess(entity))
             {
                 result = true;
             }

@@ -133,18 +133,16 @@ namespace Tests.Unit.Presentation.Web.Access
         }
 
         [Theory]
-        [InlineData(true, false, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, false, true)]
-        [InlineData(false, false, true, false, false, false, true)]
-        [InlineData(false, false, false, true, false, false, true)]
-        [InlineData(false, false, false, false, true, false, true)]
-        [InlineData(false, false, false, false, false, true, true)]
-        [InlineData(false, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, true)]
+        [InlineData(false, false, true, false, false, true)]
+        [InlineData(false, false, false, true, false, true)]
+        [InlineData(false, false, false, false, true, true)]
+        [InlineData(false, false, false, false, false, false)]
         public void AllowUpdates_For_Context_Independent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
            bool hasAssignedWriteAccess,
-           bool isLocalAdmin,
            bool hasModuleLevelAccess,
            bool hasOwnership,
            bool expectedResult)
@@ -156,7 +154,6 @@ namespace Tests.Unit.Presentation.Web.Access
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserReturns(activeUser);
             ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
-            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
