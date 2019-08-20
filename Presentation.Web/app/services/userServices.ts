@@ -291,7 +291,7 @@
                 httpDeferred.then(result => {
 
                     var user = result.data.response;
-                    this.$rootScope.userHasOrgChoices = user.isGlobalAdmin || this._.uniqBy(user.organizationRights, 'organizationId').length > 1;
+                    this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, 'organizationId').length > 1;
 
                     this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
                         this.saveUserInfo(user, orgAndDefaultUnit);
