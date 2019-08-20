@@ -164,6 +164,32 @@ namespace Tests.Unit.Presentation.Web.Access
             Assert.Equal(expectedResult, allowUpdates);
         }
 
+        [Theory]
+        [InlineData(true,true,true)]
+        [InlineData(false,true,false)]
+        [InlineData(true,false,false)]
+        public void AllowEntityVisibilityControl_Returns_True_If_HasWriteAccess_And_Is_AllowedToModifyVisibility(bool isGlobalAdmin, bool isAllowedToChangeVisibility, bool expectedResult)
+        {
+            //Arrange
+            var activeUser = CreateTestUser();
+            var inputEntity = Mock.Of<IEntity>();
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserReturns(activeUser);
+            ExpectCanChangeVisibilityOfReturns(isAllowedToChangeVisibility, inputEntity);
+
+            //Act
+            var allowUpdates = _sut.AllowEntityVisibilityControl(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        private void ExpectCanChangeVisibilityOfReturns(bool isAllowedToChangeVisibility, IEntity inputEntity)
+        {
+            _userContextMock.Setup(x => x.CanChangeVisibilityOf(inputEntity)).Returns(isAllowedToChangeVisibility);
+        }
+
         private void ExpectHasOwnershipReturns(IEntity inputEntity, bool value)
         {
             _userContextMock.Setup(x => x.HasOwnership(inputEntity)).Returns(value);

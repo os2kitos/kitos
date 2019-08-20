@@ -95,7 +95,6 @@ namespace Presentation.Web.Access
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
         }
 
-        //TODO: Test it
         public bool AllowEntityVisibilityControl(IEntity entity)
         {
             return AllowUpdates(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
