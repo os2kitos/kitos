@@ -33,7 +33,7 @@
                 $rootScope.page.subnav = subnav;
 
                 $rootScope.page.subnav.buttons = [
-                    { func: createUser, text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
+                    { func: createUser, 'data-element-type':"subnav-create-user-button", text: 'Opret Bruger', style: 'btn-success', disabled: !hasWriteAccess, icon: 'glyphicon-plus', showWhen: 'organization.user'}
                 ];
                 $rootScope.subnavPositionCenter = false;
 
