@@ -39,10 +39,12 @@ describe("Only Global Admins can create user with API access",
 
 
         it("Global admin is able to edit api access on existing user", () => {
-            userHelper.updateApiOnUser("local-regular-user@kitos.dk", true);
+            const credentials = loginHelper.getApiUserCredentials();
+
+            userHelper.updateApiOnUser(credentials.username, true);
                 browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
                 expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
-                userHelper.checkApiRoleStatusOnUser("local-regular-user@kitos.dk",true);
+            userHelper.checkApiRoleStatusOnUser(credentials.username, true);
 
             });
     });

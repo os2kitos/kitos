@@ -5,30 +5,55 @@ import WaitTimers = require("../Utility/WaitTimers");
 var waitUpTo = new WaitTimers();
 
 class Login {
-    
     public logout() {
         var navigationBarHelper = new LoginPage().navigationBarHelper;
         navigationBarHelper.logout();
     }
 
     public loginAsGlobalAdmin() {
-        this.login(0);
+        this.login(this.getCredentialsMap().globalAdmin);
     }
 
     public loginAsLocalAdmin() {
-        this.login(1);
+        this.login(this.getCredentialsMap().localAdmin);
     }
 
     public loginAsRegularUser() {
-        this.login(2);
+        this.login(this.getCredentialsMap().regularUser);
     }
 
-    private login(credentialsIndex: number) {
+    public loginAsApiUser() {
+        this.login(this.getCredentialsMap().apiUsers.regularUser);
+    }
+
+    public getApiUserCredentials() {
+        return this.getCredentialsMap().apiUsers.regularUser;
+    }
+
+    private getCredentialsMap() {
+        return {
+            globalAdmin: this.getCredentials(0),
+            localAdmin: this.getCredentials(1),
+            regularUser: this.getCredentials(2),
+            apiUsers: {
+                regularUser: this.getCredentials(3)
+            }
+        };
+    }
+
+    private getCredentials(credentialsIndex: number) {
+        return {
+            username: this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex),
+            password: this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex)
+        };
+    }
+
+    private login(credentials: any) {
         var homePage = new HomePage();
         homePage.getPage();
         browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
-        homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
-        homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
+        homePage.emailField.sendKeys(credentials.username);
+        homePage.pwdField.sendKeys(credentials.password);
         homePage.loginButton.click();
     }
 
