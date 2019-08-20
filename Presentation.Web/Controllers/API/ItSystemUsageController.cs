@@ -15,6 +15,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -35,8 +36,9 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
             IGenericRepository<ItSystemRole> roleRepository,
-            IGenericRepository<AttachedOption> attachedOptionsRepository)
-            : base(repository)
+            IGenericRepository<AttachedOption> attachedOptionsRepository,
+            IAccessContext accessContext)
+            : base(repository, accessContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
@@ -55,7 +57,9 @@ namespace Presentation.Web.Controllers.API
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
                         u.OrganizationId == organizationId
-                    );
+                    , readOnly: true);
+
+                usages = usages.Where(AllowReadAccess);
 
                 return Ok(Map(usages));
             }
@@ -77,7 +81,9 @@ namespace Presentation.Web.Controllers.API
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
-                var usages = Page(Repository.AsQueryable(), pagingModel);
+                var usages = Page(Repository.AsQueryable(true), pagingModel);
+
+                usages = usages.AsEnumerable().Where(AllowReadAccess).AsQueryable();
 
                 return Ok(Map(usages));
             }
@@ -94,7 +100,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowReadAccess(item))
                 {
                     return Forbidden();
                 }
@@ -129,13 +135,12 @@ namespace Presentation.Web.Controllers.API
                         u.OrganizationId == organizationId
                     );
 
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-                //var usages = Page(Repository.AsQueryable(), pagingModel);
-
                 // mapping to DTOs for easy lazy loading of needed properties
+                usages = usages.Where(AllowReadAccess);
                 var dtos = Map(usages);
 
-                var roles = _roleRepository.Get().ToList();
+                var roles = _roleRepository.Get(readOnly: true);
+                roles = roles.Where(AllowReadAccess).ToList();
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
@@ -152,7 +157,7 @@ namespace Presentation.Web.Controllers.API
                 list.Add(header);
                 foreach (var usage in dtos)
                 {
-                    var obj = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
+                    var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Aktiv", usage.MainContractIsActive);
                     obj.Add("IT System", usage.ItSystem.Name);
                     obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
@@ -192,9 +197,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId, readOnly: true).FirstOrDefault();
 
-                return usage == null ? NotFound() : Ok(Map(usage));
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowReadAccess(usage))
+                {
+                    return Forbidden();
+                }
+
+                return Ok(Map(usage));
             }
             catch (Exception e)
             {
@@ -206,17 +221,15 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //check for isreadonly here since no object has been created to check on yet
-                //if (!KitosUser.IsReadOnly) return Unauthorized();
                 var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString())))
+                if (!AllowWriteAccess(itsystemUsage))
                 {
                     return Forbidden();
                 }
 
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
-                                            && usage.OrganizationId == dto.OrganizationId).Any())
+                                            && usage.OrganizationId == dto.OrganizationId, readOnly: true).Any())
                 {
                     return Conflict("Usage already exist");
                 }
@@ -249,7 +262,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
                 //This will make sure we check for permissions and such...
                 return base.Delete(usage.Id, organizationId);
@@ -266,8 +282,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId))
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+                if (!AllowWriteAccess(usage))
                 {
                     return Forbidden();
                 }
@@ -277,7 +296,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     return NotFound();
                 }
-
 
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
@@ -304,7 +322,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(usage, organizationId))
+                if (!AllowWriteAccess(usage))
                 {
                     return Forbidden();
                 }
@@ -342,7 +360,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId))
+                if (!AllowWriteAccess(usage))
                 {
                     return Forbidden();
                 }
@@ -403,7 +421,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(usage, organizationId))
+                if (!AllowWriteAccess(usage))
                 {
                     return Forbidden();
                 }
@@ -475,15 +493,15 @@ namespace Presentation.Web.Controllers.API
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
-                    var usedTasks = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
-                    var inheritedTasks = Repository.AsQueryable().Where(p => p.Id == id).Select(p => p.ItSystem).SelectMany(s => s.TaskRefs);
-                    var optOuts = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(s => s.TaskRefsOptOut);
+                    var usedTasks = Repository.AsQueryable(readOnly:true).Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                    var inheritedTasks = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).Select(p => p.ItSystem).SelectMany(s => s.TaskRefs);
+                    var optOuts = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).SelectMany(s => s.TaskRefsOptOut);
                     taskQuery = usedTasks.Union(inheritedTasks);
                     taskQuery = taskQuery.Except(optOuts);
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable();
+                    taskQuery = _taskRepository.AsQueryable(readOnly: true);
                 }
 
                 //if a task group is given, only find the tasks in that group
@@ -517,19 +535,6 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItSystemUsage entity)
         {
             _itSystemUsageService.Delete(entity.Id);
-        }
-
-        protected override bool HasWriteAccess(ItSystemUsage obj, User user, int organizationId)
-        {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
-                return true;
-
-            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }
