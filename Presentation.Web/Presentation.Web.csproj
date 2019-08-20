@@ -323,10 +323,10 @@
     <Compile Include="Access\OrganizationalUserContext.cs" />
     <Compile Include="Access\UserContextFactory.cs" />
     <Compile Include="Access\IUserContextFactory.cs" />
-    <Compile Include="Access\IOrganizationContextFactory.cs" />
+    <Compile Include="Access\IAccessContextFactory.cs" />
     <Compile Include="Access\IOrganizationalUserContext.cs" />
     <Compile Include="Access\OrganizationAccessContext.cs" />
-    <Compile Include="Access\OrganizationContextFactory.cs" />
+    <Compile Include="Access\AccessContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
@@ -383,8 +383,6 @@
     <Compile Include="Controllers\API\ReferenceController.cs" />
     <Compile Include="Controllers\API\SSOConfigController.cs" />
     <Compile Include="Controllers\API\UploadFileController.cs" />
-    <Compile Include="Access\OrganizationContext.cs" />
-    <Compile Include="Access\AbstractAccessContext.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
     <Compile Include="Controllers\OData\AdviceController.cs" />
     <Compile Include="Controllers\OData\AdviceSentController.cs" />

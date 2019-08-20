@@ -128,10 +128,10 @@ namespace Presentation.Web
 
         private static void RegisterAccessContext(IKernel kernel)
         {
-            kernel.Bind<IOrganizationContextFactory>().To<OrganizationContextFactory>().InRequestScope();
+            kernel.Bind<IAccessContextFactory>().To<AccessContextFactory>().InRequestScope();
             kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
             kernel.Bind<IAccessContext>()
-                .ToMethod(ctx => ctx.Kernel.Get<IOrganizationContextFactory>().CreateOrganizationAccessContext())
+                .ToMethod(ctx => ctx.Kernel.Get<IAccessContextFactory>().CreateOrganizationAccessContext())
                 .InRequestScope();
         }
     }

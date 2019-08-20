@@ -22,7 +22,6 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
-        private readonly IOrganizationContextFactory _contextFactory;
 
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
             IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAccessContext accessContext)
