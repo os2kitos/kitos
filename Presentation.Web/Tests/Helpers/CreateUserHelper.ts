@@ -1,10 +1,10 @@
 ﻿import HomePageObjects = require("../PageObjects/Organization/UsersPage.po");
 import CreatePage = require("../PageObjects/Organization/CreateUserPage.po");
-import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import Login = require("../Helpers/LoginHelper");
 import WaitTimers = require("../Utility/waitTimers");
+import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 
-var testFixture = new TestFixtureWrapper();
+var cssHelper = new CSSLocator();
 var pageCreateObject = new CreatePage();
 var pageObject = new HomePageObjects();
 var loginHelper = new Login();
@@ -23,48 +23,27 @@ class CreateUserHelper {
         pageCreateObject.inputName.sendKeys(name);
         pageCreateObject.inputLastName.sendKeys(lastname);
         pageCreateObject.inputPhone.sendKeys(phoneNumber);
-        if (API)
-        {
+        if (API) {
             pageCreateObject.boolApi.click();
         }
         pageCreateObject.createUserButton.click();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
     }
 
-
-    public deleteUser(email: string) {
-        loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Slet")).click();
-                        element(by.buttonText("Slet bruger")).click();
-                    }
-                });
-            });
-        });
-
-    }
-
-    public checkApiRoleStatusOnUser(email: string, apiStatus : boolean) {
+    public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
 
         var checked = false;
         pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Redigér")).click();
-                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                            checked = true;
-                            expect(selected).not.toBeNull();
-                            expect(selected).toBe(apiStatus);
-                            return;
-                        });
-                    }
-                });
+            ele.element(cssHelper.byDataElementType("userEmailObject")).getText().then(text => {
+                if (text === email) {
+                    ele.element(by.linkText("Redigér")).click();
+                    pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                        checked = true;
+                        expect(selected).not.toBeNull();
+                        expect(selected).toBe(apiStatus);
+                        return;
+                    });
+                }
             });
         });
         expect(checked).toBe(true);
@@ -77,36 +56,34 @@ class CreateUserHelper {
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
         pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Redigér")).click();
-                        if (apiAccess) {
-                           pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                                if (!selected) {
-                                    pageCreateObject.boolApi.click();
-                                    pageCreateObject.editUserButton.click();
-                                    return;
-                                } else {
-                                    pageCreateObject.cancelEditUserButton.click();
-                                    return;
-                                }
-                            });
-                        }
-                        else {
-                            pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                                if (selected) {
-                                    pageCreateObject.boolApi.click();
-                                    pageCreateObject.editUserButton.click();
-                                    return;
-                                } else {
-                                    pageCreateObject.cancelEditUserButton.click();
-                                    return;
-                                }
-                            });
-                        }
+            ele.element(cssHelper.byDataElementType("userEmailObject")).getText().then(val => {
+                if (val === email) {
+                    ele.element(by.linkText("Redigér")).click();
+                    if (apiAccess) {
+                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                            if (!selected) {
+                                pageCreateObject.boolApi.click();
+                                pageCreateObject.editUserButton.click();
+                                return;
+                            } else {
+                                pageCreateObject.cancelEditUserButton.click();
+                                return;
+                            }
+                        });
                     }
-                });
+                    else {
+                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                            if (selected) {
+                                pageCreateObject.boolApi.click();
+                                pageCreateObject.editUserButton.click();
+                                return;
+                            } else {
+                                pageCreateObject.cancelEditUserButton.click();
+                                return;
+                            }
+                        });
+                    }
+                }
             });
         });
     }
