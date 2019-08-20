@@ -110,7 +110,11 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
-            //TODO: Handle visibility control for the migrated controllers - this is now an explicit question
+
+            if ((entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public && AllowEntityVisibilityControl(entity) == false)
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -142,7 +146,11 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            //TODO: Handle visibility control for the migrated controllers - this is now an explicit question
+            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) &&
+                accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
+            {
+                return Forbidden();
+            }
 
             // check model state
             if (!ModelState.IsValid)
