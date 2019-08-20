@@ -51,12 +51,14 @@ class CreateUserHelper {
 
     public checkApiRoleStatusOnUser(email: string, apiStatus : boolean) {
 
+        var checked = false;
         pageObject.mainGridAllTableRows.each((ele) => {
             ele.all(by.tagName("td")).each((tdele) => {
                 tdele.getText().then(val => {
                     if (val === email) {
                         ele.element(by.linkText("Redigér")).click();
                         pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                            checked = true;
                             expect(selected).not.toBeNull();
                             expect(selected).toBe(apiStatus);
                             return;
@@ -65,6 +67,7 @@ class CreateUserHelper {
                 });
             });
         });
+        expect(checked).toBe(true);
     }
 
 
