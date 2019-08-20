@@ -150,8 +150,110 @@ namespace Tests.Unit.Presentation.Web.Access
             Assert.Equal(expectedResult, result);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void HasAssignedWriteAccess_Delegates_Question_To_Provided_Entity(bool hasAccess)
+        {
+            //Arrange
+            var user = new User();
+            var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), user, A<int>());
+            var entity = Mock.Of<IEntity>(x => x.HasUserWriteAccess(user) == hasAccess);
+
+            //Act
+            var result = sut.HasAssignedWriteAccess(entity);
+
+            //Assert
+            Assert.Equal(hasAccess, result);
+        }
+
+        [Theory]
+        [InlineData(1, 1, true)]
+        [InlineData(1, 2, false)]
+        [InlineData(2, 1, false)]
+        public void HasOwnership_Returns_Based_On_OwnerId(int entityOwnerId, int userId, bool expectedResult)
+        {
+            //Arrange
+            var user = new User() { Id = userId };
+            var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), user, A<int>());
+            var entity = Mock.Of<IEntity>(x => x.ObjectOwnerId == entityOwnerId);
+
+            //Act
+            var result = sut.HasOwnership(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CanChangeVisibilityOf_ContractModuleEntity_Returns(bool hasAccess)
+        {
+            //Arrange
+            var features = hasAccess
+                ? GetFeatureOptions()
+                : GetFeatureOptions(Feature.CanSetContractElementsAccessModifierToPublic);
+
+            var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+            //Act
+            var result = sut.CanChangeVisibilityOf(new EconomyStream());
+
+            //Assert
+            Assert.Equal(hasAccess, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(bool hasAccess)
+        {
+            //Arrange
+            var features = hasAccess
+                ? GetFeatureOptions()
+                : GetFeatureOptions(Feature.CanSetOrganizationAccessModifierToPublic);
+
+            var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+            //Act
+            var result = sut.CanChangeVisibilityOf(new Organization());
+
+            //Assert
+            Assert.Equal(hasAccess, result);
+        }
+
+        [Theory, MemberData(nameof(GetNonSpecificVisibilityChangeTypeTestInputs))]
+        public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(IEntity inputType, bool hasAccess)
+        {
+            //Arrange
+            var features = hasAccess
+                ? GetFeatureOptions()
+                : GetFeatureOptions(Feature.CanSetAccessModifierToPublic);
+
+            var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+            //Act
+            var result = sut.CanChangeVisibilityOf(inputType);
+
+            //Assert
+            Assert.Equal(hasAccess, result);
+        }
 
         #region helpers
+
+        public static IEnumerable<object[]> GetNonSpecificVisibilityChangeTypeTestInputs()
+        {
+            yield return new object[] { new ItSystem(), true };
+            yield return new object[] { new ItSystem(), false };
+
+            yield return new object[] { new ItProject(), true };
+            yield return new object[] { new ItProject(), false };
+
+            yield return new object[] { new Report(), true };
+            yield return new object[] { new Report(), false };
+        }
+
 
         public static IEnumerable<object[]> GetRoles()
         {

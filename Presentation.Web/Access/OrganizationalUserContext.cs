@@ -91,7 +91,6 @@ namespace Presentation.Web.Access
             return entity.ObjectOwnerId == User.Id;
         }
 
-        //TODO: Test it
         public bool CanChangeVisibilityOf(IEntity entity)
         {
             if (entity is IHasAccessModifier)
