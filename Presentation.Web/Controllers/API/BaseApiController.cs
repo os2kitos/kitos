@@ -238,7 +238,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return _accessContext.AllowEntityVisibilityControl(entity);
             }
-            return KitosUser.IsGlobalAdmin;
+            return AuthenticationService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
         }
 
         private bool ApplyNewAccessControlScheme()
