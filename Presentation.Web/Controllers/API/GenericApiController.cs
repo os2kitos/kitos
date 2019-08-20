@@ -17,12 +17,13 @@ namespace Presentation.Web.Controllers.API
         where TModel : class, IEntity
     {
         protected readonly IGenericRepository<TModel> Repository;
-        private readonly IAccessContext _accessContext;
 
-        protected GenericApiController(IGenericRepository<TModel> repository, IAccessContext accessContext = null)
+        protected GenericApiController(
+            IGenericRepository<TModel> repository, 
+            IAccessContext accessContext = null)
+        :base(accessContext)
         {
             Repository = repository;
-            _accessContext = accessContext;
         }
 
         protected virtual IQueryable<TModel> GetAllQuery()
@@ -429,50 +430,5 @@ namespace Presentation.Web.Controllers.API
         }
 
         #endregion
-
-        #region access control
-        protected bool AllowOrganizationAccess(int organizationId)
-        {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _accessContext.AllowReadsWithinOrganization(organizationId);
-            }
-            var loggedIntoOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
-            return loggedIntoOrgId == organizationId || AuthenticationService.HasReadAccessOutsideContext(UserId);
-        }
-
-        protected bool AllowReadAccess(IEntity entity)
-        {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _accessContext.AllowReads(entity);
-            }
-            return AuthenticationService.HasReadAccess(UserId, entity);
-        }
-
-        protected bool AllowWriteAccess(IEntity entity)
-        {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _accessContext.AllowUpdates(entity);
-            }
-            return AuthenticationService.HasWriteAccess(UserId, entity);
-        }
-
-        protected bool AllowEntityVisibilityControl(IEntity entity)
-        {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _accessContext.AllowEntityVisibilityControl(entity);
-            }
-            return KitosUser.IsGlobalAdmin;
-        }
-
-        private bool ApplyNewAccessControlScheme()
-        {
-            return _accessContext != null;
-        }
-        #endregion
-
     }
 }

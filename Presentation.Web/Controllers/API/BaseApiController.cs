@@ -10,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
+using Presentation.Web.Access;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
 
@@ -18,6 +19,8 @@ namespace Presentation.Web.Controllers.API
     [Authorize]
     public abstract class BaseApiController : ApiController
     {
+        private readonly IAccessContext _accessContext;
+
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
@@ -29,6 +32,11 @@ namespace Presentation.Web.Controllers.API
 
         [Inject]
         public ILogger Logger { get; set; }
+
+        protected BaseApiController(IAccessContext accessContext = null)
+        {
+            _accessContext = accessContext;
+        }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
@@ -194,5 +202,49 @@ namespace Presentation.Web.Controllers.API
 
             return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
         }
+
+        #region access control
+        protected bool AllowOrganizationAccess(int organizationId)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowReadsWithinOrganization(organizationId);
+            }
+            var loggedIntoOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
+            return loggedIntoOrgId == organizationId || AuthenticationService.HasReadAccessOutsideContext(UserId);
+        }
+
+        protected bool AllowReadAccess(IEntity entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowReads(entity);
+            }
+            return AuthenticationService.HasReadAccess(UserId, entity);
+        }
+
+        protected bool AllowWriteAccess(IEntity entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowUpdates(entity);
+            }
+            return AuthenticationService.HasWriteAccess(UserId, entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            if (ApplyNewAccessControlScheme())
+            {
+                return _accessContext.AllowEntityVisibilityControl(entity);
+            }
+            return KitosUser.IsGlobalAdmin;
+        }
+
+        private bool ApplyNewAccessControlScheme()
+        {
+            return _accessContext != null;
+        }
+        #endregion
     }
 }

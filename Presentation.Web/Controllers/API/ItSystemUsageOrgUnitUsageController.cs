@@ -5,6 +5,7 @@ using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -16,7 +17,11 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
 
-        public ItSystemUsageOrgUnitUsageController(IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository, IGenericRepository<ItSystemUsage> systemUsageRepository)
+        public ItSystemUsageOrgUnitUsageController(
+            IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository,
+            IGenericRepository<ItSystemUsage> systemUsageRepository,
+            IAccessContext accessContext)
+        :base(accessContext)
         {
             _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _systemUsageRepository = systemUsageRepository;
@@ -26,8 +31,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id);
+                var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id, readOnly: true);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
+                orgUnits = orgUnits.Where(AllowReadAccess);
                 var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
 
                 return Ok(dtos);
@@ -44,7 +50,15 @@ namespace Presentation.Web.Controllers.API
             {
                 var systemUsage = _systemUsageRepository.GetByKey(id);
 
-                if (systemUsage.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
+                if (systemUsage.ResponsibleUsage == null)
+                {
+                    return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
+                }
+
+                if (!AllowReadAccess(systemUsage))
+                {
+                    return Forbidden();
+                }
 
                 var organizationUnit = systemUsage.ResponsibleUsage.OrganizationUnit;
                 var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
@@ -60,7 +74,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] {usageId, orgUnitId});
+                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] { usageId, orgUnitId });
                 var systemUsage = _systemUsageRepository.GetByKey(usageId);
 
                 systemUsage.ResponsibleUsage = entity;
