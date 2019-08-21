@@ -28,6 +28,10 @@ class Login {
         return this.getCredentialsMap().apiUsers.regularUser;
     }
 
+    public getLocalAdminCredentials() {
+        return this.getCredentialsMap().localAdmin;
+    }
+
     private getCredentialsMap() {
         return {
             globalAdmin: this.getCredentials(0),

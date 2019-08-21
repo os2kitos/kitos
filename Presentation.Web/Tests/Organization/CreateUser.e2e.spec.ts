@@ -52,24 +52,55 @@ describe("Only Global Admins can create user with API access",
             });
 
 
-        //it("Global admin is able to edit api access on existing user", () => {
-        //    const credentials = loginHelper.getApiUserCredentials();
-        //    console.log("Logging in");
-        //    loginHelper.loginAsGlobalAdmin();
+        it("Global admin is able to set api access to FALSE on existing user", () => {
+            const credentials = loginHelper.getLocalAdminCredentials();
+            console.log("Logging in");
+            loginHelper.loginAsGlobalAdmin()
+                .then(() => {
+                    console.log("Navigating to user page");
+                    pageObject.getPage();
+                })
+                .then(() => {
+                    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    console.log("Updating API status to FALSE");
+                    userHelper.updateApiOnUser(credentials.username, false);
+                }).then(() => {
+                    browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
 
-        //    console.log("Navigating to user page");
-        //    pageObject.getPage();
-        //    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                    console.log("Checking that status is updated");
+                    userHelper.checkApiRoleStatusOnUser(credentials.username, false);
+                });
+        });
 
-        //    console.log("Updating API status");
-        //    userHelper.updateApiOnUser(credentials.username, true);
+        it("Global admin is able to set api access to TRUE on existing user", () => {
+            const credentials = loginHelper.getLocalAdminCredentials();
+            console.log("Logging in");
+            loginHelper.loginAsGlobalAdmin()
+                .then(() => {
+                    console.log("Navigating to user page");
+                    pageObject.getPage();
+                })
+                .then(() => {
+                    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    console.log("Updating API status to TRUE");
+                    userHelper.updateApiOnUser(credentials.username, true);
+                }).then(() => {
+                    browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
 
-        //    browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
-        //    expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
-
-        //    console.log("Checking that status is updated");
-        //    userHelper.checkApiRoleStatusOnUser(credentials.username, true);
-        //});
+                    console.log("Checking that status is updated");
+                    userHelper.checkApiRoleStatusOnUser(credentials.username, true);
+                });
+        });
     });
 
 
