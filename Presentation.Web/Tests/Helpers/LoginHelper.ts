@@ -5,23 +5,23 @@ import WaitTimers = require("../Utility/WaitTimers");
 class Login {
     public logout() {
         var navigationBarHelper = new LoginPage().navigationBarHelper;
-        navigationBarHelper.logout();
+        return navigationBarHelper.logout();
     }
 
     public loginAsGlobalAdmin() {
-        this.login(this.getCredentialsMap().globalAdmin);
+        return this.login(this.getCredentialsMap().globalAdmin);
     }
 
     public loginAsLocalAdmin() {
-        this.login(this.getCredentialsMap().localAdmin);
+        return this.login(this.getCredentialsMap().localAdmin);
     }
 
     public loginAsRegularUser() {
-        this.login(this.getCredentialsMap().regularUser);
+        return this.login(this.getCredentialsMap().regularUser);
     }
 
     public loginAsApiUser() {
-        this.login(this.getCredentialsMap().apiUsers.regularUser);
+        return this.login(this.getCredentialsMap().apiUsers.regularUser);
     }
 
     public getApiUserCredentials() {
@@ -52,14 +52,23 @@ class Login {
         var waitUpTo = new WaitTimers();
         var ec = protractor.ExpectedConditions;
 
-        homePage.getPage();
-        browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
-        homePage.emailField.sendKeys(credentials.username);
-        homePage.pwdField.sendKeys(credentials.password);
-        homePage.loginButton.click();
-
-        //Await login completed before completing command
-        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
+        return homePage.getPage()
+            .then(() => {
+                browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
+            })
+            .then(() => {
+                homePage.emailField.sendKeys(credentials.username);
+            })
+            .then(() => {
+                homePage.pwdField.sendKeys(credentials.password);
+            })
+            .then(() => {
+                homePage.loginButton.click();
+            })
+            .then(() => {
+                //Await login completed before completing command
+                browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
+            });
     }
 
     private parseStringAsArrayAndGetIndex(input: string, index: number) {
