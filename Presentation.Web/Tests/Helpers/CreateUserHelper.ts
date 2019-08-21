@@ -32,61 +32,67 @@ class CreateUserHelper {
 
     public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
 
-        var checked = false;
-        pageObject.mainGridAllTableRows.each((row) => {
-            //TODO: Run locally and fix it
-            row.element(cssHelper.byDataElementType("userEmailObject")).getText().then(text => {
-                if (text === email) {
-                    row.element(by.linkText("Redigér")).click();
-                    checked = true;
-                    //TODO: Run locally and fix it
-                    expect(pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(apiStatus);
-                }
-            });
-        });
-        expect(checked).toBe(true);
+        this.openEditUser(email);
+
+        expect(pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(apiStatus);
     }
 
-
     public updateApiOnUser(email: string, apiAccess: boolean) {
+        //TODO: The issue is the use of promises which are not resolved so these tests are unreliable
+        this.openEditUser(email);
 
-        loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.mainGridAllTableRows.each((row) => {
-            row.element(cssHelper.byDataElementType("userEmailObject")).getText().then(val => {
-                if (val === email) {
-                    row.element(by.linkText("Redigér")).click();
-                    if (apiAccess) {
-                        //TODO: Run locally and fix it
-                        //TODO: Migrate IsSelected
-                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                            if (!selected) {
-                                pageCreateObject.boolApi.click();
-                                pageCreateObject.editUserButton.click();
-                                return;
-                            } else {
-                                pageCreateObject.cancelEditUserButton.click();
-                                return;
-                            }
-                        });
-                    }
-                    else {
-                        //TODO: Migrate IsSelected
-                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                            if (selected) {
-                                pageCreateObject.boolApi.click();
-                                pageCreateObject.editUserButton.click();
-                                return;
-                            } else {
-                                pageCreateObject.cancelEditUserButton.click();
-                                return;
-                            }
-                        });
-                    }
+        if (apiAccess) {
+            pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                if (!selected) {
+                    pageCreateObject.boolApi.click();
+                    pageCreateObject.editUserButton.click();
+                    return;
+                } else {
+                    pageCreateObject.cancelEditUserButton.click();
+                    return;
                 }
             });
+        }
+        else {
+            pageObject.hasAPiCheckBox.isSelected().then(selected => {
+                if (selected) {
+                    pageCreateObject.boolApi.click();
+                    pageCreateObject.editUserButton.click();
+                    return;
+                } else {
+                    pageCreateObject.cancelEditUserButton.click();
+                    return;
+                }
+            });
+        }
+    }
+
+    private getUserRow(email: string) {
+        const emailColumnElementType = "userEmailObject";
+
+        //TODO: Rewrite to a promise and use the promise chain
+
+        var rows = pageObject.mainGridAllTableRows.filter((row, index) => {
+            if (row.element(cssHelper.byDataElementType(emailColumnElementType)).isPresent()) {
+                var column = row.element(cssHelper.byDataElementType(emailColumnElementType));
+                
+            }
+            
+            //if (row.isElementPresent(cssHelper.byDataElementType(emailColumnElementType)).) {
+            //    row.element(cssHelper.byDataElementType(emailColumnElementType)).getText().then(text => {
+            //        return text === email;
+            //    });
+            //}
+            return false;
         });
+
+        return rows.first();
+    }
+
+    private openEditUser(email: string) {
+        const row = this.getUserRow(email);
+        expect(row).not.toBe(null);
+        row.element(by.linkText("Redigér")).click();
     }
 }
 export = CreateUserHelper;

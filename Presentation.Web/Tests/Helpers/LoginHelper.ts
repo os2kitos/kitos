@@ -2,8 +2,6 @@
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
 import WaitTimers = require("../Utility/WaitTimers");
 
-var waitUpTo = new WaitTimers();
-
 class Login {
     public logout() {
         var navigationBarHelper = new LoginPage().navigationBarHelper;
@@ -50,11 +48,18 @@ class Login {
 
     private login(credentials: any) {
         var homePage = new HomePage();
+        var navigationBar = new LoginPage().navigationBar;
+        var waitUpTo = new WaitTimers();
+        var ec = protractor.ExpectedConditions;
+
         homePage.getPage();
         browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
         homePage.emailField.sendKeys(credentials.username);
         homePage.pwdField.sendKeys(credentials.password);
         homePage.loginButton.click();
+
+        //Await login completed before completing command
+        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
     }
 
     private parseStringAsArrayAndGetIndex(input: string, index: number) {

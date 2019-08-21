@@ -84,6 +84,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\PrepareProductionDatabase.ps1 = DeploymentScripts\PrepareProductionDatabase.ps1
 		DeploymentScripts\PrepareTestDatabase.ps1 = DeploymentScripts\PrepareTestDatabase.ps1
 		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
+		DeploymentScripts\RunE2ETestsLocally.ps1 = DeploymentScripts\RunE2ETestsLocally.ps1
 		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
 		DeploymentScripts\VpnCli.ps1 = DeploymentScripts\VpnCli.ps1
 	EndProjectSection
