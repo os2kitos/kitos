@@ -91,12 +91,11 @@ namespace Presentation.Web.Controllers.API
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                     );
+                paging.WithPostProcessingFilter(AllowReadAccess);
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
                 var query = Page(Repository.AsQueryable(readOnly: true), paging);
-
-                query = query.AsEnumerable().Where(AllowReadAccess).AsQueryable();
 
                 return Ok(Map(query));
             }
@@ -453,6 +452,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
+                pagingModel.WithPostProcessingFilter(AllowReadAccess);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()

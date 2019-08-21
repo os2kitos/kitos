@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                 }
 
-                result = result.Where(AllowReadAccess);
+                paging.WithPostProcessingFilter(AllowReadAccess);
 
                 var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);

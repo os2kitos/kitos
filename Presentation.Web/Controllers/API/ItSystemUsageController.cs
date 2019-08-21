@@ -81,9 +81,9 @@ namespace Presentation.Web.Controllers.API
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
-                var usages = Page(Repository.AsQueryable(true), pagingModel);
+                pagingModel.WithPostProcessingFilter(AllowReadAccess);
 
-                usages = usages.AsEnumerable().Where(AllowReadAccess).AsQueryable();
+                var usages = Page(Repository.AsQueryable(true), pagingModel);
 
                 return Ok(Map(usages));
             }
@@ -513,6 +513,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
+                pagingModel.WithPostProcessingFilter(AllowReadAccess);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()

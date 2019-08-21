@@ -190,6 +190,7 @@ namespace Presentation.Web.Controllers.API
         protected virtual IQueryable<T> Page<T>(IQueryable<T> query, PagingModel<T> paging)
         {
             query = paging.Filter(query);
+            query = paging.ApplyPostProcessing(query);
 
             var totalCount = query.Count();
             var paginationHeader = new
@@ -200,7 +201,10 @@ namespace Presentation.Web.Controllers.API
                                                                 Newtonsoft.Json.JsonConvert.SerializeObject(
                                                                     paginationHeader));
 
-            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
+            return query
+                .OrderByField(paging.OrderBy, paging.Descending)
+                .Skip(paging.Skip)
+                .Take(paging.Take);
         }
 
         #region access control

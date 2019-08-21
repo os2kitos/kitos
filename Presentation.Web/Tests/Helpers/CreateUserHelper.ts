@@ -33,16 +33,14 @@ class CreateUserHelper {
     public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
 
         var checked = false;
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.element(cssHelper.byDataElementType("userEmailObject")).getText().then(text => {
+        pageObject.mainGridAllTableRows.each((row) => {
+            //TODO: Run locally and fix it
+            row.element(cssHelper.byDataElementType("userEmailObject")).getText().then(text => {
                 if (text === email) {
-                    ele.element(by.linkText("Redigér")).click();
-                    pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                        checked = true;
-                        expect(selected).not.toBeNull();
-                        expect(selected).toBe(apiStatus);
-                        return;
-                    });
+                    row.element(by.linkText("Redigér")).click();
+                    checked = true;
+                    //TODO: Run locally and fix it
+                    expect(pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(apiStatus);
                 }
             });
         });
@@ -55,11 +53,13 @@ class CreateUserHelper {
         loginHelper.loginAsGlobalAdmin();
         pageObject.getPage();
         browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.element(cssHelper.byDataElementType("userEmailObject")).getText().then(val => {
+        pageObject.mainGridAllTableRows.each((row) => {
+            row.element(cssHelper.byDataElementType("userEmailObject")).getText().then(val => {
                 if (val === email) {
-                    ele.element(by.linkText("Redigér")).click();
+                    row.element(by.linkText("Redigér")).click();
                     if (apiAccess) {
+                        //TODO: Run locally and fix it
+                        //TODO: Migrate IsSelected
                         pageObject.hasAPiCheckBox.isSelected().then(selected => {
                             if (!selected) {
                                 pageCreateObject.boolApi.click();
@@ -72,6 +72,7 @@ class CreateUserHelper {
                         });
                     }
                     else {
+                        //TODO: Migrate IsSelected
                         pageObject.hasAPiCheckBox.isSelected().then(selected => {
                             if (selected) {
                                 pageCreateObject.boolApi.click();
