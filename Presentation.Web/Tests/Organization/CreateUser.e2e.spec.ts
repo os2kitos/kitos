@@ -52,8 +52,12 @@ describe("Only Global Admins can create user with API access",
             });
 
         function canSetApiAccessTo(value: boolean) {
-            const credentials = loginHelper.getLocalAdminCredentials();
-            return pageObject.getPage()
+            const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
+
+            return loginHelper.loginAsGlobalAdmin()
+                .then(() => {
+                    pageObject.getPage();
+                })
                 .then(() => {
                     browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
                 })
