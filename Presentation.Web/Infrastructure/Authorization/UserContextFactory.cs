@@ -18,28 +18,24 @@ namespace Presentation.Web.Infrastructure.Authorization
             _featureChecker = featureChecker;
         }
 
-        public IOrganizationalUserContext Create(int? userId, int organizationId)
+        public IOrganizationalUserContext Create(int userId, int organizationId)
         {
-            if (userId.HasValue)
+            var user = _userRepository.GetByKey(userId);
+            if (user == null)
             {
-                var user = _userRepository.GetByKey(userId);
-                if (user == null)
-                {
-                    throw new InvalidOperationException($"Cannot create user context for invalid user ID:{userId}");
-                }
-
-                //Get roles for the organization
-                var organizationRoles = user.GetRolesInOrg(organizationId);
-
-                var supportedFeatures =
-                    Enum.GetValues(typeof(Feature))
-                        .Cast<Feature>()
-                        .Where(x => _featureChecker.CanExecute(user, x))
-                        .ToList();
-
-                return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
+                throw new InvalidOperationException($"Cannot create user context for invalid user ID:{userId}");
             }
-            return new AnonymousUserContext();
+
+            //Get roles for the organization
+            var organizationRoles = user.GetRolesInOrg(organizationId);
+
+            var supportedFeatures =
+                Enum.GetValues(typeof(Feature))
+                    .Cast<Feature>()
+                    .Where(x => _featureChecker.CanExecute(user, x))
+                    .ToList();
+
+            return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
         }
     }
 }

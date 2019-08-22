@@ -319,9 +319,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Infrastructure\Authorization\AnonymousUserContext.cs" />
     <Compile Include="Infrastructure\Authorization\IAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\OrganizationalUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\UserContextFactory.cs" />
     <Compile Include="Infrastructure\Authorization\IUserContextFactory.cs" />
     <Compile Include="Infrastructure\Authorization\IAuthorizationContextFactory.cs" />

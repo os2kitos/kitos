@@ -18,11 +18,19 @@ namespace Presentation.Web.Infrastructure.Authorization
 
         public IAuthorizationContext Create()
         {
-            var activeUserContext = _userContextFactory.Create(
-                userId: _authenticationContext.UserId,
-                organizationId: _authenticationContext.ActiveOrganizationId.GetValueOrDefault(-1));
+            var isAuthenticated =
+                _authenticationContext.UserId.HasValue &&
+                _authenticationContext.ActiveOrganizationId.HasValue;
 
-            return new OrganizationAuthorizationContext(activeUserContext);
+            if (isAuthenticated)
+            {
+                var activeUserContext = _userContextFactory.Create(
+                    userId: _authenticationContext.UserId.Value,
+                    organizationId: _authenticationContext.ActiveOrganizationId.Value);
+                return new OrganizationAuthorizationContext(activeUserContext);
+            }
+
+            return new UnauthenticatedAuthorizationContext();
         }
     }
 }
