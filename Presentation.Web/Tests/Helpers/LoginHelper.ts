@@ -70,6 +70,9 @@ class Login {
                 homePage.loginButton.click();
             })
             .then(() => {
+                browser.waitForAngular();
+            })
+            .then(() => {
                 //Await login completed before completing command
                 browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
             });

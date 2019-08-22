@@ -14,7 +14,6 @@ describe("LocalAdmin user tests", () => {
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
-        browser.waitForAngular();
     });
 
     afterAll(() => {
