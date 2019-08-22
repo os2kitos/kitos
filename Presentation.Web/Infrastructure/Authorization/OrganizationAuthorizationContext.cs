@@ -51,7 +51,7 @@ namespace Presentation.Web.Infrastructure.Authorization
                 {
                     result = true;
                 }
-                else if (IsUserInMunicipality() && HasAssignedPublicAccess(entity))
+                else if (IsUserInMunicipality() && EntityIsNotRestrictedToLocalAccess(entity))
                 {
                     result = true;
                 }
@@ -126,9 +126,9 @@ namespace Presentation.Web.Infrastructure.Authorization
             return entity is User;
         }
 
-        private static bool HasAssignedPublicAccess(IEntity entity)
+        private static bool EntityIsNotRestrictedToLocalAccess(IEntity entity)
         {
-            return (entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public;
+            return (entity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
         }
 
         private bool IsUserInMunicipality()
