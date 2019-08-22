@@ -18,38 +18,21 @@ describe("Only Global Admins can create user with API access",
             testFixture.cleanupState();
         });
 
-
         it("Global Admin can enable api access on new user", () => {
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => {
-                        pageObject.getPage();
-                    })
-                    .then(() => {
-                        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-                    })
-                    .then(() => {
-                        pageObject.createUserButton.click();
-                    })
-                    .then(() => {
-                        expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
-                    });
+            loginHelper.loginAsGlobalAdmin();
+            pageObject.getPage();
+            browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+            pageObject.createUserButton.click();
+            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
         });
 
         it("Local Admin cannot enable api access on new user", () => {
-            loginHelper.loginAsLocalAdmin()
-                .then(() => {
-                    pageObject.getPage();
-                })
-                .then(() => {
-                    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-                })
-                .then(() => {
-                    pageObject.createUserButton.click();
-                })
-                .then(() => {
-                    expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
-                });
-            });
+            loginHelper.loginAsLocalAdmin();
+            pageObject.getPage();
+            browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+            pageObject.createUserButton.click();
+            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
+        });
 
         function canSetApiAccessTo(value: boolean) {
             const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
