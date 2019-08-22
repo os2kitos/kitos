@@ -9,11 +9,11 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Moq;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.Access
+namespace Tests.Unit.Presentation.Web.Authorization
 {
     public class OrganizationalUserContextTest : WithAutoFixture
     {

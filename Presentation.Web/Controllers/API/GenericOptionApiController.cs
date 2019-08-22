@@ -4,15 +4,15 @@ using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : OptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository, IAccessContext accessContext = null)
-            : base(repository, accessContext)
+        protected GenericOptionApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
+            : base(repository, authorizationContext)
         {
         }
 

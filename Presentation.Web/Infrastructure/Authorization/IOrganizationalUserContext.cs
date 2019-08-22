@@ -1,7 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
     public interface IOrganizationalUserContext
     {

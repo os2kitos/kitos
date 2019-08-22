@@ -2,22 +2,21 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Moq;
-using Moq.Language.Flow;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.Access
+namespace Tests.Unit.Presentation.Web.Authorization
 {
-    public class OrganizationAccessContextTest : WithAutoFixture
+    public class OrganizationAuthorizationContextTest : WithAutoFixture
     {
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
-        private readonly OrganizationAccessContext _sut;
+        private readonly OrganizationAuthorizationContext _sut;
 
-        public OrganizationAccessContextTest()
+        public OrganizationAuthorizationContextTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _sut = new OrganizationAccessContext(_userContextMock.Object);
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object);
         }
 
         [Theory]

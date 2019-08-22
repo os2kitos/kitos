@@ -1,8 +1,8 @@
 ﻿using Core.DomainModel;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
-    public interface IAccessContext
+    public interface IAuthorizationContext
     {
         /// <summary>
         /// Determines if high level read-access is allowed for objects within the target organizational context

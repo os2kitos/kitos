@@ -10,16 +10,16 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
-using Presentation.Web.Access;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.API
 {
     [Authorize]
     public abstract class BaseApiController : ApiController
     {
-        private readonly IAccessContext _accessContext;
+        private readonly IAuthorizationContext _authorizationContext;
 
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
@@ -33,9 +33,9 @@ namespace Presentation.Web.Controllers.API
         [Inject]
         public ILogger Logger { get; set; }
 
-        protected BaseApiController(IAccessContext accessContext = null)
+        protected BaseApiController(IAuthorizationContext authorizationContext = null)
         {
-            _accessContext = accessContext;
+            _authorizationContext = authorizationContext;
         }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
@@ -217,7 +217,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowReadsWithinOrganization(organizationId);
+                return _authorizationContext.AllowReadsWithinOrganization(organizationId);
             }
             var loggedIntoOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
             return loggedIntoOrgId == organizationId || AuthenticationService.HasReadAccessOutsideContext(UserId);
@@ -227,7 +227,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowReads(entity);
+                return _authorizationContext.AllowReads(entity);
             }
             return AuthenticationService.HasReadAccess(UserId, entity);
         }
@@ -236,7 +236,7 @@ namespace Presentation.Web.Controllers.API
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowUpdates(entity);
+                return _authorizationContext.AllowUpdates(entity);
             }
             return AuthenticationService.HasWriteAccess(UserId, entity);
         }
@@ -245,14 +245,14 @@ namespace Presentation.Web.Controllers.API
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowEntityVisibilityControl(entity);
+                return _authorizationContext.AllowEntityVisibilityControl(entity);
             }
             return AuthenticationService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
         }
 
         private bool ApplyNewAccessControlScheme()
         {
-            return _accessContext != null;
+            return _authorizationContext != null;
         }
         #endregion
     }

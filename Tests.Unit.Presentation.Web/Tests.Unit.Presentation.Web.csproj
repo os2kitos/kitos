@@ -192,8 +192,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Access\OrganizationAccessContextTest.cs" />
-    <Compile Include="Access\OrganizationalUserContextTest.cs" />
+    <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
+    <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
     <Compile Include="Context\AuthenticationContextFactoryTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\UserMock.cs" />

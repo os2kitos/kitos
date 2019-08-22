@@ -7,22 +7,22 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Ninject.Infrastructure.Language;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
-        private readonly IAccessContext _accessContext;
+        private readonly IAuthorizationContext _authorizationContext;
 
         protected BaseEntityController(
             IGenericRepository<T> repository,
             IAuthenticationService authService,
-            IAccessContext accessContext = null)
+            IAuthorizationContext authorizationContext = null)
             : base(repository)
         {
-            _accessContext = accessContext;
+            _authorizationContext = authorizationContext;
             AuthService = authService;
         }
 
@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowReadsWithinOrganization(organizationId);
+                return _authorizationContext.AllowReadsWithinOrganization(organizationId);
             }
             var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
             return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);
@@ -215,7 +215,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowReads(entity);
+                return _authorizationContext.AllowReads(entity);
             }
             return AuthService.HasReadAccess(UserId, entity);
         }
@@ -224,7 +224,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowUpdates(entity);
+                return _authorizationContext.AllowUpdates(entity);
             }
             return AuthService.HasWriteAccess(UserId, entity);
         }
@@ -233,14 +233,14 @@ namespace Presentation.Web.Controllers.OData
         {
             if (ApplyNewAccessControlScheme())
             {
-                return _accessContext.AllowEntityVisibilityControl(entity);
+                return _authorizationContext.AllowEntityVisibilityControl(entity);
             }
             return AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
         }
 
         private bool ApplyNewAccessControlScheme()
         {
-            return _accessContext != null;
+            return _authorizationContext != null;
         }
     }
 }

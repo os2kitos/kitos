@@ -319,15 +319,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Access\AnonymouslUserContext.cs" />
-    <Compile Include="Access\IAccessContext.cs" />
-    <Compile Include="Access\OrganizationalUserContext.cs" />
-    <Compile Include="Access\UserContextFactory.cs" />
-    <Compile Include="Access\IUserContextFactory.cs" />
-    <Compile Include="Access\IAccessContextFactory.cs" />
-    <Compile Include="Access\IOrganizationalUserContext.cs" />
-    <Compile Include="Access\OrganizationAccessContext.cs" />
-    <Compile Include="Access\AccessContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\AnonymousUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\IAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\OrganizationalUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\UserContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\IUserContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\IAuthorizationContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\IOrganizationalUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\OrganizationAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\AuthorizationContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />

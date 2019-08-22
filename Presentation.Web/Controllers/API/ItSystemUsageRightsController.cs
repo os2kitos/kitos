@@ -4,8 +4,8 @@ using System.Net.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -16,8 +16,8 @@ namespace Presentation.Web.Controllers.API
         public ItSystemUsageRightsController(
             IGenericRepository<ItSystemRight> rightRepository, 
             IGenericRepository<ItSystemUsage> objectRepository,
-            IAccessContext accessContext) 
-            : base(rightRepository, objectRepository, accessContext)
+            IAuthorizationContext authorizationContext) 
+            : base(rightRepository, objectRepository, authorizationContext)
         { }
 
         /// <summary>

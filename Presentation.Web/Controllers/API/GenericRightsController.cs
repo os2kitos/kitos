@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -21,8 +21,8 @@ namespace Presentation.Web.Controllers.API
         protected GenericRightsController(
             IGenericRepository<TRight> rightRepository,
             IGenericRepository<TObject> objectRepository,
-            IAccessContext accessContext = null)
-        : base(accessContext)
+            IAuthorizationContext authorizationContext = null)
+        : base(authorizationContext)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;

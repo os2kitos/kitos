@@ -5,8 +5,8 @@ using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -20,8 +20,8 @@ namespace Presentation.Web.Controllers.API
         public ItSystemUsageOrgUnitUsageController(
             IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
-            IAccessContext accessContext)
-        :base(accessContext)
+            IAuthorizationContext authorizationContext)
+        :base(authorizationContext)
         {
             _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _systemUsageRepository = systemUsageRepository;

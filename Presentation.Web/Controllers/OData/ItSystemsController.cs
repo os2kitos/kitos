@@ -6,16 +6,16 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAccessContext accessContext)
-            : base(repository, authService, accessContext)
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
         }
 

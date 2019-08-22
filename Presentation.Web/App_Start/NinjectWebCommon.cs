@@ -14,7 +14,7 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
 using Microsoft.Owin;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
@@ -128,10 +128,10 @@ namespace Presentation.Web
 
         private static void RegisterAccessContext(IKernel kernel)
         {
-            kernel.Bind<IAccessContextFactory>().To<AccessContextFactory>().InRequestScope();
+            kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
             kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
-            kernel.Bind<IAccessContext>()
-                .ToMethod(ctx => ctx.Kernel.Get<IAccessContextFactory>().CreateOrganizationAccessContext())
+            kernel.Bind<IAuthorizationContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<IAuthorizationContextFactory>().Create())
                 .InRequestScope();
         }
     }

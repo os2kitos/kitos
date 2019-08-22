@@ -1,13 +1,13 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
-    public class OrganizationAccessContext : IAccessContext
+    public class OrganizationAuthorizationContext : IAuthorizationContext
     {
         private readonly IOrganizationalUserContext _activeUserContext;
 
-        public OrganizationAccessContext(IOrganizationalUserContext activeUserContext)
+        public OrganizationAuthorizationContext(IOrganizationalUserContext activeUserContext)
         {
             _activeUserContext = activeUserContext;
         }

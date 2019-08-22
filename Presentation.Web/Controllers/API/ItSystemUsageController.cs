@@ -15,8 +15,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -37,8 +37,8 @@ namespace Presentation.Web.Controllers.API
             IItSystemUsageService itSystemUsageService,
             IGenericRepository<ItSystemRole> roleRepository,
             IGenericRepository<AttachedOption> attachedOptionsRepository,
-            IAccessContext accessContext)
-            : base(repository, accessContext)
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;

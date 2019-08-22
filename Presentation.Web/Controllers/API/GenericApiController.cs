@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
-using Presentation.Web.Access;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -20,8 +20,8 @@ namespace Presentation.Web.Controllers.API
 
         protected GenericApiController(
             IGenericRepository<TModel> repository, 
-            IAccessContext accessContext = null)
-        :base(accessContext)
+            IAuthorizationContext authorizationContext = null)
+        :base(authorizationContext)
         {
             Repository = repository;
         }

@@ -6,8 +6,8 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -20,8 +20,8 @@ namespace Presentation.Web.Controllers.OData
         public ItSystemRightsController(
             IGenericRepository<ItSystemRight> repository,
             IAuthenticationService authService,
-            IAccessContext accessContext)
-            : base(repository, authService, accessContext)
+            IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
         }
 

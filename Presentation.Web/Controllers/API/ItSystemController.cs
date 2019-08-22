@@ -14,8 +14,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -32,8 +32,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<TaskRef> taskRepository,
             IItSystemService systemService,
             ReferenceService referenceService,
-            IAccessContext accessContext)
-            : base(repository, accessContext)
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;

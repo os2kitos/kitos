@@ -1,9 +1,9 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
-    public class AnonymouslUserContext : IOrganizationalUserContext
+    public class AnonymousUserContext : IOrganizationalUserContext
     {
         public User User { get; } = null;
 

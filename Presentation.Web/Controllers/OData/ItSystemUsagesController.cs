@@ -12,8 +12,8 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
-using Presentation.Web.Access;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -24,8 +24,8 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
 
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAccessContext accessContext)
-            : base(repository, authService, accessContext)
+            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;

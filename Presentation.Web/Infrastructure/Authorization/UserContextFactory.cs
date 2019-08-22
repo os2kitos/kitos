@@ -3,7 +3,7 @@ using System.Linq;
 using Core.ApplicationServices;
 using Core.DomainServices;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
     public class UserContextFactory : IUserContextFactory
     {
@@ -39,7 +39,7 @@ namespace Presentation.Web.Access
 
                 return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
             }
-            return new AnonymouslUserContext();
+            return new AnonymousUserContext();
         }
     }
 }

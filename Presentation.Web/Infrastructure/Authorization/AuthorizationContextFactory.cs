@@ -1,13 +1,13 @@
 ﻿using Presentation.Web.Infrastructure.Model.Authentication;
 
-namespace Presentation.Web.Access
+namespace Presentation.Web.Infrastructure.Authorization
 {
-    public class AccessContextFactory : IAccessContextFactory
+    public class AuthorizationContextFactory : IAuthorizationContextFactory
     {
         private readonly IUserContextFactory _userContextFactory;
         private readonly IAuthenticationContext _authenticationContext;
 
-        public AccessContextFactory(
+        public AuthorizationContextFactory(
             IUserContextFactory userContextFactory,
             IAuthenticationContext authenticationContext
             )
@@ -16,13 +16,13 @@ namespace Presentation.Web.Access
             _authenticationContext = authenticationContext;
         }
 
-        public IAccessContext CreateOrganizationAccessContext()
+        public IAuthorizationContext Create()
         {
             var activeUserContext = _userContextFactory.Create(
                 userId: _authenticationContext.UserId,
                 organizationId: _authenticationContext.ActiveOrganizationId.GetValueOrDefault(-1));
 
-            return new OrganizationAccessContext(activeUserContext);
+            return new OrganizationAuthorizationContext(activeUserContext);
         }
     }
 }
