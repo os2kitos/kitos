@@ -5,8 +5,8 @@ namespace Presentation.Web.Access
 {
     public interface IOrganizationalUserContext
     {
-        User User { get; }
         int ActiveOrganizationId { get; }
+        int UserId { get; }
         bool IsActiveInOrganizationOfType(OrganizationCategory category);
         bool HasRole(OrganizationRole role);
         bool HasModuleLevelAccessTo(IEntity entity);

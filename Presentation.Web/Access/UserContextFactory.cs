@@ -18,24 +18,28 @@ namespace Presentation.Web.Access
             _featureChecker = featureChecker;
         }
 
-        public IOrganizationalUserContext Create(int userId, int organizationId)
+        public IOrganizationalUserContext Create(int? userId, int organizationId)
         {
-            var user = _userRepository.GetByKey(userId);
-            if (user == null)
+            if (userId.HasValue)
             {
-                throw new InvalidOperationException($"Cannot create user context for invalid user ID:{userId}");
+                var user = _userRepository.GetByKey(userId);
+                if (user == null)
+                {
+                    throw new InvalidOperationException($"Cannot create user context for invalid user ID:{userId}");
+                }
+
+                //Get roles for the organization
+                var organizationRoles = user.GetRolesInOrg(organizationId);
+
+                var supportedFeatures =
+                    Enum.GetValues(typeof(Feature))
+                        .Cast<Feature>()
+                        .Where(x => _featureChecker.CanExecute(user, x))
+                        .ToList();
+
+                return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
             }
-
-            //Get roles for the organization
-            var organizationRoles = user.GetRolesInOrg(organizationId);
-
-            var supportedFeatures =
-                Enum.GetValues(typeof(Feature))
-                    .Cast<Feature>()
-                    .Where(x => _featureChecker.CanExecute(user, x))
-                    .ToList();
-
-            return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
+            return new AnonymouslUserContext();
         }
     }
 }

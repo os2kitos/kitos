@@ -16,6 +16,7 @@ namespace Presentation.Web.Access
     {
         private readonly ISet<Feature> _supportedFeatures;
         private readonly ISet<OrganizationRole> _roles;
+        private readonly User _user;
 
         public OrganizationalUserContext(
             IEnumerable<Feature> supportedFeatures,
@@ -23,19 +24,19 @@ namespace Presentation.Web.Access
             User user,
             int activeOrganizationId)
         {
-            User = user;
+            _user = user;
             ActiveOrganizationId = activeOrganizationId;
             _supportedFeatures = new HashSet<Feature>(supportedFeatures);
             _roles = new HashSet<OrganizationRole>(roles);
         }
 
-        public User User { get; }
-
         public int ActiveOrganizationId { get; }
+
+        public int UserId => _user.Id;
 
         public bool IsActiveInOrganizationOfType(OrganizationCategory category)
         {
-            return User.DefaultOrganization?.Type?.Category == category;
+            return _user.DefaultOrganization?.Type?.Category == category;
         }
 
         public bool HasRole(OrganizationRole role)
@@ -83,12 +84,12 @@ namespace Presentation.Web.Access
 
         public bool HasAssignedWriteAccess(IEntity entity)
         {
-            return entity.HasUserWriteAccess(User);
+            return entity.HasUserWriteAccess(_user);
         }
 
         public bool HasOwnership(IEntity entity)
         {
-            return entity.ObjectOwnerId == User.Id;
+            return entity.ObjectOwnerId == UserId;
         }
 
         public bool CanChangeVisibilityOf(IEntity entity)

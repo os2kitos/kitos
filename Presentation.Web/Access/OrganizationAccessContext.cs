@@ -178,7 +178,7 @@ namespace Presentation.Web.Access
 
         private bool EntityEqualsActiveUser(IEntity entity)
         {
-            return IsUserEntity(entity) && entity.Id == _activeUserContext.User.Id;
+            return IsUserEntity(entity) && entity.Id == _activeUserContext.UserId;
         }
     }
 }

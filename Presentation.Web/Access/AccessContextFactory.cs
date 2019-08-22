@@ -19,7 +19,7 @@ namespace Presentation.Web.Access
         public IAccessContext CreateOrganizationAccessContext()
         {
             var activeUserContext = _userContextFactory.Create(
-                userId: _authenticationContext.UserId.GetValueOrDefault(-1),
+                userId: _authenticationContext.UserId,
                 organizationId: _authenticationContext.ActiveOrganizationId.GetValueOrDefault(-1));
 
             return new OrganizationAccessContext(activeUserContext);

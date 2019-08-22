@@ -104,13 +104,13 @@ namespace Tests.Unit.Presentation.Web.Access
         }
 
         [Fact]
-        public void User_Returns_Provided_User()
+        public void UserId_Returns_Provided_Users_Id()
         {
-            var user = new User();
+            var user = new User {Id = A<int>()};
 
             var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), user, A<int>());
 
-            Assert.Same(sut.User, user);
+            Assert.Equal(sut.UserId, user.Id);
         }
 
         [Fact]
