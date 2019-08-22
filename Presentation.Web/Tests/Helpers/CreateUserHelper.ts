@@ -17,36 +17,19 @@ class CreateUserHelper {
     public updateApiOnUser(email: string, apiAccess: boolean) {
         return this.openEditUser(email)
             .then(() => {
-                if (apiAccess) {
-                    this.pageObject.hasAPiCheckBox.isSelected()
-                        .then(selected => {
-                            if (!selected) {
-                                this.pageCreateObject.boolApi.click()
-                                    .then(() => {
-                                        this.pageCreateObject.editUserButton.click();
-                                    });
-                                return;
-                            } else {
-                                this.pageCreateObject.cancelEditUserButton.click();
-                                return;
-                            }
-                        });
-                }
-                else {
-                    this.pageObject.hasAPiCheckBox.isSelected()
-                        .then(selected => {
-                            if (selected) {
-                                this.pageCreateObject.boolApi.click()
-                                    .then(() => {
-                                        this.pageCreateObject.editUserButton.click();
-                                    });
-                                return;
-                            } else {
-                                this.pageCreateObject.cancelEditUserButton.click();
-                                return;
-                            }
-                        });
-                }
+                this.pageObject.hasAPiCheckBox.isSelected()
+                    .then(selected => {
+                        if (selected !== apiAccess) {
+                            this.pageCreateObject.boolApi.click()
+                                .then(() => {
+                                    this.pageCreateObject.editUserButton.click();
+                                });
+                            return;
+                        } else {
+                            this.pageCreateObject.cancelEditUserButton.click();
+                            return;
+                        }
+                    });
             });
     }
 
