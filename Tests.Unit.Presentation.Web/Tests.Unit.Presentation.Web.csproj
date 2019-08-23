@@ -192,6 +192,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
+    <Compile Include="Authorization\LegacyAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
     <Compile Include="Context\AuthenticationContextFactoryTest.cs" />

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices
 
     public class FeatureChecker : IFeatureChecker
     {
+        private readonly IOrganizationRoleService _roleService;
         private static readonly IReadOnlyDictionary<Feature, ISet<OrganizationRole>> Features;
 
         static FeatureChecker()
@@ -51,6 +53,11 @@ namespace Core.ApplicationServices
             });
         }
 
+        public FeatureChecker(IOrganizationRoleService roleService)
+        {
+            _roleService = roleService;
+        }
+
         public bool CanExecute(User user, Feature feature)
         {
             var userRoles = CreateRoleList(user);
@@ -61,9 +68,9 @@ namespace Core.ApplicationServices
             return false;
         }
 
-        private static IEnumerable<OrganizationRole> CreateRoleList(User user)
+        private IEnumerable<OrganizationRole> CreateRoleList(User user)
         {
-            return user.GetRolesInOrg(user.DefaultOrganizationId.GetValueOrDefault());
+            return _roleService.GetRolesInOrganization(user, user.DefaultOrganizationId.GetValueOrDefault());
         }
     }
 }

@@ -158,26 +158,6 @@ namespace Core.DomainModel
                          right.OrganizationId == organizationId);
         }
 
-        public IEnumerable<OrganizationRole> GetRolesInOrg(int organizationId)
-        {
-            var roles =
-                OrganizationRights
-                    .Where(or => or.OrganizationId == organizationId)
-                    .Select(x => x.Role)
-                    .ToList();
-
-            //NOTE: Use of this property is somewhat messy. In some cases it applies the IsGlobalAdmin boolean (the right way) and in other cases it uses the "right" with the role "Global admin" which is the wrong way
-            if (IsGlobalAdmin)
-            {
-                roles.Add(OrganizationRole.GlobalAdmin);
-            }
-
-            return roles
-                .Distinct()
-                .ToList()
-                .AsReadOnly();
-        }
-
 
         #endregion
     }

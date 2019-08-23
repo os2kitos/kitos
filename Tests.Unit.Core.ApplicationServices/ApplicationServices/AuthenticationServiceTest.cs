@@ -22,6 +22,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private AuthenticationService _authenticationService;
         private IFeatureChecker _featureChecker;
+        private IOrganizationRoleService _organizationRoleService;
 
         public AuthenticationServiceTest()
         {
@@ -32,7 +33,8 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
-            _featureChecker = new FeatureChecker();
+            _organizationRoleService = Substitute.For<IOrganizationRoleService>();
+            _featureChecker = new FeatureChecker(_organizationRoleService);
             _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
@@ -162,7 +164,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private Entity SetOwner(Entity entity, User owner)
         {
-            if(entity is Organization)
+            if (entity is Organization)
                 entity.Id = owner.DefaultOrganizationId.GetValueOrDefault();
             else
                 ((IHasOrganization)entity).OrganizationId = owner.DefaultOrganizationId.GetValueOrDefault();
@@ -185,9 +187,9 @@ namespace Tests.Unit.Core.ApplicationServices
             };
         }
 
-        private static User CreateTestUser(int orgKey, bool isGlobalmin = false, OrganizationRole role = OrganizationRole.User, OrganizationCategory organizationCategory = OrganizationCategory.Other, int userId = 1)
+        private User CreateTestUser(int orgKey, bool isGlobalmin = false, OrganizationRole role = OrganizationRole.User, OrganizationCategory organizationCategory = OrganizationCategory.Other, int userId = 1)
         {
-            return new User
+            var user = new User
             {
                 Id = userId,
                 IsGlobalAdmin = isGlobalmin,
@@ -199,10 +201,18 @@ namespace Tests.Unit.Core.ApplicationServices
                     Rights = new List<OrganizationRight> { new OrganizationRight { OrganizationId = orgKey, Role = role } }
                 },
                 OrganizationRights = new List<OrganizationRight>
-                        {
-                            new OrganizationRight { OrganizationId = orgKey, Role = role }
-                        }
+                {
+                    new OrganizationRight { OrganizationId = orgKey, Role = role }
+                }
             };
+            var roleList = new List<OrganizationRole> { role };
+            if (isGlobalmin)
+            {
+                roleList.Add(OrganizationRole.GlobalAdmin);
+            }
+
+            _organizationRoleService.GetRolesInOrganization(user, Arg.Any<int>()).Returns(roleList);
+            return user;
         }
 
         private User SetAccess(bool allow, int orgKey, bool isGlobalmin = false, OrganizationRole role = OrganizationRole.User, OrganizationCategory organizationCategory = OrganizationCategory.Other)
@@ -212,6 +222,7 @@ namespace Tests.Unit.Core.ApplicationServices
             if (allow)
             {
                 var user = CreateTestUser(orgKey, isGlobalmin, role, organizationCategory);
+
                 list.Add(user);
             }
 

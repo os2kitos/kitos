@@ -9,13 +9,16 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
     {
         private readonly IUserRepository _userRepository;
         private readonly IFeatureChecker _featureChecker;
+        private readonly IOrganizationRoleService _roleService;
 
         public UserContextFactory(
             IUserRepository userRepository,
-            IFeatureChecker featureChecker)
+            IFeatureChecker featureChecker,
+            IOrganizationRoleService roleService)
         {
             _userRepository = userRepository;
             _featureChecker = featureChecker;
+            _roleService = roleService;
         }
 
         public IOrganizationalUserContext Create(int userId, int organizationId)
@@ -27,7 +30,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             }
 
             //Get roles for the organization
-            var organizationRoles = user.GetRolesInOrg(organizationId);
+            var organizationRoles = _roleService.GetRolesInOrganization(user, organizationId);
 
             var supportedFeatures =
                 Enum.GetValues(typeof(Feature))
