@@ -3,7 +3,7 @@ using System.Linq;
 using Core.ApplicationServices;
 using Core.DomainServices;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public class UserContextFactory : IUserContextFactory
     {

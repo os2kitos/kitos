@@ -2,7 +2,7 @@
 using Core.ApplicationServices;
 using Core.DomainModel;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public class LegacyAuthorizationStrategy : IControllerAuthorizationStrategy
     {

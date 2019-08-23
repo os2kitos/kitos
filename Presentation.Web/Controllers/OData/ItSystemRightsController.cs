@@ -8,6 +8,7 @@ using Core.DomainServices;
 using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.OData
 {

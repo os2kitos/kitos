@@ -13,6 +13,8 @@ using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.API
 {

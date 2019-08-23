@@ -15,6 +15,7 @@ using Presentation.Web.Properties;
 using Hangfire;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;

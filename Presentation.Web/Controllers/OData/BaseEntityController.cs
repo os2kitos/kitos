@@ -8,6 +8,8 @@ using Core.DomainModel;
 using System.Linq;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.OData
 {

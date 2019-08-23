@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public class ContextBasedAuthorizationStrategy : IControllerAuthorizationStrategy
     {

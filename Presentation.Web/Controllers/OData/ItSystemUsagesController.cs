@@ -14,6 +14,7 @@ using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.OData
 {

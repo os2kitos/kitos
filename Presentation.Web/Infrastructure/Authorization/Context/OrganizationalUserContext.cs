@@ -7,7 +7,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     /// <summary>
     /// Determines the user in a specific organizational context

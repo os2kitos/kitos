@@ -1,6 +1,6 @@
 ﻿using Core.DomainModel;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public interface IControllerAuthorizationStrategy
     {

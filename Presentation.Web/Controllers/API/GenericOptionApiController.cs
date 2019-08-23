@@ -5,6 +5,7 @@ using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {

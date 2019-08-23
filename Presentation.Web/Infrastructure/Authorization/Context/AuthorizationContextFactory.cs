@@ -1,6 +1,6 @@
 ﻿using Presentation.Web.Infrastructure.Model.Authentication;
 
-namespace Presentation.Web.Infrastructure.Authorization
+namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public class AuthorizationContextFactory : IAuthorizationContextFactory
     {

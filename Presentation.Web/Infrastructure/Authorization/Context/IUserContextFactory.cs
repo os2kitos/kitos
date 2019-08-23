@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Infrastructure.Authorization
+﻿namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public interface IUserContextFactory
     {
