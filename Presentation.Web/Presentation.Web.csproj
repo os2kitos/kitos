@@ -320,6 +320,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Infrastructure\Authorization\IAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\IControllerAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\LegacyAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\OrganizationalUserContext.cs" />
     <Compile Include="Infrastructure\Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\UserContextFactory.cs" />

@@ -19,8 +19,6 @@ namespace Presentation.Web.Controllers.API
     [Authorize]
     public abstract class BaseApiController : ApiController
     {
-        private readonly IAuthorizationContext _authorizationContext;
-
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
@@ -33,9 +31,19 @@ namespace Presentation.Web.Controllers.API
         [Inject]
         public ILogger Logger { get; set; }
 
+        //Lazy to make sure auth service is available when resolved
+        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
+
+        protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
+
         protected BaseApiController(IAuthorizationContext authorizationContext = null)
         {
-            _authorizationContext = authorizationContext;
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
+
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext)
+            );
         }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
@@ -162,8 +170,7 @@ namespace Presentation.Web.Controllers.API
             {
                 try
                 {
-                    var id = UserId;
-                    var user = UserRepository.GetByKey(id);
+                    var user = UserRepository.GetByKey(UserId);
 
                     if (user == null)
                         throw new SecurityException();
@@ -213,47 +220,27 @@ namespace Presentation.Web.Controllers.API
         }
 
         #region access control
+
         protected bool AllowOrganizationAccess(int organizationId)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowReadsWithinOrganization(organizationId);
-            }
-            var loggedIntoOrgId = AuthenticationService.GetCurrentOrganizationId(KitosUser.Id);
-            return loggedIntoOrgId == organizationId || AuthenticationService.HasReadAccessOutsideContext(UserId);
+            return AuthorizationStrategy.AllowOrganizationAccess(organizationId);
         }
 
         protected bool AllowReadAccess(IEntity entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowReads(entity);
-            }
-            return AuthenticationService.HasReadAccess(UserId, entity);
+            return AuthorizationStrategy.AllowReadAccess(entity);
         }
 
         protected bool AllowWriteAccess(IEntity entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowUpdates(entity);
-            }
-            return AuthenticationService.HasWriteAccess(UserId, entity);
+            return AuthorizationStrategy.AllowWriteAccess(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowEntityVisibilityControl(entity);
-            }
-            return AuthenticationService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
+            return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
         }
-
-        protected bool ApplyNewAccessControlScheme()
-        {
-            return _authorizationContext != null;
-        }
+       
         #endregion
     }
 }

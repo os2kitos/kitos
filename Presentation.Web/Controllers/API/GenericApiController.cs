@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                 }
 
-                if (ApplyNewAccessControlScheme())
+                if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
                 {
                     //Post processing was not a part of the old response, so let the migration control when we switch
                     paging.WithPostProcessingFilter(AllowReadAccess);

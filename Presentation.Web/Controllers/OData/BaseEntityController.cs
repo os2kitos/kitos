@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.OData
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
-        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IControllerAuthorizationStrategy _authorizationStrategy;
 
         protected BaseEntityController(
             IGenericRepository<T> repository,
@@ -22,7 +22,10 @@ namespace Presentation.Web.Controllers.OData
             IAuthorizationContext authorizationContext = null)
             : base(repository)
         {
-            _authorizationContext = authorizationContext;
+            _authorizationStrategy =
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext);
             AuthService = authService;
         }
 
@@ -53,7 +56,7 @@ namespace Presentation.Web.Controllers.OData
                 result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            if (ApplyNewAccessControlScheme())
+            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
             {
                 //Post processing was not a part of the old response, so let the migration control when we switch
                 result = result.Where(AllowReadAccess);
@@ -94,7 +97,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable(readOnly: true).Where(m => ((IHasOrganization)m).OrganizationId == key);
 
-            if (ApplyNewAccessControlScheme())
+            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
             {
                 //Post processing was not a part of the old response, so let the migration control when we switch
                 result = result.AsEnumerable().Where(AllowReadAccess).AsQueryable();
@@ -211,44 +214,22 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowOrganizationAccess(int organizationId)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowReadsWithinOrganization(organizationId);
-            }
-            var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
-            return loggedIntoOrgId == organizationId || AuthService.HasReadAccessOutsideContext(UserId);
+            return _authorizationStrategy.AllowOrganizationAccess(organizationId);
         }
 
         protected bool AllowReadAccess(T entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowReads(entity);
-            }
-            return AuthService.HasReadAccess(UserId, entity);
+            return _authorizationStrategy.AllowReadAccess(entity);
         }
 
         protected bool AllowWriteAccess(T entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowUpdates(entity);
-            }
-            return AuthService.HasWriteAccess(UserId, entity);
+            return _authorizationStrategy.AllowWriteAccess(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            if (ApplyNewAccessControlScheme())
-            {
-                return _authorizationContext.AllowEntityVisibilityControl(entity);
-            }
-            return AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
-        }
-
-        private bool ApplyNewAccessControlScheme()
-        {
-            return _authorizationContext != null;
+            return _authorizationStrategy.AllowEntityVisibilityControl(entity);
         }
     }
 }
