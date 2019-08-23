@@ -29,11 +29,6 @@ exports.config = {
             }));
 
         jasmine.getEnv().addReporter(new reporters.TeamCityReporter());
-
-        var HtmlReporter = require("protractor-beautiful-reporter");
-        jasmine.getEnv().addReporter(new HtmlReporter({
-            baseDirectory: "tmp/screenshots"
-        }).getJasmine2Reporter());
     },
 
     jasmineNodeOpts: {
