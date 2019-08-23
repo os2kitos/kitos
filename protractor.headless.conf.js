@@ -26,8 +26,9 @@ exports.config = {
                 verbosity: 3,
                 color: true,
                 showStack: true
-            }))
-            .addReporter(new reporters.TeamCityReporter());
+            }));
+
+        jasmine.getEnv().addReporter(new reporters.TeamCityReporter());
 
         var HtmlReporter = require("protractor-beautiful-reporter");
         jasmine.getEnv().addReporter(new HtmlReporter({
