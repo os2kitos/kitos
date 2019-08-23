@@ -11,7 +11,13 @@ namespace Presentation.Web.Helpers
         {
             foreach (var apiDescription in apiExplorer.ApiDescriptions)
             {
-                if(!apiDescription.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<InternalApiAttribute>().Any() && !apiDescription.ActionDescriptor.GetCustomAttributes<InternalApiAttribute>().Any()) continue;
+                var controllerIsInternal = apiDescription.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<InternalApiAttribute>().Any();
+                var actionIsInternal = apiDescription.ActionDescriptor.GetCustomAttributes<InternalApiAttribute>().Any();
+
+                if (!controllerIsInternal && !actionIsInternal)
+                {
+                    continue;
+                }
                 var route = "/" + apiDescription.RelativePath.TrimEnd('/');
                 swaggerDoc.paths.Remove(route);
             }
