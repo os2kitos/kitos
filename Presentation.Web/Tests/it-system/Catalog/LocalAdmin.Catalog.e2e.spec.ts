@@ -40,6 +40,7 @@ describe("LocalAdmin user tests", () => {
 
         console.log("Verify that catalog is deleted");
         loadPage();
+        waitForKendoGrid();
         expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
     });
 
