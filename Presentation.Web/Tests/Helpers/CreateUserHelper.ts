@@ -10,24 +10,22 @@ class CreateUserHelper {
         return this.openEditUser(email)
             .then(() => {
                 var expectedValue = apiStatus ? "true" : null;
-                expect(this.pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(expectedValue);
+                return expect(this.pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(expectedValue);
             });
     }
 
     public updateApiOnUser(email: string, apiAccess: boolean) {
         return this.openEditUser(email)
             .then(() => {
-                this.pageObject.hasAPiCheckBox.isSelected()
+                return this.pageObject.hasAPiCheckBox.isSelected()
                     .then(selected => {
                         if (selected !== apiAccess) {
-                            this.pageCreateObject.boolApi.click()
+                            return this.pageCreateObject.boolApi.click()
                                 .then(() => {
-                                    this.pageCreateObject.editUserButton.click();
+                                   return this.pageCreateObject.editUserButton.click();
                                 });
-                            return;
                         } else {
-                            this.pageCreateObject.cancelEditUserButton.click();
-                            return;
+                            return this.pageCreateObject.cancelEditUserButton.click();
                         }
                     });
             });

@@ -58,23 +58,23 @@ class Login {
 
         return homePage.getPage()
             .then(() => {
-                browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
+                return browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
             })
             .then(() => {
-                homePage.emailField.sendKeys(credentials.username);
+                return homePage.emailField.sendKeys(credentials.username);
             })
             .then(() => {
-                homePage.pwdField.sendKeys(credentials.password);
+                return homePage.pwdField.sendKeys(credentials.password);
             })
             .then(() => {
-                homePage.loginButton.click();
+                return homePage.loginButton.click();
             })
             .then(() => {
-                browser.waitForAngular();
+                return browser.waitForAngular();
             })
             .then(() => {
                 //Await login completed before completing command
-                browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
+                return browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
             });
     }
 

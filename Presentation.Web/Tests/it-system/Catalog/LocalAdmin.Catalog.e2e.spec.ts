@@ -10,38 +10,54 @@ describe("LocalAdmin user tests", () => {
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsLocalAdmin();
     });
 
     afterAll(() => {
         testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
     });
 
     it("Can create catalog and delete it again", () => {
         const catalogName = "catalog" + new Date().getTime();
 
-        console.log("Loading page");
-        loadPage();
-        waitForKendoGrid();
-
-        console.log("Making sure " + catalogName + " does not exist");
-        expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
-
-        console.log("Creating catalog");
-        CatalogHelper.createCatalog(catalogName);
-
-        console.log("Loading page after catalog creation");
-        loadPage();
-        waitForKendoGrid();
-        expect(findCatalogColumnsFor(catalogName).first().getText()).toEqual(catalogName);
-
-        console.log("Deleting catalog");
-        CatalogHelper.deleteCatalog(catalogName);
-
-        console.log("Verify that catalog is deleted");
-        loadPage();
-        waitForKendoGrid();
-        expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+        loadPage()
+            .then(() => {
+                return  waitForKendoGrid();
+            })
+            .then(() => {
+                console.log("Making sure " + catalogName + " does not exist");
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            })
+            .then(() => {
+                console.log("Creating catalog");
+                return CatalogHelper.createCatalog(catalogName);
+            })
+            .then(() => {
+                console.log("Loading page after catalog creation");
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                return expect(findCatalogColumnsFor(catalogName).first().getText()).toEqual(catalogName);
+            })
+            .then(() => {
+                console.log("Deleting catalog");
+                return CatalogHelper.deleteCatalog(catalogName);
+            })
+            .then(() => {
+                console.log("Verify that catalog is deleted");
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            });
     });
 
     function waitForKendoGrid() {
@@ -49,7 +65,8 @@ describe("LocalAdmin user tests", () => {
     }
 
     function loadPage() {
-        pageObject.getPage();
+        console.log("Loading catalog page");
+        return pageObject.getPage();
     }
 });
 

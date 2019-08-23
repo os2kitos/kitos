@@ -2,12 +2,11 @@
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
-var pageObject = new LoginPage();
-var navigationBarHelper = pageObject.navigationBarHelper;
-var testFixture = new TestFixtureWrapper();
-var loginHelper = new Login();
-
 describe("Being logged out, it is possible to login ", () => { 
+    var pageObject = new LoginPage();
+    var navigationBarHelper = pageObject.navigationBarHelper;
+    var testFixture = new TestFixtureWrapper();
+    var loginHelper = new Login();
 
     beforeEach(() => {
         testFixture.disableAutoBrowserWaits();

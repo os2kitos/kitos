@@ -39,23 +39,23 @@ describe("Only Global Admins can create user with API access",
 
             return loginHelper.loginAsGlobalAdmin()
                 .then(() => {
-                    pageObject.getPage();
+                    return pageObject.getPage();
                 })
                 .then(() => {
-                    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                    return browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
                 })
                 .then(() => {
                     console.log("Updating API status to " + value);
-                    userHelper.updateApiOnUser(credentials.username, value);
+                    return userHelper.updateApiOnUser(credentials.username, value);
                 }).then(() => {
-                    browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi),
-                        waitUpTo.twentySeconds);
+                    return browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
                 })
                 .then(() => {
-                    expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
-
+                    return expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
+                })
+                .then(() => {
                     console.log("Checking that status is updated");
-                    userHelper.checkApiRoleStatusOnUser(credentials.username, value);
+                    return userHelper.checkApiRoleStatusOnUser(credentials.username, value);
                 });
         }
 
