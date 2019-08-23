@@ -53,7 +53,11 @@ namespace Presentation.Web.Controllers.OData
                 result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            result = result.Where(AllowReadAccess);
+            if (ApplyNewAccessControlScheme())
+            {
+                //Post processing was not a part of the old response, so let the migration control when we switch
+                result = result.Where(AllowReadAccess);
+            }
 
             return Ok(result.AsQueryable());
         }
@@ -90,7 +94,11 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable(readOnly: true).Where(m => ((IHasOrganization)m).OrganizationId == key);
 
-            result = result.ToEnumerable().Where(AllowReadAccess).AsQueryable();
+            if (ApplyNewAccessControlScheme())
+            {
+                //Post processing was not a part of the old response, so let the migration control when we switch
+                result = result.AsEnumerable().Where(AllowReadAccess).AsQueryable();
+            }
 
             return Ok(result);
         }

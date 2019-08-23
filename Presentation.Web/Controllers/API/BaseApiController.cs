@@ -250,7 +250,7 @@ namespace Presentation.Web.Controllers.API
             return AuthenticationService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic);
         }
 
-        private bool ApplyNewAccessControlScheme()
+        protected bool ApplyNewAccessControlScheme()
         {
             return _authorizationContext != null;
         }

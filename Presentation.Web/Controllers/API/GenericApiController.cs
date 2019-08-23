@@ -62,7 +62,11 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                 }
 
-                paging.WithPostProcessingFilter(AllowReadAccess);
+                if (ApplyNewAccessControlScheme())
+                {
+                    //Post processing was not a part of the old response, so let the migration control when we switch
+                    paging.WithPostProcessingFilter(AllowReadAccess);
+                }
 
                 var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);
