@@ -9,6 +9,8 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -17,14 +19,17 @@ namespace Presentation.Web.Controllers.API
     {
         protected readonly IGenericRepository<TModel> Repository;
 
-        protected GenericApiController(IGenericRepository<TModel> repository)
+        protected GenericApiController(
+            IGenericRepository<TModel> repository, 
+            IAuthorizationContext authorizationContext = null)
+        :base(authorizationContext)
         {
             Repository = repository;
         }
 
         protected virtual IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable();
+            return Repository.AsQueryable(readOnly:true);
         }
 
         /// <summary>
@@ -58,6 +63,12 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
                 }
 
+                if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
+                {
+                    //Post processing was not a part of the old response, so let the migration control when we switch
+                    paging.WithPostProcessingFilter(AllowReadAccess);
+                }
+
                 var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);
                 return Ok(dtos);
@@ -80,7 +91,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if(!AllowReadAccess(item))
                 {
                     return Forbidden();
                 }
@@ -112,7 +123,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                return Ok(HasWriteAccess(id, organizationId));
+                var entity = Repository.GetByKey(id);
+                var allowWriteAccess = AllowWriteAccess(entity);
+
+                return Ok(allowWriteAccess);
             }
             catch (Exception e)
             {
@@ -141,7 +155,7 @@ namespace Presentation.Web.Controllers.API
                 item.LastChangedByUser = KitosUser;
 
                 // Check write access rights  
-                if (!HasWriteAccess(item, organizationId: 0))
+                if (!AllowWriteAccess(item))
                 {
                     return Forbidden();
                 }
@@ -213,7 +227,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!HasWriteAccess(item, organizationId))
+                if (!AllowWriteAccess(item))
                 {
                     return Forbidden();
                 }
@@ -334,7 +348,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(item, organizationId))
+                if (!AllowWriteAccess(item))
                 {
                     return Forbidden();
                 }
@@ -384,30 +398,6 @@ namespace Presentation.Web.Controllers.API
         /// <summary>
         /// Checks if the current authenticated user has write access to a given object.
         /// </summary>
-        /// <param name="objId">The id of object</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True if user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId, int organizationId)
-        {
-            return HasWriteAccess(objId, KitosUser, organizationId);
-        }
-
-        /// <summary>
-        /// Checks if a given user has write access to a given object.
-        /// </summary>
-        /// <param name="objId">The id of object</param>
-        /// <param name="user">The user</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId, User user, int organizationId)
-        {
-            var obj = Repository.GetByKey(objId);
-            return HasWriteAccess(obj, user, organizationId);
-        }
-
-        /// <summary>
-        /// Checks if the current authenticated user has write access to a given object.
-        /// </summary>
         /// <param name="obj">The object</param>
         /// <param name="organizationId"></param>
         /// <returns>True iff user has write access to obj</returns>
@@ -445,6 +435,5 @@ namespace Presentation.Web.Controllers.API
         }
 
         #endregion
-
     }
 }

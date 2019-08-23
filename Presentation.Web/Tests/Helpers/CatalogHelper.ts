@@ -22,12 +22,20 @@ class CatalogHelper {
 
     public static deleteCatalog(name: string) {
         pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name).first().click();
+        this.waitForKendoGrid();
+        this.findCatalogColumnsFor(name).first().click();
         browser.wait(systemPage.isDeleteButtonLoaded(), waitUpTo.twentySeconds);
         systemPage.getDeleteButton().click().then(() => {
             browser.switchTo().alert().accept();
         });
+    }
+
+    public static findCatalogColumnsFor(name: string) {
+        return pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+    }
+
+    public static waitForKendoGrid() {
+        return browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
     }
 }
 

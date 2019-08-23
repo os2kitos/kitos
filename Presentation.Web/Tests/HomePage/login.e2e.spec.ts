@@ -1,15 +1,11 @@
 ﻿import Login = require("../Helpers/LoginHelper");
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
-import WaitTimers = require("../Utility/waitTimers");
 
 var pageObject = new LoginPage();
 var navigationBarHelper = pageObject.navigationBarHelper;
-var navigationBar = pageObject.navigationBar;
 var testFixture = new TestFixtureWrapper();
 var loginHelper = new Login();
-var waitUpTo = new WaitTimers();
-var ec = protractor.ExpectedConditions;
 
 describe("Being logged out, it is possible to login ", () => { 
 
@@ -24,7 +20,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As global admin", () => {
         loginHelper.loginAsGlobalAdmin();
-        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
         expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeTruthy();
@@ -33,7 +28,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As local admin", () => {
         loginHelper.loginAsLocalAdmin();
-        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
         expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeFalsy();
@@ -42,7 +36,6 @@ describe("Being logged out, it is possible to login ", () => {
 
     it("As regular user", () => {
         loginHelper.loginAsRegularUser();
-        browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
         navigationBarHelper.dropDownExpand();
         expect(navigationBarHelper.isMyProfileDisplayed()).toBeTruthy();
         expect(navigationBarHelper.isGlobalAdminDisplayed()).toBeFalsy();

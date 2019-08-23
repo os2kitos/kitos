@@ -1,20 +1,16 @@
 ﻿import Login = require("../../Helpers/LoginHelper");
 import CatalogHelper = require("../../Helpers/CatalogHelper");
 import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po")
-import Constants = require("../../Utility/Constants");
-import WaitTimers = require("../../Utility/WaitTimers");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 
 describe("LocalAdmin user tests", () => {
     var loginHelper = new Login();
     var pageObject = new ItSystemEditPo();
-    var consts = new Constants();
-    var waitUpTo = new WaitTimers();
     var testFixture = new TestFixtureWrapper();
+    var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
 
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
-        browser.waitForAngular();
     });
 
     afterAll(() => {
@@ -22,24 +18,39 @@ describe("LocalAdmin user tests", () => {
     });
 
     it("Can create catalog and delete it again", () => {
-        pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects()
-            .catalogName,
-            consts.defaultCatalog)).toBeEmptyArray();
-        CatalogHelper.createCatalog(consts.defaultCatalog);
-        pageObject.getPage();
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects()
-            .catalogName,
-            consts.defaultCatalog).first().getText()).toEqual(consts.defaultCatalog);
-        CatalogHelper.deleteCatalog(consts.defaultCatalog);
-        pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects()
-            .catalogName,
-            consts.defaultCatalog)).toBeEmptyArray();
+        const catalogName = "catalog" + new Date().getTime();
+
+        console.log("Loading page");
+        loadPage();
+        waitForKendoGrid();
+
+        console.log("Making sure " + catalogName + " does not exist");
+        expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+
+        console.log("Creating catalog");
+        CatalogHelper.createCatalog(catalogName);
+
+        console.log("Loading page after catalog creation");
+        loadPage();
+        waitForKendoGrid();
+        expect(findCatalogColumnsFor(catalogName).first().getText()).toEqual(catalogName);
+
+        console.log("Deleting catalog");
+        CatalogHelper.deleteCatalog(catalogName);
+
+        console.log("Verify that catalog is deleted");
+        loadPage();
+        waitForKendoGrid();
+        expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
     });
 
+    function waitForKendoGrid() {
+        return CatalogHelper.waitForKendoGrid();
+    }
+
+    function loadPage() {
+        pageObject.getPage();
+    }
 });
 
 

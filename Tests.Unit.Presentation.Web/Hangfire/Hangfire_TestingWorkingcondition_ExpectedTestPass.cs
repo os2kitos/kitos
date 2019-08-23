@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Hangfire;
 using NSubstitute;
-using System.Web.Mvc;
-using Hangfire.Common;
-using Hangfire.States;
-using Hangfire.Logging;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Hangfire

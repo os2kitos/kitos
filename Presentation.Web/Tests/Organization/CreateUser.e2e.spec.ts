@@ -18,33 +18,54 @@ describe("Only Global Admins can create user with API access",
             testFixture.cleanupState();
         });
 
+        it("Global Admin can enable api access on new user", () => {
+            loginHelper.loginAsGlobalAdmin();
+            pageObject.getPage();
+            browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+            pageObject.createUserButton.click();
+            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
+        });
 
-        it("Global Admin can enable api access on new user",
-            () => {
-                loginHelper.loginAsGlobalAdmin();
-                pageObject.getPage();
-                browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-                pageObject.createUserButton.click();
-                expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
-            });
+        it("Local Admin cannot enable api access on new user", () => {
+            loginHelper.loginAsLocalAdmin();
+            pageObject.getPage();
+            browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+            pageObject.createUserButton.click();
+            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
+        });
 
-        it("Local Admin cannot enable api access on new user",
-            () => {
-                loginHelper.loginAsLocalAdmin();
-                pageObject.getPage();
-                browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-                pageObject.createUserButton.click();
-                expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
-            });
+        function canSetApiAccessTo(value: boolean) {
+            const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
 
+            return loginHelper.loginAsGlobalAdmin()
+                .then(() => {
+                    pageObject.getPage();
+                })
+                .then(() => {
+                    browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    console.log("Updating API status to " + value);
+                    userHelper.updateApiOnUser(credentials.username, value);
+                }).then(() => {
+                    browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi),
+                        waitUpTo.twentySeconds);
+                })
+                .then(() => {
+                    expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
 
-        it("Global admin is able to edit api access on existing user", () => {
-            userHelper.updateApiOnUser("local-regular-user@kitos.dk", true);
-                browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
-                expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
-                userHelper.checkApiRoleStatusOnUser("local-regular-user@kitos.dk",true);
+                    console.log("Checking that status is updated");
+                    userHelper.checkApiRoleStatusOnUser(credentials.username, value);
+                });
+        }
 
-            });
+        it("Global admin is able to set api access to TRUE on existing user", () => {
+            canSetApiAccessTo(true);
+        });
+
+        it("Global admin is able to set api access to FALSE on existing user", () => {
+            canSetApiAccessTo(false);
+        });
     });
 
 

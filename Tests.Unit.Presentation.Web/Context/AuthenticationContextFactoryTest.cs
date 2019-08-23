@@ -14,11 +14,7 @@ namespace Tests.Unit.Presentation.Web.Context
 {
     public class AuthenticationContextFactoryTest
     {
-        private string _tokenAuth = "JWT";
-        private string _formsAuth = "Forms";
-        public AuthenticationContextFactoryTest()
-        {
-        }
+        private const string TokenAuth = "JWT";
 
         [Fact]
         public void Unauthenticated_User_Should_Return_AuthenticationContext_With_Anonymous_AuthenticationMethod()
@@ -55,7 +51,7 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Invalid_Organization_Claim_Value_Returns_Null()
         {
             //Arrange
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: _tokenAuth, defaultOrg: "invalid", userId: "1", isAuthenticated: "true"), MakeMockUserRepository(false));
+            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: TokenAuth, defaultOrg: "invalid", userId: "1", isAuthenticated: "true"), MakeMockUserRepository(false));
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -70,7 +66,7 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Invalid_UserId_Returns_Null()
         {
             //Arrange
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: _tokenAuth, defaultOrg: "1", userId: "invalid", isAuthenticated: "true"), MakeMockUserRepository(false));
+            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: "invalid", isAuthenticated: "true"), MakeMockUserRepository(false));
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -87,7 +83,7 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Authenticated_User_Can_Have_Api_Access(int userId, bool apiAccess)
         {
             //Arrange
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: _tokenAuth, defaultOrg: "1", userId: userId.ToString(), isAuthenticated: "true"), MakeMockUserRepository(apiAccess));
+            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: userId.ToString(), isAuthenticated: "true"), MakeMockUserRepository(apiAccess));
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -110,7 +106,7 @@ namespace Tests.Unit.Presentation.Web.Context
             Assert.Equal(false, authContext.HasApiAccess);
         }
 
-        private IUserRepository MakeMockUserRepository(bool apiAccess)
+        private static IUserRepository MakeMockUserRepository(bool apiAccess)
         {
             var user = new Mock<User>();
             user.Object.HasApiAccess = apiAccess;

@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainServices
@@ -24,5 +25,7 @@ namespace Core.DomainServices
 
         OrganizationRight MakeReportModuleAdmin(User user, Organization organization, User kitosUser);
         void RemoveReportModuleAdmin(User user, Organization organization);
+
+        IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId);
     }
 }
