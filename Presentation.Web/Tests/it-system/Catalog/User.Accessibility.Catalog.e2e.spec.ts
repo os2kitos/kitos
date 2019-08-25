@@ -1,15 +1,11 @@
 ﻿import Login = require("../../Helpers/LoginHelper");
 import CatalogHelper = require("../../Helpers/CatalogHelper");
 import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po")
-import Constants = require("../../Utility/Constants");
-import WaitTimers = require("../../Utility/WaitTimers");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 
 describe("ITSystem Catalog accessibility tests", () => {
     var loginHelper = new Login();
     var pageObject = new ItSystemEditPo();
-    var consts = new Constants();
-    var waitUpTo = new WaitTimers();
     var testFixture = new TestFixtureWrapper();
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
 
@@ -30,20 +26,26 @@ describe("ITSystem Catalog accessibility tests", () => {
     it("Local Admin cannot create items in It-system catalog", () => {
         loginHelper.loginAsLocalAdmin()
             .then(() => {
-                return CatalogHelper.isCreateButtonVisible(false);
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                return expectCreateButtonVisibility(false);
             });
     });
 
     it("Regular user cannot create items in IT-system catalog", () => {
         loginHelper.loginAsRegularUser()
             .then(() => {
-                return pageObject.getPage();
+                return loadPage();
             })
             .then(() => {
-                return browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);;
+                return waitForKendoGrid();
             })
             .then(() => {
-                return CatalogHelper.isCreateButtonVisible(false);;
+                return expectCreateButtonVisibility(false);
             });
     });
 
@@ -55,6 +57,9 @@ describe("ITSystem Catalog accessibility tests", () => {
             })
             .then(() => {
                 return waitForKendoGrid();
+            })
+            .then(() => {
+                return expectCreateButtonVisibility(true);
             })
             .then(() => {
                 console.log("Making sure " + catalogName + " does not exist");
@@ -89,6 +94,10 @@ describe("ITSystem Catalog accessibility tests", () => {
                 return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
             });
     });
+
+    function expectCreateButtonVisibility(expectedEnabledState: boolean) {
+        return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
+    }
 
     function waitForKendoGrid() {
         return CatalogHelper.waitForKendoGrid();

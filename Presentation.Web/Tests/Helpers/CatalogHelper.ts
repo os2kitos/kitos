@@ -11,15 +11,6 @@ var systemPage = new SystemPage();
 var waitUpTo = new WaitTimers();
 
 class CatalogHelper {
-
-
-    public static isCreateButtonVisible(expectedEnabledState: boolean) {
-        return pageObject.getPage()
-            .then(() => {
-                return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
-            });
-    }
-
     public static createCatalog(name: string) {
         return pageObject.getPage()
             .then(() => {

@@ -14,7 +14,17 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return false;
         }
 
+        public bool AllowCreate<T>()
+        {
+            return false;
+        }
+
         public bool AllowUpdates(IEntity entity)
+        {
+            return false;
+        }
+
+        public bool AllowDelete(IEntity entity)
         {
             return false;
         }

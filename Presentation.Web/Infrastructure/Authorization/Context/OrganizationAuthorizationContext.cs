@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Context
@@ -26,7 +27,6 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             }
             else if (IsUserInMunicipality())
             {
-                //TODO: Ask question: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
                 result = true;
             }
 
@@ -58,6 +58,22 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             }
 
             return result;
+        }
+
+        public bool AllowCreate<T>()
+        {
+            if (IsReadOnly())
+            {
+                return false;
+            }
+
+            if (MatchType<T,ItSystem>())
+            {
+                return IsGlobalAdmin();
+            }
+
+            //NOTE: Once we migrate more types, this will be extended
+            return true;
         }
 
         public bool AllowUpdates(IEntity entity)
@@ -93,6 +109,22 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
+        }
+
+        public bool AllowDelete(IEntity entity)
+        {
+            if (AllowUpdates(entity))
+            {
+                switch (entity)
+                {
+                    case ItSystem _:
+                        return IsGlobalAdmin();
+                    default:
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         public bool AllowEntityVisibilityControl(IEntity entity)
@@ -179,6 +211,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         private bool EntityEqualsActiveUser(IEntity entity)
         {
             return IsUserEntity(entity) && entity.Id == _activeUserContext.UserId;
+        }
+
+        private static bool MatchType<TLeft, TRight>()
+        {
+            return typeof(TLeft) == typeof(TRight);
         }
     }
 }
