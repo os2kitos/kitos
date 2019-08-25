@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization;
@@ -187,17 +190,180 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true,false, true)]
-        [InlineData(true,true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
         [InlineData(false, false, false)]
         public void Allow_Create_ItSystem_Returns(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<ItSystem>(isGlobalAdmin, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_ItContract_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<ItContract>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_ItSystemUsage_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<ItSystemUsage>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_ItProject_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<ItProject>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_ItInterface_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<ItInterface>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_Organization_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<Organization>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        public void Allow_Create_User_Returns(bool isReadOnly, bool expectedResult)
+        {
+            Allow_Create_Returns<User>(false, isReadOnly, expectedResult);
+        }
+
+        [Theory]
+        //Checks not bound to context condition
+        [InlineData(true, false, false, false, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, false, false, true)]
+        [InlineData(false, false, true, false, false, false, false, false, true)]
+
+        //Same organization - positive matches
+        [InlineData(false, false, false, true, true, false, false, false, true)]
+        [InlineData(false, false, false, true, false, true, false, false, true)]
+        [InlineData(false, false, false, true, false, false, false, true, true)]
+
+        //Same organization - negative matches
+        [InlineData(false, false, false, true, false, false, false, false, false)]
+        [InlineData(false, false, false, true, false, false, true, true, false)]
+
+        //Different organization for context bound object
+        [InlineData(false, false, false, false, true, false, false, false, false)]
+        public void AllowDelete_For_Context_Dependent_Object_Returns(
+           bool isGlobalAdmin,
+           bool inputIsActiveUser,
+           bool hasAssignedWriteAccess,
+           bool isInSameOrganization,
+           bool isLocalAdmin,
+           bool hasModuleLevelAccess,
+           bool inputIsAUser,
+           bool hasOwnership,
+           bool expectedResult)
+        {
+            //Arrange
+            var userId = A<int>();
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? userId : A<int>()) : CreateItProject(AccessModifier.Public);
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserIdReturns(userId);
+            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
+            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
+            ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
+            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
+
+            //Act
+            var allowUpdates = _sut.AllowDelete(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, true)]
+        [InlineData(false, false, true, false, false, true)]
+        [InlineData(false, false, false, true, false, true)]
+        [InlineData(false, false, false, false, true, true)]
+        [InlineData(false, false, false, false, false, false)]
+        public void AllowDelete_For_Context_Independent_Object_Returns(
+           bool isGlobalAdmin,
+           bool inputIsActiveUser,
+           bool hasAssignedWriteAccess,
+           bool hasModuleLevelAccess,
+           bool hasOwnership,
+           bool expectedResult)
+        {
+            //Arrange
+            var userId = A<int>();
+            var inputEntity = inputIsActiveUser ? CreateUserEntity(userId) : Mock.Of<IEntity>();
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectGetUserIdReturns(userId);
+            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
+            ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
+            ExpectHasOwnershipReturns(inputEntity, hasOwnership);
+
+            //Act
+            var allowUpdates = _sut.AllowDelete(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(false, true, false, false, true)]
+        [InlineData(false, false, true, true, true)]
+        [InlineData(true, true, false, false, false)]
+        [InlineData(true, false, true, true, false)]
+        [InlineData(false, false, false, true, false)]
+        [InlineData(false, false, true, false, false)]
+        public void AllowDelete_For_ItSystem_Object_Returns(
+           bool isReadOnly,
+           bool isGlobalAdmin,
+           bool isInSameOrganization,
+           bool isLocalAdmin,
+           bool expectedResult)
+        {
+            //Arrange
+            var userId = A<int>();
+            var inputEntity = CreateTestItSystem(AccessModifier.Public);
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
+            ExpectGetUserIdReturns(userId);
+            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
+
+            //Act
+            var allowUpdates = _sut.AllowDelete(inputEntity);
+
+            //Assert
+            Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
             //Arrange
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
 
             //Act
-            var result = _sut.AllowCreate<ItSystem>();
+            var result = _sut.AllowCreate<T>();
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -226,6 +392,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private static ItSystem CreateTestItSystem(AccessModifier accessModifier)
         {
             return new ItSystem { AccessModifier = accessModifier };
+        }
+
+        private static ItProject CreateItProject(AccessModifier accessModifier)
+        {
+            return new ItProject { AccessModifier = accessModifier };
         }
 
         private void ExpectIsActiveInSameOrganizationAsReturns(IContextAware entity, bool value)

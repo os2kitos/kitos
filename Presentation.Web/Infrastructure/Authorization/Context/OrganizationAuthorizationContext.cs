@@ -67,7 +67,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 return false;
             }
 
-            if (MatchType<T,ItSystem>())
+            if (MatchType<T, ItSystem>())
             {
                 return IsGlobalAdmin();
             }
@@ -113,18 +113,23 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
         public bool AllowDelete(IEntity entity)
         {
+            var result = false;
             if (AllowUpdates(entity))
             {
                 switch (entity)
                 {
                     case ItSystem _:
-                        return IsGlobalAdmin();
+                        result =
+                            IsGlobalAdmin() ||
+                            (IsLocalAdmin() && ActiveContextIsEntityContext(entity));
+                        break;
                     default:
-                        return true;
+                        result = true;
+                        break;
                 }
             }
 
-            return false;
+            return result;
         }
 
         public bool AllowEntityVisibilityControl(IEntity entity)
