@@ -15,11 +15,9 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsLocalAdmin();
     });
 
     afterAll(() => {
-        testFixture.cleanupState();
         testFixture.disableLongRunningTest();
     });
 
@@ -96,6 +94,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     });
 
     function expectCreateButtonVisibility(expectedEnabledState: boolean) {
+        console.log("expecting createCataog visibility to be:" + expectedEnabledState);
         return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
     }
 

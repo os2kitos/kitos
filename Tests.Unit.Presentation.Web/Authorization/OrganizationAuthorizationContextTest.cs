@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Moq;
@@ -183,6 +184,23 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(true,false, true)]
+        [InlineData(true,true, false)]
+        [InlineData(false, false, false)]
+        public void Allow_Create_ItSystem_Returns(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
+        {
+            //Arrange
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
+
+            //Act
+            var result = _sut.AllowCreate<ItSystem>();
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
 
         private void ExpectCanChangeVisibilityOfReturns(bool isAllowedToChangeVisibility, IEntity inputEntity)
