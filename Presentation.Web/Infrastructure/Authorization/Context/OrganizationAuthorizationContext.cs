@@ -1,0 +1,184 @@
+﻿using Core.DomainModel;
+using Core.DomainModel.Organization;
+
+namespace Presentation.Web.Infrastructure.Authorization.Context
+{
+    public class OrganizationAuthorizationContext : IAuthorizationContext
+    {
+        private readonly IOrganizationalUserContext _activeUserContext;
+
+        public OrganizationAuthorizationContext(IOrganizationalUserContext activeUserContext)
+        {
+            _activeUserContext = activeUserContext;
+        }
+
+        public bool AllowReadsWithinOrganization(int organizationId)
+        {
+            var result = false;
+
+            if (IsGlobalAdmin())
+            {
+                result = true;
+            }
+            else if (TargetOrganizationMatchesActiveOrganization(organizationId))
+            {
+                result = true;
+            }
+            else if (IsUserInMunicipality())
+            {
+                //TODO: Ask question: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
+                result = true;
+            }
+
+            return result;
+        }
+
+        public bool AllowReads(IEntity entity)
+        {
+            var result = false;
+
+            if (IsGlobalAdmin())
+            {
+                result = true;
+            }
+            else if (EntityEqualsActiveUser(entity))
+            {
+                result = true;
+            }
+            else if (IsContextBound(entity))
+            {
+                if (ActiveContextIsEntityContext(entity))
+                {
+                    result = true;
+                }
+                else if (IsUserInMunicipality() && EntityIsNotRestrictedToLocalAccess(entity))
+                {
+                    result = true;
+                }
+            }
+
+            return result;
+        }
+
+        public bool AllowUpdates(IEntity entity)
+        {
+            var result = false;
+
+            var ignoreReadOnlyRole = false;
+
+            if (IsGlobalAdmin())
+            {
+                result = true;
+            }
+            else if (EntityEqualsActiveUser(entity))
+            {
+                ignoreReadOnlyRole = true;
+                result = true;
+            }
+            else if (HasAssignedWriteAccess(entity))
+            {
+                result = true;
+            }
+            else if (IsContextBound(entity))
+            {
+                if (ActiveContextIsEntityContext(entity))
+                {
+                    result = IsLocalAdmin() || AllowWritesToEntity(entity);
+                }
+            }
+            else
+            {
+                result = AllowWritesToEntity(entity);
+            }
+
+            //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
+            return result && (ignoreReadOnlyRole || IsReadOnly() == false);
+        }
+
+        public bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            return AllowUpdates(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
+        }
+
+        private bool AllowWritesToEntity(IEntity entity)
+        {
+            var result = false;
+
+            if (HasModuleLevelWriteAccess(entity))
+            {
+                result = true;
+            }
+            else if (IsUserEntity(entity) == false && HasOwnership(entity))
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        private bool HasModuleLevelWriteAccess(IEntity entity)
+        {
+            return _activeUserContext.HasModuleLevelAccessTo(entity);
+        }
+
+        private static bool IsUserEntity(IEntity entity)
+        {
+            return entity is User;
+        }
+
+        private static bool EntityIsNotRestrictedToLocalAccess(IEntity entity)
+        {
+            return (entity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
+        }
+
+        private bool IsUserInMunicipality()
+        {
+            return _activeUserContext.IsActiveInOrganizationOfType(OrganizationCategory.Municipality);
+        }
+
+        private bool TargetOrganizationMatchesActiveOrganization(int targetOrganizationId)
+        {
+            return _activeUserContext.IsActiveInOrganization(targetOrganizationId);
+        }
+
+        private bool HasAssignedWriteAccess(IEntity entity)
+        {
+            return _activeUserContext.HasAssignedWriteAccess(entity);
+        }
+
+        private static bool IsContextBound(IEntity entity)
+        {
+            return entity is IContextAware;
+        }
+
+        private bool ActiveContextIsEntityContext(IEntity entity)
+        {
+            return _activeUserContext.IsActiveInSameOrganizationAs((IContextAware)entity);
+        }
+
+        private bool HasOwnership(IEntity ownedEntity)
+        {
+            return _activeUserContext.HasOwnership(ownedEntity);
+        }
+
+        private bool IsGlobalAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.GlobalAdmin);
+        }
+
+        private bool IsReadOnly()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.ReadOnly);
+        }
+
+        private bool IsLocalAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.LocalAdmin);
+        }
+
+        private bool EntityEqualsActiveUser(IEntity entity)
+        {
+            return IsUserEntity(entity) && entity.Id == _activeUserContext.UserId;
+        }
+    }
+}

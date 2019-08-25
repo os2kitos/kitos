@@ -7,16 +7,27 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Ninject.Infrastructure.Language;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
+    public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        protected IAuthenticationService AuthService { get; }
+        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
+        private readonly IControllerAuthorizationStrategy _authorizationStrategy;
 
-        protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
+        protected BaseEntityController(
+            IGenericRepository<T> repository,
+            IAuthenticationService authService,
+            IAuthorizationContext authorizationContext = null)
             : base(repository)
         {
+            _authorizationStrategy =
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext);
             AuthService = authService;
         }
 
@@ -26,7 +37,7 @@ namespace Presentation.Web.Controllers.OData
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
 
-            var result = Repository.AsQueryable();
+            var result = Repository.AsQueryable(readOnly: true).ToEnumerable();
 
             if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
@@ -34,34 +45,40 @@ namespace Presentation.Web.Controllers.OData
                 {
                     if (hasOrg)
                     {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
                     }
                     else
                     {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
+                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
                     }
                 }
             }
             else
             {
-                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
             }
 
-            return Ok(result);
+            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
+            {
+                //Post processing was not a part of the old response, so let the migration control when we switch
+                result = result.Where(AllowReadAccess);
+            }
+
+            return Ok(result.AsQueryable());
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
         public override IHttpActionResult Get(int key)
         {
-            var result = Repository.AsQueryable().Where(p => p.Id == key);
+            var result = Repository.AsQueryable(readOnly: true).Where(p => p.Id == key);
 
-            if (!result.Any())
+            if (result.Any() == false)
             {
                 return NotFound();
             }
 
             var entity = result.First();
-            if (!AuthService.HasReadAccess(UserId, entity))
+            if (AllowReadAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -75,13 +92,19 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = AuthService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !AuthService.HasReadAccessOutsideContext(UserId))
+            if (AllowOrganizationAccess(key) == false)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
+            var result = Repository.AsQueryable(readOnly: true).Where(m => ((IHasOrganization)m).OrganizationId == key);
+
+            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
+            {
+                //Post processing was not a part of the old response, so let the migration control when we switch
+                result = result.AsEnumerable().Where(AllowReadAccess).AsQueryable();
+            }
+
             return Ok(result);
         }
 
@@ -93,15 +116,15 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
-            {
-                (entity as IHasOrganization).OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
-            }
-
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
+            {
+                return Forbidden();
+            }
+
+            if ((entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public && AllowEntityVisibilityControl(entity) == false)
             {
                 return Forbidden();
             }
@@ -124,7 +147,6 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
 
-
             // does the entity exist?
             if (entity == null)
             {
@@ -132,7 +154,13 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
+            {
+                return Forbidden();
+            }
+
+            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) &&
+                accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
             {
                 return Forbidden();
             }
@@ -168,7 +196,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -184,6 +212,26 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        protected bool AllowOrganizationAccess(int organizationId)
+        {
+            return _authorizationStrategy.AllowOrganizationAccess(organizationId);
+        }
+
+        protected bool AllowReadAccess(T entity)
+        {
+            return _authorizationStrategy.AllowReadAccess(entity);
+        }
+
+        protected bool AllowWriteAccess(T entity)
+        {
+            return _authorizationStrategy.AllowWriteAccess(entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            return _authorizationStrategy.AllowEntityVisibilityControl(entity);
         }
     }
 }

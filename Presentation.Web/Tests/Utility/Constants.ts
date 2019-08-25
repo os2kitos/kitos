@@ -34,7 +34,6 @@ class Constants {
     //Environmental variables
     readonly defaultItContractName = "DefaultTestItContract";
     readonly contractNameVariable = "Name";
-    readonly defaultCatalog = "katalog123";
     readonly nameOfSystemInput = "nameOfItSystemInput";
     readonly saveCatalogButton = "itCatalogSaveButton";
     readonly loginFormField = "loginFormField";

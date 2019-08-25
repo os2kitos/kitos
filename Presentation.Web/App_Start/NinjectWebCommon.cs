@@ -14,6 +14,8 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
 using Microsoft.Owin;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
@@ -103,7 +105,7 @@ namespace Presentation.Web
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
-            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InSingletonScope();
+            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
 
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -112,9 +114,26 @@ namespace Presentation.Web
 
             kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
-            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
-            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create()).InRequestScope();
+            RegisterAuthenticationContext(kernel);
+            RegisterAccessContext(kernel);
+        }
+
+        private static void RegisterAuthenticationContext(IKernel kernel)
+        {
+            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create())
+                .InRequestScope();
+        }
+
+        private static void RegisterAccessContext(IKernel kernel)
+        {
+            kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
+            kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
+            kernel.Bind<IAuthorizationContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<IAuthorizationContextFactory>().Create())
+                .InRequestScope();
         }
     }
 }

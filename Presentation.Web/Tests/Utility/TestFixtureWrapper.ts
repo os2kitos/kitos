@@ -1,4 +1,6 @@
-﻿class TestFixtureWrapper {
+﻿const defaultJasmineTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+class TestFixtureWrapper {
     public cleanupState() {
         browser.driver.manage().deleteAllCookies();
     }
@@ -11,8 +13,14 @@
         browser.ignoreSynchronization = false;
     }
 
+    public enableLongRunningTest() {
+        const minutes = 2;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = minutes * 60 * 1000;
+    }
 
-
+    public disableLongRunningTest() {
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = defaultJasmineTimeout;
+    }
 }
 
 export = TestFixtureWrapper;

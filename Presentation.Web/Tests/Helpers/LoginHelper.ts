@@ -2,34 +2,80 @@
 import LoginPage = require("../PageObjects/HomePage/LoginPage.po")
 import WaitTimers = require("../Utility/WaitTimers");
 
-var waitUpTo = new WaitTimers();
-
 class Login {
-    
     public logout() {
         var navigationBarHelper = new LoginPage().navigationBarHelper;
-        navigationBarHelper.logout();
+        return navigationBarHelper.logout();
     }
 
     public loginAsGlobalAdmin() {
-        this.login(0);
+        return this.login(this.getCredentialsMap().globalAdmin);
     }
 
     public loginAsLocalAdmin() {
-        this.login(1);
+        return this.login(this.getCredentialsMap().localAdmin);
     }
 
     public loginAsRegularUser() {
-        this.login(2);
+        return this.login(this.getCredentialsMap().regularUser);
     }
 
-    private login(credentialsIndex: number) {
+    public loginAsApiUser() {
+        return this.login(this.getCredentialsMap().apiUsers.regularUser);
+    }
+
+    public getApiUserCredentials() {
+        return this.getCredentialsMap().apiUsers.regularUser;
+    }
+
+    public getLocalAdminCredentials() {
+        return this.getCredentialsMap().localAdmin;
+    }
+
+    private getCredentialsMap() {
+        return {
+            globalAdmin: this.getCredentials(0),
+            localAdmin: this.getCredentials(1),
+            regularUser: this.getCredentials(2),
+            apiUsers: {
+                regularUser: this.getCredentials(3)
+            }
+        };
+    }
+
+    private getCredentials(credentialsIndex: number) {
+        return {
+            username: this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex),
+            password: this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex)
+        };
+    }
+
+    private login(credentials: any) {
         var homePage = new HomePage();
-        homePage.getPage();
-        browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
-        homePage.emailField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex));
-        homePage.pwdField.sendKeys(this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex));
-        homePage.loginButton.click();
+        var navigationBar = new LoginPage().navigationBar;
+        var waitUpTo = new WaitTimers();
+        var ec = protractor.ExpectedConditions;
+
+        return homePage.getPage()
+            .then(() => {
+                return browser.wait(homePage.isLoginAvailable(), waitUpTo.twentySeconds);
+            })
+            .then(() => {
+                return homePage.emailField.sendKeys(credentials.username);
+            })
+            .then(() => {
+                return homePage.pwdField.sendKeys(credentials.password);
+            })
+            .then(() => {
+                return homePage.loginButton.click();
+            })
+            .then(() => {
+                return browser.waitForAngular();
+            })
+            .then(() => {
+                //Await login completed before completing command
+                return browser.wait(ec.visibilityOf(navigationBar.dropDownMenu.dropDownElement), waitUpTo.twentySeconds);
+            });
     }
 
     private parseStringAsArrayAndGetIndex(input: string, index: number) {

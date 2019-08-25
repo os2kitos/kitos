@@ -2,75 +2,39 @@
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        private readonly IAuthenticationService _authService;
-
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
-            _authService = authService;
-        }
-        
-        [ODataRoute("ItSystems")]
-        public override IHttpActionResult Get()
-        {
-            return base.Get();
         }
 
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
-        [ODataRoute("Organizations({key})/ItSystems")]
-        public IHttpActionResult GetItSystems(int key)
+        [ODataRoute("Organizations({orgKey})/ItSystems")]
+        public IHttpActionResult GetItSystems(int orgKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
-            {
-                if (loggedIntoOrgId != key)
-                {
-                    return Forbidden();
-                }
+            if (!AllowOrganizationAccess(orgKey))
+            { 
+                return Forbidden();
+            }
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                return Ok(result);
-            }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-                return Ok(result);
-            }
-        }
+            var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
 
-        // GET /Organizations(1)/BelongingSystems
-        [EnableQuery]
-        [ODataRoute("Organizations({key})/BelongingSystems")]
-        public IHttpActionResult GetBelongingSystems(int key)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
-            {
-                if (loggedIntoOrgId != key)
-                {
-                    return Forbidden();
-                }
+            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowReadAccess);
 
-                var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
-                return Ok(result);
-            }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-                return Ok(result);
-            }
+            return Ok(systemsWithAllowedReadAccess);
         }
 
         // GET /Organizations(1)/ItSystems(1)
@@ -78,18 +42,23 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);
-            if (entity == null)
+            var system = Repository.GetByKey(sysKey);
+            if (!AllowReadAccess(system))
+            {
+                return Forbidden();
+            }
+            if (system == null)
             {
                 return NotFound();
             }
 
-            if (_authService.HasReadAccess(UserId, entity))
-            {
-                return Ok(entity);
-            }
+            return Ok(system);
+        }
 
-            return Forbidden();
+        [ODataRoute("ItSystems")]
+        public override IHttpActionResult Get()
+        {
+            return base.Get();
         }
     }
 }

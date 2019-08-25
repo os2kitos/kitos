@@ -11,7 +11,16 @@ var byDataElementType = new CssLocatorHelper().byDataElementType;
 class ItSystemCatalog implements IPageObject {
 
     public getPage(): webdriver.promise.Promise<void> {
-        return browser.get(browser.baseUrl + "/#/system/catalog");
+        return browser.getCurrentUrl()
+            .then(url => {
+                const navigateToUrl = browser.baseUrl + "/#/system/catalog";
+                if (navigateToUrl !== url) {
+                    console.log("Not at " + navigateToUrl + " but at:" + url + ". Navigating to:" + navigateToUrl);
+                    return browser.get(browser.baseUrl + "/#/system/catalog");
+                } else {
+                    console.log("Already at " + navigateToUrl + ". Ignoring command");
+                }
+            });
     }
 
     public kendoToolbarHelper = new KendoToolbarHelper();
