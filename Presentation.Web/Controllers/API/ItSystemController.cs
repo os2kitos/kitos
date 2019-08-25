@@ -477,14 +477,14 @@ namespace Presentation.Web.Controllers.API
             var canDelete = false;
             var canEdit = false;
             var canView = false;
-            if (KitosUser.IsGlobalAdmin || KitosUser.IsLocalAdmin && !KitosUser.IsReadOnly)
+            if (KitosUser.IsGlobalAdmin)
             {
                 canCreate = true;
                 canDelete = true;
                 canEdit = true;
                 canView = true;
             }
-            else if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin && KitosUser.IsInContext(KitosUser.DefaultOrganization.Id))
+            else
             {
                 canView = true;
             }

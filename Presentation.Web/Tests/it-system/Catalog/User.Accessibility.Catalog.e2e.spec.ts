@@ -5,52 +5,99 @@ import Constants = require("../../Utility/Constants");
 import WaitTimers = require("../../Utility/WaitTimers");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 
-describe("LocalAdmin user tests", () => {
+describe("ITSystem Catalog accessibility tests", () => {
     var loginHelper = new Login();
     var pageObject = new ItSystemEditPo();
     var consts = new Constants();
     var waitUpTo = new WaitTimers();
-   
+    var testFixture = new TestFixtureWrapper();
+    var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
+
+    afterEach(() => {
+        testFixture.cleanupState();
+    });
+
+    beforeAll(() => {
+        testFixture.enableLongRunningTest();
+        loginHelper.loginAsLocalAdmin();
+    });
+
+    afterAll(() => {
+        testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
+    });
+
+    it("Local Admin cannot create items in It-system catalog", () => {
+        loginHelper.loginAsLocalAdmin()
+            .then(() => {
+                return CatalogHelper.isCreateButtonVisible(false);
+            });
+    });
+
+    it("Regular user cannot create items in IT-system catalog", () => {
+        loginHelper.loginAsRegularUser()
+            .then(() => {
+                return pageObject.getPage();
+            })
+            .then(() => {
+                return browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);;
+            })
+            .then(() => {
+                return CatalogHelper.isCreateButtonVisible(false);;
+            });
+    });
 
     it("Global Admin can create and delete It-system catalog", () => {
-        loginHelper.loginAsGlobalAdmin();
-        CatalogHelper.isCreateButtonVisible(true);
-        createAndConfirm(consts.defaultCatalog);
-        browser.driver.manage().deleteAllCookies();
+        const catalogName = "catalog" + new Date().getTime();
+        loginHelper.loginAsGlobalAdmin()
+            .then(() => {
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                console.log("Making sure " + catalogName + " does not exist");
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            })
+            .then(() => {
+                console.log("Creating catalog");
+                return CatalogHelper.createCatalog(catalogName);
+            })
+            .then(() => {
+                console.log("Loading page after catalog creation");
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                return expect(findCatalogColumnsFor(catalogName).first().getText()).toEqual(catalogName);
+            })
+            .then(() => {
+                console.log("Deleting catalog");
+                return CatalogHelper.deleteCatalog(catalogName);
+            })
+            .then(() => {
+                console.log("Verify that catalog is deleted");
+                return loadPage();
+            })
+            .then(() => {
+                return waitForKendoGrid();
+            })
+            .then(() => {
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            });
     });
 
-    it("Local Admin can create and delete It-system catalog", () => {
-        loginHelper.loginAsLocalAdmin();
-        CatalogHelper.isCreateButtonVisible(true);
-        createAndConfirm(consts.defaultCatalog);
-        browser.driver.manage().deleteAllCookies();
-    });
-
-    it("Regular user cannot create and delete It-system catalog", () => {
-        loginHelper.loginAsRegularUser();
-        pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        CatalogHelper.isCreateButtonVisible(false);
-    });
-
-    function createAndConfirm(name: string) {
-
-        pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name)).toBeEmptyArray();
-
-        CatalogHelper.createCatalog(name);
-
-        pageObject.getPage();
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name).first().getText()).toEqual(name);
-
-        CatalogHelper.deleteCatalog(name);
-
-        pageObject.getPage();
-        browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
-        expect(pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName,name)).toBeEmptyArray();
+    function waitForKendoGrid() {
+        return CatalogHelper.waitForKendoGrid();
     }
 
+    function loadPage() {
+        console.log("Loading catalog page");
+        return pageObject.getPage();
+    }
 });
 
 
