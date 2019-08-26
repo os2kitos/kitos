@@ -250,7 +250,7 @@ namespace Presentation.Web.Controllers.API
 
         protected bool AllowDelete(IEntity entity)
         {
-            return AuthorizationStrategy.AllowModify(entity);
+            return AuthorizationStrategy.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)

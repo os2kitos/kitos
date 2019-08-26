@@ -78,7 +78,9 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
         public bool AllowCreate<T>(IEntity entity)
         {
-            return AllowCreate<T>() && AllowModify(entity);
+            return
+                AllowCreate<T>() &&
+                AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
         }
 
         public bool AllowModify(IEntity entity)

@@ -479,12 +479,12 @@ namespace Presentation.Web.Controllers.API
             return Ok(new ItSystemAccessRightsDTO
             {
                 CanCreate = AllowCreate<ItSystem>(),
-                CanView = AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault())
+                CanView = true
             });
         }
 
         [Route("api/itsystem/{id}/accessrights")]
-        public HttpResponseMessage GetAccessRights(int id)
+        public HttpResponseMessage GetAccessRightsForEntity(int id)
         {
             var itSystem = Repository.GetByKey(id);
             if (itSystem == null)

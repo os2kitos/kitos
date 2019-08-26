@@ -240,7 +240,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowDelete(IEntity entity)
         {
-            return _authorizationStrategy.AllowModify(entity);
+            return _authorizationStrategy.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
