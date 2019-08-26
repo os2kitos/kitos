@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -19,12 +17,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             _globalAdminApiUser = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin, true);
             _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
         }
-
-        [Fact]
-        public async Task Global_Admin_Api_User_Can_Get_Organizations_That_Use_An_It_System()
+        
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task Api_User_Can_Get_Organizations_That_Use_An_It_System(OrganizationRole apiUserType)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_globalAdminApiUser.Username, _globalAdminApiUser.Password);
+            var user = TestEnvironment.GetCredentials(apiUserType, true);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(user.Username, user.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
@@ -33,24 +34,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetDefaultOrganizationId()));
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetSecondOrganizationId()));
                 Assert.NotEmpty(response.Result);
             }
         }
-        
-        [Fact(Skip="Currently fails since the regular user can get information about other organizations which the user should not")]
-        public async Task Regular_Api_User_Can_Not_Get_Information_About_Other_Organizations_That_Use_An_It_System()
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task Api_User_Can_Get_Default_Organization_From_Default_It_System_Usage(OrganizationRole apiUserType)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, _regularApiUser.Password);
+            var user = TestEnvironment.GetCredentials(apiUserType, true);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(user.Username, user.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystemUsages"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"odata/ItSystemUsages?$expand=Organization&%24format=json&%24filter=ItSystemId+eq+{TestEnvironment.GetDefaultItSystemId()}&%24count=true"), token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.True(response.Result.All(x => x.OrganizationId == 1));
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetDefaultOrganizationId()));
                 Assert.NotEmpty(response.Result);
             }
         }
