@@ -5,6 +5,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -12,8 +14,12 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class ItSystemUsageRightsController : GenericRightsController<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
-        public ItSystemUsageRightsController(IGenericRepository<ItSystemRight> rightRepository, IGenericRepository<ItSystemUsage> objectRepository) : base(rightRepository, objectRepository)
-        {}
+        public ItSystemUsageRightsController(
+            IGenericRepository<ItSystemRight> rightRepository, 
+            IGenericRepository<ItSystemUsage> objectRepository,
+            IAuthorizationContext authorizationContext) 
+            : base(rightRepository, objectRepository, authorizationContext)
+        { }
 
         /// <summary>
         /// Returns all ITSystemRights for a specific user
@@ -25,7 +31,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = new List<ItSystemRight>();
-                theRights.AddRange(RightRepository.Get(r => r.UserId == userId));
+                theRights.AddRange(RightRepository.Get(r => r.UserId == userId, readOnly: true));
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<ItSystemRight>, ICollection<RightOutputDTO>>(theRights);
 

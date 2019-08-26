@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -6,6 +7,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -15,21 +18,24 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
-        private IAuthenticationService _authService;
-        public ItSystemRightsController(IGenericRepository<ItSystemRight> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItSystemRightsController(
+            IGenericRepository<ItSystemRight> repository,
+            IAuthenticationService authService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
-            this._authService = authService;
         }
 
-        // GET /Organizations(1)/ItSystemUsages
+        // GET /Organizations(1)/ItSystemUsages(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId);
-            return Ok(result);
+            var result = Repository.AsQueryable(readOnly:true).Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
+
+            result = FilterByAccessControl(result);
+
+            return Ok(result.AsQueryable());
         }
 
         // GET /Users(1)/ItProjectRights
@@ -37,14 +43,22 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Users({userId})/ItSystemRights")]
         public IHttpActionResult GetByUser(int userId)
         {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.UserId == userId);
-            return Ok(result);
+            var result = Repository.AsQueryable(readOnly:true).Where(x => x.UserId == userId).ToList();
+
+            result = FilterByAccessControl(result);
+
+            return Ok(result.AsQueryable());
         }
 
         public override IHttpActionResult Patch(int key, Delta<ItSystemRight> delta)
         {
             var entity = Repository.GetByKey(key);
+
+            // check model state
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             // does the entity exist?
             if (entity == null)
@@ -53,22 +67,9 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
-            }
-
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
-
-            // check model state
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
             }
 
             try
@@ -97,7 +98,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (AllowWriteAccess(entity) == false)
             {
                 return Forbidden();
             }
@@ -113,6 +114,12 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
+        {
+            result = result.Where(AllowReadAccess).ToList();
+            return result;
         }
     }
 }

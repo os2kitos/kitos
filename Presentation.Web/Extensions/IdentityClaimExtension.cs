@@ -3,9 +3,9 @@ using System.Security.Claims;
 
 namespace Presentation.Web.Extensions
 {
-    public class IdentityClaimExtension
+    public static class IdentityClaimExtension
     {
-        public Claim GetClaimOrNull(ClaimsIdentity claimHolder, string claimName)
+        public static Claim GetClaimOrNull(this ClaimsIdentity claimHolder, string claimName)
         {
             return claimHolder.FindAll(x => x.Type == claimName).FirstOrDefault();
         }

@@ -28,10 +28,7 @@ exports.config = {
                 showStack: true
             }));
 
-        var HtmlReporter = require("protractor-beautiful-reporter");
-        jasmine.getEnv().addReporter(new HtmlReporter({
-            baseDirectory: "tmp/screenshots"
-        }).getJasmine2Reporter());
+        jasmine.getEnv().addReporter(new reporters.TeamCityReporter());
     },
 
     jasmineNodeOpts: {

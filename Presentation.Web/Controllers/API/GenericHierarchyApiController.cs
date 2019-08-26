@@ -4,6 +4,8 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -11,8 +13,8 @@ namespace Presentation.Web.Controllers.API
     public abstract class GenericHierarchyApiController<TModel, TDto> : GenericContextAwareApiController<TModel, TDto>
         where TModel : Entity, IHierarchy<TModel>, IContextAware
     {
-        protected GenericHierarchyApiController(IGenericRepository<TModel> repository)
-            : base(repository)
+        protected GenericHierarchyApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
+            : base(repository, authorizationContext)
         {
         }
 
