@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API
                         u.OrganizationId == organizationId
                     , readOnly: true);
 
-                usages = usages.Where(AllowReadAccess);
+                usages = usages.Where(AllowRead);
 
                 return Ok(Map(usages));
             }
@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
 
-                pagingModel.WithPostProcessingFilter(AllowReadAccess);
+                pagingModel.WithPostProcessingFilter(AllowRead);
 
                 var usages = Page(Repository.AsQueryable(true), pagingModel);
 
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AllowReadAccess(item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }
@@ -137,11 +137,11 @@ namespace Presentation.Web.Controllers.API
                     );
 
                 // mapping to DTOs for easy lazy loading of needed properties
-                usages = usages.Where(AllowReadAccess);
+                usages = usages.Where(AllowRead);
                 var dtos = Map(usages);
 
                 var roles = _roleRepository.Get(readOnly: true);
-                roles = roles.Where(AllowReadAccess).ToList();
+                roles = roles.Where(AllowRead).ToList();
 
                 var list = new List<dynamic>();
                 var header = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowReadAccess(usage))
+                if (!AllowRead(usage))
                 {
                     return Forbidden();
                 }
@@ -224,7 +224,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!AllowWriteAccess(itsystemUsage))
+                if (!AllowModify(itsystemUsage))
                 {
                     return Forbidden();
                 }
@@ -287,7 +287,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     return NotFound();
                 }
-                if (!AllowWriteAccess(usage))
+                if (!AllowModify(usage))
                 {
                     return Forbidden();
                 }
@@ -323,7 +323,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowWriteAccess(usage))
+                if (!AllowModify(usage))
                 {
                     return Forbidden();
                 }
@@ -361,7 +361,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!AllowWriteAccess(usage))
+                if (!AllowModify(usage))
                 {
                     return Forbidden();
                 }
@@ -422,7 +422,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowWriteAccess(usage))
+                if (!AllowModify(usage))
                 {
                     return Forbidden();
                 }
@@ -514,7 +514,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
-                pagingModel.WithPostProcessingFilter(AllowReadAccess);
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()

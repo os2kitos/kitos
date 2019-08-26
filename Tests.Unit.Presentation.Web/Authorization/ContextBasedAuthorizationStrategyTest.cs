@@ -34,7 +34,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _authContext.Setup(x => x.AllowReadsWithinOrganization(organizationId)).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowOrganizationAccess(organizationId);
+            var result = _sut.AllowOrganizationReadAccess(organizationId);
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -50,7 +50,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _authContext.Setup(x => x.AllowReads(entity)).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowReadAccess(entity);
+            var result = _sut.AllowRead(entity);
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -66,7 +66,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _authContext.Setup(x => x.AllowUpdates(entity)).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowWriteAccess(entity);
+            var result = _sut.AllowModify(entity);
 
             //Assert
             Assert.Equal(expectedResult, result);

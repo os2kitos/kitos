@@ -223,19 +223,29 @@ namespace Presentation.Web.Controllers.API
 
         #region access control
 
-        protected bool AllowOrganizationAccess(int organizationId)
+        protected bool AllowOrganizationReadAccess(int organizationId)
         {
-            return AuthorizationStrategy.AllowOrganizationAccess(organizationId);
+            return AuthorizationStrategy.AllowOrganizationReadAccess(organizationId);
         }
 
-        protected bool AllowReadAccess(IEntity entity)
+        protected bool AllowRead(IEntity entity)
         {
-            return AuthorizationStrategy.AllowReadAccess(entity);
+            return AuthorizationStrategy.AllowRead(entity);
         }
 
-        protected bool AllowWriteAccess(IEntity entity)
+        protected bool AllowModify(IEntity entity)
         {
-            return AuthorizationStrategy.AllowWriteAccess(entity);
+            return AuthorizationStrategy.AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>(IEntity entity = null)
+        {
+            return AuthorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowDelete(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowModify(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)

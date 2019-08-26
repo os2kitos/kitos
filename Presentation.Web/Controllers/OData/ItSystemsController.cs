@@ -7,7 +7,6 @@ using Core.DomainServices;
 using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.OData
@@ -32,7 +31,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
 
-            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowReadAccess);
+            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowRead);
 
             return Ok(systemsWithAllowedReadAccess);
         }
@@ -43,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
             var system = Repository.GetByKey(sysKey);
-            if (!AllowReadAccess(system))
+            if (!AllowRead(system))
             {
                 return Forbidden();
             }

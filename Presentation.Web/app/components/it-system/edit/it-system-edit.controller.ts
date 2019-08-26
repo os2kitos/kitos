@@ -22,8 +22,8 @@
                             return result.data.response;
                         });
                 }],
-                userAccessRights: ['$http', function ($http) {
-                    return $http.get("api/itsystem/GetAccessRights")
+                userAccessRights: ['$http', '$stateParams', function ($http, $stateParams) {
+                    return $http.get("api/itsystem/" + $stateParams.id +"/accessrights")
                         .then(function (result) {
                             return result.data.response;
                         });

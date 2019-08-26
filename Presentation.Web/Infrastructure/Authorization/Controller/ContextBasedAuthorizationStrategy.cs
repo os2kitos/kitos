@@ -14,19 +14,30 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
 
         public bool ApplyBaseQueryPostProcessing { get; } = true;
 
-        public bool AllowOrganizationAccess(int organizationId)
+        public bool AllowOrganizationReadAccess(int organizationId)
         {
             return _authorizationContext.AllowReadsWithinOrganization(organizationId);
         }
 
-        public bool AllowReadAccess(IEntity entity)
+        public bool AllowRead(IEntity entity)
         {
             return _authorizationContext.AllowReads(entity);
         }
 
-        public bool AllowWriteAccess(IEntity entity)
+        public bool AllowCreate<T>(IEntity entity)
+        {
+            //Entity instance is not used going forward
+            return _authorizationContext.AllowCreate<T>();
+        }
+
+        public bool AllowModify(IEntity entity)
         {
             return _authorizationContext.AllowUpdates(entity);
+        }
+
+        public bool AllowDelete(IEntity entity)
+        {
+            return _authorizationContext.AllowDelete(entity);
         }
 
         public bool AllowEntityVisibilityControl(IEntity entity)

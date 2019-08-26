@@ -5,9 +5,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
     public interface IControllerAuthorizationStrategy
     {
         bool ApplyBaseQueryPostProcessing { get; }
-        bool AllowOrganizationAccess(int organizationId);
-        bool AllowReadAccess(IEntity entity);
-        bool AllowWriteAccess(IEntity entity);
+        bool AllowOrganizationReadAccess(int organizationId);
+        bool AllowRead(IEntity entity);
+        bool AllowCreate<T>(IEntity entity);
+        bool AllowModify(IEntity entity);
+        bool AllowDelete(IEntity entity);
         bool AllowEntityVisibilityControl(IEntity entity);
     }
 }

@@ -9,7 +9,6 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
@@ -66,7 +65,7 @@ namespace Presentation.Web.Controllers.API
                 if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
                 {
                     //Post processing was not a part of the old response, so let the migration control when we switch
-                    paging.WithPostProcessingFilter(AllowReadAccess);
+                    paging.WithPostProcessingFilter(AllowRead);
                 }
 
                 var query = Page(result.AsQueryable(), paging);
@@ -91,7 +90,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AllowReadAccess(item))
+                if(!AllowRead(item))
                 {
                     return Forbidden();
                 }
@@ -124,7 +123,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var entity = Repository.GetByKey(id);
-                var allowWriteAccess = AllowWriteAccess(entity);
+                var allowWriteAccess = AllowModify(entity);
 
                 return Ok(allowWriteAccess);
             }
@@ -154,8 +153,8 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                // Check write access rights  
-                if (!AllowWriteAccess(item))
+                // Check CREATE access rights  
+                if (!AllowCreate<TModel>(item))
                 {
                     return Forbidden();
                 }
@@ -227,7 +226,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AllowWriteAccess(item))
+                if (!AllowDelete(item))
                 {
                     return Forbidden();
                 }
@@ -348,7 +347,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowWriteAccess(item))
+                if (!AllowModify(item))
                 {
                     return Forbidden();
                 }

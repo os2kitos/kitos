@@ -922,7 +922,7 @@
                             "userService", userService => userService.getUser()
                         ],
                         userAccessRights: ['$http', function ($http) {
-                            return $http.get("api/itsystem/GetAccessRights")
+                            return $http.get("api/itsystem/accessrights")
                                 .then(function (result) {
                                     return result.data.response;
                                 });

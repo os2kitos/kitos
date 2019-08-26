@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.OData
             if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
             {
                 //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.Where(AllowReadAccess);
+                result = result.Where(AllowRead);
             }
 
             return Ok(result.AsQueryable());
@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             var entity = result.First();
-            if (AllowReadAccess(entity) == false)
+            if (AllowRead(entity) == false)
             {
                 return Forbidden();
             }
@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.OData
             if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
             {
                 //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.AsEnumerable().Where(AllowReadAccess).AsQueryable();
+                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
             }
 
             return Ok(result);
@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.OData
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
-            if (AllowWriteAccess(entity) == false)
+            if (AllowCreate<T>(entity) == false)
             {
                 return Forbidden();
             }
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (AllowWriteAccess(entity) == false)
+            if (AllowWrite(entity) == false)
             {
                 return Forbidden();
             }
@@ -196,7 +196,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (AllowWriteAccess(entity) == false)
+            if (AllowDelete(entity) == false)
             {
                 return Forbidden();
             }
@@ -216,17 +216,27 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowOrganizationAccess(int organizationId)
         {
-            return _authorizationStrategy.AllowOrganizationAccess(organizationId);
+            return _authorizationStrategy.AllowOrganizationReadAccess(organizationId);
         }
 
-        protected bool AllowReadAccess(T entity)
+        protected bool AllowRead(T entity)
         {
-            return _authorizationStrategy.AllowReadAccess(entity);
+            return _authorizationStrategy.AllowRead(entity);
         }
 
-        protected bool AllowWriteAccess(T entity)
+        protected bool AllowWrite(T entity)
         {
-            return _authorizationStrategy.AllowWriteAccess(entity);
+            return _authorizationStrategy.AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>(IEntity entity = null)
+        {
+            return _authorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowDelete(IEntity entity)
+        {
+            return _authorizationStrategy.AllowModify(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
