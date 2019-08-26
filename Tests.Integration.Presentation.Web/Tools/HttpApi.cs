@@ -31,16 +31,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
-            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
 
-            return HttpClient.SendAsync(requestMessage);
+            return SendAsync(cookie, requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> GetWithCookieAsync(Uri url, Cookie cookie)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+
+            return SendAsync(cookie, requestMessage);
         }
 
         public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Delete, url);
-            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
-            return HttpClient.SendAsync(requestMessage);
+
+            return SendAsync(cookie, requestMessage);
         }
 
         public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object body)
@@ -49,7 +55,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
+
+            return SendAsync(cookie, requestMessage);
+        }
+
+        private static Task<HttpResponseMessage> SendAsync(Cookie cookie, HttpRequestMessage requestMessage)
+        {
             requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
+
             return HttpClient.SendAsync(requestMessage);
         }
 
@@ -138,8 +151,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        
-
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
@@ -158,7 +169,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         }
 
-        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role)
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role, int organizationId = 1)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -180,7 +191,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Role = role
             };
 
-            using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl("odata/Organizations(1)/Rights"), cookie, roleDto))
+            using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto))
             {
                 Assert.Equal(HttpStatusCode.Created, addedRole.StatusCode);
             }

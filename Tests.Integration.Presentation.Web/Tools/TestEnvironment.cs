@@ -79,6 +79,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static int DefaultItSystemId => 1;
+
         private static KitosCredentials LoadUserFromEnvironment(OrganizationRole role)
         {
             var suffix = string.Empty;
