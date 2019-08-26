@@ -7,7 +7,6 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Ninject.Infrastructure.Language;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
@@ -229,7 +228,12 @@ namespace Presentation.Web.Controllers.OData
             return _authorizationStrategy.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(IEntity entity = null)
+        protected bool AllowCreate<T>()
+        {
+            return _authorizationStrategy.AllowCreate<T>();
+        }
+
+        protected bool AllowCreate<T>(IEntity entity)
         {
             return _authorizationStrategy.AllowCreate<T>(entity);
         }

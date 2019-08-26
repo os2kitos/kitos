@@ -19,7 +19,12 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return false;
         }
 
-        public bool AllowUpdates(IEntity entity)
+        public bool AllowCreate<T>(IEntity entity)
+        {
+            return false;
+        }
+
+        public bool AllowModify(IEntity entity)
         {
             return false;
         }

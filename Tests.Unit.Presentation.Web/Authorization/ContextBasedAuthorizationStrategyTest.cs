@@ -63,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             //Arrange
             var entity = Mock.Of<IEntity>();
-            _authContext.Setup(x => x.AllowUpdates(entity)).Returns(expectedResult);
+            _authContext.Setup(x => x.AllowModify(entity)).Returns(expectedResult);
 
             //Act
             var result = _sut.AllowModify(entity);

@@ -27,12 +27,17 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
         public bool AllowCreate<T>(IEntity entity)
         {
             //Entity instance is not used going forward
+            return _authorizationContext.AllowCreate<T>(entity);
+        }
+
+        public bool AllowCreate<T>()
+        {
             return _authorizationContext.AllowCreate<T>();
         }
 
         public bool AllowModify(IEntity entity)
         {
-            return _authorizationContext.AllowUpdates(entity);
+            return _authorizationContext.AllowModify(entity);
         }
 
         public bool AllowDelete(IEntity entity)

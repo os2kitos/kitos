@@ -24,11 +24,18 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         /// <returns></returns>
         bool AllowCreate<T>();
         /// <summary>
+        /// Determines if create-access is allowed for the provided entity type and with the representation passed in <paramref name="entity"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool AllowCreate<T>(IEntity entity);
+        /// <summary>
         /// Determines if update-access is allowed for the provided entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        bool AllowUpdates(IEntity entity);
+        bool AllowModify(IEntity entity);
         /// <summary>
         /// Determines if delete-access is allowed for the provided entity
         /// </summary>

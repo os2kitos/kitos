@@ -34,6 +34,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             return AllowModify(entity);
         }
 
+        public bool AllowCreate<T>()
+        {
+            return false;
+        }
 
         public bool AllowModify(IEntity entity)
         {

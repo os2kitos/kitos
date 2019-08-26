@@ -238,9 +238,14 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(IEntity entity = null)
+        protected bool AllowCreate<T>(IEntity entity)
         {
             return AuthorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowCreate<T>()
+        {
+            return AuthorizationStrategy.AllowCreate<T>();
         }
 
         protected bool AllowDelete(IEntity entity)

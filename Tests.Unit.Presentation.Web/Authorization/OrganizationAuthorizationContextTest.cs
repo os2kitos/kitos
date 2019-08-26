@@ -130,7 +130,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
-            var allowUpdates = _sut.AllowUpdates(inputEntity);
+            var allowUpdates = _sut.AllowModify(inputEntity);
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
@@ -162,7 +162,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
             //Act
-            var allowUpdates = _sut.AllowUpdates(inputEntity);
+            var allowUpdates = _sut.AllowModify(inputEntity);
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);

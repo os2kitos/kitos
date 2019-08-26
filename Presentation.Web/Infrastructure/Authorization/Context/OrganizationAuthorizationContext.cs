@@ -76,7 +76,12 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return true;
         }
 
-        public bool AllowUpdates(IEntity entity)
+        public bool AllowCreate<T>(IEntity entity)
+        {
+            return AllowCreate<T>() && AllowModify(entity);
+        }
+
+        public bool AllowModify(IEntity entity)
         {
             var result = false;
 
@@ -114,7 +119,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         public bool AllowDelete(IEntity entity)
         {
             var result = false;
-            if (AllowUpdates(entity))
+            if (AllowModify(entity))
             {
                 switch (entity)
                 {
@@ -134,7 +139,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
         public bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return AllowUpdates(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
+            return AllowModify(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
         }
 
         private bool AllowWritesToEntity(IEntity entity)

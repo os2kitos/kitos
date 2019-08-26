@@ -8,6 +8,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
         bool AllowOrganizationReadAccess(int organizationId);
         bool AllowRead(IEntity entity);
         bool AllowCreate<T>(IEntity entity);
+        bool AllowCreate<T>();
         bool AllowModify(IEntity entity);
         bool AllowDelete(IEntity entity);
         bool AllowEntityVisibilityControl(IEntity entity);
