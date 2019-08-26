@@ -1,111 +1,62 @@
 ﻿import HomePageObjects = require("../PageObjects/Organization/UsersPage.po");
 import CreatePage = require("../PageObjects/Organization/CreateUserPage.po");
-import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
-import Login = require("../Helpers/LoginHelper");
-import WaitTimers = require("../Utility/waitTimers");
-
-var testFixture = new TestFixtureWrapper();
-var pageCreateObject = new CreatePage();
-var pageObject = new HomePageObjects();
-var loginHelper = new Login();
-var waitUpTo = new WaitTimers();
-var ec = protractor.ExpectedConditions;
+import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 
 class CreateUserHelper {
-    createrUserWithAPI(email: string, name: string, lastname: string, phoneNumber: string, API: boolean) {
-
-        loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.createUserButton.click();
-        pageCreateObject.inputEmail.sendKeys(email);
-        pageCreateObject.inputEmailRepeat.sendKeys(email);
-        pageCreateObject.inputName.sendKeys(name);
-        pageCreateObject.inputLastName.sendKeys(lastname);
-        pageCreateObject.inputPhone.sendKeys(phoneNumber);
-        if (API)
-        {
-            pageCreateObject.boolApi.click();
-        }
-        pageCreateObject.createUserButton.click();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-    }
-
-
-    public deleteUser(email: string) {
-        loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Slet")).click();
-                        element(by.buttonText("Slet bruger")).click();
-                    }
-                });
+    private cssHelper = new CSSLocator();
+    private pageCreateObject = new CreatePage();
+    private pageObject = new HomePageObjects();
+    public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
+        return this.openEditUser(email)
+            .then(() => {
+                var expectedValue = apiStatus ? "true" : null;
+                return expect(this.pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(expectedValue);
             });
-        });
-
     }
-
-    public checkApiRoleStatusOnUser(email: string, apiStatus : boolean) {
-
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Redigér")).click();
-                        pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                            expect(selected).not.toBeNull();
-                            expect(selected).toBe(apiStatus);
-                            return;
-                        });
-                    }
-                });
-            });
-        });
-    }
-
 
     public updateApiOnUser(email: string, apiAccess: boolean) {
-
-        loginHelper.loginAsGlobalAdmin();
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-        pageObject.mainGridAllTableRows.each((ele) => {
-            ele.all(by.tagName("td")).each((tdele) => {
-                tdele.getText().then(val => {
-                    if (val === email) {
-                        ele.element(by.linkText("Redigér")).click();
-                        if (apiAccess) {
-                           pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                                if (!selected) {
-                                    pageCreateObject.boolApi.click();
-                                    pageCreateObject.editUserButton.click();
-                                    return;
-                                } else {
-                                    pageCreateObject.cancelEditUserButton.click();
-                                    return;
-                                }
-                            });
+        return this.openEditUser(email)
+            .then(() => {
+                return this.pageObject.hasAPiCheckBox.isSelected()
+                    .then(selected => {
+                        if (selected !== apiAccess) {
+                            return this.pageCreateObject.boolApi.click()
+                                .then(() => {
+                                   return this.pageCreateObject.editUserButton.click();
+                                });
+                        } else {
+                            return this.pageCreateObject.cancelEditUserButton.click();
                         }
-                        else {
-                            pageObject.hasAPiCheckBox.isSelected().then(selected => {
-                                if (selected) {
-                                    pageCreateObject.boolApi.click();
-                                    pageCreateObject.editUserButton.click();
-                                    return;
-                                } else {
-                                    pageCreateObject.cancelEditUserButton.click();
-                                    return;
-                                }
-                            });
-                        }
-                    }
-                });
+                    });
             });
+    }
+
+    private getUserRow(email: string) {
+        const emailColumnElementType = "userEmailObject";
+
+        var rows = this.pageObject.mainGridAllTableRows.filter((row, index) => {
+            console.log("Searching for email column");
+            var column = row.element(this.cssHelper.byDataElementType(emailColumnElementType));
+            return column.isPresent()
+                .then(present => {
+                    if (present) {
+                        console.log("Found email column - checking if row is the right one");
+                        return column.getText()
+                            .then(text => {
+                                return text === email;
+                            });
+                    }
+                    return false;
+                });
         });
+
+        return rows.first();
+    }
+
+    private openEditUser(email: string) {
+        const row = this.getUserRow(email);
+        expect(row).not.toBe(null);
+        return row.element(by.linkText("Redigér")).click();
     }
 }
 export = CreateUserHelper;

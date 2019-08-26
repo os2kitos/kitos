@@ -13,7 +13,6 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
         private readonly ILogger _logger;
         private readonly IOwinContext _owinContext;
         private readonly IUserRepository _userRepository;
-        private readonly IdentityClaimExtension identityClaimExtension = new IdentityClaimExtension();
 
         public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
         {
@@ -26,14 +25,13 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
         {
             var user = _owinContext.Authentication.User;
             return IsAuthenticated(user)
-                ? new AuthenticationContext(MapAuthenticationMethod(user), MapApiAccess(user), MapUserId(user), MapOrganizationId(user))
+                ? new AuthenticationContext(MapAuthenticationMethod(user), MapApiAccess(user), GetUserId(user), MapOrganizationId(user))
                 : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
         }
 
         private bool MapApiAccess(IPrincipal user)
         {
-            var userId = user.Identity.Name;
-            var id = ParseInteger(userId);
+            var id = GetUserId(user);
             if (id.HasValue)
             {
                 var dbUser = _userRepository.GetById(id.Value);
@@ -48,7 +46,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             var method = MapAuthenticationMethod(user);
             if (method == AuthenticationMethod.KitosToken)
             {
-                var orgId = identityClaimExtension.GetClaimOrNull((user.Identity as ClaimsIdentity), BearerTokenConfig.DefaultOrganizationClaimName);
+                var orgId = (user.Identity as ClaimsIdentity).GetClaimOrNull(BearerTokenConfig.DefaultOrganizationClaimName);
 
                 if (orgId != null)
                 {
@@ -59,13 +57,16 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
                     _logger.Error("Found Claim {claimName}, but could not parse it to an integer", BearerTokenConfig.DefaultOrganizationClaimName);
                 }
             }
+            else if (method == AuthenticationMethod.Forms)
+            {
+                var userId = GetUserId(user);
+                if (userId.HasValue)
+                {
+                    var dbUser = _userRepository.GetByKey(userId.Value);
+                    return dbUser?.DefaultOrganizationId;
+                }
+            }
             return default(int?);
-        }
-
-        private int? MapUserId(IPrincipal user)
-        {
-            var userId = user.Identity.Name;
-            return ParseInteger(userId);
         }
 
         private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)
@@ -98,6 +99,13 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
             _logger.Error("Could not parse to int: {toParse}", toParse);
             return null;
+        }
+
+        private int? GetUserId(IPrincipal user)
+        {
+            var userId = user.Identity.Name;
+            var id = ParseInteger(userId);
+            return id;
         }
     }
 }

@@ -62,6 +62,7 @@
   </parameter>
 
   <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
+    <parameterValidation kind="AllowEmpty" />
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DefaultUserPassword']/value/text()">
     </parameterentry>
   </parameter>

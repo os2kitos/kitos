@@ -12,6 +12,9 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -29,6 +32,21 @@ namespace Presentation.Web.Controllers.API
 
         [Inject]
         public ILogger Logger { get; set; }
+
+        //Lazy to make sure auth service is available when resolved
+        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
+
+        protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
+
+        protected BaseApiController(IAuthorizationContext authorizationContext = null)
+        {
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
+
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext)
+            );
+        }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
@@ -154,8 +172,7 @@ namespace Presentation.Web.Controllers.API
             {
                 try
                 {
-                    var id = Convert.ToInt32(User.Identity.Name);
-                    var user = UserRepository.GetByKey(id);
+                    var user = UserRepository.GetByKey(UserId);
 
                     if (user == null)
                         throw new SecurityException();
@@ -169,6 +186,8 @@ namespace Presentation.Web.Controllers.API
                 }
             }
         }
+
+        protected int UserId => Convert.ToInt32(User.Identity.Name);
 
         protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
@@ -190,7 +209,40 @@ namespace Presentation.Web.Controllers.API
                                                                 Newtonsoft.Json.JsonConvert.SerializeObject(
                                                                     paginationHeader));
 
-            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
+            //Make sure query is ordered
+            query = query.OrderByField(paging.OrderBy, paging.Descending);
+
+            //Apply post-processing
+            query = paging.ApplyPostProcessing(query);
+
+            //Load the page
+            return query
+                .Skip(paging.Skip)
+                .Take(paging.Take);
         }
+
+        #region access control
+
+        protected bool AllowOrganizationAccess(int organizationId)
+        {
+            return AuthorizationStrategy.AllowOrganizationAccess(organizationId);
+        }
+
+        protected bool AllowReadAccess(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowReadAccess(entity);
+        }
+
+        protected bool AllowWriteAccess(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowWriteAccess(entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
+        }
+       
+        #endregion
     }
 }

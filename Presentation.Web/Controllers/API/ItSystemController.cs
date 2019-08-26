@@ -15,6 +15,8 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -26,8 +28,13 @@ namespace Presentation.Web.Controllers.API
         private readonly IItSystemService _systemService;
         private readonly ReferenceService _referenceService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService, ReferenceService referenceService)
-            : base(repository)
+        public ItSystemController(
+            IGenericRepository<ItSystem> repository,
+            IGenericRepository<TaskRef> taskRepository,
+            IItSystemService systemService,
+            ReferenceService referenceService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
@@ -85,10 +92,11 @@ namespace Presentation.Web.Controllers.API
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                     );
+                paging.WithPostProcessingFilter(AllowReadAccess);
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
-                var query = Page(Repository.AsQueryable(), paging);
+                var query = Page(Repository.AsQueryable(readOnly: true), paging);
 
                 return Ok(Map(query));
             }
@@ -103,7 +111,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systems =
-                    Repository.AsQueryable()
+                    Repository.AsQueryable(readOnly: true)
                         .Where(s =>
                             // global admin sees all
                             (KitosUser.IsGlobalAdmin ||
@@ -118,9 +126,7 @@ namespace Presentation.Web.Controllers.API
                         // only object owners will be albe to see private objects
                         ));
 
-                //if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
-
-                //var query = Page(systems, paging);
+                systems = systems.AsEnumerable().Where(AllowReadAccess).AsQueryable();
 
                 var dtos = Map(systems);
 
@@ -187,7 +193,10 @@ namespace Presentation.Web.Controllers.API
                          s.OrganizationId == orgId)
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
-                    );
+                    , readOnly: true);
+
+                systems = systems.Where(AllowReadAccess);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -202,6 +211,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systems = _systemService.GetInterfaces(orgId, q, KitosUser);
+
+                systems = systems.Where(AllowReadAccess);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -216,6 +228,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systems = _systemService.GetNonInterfaces(orgId, q, KitosUser);
+
+                systems = systems.Where(AllowReadAccess);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -230,6 +245,9 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systems = _systemService.GetHierarchy(id);
+
+                systems = systems.Where(AllowReadAccess);
+
                 return Ok(Map(systems));
             }
             catch (Exception e)
@@ -242,24 +260,22 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                // only global admin can set access mod to public
-                if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-
                 if (!IsAvailable(dto.Name, dto.OrganizationId))
                 {
                     return Conflict("Name is already taken!");
                 }
 
                 var item = Map(dto);
+                if (dto.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(item))
+                {
+                    return Forbidden();
+                }
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
 
-                if(!base.HasWriteAccess(item, KitosUser, organizationId: 0))
+                if (!AllowWriteAccess(item))
                 {
                     return Forbidden();
                 }
@@ -284,7 +300,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId));
+                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId), readOnly: true);
+
+                systems = systems?.Where(AllowReadAccess);
 
                 return systems == null ? NotFound() : Ok(Map(systems));
             }
@@ -300,7 +318,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!HasWriteAccess(system, organizationId))
+                if (!AllowWriteAccess(system))
                 {
                     return Forbidden();
                 }
@@ -353,7 +371,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(system, organizationId))
+                if (!AllowWriteAccess(system))
                 {
                     return Forbidden();
                 }
@@ -406,15 +424,24 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var system = Repository.GetByKey(id);
+                if (system == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowReadAccess(system))
+                {
+                    return Forbidden();
+                }
 
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
-                    taskQuery = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                    taskQuery = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable();
+                    taskQuery = _taskRepository.AsQueryable(readOnly: true);
                 }
 
                 // if a task group is given, only find the tasks in that group
@@ -426,6 +453,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
+                pagingModel.WithPostProcessingFilter(AllowReadAccess);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
@@ -447,8 +475,9 @@ namespace Presentation.Web.Controllers.API
             // try get AccessModifier value
             JToken accessModToken;
             obj.TryGetValue("accessModifier", out accessModToken);
-            // only global admin can set access mod to public
-            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+
+            var itSystem = Repository.GetByKey(id);
+            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !AllowEntityVisibilityControl(itSystem))
             {
                 return Forbidden();
             }
@@ -471,6 +500,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                if (!AllowOrganizationAccess(orgId))
+                {
+                    return Forbidden();
+                }
                 return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
             }
             catch (Exception e)
@@ -483,24 +516,6 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
-        }
-
-        protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
-        {
-            if (obj.IsInContext(organizationId) && user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
-            {
-                return true;
-            }
-            if (user.IsLocalAdmin && obj.ObjectOwnerId == user.Id && user.DefaultOrganizationId == organizationId)
-            {
-                return true;
-            }
-            return base.HasWriteAccess(obj, user, organizationId);
-        }
-
-        protected bool HasWriteAccess()
-        {
-            return KitosUser.IsGlobalAdmin;
         }
     }
 }

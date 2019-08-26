@@ -11,7 +11,8 @@ namespace Core.DomainServices
         IEnumerable<TModel> Get(
             Expression<Func<TModel, bool>> filter = null,
             Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
-            string includeProperties = "");
+            string includeProperties = "",
+            bool readOnly = false);
         TModel GetByKey(params object[] key);
         TModel Insert(TModel entity);
         void Delete(TModel entity);
@@ -19,7 +20,7 @@ namespace Core.DomainServices
         void Update(TModel entity);
         void Save();
         void Patch(TModel item);
-        IQueryable<TModel> AsQueryable();
+        IQueryable<TModel> AsQueryable(bool readOnly = false);
 
         IEnumerable<TModel> SQL(string sql);
 
