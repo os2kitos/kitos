@@ -19,7 +19,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
-        private static readonly HttpClient StatelessHttpClient = new HttpClient();
+        private static readonly HttpClient StatelessHttpClient =
+            new HttpClient(
+                new HttpClientHandler
+                {
+                    UseCookies = false
+                });
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
         {
@@ -64,10 +69,10 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         private static async Task<HttpResponseMessage> SendWithCookieAsync(Cookie cookie, HttpRequestMessage requestMessage)
         {
-            requestMessage.Headers.Add("Cookie", cookie.Name + "=" + cookie.Value);
-
             //Make sure state does not bleed into stateless handler
-            using (var client = new HttpClient())
+            var cookieContainer = new CookieContainer();
+            cookieContainer.Add(cookie);
+            using (var client = new HttpClient(new HttpClientHandler {CookieContainer = cookieContainer}))
             {
                 return await client.SendAsync(requestMessage);
             }
