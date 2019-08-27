@@ -100,6 +100,26 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
+        public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
+        {
+            var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+            var userCredentials = TestEnvironment.GetCredentials(role, true);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
+
+            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            {
+                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
+
+                Assert.Equal(loginDto.Email, tokenResponse.Email);
+                Assert.True(tokenResponse.LoginSuccessful);
+                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
+
+                return tokenResponse;
+            }
+        }
+
         public static async Task<GetTokenResponseDTO> GetTokenAsync(LoginDTO loginDto)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");

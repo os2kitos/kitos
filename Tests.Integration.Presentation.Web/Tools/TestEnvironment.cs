@@ -177,5 +177,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             return 1;
         }
+
+        public static int GetDefaultItSystemId()
+        {
+            return 1;
+        }
     }
 }

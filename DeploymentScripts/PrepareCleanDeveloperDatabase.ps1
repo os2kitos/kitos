@@ -1,8 +1,10 @@
-param(
+﻿param(
     [Parameter(Mandatory=$true)][string]$testToolsExePath,
     [Parameter(Mandatory=$true)][string]$migrationsFolderPath,
     [Parameter(Mandatory=$true)][string]$kitosDbConnectionString,
     [Parameter(Mandatory=$true)][string]$hangfireDbConnectionString,
+    [Parameter(Mandatory=$true)][string]$defaultOrganization,
+    [Parameter(Mandatory=$true)][string]$secondOrganization,
     [Parameter(Mandatory=$true)][string]$globalAdminUserName,
     [Parameter(Mandatory=$true)][string]$globalAdminPw,
     [Parameter(Mandatory=$true)][string]$localAdminUserName,
@@ -51,35 +53,35 @@ if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO ENABLE ALL OPTIONS IN KITOS DB" }
 Write-Host "Configuring test organizations"
 #-------------------------------------------------------------
 
-& $testToolsExePath "CreateSecondOrganization" "$kitosDbConnectionString"
+& $testToolsExePath "CreateOrganization" "$kitosDbConnectionString" "1" "$secondOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE ORGANIZATION" }
 
 #-------------------------------------------------------------
 Write-Host "Configuring test users"
 #-------------------------------------------------------------
 
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$globalAdminUserName" "$globalAdminPw" "GlobalAdmin"
+& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$globalAdminUserName" "$globalAdminPw" "GlobalAdmin" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE GLOBAL ADMIN" }
 
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$localAdminUserName" "$localAdminPw" "LocalAdmin"
+& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$localAdminUserName" "$localAdminPw" "LocalAdmin" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE LOCAL ADMIN" }
 
-& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$normalUserUserName" "$normalUserPw" "User"
+& $testToolsExePath "CreateTestUser" "$kitosDbConnectionString" "$normalUserUserName" "$normalUserPw" "User" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE NORMAL USER" }
 
-& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "User"
+& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiUserUserName" "$apiUserPw" "User" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE APIACCESS USER" }
 
-& $testToolsExePath "CreateMultiOrganizationApiTestUser" "$kitosDbConnectionString" "$apiGlobalAdminUserName" "$apiGlobalAdminPw" "GlobalAdmin"
+& $testToolsExePath "CreateApiTestUser" "$kitosDbConnectionString" "$apiGlobalAdminUserName" "$apiGlobalAdminPw" "GlobalAdmin" "$defaultOrganization,$secondOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE MULTI ORGANIZATION APIACCESS USER" }
 
 #-------------------------------------------------------------
 Write-Host "Create IT System"
 #-------------------------------------------------------------
-& $testToolsExePath "CreateDefaultOrganizationItSystem" "$kitosDbConnectionString" "DefaultTestItSystem"
+& $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "DefaultTestItSystem" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
-& $testToolsExePath "CreateSecondOrganizationItSystem" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem"
+& $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem" "$secondOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
 #-------------------------------------------------------------

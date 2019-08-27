@@ -7,9 +7,13 @@ namespace Tools.Test.Database.Model.Tasks
 {
     public class CreateOrganizationTask : DatabaseTask
     {
+        private readonly string _orgName;
+        private readonly int _organizationType;
 
-        public CreateOrganizationTask(string connectionString) : base(connectionString)
+        public CreateOrganizationTask(string connectionString, string organizationType, string orgName) : base(connectionString)
         {
+            _organizationType = ParseInt(organizationType ?? throw new ArgumentNullException(nameof(organizationType)));
+            _orgName = orgName ?? throw new ArgumentNullException(nameof(orgName));
         }
 
         public override bool Execute()
@@ -20,9 +24,9 @@ namespace Tools.Test.Database.Model.Tasks
 
                 var organization = new Organization()
                 {
-                    Name = TestOrganizations.secondTestOrg,
+                    Name = _orgName,
                     AccessModifier = AccessModifier.Public,
-                    TypeId = 1,
+                    TypeId = _organizationType,
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id
                 };
@@ -40,6 +44,17 @@ namespace Tools.Test.Database.Model.Tasks
             }
 
             return true;
+        }
+
+        private int ParseInt(string input)
+        {
+            
+            if (!int.TryParse(input, out var output))
+            {
+                throw new ArgumentException($"{nameof(input)} must be an integer");
+            }
+
+            return output;
         }
     }
 }

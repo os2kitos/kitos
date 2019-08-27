@@ -48,50 +48,45 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(connectionString);
                     return new DropDatabaseTask(connectionString);
 
-                case CliTargets.CreateSecondOrganization:
-                    Console.WriteLine("Expecting the following arguments: <connectionString>");
+                case CliTargets.CreateOrganization:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <organizationType> <organizationName>");
                     var createOrganizationArgs = new
                     {
-                        ConnectionString = GetArgument(additionalArgs, 0)
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        OrganizationType = GetArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2)
                     };
 
-                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString);
+                    FailOnConnectionToProd(createOrganizationArgs.ConnectionString);
+                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString, createOrganizationArgs.OrganizationType, createOrganizationArgs.OrganizationName);
 
                 case CliTargets.CreateTestUser:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role> <organizationNames>");
                     var createUserArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         Email = GetArgument(additionalArgs, 1),
                         Password = GetArgument(additionalArgs, 2),
                         Role = GetArgument(additionalArgs, 3),
+                        OrganizationNames = GetArgument(additionalArgs, 4)
                     };
 
-                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
+                    FailOnConnectionToProd(createUserArgs.ConnectionString);
+                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role, createUserArgs.OrganizationNames);
 
                 case CliTargets.CreateApiTestUser:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role> <organizationNames>");
                     var createApiUserArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         Email = GetArgument(additionalArgs, 1),
                         Password = GetArgument(additionalArgs, 2),
                         Role = GetArgument(additionalArgs, 3),
+                        OrganizationNames = GetArgument(additionalArgs, 4)
                     };
 
-                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, true);
-
-                case CliTargets.CreateMultiOrganizationApiTestUser:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
-                    var createMultiOrganizationApiUserArgs = new
-                    {
-                        ConnectionString = GetArgument(additionalArgs, 0),
-                        Email = GetArgument(additionalArgs, 1),
-                        Password = GetArgument(additionalArgs, 2),
-                        Role = GetArgument(additionalArgs, 3),
-                    };
-
-                    return new CreateKitosUserTask(createMultiOrganizationApiUserArgs.ConnectionString, createMultiOrganizationApiUserArgs.Email, createMultiOrganizationApiUserArgs.Password, createMultiOrganizationApiUserArgs.Role, true, true);
+                    FailOnConnectionToProd(createApiUserArgs.ConnectionString);
+                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, createApiUserArgs.OrganizationNames, true);
 
                 case CliTargets.EnableAllOptions:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
@@ -103,27 +98,17 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(enableAllArgs.ConnectionString);
                     return new EnableAllOptionsTask(enableAllArgs.ConnectionString);
 
-                case CliTargets.CreateDefaultOrganizationItSystem:
+                case CliTargets.CreateItSystem:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
-                    var createDefaultOrganiztionSystemArgs = new
+                    var createItSystemArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
-                        ItSystemName = GetArgument(additionalArgs, 1)
+                        ItSystemName = GetArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2)
                     };
 
-                    FailOnConnectionToProd(createDefaultOrganiztionSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createDefaultOrganiztionSystemArgs.ConnectionString, createDefaultOrganiztionSystemArgs.ItSystemName);
-
-                case CliTargets.CreateSecondOrganizationItSystem:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
-                    var createSecondOrganizationSystemArgs = new
-                    {
-                        ConnectionString = GetArgument(additionalArgs, 0),
-                        ItSystemName = GetArgument(additionalArgs, 1)
-                    };
-
-                    FailOnConnectionToProd(createSecondOrganizationSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createSecondOrganizationSystemArgs.ConnectionString, createSecondOrganizationSystemArgs.ItSystemName, true);
+                    FailOnConnectionToProd(createItSystemArgs.ConnectionString);
+                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
