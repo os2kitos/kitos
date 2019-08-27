@@ -90,10 +90,6 @@
                 }
             });
 
-
-            //this.checkUserAccessRights();
-            
-
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
                 // global admin should see all it systems everywhere with all levels of access

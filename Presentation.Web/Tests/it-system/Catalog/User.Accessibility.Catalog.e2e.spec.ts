@@ -47,7 +47,49 @@ describe("ITSystem Catalog accessibility tests", () => {
             });
     });
 
-    it("Global Admin can create and delete It-system catalog", () => {
+    it("Local Admin can still delete IT-system Catalogs that have been created locally", () => {
+        const catalogName = "catalog" + new Date().getTime();
+        loginHelper.loginAsGlobalAdmin()
+            .then(() => {
+                return loadPage();
+            }).then(() => {
+                return waitForKendoGrid();
+            }).then(() => {
+                return expectCreateButtonVisibility(true);
+            }).then(() => {
+                console.log("Making sure " + catalogName + " does not exist");
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            }).then(() => {
+                console.log("Creating catalog");
+                return CatalogHelper.createCatalog(catalogName);
+            }).then(() => {
+                console.log("Deleting cookies");
+                return browser.driver.manage().deleteAllCookies();
+            }).then(() => {
+                console.log("Logging in as Local Admin");
+                return loginHelper.loginAsLocalAdmin();
+            }).then(() => {
+                return loadPage();
+            }).then(() => {
+                return waitForKendoGrid();
+            }).then(() => {
+                return expect(findCatalogColumnsFor(catalogName).first().getText()).toEqual(catalogName);
+            }).then(() => {
+                console.log("Deleting catalog");
+                return CatalogHelper.deleteCatalog(catalogName);
+            }).then(() => {
+                return loadPage();
+            }).then(() => {
+                return waitForKendoGrid();
+            }).then(() => {
+            console.log("Checking that the catalog have been deleted");
+                return expect(findCatalogColumnsFor(catalogName)).toBeEmptyArray();
+            });
+
+    });
+    
+
+        it("Global Admin can create and delete It-system catalog", () => {
         const catalogName = "catalog" + new Date().getTime();
         loginHelper.loginAsGlobalAdmin()
             .then(() => {
