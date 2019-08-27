@@ -37,6 +37,8 @@
             '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_','userAccessRights',
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
                 
+                //TODO for MBK - har du set den der? -> Hvilken indflydelse har den nu hvor der er de nye access rights? Den går igen på de andre tabs. Selve værdien er det samme som den fra canEdit, da den også kalder AllowModify
+                //TODO: Overvej om de to GetAccessRights metoder skal ned i GenericApiController. De kalder ned i generisk funktionalitet i forvejen. Samtidig bør vi have to forskellige DTO'er tilpasset hhv. "Må jeg" med/uden entity
                 $scope.hasWriteAccess = hasWriteAccess;
 
                 if (userAccessRights.canDelete) {
