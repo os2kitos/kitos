@@ -10,14 +10,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemUsedByTests : WithAutoFixture
     {
-        private readonly KitosCredentials _globalAdminApiUser, _regularApiUser;
 
-        public ItSystemUsedByTests()
-        {
-            _globalAdminApiUser = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin, true);
-            _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
-        }
-        
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
@@ -34,8 +27,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetDefaultOrganizationId()));
-                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetSecondOrganizationId()));
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId));
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.SecondOrganizationId));
                 Assert.NotEmpty(response.Result);
             }
         }
@@ -49,14 +42,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var user = TestEnvironment.GetCredentials(apiUserType, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(user.Username, user.Password);
             var token = await HttpApi.GetTokenAsync(loginDto);
+            var url = TestEnvironment.CreateUrl(
+                $"odata/ItSystemUsages?$expand=Organization&%24format=json&%24filter=ItSystemId+eq+{TestEnvironment.DefaultItSystemId}&%24count=true");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"odata/ItSystemUsages?$expand=Organization&%24format=json&%24filter=ItSystemId+eq+{TestEnvironment.GetDefaultItSystemId()}&%24count=true"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.GetDefaultOrganizationId()));
+                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId));
                 Assert.NotEmpty(response.Result);
             }
         }
