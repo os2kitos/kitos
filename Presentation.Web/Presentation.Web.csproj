@@ -503,7 +503,6 @@
     <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
-    <Compile Include="Infrastructure\Attributes\KITOSApiExplorer.cs" />
     <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
