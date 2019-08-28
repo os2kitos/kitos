@@ -149,12 +149,12 @@ describe("ITSystem Catalog accessibility tests", () => {
         return "Catalog" + new Date().getTime();
     }
 
-    function expectCatalogWithName(name: string){
+    function expectCatalogWithName(name: string) {
         console.log("Making sure " + name + " does exist");
         return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
     }
 
-    function expectNoCatalogWithName(name: string){
+    function expectNoCatalogWithName(name: string) {
         console.log("Making sure " + name + " does not exist");
         return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
     }
