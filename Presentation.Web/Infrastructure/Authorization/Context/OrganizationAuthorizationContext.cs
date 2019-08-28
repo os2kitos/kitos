@@ -98,15 +98,14 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 ignoreReadOnlyRole = true;
                 result = true;
             }
-            else if (HasAssignedWriteAccess(entity))
-            {
-                result = true;
-            }
             else if (IsContextBound(entity))
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    result = IsLocalAdmin() || AllowWritesToEntity(entity);
+                    result = 
+                        IsLocalAdmin() || 
+                        AllowWritesToEntity(entity) ||
+                        HasAssignedWriteAccess(entity);
                 }
             }
             else

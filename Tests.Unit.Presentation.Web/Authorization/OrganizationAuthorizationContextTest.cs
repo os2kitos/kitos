@@ -93,7 +93,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         //Checks not bound to context condition
         [InlineData(true, false, false, false, false, false, false, false, true)]
         [InlineData(false, true, false, false, false, false, false, false, true)]
-        [InlineData(false, false, true, false, false, false, false, false, true)]
+        [InlineData(false, false, true, true, false, false, false, false, true)]
 
         //Same organization - positive matches
         [InlineData(false, false, false, true, true, false, false, false, true)]
@@ -137,16 +137,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, true)]
-        [InlineData(false, false, true, false, false, true)]
-        [InlineData(false, false, false, true, false, true)]
-        [InlineData(false, false, false, false, true, true)]
-        [InlineData(false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, true)]
+        [InlineData(false, true, false, false, true)]
+        [InlineData(false, false, true, false, true)]
+        [InlineData(false, false, false, true, true)]
+        [InlineData(false, false, false, false, false)]
         public void AllowUpdates_For_Context_Independent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
-           bool hasAssignedWriteAccess,
            bool hasModuleLevelAccess,
            bool hasOwnership,
            bool expectedResult)
@@ -157,7 +155,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
-            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
@@ -250,7 +247,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         //Checks not bound to context condition
         [InlineData(true, false, false, false, false, false, false, false, true)]
         [InlineData(false, true, false, false, false, false, false, false, true)]
-        [InlineData(false, false, true, false, false, false, false, false, true)]
+        [InlineData(false, false, true, true, false, false, false, false, true)]
 
         //Same organization - positive matches
         [InlineData(false, false, false, true, true, false, false, false, true)]
@@ -294,16 +291,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, true)]
-        [InlineData(false, false, true, false, false, true)]
-        [InlineData(false, false, false, true, false, true)]
-        [InlineData(false, false, false, false, true, true)]
-        [InlineData(false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, true)]
+        [InlineData(false, true, false, false, true)]
+        [InlineData(false, false, true, false, true)]
+        [InlineData(false, false, false, true, true)]
+        [InlineData(false, false, false, false, false)]
         public void AllowDelete_For_Context_Independent_Object_Returns(
            bool isGlobalAdmin,
            bool inputIsActiveUser,
-           bool hasAssignedWriteAccess,
            bool hasModuleLevelAccess,
            bool hasOwnership,
            bool expectedResult)
@@ -314,7 +309,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
-            ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
 
