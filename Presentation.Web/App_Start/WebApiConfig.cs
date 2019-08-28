@@ -65,7 +65,6 @@ namespace Presentation.Web
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
-            config.Services.Replace(typeof(IApiExplorer), new KITOSApiExplorer(config));
         }
 
         public static IEdmModel GetModel()

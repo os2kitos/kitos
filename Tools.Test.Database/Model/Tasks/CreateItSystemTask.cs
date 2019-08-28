@@ -11,20 +11,20 @@ namespace Tools.Test.Database.Model.Tasks
     public class CreateItSystemTask : DatabaseTask
     {
         private readonly string _name;
-        private readonly bool _secondOrganization;
+        private readonly string _organizationName;
 
-        public CreateItSystemTask(string connectionString, string name, bool secondOrganization = false)
+        public CreateItSystemTask(string connectionString, string name, string organizationName)
             : base(connectionString)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
-            _secondOrganization = secondOrganization;
+            _organizationName = organizationName;
         }
 
         public override bool Execute()
         {
             using (var context = CreateKitosContext())
             {
-                var organization = _secondOrganization ? context.GetOrganization(TestOrganizations.secondTestOrg) : context.GetOrganization(TestOrganizations.commonOrg);
+                var organization = context.GetOrganization(_organizationName);
                 var globalAdmin = context.GetGlobalAdmin();
 
                 //Create the new it system

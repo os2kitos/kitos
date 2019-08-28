@@ -15,7 +15,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
@@ -92,7 +91,7 @@ namespace Presentation.Web.Controllers.API
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                     );
-                paging.WithPostProcessingFilter(AllowReadAccess);
+                paging.WithPostProcessingFilter(AllowRead);
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -126,7 +125,7 @@ namespace Presentation.Web.Controllers.API
                         // only object owners will be albe to see private objects
                         ));
 
-                systems = systems.AsEnumerable().Where(AllowReadAccess).AsQueryable();
+                systems = systems.AsEnumerable().Where(AllowRead).AsQueryable();
 
                 var dtos = Map(systems);
 
@@ -195,7 +194,7 @@ namespace Presentation.Web.Controllers.API
                     // only object owners will be albe to see private objects
                     , readOnly: true);
 
-                systems = systems.Where(AllowReadAccess);
+                systems = systems.Where(AllowRead);
 
                 var dtos = Map(systems);
                 return Ok(dtos);
@@ -212,7 +211,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var systems = _systemService.GetInterfaces(orgId, q, KitosUser);
 
-                systems = systems.Where(AllowReadAccess);
+                systems = systems.Where(AllowRead);
 
                 var dtos = Map(systems);
                 return Ok(dtos);
@@ -229,7 +228,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var systems = _systemService.GetNonInterfaces(orgId, q, KitosUser);
 
-                systems = systems.Where(AllowReadAccess);
+                systems = systems.Where(AllowRead);
 
                 var dtos = Map(systems);
                 return Ok(dtos);
@@ -246,7 +245,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var systems = _systemService.GetHierarchy(id);
 
-                systems = systems.Where(AllowReadAccess);
+                systems = systems.Where(AllowRead);
 
                 return Ok(Map(systems));
             }
@@ -275,7 +274,7 @@ namespace Presentation.Web.Controllers.API
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
 
-                if (!AllowWriteAccess(item))
+                if (!AllowCreate<ItSystem>(item))
                 {
                     return Forbidden();
                 }
@@ -302,7 +301,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId), readOnly: true);
 
-                systems = systems?.Where(AllowReadAccess);
+                systems = systems?.Where(AllowRead);
 
                 return systems == null ? NotFound() : Ok(Map(systems));
             }
@@ -318,7 +317,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!AllowWriteAccess(system))
+                if (!AllowModify(system))
                 {
                     return Forbidden();
                 }
@@ -371,7 +370,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowWriteAccess(system))
+                if (!AllowModify(system))
                 {
                     return Forbidden();
                 }
@@ -429,7 +428,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowReadAccess(system))
+                if (!AllowRead(system))
                 {
                     return Forbidden();
                 }
@@ -453,7 +452,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
-                pagingModel.WithPostProcessingFilter(AllowReadAccess);
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
@@ -500,7 +499,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationAccess(orgId))
+                if (!AllowOrganizationReadAccess(orgId))
                 {
                     return Forbidden();
                 }

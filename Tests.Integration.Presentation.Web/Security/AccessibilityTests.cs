@@ -26,8 +26,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, _regularApiUser.Password);
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token))
@@ -53,14 +52,13 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, _regularApiUser.Password);
             var payload = new
             {
                 Title = A<string>(),
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
             using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))

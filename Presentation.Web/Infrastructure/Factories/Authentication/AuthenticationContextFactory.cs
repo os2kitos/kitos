@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
+using Core.DomainModel;
 using Core.DomainServices;
 using Microsoft.Owin;
 using Presentation.Web.Extensions;
@@ -23,30 +24,24 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 
         public IAuthenticationContext Create()
         {
-            var user = _owinContext.Authentication.User;
-            return IsAuthenticated(user)
-                ? new AuthenticationContext(MapAuthenticationMethod(user), MapApiAccess(user), GetUserId(user), MapOrganizationId(user))
+            var principal = _owinContext.Authentication.User;
+            var user = GetAuthenticatedUser(principal);
+            return user != null
+                ? new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id, MapOrganizationId(user, principal))
                 : new AuthenticationContext(AuthenticationMethod.Anonymous, false);
         }
 
-        private bool MapApiAccess(IPrincipal user)
+        private bool MapApiAccess(User user)
         {
-            var id = GetUserId(user);
-            if (id.HasValue)
-            {
-                var dbUser = _userRepository.GetById(id.Value);
-                return dbUser.HasApiAccess == true;
-            }
-            return false;
-
+            return user.HasApiAccess == true;
         }
 
-        private int? MapOrganizationId(IPrincipal user)
+        private int? MapOrganizationId(User user, IPrincipal principal)
         {
-            var method = MapAuthenticationMethod(user);
+            var method = MapAuthenticationMethod(principal);
             if (method == AuthenticationMethod.KitosToken)
             {
-                var orgId = (user.Identity as ClaimsIdentity).GetClaimOrNull(BearerTokenConfig.DefaultOrganizationClaimName);
+                var orgId = (principal.Identity as ClaimsIdentity).GetClaimOrNull(BearerTokenConfig.DefaultOrganizationClaimName);
 
                 if (orgId != null)
                 {
@@ -59,12 +54,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
             else if (method == AuthenticationMethod.Forms)
             {
-                var userId = GetUserId(user);
-                if (userId.HasValue)
-                {
-                    var dbUser = _userRepository.GetByKey(userId.Value);
-                    return dbUser?.DefaultOrganizationId;
-                }
+                return user.DefaultOrganizationId;
             }
             return default(int?);
         }
@@ -86,9 +76,18 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             }
         }
 
-        private bool IsAuthenticated(IPrincipal user)
+        private User GetAuthenticatedUser(IPrincipal user)
         {
-            return user.Identity.IsAuthenticated;
+            if (user.Identity.IsAuthenticated)
+            {
+                var id = GetUserId(user);
+                if (id.HasValue)
+                {
+                    return _userRepository.GetById(id.Value);
+                }
+            }
+
+            return null;
         }
 
         private int? ParseInteger(string toParse)

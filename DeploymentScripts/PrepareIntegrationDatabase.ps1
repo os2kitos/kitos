@@ -1,4 +1,4 @@
-#-------------------------------------------------------------
+﻿#-------------------------------------------------------------
 # Stop on first error
 #-------------------------------------------------------------
 $ErrorActionPreference = "Stop"
@@ -16,6 +16,8 @@ Setup-Environment -environmentName "integration"
                 -migrationsFolderPath "$Env:MigrationsFolder" `
                 -kitosDbConnectionString "$Env:KitosDbConnectionStringForTeamCity" `
                 -hangfireDbConnectionString "$Env:HangfireDbConnectionStringForTeamCity" `
+                -defaultOrganization "Fælles Kommune" `
+                -secondOrganization "Test organisation to" `
                 -globalAdminUserName "$Env:TestUserGlobalAdmin" `
                 -globalAdminPw "$Env:TestUserGlobalAdminPw" `
                 -localAdminUserName "$Env:TestUserLocalAdmin" `

@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Context
@@ -26,7 +27,6 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             }
             else if (IsUserInMunicipality())
             {
-                //TODO: Ask question: Verify this. Seems a bit broad. Is there no requirement that the other org is a municipality?
                 result = true;
             }
 
@@ -60,7 +60,30 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return result;
         }
 
-        public bool AllowUpdates(IEntity entity)
+        public bool AllowCreate<T>()
+        {
+            if (IsReadOnly())
+            {
+                return false;
+            }
+
+            if (MatchType<T, ItSystem>())
+            {
+                return IsGlobalAdmin();
+            }
+
+            //NOTE: Once we migrate more types, this will be extended
+            return true;
+        }
+
+        public bool AllowCreate<T>(IEntity entity)
+        {
+            return
+                AllowCreate<T>() &&
+                AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
+        }
+
+        public bool AllowModify(IEntity entity)
         {
             var result = false;
 
@@ -75,15 +98,14 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 ignoreReadOnlyRole = true;
                 result = true;
             }
-            else if (HasAssignedWriteAccess(entity))
-            {
-                result = true;
-            }
             else if (IsContextBound(entity))
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    result = IsLocalAdmin() || AllowWritesToEntity(entity);
+                    result = 
+                        IsLocalAdmin() || 
+                        AllowWritesToEntity(entity) ||
+                        HasAssignedWriteAccess(entity);
                 }
             }
             else
@@ -95,9 +117,30 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
         }
 
+        public bool AllowDelete(IEntity entity)
+        {
+            var result = false;
+            if (AllowModify(entity))
+            {
+                switch (entity)
+                {
+                    case ItSystem _:
+                        result =
+                            IsGlobalAdmin() ||
+                            (IsLocalAdmin() && ActiveContextIsEntityContext(entity));
+                        break;
+                    default:
+                        result = true;
+                        break;
+                }
+            }
+
+            return result;
+        }
+
         public bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return AllowUpdates(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
+            return AllowModify(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
         }
 
         private bool AllowWritesToEntity(IEntity entity)
@@ -179,6 +222,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         private bool EntityEqualsActiveUser(IEntity entity)
         {
             return IsUserEntity(entity) && entity.Id == _activeUserContext.UserId;
+        }
+
+        private static bool MatchType<TLeft, TRight>()
+        {
+            return typeof(TLeft) == typeof(TRight);
         }
     }
 }

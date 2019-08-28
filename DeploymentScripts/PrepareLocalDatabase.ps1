@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory=$true)][string]$kitosDbConnectionString,
     [Parameter(Mandatory=$true)][string]$hangfireDbConnectionString
     )
@@ -30,6 +30,8 @@ $localUserPassword = "localNoSecret"
                 -migrationsFolderPath "$migrationsFolder" `
                 -kitosDbConnectionString "$kitosDbConnectionString" `
                 -hangfireDbConnectionString "$hangfireDbConnectionString" `
+                -defaultOrganization "Fælles Kommune" `
+                -secondOrganization "Test organisation to" `
                 -globalAdminUserName "local-global-admin-user@kitos.dk" `
                 -globalAdminPw "$localUserPassword" `
                 -localAdminUserName "local-local-admin-user@kitos.dk" `
@@ -40,3 +42,4 @@ $localUserPassword = "localNoSecret"
                 -apiUserPw "$localUserPassword" `
                 -apiGlobalAdminUserName "local-api-global-admin-user@kitos.dk" `
                 -apiGlobalAdminPw "$localUserPassword"
+                
