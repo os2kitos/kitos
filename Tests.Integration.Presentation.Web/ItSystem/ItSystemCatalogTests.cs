@@ -80,7 +80,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(role);
-            
+
             //Act
             using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id={TestEnvironment.DefaultItSystemId}&getEntityAccessRights=true"), cookie))
             {
@@ -90,6 +90,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(canView, response.Result.CanView);
                 Assert.Equal(canEdit, response.Result.CanEdit);
                 Assert.Equal(canDelete, response.Result.CanDelete);
+            }
+        }
+
+        [Fact]
+        public async Task GetAccessRightsForEntity_With_Unknown_Entity_Returns_404()
+        {
+            //Arrange
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id=-1&getEntityAccessRights=true"), cookie))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.NotFound, httpResponse.StatusCode);
             }
         }
     }

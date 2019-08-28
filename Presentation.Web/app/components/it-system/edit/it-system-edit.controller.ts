@@ -23,7 +23,7 @@
                         });
                 }],
                 userAccessRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id + "?getEntityAccessRights=true")
+                    return $http.get("api/itsystem?id=" + $stateParams.id + "&getEntityAccessRights=true")
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -34,11 +34,9 @@
 
     app.controller('system.EditCtrl',
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_','userAccessRights',
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights',
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
-                
-                //TODO for MBK - har du set den der? -> Hvilken indflydelse har den nu hvor der er de nye access rights? Den går igen på de andre tabs. Selve værdien er det samme som den fra canEdit, da den også kalder AllowModify
-                //TODO: Overvej om de to GetAccessRights metoder skal ned i GenericApiController. De kalder ned i generisk funktionalitet i forvejen. Samtidig bør vi have to forskellige DTO'er tilpasset hhv. "Må jeg" med/uden entity
+
                 $scope.hasWriteAccess = hasWriteAccess;
 
                 if (userAccessRights.canDelete) {
@@ -46,8 +44,7 @@
                         $rootScope.page.subnav.buttons.push({ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' });
                     }
                 }
-                else
-                {
+                else {
                     _.remove($rootScope.page.subnav.buttons, function (o) {
                         return o.text === "Slet IT System";
                     });
@@ -60,16 +57,14 @@
                         return o.text === "Aktivér IT System";
                     });
 
-                    if (userAccessRights.canEdit) {
-                        if (!itSystem.disabled) {
-                            $rootScope.page.subnav.buttons.push(
-                                { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
-                            );
-                        } else {
-                            $rootScope.page.subnav.buttons.push(
-                                { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
-                            );
-                        }
+                    if (!itSystem.disabled) {
+                        $rootScope.page.subnav.buttons.push(
+                            { func: disableSystem, text: 'Deaktivér IT System', style: 'btn-danger', showWhen: 'it-system.edit' }
+                        );
+                    } else {
+                        $rootScope.page.subnav.buttons.push(
+                            { func: enableSystem, text: 'Aktivér IT System', style: 'btn-success', showWhen: 'it-system.edit' }
+                        );
                     }
                 }
                 function disableSystem() {

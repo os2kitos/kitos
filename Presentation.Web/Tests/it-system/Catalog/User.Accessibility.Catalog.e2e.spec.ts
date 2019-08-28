@@ -159,7 +159,3 @@ describe("ITSystem Catalog accessibility tests", () => {
         return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
     }
 });
-
-
-
-
