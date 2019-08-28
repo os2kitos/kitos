@@ -133,8 +133,8 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
-            var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
+            var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
             using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))

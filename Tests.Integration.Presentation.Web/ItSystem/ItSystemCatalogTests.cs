@@ -4,29 +4,24 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemCatalogTests : WithAutoFixture
     {
-        private readonly KitosCredentials _apiUser;
 
-        public ItSystemCatalogTests()
-        {
-            _apiUser = TestEnvironment.GetApiUser();
-        }
-
-        [Fact]
-        public async Task Api_User_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization()
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Api_Users_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization(OrganizationRole role)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(role);
+            var url = TestEnvironment.CreateUrl($"odata/ItSystems({TestEnvironment.DefaultItSystemId})");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems(1)"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert
@@ -35,12 +30,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_Data_From_Own_Organizations()
+        [Theory]
+        [InlineData(OrganizationRole.User, 1)]
+        [InlineData(OrganizationRole.GlobalAdmin, 2)]
+        public async Task Api_Users_Can_Get_All_IT_Systems_Data_From_Own_Organizations(OrganizationRole role, int minimumNumberOfItSystems)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(role);
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems"), token.Token))
@@ -49,6 +45,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotNull(response.Result.First().Name);
+                Assert.True(minimumNumberOfItSystems <= response.Result.Count);
             }
         }
 

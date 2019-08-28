@@ -2,7 +2,6 @@
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -11,12 +10,12 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AuthorizationTests : WithAutoFixture
     {
-        private readonly KitosCredentials _apiUser, _globalAdmin;
+        private readonly KitosCredentials _regularApiUser, _globalAdmin;
         private readonly Uri _getTokenUrl;
 
         public AuthorizationTests()
         {
-            _apiUser = TestEnvironment.GetApiUser();
+            _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
             _globalAdmin = TestEnvironment.GetCredentials(OrganizationRole.GlobalAdmin);
             _getTokenUrl = TestEnvironment.CreateUrl("api/authorize/GetToken");
         }
@@ -25,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Api_Access_User_Can_Get_Token()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, _regularApiUser.Password);
 
             //Act
             var tokenResponse = await HttpApi.GetTokenAsync(loginDto);
@@ -57,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Get_Token_Returns_401_On_Invalid_Password()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, A<string>());
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_regularApiUser.Username, A<string>());
             
             //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))
@@ -71,7 +70,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Get_Token_Returns_401_On_Invalid_Username()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(A<string>(), _apiUser.Password);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(A<string>(), _regularApiUser.Password);
 
             //Act
             using (var httpResponseMessage = await HttpApi.PostAsync(_getTokenUrl, loginDto))

@@ -10,9 +10,11 @@ namespace Tests.Integration.Presentation.Web.TestEnvironmentValidation
         [InlineData(OrganizationRole.User)]
         [InlineData(OrganizationRole.LocalAdmin)]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        public void User_With_Role_Is_Available(OrganizationRole role)
+        [InlineData(OrganizationRole.User, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        public void User_With_Role_Is_Available(OrganizationRole role, bool apiAccess = false)
         {
-            var user = TestEnvironment.GetCredentials(role);
+            var user = TestEnvironment.GetCredentials(role, apiAccess);
 
             Assert.NotNull(user);
             Assert.False(string.IsNullOrWhiteSpace(user.Username));
