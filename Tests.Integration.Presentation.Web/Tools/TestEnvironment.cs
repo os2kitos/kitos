@@ -173,15 +173,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             return DefaultUserPassword;
         }
-
-        public static int GetDefaultOrganizationId()
-        {
-            return 1;
-        }
-
-        public static int GetDefaultItSystemId()
-        {
-            return 1;
-        }
+        
+        public static int DefaultItSystemId => 1;
+        public static int DefaultOrganizationId => 1;
     }
 }

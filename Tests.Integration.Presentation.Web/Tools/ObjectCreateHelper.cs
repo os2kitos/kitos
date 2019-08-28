@@ -33,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return new CreateUserDTO
             {
                 user = apiUser,
-                organizationId = TestEnvironment.GetDefaultOrganizationId(),
+                organizationId = TestEnvironment.DefaultOrganizationId,
                 sendMailOnCreation = false
             };
         }

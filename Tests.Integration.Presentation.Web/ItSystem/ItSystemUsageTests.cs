@@ -15,7 +15,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages");
+            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.DefaultOrganizationId})/ItSystemUsages");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
@@ -32,7 +32,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/OrganizationUnits({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages");
+            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.DefaultOrganizationId})/OrganizationUnits({TestEnvironment.DefaultOrganizationId})/ItSystemUsages");
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {

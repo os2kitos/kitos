@@ -12,7 +12,6 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
@@ -223,19 +222,34 @@ namespace Presentation.Web.Controllers.API
 
         #region access control
 
-        protected bool AllowOrganizationAccess(int organizationId)
+        protected bool AllowOrganizationReadAccess(int organizationId)
         {
-            return AuthorizationStrategy.AllowOrganizationAccess(organizationId);
+            return AuthorizationStrategy.AllowOrganizationReadAccess(organizationId);
         }
 
-        protected bool AllowReadAccess(IEntity entity)
+        protected bool AllowRead(IEntity entity)
         {
-            return AuthorizationStrategy.AllowReadAccess(entity);
+            return AuthorizationStrategy.AllowRead(entity);
         }
 
-        protected bool AllowWriteAccess(IEntity entity)
+        protected bool AllowModify(IEntity entity)
         {
-            return AuthorizationStrategy.AllowWriteAccess(entity);
+            return AuthorizationStrategy.AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowCreate<T>()
+        {
+            return AuthorizationStrategy.AllowCreate<T>();
+        }
+
+        protected bool AllowDelete(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
