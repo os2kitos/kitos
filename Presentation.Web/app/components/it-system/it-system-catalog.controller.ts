@@ -918,7 +918,7 @@
                             "userService", userService => userService.getUser()
                         ],
                         userAccessRights: ['$http', function ($http) {
-                            return $http.get("api/itsystem/accessrights")
+                            return $http.get("api/itsystem/?getEntitiesAccessRights=true")
                                 .then(function (result) {
                                     return result.data.response;
                                 });

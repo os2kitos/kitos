@@ -526,8 +526,9 @@
     <Compile Include="Models\DataResponsibleDTO.cs" />
     <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
+    <Compile Include="Models\EntitiesAccessRightsDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
-    <Compile Include="Models\ItSystemAccessRightsDTO.cs" />
+    <Compile Include="Models\EntityAccessRightsDTO.cs" />
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />

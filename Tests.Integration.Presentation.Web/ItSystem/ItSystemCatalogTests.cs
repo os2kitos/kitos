@@ -62,15 +62,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem/accessrights"), cookie))
+            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem?getEntitiesAccessRights=true"), cookie))
             {
                 //Assert
-                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<ItSystemAccessRightsDTO>();
+                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<EntitiesAccessRightsDTO>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.Equal(canView, response.Result.CanView);
-                Assert.Equal(canEdit, response.Result.CanEdit);
                 Assert.Equal(canCreate, response.Result.CanCreate);
-                Assert.Equal(canDelete, response.Result.CanDelete);
             }
         }
 
@@ -84,14 +82,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
             
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem/{TestEnvironment.DefaultItSystemId}/accessrights"), cookie))
+            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id={TestEnvironment.DefaultItSystemId}&getEntityAccessRights=true"), cookie))
             {
                 //Assert
-                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<ItSystemAccessRightsDTO>();
+                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<EntityAccessRightsDTO>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.Equal(canView, response.Result.CanView);
                 Assert.Equal(canEdit, response.Result.CanEdit);
-                Assert.Equal(canCreate, response.Result.CanCreate);
                 Assert.Equal(canDelete, response.Result.CanDelete);
             }
         }

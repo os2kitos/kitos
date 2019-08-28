@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
@@ -132,6 +133,44 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        /// <summary>
+        /// GET api/T/GetAccessRights
+        /// Checks what access rights the user has for the given entities
+        /// </summary>
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        {
+            if (!AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault()))
+            {
+                return Forbidden();
+            }
+            return Ok(new EntitiesAccessRightsDTO
+            {
+                CanCreate = AllowCreate<TModel>(),
+                CanView = true
+            });
+        }
+
+        /// <summary>
+        /// GET api/T/id?GetAccessRightsForEntity
+        /// Checks what access rights the user has for the given entity
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        public HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
+        {
+            var item = Repository.GetByKey(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(new EntityAccessRightsDTO
+            {
+                CanDelete = AllowDelete(item),
+                CanEdit = AllowModify(item),
+                CanView = AllowRead(item)
+            });
+        }
+
         protected virtual TModel PostQuery(TModel item)
         {
             var insertedItem = Repository.Insert(item);

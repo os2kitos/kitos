@@ -469,36 +469,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [Route("api/itsystem/accessrights")]
-        public HttpResponseMessage GetAccessRights()
-        {
-            if (!AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault()))
-            {
-                return Forbidden();
-            }
-            return Ok(new ItSystemAccessRightsDTO
-            {
-                CanCreate = AllowCreate<ItSystem>(),
-                CanView = true
-            });
-        }
-
-        [Route("api/itsystem/{id}/accessrights")]
-        public HttpResponseMessage GetAccessRightsForEntity(int id)
-        {
-            var itSystem = Repository.GetByKey(id);
-            if (itSystem == null)
-            {
-                return NotFound();
-            }
-            return Ok(new ItSystemAccessRightsDTO
-            {
-                CanDelete = AllowDelete(itSystem),
-                CanEdit = AllowModify(itSystem),
-                CanView = AllowRead(itSystem)
-            });
-        }
-
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             // try get AccessModifier value

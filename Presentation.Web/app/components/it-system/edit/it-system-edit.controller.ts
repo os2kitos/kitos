@@ -23,7 +23,7 @@
                         });
                 }],
                 userAccessRights: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id +"/accessrights")
+                    return $http.get("api/itsystem/" + $stateParams.id + "?getEntityAccessRights=true")
                         .then(function (result) {
                             return result.data.response;
                         });

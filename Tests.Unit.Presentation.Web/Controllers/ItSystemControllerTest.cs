@@ -40,7 +40,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             ExpectAllowReadsWithinOrganizationReturns(false);
 
             //Act
-            var accessRights = _sut.GetAccessRights();
+            var accessRights = _sut.GetAccessRights(true);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, accessRights.StatusCode);
@@ -56,14 +56,12 @@ namespace Tests.Unit.Presentation.Web.Controllers
             ExpectAllowCreateReturns(allowCreate);
 
             //Act
-            var responseMessage = _sut.GetAccessRights();
+            var responseMessage = _sut.GetAccessRights(true);
 
             //Assert
-            var dto = ExpectResponseOf<ItSystemAccessRightsDTO>(responseMessage);
+            var dto = ExpectResponseOf<EntitiesAccessRightsDTO>(responseMessage);
 
             Assert.True(dto.CanView);
-            Assert.False(dto.CanDelete);
-            Assert.False(dto.CanEdit);
             Assert.Equal(allowCreate, dto.CanCreate);
         }
 
@@ -86,15 +84,14 @@ namespace Tests.Unit.Presentation.Web.Controllers
             ExpectAllowDeleteReturns(allowDelete, itSystem);
 
             //Act
-            var responseMessage = _sut.GetAccessRightsForEntity(id);
+            var responseMessage = _sut.GetAccessRightsForEntity(id,true);
 
             //Assert
-            var dto = ExpectResponseOf<ItSystemAccessRightsDTO>(responseMessage);
+            var dto = ExpectResponseOf<EntityAccessRightsDTO>(responseMessage);
 
             Assert.Equal(allowRead, dto.CanView);
             Assert.Equal(allowModify, dto.CanEdit);
             Assert.Equal(allowDelete, dto.CanDelete);
-            Assert.False(dto.CanCreate);
         }
 
         private void ExpectAllowDeleteReturns(bool allowDelete, ItSystem itSystem)
