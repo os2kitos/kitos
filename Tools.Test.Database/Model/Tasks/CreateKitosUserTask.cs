@@ -15,13 +15,15 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly OrganizationRole _role;
         private readonly bool _apiAccess;
         private readonly string _salt;
+        private readonly string[] _organizationNames;
 
-        public CreateKitosUserTask(string connectionString, string email, string password, string role, bool apiAccess)
+        public CreateKitosUserTask(string connectionString, string email, string password, string role, string organizationNames, bool apiAccess = false)
             : base(connectionString)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
-            _password = password ?? throw new ArgumentNullException(nameof(password)); ;
+            _password = password ?? throw new ArgumentNullException(nameof(password));
             _role = ParseRole(role ?? throw new ArgumentNullException(nameof(role)));
+            _organizationNames = ParseOrganizationNames(organizationNames ?? throw new ArgumentNullException(nameof(organizationNames)));
             _apiAccess = apiAccess;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
         }
@@ -35,11 +37,14 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var commonOrg = context.GetCommonOrganization();
+                var firstOrg = context.GetOrganization(_organizationNames[0]);
 
-                var newUser = CreateUser(commonOrg, context);
+                var newUser = CreateUser(firstOrg, context);
 
-                AssignOrganizationRole(context, newUser, commonOrg);
+                foreach (var orgName in _organizationNames)
+                {
+                    AssignOrganizationRole(context, newUser, orgName);
+                }
 
                 context.SaveChanges();
             }
@@ -70,19 +75,20 @@ namespace Tools.Test.Database.Model.Tasks
             return newUser;
         }
 
-        private void AssignOrganizationRole(KitosContext context, User newUser, Organization commonOrg)
+        private void AssignOrganizationRole(KitosContext context, User newUser, string orgName)
         {
             var globalAdmin = context.GetGlobalAdmin();
+            var org = context.GetOrganization(orgName);
             var newRight = new OrganizationRight
             {
                 UserId = newUser.Id,
                 Role = _role,
-                OrganizationId = commonOrg.Id,
+                OrganizationId = org.Id,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            context.OrganizationRights.AddOrUpdate(x => x.UserId, newRight);
+            context.OrganizationRights.Add(newRight);
             context.SaveChanges();
         }
 
@@ -95,6 +101,11 @@ namespace Tools.Test.Database.Model.Tasks
             }
 
             return actualRole;
+        }
+
+        private string[] ParseOrganizationNames(string organizationNames)
+        {
+            return organizationNames.Split(',');
         }
     }
 }

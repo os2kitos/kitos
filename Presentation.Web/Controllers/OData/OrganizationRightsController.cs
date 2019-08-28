@@ -84,14 +84,13 @@ namespace Presentation.Web.Controllers.OData
         }
 
         /// <summary>
-        /// Always Unauthorized 401. Use POST /Organizations(orgKey)/Rights instead
+        /// Always Use 403 - POST /Organizations(orgKey)/Rights instead
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return StatusCode(HttpStatusCode.NotImplemented);
-            //return base.Post(entity);
+            return StatusCode(HttpStatusCode.Forbidden);
         }
 
         // DELETE /Organizations(1)/Rights(1)

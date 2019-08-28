@@ -18,11 +18,30 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         /// <returns></returns>
         bool AllowReads(IEntity entity);
         /// <summary>
-        /// Determines if write-access is allowed for the provided entity
+        /// Determines if create-access is allowed for the provided entity type
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        bool AllowUpdates(IEntity entity);
+        bool AllowCreate<T>();
+        /// <summary>
+        /// Determines if create-access is allowed for the provided entity type and with the representation passed in <paramref name="entity"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool AllowCreate<T>(IEntity entity);
+        /// <summary>
+        /// Determines if update-access is allowed for the provided entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool AllowModify(IEntity entity);
+        /// <summary>
+        /// Determines if delete-access is allowed for the provided entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        bool AllowDelete(IEntity entity);
         /// <summary>
         /// Determines if write-access is allowed to entity's visibility control
         /// </summary>

@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (AllowWriteAccess(entity) == false)
+            if (AllowWrite(entity) == false)
             {
                 return Forbidden();
             }
@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (AllowWriteAccess(entity) == false)
+            if (AllowWrite(entity) == false)
             {
                 return Forbidden();
             }
@@ -122,7 +122,7 @@ namespace Presentation.Web.Controllers.OData
 
         private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
         {
-            result = result.Where(AllowReadAccess).ToList();
+            result = result.Where(AllowRead).ToList();
             return result;
         }
     }

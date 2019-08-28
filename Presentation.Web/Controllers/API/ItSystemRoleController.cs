@@ -1,7 +1,6 @@
 ﻿using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 

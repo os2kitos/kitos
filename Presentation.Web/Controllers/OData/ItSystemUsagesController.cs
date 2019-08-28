@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
 
-            var itSystemUsages = result.ToEnumerable().Where(AllowReadAccess);
+            var itSystemUsages = result.ToEnumerable().Where(AllowRead);
 
             return Ok(itSystemUsages);
         }
@@ -83,7 +83,7 @@ namespace Presentation.Web.Controllers.OData
                 }
             }
 
-            var result = systemUsages.Where(AllowReadAccess);
+            var result = systemUsages.Where(AllowRead);
 
             return Ok(result);
         }
@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AllowWriteAccess(itSystemUsage))
+            if (!AllowWrite(itSystemUsage))
             {
                 return Forbidden();
             }
@@ -132,7 +132,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!AllowWriteAccess(itSystemUsage))
+            if (!AllowWrite(itSystemUsage))
             {
                 return Forbidden();
             }

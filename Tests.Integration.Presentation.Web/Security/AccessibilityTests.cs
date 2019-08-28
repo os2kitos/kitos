@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -9,12 +10,12 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests : WithAutoFixture
     {
-        private readonly KitosCredentials _apiUser;
+        private readonly KitosCredentials _regularApiUser;
         private readonly string _defaultPassword;
 
         public AccessibilityTests()
         {
-            _apiUser = TestEnvironment.GetApiUser();
+            _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
             _defaultPassword = TestEnvironment.GetDefaultUserPassword();
         }
 
@@ -25,8 +26,7 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token))
@@ -52,14 +52,13 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
             //Arrange
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_apiUser.Username, _apiUser.Password);
             var payload = new
             {
                 Title = A<string>(),
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-            var token = await HttpApi.GetTokenAsync(loginDto);
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
             using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))

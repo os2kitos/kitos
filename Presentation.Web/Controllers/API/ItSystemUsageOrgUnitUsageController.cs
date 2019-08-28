@@ -7,7 +7,6 @@ using AutoMapper;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -39,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id, readOnly: true);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
-                orgUnits = orgUnits.Where(AllowReadAccess);
+                orgUnits = orgUnits.Where(AllowRead);
                 var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
 
                 return Ok(dtos);
@@ -66,7 +65,7 @@ namespace Presentation.Web.Controllers.API
                     return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
                 }
 
-                if (!AllowReadAccess(systemUsage))
+                if (!AllowRead(systemUsage))
                 {
                     return Forbidden();
                 }

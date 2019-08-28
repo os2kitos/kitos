@@ -5,11 +5,11 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API
                 if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
                 {
                     //Post processing was not a part of the old response, so let the migration control when we switch
-                    paging.WithPostProcessingFilter(AllowReadAccess);
+                    paging.WithPostProcessingFilter(AllowRead);
                 }
 
                 var query = Page(result.AsQueryable(), paging);
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AllowReadAccess(item))
+                if(!AllowRead(item))
                 {
                     return Forbidden();
                 }
@@ -124,7 +124,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var entity = Repository.GetByKey(id);
-                var allowWriteAccess = AllowWriteAccess(entity);
+                var allowWriteAccess = AllowModify(entity);
 
                 return Ok(allowWriteAccess);
             }
@@ -133,6 +133,44 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        /// <summary>
+        /// GET api/T/GetAccessRights
+        /// Checks what access rights the user has for the given entities
+        /// </summary>
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        {
+            if (!AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault()))
+            {
+                return Forbidden();
+            }
+            return Ok(new EntitiesAccessRightsDTO
+            {
+                CanCreate = AllowCreate<TModel>(),
+                CanView = true
+            });
+        }
+
+        /// <summary>
+        /// GET api/T/id?GetAccessRightsForEntity
+        /// Checks what access rights the user has for the given entity
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        public HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
+        {
+            var item = Repository.GetByKey(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(new EntityAccessRightsDTO
+            {
+                CanDelete = AllowDelete(item),
+                CanEdit = AllowModify(item),
+                CanView = AllowRead(item)
+            });
+        }
+
         protected virtual TModel PostQuery(TModel item)
         {
             var insertedItem = Repository.Insert(item);
@@ -154,8 +192,8 @@ namespace Presentation.Web.Controllers.API
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
 
-                // Check write access rights  
-                if (!AllowWriteAccess(item))
+                // Check CREATE access rights  
+                if (!AllowCreate<TModel>(item))
                 {
                     return Forbidden();
                 }
@@ -227,7 +265,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AllowWriteAccess(item))
+                if (!AllowDelete(item))
                 {
                     return Forbidden();
                 }
@@ -348,7 +386,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!AllowWriteAccess(item))
+                if (!AllowModify(item))
                 {
                     return Forbidden();
                 }

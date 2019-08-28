@@ -4,7 +4,6 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 

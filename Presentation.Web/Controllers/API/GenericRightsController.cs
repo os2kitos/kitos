@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
@@ -49,7 +48,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = GetRightsQuery(id);
-                theRights = theRights.Where(AllowReadAccess);
+                theRights = theRights.Where(AllowRead);
                 var dtos = Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
@@ -135,7 +134,7 @@ namespace Presentation.Web.Controllers.API
         {
             var obj = _objectRepository.GetByKey(objectId);
 
-            return AllowWriteAccess(obj);
+            return AllowModify(obj);
         }
     }
 }

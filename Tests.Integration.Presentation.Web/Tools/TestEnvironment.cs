@@ -8,8 +8,8 @@ namespace Tests.Integration.Presentation.Web.Tools
     public static class TestEnvironment
     {
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment;
+        private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> ApiUsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
-        private static readonly KitosCredentials ApiUser;
         private static readonly string DefaultUserPassword;
 
         static TestEnvironment()
@@ -54,11 +54,24 @@ namespace Tests.Integration.Presentation.Web.Tools
                             OrganizationRole.GlobalAdmin)
                     }
                 };
+                ApiUsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
+                {
+                    {
+                        OrganizationRole.User,
+                        new KitosCredentials(
+                            "local-api-user@kitos.dk",
+                            localDevUserPassword,
+                            OrganizationRole.User)
+                    },
+                    {
+                        OrganizationRole.GlobalAdmin,
+                        new KitosCredentials(
+                            "local-api-global-admin-user@kitos.dk",
+                            localDevUserPassword,
+                            OrganizationRole.GlobalAdmin)
+                    }
+                };
 
-                ApiUser = new KitosCredentials(
-                    "local-api-user@kitos.dk",
-                    localDevUserPassword,
-                    OrganizationRole.User);
             }
             else
             {
@@ -71,24 +84,31 @@ namespace Tests.Integration.Presentation.Web.Tools
                     {OrganizationRole.LocalAdmin, LoadUserFromEnvironment(OrganizationRole.LocalAdmin)},
                     {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin)}
                 };
+                ApiUsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
+                {
 
-                ApiUser = new KitosCredentials(
-                    GetEnvironmentVariable($"TestUserApiUser"),
-                    GetEnvironmentVariable($"TestUserApiUserPw"),
-                    OrganizationRole.User);
+                    {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User, true)},
+                    {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin, true)}
+                };
             }
         }
 
-        private static KitosCredentials LoadUserFromEnvironment(OrganizationRole role)
+        private static KitosCredentials LoadUserFromEnvironment(OrganizationRole role, bool apiAccess = false)
         {
             var suffix = string.Empty;
             switch (role)
             {
+                case OrganizationRole.User when apiAccess:
+                    suffix = "ApiUser";
+                    break;
                 case OrganizationRole.User:
                     suffix = "NormalUser";
                     break;
                 case OrganizationRole.LocalAdmin:
                     suffix = "LocalAdmin";
+                    break;
+                case OrganizationRole.GlobalAdmin when apiAccess:
+                    suffix = "ApiGlobalAdmin";
                     break;
                 case OrganizationRole.GlobalAdmin:
                     suffix = "GlobalAdmin";
@@ -120,13 +140,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             return variable;
         }
 
-        public static KitosCredentials GetCredentials(OrganizationRole role)
+        public static KitosCredentials GetCredentials(OrganizationRole role, bool apiAccess = false)
         {
-            if (UsersFromEnvironment.TryGetValue(role, out var credentials))
+            var userEnvironment = apiAccess ? ApiUsersFromEnvironment : UsersFromEnvironment;
+
+            if (userEnvironment.TryGetValue(role, out var credentials))
             {
                 return credentials;
             }
-            throw new ArgumentNullException($"No environment user configured for role:{role:G}");
+            throw new ArgumentNullException($"No environment {(apiAccess ? "api " : "")}user configured for role:{role:G}");
         }
 
         public static string GetBaseUrl()
@@ -147,19 +169,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             return new Uri($"{GetBaseUrl()}/{pathAndQuery.TrimStart('/')}");
         }
 
-        public static KitosCredentials GetApiUser()
-        {
-            return ApiUser;
-        }
-
         public static string GetDefaultUserPassword()
         {
             return DefaultUserPassword;
         }
-
-        public static int GetDefaultOrganizationId()
-        {
-            return 1;
-        }
+        
+        public static int DefaultItSystemId => 1;
+        public static int DefaultOrganizationId => 1;
     }
 }
