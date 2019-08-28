@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -7,8 +9,9 @@ using Core.DomainServices;
 using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -23,6 +26,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             if (!AllowOrganizationAccess(orgKey))
@@ -40,6 +45,9 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystems(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItSystem>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
             var system = Repository.GetByKey(sysKey);
@@ -56,6 +64,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [ODataRoute("ItSystems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
         public override IHttpActionResult Get()
         {
             return base.Get();

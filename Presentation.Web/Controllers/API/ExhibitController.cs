@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel;
@@ -8,6 +9,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -22,6 +24,9 @@ namespace Presentation.Web.Controllers.API
             _repository = repository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetInterfacesBySystem(int sysId, int orgId, bool? interfaces)
         {
             try
@@ -37,6 +42,9 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetBySystem(int sysId, int orgId, string q)
         {
             try

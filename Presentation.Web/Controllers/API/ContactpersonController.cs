@@ -4,9 +4,11 @@ using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -27,6 +29,11 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET DataProtectionAdvisor by OrganizationId
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ContactPersonDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public override HttpResponseMessage GetSingle(int id)
         {
             try

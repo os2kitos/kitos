@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -10,6 +11,8 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -29,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
         public override IHttpActionResult Get()
         {
             return base.Get();
@@ -37,6 +41,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProject>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjects(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -60,6 +66,9 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
@@ -80,6 +89,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItProject>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

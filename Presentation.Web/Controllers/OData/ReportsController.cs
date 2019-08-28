@@ -7,7 +7,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ReportsController : BaseEntityController<Report>
     {
         public ReportsController(IGenericRepository<Report> repository, IAuthenticationService authService)

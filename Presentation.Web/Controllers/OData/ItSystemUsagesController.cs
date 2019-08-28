@@ -13,8 +13,9 @@ using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -35,6 +36,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             if (!AllowOrganizationAccess(orgKey))
@@ -51,6 +54,8 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
             if (!AllowOrganizationAccess(orgKey))
