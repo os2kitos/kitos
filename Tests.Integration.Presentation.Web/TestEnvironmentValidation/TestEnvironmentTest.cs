@@ -14,7 +14,7 @@ namespace Tests.Integration.Presentation.Web.TestEnvironmentValidation
         [InlineData(OrganizationRole.GlobalAdmin, true)]
         public void User_With_Role_Is_Available(OrganizationRole role, bool apiAccess = false)
         {
-            var user = apiAccess ? TestEnvironment.GetCredentials(role, true) : TestEnvironment.GetCredentials(role);
+            var user = TestEnvironment.GetCredentials(role, apiAccess);
 
             Assert.NotNull(user);
             Assert.False(string.IsNullOrWhiteSpace(user.Username));

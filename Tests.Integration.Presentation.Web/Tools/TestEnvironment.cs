@@ -7,7 +7,8 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class TestEnvironment
     {
-        private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment, ApiUsersFromEnvironment;
+        private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment;
+        private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> ApiUsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
         private static readonly string DefaultUserPassword;
 

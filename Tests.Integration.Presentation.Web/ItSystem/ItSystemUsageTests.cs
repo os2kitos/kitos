@@ -11,13 +11,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     {
 
         [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_In_Usage_Data_From_Own_Organization()
+        public async Task Api_User_Can_Get_All_IT_Systems_In_Use_Data_From_Own_Organization()
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
@@ -27,13 +28,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task Api_User_Can_Get_All_IT_Systems_In_Usage_Data_From_Responsible_OrganizationUnit()
+        public async Task Api_User_Can_Get_All_IT_Systems_In_Use_Data_From_Responsible_OrganizationUnit()
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-
+            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/OrganizationUnits({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages");
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.GetDefaultOrganizationId()})/OrganizationUnits({TestEnvironment.GetDefaultOrganizationId()})/ItSystemUsages"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert

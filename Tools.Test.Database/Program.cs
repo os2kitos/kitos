@@ -53,7 +53,7 @@ namespace Tools.Test.Database
                     var createOrganizationArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
-                        OrganizationType = GetArgument(additionalArgs, 1),
+                        OrganizationType = GetIntegerArgument(additionalArgs, 1),
                         OrganizationName = GetArgument(additionalArgs, 2)
                     };
 
@@ -141,6 +141,19 @@ namespace Tools.Test.Database
                 arg = arg.Trim('"');
             }
             return arg;
+        }
+
+        private static int GetIntegerArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)
+        {
+            var arg = GetArgument(additionalArgs, index, trimEnclosingQuotes);
+            if (int.TryParse(arg, out int res))
+            {
+                return res;
+            }
+            else
+            {
+                throw new ArgumentException($"argument at index {index} must be an integer");
+            }
         }
         
     }

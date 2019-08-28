@@ -17,9 +17,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(role);
+            var url = TestEnvironment.CreateUrl($"odata/ItSystems({TestEnvironment.GetDefaultItSystemId()})");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"odata/ItSystems({TestEnvironment.GetDefaultItSystemId()})"), token.Token))
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert

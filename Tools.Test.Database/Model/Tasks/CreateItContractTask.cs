@@ -19,7 +19,7 @@ namespace Tools.Test.Database.Model.Tasks
         {
             using (var context = CreateKitosContext())
             {
-                var commonOrg = context.GetOrganization(TestOrganizations.commonOrg);
+                var commonOrg = context.GetOrganization(TestOrganizations.CommonOrg);
                 var globalAdmin = context.GetGlobalAdmin();
 
                 var systemWithSameName = context.ItContracts.AsNoTracking().FirstOrDefault(x => x.Name == _name);

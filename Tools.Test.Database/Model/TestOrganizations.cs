@@ -2,7 +2,7 @@
 {
     public class TestOrganizations
     {
-        public static string commonOrg = "Fælles Kommune";
-        public static string secondTestOrg = "Test organisation to";
+        public const string CommonOrg = "Fælles Kommune";
+        public const string SecondTestOrg = "Test organisation to";
     }
 }

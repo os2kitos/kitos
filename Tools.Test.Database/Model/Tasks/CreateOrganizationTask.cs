@@ -10,9 +10,9 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _orgName;
         private readonly int _organizationType;
 
-        public CreateOrganizationTask(string connectionString, string organizationType, string orgName) : base(connectionString)
+        public CreateOrganizationTask(string connectionString, int organizationType, string orgName) : base(connectionString)
         {
-            _organizationType = ParseInt(organizationType ?? throw new ArgumentNullException(nameof(organizationType)));
+            _organizationType = organizationType;
             _orgName = orgName ?? throw new ArgumentNullException(nameof(orgName));
         }
 
@@ -44,17 +44,6 @@ namespace Tools.Test.Database.Model.Tasks
             }
 
             return true;
-        }
-
-        private int ParseInt(string input)
-        {
-            
-            if (!int.TryParse(input, out var output))
-            {
-                throw new ArgumentException($"{nameof(input)} must be an integer");
-            }
-
-            return output;
         }
     }
 }

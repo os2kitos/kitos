@@ -43,7 +43,6 @@ namespace Tools.Test.Database.Model.Tasks
 
                 foreach (var orgName in _organizationNames)
                 {
-                    Console.WriteLine(orgName);
                     AssignOrganizationRole(context, newUser, orgName);
                 }
 
