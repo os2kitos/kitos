@@ -188,6 +188,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage GetExcel(bool? csv, int orgUnitId, bool onlyStarred)
         {
             try
