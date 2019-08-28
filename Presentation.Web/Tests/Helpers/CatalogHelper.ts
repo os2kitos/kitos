@@ -11,7 +11,6 @@ var systemPage = new SystemPage();
 var waitUpTo = new WaitTimers();
 
 class CatalogHelper {
-
     public static createCatalog(name: string) {
         return pageObject.getPage()
             .then(() => {
