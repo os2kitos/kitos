@@ -115,6 +115,12 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
+            //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
+            if (entity is IHasOrganization organization && organization.OrganizationId == 0)
+            {
+                organization.OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
+            }
+
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
