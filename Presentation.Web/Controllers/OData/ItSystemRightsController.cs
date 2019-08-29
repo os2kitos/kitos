@@ -34,7 +34,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
-            var result = Repository.AsQueryable(readOnly:true).Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
+            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
 
             result = FilterByAccessControl(result);
 
@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository.AsQueryable(readOnly:true).Where(x => x.UserId == userId).ToList();
+            var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
 
             result = FilterByAccessControl(result);
 

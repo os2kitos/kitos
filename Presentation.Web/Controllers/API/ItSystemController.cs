@@ -97,7 +97,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
-                var query = Page(Repository.AsQueryable(readOnly: true), paging);
+                var query = Page(Repository.AsQueryable(), paging);
 
                 return Ok(Map(query));
             }
@@ -112,7 +112,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systems =
-                    Repository.AsQueryable(readOnly: true)
+                    Repository.AsQueryable()
                         .Where(s =>
                             // global admin sees all
                             (KitosUser.IsGlobalAdmin ||
@@ -195,7 +195,7 @@ namespace Presentation.Web.Controllers.API
                          s.OrganizationId == orgId)
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
-                    , readOnly: true);
+                    );
 
                 systems = systems.Where(AllowRead);
 
@@ -307,7 +307,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId), readOnly: true);
+                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId));
 
                 systems = systems?.Where(AllowRead);
 
@@ -447,11 +447,11 @@ namespace Presentation.Web.Controllers.API
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
-                    taskQuery = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                    taskQuery = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable(readOnly: true);
+                    taskQuery = _taskRepository.AsQueryable();
                 }
 
                 // if a task group is given, only find the tasks in that group
