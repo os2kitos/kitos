@@ -50,10 +50,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true, false, true, false)]
-        [InlineData(OrganizationRole.LocalAdmin, true, false, false, false)]
-        [InlineData(OrganizationRole.User, true, false, false, false)]
-        public async Task GetAccessRights_Returns(OrganizationRole role, bool canView, bool canEdit, bool canCreate, bool canDelete)
+        [InlineData(OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.User, true, false)]
+        public async Task GetAccessRights_Returns(OrganizationRole role, bool canView, bool canCreate)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(role);
@@ -70,10 +70,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true, true, false, true)]
-        [InlineData(OrganizationRole.LocalAdmin, true, true, false, true)] //Local admin in own org can delete itsystem
-        [InlineData(OrganizationRole.User, true, false, false, false)]
-        public async Task GetAccessRightsForEntity_Returns(OrganizationRole role, bool canView, bool canEdit, bool canCreate, bool canDelete)
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)] //Local admin in own org can delete itsystem
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task GetAccessRightsForEntity_Returns(OrganizationRole role, bool canView, bool canEdit, bool canDelete)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(role);

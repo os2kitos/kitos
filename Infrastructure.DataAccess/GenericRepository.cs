@@ -25,8 +25,7 @@ namespace Infrastructure.DataAccess
         public IEnumerable<T> Get(
            Expression<Func<T, bool>> filter = null,
            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-           string includeProperties = "",
-           bool readOnly = false)
+           string includeProperties = "")
         {
             IQueryable<T> query = _dbSet;
 
@@ -43,21 +42,14 @@ namespace Infrastructure.DataAccess
 
 
             query = orderBy?.Invoke(query) ?? query;
-            if (readOnly)
-            {
-                query = query.AsNoTracking();
-            }
 
             return query.ToList();
         }
 
-        public IQueryable<T> AsQueryable(bool readOnly)
+        public IQueryable<T> AsQueryable()
         {
             var dbAsQueryable = _dbSet.AsQueryable();
-            if (readOnly)
-            {
-                dbAsQueryable = dbAsQueryable.AsNoTracking();
-            }
+            
             return dbAsQueryable;
         }
 

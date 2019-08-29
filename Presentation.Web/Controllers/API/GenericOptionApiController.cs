@@ -18,14 +18,14 @@ namespace Presentation.Web.Controllers.API
 
         protected override IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable(readOnly:true).Where(t => t.IsLocallyAvailable && !t.IsSuggestion);
+            return Repository.AsQueryable().Where(t => t.IsLocallyAvailable && !t.IsSuggestion);
         }
 
         public HttpResponseMessage GetAllSuggestions(bool? suggestions)
         {
             try
             {
-                var items = Repository.AsQueryable(readOnly:true).Where(t => t.IsSuggestion);
+                var items = Repository.AsQueryable().Where(t => t.IsSuggestion);
 
                 return Ok(Map(items));
             }
@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable(readOnly:true).Where(t => !t.IsSuggestion);
+                var items = Repository.AsQueryable().Where(t => !t.IsSuggestion);
 
                 return Ok(Map(items));
             }

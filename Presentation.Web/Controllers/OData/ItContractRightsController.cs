@@ -6,6 +6,8 @@ using Core.DomainServices;
 using Core.DomainModel.ItContract;
 using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -25,6 +27,7 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItContracts(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
         public IHttpActionResult GetByItContract(int orgId, int contractId)
         {
             // TODO figure out how to check auth
@@ -35,6 +38,7 @@ namespace Presentation.Web.Controllers.OData
         // GET /Users(1)/ItContractRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItContractRights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -83,13 +87,6 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
-
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
 
             // check model state
             if (!ModelState.IsValid)

@@ -1,9 +1,12 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -25,6 +28,8 @@ namespace Presentation.Web.Controllers.API
         /// <param name="id"></param>
         /// <param name="system"></param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ArchivePeriodDTO>>))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetSingle(int id, [FromUri] bool system)
         {
             var item = Repository.Get(x => x.ItSystemUsageId == id);

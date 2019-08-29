@@ -5,7 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [PublicApi]
+    [InternalApi]
     public class UploadFileController : BaseApiController
     {
         public HttpResponseMessage Post()

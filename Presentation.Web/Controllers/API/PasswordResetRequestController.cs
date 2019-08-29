@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -39,6 +40,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET api/PasswordResetRequest
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<PasswordResetRequestDTO>))]
         public HttpResponseMessage Get(string requestId)
         {
             try

@@ -533,6 +533,7 @@
     <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SSOConfigDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />

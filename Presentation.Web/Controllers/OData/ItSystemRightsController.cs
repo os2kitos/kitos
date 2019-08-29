@@ -9,6 +9,8 @@ using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -29,9 +31,10 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystemUsages(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
-            var result = Repository.AsQueryable(readOnly:true).Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
+            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
 
             result = FilterByAccessControl(result);
 
@@ -41,9 +44,10 @@ namespace Presentation.Web.Controllers.OData
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItSystemRights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository.AsQueryable(readOnly:true).Where(x => x.UserId == userId).ToList();
+            var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
 
             result = FilterByAccessControl(result);
 

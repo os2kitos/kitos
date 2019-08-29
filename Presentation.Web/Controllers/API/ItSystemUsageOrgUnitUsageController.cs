@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel.ItSystemUsage;
@@ -8,6 +9,7 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -27,11 +29,12 @@ namespace Presentation.Web.Controllers.API
             _systemUsageRepository = systemUsageRepository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<SimpleOrgUnitDTO>>))]
         public HttpResponseMessage GetOrgUnitsBySystemUsage(int id)
         {
             try
             {
-                var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id, readOnly: true);
+                var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
                 orgUnits = orgUnits.Where(AllowRead);
                 var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
@@ -44,6 +47,9 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SimpleOrgUnitDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetResponsibleBySystemUsage(int id, bool? responsible)
         {
             try

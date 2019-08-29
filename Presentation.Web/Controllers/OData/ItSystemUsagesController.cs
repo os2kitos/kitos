@@ -14,6 +14,8 @@ using Core.ApplicationServices;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -34,6 +36,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             if (!AllowOrganizationAccess(orgKey))
@@ -41,7 +45,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
 
             var itSystemUsages = result.ToEnumerable().Where(AllowRead);
 
@@ -50,6 +54,8 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
             if (!AllowOrganizationAccess(orgKey))
@@ -63,7 +69,7 @@ namespace Presentation.Web.Controllers.OData
             while (queue.Count > 0)
             {
                 var orgUnitKey = queue.Dequeue();
-                var orgUnit = _orgUnitRepository.AsQueryable(readOnly:true)
+                var orgUnit = _orgUnitRepository.AsQueryable()
                     .Include(x => x.Children)
                     .Include(x => x.Using.Select(y => y.ResponsibleItSystemUsage))
                     .First(x => x.OrganizationId == orgKey && x.Id == orgUnitKey);
