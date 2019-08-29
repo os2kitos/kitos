@@ -46,13 +46,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin, 2)]
         [InlineData(OrganizationRole.User, 1)]
         [InlineData(OrganizationRole.User, 2)]
-        public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int userId)
+        public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
             var token = await HttpApi.GetTokenAsync(role);
 
             await GenerateTestInterfaces();
 
-            var url = TestEnvironment.CreateUrl($"/odata/Organizations({userId})/ItInterfaces");
+            var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
@@ -64,7 +64,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
                 foreach (var item in response.Result)
                 {
-                    if (item.OrganizationId != userId)
+                    if (item.OrganizationId != orgId)
                     {
                         Assert.NotEqual(item.AccessModifier, AccessModifier.Local);
                     }
