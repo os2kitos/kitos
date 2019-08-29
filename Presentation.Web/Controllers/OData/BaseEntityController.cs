@@ -9,6 +9,7 @@ using System.Linq;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {

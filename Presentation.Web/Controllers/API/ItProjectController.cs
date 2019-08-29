@@ -17,6 +17,7 @@ using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -46,6 +47,7 @@ namespace Presentation.Web.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -76,7 +78,8 @@ namespace Presentation.Web.Controllers.API
         }
         /// <summary>  
         ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation
-        /// </summary>  
+        /// </summary>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
             try
@@ -105,6 +108,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -128,6 +132,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
         public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -261,6 +266,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -334,24 +340,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        // TODO cloning has been disabled for now, reviewed at a later date
-        //public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
-        //{
-        //    try
-        //    {
-        //        //make sure we only clone projects that the is accessible from the organization
-        //        var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
-
-        //        var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
-
-        //        return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
             try
@@ -366,6 +355,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrgUnitDTO>>))]
         public HttpResponseMessage GetOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
         {
             try
@@ -580,6 +570,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="taskGroup">Optional filtering on task group</param>
         /// <param name="pagingModel">Paging model</param>
         /// <returns>List of TaskRefSelectedDTO</returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskRefSelectedDTO>>))]
         public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
         {
             try
@@ -621,6 +612,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetItSystemsUsedByThisProject(int id, [FromUri] bool? usages)
         {
             try
@@ -713,6 +705,8 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <param name="itProjects"></param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] bool itProjects)
         {
             try
@@ -733,6 +727,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <param name="usageId"></param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] int usageId)
         {
             try

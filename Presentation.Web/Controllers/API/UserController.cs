@@ -144,24 +144,6 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        //public HttpResponseMessage PostTokenRequest(bool? token, int userId)
-        //{
-        //    try
-        //    {
-        //        var user = Repository.GetByKey(userId);
-        //        if (user == null)
-        //            return NotFound();
-
-        //        user.UniqueId = Guid.NewGuid();
-        //        PatchQuery(user, null);
-        //        return Ok(user.Uuid);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return LogError(e);
-        //    }
-        //}
-
         public HttpResponseMessage GetBySearch(string q)
         {
             try

@@ -204,59 +204,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        ///// <summary>
-        ///// Post a new right to the object
-        ///// </summary>
-        ///// <param name="id">The id of the object</param>
-        ///// <param name="organizationId"></param>
-        ///// <param name="dto">DTO of right</param>
-        ///// <returns></returns>
-        //public HttpResponseMessage PostRight(int id, int organizationId, OrganizationRightDTO dto)
-        //{
-        //    try
-        //    {
-        //        var right = AutoMapper.Mapper.Map<OrganizationRightDTO, OrganizationRight>(dto);
-        //        right.OrganizationId = id;
-        //        right.ObjectOwner = KitosUser;
-
-        //        // Only global admin can set other users as global admins
-        //        if (right.Role == OrganizationRole.GlobalAdmin)
-        //        {
-        //            if (!KitosUser.IsGlobalAdmin)
-        //                return Unauthorized();
-        //        }
-
-        //        // Only local and global admins can make users local admins
-        //        if (right.Role == OrganizationRole.LocalAdmin)
-        //        {
-        //            if (!KitosUser.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
-        //                return Unauthorized();
-        //        }
-
-        //        if (!base.HasWriteAccess(right, KitosUser, organizationId))
-        //        {
-        //            return Unauthorized();
-        //        }
-
-        //        right.LastChangedByUser = KitosUser;
-        //        right.LastChanged = DateTime.UtcNow;
-
-        //        right = _rightRepository.Insert(right);
-        //        _rightRepository.Save();
-
-        //        //TODO: FIX navigation properties not loading properly!!!
-        //        right.User = UserRepository.GetByKey(right.UserId);
-
-        //        var outputDTO = AutoMapper.Mapper.Map<OrganizationRight, OrganizationRightDTO>(right);
-
-        //        return Created(outputDTO);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
         /// <summary>
         /// Delete a right from the object
         /// </summary>

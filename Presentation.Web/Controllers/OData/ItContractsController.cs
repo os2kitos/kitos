@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -9,6 +10,8 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -27,6 +30,7 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("ItContracts")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         public override IHttpActionResult Get()
         {
             var orgId = _authService.GetCurrentOrganizationId(UserId);
@@ -38,6 +42,9 @@ namespace Presentation.Web.Controllers.OData
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
         [EnableQuery]
         [ODataRoute("ItContracts({contractKey})/ResponsibleOrganizationUnit")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<OrganizationUnit>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetResponsibleOrganizationUnit(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
@@ -57,6 +64,9 @@ namespace Presentation.Web.Controllers.OData
         // GET /ItContracts(1)/ResponsibleOrganizationUnit
         [EnableQuery]
         [ODataRoute("ItContracts({contractKey})/Organization")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<Organization>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetOrganization(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).Organization;
@@ -76,6 +86,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItContracts
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItContracts")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -93,6 +105,8 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/Supplier
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/Supplier")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetSupplier(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -108,6 +122,9 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItContracts(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItContract>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItContracts(int orgKey, int contractKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == contractKey);
@@ -127,6 +144,8 @@ namespace Presentation.Web.Controllers.OData
         // TODO refactor this now that we are using MS Sql Server that has support for MARS
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItContract>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

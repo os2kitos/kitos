@@ -5,7 +5,10 @@ using Presentation.Web.Models;
 using System.Net.Http;
 using Core.DomainModel;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -19,6 +22,8 @@ namespace Presentation.Web.Controllers.API
             this._contracts = contracts;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<EconomyStreamDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
@@ -46,6 +51,8 @@ namespace Presentation.Web.Controllers.API
             return Ok(Map(result));
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
