@@ -12,12 +12,14 @@ namespace Tools.Test.Database.Model.Tasks
     {
         private readonly string _name;
         private readonly string _organizationName;
+        private readonly int? _parentId;
 
-        public CreateItSystemTask(string connectionString, string name, string organizationName)
+        public CreateItSystemTask(string connectionString, string name, string organizationName, int? parentId)
             : base(connectionString)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _organizationName = organizationName;
+            _parentId = parentId;
         }
 
         public override bool Execute()
@@ -41,7 +43,8 @@ namespace Tools.Test.Database.Model.Tasks
                     ObjectOwnerId = globalAdmin.Id,
                     OrganizationId = organization.Id,
                     LastChangedByUserId = globalAdmin.Id,
-                    Uuid = Guid.NewGuid()
+                    Uuid = Guid.NewGuid(),
+                    ParentId = _parentId
                 };
 
                 context.ItSystems.Add(itSystem);

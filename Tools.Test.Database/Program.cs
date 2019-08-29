@@ -108,7 +108,20 @@ namespace Tools.Test.Database
                     };
 
                     FailOnConnectionToProd(createItSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName);
+                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName, null);
+
+                case CliTargets.CreateItSystemWithParent:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
+                    var createItSystemWithParentArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        ItSystemName = GetArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2),
+                        ParentId = GetIntegerArgument(additionalArgs, 3)
+                    };
+
+                    FailOnConnectionToProd(createItSystemWithParentArgs.ConnectionString);
+                    return new CreateItSystemTask(createItSystemWithParentArgs.ConnectionString, createItSystemWithParentArgs.ItSystemName, createItSystemWithParentArgs.OrganizationName, createItSystemWithParentArgs.ParentId);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
@@ -155,6 +168,6 @@ namespace Tools.Test.Database
                 throw new ArgumentException($"argument at index {index} must be an integer");
             }
         }
-        
+
     }
 }

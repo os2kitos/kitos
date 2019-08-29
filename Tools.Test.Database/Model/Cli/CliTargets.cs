@@ -8,7 +8,7 @@
         public const string CreateOrganization = "CreateOrganization";
         public const string EnableAllOptions = "EnableAllOptions";
         public const string CreateItSystem = "CreateItSystem";
-        public const string CreateSecondOrganizationItSystem = "CreateSecondOrganizationItSystem";
+        public const string CreateItSystemWithParent = "CreateItSystemWithParent";
         public const string CreateItContract = "CreateItContract";
     }
 }
