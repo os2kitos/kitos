@@ -22,8 +22,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
         {
             try
@@ -39,8 +37,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetByUsage(int usageId)
         {
             try
@@ -56,8 +52,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetByContract(int contractId)
         {
             try

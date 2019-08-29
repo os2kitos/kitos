@@ -58,8 +58,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetSearch(string q, int orgId)
         {
             try
@@ -91,8 +89,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetCatalog(string q, int organizationId, [FromUri] PagingModel<ItInterface> pagingModel)
         {
             try
@@ -236,9 +232,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Interface name must be new")]
         public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
         {
             try
@@ -252,9 +246,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Interface Id and name must be unique")]
         public HttpResponseMessage GetItInterfaceNameUniqueConstraint(string checkitinterfaceid, string checkname, int orgId)
         {
             try

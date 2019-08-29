@@ -23,8 +23,6 @@ namespace Presentation.Web.Controllers.API
         /// <param name="userId">Id of the user</param>
         /// <returns>List of rights</returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ICollection<RightOutputDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetRightsForUser(int userId)
         {
             try

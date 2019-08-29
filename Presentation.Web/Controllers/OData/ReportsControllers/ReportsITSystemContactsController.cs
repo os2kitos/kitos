@@ -29,7 +29,6 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("ReportsITSystemContacts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ReportItSystemRightOutputDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public IHttpActionResult Get()
         {
             if (!_authService.HasReadAccessOutsideContext(UserId))
