@@ -18,18 +18,21 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IExcelHandler _excelHandler;
+        private readonly ICryptoService _cryptoService;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<OrganizationRight> orgRightRepository,
-            IExcelHandler excelHandler)
+            IExcelHandler excelHandler,
+            ICryptoService cryptoService)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
             _itContractRepository = itContractRepository;
             _orgRightRepository = orgRightRepository;
             _excelHandler = excelHandler;
+            _cryptoService = cryptoService;
         }
 
         /// <summary>
@@ -366,7 +369,7 @@ namespace Core.ApplicationServices
                         LastChanged = DateTime.UtcNow,
                         IsGlobalAdmin = false,
                         Password = "mangler at blive indsat",
-                        Salt = "mangler at blive indsat"
+                        Salt = _cryptoService.Encrypt(Guid.NewGuid().ToString("N"))
                     };
 
                     // if user dosnt exist create a new one.
