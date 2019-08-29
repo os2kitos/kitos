@@ -8,10 +8,12 @@ using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ReportsItSystemsController : BaseOdataAuthorizationController<ItSystem>
     {
         private readonly IAuthenticationService _authService;
@@ -23,6 +25,8 @@ namespace Presentation.Web.Controllers.OData
         [HttpGet]
         [EnableQuery]
         [ODataRoute("ReportsItSystems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IOrderedEnumerable<ItSystem>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Get()
         {
             if (!_authService.HasReadAccessOutsideContext(UserId))

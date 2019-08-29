@@ -13,10 +13,10 @@ namespace Presentation.Web.Controllers.OData
         where TType : OptionEntity<TDomainModelType>
     {
 
-        private IGenericRepository<TType> _repository;
-        private IAuthenticationService _authService;
+        private readonly IGenericRepository<TType> _repository;
+        private readonly IAuthenticationService _authService;
         // GET: BaseRole
-        public BaseOptionController(IGenericRepository<TType> repository, IAuthenticationService authService)
+        protected BaseOptionController(IGenericRepository<TType> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
             _repository = repository;
@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 var Entities = _repository.Get();
 
-                if(Entities.Count() > 0)
+                if(Entities.Any())
                 {
                     entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
                 }else
@@ -136,7 +136,6 @@ namespace Presentation.Web.Controllers.OData
             catch (Exception ex)
             {
                 Logger.Error(ex, "Could not reprioritize!");
-                //return InternalServerError(ex);
             }
 
             return StatusCode(HttpStatusCode.NoContent);
