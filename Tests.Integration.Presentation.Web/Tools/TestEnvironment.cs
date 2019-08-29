@@ -177,5 +177,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static int DefaultItSystemId => 1;
         public static int DefaultOrganizationId => 1;
         public static int SecondOrganizationId => 2;
+        public static int DefaultContractId => 1;
+        public static int DefaultItInterfaceId => 1;
     }
 }

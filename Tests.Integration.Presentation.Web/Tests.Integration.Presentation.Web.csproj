@@ -87,6 +87,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ItSystem\ItInterfaceUsageTests.cs" />
     <Compile Include="ItSystem\ItSystemCatalogTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
