@@ -4,7 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
@@ -12,65 +15,111 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemInterfacesTest : WithAutoFixture
     {
+        //  As a user i am able to see interfaces from my own organization and public from others
         [Theory]
-        [InlineData(OrganizationRole.User)]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        public async Task Api_Users_Can_Get_IT_Interfaces_Data_From_Own_Organization(OrganizationRole role)
+        public async Task Global_Administrator_Can_Get_All_Interfaces(OrganizationRole role)
         {
-            //Arrange
+            //Arrange Global_Administrator_Can_Get_All_Interfaces
             var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"odata/Organizations({TestEnvironment.DefaultOrganizationId})/ItInterfaces");
 
-            //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotNull(response);
-            }
-        }
+            await GenerateTestInterfaces();
 
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, HttpStatusCode.OK)]
-        [InlineData(OrganizationRole.User, HttpStatusCode.Forbidden)]
-        public async Task Api_Global_Admin_Can_Get_All_ITsystem_Interfaces(OrganizationRole role,HttpStatusCode code)
-        {
-            //Arrange
-            var token = await HttpApi.GetTokenAsync(role);
+            var res = GetInterfacesByName("IntegrationTest");
+
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+
                 //Assert
-                Assert.Equal(code, httpResponse.StatusCode);
-                Assert.NotNull(response);
+                Assert.NotNull(response.Result);
+                Assert.Equal(response.Result.Count, res.Result.Result.Count);
+            }
+        }
+
+        // As a global administrator i am able to see every interface created
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, 1)]
+        [InlineData(OrganizationRole.GlobalAdmin, 2)]
+        [InlineData(OrganizationRole.User, 1)]
+        [InlineData(OrganizationRole.User, 2)]
+        public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int userId)
+        {
+            var token = await HttpApi.GetTokenAsync(role);
+
+            await GenerateTestInterfaces();
+
+            var url = TestEnvironment.CreateUrl($"/odata/Organizations({userId})/ItInterfaces");
+
+            //Act
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            {
+                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+
+                //Assert
+                Assert.NotNull(response.Result);
+
+                foreach (var item in response.Result)
+                {
+                    if (item.OrganizationId != userId)
+                    {
+                        Assert.NotEqual(item.AccessModifier, AccessModifier.Local);
+                    }
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public(OrganizationRole role)
+        {
+            var token = await HttpApi.GetTokenAsync(role);
+
+            await GenerateTestInterfaces();
+
+            var res = await GetInterfacesByName("IntegrationTest");
+
+            foreach (var item in res.Result)
+            {
+
+                var orgFromItem = item.OrganizationId;
+                var interFaceId = item.Id;
+
+                var url = TestEnvironment.CreateUrl($"odata/Organizations({orgFromItem})/ItInterfaces({interFaceId})");
+
+                //Act
+                using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+                {
+                    var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                    //Assert
+                    Assert.NotNull(res);
+                    Assert.Equal(interFaceId, response.Result.Id);
+                }
             }
         }
 
 
-        //  As a user i am able to see interfaces from my own organization and public from others
-
-        public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public()
+        public async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
         {
-
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var arrangeUrl = TestEnvironment.CreateUrl($"odata/ItInterfaces?filter=contains({name})");
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(arrangeUrl, token.Token))
+            {
+                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                return response;
+            }
         }
 
-        // As a global administrator i am able to see every interface created
-
-        public async Task Global_Administrator_Can_Get_All_Interfaces()
+        public async Task GenerateTestInterfaces()
         {
-
+            await InterfaceHelper.CreateInterfaces(
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local),
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public),
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, 2, AccessModifier.Local),
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, 2, AccessModifier.Public));
         }
-
-        // As a user i am able to see a specific interface from my org or public 
-
-        public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public()
-        {
-
-        }
-
     }
 }

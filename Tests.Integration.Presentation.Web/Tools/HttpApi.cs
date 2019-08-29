@@ -238,6 +238,5 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return response;
         }
-
     }
 }
