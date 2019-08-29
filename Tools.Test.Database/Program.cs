@@ -107,7 +107,7 @@ namespace Tools.Test.Database
                         OrganizationName = GetArgument(additionalArgs, 2),
                         parentId = GetNullableIntegerArgument(additionalArgs, 3)
                     };
-                    Console.WriteLine(createItSystemArgs.parentId);
+
                     FailOnConnectionToProd(createItSystemArgs.ConnectionString);
                     return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName, createItSystemArgs.parentId);
 
