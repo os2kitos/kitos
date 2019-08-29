@@ -7,6 +7,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Core.DomainModel;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
@@ -35,7 +36,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public);
 
             var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowRead);
 

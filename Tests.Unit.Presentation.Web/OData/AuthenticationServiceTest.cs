@@ -56,10 +56,10 @@ namespace Tests.Unit.Presentation.Web.OData
                 new Report { AccessModifier = AccessModifier.Public, OrganizationId = 1, Name = "Test fra org 1 med Public"},
                 new Report { AccessModifier = AccessModifier.Local, OrganizationId = 2, Name = "Test fra org 2 med Local"},
             });
-            _reportRepository.AsQueryable(Arg.Any<bool>()).Returns(reports);
+            _reportRepository.AsQueryable().Returns(reports);
 
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
-            _organizationUnitRepository.AsQueryable(Arg.Any<bool>()).Returns(organizationUnits);
+            _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
 
             _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository, _authenticationService);
             _reportsController = new ReportsController(_reportRepository, _authenticationService);

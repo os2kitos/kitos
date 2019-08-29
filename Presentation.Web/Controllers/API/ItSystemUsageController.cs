@@ -59,8 +59,7 @@ namespace Presentation.Web.Controllers.API
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    , readOnly: true);
+                        u.OrganizationId == organizationId);
 
                 usages = usages.Where(AllowRead);
 
@@ -87,7 +86,7 @@ namespace Presentation.Web.Controllers.API
 
                 pagingModel.WithPostProcessingFilter(AllowRead);
 
-                var usages = Page(Repository.AsQueryable(true), pagingModel);
+                var usages = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(usages));
             }
@@ -144,7 +143,7 @@ namespace Presentation.Web.Controllers.API
                 usages = usages.Where(AllowRead);
                 var dtos = Map(usages);
 
-                var roles = _roleRepository.Get(readOnly: true);
+                var roles = _roleRepository.Get();
                 roles = roles.Where(AllowRead).ToList();
 
                 var list = new List<dynamic>();
@@ -205,7 +204,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId, readOnly: true).FirstOrDefault();
+                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
 
                 if (usage == null)
                 {
@@ -237,7 +236,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
-                                            && usage.OrganizationId == dto.OrganizationId, readOnly: true).Any())
+                                            && usage.OrganizationId == dto.OrganizationId).Any())
                 {
                     return Conflict("Usage already exist");
                 }
@@ -502,15 +501,15 @@ namespace Presentation.Web.Controllers.API
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
-                    var usedTasks = Repository.AsQueryable(readOnly:true).Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
-                    var inheritedTasks = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).Select(p => p.ItSystem).SelectMany(s => s.TaskRefs);
-                    var optOuts = Repository.AsQueryable(readOnly: true).Where(p => p.Id == id).SelectMany(s => s.TaskRefsOptOut);
+                    var usedTasks = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
+                    var inheritedTasks = Repository.AsQueryable().Where(p => p.Id == id).Select(p => p.ItSystem).SelectMany(s => s.TaskRefs);
+                    var optOuts = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(s => s.TaskRefsOptOut);
                     taskQuery = usedTasks.Union(inheritedTasks);
                     taskQuery = taskQuery.Except(optOuts);
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable(readOnly: true);
+                    taskQuery = _taskRepository.AsQueryable();
                 }
 
                 //if a task group is given, only find the tasks in that group

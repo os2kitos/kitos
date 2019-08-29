@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = new List<ItSystemRight>();
-                theRights.AddRange(RightRepository.Get(r => r.UserId == userId, readOnly: true));
+                theRights.AddRange(RightRepository.Get(r => r.UserId == userId));
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<ItSystemRight>, ICollection<RightOutputDTO>>(theRights);
 
