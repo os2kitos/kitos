@@ -104,11 +104,12 @@ namespace Tools.Test.Database
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         ItSystemName = GetArgument(additionalArgs, 1),
-                        OrganizationName = GetArgument(additionalArgs, 2)
+                        OrganizationName = GetArgument(additionalArgs, 2),
+                        parentId = GetNullableIntegerArgument(additionalArgs, 3)
                     };
-
+                    Console.WriteLine(createItSystemArgs.parentId);
                     FailOnConnectionToProd(createItSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName);
+                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName, createItSystemArgs.parentId);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
@@ -155,6 +156,15 @@ namespace Tools.Test.Database
                 throw new ArgumentException($"argument at index {index} must be an integer");
             }
         }
-        
+
+        private static int? GetNullableIntegerArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)
+        {
+            if (additionalArgs.Length <= index)
+            {
+                return null;
+            }
+            return GetIntegerArgument(additionalArgs, index, trimEnclosingQuotes);
+        }
+
     }
 }
