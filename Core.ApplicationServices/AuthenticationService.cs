@@ -151,15 +151,12 @@ namespace Core.ApplicationServices
                 return false;
             }
 
-            //TODO: This checks even if it is not changed. Seems very odd. Also it is too specific. Check should be where it happens....
-            //TODO: Add a rule for access modifier check in POST for ITSystem and ITSystemUsage. Then this is covered.
-            #region instane
             //Check if user is allowed to set accessmodifier to public
-            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier; //TODO: at this stage we cannot assume that the access modifier is "new". Could it not be the old value? It is a strange assumption.
+            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
             if (accessModifier == AccessModifier.Public)
             {
                 // special case for organisation
-                if (entity is Organization) //TODO: IOrganizationController (non-OData( checks for the generic "Can set access modifier"))
+                if (entity is Organization)
                 {
                     if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {
@@ -180,7 +177,6 @@ namespace Core.ApplicationServices
                     return false;
                 }
             }
-            #endregion insane
 
             // check if entity is in context
             if (entity is IContextAware) // TODO I don't like this impl
