@@ -81,7 +81,7 @@ Write-Host "Create IT System"
 & $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "DefaultTestItSystem" "$defaultOrganization"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
-& $testToolsExePath "CreateItSystem" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem" "$secondOrganization" "1"
+& $testToolsExePath "CreateItSystemWithParent" "$kitosDbConnectionString" "SecondOrganizationDefaultTestItSystem" "$secondOrganization" "1"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT SYSTEM" }
 
 #-------------------------------------------------------------

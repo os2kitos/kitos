@@ -104,12 +104,24 @@ namespace Tools.Test.Database
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         ItSystemName = GetArgument(additionalArgs, 1),
-                        OrganizationName = GetArgument(additionalArgs, 2),
-                        parentId = GetNullableIntegerArgument(additionalArgs, 3)
+                        OrganizationName = GetArgument(additionalArgs, 2)
                     };
 
                     FailOnConnectionToProd(createItSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName, createItSystemArgs.parentId);
+                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName, null);
+
+                case CliTargets.CreateItSystemWithParent:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
+                    var createItSystemWithParentArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        ItSystemName = GetArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2),
+                        ParentId = GetIntegerArgument(additionalArgs, 3)
+                    };
+
+                    FailOnConnectionToProd(createItSystemWithParentArgs.ConnectionString);
+                    return new CreateItSystemTask(createItSystemWithParentArgs.ConnectionString, createItSystemWithParentArgs.ItSystemName, createItSystemWithParentArgs.OrganizationName, createItSystemWithParentArgs.ParentId);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
@@ -155,15 +167,6 @@ namespace Tools.Test.Database
             {
                 throw new ArgumentException($"argument at index {index} must be an integer");
             }
-        }
-
-        private static int? GetNullableIntegerArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)
-        {
-            if (additionalArgs.Length <= index)
-            {
-                return null;
-            }
-            return GetIntegerArgument(additionalArgs, index, trimEnclosingQuotes);
         }
 
     }
