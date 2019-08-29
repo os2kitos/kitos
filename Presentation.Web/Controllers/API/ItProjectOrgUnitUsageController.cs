@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using AutoMapper;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -22,6 +24,7 @@ namespace Presentation.Web.Controllers.API
             _projectRepository = projectRepository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<SimpleOrgUnitDTO>>))]
         public HttpResponseMessage GetOrgUnitsByProject(int id)
         {
             try
@@ -38,6 +41,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SimpleOrgUnitDTO>))]
         public HttpResponseMessage GetResponsibleByProject(int id, bool? responsible)
         {
             try

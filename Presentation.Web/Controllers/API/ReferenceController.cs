@@ -60,11 +60,5 @@ namespace Presentation.Web.Controllers.API
 
             return false;
         }
-
-        /*  public override HttpResponseMessage Post(ExternalReferenceDTO dto)
-          {
-              dto.ItProjectId
-              return base.Post(dto);
-          }*/
     }
 }

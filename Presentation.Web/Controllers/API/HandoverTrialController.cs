@@ -1,8 +1,11 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -14,6 +17,7 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<HandoverTrialDTO>>))]
         public HttpResponseMessage GetByContractid(int id, bool? byContract)
         {
             var query = Repository.Get(x => x.ItContractId == id);

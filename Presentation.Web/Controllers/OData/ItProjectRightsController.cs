@@ -1,4 +1,4 @@
-﻿ using System.Linq;
+﻿using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -6,6 +6,8 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.ApplicationServices;
  using Presentation.Web.Infrastructure.Attributes;
+ using Swashbuckle.OData;
+ using Swashbuckle.Swagger.Annotations;
 
  namespace Presentation.Web.Controllers.OData
 {
@@ -25,6 +27,7 @@ using Core.ApplicationServices;
         // GET /Organizations(1)/ItProjects(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
         public IHttpActionResult GetByItProject(int orgId, int projId)
         {
             // TODO figure out how to check auth
@@ -35,6 +38,7 @@ using Core.ApplicationServices;
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItProjectRights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -82,13 +86,6 @@ using Core.ApplicationServices;
             {
                 return Forbidden();
             }
-
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
 
             // check model state
             if (!ModelState.IsValid)

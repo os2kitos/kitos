@@ -4,11 +4,15 @@ using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Hangfire;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Results;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -185,6 +189,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
         public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
@@ -197,6 +202,8 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
             var currentOrgId = AuthService.GetCurrentOrganizationId(UserId);
