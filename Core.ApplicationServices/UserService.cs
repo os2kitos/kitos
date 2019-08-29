@@ -15,6 +15,8 @@ namespace Core.ApplicationServices
         private readonly TimeSpan _ttl;
         private readonly string _baseUrl;
         private readonly string _mailSuffix;
+        private readonly string _defaultUserPassword;
+        private readonly bool _useDefaultUserPassword;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -26,6 +28,8 @@ namespace Core.ApplicationServices
         public UserService(TimeSpan ttl,
             string baseUrl,
             string mailSuffix,
+            string defaultUserPassword,
+            bool useDefaultUserPassword,
             IGenericRepository<User> userRepository,
             IGenericRepository<Organization> orgRepository,
             IGenericRepository<PasswordResetRequest> passwordResetRequestRepository,
@@ -35,25 +39,31 @@ namespace Core.ApplicationServices
             _ttl = ttl;
             _baseUrl = baseUrl;
             _mailSuffix = mailSuffix;
+            _defaultUserPassword = defaultUserPassword;
+            _useDefaultUserPassword = useDefaultUserPassword;
             _userRepository = userRepository;
             _orgRepository = orgRepository;
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
             _crypt = new SHA256Managed();
+            if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
+            {
+                throw new ArgumentException(nameof(defaultUserPassword) + " must be defined, when it must be used.");
+            }
         }
 
         public User AddUser(User user, bool sendMailOnCreation, int orgId)
         {
             // hash his salt and default password
-            user.Salt = _cryptoService.Encrypt(DateTime.UtcNow + " spices");
-#if DEBUG
-            user.Password = _cryptoService.Encrypt("arne123" + user.Salt); //TODO: Don't use default password
-#else
-            user.Password = _cryptoService.Encrypt(DateTime.UtcNow + user.Salt);
-#endif
+            var utcNow = DateTime.UtcNow;
+            user.Salt = _cryptoService.Encrypt(utcNow + " spices");
 
-            user.LastChanged = DateTime.UtcNow;
+            user.Password = _useDefaultUserPassword
+                ? _cryptoService.Encrypt(_defaultUserPassword + user.Salt)
+                : _cryptoService.Encrypt(utcNow + user.Salt);
+
+            user.LastChanged = utcNow;
             user.DefaultOrganizationId = orgId;
 
             _userRepository.Insert(user);
@@ -184,9 +194,19 @@ namespace Core.ApplicationServices
         }
 
 
-        private bool IsValidPassword(string password)
+        private static bool IsValidPassword(string password)
         {
             return password.Length >= 6;
+        }
+
+        public User GetUserById(int id)
+        {
+            return _userRepository.GetByKey(id);
+        }
+
+        public void Dispose()
+        {
+            _crypt?.Dispose();
         }
     }
 }

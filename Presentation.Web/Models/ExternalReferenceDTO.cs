@@ -1,8 +1,4 @@
-﻿using Core.DomainModel.ItProject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System;
 
 namespace Presentation.Web.Models
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
@@ -10,6 +7,7 @@ namespace Presentation.Web.Controllers.OData.OptionControllers
     using Core.DomainModel.ItSystemUsage;
     using Core.DomainServices;
 
+    [InternalApi]
     public class ArchiveTestLocationsController : BaseOptionController<ArchiveTestLocation, ItSystemUsage>
     {
         public ArchiveTestLocationsController(IGenericRepository<ArchiveTestLocation> repository, IAuthenticationService authService)

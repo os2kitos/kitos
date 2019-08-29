@@ -1,21 +1,15 @@
-﻿using System.Linq;
-using Core.DomainModel;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {
     public class GenericContextAwareApiController<TModel, TDto> : GenericApiController<TModel, TDto>
         where TModel : Entity, IContextAware
     {
-        public GenericContextAwareApiController(IGenericRepository<TModel> repository)
-            : base(repository)
+        public GenericContextAwareApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
+            : base(repository, authorizationContext)
         {
-        }
-
-        protected override bool HasWriteAccess(TModel obj, User user, int organizationId)
-        {
-            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

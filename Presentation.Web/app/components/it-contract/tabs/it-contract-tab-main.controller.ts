@@ -343,7 +343,6 @@
                     }
                 }
                 $scope.checkContractValidity = (field, value) => {
-                    console.log(value);
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
                     var formatString = "DD-MM-YYYY";

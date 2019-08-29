@@ -111,7 +111,7 @@
                     emailExists: ['$http', '$stateParams', 'organization', 'contactPerson', function ($http, $stateParams, organization, contactPerson) {
                         //get by org id
                         if (contactPerson != null) {
-                            return $http.get('/odata/Users/IsEmailAvailable(email=\'' + contactPerson.email + '\')')
+                            return $http.get('/odata/Users/Users.IsEmailAvailable(email=\'' + contactPerson.email + '\')')
                                 .then(function (response) {
                                     if (response.data.value) {return false;} else {return true;};
                                 });

@@ -1,92 +1,74 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using System.Net;
 using Core.ApplicationServices;
+using Core.DomainModel;
+using Ninject.Infrastructure.Language;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        private readonly IAuthenticationService _authService;
-
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
-            _authService = authService;
-        }
-        
-        [ODataRoute("ItSystems")]
-        public override IHttpActionResult Get()
-        {
-            var test = base.Get();
-            return base.Get();
-            //if (AuthenticationService.HasReadAccessOutsideContext(CurentUser))
-            //    return base.Get();
-
-            //var orgId = CurrentOrganizationId;
-            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
-        [ODataRoute("Organizations({key})/ItSystems")]
-        public IHttpActionResult GetItSystems(int key)
+        [ODataRoute("Organizations({orgKey})/ItSystems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetItSystems(int orgKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
-            {
-                if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+            if (!AllowOrganizationAccess(orgKey))
+            { 
+                return Forbidden();
+            }
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
-                return Ok(result);
-            }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-                return Ok(result);
-            }
-        }
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public);
 
-        // GET /Organizations(1)/BelongingSystems
-        [EnableQuery]
-        [ODataRoute("Organizations({key})/BelongingSystems")]
-        public IHttpActionResult GetBelongingSystems(int key)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
-            {
-                if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowRead);
 
-                var result = Repository.AsQueryable().Where(m => m.BelongsToId == key);
-                return Ok(result);
-            }
-            else
-            {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
-                return Ok(result);
-            }
+            return Ok(systemsWithAllowedReadAccess);
         }
 
         // GET /Organizations(1)/ItSystems(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItSystem>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == sysKey);
-            if (entity == null)
+            var system = Repository.GetByKey(sysKey);
+            if (!AllowRead(system))
+            {
+                return Forbidden();
+            }
+            if (system == null)
+            {
                 return NotFound();
+            }
 
-            if (_authService.HasReadAccess(UserId, entity))
-                return Ok(entity);
+            return Ok(system);
+        }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+        [ODataRoute("ItSystems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        public override IHttpActionResult Get()
+        {
+            return base.Get();
         }
     }
 }

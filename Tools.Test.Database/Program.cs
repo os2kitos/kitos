@@ -48,17 +48,45 @@ namespace Tools.Test.Database
                     FailOnConnectionToProd(connectionString);
                     return new DropDatabaseTask(connectionString);
 
+                case CliTargets.CreateOrganization:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <organizationType> <organizationName>");
+                    var createOrganizationArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        OrganizationType = GetIntegerArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2)
+                    };
+
+                    FailOnConnectionToProd(createOrganizationArgs.ConnectionString);
+                    return new CreateOrganizationTask(createOrganizationArgs.ConnectionString, createOrganizationArgs.OrganizationType, createOrganizationArgs.OrganizationName);
+
                 case CliTargets.CreateTestUser:
-                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role>");
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role> <organizationNames>");
                     var createUserArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
                         Email = GetArgument(additionalArgs, 1),
                         Password = GetArgument(additionalArgs, 2),
                         Role = GetArgument(additionalArgs, 3),
+                        OrganizationNames = GetArgument(additionalArgs, 4)
                     };
 
-                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role);
+                    FailOnConnectionToProd(createUserArgs.ConnectionString);
+                    return new CreateKitosUserTask(createUserArgs.ConnectionString, createUserArgs.Email, createUserArgs.Password, createUserArgs.Role, createUserArgs.OrganizationNames);
+
+                case CliTargets.CreateApiTestUser:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <email> <password> <role> <organizationNames>");
+                    var createApiUserArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        Email = GetArgument(additionalArgs, 1),
+                        Password = GetArgument(additionalArgs, 2),
+                        Role = GetArgument(additionalArgs, 3),
+                        OrganizationNames = GetArgument(additionalArgs, 4)
+                    };
+
+                    FailOnConnectionToProd(createApiUserArgs.ConnectionString);
+                    return new CreateKitosUserTask(createApiUserArgs.ConnectionString, createApiUserArgs.Email, createApiUserArgs.Password, createApiUserArgs.Role, createApiUserArgs.OrganizationNames, true);
 
                 case CliTargets.EnableAllOptions:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
@@ -72,14 +100,15 @@ namespace Tools.Test.Database
 
                 case CliTargets.CreateItSystem:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_system_name>");
-                    var createSystemArgs = new
+                    var createItSystemArgs = new
                     {
                         ConnectionString = GetArgument(additionalArgs, 0),
-                        ItSystemName = GetArgument(additionalArgs, 1)
+                        ItSystemName = GetArgument(additionalArgs, 1),
+                        OrganizationName = GetArgument(additionalArgs, 2)
                     };
 
-                    FailOnConnectionToProd(createSystemArgs.ConnectionString);
-                    return new CreateItSystemTask(createSystemArgs.ConnectionString, createSystemArgs.ItSystemName);
+                    FailOnConnectionToProd(createItSystemArgs.ConnectionString);
+                    return new CreateItSystemTask(createItSystemArgs.ConnectionString, createItSystemArgs.ItSystemName, createItSystemArgs.OrganizationName);
 
                 case CliTargets.CreateItContract:
                     Console.WriteLine("Expecting the following arguments: <connectionString> <it_contract_name>");
@@ -113,5 +142,19 @@ namespace Tools.Test.Database
             }
             return arg;
         }
+
+        private static int GetIntegerArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)
+        {
+            var arg = GetArgument(additionalArgs, index, trimEnclosingQuotes);
+            if (int.TryParse(arg, out int res))
+            {
+                return res;
+            }
+            else
+            {
+                throw new ArgumentException($"argument at index {index} must be an integer");
+            }
+        }
+        
     }
 }

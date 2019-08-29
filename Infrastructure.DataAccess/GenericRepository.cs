@@ -40,15 +40,17 @@ namespace Infrastructure.DataAccess
                 query = query.Include(includeProperty);
             }
 
-            return orderBy?.Invoke(query).ToList() ?? query.ToList();
+
+            query = orderBy?.Invoke(query) ?? query;
+
+            return query.ToList();
         }
-
-
-
 
         public IQueryable<T> AsQueryable()
         {
-            return _dbSet.AsQueryable();
+            var dbAsQueryable = _dbSet.AsQueryable();
+            
+            return dbAsQueryable;
         }
 
         public T Create()

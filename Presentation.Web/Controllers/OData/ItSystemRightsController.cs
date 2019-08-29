@@ -1,67 +1,80 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
     using System;
     using System.Net;
 
+    [PublicApi]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
-        private IAuthenticationService _authService;
-        public ItSystemRightsController(IGenericRepository<ItSystemRight> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItSystemRightsController(
+            IGenericRepository<ItSystemRight> repository,
+            IAuthenticationService authService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
-            this._authService = authService;
         }
 
-        // GET /Organizations(1)/ItSystemUsages
+        // GET /Organizations(1)/ItSystemUsages(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId);
-            return Ok(result);
+            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
+
+            result = FilterByAccessControl(result);
+
+            return Ok(result.AsQueryable());
         }
 
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItSystemRights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.UserId == userId);
-            return Ok(result);
+            var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
+
+            result = FilterByAccessControl(result);
+
+            return Ok(result.AsQueryable());
         }
 
         public override IHttpActionResult Patch(int key, Delta<ItSystemRight> delta)
         {
             var entity = Repository.GetByKey(key);
 
-            // does the entity exist?
-            if (entity == null)
-                return NotFound();
-
-            // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
-
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
+
+            // does the entity exist?
+            if (entity == null)
+            {
+                return NotFound();
+            }
+
+            // check if user is allowed to write to the entity
+            if (AllowWrite(entity) == false)
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -85,10 +98,14 @@ namespace Presentation.Web.Controllers.OData
             var entity = Repository.GetByKey(key);
 
             if (entity == null)
+            {
                 return NotFound();
+            }
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return Unauthorized();
+            if (AllowWrite(entity) == false)
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -101,6 +118,12 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
+        {
+            result = result.Where(AllowRead).ToList();
+            return result;
         }
     }
 }

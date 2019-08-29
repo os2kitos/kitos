@@ -13,6 +13,12 @@ using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
+using Microsoft.Owin;
+using Presentation.Web.Infrastructure.Authorization;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Factories.Authentication;
+using Presentation.Web.Infrastructure.Model.Authentication;
+using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
 [assembly: WebActivatorEx.ApplicationShutdownMethodAttribute(typeof(NinjectWebCommon), "Stop")]
@@ -82,7 +88,9 @@ namespace Presentation.Web
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
                 .WithConstructorArgument("baseUrl", Settings.Default.BaseUrl)
-                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix);
+                .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
+                .WithConstructorArgument("defaultUserPassword", Settings.Default.DefaultUserPassword)
+                .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
             kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
@@ -97,13 +105,35 @@ namespace Presentation.Web
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
-            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InSingletonScope();
+            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
 
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
             kernel.Bind<RoleProvider>().ToMethod(ctx => Roles.Provider);
+
+            kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
+            
+            kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
+            RegisterAuthenticationContext(kernel);
+            RegisterAccessContext(kernel);
+        }
+
+        private static void RegisterAuthenticationContext(IKernel kernel)
+        {
+            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create())
+                .InRequestScope();
+        }
+
+        private static void RegisterAccessContext(IKernel kernel)
+        {
+            kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
+            kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
+            kernel.Bind<IAuthorizationContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<IAuthorizationContextFactory>().Create())
+                .InRequestScope();
         }
     }
 }

@@ -5,9 +5,14 @@ using Presentation.Web.Models;
 using System.Net.Http;
 using Core.DomainModel;
 using System;
+using System.Collections.Generic;
+using System.Net;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;
@@ -17,6 +22,8 @@ namespace Presentation.Web.Controllers.API
             this._contracts = contracts;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<EconomyStreamDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
@@ -29,8 +36,11 @@ namespace Presentation.Web.Controllers.API
                     // all users may view economy streams marked Public or if they are part of the organization
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.ExternPaymentFor.OrganizationId == currentOrgId);
                     if (!result.Any())
-                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
-                        return Unauthorized();
+                    {
+                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not allowed to view the data
+                        return Forbidden();
+
+                    }
                 }
             }
             else
@@ -41,6 +51,8 @@ namespace Presentation.Web.Controllers.API
             return Ok(Map(result));
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
@@ -54,7 +66,9 @@ namespace Presentation.Web.Controllers.API
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.InternPaymentFor.OrganizationId == currentOrgId);
                     if (!result.Any())
                         //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
-                        return Unauthorized();
+                    {
+                        return Forbidden();
+                    }
                 }
             }
             else
@@ -87,7 +101,7 @@ namespace Presentation.Web.Controllers.API
 
             if (!AuthenticationService.HasWriteAccess(KitosUser.Id, stream))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             stream.ObjectOwner = KitosUser;

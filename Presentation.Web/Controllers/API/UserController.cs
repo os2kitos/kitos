@@ -18,10 +18,12 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Ninject;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class UserController : GenericApiController<User, UserDTO>
     {
         private readonly IUserService _userService;
@@ -142,24 +144,6 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        //public HttpResponseMessage PostTokenRequest(bool? token, int userId)
-        //{
-        //    try
-        //    {
-        //        var user = Repository.GetByKey(userId);
-        //        if (user == null)
-        //            return NotFound();
-
-        //        user.UniqueId = Guid.NewGuid();
-        //        PatchQuery(user, null);
-        //        return Ok(user.Uuid);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return LogError(e);
-        //    }
-        //}
-
         public HttpResponseMessage GetBySearch(string q)
         {
             try
@@ -243,14 +227,14 @@ namespace Presentation.Web.Controllers.API
                 header.Add("Organisationsenhed", "Default org.enhed");
                 header.Add("Advis", "Advis");
                 header.Add("Oprettet", "Oprettet Af");
-                header.Add("OrgRoller", "Organisations roller");
+                header.Add("OrgRoller", "Organisations roller"); 
                 header.Add("ITProjektRoller", "ITProjekt roller");
                 header.Add("ITSystemRoller", "ITSystem roller");
                 header.Add("ITKontraktRoller", "ITKontrakt roller");
                 list.Add(header);
 
                 foreach (var user in dtos)
-                    {
+                {
                     var obj = new ExpandoObject() as IDictionary<string, Object>;
                     obj.Add("Fornavn", user.Name);
                     obj.Add("Efternavn", user.LastName);
@@ -402,11 +386,23 @@ namespace Presentation.Web.Controllers.API
             if (user.IsReadOnly && !user.IsGlobalAdmin)
                 return false;
 
-            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
-            if (isLocalAdmin)
-                return true;
-
             return base.HasWriteAccess(obj, user, organizationId);
+        }
+
+        /// <summary>
+        /// Deletes user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <param name="organizationId">Not used in this case. Should remain empty</param>
+        /// <returns></returns>
+        public override HttpResponseMessage Delete(int id, int organizationId = 0)
+        {
+            if (!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
+            {
+                return Forbidden();
+            }
+
+            return base.Delete(id, organizationId);
         }
     }
 }

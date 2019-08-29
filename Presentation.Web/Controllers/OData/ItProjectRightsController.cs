@@ -5,12 +5,16 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.ApplicationServices;
+ using Presentation.Web.Infrastructure.Attributes;
+ using Swashbuckle.OData;
+ using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.OData
+ namespace Presentation.Web.Controllers.OData
 {
     using System;
     using System.Net;
 
+    [PublicApi]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
         private IAuthenticationService _authService;
@@ -23,6 +27,7 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItProjects(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
         public IHttpActionResult GetByItProject(int orgId, int projId)
         {
             // TODO figure out how to check auth
@@ -33,6 +38,7 @@ namespace Presentation.Web.Controllers.OData
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItProjectRights")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
@@ -48,7 +54,9 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -69,22 +77,21 @@ namespace Presentation.Web.Controllers.OData
 
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
-
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
+            {
+                return Forbidden();
+            }
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {

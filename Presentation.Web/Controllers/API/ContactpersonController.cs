@@ -1,33 +1,33 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.Organization;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
-        private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<ContactPerson> _repository;
         private readonly IGenericRepository<Organization> _orgRepository;
 
-        public ContactpersonController(IGenericRepository<ContactPerson> repository, IAuthenticationService authService,
-            IGenericRepository<Organization> orgRepository)
+        public ContactpersonController(IGenericRepository<ContactPerson> repository, IGenericRepository<Organization> orgRepository)
             : base(repository)
         {
-            _authService = authService;
             _repository = repository;
             _orgRepository = orgRepository;
         }
 
         // GET DataProtectionAdvisor by OrganizationId
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ContactPersonDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public override HttpResponseMessage GetSingle(int id)
         {
             try
@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 var dto = Map(item);

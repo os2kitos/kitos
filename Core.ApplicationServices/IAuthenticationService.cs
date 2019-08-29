@@ -13,7 +13,6 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have write access to the given instance, else false.</returns>
         bool HasWriteAccess(int userId, IEntity entity);
         bool IsGlobalAdmin(int userId);
-        bool IsLocalAdmin(int userId, int organizationId);
         bool IsLocalAdmin(int userId);
         bool HasReadAccessOutsideContext(int userId);
         int GetCurrentOrganizationId(int userId);

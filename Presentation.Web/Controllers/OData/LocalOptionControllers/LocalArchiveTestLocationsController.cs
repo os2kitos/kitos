@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
@@ -11,6 +8,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     using Core.DomainModel.LocalOptions;
     using Core.DomainServices;
 
+    [InternalApi]
     public class LocalArchiveTestLocationsController : LocalOptionBaseController<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>
     {
         public LocalArchiveTestLocationsController(IGenericRepository<LocalArchiveTestLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveTestLocation> optionsRepository)

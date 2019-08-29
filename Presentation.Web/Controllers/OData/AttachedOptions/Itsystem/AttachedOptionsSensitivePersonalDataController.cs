@@ -2,33 +2,39 @@
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using System.Web.Mvc;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
-    using System.Net;
-
+    [InternalApi]
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
-        public AttachedOptionsSensitivePersonalDataController(IGenericRepository<AttachedOption> repository,
-            IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository, IAuthenticationService authService,
+        public AttachedOptionsSensitivePersonalDataController(
+            IGenericRepository<AttachedOption> repository,
+            IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository,
+            IAuthenticationService authService,
             IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository)
-           : base(repository, authService, sensitiveDataTypeRepository,
-                 localSensitivePersonalDataTypeRepository){}
-
-        [System.Web.Http.HttpGet]
-        [EnableQuery]
-        [ODataRoute("GetSensitivePersonalDataByObjectID(id={id}, entitytype={entitytype})")]
-        public IHttpActionResult GetOptionsByObjectID(int id, EntityType entitytype)
+           : base(repository, authService, sensitiveDataTypeRepository, localSensitivePersonalDataTypeRepository)
         {
-            return base.GetOptionsByObjectIDAndType(id,entitytype, OptionType.SENSITIVEPERSONALDATA);
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        [ODataRoute("GetSensitivePersonalDataByUsageId(id={id})")]
+        public IHttpActionResult GetSensitivePersonalDataByUsageId(int id)
+        {
+            return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEMUSAGE, OptionType.SENSITIVEPERSONALDATA);
+        }
+
+        [HttpGet]
+        [EnableQuery]
+        [ODataRoute("GetSensitivePersonalDataBySystemId(id={id})")]
+        public IHttpActionResult GetSensitivePersonalDataBySystemId(int id)
+        {
+            return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEM, OptionType.SENSITIVEPERSONALDATA);
         }
     }
 }

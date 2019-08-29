@@ -29,23 +29,6 @@ namespace Core.ApplicationServices
         }
 
         /// <summary>
-        /// Checks if the user is local admin in a respective organization.
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="organizationId"></param>
-        /// <returns></returns>
-        public bool IsLocalAdmin(int userId, int organizationId)
-        {
-            var user = _userRepository.AsQueryable()
-                .SingleOrDefault(x => x.Id == userId &&
-                    x.OrganizationRights.Any(
-                        right => right.Role == OrganizationRole.LocalAdmin &&
-                        right.OrganizationId == organizationId));
-
-            return user != null;
-        }
-
-        /// <summary>
         /// Checks if the user is local admin in the current organization.
         /// </summary>
         /// <param name="userId"></param>
@@ -81,8 +64,14 @@ namespace Core.ApplicationServices
         /// <returns>Returns true if the user have read access to the given instance, else false.</returns>
         public bool HasReadAccess(int userId, IEntity entity)
         {
-            var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            var user = _userRepository.GetByKey(userId);
+
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+            if (loggedIntoOrganizationId == -1)
+            {
+                return false;
+            }
+
             // check if global admin
             if (user.IsGlobalAdmin)
             {
@@ -136,7 +125,12 @@ namespace Core.ApplicationServices
         {
             var user = _userRepository.AsQueryable().Single(x => x.Id == userId);
             AssertUserIsNotNull(user);
-            var loggedIntoOrganizationId = user.DefaultOrganizationId.Value;
+            var loggedIntoOrganizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+
+            if (loggedIntoOrganizationId == -1)
+            {
+                return false;
+            }
 
             // check if global admin
             if (user.IsGlobalAdmin)
@@ -144,23 +138,28 @@ namespace Core.ApplicationServices
                 // global admin always have access
                 return true;
             }
-            //check if user is readonly
-            if (user.IsReadOnly) {
+
+            // check "Forretningsroller" for the entity
+            if (entity.HasUserWriteAccess(user))
+            {
+                return true;
+            }
+
+            // check ReadOnly
+            if (user.IsReadOnly)
+            {
                 return false;
             }
 
-            //User has access if user created entity
-            //if (user.IsLocalAdmin && entity.ObjectOwnerId == user.Id)
-            //{
-            //    return true;
-            //}
-
+            //TODO: This checks even if it is not changed. Seems very odd. Also it is too specific. Check should be where it happens....
+            //TODO: Add a rule for access modifier check in POST for ITSystem and ITSystemUsage. Then this is covered.
+            #region instane
             //Check if user is allowed to set accessmodifier to public
-            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
+            var accessModifier = (entity as IHasAccessModifier)?.AccessModifier; //TODO: at this stage we cannot assume that the access modifier is "new". Could it not be the old value? It is a strange assumption.
             if (accessModifier == AccessModifier.Public)
             {
                 // special case for organisation
-                if (entity is Organization)
+                if (entity is Organization) //TODO: IOrganizationController (non-OData( checks for the generic "Can set access modifier"))
                 {
                     if (!_featureChecker.CanExecute(user, Feature.CanSetOrganizationAccessModifierToPublic))
                     {
@@ -175,11 +174,13 @@ namespace Core.ApplicationServices
                         return false;
                     }
                 }
+
                 else if (!_featureChecker.CanExecute(user, Feature.CanSetAccessModifierToPublic))
                 {
                     return false;
                 }
             }
+            #endregion insane
 
             // check if entity is in context
             if (entity is IContextAware) // TODO I don't like this impl
@@ -212,18 +213,13 @@ namespace Core.ApplicationServices
             if (_featureChecker.CanExecute(user, Feature.CanModifyReports) && entity is IReportModule)
                 return true;
 
-            // check if user has a write role on the target entity
-            if (entity.HasUserWriteAccess(user))
-                return true;
-
             // check if user is object owner
-            if (entity.ObjectOwnerId == user.Id)
+            if (entity.ObjectOwner != null && entity.ObjectOwner.Id == user.Id && (entity is IProjectModule || entity is ISystemModule || entity is ItContract || entity is IReportModule))
             {
                 // object owners have write access to their objects if they're within the context,
                 // else they'll have to switch to the correct context and try again
                 return true;
-
-            }
+            }            
 
             // User is a special case
             if (entity is User && (entity.Id == user.Id || _featureChecker.CanExecute(user, Feature.CanModifyUsers)))

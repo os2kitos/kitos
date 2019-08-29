@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Extensions;
 using Core.DomainServices;
 using System.Web.OData.Routing;
-using Microsoft.OData.Core;
-using Microsoft.OData.Core.UriParser;
+using Microsoft.OData.UriParser;
 using Ninject;
 using Ninject.Extensions.Logging;
 using System.Web.Http.Routing;
@@ -60,22 +60,26 @@ namespace Presentation.Web.Controllers.OData
             }
 
             var urlHelper = request.GetUrlHelper() ?? new UrlHelper(request);
+            var pathHandler = (IODataPathHandler)request.GetRequestContainer().GetService(typeof(IODataPathHandler));
 
-            string serviceRoot = urlHelper.CreateODataLink(
-                request.ODataProperties().RouteName,
-                request.ODataProperties().PathHandler, new List<ODataPathSegment>());
-            var odataPath = request.ODataProperties().PathHandler.Parse(
-                request.ODataProperties().Model,
-                serviceRoot, uri.LocalPath);
+            string serviceRoot = urlHelper.CreateODataLink(request.ODataProperties().RouteName,pathHandler, new List<ODataPathSegment>());
 
-            var keySegment = odataPath.Segments.OfType<KeyValuePathSegment>().FirstOrDefault();
+            var odataPath = pathHandler.Parse(serviceRoot,uri.LocalPath, request.GetRequestContainer());
+
+            var keySegment = odataPath.Segments.OfType<KeySegment>().FirstOrDefault();
             if (keySegment == null)
             {
                 throw new InvalidOperationException("The link does not contain a key.");
             }
 
-            var value = ODataUriUtils.ConvertFromUriLiteral(keySegment.Value, ODataVersion.V4);
+            var value = keySegment.Keys.FirstOrDefault().Value;
             return (TKey)value;
         }
+
+        protected virtual IHttpActionResult Forbidden()
+        {
+            return ResponseMessage(new HttpResponseMessage(HttpStatusCode.Forbidden));
+        }
+
     }
 }

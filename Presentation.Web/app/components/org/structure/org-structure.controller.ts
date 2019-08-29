@@ -640,7 +640,7 @@
             };
 
             $scope.selectTaskGroup = function () {
-                var url = "api/taskusage?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
+                var url = "api/taskusage/taskGroup?orgUnitId=" + $scope.chosenOrgUnit.id + "&taskId=" + $scope.selectedTaskGroup;
 
                 var msg = notify.addInfoMessage("Opretter tilknytning...", false);
                 $http.post<Kitos.API.Models.IApiWrapper<any>>(url, null).then((result) => {
