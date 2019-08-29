@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable(readOnly:true).Where(m => m.OrganizationId == orgKey);
+            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
 
             var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowRead);
 

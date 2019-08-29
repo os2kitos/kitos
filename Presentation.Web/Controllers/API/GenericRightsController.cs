@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns>List of all rights</returns>
         protected IEnumerable<TRight> GetRightsQuery(int id)
         {
-            return RightRepository.Get(right => right.ObjectId == id, readOnly: true);
+            return RightRepository.Get(right => right.ObjectId == id);
         }
 
         /// <summary>

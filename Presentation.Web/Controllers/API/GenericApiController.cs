@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual IQueryable<TModel> GetAllQuery()
         {
-            return Repository.AsQueryable(readOnly:true);
+            return Repository.AsQueryable();
         }
 
         /// <summary>
