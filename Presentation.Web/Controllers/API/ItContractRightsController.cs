@@ -7,10 +7,9 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class ItContractRightController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
     {
-        private readonly IGenericRepository<ItContract> _objectRepository;
-        public ItContractRightController(IGenericRepository<ItContractRight> rightRepository, IGenericRepository<ItContract> objectRepository) : base(rightRepository, objectRepository)
+        public ItContractRightController(IGenericRepository<ItContractRight> rightRepository, IGenericRepository<ItContract> objectRepository) 
+            : base(rightRepository, objectRepository)
         {
-            _objectRepository = objectRepository;
         }
     }
 }

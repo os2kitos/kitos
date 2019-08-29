@@ -34,6 +34,8 @@ namespace Presentation.Web.Controllers.API
             _taskRepository = taskRepository;
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]

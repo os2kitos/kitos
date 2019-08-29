@@ -4,12 +4,9 @@ using Core.DomainServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
 using static System.String;
 
 namespace Presentation.Web.Controllers.OData

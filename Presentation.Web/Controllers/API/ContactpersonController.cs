@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
@@ -15,15 +14,12 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
-        private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<ContactPerson> _repository;
         private readonly IGenericRepository<Organization> _orgRepository;
 
-        public ContactpersonController(IGenericRepository<ContactPerson> repository, IAuthenticationService authService,
-            IGenericRepository<Organization> orgRepository)
+        public ContactpersonController(IGenericRepository<ContactPerson> repository, IGenericRepository<Organization> orgRepository)
             : base(repository)
         {
-            _authService = authService;
             _repository = repository;
             _orgRepository = orgRepository;
         }

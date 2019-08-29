@@ -274,6 +274,9 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -346,24 +349,6 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
-        // TODO cloning has been disabled for now, reviewed at a later date
-        //public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
-        //{
-        //    try
-        //    {
-        //        //make sure we only clone projects that the is accessible from the organization
-        //        var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
-
-        //        var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
-
-        //        return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

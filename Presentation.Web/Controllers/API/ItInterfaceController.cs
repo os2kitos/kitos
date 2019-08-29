@@ -190,47 +190,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Get interfaces by name that aren't already used by the system in question
-        /// </summary>
-        /// <param name="q"></param>
-        /// <param name="orgId"></param>
-        /// <param name="sysId"></param>
-        /// <returns>Available interfaces</returns>
-        //
-        // Udkommenteret ifm. OS2KITOS-663
-        //public HttpResponseMessage GetSearchExclude(string q, int orgId, int sysId)
-        //{
-        //    try
-        //    {
-        //        var interfaces = Repository.Get(
-        //            s =>
-        //                // filter by name
-        //                s.Name.Contains(q) &&
-        //                // filter (remove) interfaces already used by the system
-        //                s.CanBeUsedBy.Count(x => x.ItSystemId == sysId) == 0 &&
-        //                // global admin sees all within the context
-        //                (KitosUser.IsGlobalAdmin &&
-        //                 s.OrganizationId == orgId ||
-        //                 // object owner sees his own objects
-        //                 s.ObjectOwnerId == KitosUser.Id ||
-        //                 // it's public everyone can see it
-        //                 s.AccessModifier == AccessModifier.Public ||
-        //                 // everyone in the same organization can see normal objects
-        //                 s.AccessModifier == AccessModifier.Local &&
-        //                 s.OrganizationId == orgId)
-        //                // it systems doesn't have roles so private doesn't make sense
-        //                // only object owners will be albe to see private objects
-        //            );
-        //        var dtos = Map(interfaces);
-        //        return Ok(dtos);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return LogError(e);
-        //    }
-        //}
-
         public override HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try

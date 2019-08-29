@@ -47,6 +47,11 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
             paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
@@ -167,11 +172,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        public override HttpResponseMessage Post(ItContractDTO dto)
-        { 
-            return base.Post(dto);
         }
 
         /// <summary>
@@ -422,8 +422,6 @@ namespace Presentation.Web.Controllers.API
                 //Get contracts within organization
                 var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
 
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-                //var contracts = Page(Repository.AsQueryable(), pagingModel);
 
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
 

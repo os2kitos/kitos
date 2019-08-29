@@ -87,13 +87,6 @@ using Core.ApplicationServices;
                 return Forbidden();
             }
 
-            //Check if user is allowed to set accessmodifier to public
-            //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
-            //{
-            //    return Unauthorized();
-            //}
-
             // check model state
             if (!ModelState.IsValid)
             {

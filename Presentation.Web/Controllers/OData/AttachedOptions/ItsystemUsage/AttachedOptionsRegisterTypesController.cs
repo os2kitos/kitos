@@ -37,25 +37,6 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         [ODataRoute("AttachedOptions")]
         public async Task<IHttpActionResult> Post([FromODataUri] int key, AttachedOption dto)
         {
-            //try
-            //{
-            //    var Entities = _AttachedOptionRepository.Get();
-
-            //    if (Entities.Count() > 0)
-            //    {
-            //        entity.Priority = _AttachedOptionRepository.Get().Max(e => e.Priority) + 1;
-            //    }
-            //    else
-            //    {
-            //        entity.Priority = 1;
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    var message = e.Message;
-            //    return InternalServerError(e);
-            //}
-
             return base.Post(dto);
         }
     }
