@@ -37,7 +37,8 @@ namespace Core.DomainServices.Queries
                     return refinement.Apply(source);
                 }
             }
-            if (_hasOrganization)
+
+            if (_allowCrossOrganizationAccess == false && _hasOrganization)
             {
                 var refinement = QueryFactory.ByOrganizationId<T>(_organizationId);
 

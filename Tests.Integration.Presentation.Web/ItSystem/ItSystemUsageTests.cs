@@ -47,11 +47,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        [Fact]
-        public async Task GlobalAdmin_Api_User_Can_Get_Organizations_That_Use_An_It_System()
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task Api_User_Can_Get_Organizations_That_Use_An_It_System(OrganizationRole role)
         {
             //Arrange
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var token = await HttpApi.GetTokenAsync(role);
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystemUsages"), token.Token))
