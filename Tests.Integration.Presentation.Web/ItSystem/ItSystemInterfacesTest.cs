@@ -15,7 +15,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemInterfacesTest : WithAutoFixture
     {
-        //  As a user i am able to see interfaces from my own organization and public from others
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task Global_Administrator_Can_Get_All_Interfaces(OrganizationRole role)
@@ -40,12 +39,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        // As a global administrator i am able to see every interface created
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, 1)]
-        [InlineData(OrganizationRole.GlobalAdmin, 2)]
-        [InlineData(OrganizationRole.User, 1)]
-        [InlineData(OrganizationRole.User, 2)]
+        [InlineData(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId)]
+        [InlineData(OrganizationRole.GlobalAdmin, TestEnvironment.SecondOrganizationId)]
+        [InlineData(OrganizationRole.User, TestEnvironment.DefaultOrganizationId)]
+        [InlineData(OrganizationRole.User, TestEnvironment.SecondOrganizationId)]
         public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
             var token = await HttpApi.GetTokenAsync(role);
@@ -66,7 +64,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 {
                     if (item.OrganizationId != orgId)
                     {
-                        Assert.NotEqual(item.AccessModifier, AccessModifier.Local);
+                        Assert.NotEqual(AccessModifier.Local, item.AccessModifier);
                     }
                 }
             }
@@ -84,7 +82,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             foreach (var item in res.Result)
             {
-
                 var orgFromItem = item.OrganizationId;
                 var interFaceId = item.Id;
 
@@ -113,13 +110,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        public async Task GenerateTestInterfaces()
+        internal async Task GenerateTestInterfaces()
         {
             await InterfaceHelper.CreateInterfaces(
                 InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local),
                 InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public),
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, 2, AccessModifier.Local),
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, 2, AccessModifier.Public));
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Local),
+                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Public));
         }
     }
 }
