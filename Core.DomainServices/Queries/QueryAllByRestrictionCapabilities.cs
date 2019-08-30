@@ -21,21 +21,30 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            if ((_allowCrossOrganizationAccess || _hasOrganization == false) && _hasAccessModifier)
+            if (_hasAccessModifier && _allowCrossOrganizationAccess)
             {
+                if (_hasOrganization)
+                {
+                    var refinement = QueryFactory.ByPublicAccessOrOrganizationId<T>(_organizationId);
 
-                var refinement = _hasOrganization
-                    ? QueryFactory.ByPublicAccessOrOrganizationId<T>(_organizationId)
-                    : QueryFactory.ByPublicAccessModifier<T>();
+                    return refinement.Apply(source);
+                }
+                else
+                {
 
-                return refinement.Apply(source);
+                    var refinement = QueryFactory.ByPublicAccessModifier<T>();
+
+                    return refinement.Apply(source);
+                }
             }
-            else
+            if (_hasOrganization)
             {
                 var refinement = QueryFactory.ByOrganizationId<T>(_organizationId);
 
                 return refinement.Apply(source);
             }
+
+            return source;
         }
     }
 }
