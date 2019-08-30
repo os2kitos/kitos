@@ -24,7 +24,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                 AccessModifier = access
             };
         }
-
         public static async Task CreateInterface(ItInterfaceDTO iDto)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

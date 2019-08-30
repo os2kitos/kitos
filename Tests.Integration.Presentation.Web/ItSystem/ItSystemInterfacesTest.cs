@@ -98,7 +98,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-
         public async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
