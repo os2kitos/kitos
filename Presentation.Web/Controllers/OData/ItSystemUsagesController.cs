@@ -11,7 +11,7 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
-using Ninject.Infrastructure.Language;
+using Core.DomainModel.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
@@ -25,12 +25,17 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
 
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, 
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository,
             IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAuthorizationContext authorizationContext)
             : base(repository, authService, authorizationContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
+        }
+
+        protected override IQueryable<ItSystemUsage> QueryByOrganization(IQueryable<ItSystemUsage> result, int organizationId)
+        {
+            return result.ByOrganizationId(organizationId);
         }
 
         // GET /Organizations(1)/ItSystemUsages
@@ -45,11 +50,9 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+            var result = QueryByOrganization(Repository.AsQueryable(), orgKey);
 
-            var itSystemUsages = result.ToEnumerable().Where(AllowRead);
-
-            return Ok(itSystemUsages);
+            return Ok(result);
         }
 
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
@@ -83,9 +86,7 @@ namespace Presentation.Web.Controllers.OData
                 }
             }
 
-            var result = systemUsages.Where(AllowRead);
-
-            return Ok(result);
+            return Ok(systemUsages);
         }
 
         [AcceptVerbs("POST", "PUT")]
@@ -101,7 +102,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
-            
+
             switch (navigationProperty)
             {
                 case "AccessTypes":

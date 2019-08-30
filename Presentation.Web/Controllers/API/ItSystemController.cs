@@ -10,6 +10,7 @@ using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -39,6 +40,21 @@ namespace Presentation.Web.Controllers.API
             _taskRepository = taskRepository;
             _systemService = systemService;
             _referenceService = referenceService;
+        }
+
+        protected override IQueryable<ItSystem> QueryByOrganization(IQueryable<ItSystem> result, int organizationId)
+        {
+            return result.ByOrganizationId(organizationId);
+        }
+
+        protected override IQueryable<ItSystem> QueryByPublicAccessModifier(IQueryable<ItSystem> result)
+        {
+            return result.ByPublicAccessModifier();
+        }
+
+        protected override IQueryable<ItSystem> QueryByPublicAccessOrOrganization(IQueryable<ItSystem> result, int organizationId)
+        {
+            return result.ByPublicAccessOrOrganizationId(organizationId);
         }
 
         // DELETE api/T

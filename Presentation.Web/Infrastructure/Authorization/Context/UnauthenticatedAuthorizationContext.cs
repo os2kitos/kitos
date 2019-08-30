@@ -4,6 +4,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public class UnauthenticatedAuthorizationContext : IAuthorizationContext
     {
+        public bool AllowGlobalReadAccess()
+        {
+            return false;
+        }
+
         public bool AllowReadsWithinOrganization(int organizationId)
         {
             return false;

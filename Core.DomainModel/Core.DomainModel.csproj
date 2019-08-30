@@ -53,6 +53,7 @@
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="AttachedOption.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />

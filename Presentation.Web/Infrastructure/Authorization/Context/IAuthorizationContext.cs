@@ -4,6 +4,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public interface IAuthorizationContext
     {
+        bool AllowGlobalReadAccess();
         /// <summary>
         /// Determines if high level read-access is allowed for objects within the target organizational context
         /// NOTE: Does not provide entity-level access rights. Just answers the question if ANY access at all can be granted.

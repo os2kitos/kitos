@@ -11,6 +11,7 @@ using System.Web.Http;
 using Castle.Core.Internal;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -48,20 +49,26 @@ namespace Presentation.Web.Controllers.API
             _attachedOptionsRepository = attachedOptionsRepository;
         }
 
+        protected override IQueryable<ItSystemUsage> QueryByOrganization(IQueryable<ItSystemUsage> result, int organizationId)
+        {
+            return result.ByOrganizationId(organizationId);
+        }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
         {
             try
             {
+                if (!AllowOrganizationReadAccess(organizationId))
+                {
+                    return Forbidden();
+                }
                 var usages = Repository.Get(
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
                         u.OrganizationId == organizationId);
-
-                usages = usages.Where(AllowRead);
 
                 return Ok(Map(usages));
             }
@@ -76,6 +83,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                if (!AllowOrganizationReadAccess(organizationId))
+                {
+                    return Forbidden();
+                }
+
                 pagingModel.Where(
                     u =>
                         // system usage is only within the context
@@ -83,8 +95,6 @@ namespace Presentation.Web.Controllers.API
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-
-                pagingModel.WithPostProcessingFilter(AllowRead);
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
 

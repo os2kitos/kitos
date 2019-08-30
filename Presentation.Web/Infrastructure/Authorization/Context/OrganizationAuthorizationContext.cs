@@ -13,6 +13,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             _activeUserContext = activeUserContext;
         }
 
+        public bool AllowGlobalReadAccess()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.GlobalAdmin);
+        }
+
         public bool AllowReadsWithinOrganization(int organizationId)
         {
             var result = false;

@@ -12,7 +12,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _authorizationContext = authorizationContext;
         }
 
-        public bool ApplyBaseQueryPostProcessing { get; } = true;
+        public bool ApplyBaseQueryPostProcessing => _authorizationContext.AllowGlobalReadAccess() == false;
 
         public bool AllowOrganizationReadAccess(int organizationId)
         {

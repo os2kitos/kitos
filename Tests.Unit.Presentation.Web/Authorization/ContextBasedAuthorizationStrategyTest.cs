@@ -18,10 +18,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new ContextBasedAuthorizationStrategy(_authContext.Object);
         }
 
-        [Fact]
-        public void ApplyBaseQueryPostProcessing_Returns_True()
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void ApplyBaseQueryPostProcessing_Returns_True_If_Global_Read_Access_Is_False(bool allowGlobalRead, bool expectedResult)
         {
-            Assert.True(_sut.ApplyBaseQueryPostProcessing);
+            _authContext.Setup(x => x.AllowGlobalReadAccess()).Returns(allowGlobalRead);
+
+            Assert.Equal(expectedResult, _sut.ApplyBaseQueryPostProcessing);
         }
 
         [Theory]

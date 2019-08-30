@@ -9,7 +9,6 @@ using System.Linq;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
-using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -36,35 +35,45 @@ namespace Presentation.Web.Controllers.OData
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
-
-            var result = Repository.AsQueryable().ToEnumerable();
+            var result = Repository.AsQueryable();
+            var organizationId = AuthService.GetCurrentOrganizationId(UserId);
 
             if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
             {
                 if (hasAccessModifier && !AuthService.IsGlobalAdmin(UserId))
                 {
-                    if (hasOrg)
-                    {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
-                    }
-                    else
-                    {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
-                    }
+                    result = hasOrg
+                        ? QueryByPublicAccessOrOrganization(result, organizationId)
+                        : QueryByPublicAccessModifier(result);
                 }
             }
             else
             {
-                result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
+                result = QueryByOrganization(result, organizationId);
             }
 
             if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
             {
                 //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.Where(AllowRead);
+                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
             }
 
-            return Ok(result.AsQueryable());
+            return Ok(result);
+        }
+
+        protected virtual IQueryable<T> QueryByOrganization(IQueryable<T> result, int organizationId)
+        {
+            return result.ToEnumerable().Where(x => ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
+        }
+
+        protected virtual IQueryable<T> QueryByPublicAccessModifier(IQueryable<T> result)
+        {
+            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
+        }
+
+        protected virtual IQueryable<T> QueryByPublicAccessOrOrganization(IQueryable<T> result, int organizationId)
+        {
+            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -92,20 +101,14 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            if (AllowOrganizationAccess(key) == false)
+            if (AllowOrganizationAccess(key))
             {
-                return Forbidden();
+                var result = QueryByOrganization(Repository.AsQueryable(), key);
+
+                return Ok(result);
             }
 
-            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
-
-            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
-            {
-                //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
-            }
-
-            return Ok(result);
+            return Forbidden();
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]

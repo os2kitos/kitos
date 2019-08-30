@@ -5,11 +5,11 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
+using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
@@ -20,9 +20,9 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TModel> Repository;
 
         protected GenericApiController(
-            IGenericRepository<TModel> repository, 
+            IGenericRepository<TModel> repository,
             IAuthorizationContext authorizationContext = null)
-        :base(authorizationContext)
+        : base(authorizationContext)
         {
             Repository = repository;
         }
@@ -42,7 +42,8 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
-                var result = GetAllQuery().AsEnumerable();
+                var result = GetAllQuery();
+                var organizationId = KitosUser.DefaultOrganizationId.GetValueOrDefault();
 
                 if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
                 {
@@ -50,17 +51,17 @@ namespace Presentation.Web.Controllers.API
                     {
                         if (hasOrg)
                         {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                            result = QueryByPublicAccessOrOrganization(result, organizationId);
                         }
                         else
                         {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
+                            result = QueryByPublicAccessModifier(result);
                         }
                     }
                 }
                 else
                 {
-                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                    result = QueryByOrganization(result, organizationId);
                 }
 
                 if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
@@ -79,6 +80,21 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        protected virtual IQueryable<TModel> QueryByOrganization(IQueryable<TModel> result, int organizationId)
+        {
+            return result.ToEnumerable().Where(x => ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
+        }
+
+        protected virtual IQueryable<TModel> QueryByPublicAccessModifier(IQueryable<TModel> result)
+        {
+            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
+        }
+
+        protected virtual IQueryable<TModel> QueryByPublicAccessOrOrganization(IQueryable<TModel> result, int organizationId)
+        {
+            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
+        }
+
         // GET api/T
         /// <summary>
         /// Get single from base entity controller
@@ -91,7 +107,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AllowRead(item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }
