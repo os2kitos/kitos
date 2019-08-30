@@ -19,13 +19,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task Global_Administrator_Can_Get_All_Interfaces(OrganizationRole role)
         {
-            //Arrange Global_Administrator_Can_Get_All_Interfaces
+            //Arrange 
             var token = await HttpApi.GetTokenAsync(role);
-
             await GenerateTestInterfaces();
-
             var res = GetInterfacesByName("IntegrationTest");
-
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
 
             //Act
@@ -47,9 +44,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
             var token = await HttpApi.GetTokenAsync(role);
-
             await GenerateTestInterfaces();
-
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
@@ -74,10 +69,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public(OrganizationRole role)
         {
+            //Arrange
             var token = await HttpApi.GetTokenAsync(role);
-
             await GenerateTestInterfaces();
-
             var res = await GetInterfacesByName("IntegrationTest");
 
             foreach (var item in res.Result)
