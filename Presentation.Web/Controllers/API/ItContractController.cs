@@ -9,6 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -45,6 +46,11 @@ namespace Presentation.Web.Controllers.API
             _roleRepository = roleRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
             _itContractService = itContractService;
+        }
+
+        protected override IQueryable<ItContract> QueryByOrganization(IQueryable<ItContract> result, int organizationId)
+        {
+            return result.ByOrganizationId(organizationId);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]

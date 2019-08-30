@@ -10,6 +10,7 @@ using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -45,6 +46,21 @@ namespace Presentation.Web.Controllers.API
             _itSystemUsageRepository = itSystemUsageRepository;
             _roleRepository = roleRepository;
             _orgUnitRepository = orgUnitRepository;
+        }
+
+        protected override IQueryable<ItProject> QueryByOrganization(IQueryable<ItProject> result, int organizationId)
+        {
+            return result.ByOrganizationId(organizationId);
+        }
+
+        protected override IQueryable<ItProject> QueryByPublicAccessModifier(IQueryable<ItProject> result)
+        {
+            return result.ByPublicAccessModifier();
+        }
+
+        protected override IQueryable<ItProject> QueryByPublicAccessOrOrganization(IQueryable<ItProject> result, int organizationId)
+        {
+            return result.ByPublicAccessOrOrganizationId(organizationId);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
