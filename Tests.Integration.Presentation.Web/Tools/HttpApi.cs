@@ -110,7 +110,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-
         public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
