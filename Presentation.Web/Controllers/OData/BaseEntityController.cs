@@ -34,25 +34,14 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
-            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
             var result = Repository.AsQueryable();
             var organizationId = AuthService.GetCurrentOrganizationId(UserId);
+            var userHasCrossOrganizationAccess = AuthService.HasReadAccessOutsideContext(UserId);
+            var isGlobalAdmin = AuthService.IsGlobalAdmin(UserId);
 
-            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (isGlobalAdmin == false)
             {
-                if (hasAccessModifier && !AuthService.IsGlobalAdmin(UserId))
-                {
-                    var refinement = hasOrg
-                        ? QueryFactory.ByPublicAccessOrOrganizationId<T>(organizationId)
-                        : QueryFactory.ByPublicAccessModifier<T>();
-
-                    result = refinement.Apply(result);
-                }
-            }
-            else
-            {
-                var refinement = QueryFactory.ByOrganizationId<T>(organizationId);
+                var refinement = new QueryAllByRestrictionCapabilities<T>(userHasCrossOrganizationAccess, organizationId);
 
                 result = refinement.Apply(result);
             }

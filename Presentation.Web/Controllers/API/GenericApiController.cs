@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
-using Ninject.Infrastructure.Language;
+using Core.DomainServices.Queries;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
@@ -41,27 +41,16 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
-                var result = GetAllQuery();
-                var organizationId = KitosUser.DefaultOrganizationId.GetValueOrDefault();
+                var result = Repository.AsQueryable();
+                var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
+                var userHasCrossOrganizationAccess = AuthenticationService.HasReadAccessOutsideContext(UserId);
+                var isGlobalAdmin = AuthenticationService.IsGlobalAdmin(UserId);
 
-                if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
+                if (isGlobalAdmin == false)
                 {
-                    if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(TModel)) && !AuthenticationService.IsGlobalAdmin(KitosUser.Id))
-                    {
-                        if (hasOrg)
-                        {
-                            result = QueryByPublicAccessOrOrganization(result, organizationId);
-                        }
-                        else
-                        {
-                            result = QueryByPublicAccessModifier(result);
-                        }
-                    }
-                }
-                else
-                {
-                    result = QueryByOrganization(result, organizationId);
+                    var refinement = new QueryAllByRestrictionCapabilities<TModel>(userHasCrossOrganizationAccess, organizationId);
+
+                    result = refinement.Apply(result);
                 }
 
                 if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
@@ -78,21 +67,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        protected virtual IQueryable<TModel> QueryByOrganization(IQueryable<TModel> result, int organizationId)
-        {
-            return result.ToEnumerable().Where(x => ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
-        }
-
-        protected virtual IQueryable<TModel> QueryByPublicAccessModifier(IQueryable<TModel> result)
-        {
-            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
-        }
-
-        protected virtual IQueryable<TModel> QueryByPublicAccessOrOrganization(IQueryable<TModel> result, int organizationId)
-        {
-            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
         }
 
         // GET api/T

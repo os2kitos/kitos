@@ -42,21 +42,6 @@ namespace Presentation.Web.Controllers.API
             _referenceService = referenceService;
         }
 
-        protected override IQueryable<ItSystem> QueryByOrganization(IQueryable<ItSystem> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
-        }
-
-        protected override IQueryable<ItSystem> QueryByPublicAccessModifier(IQueryable<ItSystem> result)
-        {
-            return result.ByPublicAccessModifier();
-        }
-
-        protected override IQueryable<ItSystem> QueryByPublicAccessOrOrganization(IQueryable<ItSystem> result, int organizationId)
-        {
-            return result.ByPublicAccessOrOrganizationId(organizationId);
-        }
-
         // DELETE api/T
         public override HttpResponseMessage Delete(int id, int organizationId)
         {

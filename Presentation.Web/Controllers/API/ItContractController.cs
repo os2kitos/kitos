@@ -13,7 +13,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -46,11 +45,6 @@ namespace Presentation.Web.Controllers.API
             _roleRepository = roleRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
             _itContractService = itContractService;
-        }
-
-        protected override IQueryable<ItContract> QueryByOrganization(IQueryable<ItContract> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]

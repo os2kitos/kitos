@@ -49,11 +49,6 @@ namespace Presentation.Web.Controllers.API
             _attachedOptionsRepository = attachedOptionsRepository;
         }
 
-        protected override IQueryable<ItSystemUsage> QueryByOrganization(IQueryable<ItSystemUsage> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
         {
