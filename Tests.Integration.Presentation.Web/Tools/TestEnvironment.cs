@@ -178,6 +178,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
         
         public static int DefaultItSystemId => 1;
+        public static int SecondItSystemId => 2;
         public static int DefaultUserId => 1;
     }
 }
