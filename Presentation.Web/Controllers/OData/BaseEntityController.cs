@@ -6,6 +6,7 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.DomainServices.Queries;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
@@ -42,14 +43,18 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (hasAccessModifier && !AuthService.IsGlobalAdmin(UserId))
                 {
-                    result = hasOrg
-                        ? QueryByPublicAccessOrOrganization(result, organizationId)
-                        : QueryByPublicAccessModifier(result);
+                    var refinement = hasOrg
+                        ? QueryFactory.ByPublicAccessOrOrganizationId<T>(organizationId)
+                        : QueryFactory.ByPublicAccessModifier<T>();
+
+                    result = refinement.Apply(result);
                 }
             }
             else
             {
-                result = QueryByOrganization(result, organizationId);
+                var refinement = QueryFactory.ByOrganizationId<T>(organizationId);
+
+                result = refinement.Apply(result);
             }
 
             if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
@@ -59,21 +64,6 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return Ok(result);
-        }
-
-        protected virtual IQueryable<T> QueryByOrganization(IQueryable<T> result, int organizationId)
-        {
-            return result.ToEnumerable().Where(x => ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
-        }
-
-        protected virtual IQueryable<T> QueryByPublicAccessModifier(IQueryable<T> result)
-        {
-            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
-        }
-
-        protected virtual IQueryable<T> QueryByPublicAccessOrOrganization(IQueryable<T> result, int organizationId)
-        {
-            return result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == organizationId).AsQueryable();
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -103,7 +93,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (AllowOrganizationAccess(key))
             {
-                var result = QueryByOrganization(Repository.AsQueryable(), key);
+                var result = QueryFactory.ByOrganizationId<T>(key).Apply(Repository.AsQueryable());
 
                 return Ok(result);
             }

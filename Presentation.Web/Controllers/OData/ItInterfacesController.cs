@@ -7,7 +7,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
-using Core.DomainModel.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -23,11 +22,6 @@ namespace Presentation.Web.Controllers.OData
             : base(repository, authService)
         {
             _authService = authService;
-        }
-
-        protected override IQueryable<ItInterface> QueryByOrganization(IQueryable<ItInterface> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
         }
 
         [EnableQuery]

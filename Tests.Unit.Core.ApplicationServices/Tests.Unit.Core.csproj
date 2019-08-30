@@ -122,6 +122,7 @@
       <Link>UserMock.cs</Link>
     </Compile>
     <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
+    <Compile Include="DomainServices\GenericQueryConstructionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

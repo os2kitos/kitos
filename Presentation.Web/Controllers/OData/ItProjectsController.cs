@@ -10,7 +10,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
-using Core.DomainModel.Extensions;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -29,21 +29,6 @@ namespace Presentation.Web.Controllers.OData
         {
             _orgUnitRepository = orgUnitRepository;
             _authService = authService;
-        }
-
-        protected override IQueryable<ItProject> QueryByOrganization(IQueryable<ItProject> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
-        }
-
-        protected override IQueryable<ItProject> QueryByPublicAccessModifier(IQueryable<ItProject> result)
-        {
-            return result.ByPublicAccessModifier();
-        }
-
-        protected override IQueryable<ItProject> QueryByPublicAccessOrOrganization(IQueryable<ItProject> result, int organizationId)
-        {
-            return result.ByPublicAccessOrOrganizationId(organizationId);
         }
 
         [EnableQuery]

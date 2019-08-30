@@ -7,7 +7,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
-using Core.DomainModel.Extensions;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
@@ -23,21 +23,6 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        protected override IQueryable<ItSystem> QueryByOrganization(IQueryable<ItSystem> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
-        }
-
-        protected override IQueryable<ItSystem> QueryByPublicAccessModifier(IQueryable<ItSystem> result)
-        {
-            return result.ByPublicAccessModifier();
-        }
-
-        protected override IQueryable<ItSystem> QueryByPublicAccessOrOrganization(IQueryable<ItSystem> result, int organizationId)
-        {
-            return result.ByPublicAccessOrOrganizationId(organizationId);
-        }
-
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems")]
@@ -50,7 +35,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = QueryByPublicAccessOrOrganization(Repository.AsQueryable(), orgKey);
+            var result = Repository.AsQueryable().ByOrganizationId(orgKey);
 
             return Ok(result);
         }

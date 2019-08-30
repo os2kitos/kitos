@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using Core.DomainModel;
+using Core.DomainServices.Queries;
 
-namespace Core.DomainModel.Extensions
+namespace Core.DomainServices.Extensions
 {
     public static class EntityQueryExtensions
     {
@@ -8,14 +10,14 @@ namespace Core.DomainModel.Extensions
             class,
             IHasOrganization
         {
-            return result.Where(x => x.OrganizationId == organizationId);
+            return new QueryByOrganizationId<T>(organizationId).Apply(result);
         }
 
         public static IQueryable<T> ByPublicAccessModifier<T>(this IQueryable<T> result) where T :
             class,
             IHasAccessModifier
         {
-            return result.Where(x => x.AccessModifier == AccessModifier.Public);
+            return new QueryByAccessModifier<T>(AccessModifier.Public).Apply(result);
         }
 
         public static IQueryable<T> ByPublicAccessOrOrganizationId<T>(this IQueryable<T> result, int organizationId) where T :
@@ -23,7 +25,7 @@ namespace Core.DomainModel.Extensions
             IHasAccessModifier,
             IHasOrganization
         {
-            return result.Where(x => x.AccessModifier == AccessModifier.Public || x.OrganizationId == organizationId);
+            return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result); ;
         }
     }
 }

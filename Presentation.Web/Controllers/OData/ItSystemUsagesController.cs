@@ -11,7 +11,7 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
-using Core.DomainModel.Extensions;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
@@ -33,11 +33,6 @@ namespace Presentation.Web.Controllers.OData
             _accessTypeRepository = accessTypeRepository;
         }
 
-        protected override IQueryable<ItSystemUsage> QueryByOrganization(IQueryable<ItSystemUsage> result, int organizationId)
-        {
-            return result.ByOrganizationId(organizationId);
-        }
-
         // GET /Organizations(1)/ItSystemUsages
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
@@ -50,7 +45,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = QueryByOrganization(Repository.AsQueryable(), orgKey);
+            var result = Repository.AsQueryable().ByOrganizationId(orgKey);
 
             return Ok(result);
         }
