@@ -107,8 +107,8 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    result = 
-                        IsLocalAdmin() || 
+                    result =
+                        IsLocalAdmin() ||
                         AllowWritesToEntity(entity) ||
                         HasAssignedWriteAccess(entity);
                 }
@@ -196,12 +196,12 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
         private static bool IsContextBound(IEntity entity)
         {
-            return entity is IContextAware;
+            return entity is IContextAware || entity is IHasOrganization;
         }
 
         private bool ActiveContextIsEntityContext(IEntity entity)
         {
-            return _activeUserContext.IsActiveInSameOrganizationAs((IContextAware)entity);
+            return _activeUserContext.IsActiveInSameOrganizationAs(entity);
         }
 
         private bool HasOwnership(IEntity ownedEntity)

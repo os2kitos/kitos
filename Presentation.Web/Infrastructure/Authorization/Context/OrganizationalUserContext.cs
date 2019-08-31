@@ -77,9 +77,17 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return ActiveOrganizationId == organizationId;
         }
 
-        public bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg)
+        public bool IsActiveInSameOrganizationAs(IEntity entity)
         {
-            return contextAwareOrg.IsInContext(ActiveOrganizationId);
+            switch (entity)
+            {
+                case IContextAware contextAware:
+                    return contextAware.IsInContext(ActiveOrganizationId);
+                case IHasOrganization hasOrg:
+                    return IsActiveInOrganization(hasOrg.OrganizationId);
+                default:
+                    return false;
+            }
         }
 
         public bool HasAssignedWriteAccess(IEntity entity)

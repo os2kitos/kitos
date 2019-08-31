@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Moq;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -59,7 +57,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
-            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)entity, isInSameOrg);
+            ExpectIsActiveInSameOrganizationAsReturns(entity, isInSameOrg);
             ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isUserActiveInMunicipality);
 
             //Act
@@ -124,7 +122,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
             ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
-            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
             ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
@@ -278,7 +276,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
             ExpectHasAssignedWriteAccessReturns(inputEntity, hasAssignedWriteAccess);
-            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
             ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
             ExpectHasModuleLevelAccessReturns(inputEntity, hasModuleLevelAccess);
             ExpectHasOwnershipReturns(inputEntity, hasOwnership);
@@ -340,7 +338,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, isReadOnly);
             ExpectGetUserIdReturns(userId);
-            ExpectIsActiveInSameOrganizationAsReturns((IContextAware)inputEntity, isInSameOrganization);
+            ExpectIsActiveInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
             ExpectHasRoleReturns(OrganizationRole.LocalAdmin, isLocalAdmin);
 
             //Act
@@ -393,7 +391,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             return new ItProject { AccessModifier = accessModifier };
         }
 
-        private void ExpectIsActiveInSameOrganizationAsReturns(IContextAware entity, bool value)
+        private void ExpectIsActiveInSameOrganizationAsReturns(IEntity entity, bool value)
         {
             _userContextMock.Setup(x => x.IsActiveInSameOrganizationAs(entity)).Returns(value);
         }
