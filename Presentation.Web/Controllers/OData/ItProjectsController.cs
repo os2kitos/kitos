@@ -54,12 +54,12 @@ namespace Presentation.Web.Controllers.OData
                     return Forbidden();
                 }
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+                var result = Repository.AsQueryable().ByOrganizationId(key);
                 return Ok(result);
             }
             else
             {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+                var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
                 return Ok(result);
             }
         }

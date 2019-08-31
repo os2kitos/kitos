@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByOrganizationId(orgKey);
+            var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(orgKey);
 
             return Ok(result);
         }

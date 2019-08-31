@@ -9,6 +9,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -97,7 +98,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             //tolist requried to handle filtering on computed fields
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            var result = Repository.AsQueryable().ByOrganizationId(key);
             
             return Ok(result);
         }
@@ -115,7 +116,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+            var result = Repository.AsQueryable().ByOrganizationId(key);
             return Ok(result);
         }
 
