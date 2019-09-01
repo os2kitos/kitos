@@ -16,6 +16,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _userId = userId;
         }
 
+        public bool RequireGenericQueryPostFiltering<T>()
+        {
+            return GenericQueryCompleteness.RequireGenericQueryPostFiltering<T>(GetCrossOrganizationReadAccess());
+        }
+
         public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
         {
             var userId = _userId();

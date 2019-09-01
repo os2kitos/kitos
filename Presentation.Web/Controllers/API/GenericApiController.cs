@@ -49,6 +49,11 @@ namespace Presentation.Web.Controllers.API
 
                 var result = refinement.Apply(Repository.AsQueryable());
 
+                if (AuthorizationStrategy.RequireGenericQueryPostFiltering<TModel>())
+                {
+                    paging = paging.WithPostProcessingFilter(AllowRead);
+                }
+
                 var query = Page(result, paging);
 
                 var dtos = Map(query);

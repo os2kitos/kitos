@@ -7,6 +7,7 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Core.DomainServices.Queries;
+using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
@@ -40,6 +41,11 @@ namespace Presentation.Web.Controllers.OData
             var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
 
             var result = refinement.Apply(Repository.AsQueryable());
+
+            if (_authorizationStrategy.RequireGenericQueryPostFiltering<T>())
+            {
+                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
+            }
 
             return Ok(result);
         }

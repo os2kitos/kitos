@@ -37,7 +37,6 @@ namespace Core.DomainServices.Queries
                 }
                 else
                 {
-
                     var refinement = QueryFactory.ByPublicAccessModifier<T>();
 
                     return refinement.Apply(source);

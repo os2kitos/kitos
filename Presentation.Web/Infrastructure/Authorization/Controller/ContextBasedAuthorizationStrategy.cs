@@ -18,6 +18,11 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             return _authorizationContext.GetCrossOrganizationReadAccess();
         }
 
+        public bool RequireGenericQueryPostFiltering<T>()
+        {
+            return GenericQueryCompleteness.RequireGenericQueryPostFiltering<T>(GetCrossOrganizationReadAccess());
+        }
+
         public bool AllowOrganizationReadAccess(int organizationId)
         {
             return _authorizationContext.AllowReadsWithinOrganization(organizationId);
