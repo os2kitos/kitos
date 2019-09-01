@@ -7,8 +7,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
-using Core.DomainModel;
-using Ninject.Infrastructure.Language;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
@@ -27,20 +26,18 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItSystems
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
             if (!AllowOrganizationAccess(orgKey))
-            { 
+            {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey || m.AccessModifier == AccessModifier.Public);
+            var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(orgKey);
 
-            var systemsWithAllowedReadAccess  = result.ToEnumerable().Where(AllowRead);
-
-            return Ok(systemsWithAllowedReadAccess);
+            return Ok(result);
         }
 
         // GET /Organizations(1)/ItSystems(1)

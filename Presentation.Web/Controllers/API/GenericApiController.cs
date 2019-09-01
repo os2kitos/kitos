@@ -5,11 +5,11 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
+using Core.DomainServices.Queries;
 using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
@@ -20,9 +20,9 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TModel> Repository;
 
         protected GenericApiController(
-            IGenericRepository<TModel> repository, 
+            IGenericRepository<TModel> repository,
             IAuthorizationContext authorizationContext = null)
-        :base(authorizationContext)
+        : base(authorizationContext)
         {
             Repository = repository;
         }
@@ -41,36 +41,23 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
-                var result = GetAllQuery().AsEnumerable();
+                var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
 
-                if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
+                var crossOrganizationReadAccess = AuthorizationStrategy.GetCrossOrganizationReadAccess();
+
+                var refinement = new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId);
+
+                var result = refinement.Apply(Repository.AsQueryable());
+
+                if (refinement.RequiresPostFiltering())
                 {
-                    if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(TModel)) && !AuthenticationService.IsGlobalAdmin(KitosUser.Id))
-                    {
-                        if (hasOrg)
-                        {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
-                        }
-                        else
-                        {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
-                        }
-                    }
-                }
-                else
-                {
-                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                    paging = paging.WithPostProcessingFilter(AllowRead);
                 }
 
-                if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
-                {
-                    //Post processing was not a part of the old response, so let the migration control when we switch
-                    paging.WithPostProcessingFilter(AllowRead);
-                }
+                var query = Page(result, paging);
 
-                var query = Page(result.AsQueryable(), paging);
                 var dtos = Map(query);
+
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -91,7 +78,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AllowRead(item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }

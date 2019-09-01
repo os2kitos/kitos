@@ -6,10 +6,10 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.DomainServices.Queries;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
-using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -34,37 +34,20 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
-            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
+            var organizationId = AuthService.GetCurrentOrganizationId(UserId);
 
-            var result = Repository.AsQueryable().ToEnumerable();
+            var crossOrganizationReadAccess = _authorizationStrategy.GetCrossOrganizationReadAccess();
 
-            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
+
+            var result = refinement.Apply(Repository.AsQueryable());
+
+            if (refinement.RequiresPostFiltering())
             {
-                if (hasAccessModifier && !AuthService.IsGlobalAdmin(UserId))
-                {
-                    if (hasOrg)
-                    {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
-                    }
-                    else
-                    {
-                        result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
-                    }
-                }
-            }
-            else
-            {
-                result = result.Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId));
+                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
             }
 
-            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
-            {
-                //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.Where(AllowRead);
-            }
-
-            return Ok(result.AsQueryable());
+            return Ok(result);
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
@@ -92,20 +75,14 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            if (AllowOrganizationAccess(key) == false)
+            if (AllowOrganizationAccess(key))
             {
-                return Forbidden();
+                var result = QueryFactory.ByOrganizationId<T>(key).Apply(Repository.AsQueryable());
+
+                return Ok(result);
             }
 
-            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
-
-            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
-            {
-                //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
-            }
-
-            return Ok(result);
+            return Forbidden();
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]

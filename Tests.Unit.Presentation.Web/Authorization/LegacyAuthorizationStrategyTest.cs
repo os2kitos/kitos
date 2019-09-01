@@ -1,5 +1,6 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainServices.Authorization;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -20,10 +21,21 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new LegacyAuthorizationStrategy(_authenticationService.Object, () => _userId);
         }
 
-        [Fact]
-        public void ApplyBaseQueryPostProcessing_Returns_False()
+        [Theory]
+        [InlineData(true, false, CrossOrganizationReadAccess.All)]
+        [InlineData(false, true, CrossOrganizationReadAccess.Public)]
+        [InlineData(false, false, CrossOrganizationReadAccess.None)]
+        public void GetCrossOrganizationReadAccess_Returns(bool isGlobalAdmin, bool hasReadAccessOutsideOfContext, CrossOrganizationReadAccess expectedResult)
         {
-            Assert.False(_sut.ApplyBaseQueryPostProcessing);
+            //Arrange
+            _authenticationService.Setup(x => x.IsGlobalAdmin(_userId)).Returns(isGlobalAdmin);
+            _authenticationService.Setup(x => x.HasReadAccessOutsideContext(_userId)).Returns(hasReadAccessOutsideOfContext);
+
+            //Act
+            var readAccess = _sut.GetCrossOrganizationReadAccess();
+
+            //Assert
+            Assert.Equal(expectedResult, readAccess);
         }
 
         [Theory]

@@ -61,15 +61,17 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.False(result);
         }
 
+        public interface IEntityWithContextAware : IEntity, IContextAware { }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void IsActiveInSameOrganizationAs_Returns_Result_Based_On_Active_Org_Id(bool contextResult)
+        public void IsActiveInSameOrganizationAs_Returns_Result_Based_On_Active_Context_Query(bool contextResult)
         {
             //Arrange
             var activeOrganizationId = A<int>();
             var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), new User(), activeOrganizationId);
-            var target = new Mock<IContextAware>();
+            var target = new Mock<IEntityWithContextAware>();
             target.Setup(x => x.IsInContext(activeOrganizationId)).Returns(contextResult);
 
             //Act
@@ -78,6 +80,27 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Assert
             target.Verify();
             Assert.Equal(contextResult, result);
+        }
+
+        public interface IEntityWithOrganization : IEntity, IHasOrganization { }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void IsActiveInSameOrganizationAs_Returns_Result_Based_On_Same_Organization_Som_OrganizationId_Property(bool sameOrg)
+        {
+            //Arrange
+            var activeOrganizationId = A<int>();
+            var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), new User(), activeOrganizationId);
+            var target = new Mock<IEntityWithOrganization>();
+            target.Setup(x => x.OrganizationId).Returns(sameOrg ? activeOrganizationId : A<int>());
+
+            //Act
+            var result = sut.IsActiveInSameOrganizationAs(target.Object);
+
+            //Assert
+            target.Verify();
+            Assert.Equal(sameOrg, result);
         }
 
         [Theory]
@@ -107,7 +130,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [Fact]
         public void UserId_Returns_Provided_Users_Id()
         {
-            var user = new User {Id = A<int>()};
+            var user = new User { Id = A<int>() };
 
             var sut = new OrganizationalUserContext(Many<Feature>(), Many<OrganizationRole>(), user, A<int>());
 
