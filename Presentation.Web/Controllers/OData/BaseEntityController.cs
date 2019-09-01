@@ -7,7 +7,6 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Core.DomainServices.Queries;
-using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
@@ -34,23 +33,13 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var result = Repository.AsQueryable();
             var organizationId = AuthService.GetCurrentOrganizationId(UserId);
-            var userHasCrossOrganizationAccess = AuthService.HasReadAccessOutsideContext(UserId);
-            var isGlobalAdmin = AuthService.IsGlobalAdmin(UserId);
 
-            if (isGlobalAdmin == false)
-            {
-                var refinement = new QueryAllByRestrictionCapabilities<T>(userHasCrossOrganizationAccess, organizationId);
+            var crossOrganizationReadAccess = _authorizationStrategy.GetCrossOrganizationReadAccess();
 
-                result = refinement.Apply(result);
-            }
+            var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
 
-            if (_authorizationStrategy.ApplyBaseQueryPostProcessing)
-            {
-                //Post processing was not a part of the old response, so let the migration control when we switch
-                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
-            }
+            var result = refinement.Apply(Repository.AsQueryable());
 
             return Ok(result);
         }

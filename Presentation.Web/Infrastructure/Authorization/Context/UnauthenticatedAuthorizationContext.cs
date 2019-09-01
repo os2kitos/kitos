@@ -1,12 +1,13 @@
 ﻿using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Context
 {
     public class UnauthenticatedAuthorizationContext : IAuthorizationContext
     {
-        public bool AllowGlobalReadAccess()
+        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
         {
-            return false;
+            return CrossOrganizationReadAccess.None;
         }
 
         public bool AllowReadsWithinOrganization(int organizationId)

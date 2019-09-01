@@ -1,19 +1,20 @@
 ﻿using System.Linq;
 using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
 namespace Core.DomainServices.Queries
 {
     public class QueryAllByRestrictionCapabilities<T> : IDomainQuery<T>
     where T : class
     {
-        private readonly bool _allowCrossOrganizationAccess;
+        private readonly CrossOrganizationReadAccess _crossOrganizationAccess;
         private readonly int _organizationId;
         private readonly bool _hasOrganization;
         private readonly bool _hasAccessModifier;
 
-        public QueryAllByRestrictionCapabilities(bool allowCrossOrganizationAccess, int organizationId)
+        public QueryAllByRestrictionCapabilities(CrossOrganizationReadAccess crossOrganizationAccess, int organizationId)
         {
-            _allowCrossOrganizationAccess = allowCrossOrganizationAccess;
+            _crossOrganizationAccess = crossOrganizationAccess;
             _organizationId = organizationId;
             _hasOrganization = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
             _hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
@@ -21,7 +22,11 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            if (_hasAccessModifier && _allowCrossOrganizationAccess)
+            if (_crossOrganizationAccess == CrossOrganizationReadAccess.All)
+            {
+                return source;
+            }
+            if (_hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationReadAccess.Public)
             {
                 if (_hasOrganization)
                 {
@@ -38,7 +43,7 @@ namespace Core.DomainServices.Queries
                 }
             }
 
-            if (_allowCrossOrganizationAccess == false && _hasOrganization)
+            if (_crossOrganizationAccess == CrossOrganizationReadAccess.None && _hasOrganization)
             {
                 var refinement = QueryFactory.ByOrganizationId<T>(_organizationId);
 

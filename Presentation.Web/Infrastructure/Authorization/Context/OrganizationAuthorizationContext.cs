@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Context
 {
@@ -13,24 +14,27 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             _activeUserContext = activeUserContext;
         }
 
-        public bool AllowGlobalReadAccess()
+        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
         {
-            return _activeUserContext.HasRole(OrganizationRole.GlobalAdmin);
+            if (IsGlobalAdmin())
+            {
+                return CrossOrganizationReadAccess.All;
+            }
+
+            return IsUserInMunicipality() ? 
+                CrossOrganizationReadAccess.Public : 
+                CrossOrganizationReadAccess.None;
         }
 
         public bool AllowReadsWithinOrganization(int organizationId)
         {
             var result = false;
 
-            if (IsGlobalAdmin())
+            if (TargetOrganizationMatchesActiveOrganization(organizationId))
             {
                 result = true;
             }
-            else if (TargetOrganizationMatchesActiveOrganization(organizationId))
-            {
-                result = true;
-            }
-            else if (IsUserInMunicipality())
+            else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public)
             {
                 result = true;
             }
@@ -56,7 +60,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 {
                     result = true;
                 }
-                else if (IsUserInMunicipality() && EntityAllowsCrossOrganizationRead(entity))
+                else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public && EntityIsShared(entity))
                 {
                     result = true;
                 }
@@ -174,7 +178,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return entity is User;
         }
 
-        private static bool EntityAllowsCrossOrganizationRead(IEntity entity)
+        private static bool EntityIsShared(IEntity entity)
         {
             //Only return true if entity supports cross-organization sharing and access is marked as public
             return (entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public;

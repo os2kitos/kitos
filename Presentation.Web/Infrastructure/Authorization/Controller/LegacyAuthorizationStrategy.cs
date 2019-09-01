@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
@@ -15,7 +16,19 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _userId = userId;
         }
 
-        public bool ApplyBaseQueryPostProcessing { get; } = false;
+        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        {
+            var userId = _userId();
+
+            if (_authenticationService.IsGlobalAdmin(userId))
+            {
+                return CrossOrganizationReadAccess.All;
+            }
+
+            return _authenticationService.HasReadAccessOutsideContext(userId)
+                ? CrossOrganizationReadAccess.Public
+                : CrossOrganizationReadAccess.None;
+        }
 
         public bool AllowOrganizationReadAccess(int organizationId)
         {

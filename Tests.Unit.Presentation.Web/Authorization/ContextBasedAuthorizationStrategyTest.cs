@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainServices.Authorization;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
@@ -18,15 +19,20 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new ContextBasedAuthorizationStrategy(_authContext.Object);
         }
 
-        [Theory]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
-        public void ApplyBaseQueryPostProcessing_Returns_True_If_Global_Read_Access_Is_False(bool allowGlobalRead, bool expectedResult)
+        [Fact]
+        public void GetCrossOrganizationReadAccess_Returns_Result_From_Context()
         {
-            _authContext.Setup(x => x.AllowGlobalReadAccess()).Returns(allowGlobalRead);
+            //Arrange
+            var expectedResult = A<CrossOrganizationReadAccess>();
+            _authContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(expectedResult);
 
-            Assert.Equal(expectedResult, _sut.ApplyBaseQueryPostProcessing);
+            //Act
+            var result = _sut.GetCrossOrganizationReadAccess();
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
+
 
         [Theory]
         [InlineData(true)]

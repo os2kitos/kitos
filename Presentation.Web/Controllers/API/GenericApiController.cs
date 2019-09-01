@@ -41,26 +41,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var result = Repository.AsQueryable();
                 var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
-                var userHasCrossOrganizationAccess = AuthenticationService.HasReadAccessOutsideContext(UserId);
-                var isGlobalAdmin = AuthenticationService.IsGlobalAdmin(UserId);
 
-                if (isGlobalAdmin == false)
-                {
-                    var refinement = new QueryAllByRestrictionCapabilities<TModel>(userHasCrossOrganizationAccess, organizationId);
+                var crossOrganizationReadAccess = AuthorizationStrategy.GetCrossOrganizationReadAccess();
 
-                    result = refinement.Apply(result);
-                }
+                var refinement = new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId);
 
-                if (AuthorizationStrategy.ApplyBaseQueryPostProcessing)
-                {
-                    //Post processing was not a part of the old response, so let the migration control when we switch
-                    paging.WithPostProcessingFilter(AllowRead);
-                }
+                var result = refinement.Apply(Repository.AsQueryable());
 
-                var query = Page(result.AsQueryable(), paging);
+                var query = Page(result, paging);
+
                 var dtos = Map(query);
+
                 return Ok(dtos);
             }
             catch (Exception e)
