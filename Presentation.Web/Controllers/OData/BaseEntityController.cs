@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.OData
 
             var result = refinement.Apply(Repository.AsQueryable());
 
-            if (_authorizationStrategy.RequireGenericQueryPostFiltering<T>())
+            if (refinement.RequiresPostFiltering())
             {
                 result = result.ToEnumerable().Where(AllowRead).AsQueryable();
             }

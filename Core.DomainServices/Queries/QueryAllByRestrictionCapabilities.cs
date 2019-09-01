@@ -52,5 +52,20 @@ namespace Core.DomainServices.Queries
 
             return source;
         }
+
+        public bool RequiresPostFiltering()
+        {
+            if (_crossOrganizationAccess == CrossOrganizationReadAccess.All)
+            {
+                return false;
+            }
+
+            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
+            var contextAware = typeof(IContextAware).IsAssignableFrom(typeof(T));
+
+            //If object is context aware but NOT refinable in the query (has org) then post processing is required on the entity level. Example: Economystream must be refined by digging into the child objects hence is not suited for the general approach
+            return hasOrg == false && (hasAccessModifier && contextAware);
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API
 
                 var result = refinement.Apply(Repository.AsQueryable());
 
-                if (AuthorizationStrategy.RequireGenericQueryPostFiltering<TModel>())
+                if (refinement.RequiresPostFiltering())
                 {
                     paging = paging.WithPostProcessingFilter(AllowRead);
                 }
