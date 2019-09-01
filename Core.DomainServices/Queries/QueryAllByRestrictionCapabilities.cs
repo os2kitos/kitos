@@ -26,6 +26,7 @@ namespace Core.DomainServices.Queries
             {
                 return source;
             }
+
             if (_hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationReadAccess.Public)
             {
                 if (_hasOrganization)
@@ -43,7 +44,7 @@ namespace Core.DomainServices.Queries
                 }
             }
 
-            if (_crossOrganizationAccess == CrossOrganizationReadAccess.None && _hasOrganization)
+            if (_hasOrganization)
             {
                 var refinement = QueryFactory.ByOrganizationId<T>(_organizationId);
 
