@@ -56,7 +56,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 {
                     result = true;
                 }
-                else if (IsUserInMunicipality() && EntityIsNotRestrictedToLocalAccess(entity))
+                else if (IsUserInMunicipality() && EntityAllowsCrossOrganizationRead(entity))
                 {
                     result = true;
                 }
@@ -174,9 +174,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return entity is User;
         }
 
-        private static bool EntityIsNotRestrictedToLocalAccess(IEntity entity)
+        private static bool EntityAllowsCrossOrganizationRead(IEntity entity)
         {
-            return (entity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
+            //Only return true if entity supports cross-organization sharing and access is marked as public
+            return (entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public;
         }
 
         private bool IsUserInMunicipality()
