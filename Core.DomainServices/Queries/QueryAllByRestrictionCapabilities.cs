@@ -55,16 +55,18 @@ namespace Core.DomainServices.Queries
 
         public bool RequiresPostFiltering()
         {
-            if (_crossOrganizationAccess == CrossOrganizationReadAccess.All)
+            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
+
+            if (hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationReadAccess.Public)
             {
+                //Supported by query - shared data is returned and filtered by organization if target has organization reference
                 return false;
             }
 
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
-            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
             var contextAware = typeof(IContextAware).IsAssignableFrom(typeof(T));
 
-            //If object is context aware but NOT refinable in the query (has org) then post processing is required on the entity level. Example: Economystream must be refined by digging into the child objects hence is not suited for the general approach
+            //Unsupported by db query since object does not have org reference but has access modifier and is context aware (belongs in an organization)
             return hasOrg == false && (hasAccessModifier && contextAware);
         }
     }
