@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Infrastructure.Annotations;
 using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -52,6 +54,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.ItInterfaces)
                 .HasForeignKey(t => t.OrganizationId)
                 .WillCascadeOnDelete(false);
+
+            TypeMapping.AddIndexOnAccessModifier<ItInterfaceMap, ItInterface>(this);
         }
     }
 }

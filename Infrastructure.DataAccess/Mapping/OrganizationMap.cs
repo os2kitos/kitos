@@ -39,7 +39,9 @@ namespace Infrastructure.DataAccess.Mapping
             HasOptional(o => o.ContactPerson)
                 .WithOptionalDependent(c => c.Organization)
                 .WillCascadeOnDelete(true);
-                
+
+            TypeMapping.AddIndexOnAccessModifier<OrganizationMap, Organization>(this);
+
         }
     }
 }

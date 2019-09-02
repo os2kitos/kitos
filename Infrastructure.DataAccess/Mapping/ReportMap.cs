@@ -6,7 +6,7 @@ namespace Infrastructure.DataAccess.Mapping
     {
         public ReportMap()
         {
-            
+            TypeMapping.AddIndexOnAccessModifier<ReportMap, Report>(this);
         }
     }
 }
