@@ -503,9 +503,14 @@
     <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.Designer.cs">
       <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.cs" />
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.Designer.cs">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
+    <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -797,6 +802,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.resx">
       <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.resx">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
