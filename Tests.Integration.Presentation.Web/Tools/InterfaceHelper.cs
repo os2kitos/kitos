@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, iDto))
             {
-             //   Assert.Equal(HttpStatusCode.Created,createdResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.Created,createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAs<ItInterfaceDTO>();
             }
         }

@@ -19,20 +19,23 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task Global_Administrator_Can_Get_All_Interfaces(OrganizationRole role)
         {
+            const string interFacePrefixName = "GlobalAdminInterfaceTest";
+            
             //Arrange 
             var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces();
-            var res = GetInterfacesByName("IntegrationTest");
+            await GenerateTestInterfaces(interFacePrefixName);
+            var interfaceResult = GetInterfacesByName(interFacePrefixName);
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName));
 
                 //Assert
                 Assert.NotNull(response.Result);
-                Assert.Equal(response.Result.Count, res.Result.Result.Count);
+                Assert.Equal(filteredResult.Count(), interfaceResult.Result.Result.Count);
             }
         }
 
@@ -43,8 +46,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.User, TestEnvironment.SecondOrganizationId)]
         public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
+            const string interFacePrefixName = "UserInterfacesPreFix";
             var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces();
+            await GenerateTestInterfaces(interFacePrefixName);
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
@@ -59,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 {
                     if (item.OrganizationId != orgId)
                     {
-                        Assert.NotEqual(AccessModifier.Local, item.AccessModifier);
+                        Assert.Equal(AccessModifier.Public, item.AccessModifier);
                     }
                 }
             }
@@ -69,12 +73,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public(OrganizationRole role)
         {
+            const string interFacePrefixName = "UserSpecificInterfacePrefix";
             //Arrange
             var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces();
-            var res = await GetInterfacesByName("IntegrationTest");
+            await GenerateTestInterfaces(interFacePrefixName);
+            var interfaceResultByName = await GetInterfacesByName(interFacePrefixName);
 
-            foreach (var item in res.Result)
+            foreach (var item in interfaceResultByName.Result)
             {
                 var orgFromItem = item.OrganizationId;
                 var interFaceId = item.Id;
@@ -86,16 +91,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 {
                     var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
                     //Assert
-                    Assert.NotNull(res);
+                    Assert.NotNull(interfaceResultByName);
                     Assert.Equal(interFaceId, response.Result.Id);
                 }
             }
         }
-
-        public async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
+        // Return wrong number of interfaces.....
+        private async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var arrangeUrl = TestEnvironment.CreateUrl($"odata/ItInterfaces?filter=contains({name})");
+            var arrangeUrl = TestEnvironment.CreateUrl($"/odata/ItInterfaces?$filter=contains(Name,'{name}')");
             using (var httpResponse = await HttpApi.GetWithTokenAsync(arrangeUrl, token.Token))
             {
                 var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
@@ -103,13 +108,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        internal async Task GenerateTestInterfaces()
+        private async Task GenerateTestInterfaces(string name)
         {
             await InterfaceHelper.CreateInterfaces(
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local),
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public),
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Local),
-                InterfaceHelper.CreateInterfaceDTO("IntegrationTest-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Public));
+                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local),
+                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public),
+                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Local),
+                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Public));
         }
     }
 }
