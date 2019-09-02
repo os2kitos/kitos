@@ -3,12 +3,12 @@
 var navigationBar = new NavigationBarWrapper();
 class NavigationBarHelper {
 
-    public dropDownExpand(): void {
-        navigationBar.dropDownMenu.dropDownElement.click();
+    public dropDownExpand() {
+        return  navigationBar.dropDownMenu.dropDownElement.click();
     }
 
-    public logout(): void {
-        navigationBar.dropDownMenu.logOut.click();
+    public logout() {
+        return navigationBar.dropDownMenu.logOut.click();
     }
 
     public isMyProfileDisplayed(): webdriver.promise.Promise<Boolean>{

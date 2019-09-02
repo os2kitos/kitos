@@ -9,9 +9,12 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
+using System.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class OrganizationsController : BaseEntityController<Organization>
     {
         private readonly IOrganizationService _organizationService;
@@ -28,18 +31,24 @@ namespace Presentation.Web.Controllers.OData
             _userRepository = userRepository;
         }
 
-        [ODataRoute("Organizations({orgKey})/RemoveUser")]
-        public IHttpActionResult DeleteRemoveUserFromOrganization(int orgKey, ODataActionParameters parameters)
+        [HttpPost]
+        public IHttpActionResult RemoveUser([FromODataUri]int orgKey, ODataActionParameters parameters)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             var entity = Repository.GetByKey(orgKey);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (!_authService.HasWriteAccess(UserId, entity))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             var userId = 0;
             if (parameters.ContainsKey("userId"))
@@ -59,7 +68,9 @@ namespace Presentation.Web.Controllers.OData
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var result = Repository.GetByKey(orgKey).LastChangedByUser;
             return Ok(result);
@@ -72,7 +83,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.GetByKey(orgKey).ObjectOwner;
@@ -86,7 +97,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var result = Repository.GetByKey(orgKey).Type;
@@ -99,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
             {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
             var user = _userRepository.GetByKey(UserId);
@@ -126,9 +137,22 @@ namespace Presentation.Web.Controllers.OData
             return Created(organization);
         }
 
+        [EnableQuery]
+        public IHttpActionResult GetUsers([FromODataUri] int key)
+        {
+            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
+            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            {
+                return Forbidden();
+            }
+
+            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
+            return Ok(result);
+        }
+
         public override IHttpActionResult Patch(int key, Delta<Organization> delta)
         {
-            var organization = delta.GetEntity();
+            var organization = delta.GetInstance();
 
             CheckOrgTypeRights(organization);
             return base.Patch(key, delta);

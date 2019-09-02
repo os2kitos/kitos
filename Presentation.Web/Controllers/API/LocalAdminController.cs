@@ -3,10 +3,12 @@ using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class LocalAdminController : BaseApiController
     {
         private readonly IOrganizationRoleService _organizationRoleService;

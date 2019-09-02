@@ -222,7 +222,7 @@
         }
 
         public checkIfRoleIsAvailable(roleId) {
-            var foundSelectedInOptions = _.find(this.activeItProjectRoles, function (option: any) { return option.Id === parseInt(roleId, 10) });
+            var foundSelectedInOptions = _.find(this.activeItProjectRoles, (option: any) => option.Id === parseInt(roleId, 10));
             return (foundSelectedInOptions);
         }
     }

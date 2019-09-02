@@ -8,10 +8,12 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;

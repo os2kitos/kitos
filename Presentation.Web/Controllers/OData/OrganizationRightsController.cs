@@ -7,9 +7,11 @@ using System.Web.OData.Routing;
 using Core.ApplicationServices;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;
@@ -36,15 +38,38 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
+
+            var user = _userService.GetUserById(UserId);
+
+            if(entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if(!user.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
+
+            if(entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
 
             entity.OrganizationId = orgKey;
             entity.ObjectOwnerId = UserId;
-            entity.LastChangedByUserId = UserId;
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
+            entity.LastChangedByUserId = UserId;
+            
             try
             {
                 entity = Repository.Insert(entity);
@@ -58,16 +83,48 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        /// <summary>
+        /// Always Use 403 - POST /Organizations(orgKey)/Rights instead
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public override IHttpActionResult Post(OrganizationRight entity)
+        {
+            return StatusCode(HttpStatusCode.Forbidden);
+        }
+
         // DELETE /Organizations(1)/Rights(1)
         [ODataRoute("Organizations({orgKey})/Rights({key})")]
         public IHttpActionResult DeleteRights(int orgKey, int key)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
             if (entity == null)
+            {
                 return NotFound();
+            }
+
+            var user = _userService.GetUserById(UserId);
+
+            if (entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (!user.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
+
+            if (entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -89,7 +146,27 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
+
+            var user = _userService.GetUserById(UserId);
+
+            if (entity.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (!user.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
+
+            if (entity.Role == OrganizationRole.LocalAdmin)
+            {
+                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
+                {
+                    return Forbidden();
+                }
+            }
 
             try
             {
@@ -110,22 +187,28 @@ namespace Presentation.Web.Controllers.OData
             
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
             if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             //Check if user is allowed to set accessmodifier to public
             //var accessModifier = (entity as IHasAccessModifier)?.AccessModifier;
-            //if (accessModifier == AccessModifier.Public && !_authService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
+            //if (accessModifier == AccessModifier.Public && !AuthService.CanExecute(UserId, Feature.CanSetAccessModifierToPublic))
             //{
             //    return Unauthorized();
-            //}
+            //} 
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {

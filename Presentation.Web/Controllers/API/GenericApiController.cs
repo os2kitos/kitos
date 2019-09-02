@@ -9,6 +9,8 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
+using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -17,7 +19,10 @@ namespace Presentation.Web.Controllers.API
     {
         protected readonly IGenericRepository<TModel> Repository;
 
-        protected GenericApiController(IGenericRepository<TModel> repository)
+        protected GenericApiController(
+            IGenericRepository<TModel> repository,
+            IAuthorizationContext authorizationContext = null)
+        : base(authorizationContext)
         {
             Repository = repository;
         }
@@ -27,34 +32,32 @@ namespace Presentation.Web.Controllers.API
             return Repository.AsQueryable();
         }
 
+        /// <summary>
+        /// Get all from base entity controller
+        /// </summary>
+        /// <param name="paging"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage GetAll([FromUri] PagingModel<TModel> paging)
         {
             try
             {
-                var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(TModel));
-                var result = GetAllQuery().AsEnumerable();
+                var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
 
-                if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id) || hasOrg == false)
+                var crossOrganizationReadAccess = AuthorizationStrategy.GetCrossOrganizationReadAccess();
+
+                var refinement = new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId);
+
+                var result = refinement.Apply(Repository.AsQueryable());
+
+                if (refinement.RequiresPostFiltering())
                 {
-                    if (typeof(IHasAccessModifier).IsAssignableFrom(typeof(TModel)) && !AuthenticationService.IsGlobalAdmin(KitosUser.Id))
-                    {
-                        if (hasOrg)
-                        {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
-                        }
-                        else
-                        {
-                            result = result.Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public);
-                        }
-                    }
-                }
-                else
-                {
-                    result = result.Where(x => ((IHasOrganization)x).OrganizationId == KitosUser.DefaultOrganizationId);
+                    paging = paging.WithPostProcessingFilter(AllowRead);
                 }
 
-                var query = Page(result.AsQueryable(), paging);
+                var query = Page(result, paging);
+
                 var dtos = Map(query);
+
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -64,18 +67,26 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET api/T
+        /// <summary>
+        /// Get single from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Single object from database related to the controller</returns>
         public virtual HttpResponseMessage GetSingle(int id)
         {
             try
             {
                 var item = Repository.GetByKey(id);
 
-                if(!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
                 return Ok(dto);
@@ -99,12 +110,52 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                return Ok(HasWriteAccess(id, organizationId));
+                var entity = Repository.GetByKey(id);
+                var allowWriteAccess = AllowModify(entity);
+
+                return Ok(allowWriteAccess);
             }
             catch (Exception e)
             {
                 return LogError(e);
             }
+        }
+
+        /// <summary>
+        /// GET api/T/GetAccessRights
+        /// Checks what access rights the user has for the given entities
+        /// </summary>
+        public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
+        {
+            if (!AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault()))
+            {
+                return Forbidden();
+            }
+            return Ok(new EntitiesAccessRightsDTO
+            {
+                CanCreate = AllowCreate<TModel>(),
+                CanView = true
+            });
+        }
+
+        /// <summary>
+        /// GET api/T/id?GetAccessRightsForEntity
+        /// Checks what access rights the user has for the given entity
+        /// </summary>
+        /// <param name="id">The id of the object</param>
+        public HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
+        {
+            var item = Repository.GetByKey(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(new EntityAccessRightsDTO
+            {
+                CanDelete = AllowDelete(item),
+                CanEdit = AllowModify(item),
+                CanView = AllowRead(item)
+            });
         }
 
         protected virtual TModel PostQuery(TModel item)
@@ -115,15 +166,24 @@ namespace Presentation.Web.Controllers.API
             return insertedItem;
         }
 
-        // POST api/T
+        /// <summary>
+        /// Post from base entity controller
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>HTML code for success or failure</returns>
         public virtual HttpResponseMessage Post(TDto dto)
         {
             try
             {
                 var item = Map<TDto, TModel>(dto);
-
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
+
+                // Check CREATE access rights  
+                if (!AllowCreate<TModel>(item))
+                {
+                    return Forbidden();
+                }
 
                 var savedItem = PostQuery(item);
 
@@ -141,8 +201,12 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException?.InnerException != null)
+                {
                     if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
                         return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
 
                 return LogError(e);
             }
@@ -157,6 +221,13 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PUT api/T
+        /// <summary>
+        /// Put from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Put(int id, int organizationId, JObject obj)
         {
             return Patch(id, organizationId, obj);
@@ -169,12 +240,22 @@ namespace Presentation.Web.Controllers.API
         }
 
         // DELETE api/T
+        /// <summary>
+        /// Delete from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
                 var item = Repository.GetByKey(id);
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+
+                if (!AllowDelete(item))
+                {
+                    return Forbidden();
+                }
 
                 DeleteQuery(item);
 
@@ -199,13 +280,17 @@ namespace Presentation.Web.Controllers.API
                 {
                     var mapMember = nonNullMaps.SingleOrDefault(x => x.SourceMember.Name.Equals(valuePair.Key, StringComparison.InvariantCultureIgnoreCase));
                     if (mapMember == null)
+                    {
                         continue; // abort if no map found
+                    }
 
                     var destName = mapMember.DestinationProperty.Name;
                     var jToken = valuePair.Value;
 
                     if (destName == "LastChangedByUserId" || destName == "LastChanged")
+                    {
                         continue; // don't allow writing to these. TODO This should really be done using in/out DTOs
+                    }
 
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
@@ -232,6 +317,7 @@ namespace Presentation.Web.Controllers.API
                             propRef.SetValue(item, null);
                         }
                     }
+
                     // BUG JSON.NET throws on Guid
                     // Bugreport https://json.codeplex.com/workitem/25599
                     else if (t.IsEquivalentTo(typeof(Guid)))
@@ -270,13 +356,27 @@ namespace Presentation.Web.Controllers.API
         }
 
         // PATCH api/T
+        /// <summary>
+        /// Patch from base entity controller
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="organizationId"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public virtual HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             try
             {
                 var item = Repository.GetByKey(id);
-                if (item == null) return NotFound();
-                if (!HasWriteAccess(item, organizationId)) return Unauthorized();
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(item))
+                {
+                    return Forbidden();
+                }
 
                 var result = PatchQuery(item, obj);
                 return Ok(Map(result));
@@ -285,9 +385,15 @@ namespace Presentation.Web.Controllers.API
             {
                 // check if inner message is a duplicate, if so return conflict
                 if (e.InnerException != null)
+                {
                     if (e.InnerException.InnerException != null)
+                    {
                         if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                        {
                             return Conflict(e.InnerException.InnerException.Message);
+                        }
+                    }
+                }
 
                 return LogError(e);
             }
@@ -308,34 +414,10 @@ namespace Presentation.Web.Controllers.API
         /// <param name="obj">The object</param>
         /// <param name="user">The user</param>
         /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to obj</returns>
+        /// <returns>True if user has write access to obj</returns>
         protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
         {
             return AuthenticationService.HasWriteAccess(user.Id, obj);
-        }
-
-        /// <summary>
-        /// Checks if the current authenticated user has write access to a given object.
-        /// </summary>
-        /// <param name="objId">The id of object</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId, int organizationId)
-        {
-            return HasWriteAccess(objId, KitosUser, organizationId);
-        }
-
-        /// <summary>
-        /// Checks if a given user has write access to a given object.
-        /// </summary>
-        /// <param name="objId">The id of object</param>
-        /// <param name="user">The user</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to the object with objId</returns>
-        protected bool HasWriteAccess(int objId, User user, int organizationId)
-        {
-            var obj = Repository.GetByKey(objId);
-            return HasWriteAccess(obj, user, organizationId);
         }
 
         /// <summary>
@@ -378,6 +460,5 @@ namespace Presentation.Web.Controllers.API
         }
 
         #endregion
-
     }
 }

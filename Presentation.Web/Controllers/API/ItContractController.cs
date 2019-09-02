@@ -13,13 +13,16 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
     using Core.DomainModel;
     using Core.DomainModel.Organization;
 
+    [PublicApi]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
 
     {
@@ -44,12 +47,18 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
             paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
             return base.GetAll(paging);
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public override HttpResponseMessage GetSingle(int id) {
 
             try
@@ -58,10 +67,13 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
 
@@ -83,7 +95,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -109,7 +124,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
@@ -129,6 +147,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public virtual HttpResponseMessage GetExhibitedInterfaces(int id, bool? exhibit)
         {
             try
@@ -136,7 +156,7 @@ namespace Presentation.Web.Controllers.API
                 var contract = Repository.GetByKey(id);
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
                 var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
                 var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
@@ -160,11 +180,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (contract == null) return NotFound();
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (contract == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var usage = _usageRepository.GetByKey(systemUsageId);
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
                 if (_itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId }) != null)
                     return Conflict("The IT system usage is already associated with the contract");
@@ -195,7 +225,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(contract, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var contractItSystemUsage = _itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId });
                 if (contractItSystemUsage == null)
@@ -215,6 +248,9 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -226,7 +262,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, itContract))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
                 // this trick will put the first object in the result as well as the children
                 var children = new[] { itContract }.SelectNestedChildren(x => x.Children);
@@ -242,11 +278,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractOverviewDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
             if (KitosUser.DefaultOrganizationId != organizationId)
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try
@@ -334,11 +372,13 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractPlanDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
         {
             if (KitosUser.DefaultOrganizationId != organizationId)
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             try
@@ -370,8 +410,6 @@ namespace Presentation.Web.Controllers.API
                 //Get contracts within organization
                 var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
 
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-                //var contracts = Page(Repository.AsQueryable(), pagingModel);
 
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
 
@@ -439,9 +477,6 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool HasWriteAccess(ItContract obj, User user, int organizationId)
         {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ContractModuleAdmin)))

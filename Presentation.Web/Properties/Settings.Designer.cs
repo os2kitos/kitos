@@ -67,5 +67,23 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["DeploymentVersion"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("arne123")]
+        public string DefaultUserPassword {
+            get {
+                return ((string)(this["DefaultUserPassword"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("true")]
+        public string UseDefaultPassword {
+            get {
+                return ((string)(this["UseDefaultPassword"]));
+            }
+        }
     }
 }

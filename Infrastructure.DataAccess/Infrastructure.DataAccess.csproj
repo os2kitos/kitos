@@ -35,51 +35,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug %40 Test Mijlø|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\Output\DataAccess\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Sandbox|AnyCPU'">
-    <OutputPath>..\Output\DataAccess\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AppVeyor|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\Output\DataAccess\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
-    <OutputPath>bin\Test\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Prod|AnyCPU'">
-    <OutputPath>bin\Prod\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
@@ -540,9 +495,22 @@
     <Compile Include="Migrations\201804161323008_ContactPersonAdded.Designer.cs">
       <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs" />
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.Designer.cs">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.cs" />
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.Designer.cs">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.cs" />
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.Designer.cs">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
+    <Compile Include="TypeMapping.cs" />
     <Compile Include="UserRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -828,6 +796,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804161323008_ContactPersonAdded.resx">
       <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.resx">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.resx">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.resx">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

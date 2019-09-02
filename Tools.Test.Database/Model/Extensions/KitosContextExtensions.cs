@@ -17,11 +17,12 @@ namespace Tools.Test.Database.Model.Extensions
                 .First();
         }
 
-        public static Organization GetCommonOrganization(this KitosContext context)
+        public static Organization GetOrganization(this KitosContext context, string name)
         {
             return context
                 .Organizations
-                .First(x => x.Name == "Fælles Kommune");
+                .First(x => x.Name == name);
         }
+        
     }
 }

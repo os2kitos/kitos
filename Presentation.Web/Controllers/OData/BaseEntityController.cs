@@ -6,48 +6,45 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.DomainServices.Queries;
 using Ninject.Infrastructure.Language;
+using Presentation.Web.Infrastructure.Authorization.Context;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.OData
 {
-    public abstract class BaseEntityController<T> : BaseController <T> where T : class, IEntity
+    public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        private readonly IAuthenticationService _authService;
+        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
+        private readonly IControllerAuthorizationStrategy _authorizationStrategy;
 
-        protected BaseEntityController(IGenericRepository<T> repository, IAuthenticationService authService)
+        protected BaseEntityController(
+            IGenericRepository<T> repository,
+            IAuthenticationService authService,
+            IAuthorizationContext authorizationContext = null)
             : base(repository)
         {
-            _authService = authService;
+            _authorizationStrategy =
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext);
+            AuthService = authService;
         }
 
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            if (UserId == 0)
-                return Unauthorized();
+            var organizationId = AuthService.GetCurrentOrganizationId(UserId);
 
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
-            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
+            var crossOrganizationReadAccess = _authorizationStrategy.GetCrossOrganizationReadAccess();
 
-            var result = Repository.AsQueryable();
+            var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            var result = refinement.Apply(Repository.AsQueryable());
+
+            if (refinement.RequiresPostFiltering())
             {
-                if (hasAccessModifier && !_authService.IsGlobalAdmin(UserId))
-                {
-                    if (hasOrg)
-                    {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public || ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
-                    }
-                    else
-                    {
-                        result = result.ToEnumerable().Where(x => ((IHasAccessModifier)x).AccessModifier == AccessModifier.Public).AsQueryable();
-                    }
-                }
-            }
-            else
-            {
-                result = result.ToEnumerable().Where(x => ((IHasOrganization) x).OrganizationId == _authService.GetCurrentOrganizationId(UserId)).AsQueryable();
+                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
             }
 
             return Ok(result);
@@ -58,12 +55,16 @@ namespace Presentation.Web.Controllers.OData
         {
             var result = Repository.AsQueryable().Where(p => p.Id == key);
 
-            if (!result.Any())
+            if (result.Any() == false)
+            {
                 return NotFound();
+            }
 
             var entity = result.First();
-            if (!_authService.HasReadAccess(UserId, entity))
-                return Unauthorized();
+            if (AllowRead(entity) == false)
+            {
+                return Forbidden();
+            }
 
             return Ok(SingleResult.Create(result));
         }
@@ -74,35 +75,41 @@ namespace Presentation.Web.Controllers.OData
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
                 throw new InvalidCastException("Entity must implement IHasOrganization");
 
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-                return Unauthorized();
+            if (AllowOrganizationAccess(key))
+            {
+                var result = QueryFactory.ByOrganizationId<T>(key).Apply(Repository.AsQueryable());
 
-            var result = Repository.AsQueryable().Where(m => ((IHasOrganization)m).OrganizationId == key);
-            return Ok(result);
+                return Ok(result);
+            }
+
+            return Forbidden();
         }
 
-        public IHttpActionResult Put(int key, T entity)
-        {
-            return StatusCode(HttpStatusCode.NotImplemented);
-        }
-
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Post(T entity)
         {
             if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (entity is IHasOrganization && (entity as IHasOrganization).OrganizationId == 0)
             {
-                (entity as IHasOrganization).OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                return BadRequest(ModelState);
+            }
+
+            //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
+            if (entity is IHasOrganization organization && organization.OrganizationId == 0)
+            {
+                organization.OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
             }
 
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (AllowCreate<T>(entity) == false)
             {
-                return Unauthorized();
+                return Forbidden();
+            }
+
+            if ((entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public && AllowEntityVisibilityControl(entity) == false)
+            {
+                return Forbidden();
             }
 
             try
@@ -118,22 +125,34 @@ namespace Presentation.Web.Controllers.OData
             return Created(entity);
         }
 
+        [System.Web.Http.Description.ApiExplorerSettings]
         public virtual IHttpActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);
 
-
             // does the entity exist?
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
+            if (AllowWrite(entity) == false)
+            {
+                return Forbidden();
+            }
+
+            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) &&
+                accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
+            {
+                return Forbidden();
+            }
 
             // check model state
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             try
             {
@@ -156,10 +175,14 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
-            if (!_authService.HasWriteAccess(UserId, entity))
-                return Unauthorized();
+            if (AllowDelete(entity) == false)
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -172,6 +195,41 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        protected bool AllowOrganizationAccess(int organizationId)
+        {
+            return _authorizationStrategy.AllowOrganizationReadAccess(organizationId);
+        }
+
+        protected bool AllowRead(T entity)
+        {
+            return _authorizationStrategy.AllowRead(entity);
+        }
+
+        protected bool AllowWrite(T entity)
+        {
+            return _authorizationStrategy.AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>()
+        {
+            return _authorizationStrategy.AllowCreate<T>();
+        }
+
+        protected bool AllowCreate<T>(IEntity entity)
+        {
+            return _authorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowDelete(IEntity entity)
+        {
+            return _authorizationStrategy.AllowDelete(entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            return _authorizationStrategy.AllowEntityVisibilityControl(entity);
         }
     }
 }

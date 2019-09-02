@@ -1,19 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using System.Net;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Core.DomainServices.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [PublicApi]
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -28,34 +33,33 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
         public override IHttpActionResult Get()
         {
             return base.Get();
-
-            //if (AuthenticationService.HasReadAccessOutsideContext(UserId))
-            //    return base.Get();
-
-            //var orgId = CurrentOrganizationId;
-            //return Ok(Repository.AsQueryable().Where(x => x.OrganizationId == orgId));
         }
 
         // GET /Organizations(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProject>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjects(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (!_authService.HasReadAccessOutsideContext(UserId))
             {
                 if (loggedIntoOrgId != key)
-                    return StatusCode(HttpStatusCode.Forbidden);
+                {
+                    return Forbidden();
+                }
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+                var result = Repository.AsQueryable().ByOrganizationId(key);
                 return Ok(result);
             }
             else
             {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+                var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
                 return Ok(result);
             }
         }
@@ -63,27 +67,38 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/ItProjects(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             if (_authService.HasReadAccess(UserId, entity))
+            {
                 return Ok(entity);
+            }
 
-            return StatusCode(HttpStatusCode.Forbidden);
+            return Forbidden();
         }
 
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItProject>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-                return StatusCode(HttpStatusCode.Forbidden);
+            {
+                return Forbidden();
+            }
 
             var projects = new List<ItProject>();
 

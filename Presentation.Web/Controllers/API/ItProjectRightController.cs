@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItProjectRightController : GenericRightsController<ItProject, ItProjectRight, ItProjectRole>
     {
         public ItProjectRightController(IGenericRepository<ItProjectRight> rightRepository, IGenericRepository<ItProject> objectRepository) : base(rightRepository, objectRepository)
@@ -18,6 +22,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="userId">Id of the user</param>
         /// <returns>List of rights</returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ICollection<RightOutputDTO>>))]
         public HttpResponseMessage GetRightsForUser(int userId)
         {
             try

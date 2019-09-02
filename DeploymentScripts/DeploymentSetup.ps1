@@ -13,6 +13,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:LogLevel = $parameters["LogLevel"]
     $Env:EsUrl = $parameters["EsUrl"]
     $Env:SsoGateway = $parameters["SsoGateway"]
+    $Env:SecurityKeyString = $parameters["SecurityKeyString"]
     $Env:SmtpFromMail = $parameters["SmtpFromMail"]
     $Env:SmtpNetworkHost = $parameters["SmtpNetworkHost"]
     $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]
@@ -35,6 +36,13 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
 
         $Env:TestUserNormalUser = $parameters["TestUserNormalUser"]
         $Env:TestUserNormalUserPw = $parameters["TestUserNormalUserPw"]
+        
+        $Env:TestUserApiUser = $parameters["TestUserApiUser"]
+        $Env:TestUserApiUserPw = $parameters["TestUserApiUserPw"]
+        
+        $Env:TestUserApiGlobalAdmin = $parameters["TestUserApiGlobalAdmin"]
+        $Env:TestUserApiGlobalAdminPw = $parameters["TestUserApiGlobalAdminPw"]
+        $Env:DefaultUserPassword = $parameters["DefaultUserPassword"]
     }
     
     
@@ -50,28 +58,34 @@ Function Setup-Environment([String] $environmentName) {
     if (-Not (Test-Path 'env:AwsSecretAccessKey')) { 
     	throw "Error: Remember to set the AwsSecretAccessKey input before starting the build"
     }
-    
+
+    $Env:MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
+
     switch( $environmentName ) 
     {
         "integration" 
         {
+            $Env:TestToolsPath = Resolve-Path "$PSScriptRoot\..\TestDatabaseTools\Tools.Test.Database.exe"
             $loadTcHangfireConnectionString = $true
             $loadTestUsers = $true
+            $Env:UseDefaultUserPassword = "true"
             break;
         }
         "test"
         {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
+            $Env:UseDefaultUserPassword = "false"
             break;
         }
         "production"
         {
             $loadTcHangfireConnectionString = $false
             $loadTestUsers = $false
+            $Env:UseDefaultUserPassword = "false"
             break;
         }
-        default { Throw "Error: Unknnown environment provided: $environmentName" }
+        default { Throw "Error: Unknown environment provided: $environmentName" }
     }
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"

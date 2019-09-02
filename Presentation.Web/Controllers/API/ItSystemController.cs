@@ -14,18 +14,27 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
         private readonly ReferenceService _referenceService;
 
-        public ItSystemController(IGenericRepository<ItSystem> repository, IGenericRepository<TaskRef> taskRepository, IItSystemService systemService, ReferenceService referenceService)
-            : base(repository)
+        public ItSystemController(
+            IGenericRepository<ItSystem> repository,
+            IGenericRepository<TaskRef> taskRepository,
+            IItSystemService systemService,
+            ReferenceService referenceService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
@@ -63,6 +72,7 @@ namespace Presentation.Web.Controllers.API
             _systemService.Delete(entity.Id);
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
@@ -83,6 +93,7 @@ namespace Presentation.Web.Controllers.API
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                     );
+                paging.WithPostProcessingFilter(AllowRead);
 
                 if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
 
@@ -116,9 +127,7 @@ namespace Presentation.Web.Controllers.API
                         // only object owners will be albe to see private objects
                         ));
 
-                //if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
-
-                //var query = Page(systems, paging);
+                systems = systems.AsEnumerable().Where(AllowRead).AsQueryable();
 
                 var dtos = Map(systems);
 
@@ -164,6 +173,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, int excludeId)
         {
             try
@@ -186,6 +196,9 @@ namespace Presentation.Web.Controllers.API
                     // it systems doesn't have roles so private doesn't make sense
                     // only object owners will be albe to see private objects
                     );
+
+                systems = systems.Where(AllowRead);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -195,11 +208,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
             try
             {
                 var systems = _systemService.GetInterfaces(orgId, q, KitosUser);
+
+                systems = systems.Where(AllowRead);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -209,11 +226,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetNonInterfacesSearch(string q, int orgId, bool? nonInterfaces)
         {
             try
             {
                 var systems = _systemService.GetNonInterfaces(orgId, q, KitosUser);
+
+                systems = systems.Where(AllowRead);
+
                 var dtos = Map(systems);
                 return Ok(dtos);
             }
@@ -223,11 +244,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
         {
             try
             {
                 var systems = _systemService.GetHierarchy(id);
+
+                systems = systems.Where(AllowRead);
+
                 return Ok(Map(systems));
             }
             catch (Exception e)
@@ -240,20 +265,25 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                // only global admin can set access mod to public
-                if (dto.AccessModifier == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+                if (!IsAvailable(dto.Name, dto.OrganizationId))
                 {
-                    return Unauthorized();
+                    return Conflict("Name is already taken!");
                 }
 
-                if (!IsAvailable(dto.Name, dto.OrganizationId))
-                    return Conflict("Name is already taken!");
-
                 var item = Map(dto);
+                if (dto.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(item))
+                {
+                    return Forbidden();
+                }
 
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
+
+                if (!AllowCreate<ItSystem>(item))
+                {
+                    return Forbidden();
+                }
 
                 foreach (var id in dto.TaskRefIds)
                 {
@@ -271,11 +301,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)
         {
             try
             {
                 var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId));
+
+                systems = systems?.Where(AllowRead);
 
                 return systems == null ? NotFound() : Ok(Map(systems));
             }
@@ -291,7 +325,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
-                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
+                if (!AllowModify(system))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -336,8 +373,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var system = Repository.GetByKey(id);
-                if (system == null) return NotFound();
-                if (!HasWriteAccess(system, organizationId)) return Unauthorized();
+                if (system == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(system))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -382,11 +426,23 @@ namespace Presentation.Web.Controllers.API
         /// <param name="taskGroup">Optional filtering on task group</param>
         /// <param name="pagingModel">Paging model</param>
         /// <returns>List of TaskRefSelectedDTO</returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskRefSelectedDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
         {
             try
             {
                 var system = Repository.GetByKey(id);
+                if (system == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowRead(system))
+                {
+                    return Forbidden();
+                }
 
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
@@ -407,6 +463,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
@@ -428,10 +485,11 @@ namespace Presentation.Web.Controllers.API
             // try get AccessModifier value
             JToken accessModToken;
             obj.TryGetValue("accessModifier", out accessModToken);
-            // only global admin can set access mod to public
-            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !KitosUser.IsGlobalAdmin)
+
+            var itSystem = Repository.GetByKey(id);
+            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !AllowEntityVisibilityControl(itSystem))
             {
-                return Unauthorized();
+                return Forbidden();
             }
 
             // try get name value
@@ -448,10 +506,17 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "It System names must be new")]
         public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
         {
             try
             {
+                if (!AllowOrganizationReadAccess(orgId))
+                {
+                    return Forbidden();
+                }
                 return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
             }
             catch (Exception e)
@@ -464,24 +529,6 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
-        }
-
-        protected override bool HasWriteAccess(ItSystem obj, User user, int organizationId)
-        {
-            if (obj.IsInContext(organizationId) && user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
-            {
-                return true;
-            }
-            if (user.IsLocalAdmin && obj.ObjectOwnerId == user.Id && user.DefaultOrganizationId == organizationId)
-            {
-                return true;
-            }
-            return HasWriteAccess();
-        }
-
-        protected bool HasWriteAccess()
-        {
-            return KitosUser.IsGlobalAdmin;
         }
     }
 }

@@ -47,7 +47,6 @@ describe("Can edit reference URL",
 
         beforeAll(() => {
             loginHelper.loginAsLocalAdmin();
-            browser.waitForAngular();
             refHelper.createReference(consts.refTitle, consts.validUrl, consts.refId);
         });
 

@@ -43,8 +43,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>0</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>bin\Presentation.Web.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PublishDatabases>false</PublishDatabases>
   </PropertyGroup>
@@ -56,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+    <DocumentationFile>bin\Presentation.Web.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
@@ -99,36 +99,65 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.1.1.0\lib\net451\Microsoft.IdentityModel.Logging.dll</HintPath>
+    <Reference Include="Microsoft.Data.Edm, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.8.4\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.OData.5.8.4\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Services.5.8.4\lib\net40\Microsoft.Data.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services.Client, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Services.Client.5.8.4\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.1.0\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.OData.Core, Version=6.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.OData.Core.6.15.0\lib\portable-net45+win+wpa81\Microsoft.OData.Core.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.2.1\lib\net451\Microsoft.IdentityModel.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.OData.Edm, Version=6.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.OData.Edm.6.15.0\lib\portable-net45+win+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.2.1\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    <Reference Include="Microsoft.OData.Core, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Core.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Edm, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Edm.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Spatial, Version=6.15.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Spatial.6.15.0\lib\portable-net45+win+wpa81\Microsoft.Spatial.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.0\lib\net451\Microsoft.Owin.Security.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.Owin.Security.Jwt, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Jwt.3.1.0\lib\net45\Microsoft.Owin.Security.Jwt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.0.0\lib\net451\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Spatial, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Spatial.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Ninject">
@@ -186,18 +215,29 @@
     <Reference Include="SerilogWeb.Classic">
       <HintPath>externalreferences\SerilogWeb.Classic.dll</HintPath>
     </Reference>
+    <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.Core.5.5.2\lib\net40\Swashbuckle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Swashbuckle.OData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2e252c86e553959, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.OData.3.5.0\lib\net452\Swashbuckle.OData.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.1.0\lib\net451\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.2.28, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.2.202250711\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Spatial, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Spatial.5.8.4\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
       <Private>True</Private>
@@ -228,9 +268,8 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
-    <Reference Include="System.Web.OData, Version=5.9.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.OData.5.9.1\lib\net45\System.Web.OData.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="System.Web.OData, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.OData.6.0.0\lib\net45\System.Web.OData.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
@@ -280,6 +319,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\OrganizationalUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\UnauthenticatedAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\UserContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\IUserContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContextFactory.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\IOrganizationalUserContext.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\OrganizationAuthorizationContext.cs" />
+    <Compile Include="Infrastructure\Authorization\Context\AuthorizationContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
@@ -304,6 +355,7 @@
     <Compile Include="Controllers\API\ArchivePeriodController.cs" />
     <Compile Include="Controllers\API\ArchiveTestLocationController.cs" />
     <Compile Include="Controllers\API\ContactpersonController.cs" />
+    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
     <Compile Include="Controllers\API\DataResponsibleController.cs" />
     <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
@@ -332,59 +384,43 @@
     <Compile Include="Controllers\API\OptionExtendController.cs" />
     <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
-    <!--<Compile Include="Controllers\OData\LocalOptionControllers\AgreementElementTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ArchiveTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\BusinessTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\DataTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\FrequencyTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\GoalTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\HandoverTrialTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\InterfaceTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItContractRolesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItContractTemplateTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItContractTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItInterfaceExhibitsController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItInterfaceTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItInterfaceUsesEntityController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItProjectRolesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItProjectTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItSystemRolesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ItSystemTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\MethodTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\OptionExtendTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\OrganizationUnitRolesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\PaymentFrequencyTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\PaymentModelTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\PriceRegulationTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ProcurementStrategyTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\PurchaseFormTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\ReportCategoriesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\SensitiveDataTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\TerminationDeadlineTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\TsaTypesController.cs" />-->
     <Compile Include="Controllers\API\ReferenceController.cs" />
     <Compile Include="Controllers\API\SSOConfigController.cs" />
-    <Compile Include="Controllers\OData\AdviceSentController.cs" />
-    <Compile Include="Controllers\OData\AdviceController.cs" />
+    <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\AccessTypesController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsFunctionController.cs" />
+    <Compile Include="Controllers\OData\AdviceController.cs" />
+    <Compile Include="Controllers\OData\AdviceSentController.cs" />
+    <Compile Include="Controllers\OData\ArchivePeriodsController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsFunctionController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsRegisterTypesController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsRegularPersonalDataController.cs" />
     <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsSensitivePersonalDataController.cs" />
-    <Compile Include="Controllers\OData\ArchivePeriodsController.cs" />
+    <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\BaseOptionController.cs" />
-    <Compile Include="Controllers\API\UploadFileController.cs" />
     <Compile Include="Controllers\OData\ConfigsController.cs" />
+    <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
     <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTestLocationsController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
+    <Compile Include="Controllers\OData\ItContractRightsController.cs" />
+    <Compile Include="Controllers\OData\ItContractsController.cs" />
+    <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
+    <Compile Include="Controllers\OData\ItInterfacesController.cs" />
+    <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
+    <Compile Include="Controllers\OData\ItProjectsController.cs" />
+    <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
+    <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionBaseController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTestLocationsController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalBusinessTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalFrequencyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalGoalTypesController.cs" />
@@ -393,11 +429,12 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTemplateTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItInterfaceTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectRolesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalBusinessTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItInterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalMethodTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
@@ -406,75 +443,80 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPriceRegulationTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPurchaseFormTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\ArchiveTestLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveTestLocationsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
-    <Compile Include="Controllers\OData\BaseController.cs" />
-    <Compile Include="Controllers\OData\BaseEntityController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\BusinessTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\DataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\FrequencyTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\GoalTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\HandoverTrialTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\InterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItContractRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItContractTemplateTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItContractTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItInterfaceTypesController.cs" />
-    <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
-    <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
-    <Compile Include="Controllers\OData\ItInterfacesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\ItContractRolesController.cs" />
-    <Compile Include="Controllers\OData\ItContractRightsController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\GoalTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItProjectRolesController.cs" />
-    <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItProjectTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemCategoriesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionBaseController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
-    <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
-    <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
-    <Compile Include="Controllers\OData\ItContractsController.cs" />
-    <Compile Include="Controllers\OData\ItProjectsController.cs" />
-    <Compile Include="Controllers\OData\ItSystemsController.cs" />
-    <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PaymentFrequencyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PaymentModelTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PriceRegulationTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ReportCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
-    <Compile Include="Controllers\OData\ReportsController.cs" />
-    <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
-    <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
-    <Compile Include="Controllers\OData\OrganizationsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TsaTypesController.cs" />
+    <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
+    <Compile Include="Controllers\OData\ReportsController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\BaseOdataAuthorizationController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\ReportsITSystemContactsController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemRolesController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemsController.cs" />
-    <Compile Include="Controllers\OData\ReportsControllers\ReportsITSystemContactsController.cs" />
     <Compile Include="Controllers\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
     <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Extensions\IdentityClaimExtension.cs" />
+    <Compile Include="Extensions\OwinContextExtensions.cs" />
+    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Helpers\InternalApiAttributeFilter.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
+    <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
+    <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\IAuthenticationContext.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
+    <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
+    <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
@@ -483,11 +525,15 @@
     <Compile Include="Models\DataResponsibleDTO.cs" />
     <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
     <Compile Include="Models\AdviceUserRelationDTO.cs" />
+    <Compile Include="Models\EntitiesAccessRightsDTO.cs" />
     <Compile Include="Models\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\EntityAccessRightsDTO.cs" />
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
+    <Compile Include="Models\GetTokenResponseDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Models\SSOConfigDTO.cs" />
     <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
     <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Models\HandoverTrialDTO.cs" />
@@ -635,15 +681,20 @@
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\It-System\Catalog\LocalAdmin.Catalog.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Organization\CreateUser.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\LocalAdmin.Reference.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\It-system\Catalog\ItSystemCatalog.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemReference.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
@@ -885,7 +936,6 @@
     <Content Include="Content\notify\notify.css" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.view.html" />
-    <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
     <Content Include="externalreferences\SerilogWeb.Classic.dll" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
@@ -1175,17 +1225,7 @@
     <Content Include="Content\less\variables.less" />
     <Content Include="Content\notify\notify.less" />
     <Content Include="Content\kendo.default.min.css" />
-    <None Include="Properties\PublishProfiles\DeployToProd.pubxml" />
-    <None Include="Properties\PublishProfiles\DeployToTest.pubxml">
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
-    <None Include="Properties\PublishProfiles\Local.pubxml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Properties\PublishProfiles\MiracleTest.pubxml">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -1200,23 +1240,14 @@
     <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />
+    <EmbeddedResource Include="Scripts\SwaggerUICustom.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </None>
-    <None Include="Web.Prod.config">
-      <DependentUpon>Web.config</DependentUpon>
-      <IsTransformFile>True</IsTransformFile>
-    </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Web.Test.config">
-      <DependentUpon>Web.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
     </None>
     <Content Include="Images\accent.png" />
     <Content Include="Images\bullet.png" />
@@ -1272,6 +1303,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
@@ -1291,24 +1323,6 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Test|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Prod|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>
     </ApplicationIcon>
@@ -1322,9 +1336,6 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
   </PropertyGroup>
-  <!--<Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />-->
   <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
     <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
   </Target>

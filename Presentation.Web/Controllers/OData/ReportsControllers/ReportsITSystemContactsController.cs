@@ -1,22 +1,21 @@
 ﻿using System;
 using Core.ApplicationServices;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
-using System.Security;
-using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
-using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Core.DomainModel.ItSystem;
 using System.Collections.Generic;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [InternalApi]
     public class ReportsITSystemContactsController : BaseOdataAuthorizationController<ItSystemRight>
     {
         private readonly IAuthenticationService _authService;
@@ -28,6 +27,8 @@ namespace Presentation.Web.Controllers.OData
         [HttpGet]
         [EnableQuery]
         [ODataRoute("ReportsITSystemContacts")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ReportItSystemRightOutputDTO>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Get()
         {
             if (!_authService.HasReadAccessOutsideContext(UserId))

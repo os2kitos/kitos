@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -14,7 +13,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity
+    public class User : Entity, IContextAware
     {
         public User()
         {
@@ -45,6 +44,8 @@ namespace Core.DomainModel
         public int? DefaultOrganizationId { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
+
+        public bool? HasApiAccess { get; set; }
 
         /// <summary>
         ///     The organization the user will be automatically logged into.
@@ -124,34 +125,39 @@ namespace Core.DomainModel
 
         public bool IsGlobalAdmin { get; set; }
 
-        public bool IsReadOnly {
-            get
-            {
-                return OrganizationRights.Any(
-                    right => (right.Role == OrganizationRole.ReadOnly) &&
-                             (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
-            }
+        public bool IsReadOnly => IsReadOnlyInOrg(DefaultOrganizationId.GetValueOrDefault());
+
+        public bool IsReadOnlyInOrg(int organizationId)
+        {
+            return OrganizationRights.Any(
+                right => (right.Role == OrganizationRole.ReadOnly) &&
+                         (right.OrganizationId == organizationId));
         }
 
         public override bool HasUserWriteAccess(User user)
         {
-            if (IsReadOnly) {
-                return (Id == user.Id) || base.HasUserWriteAccess(user);
-            }else
+            if (IsReadOnly)
             {
-                return IsReadOnly;
+                return (Id == user.Id) || base.HasUserWriteAccess(user);
             }
+
+            return IsReadOnly;
         }
 
-        public bool IsLocalAdmin
+        public bool IsInContext(int organizationId)
         {
-            get
-            {
-                return OrganizationRights.Any(
-                    right => (right.Role == OrganizationRole.LocalAdmin) &&
-                             (right.OrganizationId == DefaultOrganizationId.GetValueOrDefault()));
-            }
+            return DefaultOrganizationId == organizationId;
         }
+
+        public bool IsLocalAdmin => IsLocalAdminInOrg(DefaultOrganizationId.GetValueOrDefault());
+
+        public bool IsLocalAdminInOrg(int organizationId)
+        {
+            return OrganizationRights.Any(
+                right => (right.Role == OrganizationRole.LocalAdmin) &&
+                         right.OrganizationId == organizationId);
+        }
+
 
         #endregion
     }

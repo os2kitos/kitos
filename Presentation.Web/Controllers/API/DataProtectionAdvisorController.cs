@@ -1,16 +1,16 @@
-﻿using Core.DomainModel.Advice;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using System.Web;
-using System.Web.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class DataProtectionAdvisorController : GenericApiController<DataProtectionAdvisor, DataProtectionAdvisorDTO>
     {
         IGenericRepository<DataProtectionAdvisor> _repository;
@@ -22,13 +22,19 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET DataProtectionAdvisor by OrganizationId
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<DataProtectionAdvisorDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public override HttpResponseMessage GetSingle(int id)
         {
             try
             {
                 var organization = _orgRepository.GetByKey(id);
 
-                if (organization == null) return NotFound();
+                if (organization == null)
+                {
+                    return NotFound();
+                }
 
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 
@@ -49,7 +55,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
                 var dto = Map(item);

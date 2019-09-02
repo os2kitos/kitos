@@ -4,14 +4,15 @@ using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : OptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository)
-            : base(repository)
+        protected GenericOptionApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
+            : base(repository, authorizationContext)
         {
         }
 
@@ -50,7 +51,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override TModel PutQuery(TModel item)
         {
-            if (!item.IsSuggestion && !IsGlobalAdmin())
+            if (!item.IsSuggestion && !AllowModify(item)) 
                 throw new SecurityException();
 
             return base.PutQuery(item);

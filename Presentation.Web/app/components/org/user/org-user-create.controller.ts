@@ -13,6 +13,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        hasApi: boolean;
     }
 
     class CreateOrganizationUserController {
@@ -27,6 +28,7 @@
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
         public isReadOnly = false;
+        public hasApi = false;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
 
@@ -50,6 +52,7 @@
             this.isUserContractAdmin = user.isContractAdmin;
             this.isUserReportAdmin = user.isReportAdmin;
             this.isReadOnly = user.isReadOnly;
+            this.hasApi = user.hasApi;
 
             autofocus();
             this.busy = false;
@@ -66,15 +69,16 @@
                     Name: this.vm.name,
                     LastName: this.vm.lastName,
                     Email: this.vm.email,
-                    PhoneNumber: this.vm.phoneNumber
-                },
+                    PhoneNumber: this.vm.phoneNumber,
+                    HasApiAccess: this.vm.hasApi
+        },
                 organizationId: this.user.currentOrganizationId,
                 sendMailOnCreation: sendMail
             };
 
             var msg = this.notify.addInfoMessage("Opretter bruger", false);
 
-            this.$http.post<Models.IUser>("odata/Users/Create", userPayload, { handleBusy: true })
+            this.$http.post<Models.IUser>("odata/Users/Users.Create", userPayload, { handleBusy: true })
                 .then((response) => {
                     var userResult = response.data;
 
@@ -94,6 +98,7 @@
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
                     if (this.vm.isReadOnly)
                         promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
+
 
                     // when all requests are done
                     this.$q.all(promises).then(
@@ -140,6 +145,7 @@
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
                 if (this.vm.isReadOnly)
                     promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReadOnly));
+
                 // when all requests are done
                 this.$q.all(promises).then(
                     () => {

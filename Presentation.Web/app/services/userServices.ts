@@ -17,6 +17,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        hasApi: boolean;
 
         orgAndDefaultUnit: any;
 
@@ -82,6 +83,7 @@
             var isReadOnly = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.ReadOnly && userRight.organizationId == currOrg.id;
             });
+            
 
             // the current org unit is the default org unit for this organization if the user has selected one
             // otherwise it's the root of this organization
@@ -110,6 +112,7 @@
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 uuid: user.uuid,
+                hasApi: user.hasApi,
                 defaultUserStartPreference: user.defaultUserStartPreference || "index",
 
                 isGlobalAdmin: user.isGlobalAdmin,
@@ -120,6 +123,7 @@
                 isContractAdmin: isContractAdmin,
                 isReportAdmin: isReportAdmin,
                 isReadOnly: isReadOnly,
+                
 
                 orgAndDefaultUnit: orgAndDefaultUnit,
 
