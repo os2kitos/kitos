@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\ItSystemUsageMigration.cs" />
     <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
@@ -531,6 +532,7 @@
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SSOConfigDTO.cs" />
