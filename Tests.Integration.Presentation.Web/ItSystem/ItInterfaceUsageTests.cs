@@ -17,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Api_User_Can_Get_It_Interface_Usage(OrganizationRole role)
         {
             //Arrange
-            var dto = InterfaceHelper.CreateInterfaceDto(A<Guid>().ToString("N"), A<Guid>().ToString("N"), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var dto = CreateNewInterfaceDto();
 
             var createdInterface = await InterfaceHelper.CreateInterface(dto);
             await InterfaceHelper.CreateItInterfaceUsageAsync(
@@ -41,6 +41,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(createdInterface.Id, response.ItInterfaceId);
                 Assert.Equal(TestEnvironment.DefaultContractId, response.ItContractId);
             }
+        }
+
+        private ItInterfaceDTO CreateNewInterfaceDto()
+        {
+            return InterfaceHelper.CreateInterfaceDto(A<Guid>().ToString("N"), A<Guid>().ToString("N"), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
         }
     }
 }
