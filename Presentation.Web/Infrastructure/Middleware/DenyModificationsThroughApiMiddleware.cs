@@ -2,7 +2,7 @@
 using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
-using Presentation.Web.Infrastructure.Model.Authentication;
+using Presentation.Web.Extensions;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
@@ -33,16 +33,7 @@ namespace Presentation.Web.Infrastructure.Middleware
 
         private static bool IsMutationAttempt(IOwinContext context)
         {
-            switch (context.Request.Method.ToLowerInvariant())
-            {
-                case "post":
-                case "put":
-                case "patch":
-                case "delete":
-                    return true;
-                default:
-                    return false;
-            }
+            return context.Request.Method.IsMutation();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using Presentation.Web;
-using Presentation.Web.Helpers;
+using Presentation.Web.Swagger;
 using Swashbuckle.Application;
 using Swashbuckle.OData;
 using WebActivatorEx;
@@ -24,7 +24,9 @@ namespace Presentation.Web
                                  "Mange kald bliver oprettet gennem en generisk kontroller, og disse vil ikke blive beskrevet individuelt, men blive påskrevet en værdi fra denne generiske kontroller. \n \n" +
                                  "Til information er det ikke alle parametre der skal bruges når API'et tilgås ObjectOwnerId, LastChanged og LastChangedByUserId bliver som udgangspunkt sat af systemet automatisk. \n \n" +
                                  "I første version af APIet er der udelukkende adgang til læseoperationer. Ved behov for adgang til funktionalitet, der ændrer i data, kontakt da venligst KITOS sekretariatet.");
-                c.DocumentFilter<InternalApiAttributeFilter>();
+
+                c.DocumentFilter<RemoveInternalApiOperationsFilter>();
+                c.DocumentFilter<RemoveMutatingCallsFilter>();
 
                 c.GroupActionsBy(apiDesc =>
                         {
@@ -50,7 +52,7 @@ namespace Presentation.Web
                 {
                     odataConfig.EnableSwaggerRequestCaching();
                 }));
-                
+
 
             })
                 .EnableSwaggerUi(c =>
@@ -58,7 +60,7 @@ namespace Presentation.Web
                     c.InjectJavaScript(Assembly.GetExecutingAssembly(), "Presentation.Web.Scripts.SwaggerUICustom.js");
                     c.EnableApiKeySupport("Authorization", "header");
                 });
-            
+
         }
     }
 }
