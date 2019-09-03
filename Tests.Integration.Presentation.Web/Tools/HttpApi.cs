@@ -189,7 +189,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role, int organizationId = 1)
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -208,7 +208,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var roleDto = new OrgRightDTO
             {
                 UserId = userId,
-                Role = role
+                Role = role.ToString("G")
             };
 
             using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto))
