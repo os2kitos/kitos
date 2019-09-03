@@ -21,7 +21,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange 
             var interFacePrefixName = CreateInterFacePrefixName();
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
-            //var interfaceResult = GetInterfacesByName(interFacePrefixName);
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
 
