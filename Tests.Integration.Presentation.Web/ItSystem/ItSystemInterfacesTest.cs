@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -15,27 +13,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemInterfacesTest : WithAutoFixture
     {
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        public async Task Global_Administrator_Can_Get_All_Interfaces(OrganizationRole role)
+        private int _defaultUserId;
+
+        [Fact]
+        public async Task Global_Administrator_Can_Get_All_Interfaces()
         {
-            const string interFacePrefixName = "GlobalAdminInterfaceTest";
-            
             //Arrange 
-            var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces(interFacePrefixName);
-            var interfaceResult = GetInterfacesByName(interFacePrefixName);
+            var interFacePrefixName = CreateInterFacePrefixName();
+            var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
+            //var interfaceResult = GetInterfacesByName(interFacePrefixName);
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
-                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName));
+                var response = httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
+                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
 
                 //Assert
                 Assert.NotNull(response.Result);
-                Assert.Equal(filteredResult.Count(), interfaceResult.Result.Result.Count);
+                Assert.Equal(interfacesCreated.Length, filteredResult.Count);
+                Assert.True(interfacesCreated.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
             }
         }
 
@@ -46,26 +45,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.User, TestEnvironment.SecondOrganizationId)]
         public async Task User_Is_Able_To_Get_Interfaces_From_Own_Org_Or_Public(OrganizationRole role, int orgId)
         {
-            const string interFacePrefixName = "UserInterfacesPreFix";
+            //Arrabge
+            var interFacePrefixName = CreateInterFacePrefixName();
             var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces(interFacePrefixName);
+            var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
+            var expectedResults = interfacesCreated.Where(x => x.OrganizationId == orgId || x.AccessModifier == AccessModifier.Public).ToList();
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                var response = httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
+                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
 
                 //Assert
                 Assert.NotNull(response.Result);
 
-                foreach (var item in response.Result)
-                {
-                    if (item.OrganizationId != orgId)
-                    {
-                        Assert.Equal(AccessModifier.Public, item.AccessModifier);
-                    }
-                }
+                Assert.Equal(expectedResults.Count, filteredResult.Count);
+                Assert.True(expectedResults.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
             }
         }
 
@@ -73,8 +70,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public(OrganizationRole role)
         {
-            const string interFacePrefixName = "UserSpecificInterfacePrefix";
             //Arrange
+            var interFacePrefixName = CreateInterFacePrefixName();
             var token = await HttpApi.GetTokenAsync(role);
             await GenerateTestInterfaces(interFacePrefixName);
             var interfaceResultByName = await GetInterfacesByName(interFacePrefixName);
@@ -82,39 +79,52 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             foreach (var item in interfaceResultByName.Result)
             {
                 var orgFromItem = item.OrganizationId;
-                var interFaceId = item.Id;
+                var key = item.Id;
 
-                var url = TestEnvironment.CreateUrl($"odata/Organizations({orgFromItem})/ItInterfaces({interFaceId})");
+                var url = TestEnvironment.CreateUrl($"odata/Organizations({orgFromItem})/ItInterfaces({key})");
 
                 //Act
                 using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
                 {
-                    var response = httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                    var response = httpResponse.ReadResponseBodyAs<ItInterface>();
                     //Assert
                     Assert.NotNull(interfaceResultByName);
-                    Assert.Equal(interFaceId, response.Result.Id);
+                    Assert.Equal(key, response.Result.Id);
                 }
             }
         }
-        // Return wrong number of interfaces.....
-        private async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
+
+        private string CreateInterFacePrefixName()
+        {
+            return $"{nameof(ItSystemInterfacesTest)}-{A<Guid>():N}";
+        }
+
+        private static async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var arrangeUrl = TestEnvironment.CreateUrl($"/odata/ItInterfaces?$filter=contains(Name,'{name}')");
             using (var httpResponse = await HttpApi.GetWithTokenAsync(arrangeUrl, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItInterface>();
+                var response = httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
                 return response;
             }
         }
 
-        private async Task GenerateTestInterfaces(string name)
+        private async Task<ItInterfaceDTO[]> GenerateTestInterfaces(string name)
         {
-            await InterfaceHelper.CreateInterfaces(
-                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local),
-                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public),
-                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Local),
-                InterfaceHelper.CreateInterfaceDTO(name + "-" + A<Guid>(), A<Guid>().ToString(), TestEnvironment.DefaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Public));
+            _defaultUserId = TestEnvironment.DefaultUserId;
+            var itInterfaceDto1 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), _defaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterfaceDto2 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), _defaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var itInterfaceDto3 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), _defaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Local);
+            var itInterfaceDto4 = InterfaceHelper.CreateInterfaceDto($"{name}-{A<Guid>():N}", A<Guid>().ToString(), _defaultUserId, TestEnvironment.SecondOrganizationId, AccessModifier.Public);
+            await InterfaceHelper.CreateInterfaces(itInterfaceDto1, itInterfaceDto2, itInterfaceDto3, itInterfaceDto4);
+            return new[]
+            {
+                itInterfaceDto1,
+                itInterfaceDto2,
+                itInterfaceDto3,
+                itInterfaceDto4
+            };
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -13,26 +9,31 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class InterfaceHelper
     {
-        public static ItInterfaceDTO CreateInterfaceDTO(string name, string ItInterfaceId, int? userID, int orgId, AccessModifier access)
+        public static ItInterfaceDTO CreateInterfaceDto(
+            string name,
+            string interfaceId,
+            int? userId,
+            int orgId,
+            AccessModifier access)
         {
             return new ItInterfaceDTO
             {
-                ItInterfaceId = ItInterfaceId,
+                ItInterfaceId = interfaceId,
                 Name = name,
                 OrganizationId = orgId,
-                BelongsToId = userID,
+                BelongsToId = userId,
                 AccessModifier = access
             };
         }
-        public static async Task CreateInterface(ItInterfaceDTO iDto)
+        public static async Task CreateInterface(ItInterfaceDTO input)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/itinterface");
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, iDto))
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, input))
             {
-                Assert.Equal(HttpStatusCode.Created,createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAs<ItInterfaceDTO>();
+                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+                await createdResponse.ReadResponseBodyAs<ItInterfaceDTO>();
             }
         }
 
