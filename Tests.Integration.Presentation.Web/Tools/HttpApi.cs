@@ -136,17 +136,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostAsync(url, loginDto))
             {
-                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>().ConfigureAwait(false);
-
-                Assert.Equal(loginDto.Email, tokenResponse.Email);
-                Assert.True(tokenResponse.LoginSuccessful);
-                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
-                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
-
-                return tokenResponse;
+                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
         }
 
@@ -154,18 +146,24 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
 
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostAsync(url, loginDto))
             {
-                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>().ConfigureAwait(false);
-
-                Assert.Equal(loginDto.Email, tokenResponse.Email);
-                Assert.True(tokenResponse.LoginSuccessful);
-                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
-                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
-
-                return tokenResponse;
+                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
+        }
+
+        private static async Task<GetTokenResponseDTO> GetTokenResponseDtoAsync(LoginDTO loginDto, HttpResponseMessage httpResponseMessage)
+        {
+            Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>()
+                .ConfigureAwait(false);
+
+            Assert.Equal(loginDto.Email, tokenResponse.Email);
+            Assert.True(tokenResponse.LoginSuccessful);
+            Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+            Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
+
+            return tokenResponse;
         }
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
