@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -43,6 +48,34 @@ namespace Tests.Integration.Presentation.Web.Security
             using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))
             {
                 Assert.Equal(httpCode, httpResponse.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData("odata/itsystems", typeof(Core.DomainModel.ItSystem.ItSystem))]
+        [InlineData("api/itsystem", typeof(Core.DomainModel.ItSystem.ItSystem))]
+        [InlineData("odata/itinterfaces", typeof(ItInterface))]
+        [InlineData("api/itinterface", typeof(ItInterface))]
+        [InlineData("odata/reports", typeof(Report))]
+        [InlineData("api/report", typeof(Report))]
+        [InlineData("odata/itsystemusages", typeof(ItSystemUsage))]
+        [InlineData("api/itsystemusage", typeof(ItSystemUsage))]
+        [InlineData("odata/itcontracts", typeof(ItContract))]
+        [InlineData("api/itcontract", typeof(ItContract))]
+        [InlineData("odata/itprojects", typeof(ItProject))]
+        [InlineData("api/itproject", typeof(ItProject))]
+        public async Task Api_Is_Read_Only(string path, Type inputType)
+        {
+            //Arrange
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), Activator.CreateInstance(inputType), globalAdminToken.Token))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
+                var message = await httpResponse.Content.ReadAsStringAsync();
+                Assert.Equal("Det er ikke tilladt at skrive data via APIet", message);
             }
         }
 

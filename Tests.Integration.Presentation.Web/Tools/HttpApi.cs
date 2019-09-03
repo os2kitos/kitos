@@ -33,6 +33,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
+        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string token)
+        {
+            var requestMessage = CreatePostMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+
         public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)

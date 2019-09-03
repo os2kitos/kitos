@@ -23,7 +23,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                 logger.Warning("User with id: {userID} attempted to mutate resource: {url} by method {method}",
                     authenticationContext.UserId, context.Request.Uri.ToString(), context.Request.Method);
                 context.Response.StatusCode = 403;
-                context.Response.Write("Det er ikke tilladt at ændre data via APIet");
+                context.Response.Write("Det er ikke tilladt at skrive data via APIet");
             }
             else
             {
