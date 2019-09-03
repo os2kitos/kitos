@@ -110,7 +110,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-
         public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -190,7 +189,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role, int organizationId = 1)
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -209,7 +208,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var roleDto = new OrgRightDTO
             {
                 UserId = userId,
-                Role = role
+                Role = role.ToString("G")
             };
 
             using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto))
@@ -238,6 +237,5 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return response;
         }
-
     }
 }
