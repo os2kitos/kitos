@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    public class ItSystemInterfacesTest : WithAutoFixture
+    public class ItIterfacesTest : WithAutoFixture
     {
         private int _defaultUserId;
 
@@ -96,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private string CreateInterFacePrefixName()
         {
-            return $"{nameof(ItSystemInterfacesTest)}-{A<Guid>():N}";
+            return $"{nameof(ItIterfacesTest)}-{A<Guid>():N}";
         }
 
         private static async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)

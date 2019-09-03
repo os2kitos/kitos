@@ -89,7 +89,7 @@
   <ItemGroup>
     <Compile Include="ItSystem\ItSystemCatalogTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
-    <Compile Include="ItSystem\ItSystemInterfacesTest.cs" />
+    <Compile Include="ItSystem\ItIterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
