@@ -25,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 AccessModifier = access
             };
         }
-        public static async Task CreateInterface(ItInterfaceDTO input)
+        public static async Task<ItInterfaceDTO> CreateInterface(ItInterfaceDTO input)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/itinterface");
@@ -33,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, input))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                await createdResponse.ReadResponseBodyAsAsync<ItInterfaceDTO>();
+                return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
             }
         }
 

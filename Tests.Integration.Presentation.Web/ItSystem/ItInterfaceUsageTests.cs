@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
@@ -12,19 +14,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.User)]
         public async Task Api_User_Can_Get_It_Interface_Usage(OrganizationRole role)
         {
             //Arrange
+            var dto = InterfaceHelper.CreateInterfaceDto(A<Guid>().ToString("N"), A<Guid>().ToString("N"), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+
+            var createdInterface = await InterfaceHelper.CreateInterface(dto);
             await InterfaceHelper.CreateItInterfaceUsageAsync(
+                TestEnvironment.DefaultItSystemUsageId,
+                createdInterface.Id,
                 TestEnvironment.DefaultItSystemId,
-                TestEnvironment.DefaultItInterfaceId,
-                TestEnvironment.DefaultItSystemId,
-                TestEnvironment.DefaultOrganizationId,
+                dto.OrganizationId,
                 TestEnvironment.DefaultContractId);
 
             var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?usageId={TestEnvironment.DefaultItSystemId}&sysId={TestEnvironment.DefaultItSystemId}&interfaceId={TestEnvironment.DefaultItInterfaceId}");
+            var url = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?usageId={TestEnvironment.DefaultItSystemUsageId}&sysId={TestEnvironment.DefaultItSystemId}&interfaceId={createdInterface.Id}");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
@@ -32,9 +36,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.Equal(TestEnvironment.DefaultItSystemId, response.ItSystemUsageId);
+                Assert.Equal(TestEnvironment.DefaultItSystemUsageId, response.ItSystemUsageId);
                 Assert.Equal(TestEnvironment.DefaultItSystemId, response.ItSystemId);
-                Assert.Equal(TestEnvironment.DefaultItInterfaceId, response.ItInterfaceId);
+                Assert.Equal(createdInterface.Id, response.ItInterfaceId);
                 Assert.Equal(TestEnvironment.DefaultContractId, response.ItContractId);
             }
         }
