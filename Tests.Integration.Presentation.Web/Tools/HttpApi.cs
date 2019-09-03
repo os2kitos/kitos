@@ -93,17 +93,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return requestMessage;
         }
 
-        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string tokenvalue)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"),
-            };
-            requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
-
-            return StatelessHttpClient.SendAsync(requestMessage);
-        }
-
         public static Task<HttpResponseMessage> GetAsync(Uri url)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);

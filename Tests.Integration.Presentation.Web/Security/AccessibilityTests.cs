@@ -56,10 +56,10 @@ namespace Tests.Integration.Presentation.Web.Security
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.User);
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))
+            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/Reference"), cookie, payload))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
@@ -80,7 +80,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
             };
-            
+
             //Act
             await DisableApiAccessForUserAsync(userDto, createdUserId);
 
@@ -103,6 +103,6 @@ namespace Tests.Integration.Presentation.Web.Security
             userDto.HasApiAccess = false;
             await HttpApi.PatchOdataUserAsync(userDto, id);
         }
-    
+
     }
 }

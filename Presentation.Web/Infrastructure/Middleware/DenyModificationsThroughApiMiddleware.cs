@@ -1,0 +1,48 @@
+﻿using System.Threading.Tasks;
+using Core.ApplicationServices.Authentication;
+using Microsoft.Owin;
+using Ninject;
+using Presentation.Web.Infrastructure.Model.Authentication;
+using Serilog;
+
+namespace Presentation.Web.Infrastructure.Middleware
+{
+    public class DenyModificationsThroughApiMiddleware : OwinMiddleware
+    {
+        public DenyModificationsThroughApiMiddleware(OwinMiddleware next) : base(next)
+        {
+        }
+
+        public override async Task Invoke(IOwinContext context)
+        {
+            var kernel = context.GetNinjectKernel();
+            var logger = kernel.Get<ILogger>();
+            var authenticationContext = kernel.Get<IAuthenticationContext>();
+            if (authenticationContext.Method == AuthenticationMethod.KitosToken && IsMutationAttempt(context))
+            {
+                logger.Warning("User with id: {userID} attempted to mutate resource: {url} by method {method}",
+                    authenticationContext.UserId, context.Request.Uri.ToString(), context.Request.Method);
+                context.Response.StatusCode = 403;
+                context.Response.Write("Det er ikke tilladt at ændre data via APIet");
+            }
+            else
+            {
+                await Next.Invoke(context);
+            }
+        }
+
+        private static bool IsMutationAttempt(IOwinContext context)
+        {
+            switch (context.Request.Method.ToLowerInvariant())
+            {
+                case "post":
+                case "put":
+                case "patch":
+                case "delete":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+}

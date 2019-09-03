@@ -2,7 +2,6 @@
 using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware

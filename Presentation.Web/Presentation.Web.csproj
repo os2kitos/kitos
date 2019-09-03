@@ -492,6 +492,7 @@
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\InternalApiAttributeFilter.cs" />
     <Compile Include="Infrastructure\Factories\Authentication\OwinAuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyModificationsThroughApiMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
