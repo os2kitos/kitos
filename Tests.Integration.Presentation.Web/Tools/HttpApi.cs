@@ -33,6 +33,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
+        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string token)
+        {
+            var requestMessage = CreatePostMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+
         public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
@@ -91,17 +98,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
             };
             return requestMessage;
-        }
-
-        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string tokenvalue)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"),
-            };
-            requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
-
-            return StatelessHttpClient.SendAsync(requestMessage);
         }
 
         public static Task<HttpResponseMessage> GetAsync(Uri url)
