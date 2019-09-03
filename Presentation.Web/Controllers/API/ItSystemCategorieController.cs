@@ -1,8 +1,8 @@
-﻿using Core.DomainModel.ItSystem;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API

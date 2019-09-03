@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Infrastructure.Model.Authentication
+﻿namespace Core.ApplicationServices.Authentication
 {
     public class AuthenticationContext : IAuthenticationContext
     {

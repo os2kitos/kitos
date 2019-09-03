@@ -6,9 +6,9 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Queries;
 using Ninject.Infrastructure.Language;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.OData

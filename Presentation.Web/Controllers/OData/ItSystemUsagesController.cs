@@ -11,9 +11,9 @@ using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 

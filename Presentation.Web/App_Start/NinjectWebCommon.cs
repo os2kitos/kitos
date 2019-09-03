@@ -2,6 +2,8 @@ using System;
 using System.Web;
 using System.Web.Security;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authentication;
+using Core.ApplicationServices.Authorization;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
@@ -13,9 +15,9 @@ using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
+using Infrastructure.Services.Cryptography;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Authorization;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
@@ -122,7 +124,7 @@ namespace Presentation.Web
 
         private static void RegisterAuthenticationContext(IKernel kernel)
         {
-            kernel.Bind<IAuthenticationContextFactory>().To<AuthenticationContextFactory>().InRequestScope();
+            kernel.Bind<IAuthenticationContextFactory>().To<OwinAuthenticationContextFactory>().InRequestScope();
             kernel.Bind<IAuthenticationContext>().ToMethod(ctx => ctx.Kernel.Get<IAuthenticationContextFactory>().Create())
                 .InRequestScope();
         }
