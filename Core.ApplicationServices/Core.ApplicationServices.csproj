@@ -97,6 +97,8 @@
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
+    <Compile Include="ItSystemUsageMigration\IItSystemUsageMigrationService.cs" />
+    <Compile Include="ItSystemUsageMigration\ItSystemUsageMigrationService.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
     <Compile Include="IAuthenticationService.cs" />

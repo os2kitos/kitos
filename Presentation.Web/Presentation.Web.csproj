@@ -519,6 +519,7 @@
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SSOConfigDTO.cs" />

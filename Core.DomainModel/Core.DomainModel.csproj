@@ -202,6 +202,7 @@
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
+    <Compile Include="Return.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />
