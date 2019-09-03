@@ -711,14 +711,19 @@
             return regexp.test(Url.toLowerCase());
         };
 
+
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
             //Filter by usageId
+
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
             this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
             //Open modal
             this.modal.center().open();
+        }
+        public migrateItSystem(name : string) {
+            console.log(name + " is selected");
         }
 
         // usagedetails grid
@@ -739,12 +744,17 @@
             autoBind: false,
             columns: [
                 {
-                    field: "Organization.Name",
-                    title: "Organisation"
+                    field: "Organization.Name", title: "Organisation",
+                    template: dataItem => {
+                        var orgName = dataItem.Organization.Name;
+
+                        return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`
+                    },
                 }
             ],
             dataBound: this.detailsBound
         };
+
 
         private exportFlag = false;
         private exportToExcel = (e) => {
@@ -887,6 +897,8 @@
 
                 dataSource.filter(newFilter);
             }
+
+
 
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
