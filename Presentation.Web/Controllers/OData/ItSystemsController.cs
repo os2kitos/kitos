@@ -7,9 +7,9 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using Core.DomainModel;
 using Core.DomainServices;
+using Infrastructure.Services.Cryptography;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Infrastructure;
 using Xunit;

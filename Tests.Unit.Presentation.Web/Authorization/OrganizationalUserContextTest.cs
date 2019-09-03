@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -10,7 +11,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Moq;
 using Presentation.Web.Infrastructure.Authorization;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

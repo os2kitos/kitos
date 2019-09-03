@@ -6,13 +6,13 @@ using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.API

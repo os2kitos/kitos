@@ -47,7 +47,6 @@
     <Compile Include="Authorization\CrossOrganizationReadAccess.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
-    <Compile Include="ICryptoService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IItProjectService.cs" />
     <Compile Include="IItSystemService.cs" />
