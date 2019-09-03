@@ -38,21 +38,5 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(TestEnvironment.DefaultContractId, response.ItContractId);
             }
         }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        public async Task Api_User_Can_Get_It_Interface_Usages(OrganizationRole role)
-        {
-            //Arrange
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?usageId={TestEnvironment.DefaultItSystemId}");
-
-            //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-            }
-        }
     }
 }
