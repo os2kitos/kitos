@@ -41,17 +41,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.User)]
         public async Task Api_User_Can_Get_It_Interface_Usages(OrganizationRole role)
         {
             //Arrange
-            await InterfaceHelper.CreateItInterfaceUsageAsync(
-                TestEnvironment.DefaultItSystemId,
-                TestEnvironment.DefaultItInterfaceId,
-                TestEnvironment.DefaultItSystemId,
-                TestEnvironment.DefaultOrganizationId,
-                TestEnvironment.DefaultContractId);
-
             var token = await HttpApi.GetTokenAsync(role);
             var url = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?usageId={TestEnvironment.DefaultItSystemId}");
 
