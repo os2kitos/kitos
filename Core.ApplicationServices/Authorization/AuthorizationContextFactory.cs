@@ -1,6 +1,6 @@
-﻿using Presentation.Web.Infrastructure.Model.Authentication;
+﻿using Core.ApplicationServices.Authentication;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public class AuthorizationContextFactory : IAuthorizationContextFactory
     {

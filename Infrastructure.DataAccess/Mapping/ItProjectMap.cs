@@ -76,6 +76,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptional(e => e.AssociatedItProject)
                 .HasForeignKey(e => e.AssociatedItProjectId)
                 .WillCascadeOnDelete(true);
+
+            TypeMapping.AddIndexOnAccessModifier<ItProjectMap, ItProject>(this);
         }
     }
 }

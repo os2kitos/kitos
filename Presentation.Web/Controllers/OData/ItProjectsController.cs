@@ -10,6 +10,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -53,12 +54,12 @@ namespace Presentation.Web.Controllers.OData
                     return Forbidden();
                 }
 
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key);
+                var result = Repository.AsQueryable().ByOrganizationId(key);
                 return Ok(result);
             }
             else
             {
-                var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
+                var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
                 return Ok(result);
             }
         }

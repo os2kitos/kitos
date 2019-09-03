@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
 using Presentation.Web.Infrastructure.Model.Authentication;

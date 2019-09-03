@@ -1,7 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public interface IOrganizationalUserContext
     {
@@ -11,7 +11,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
         bool HasRole(OrganizationRole role);
         bool HasModuleLevelAccessTo(IEntity entity);
         bool IsActiveInOrganization(int organizationId);
-        bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg);
+        bool IsActiveInSameOrganizationAs(IEntity entity);
         bool HasAssignedWriteAccess(IEntity entity);
         bool HasOwnership(IEntity entity);
         bool CanChangeVisibilityOf(IEntity entity);

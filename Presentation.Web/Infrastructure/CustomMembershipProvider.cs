@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Web.Security;
 using Core.DomainModel;
 using Core.DomainServices;
+using Infrastructure.Services.Cryptography;
 using Ninject;
 using Ninject.Extensions.Logging;
 

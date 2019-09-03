@@ -1,6 +1,7 @@
-﻿using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
+using Core.DomainServices.Authorization;
 using Moq;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -19,10 +20,19 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Fact]
-        public void ApplyBaseQueryPostProcessing_Returns_True()
+        public void GetCrossOrganizationReadAccess_Returns_Result_From_Context()
         {
-            Assert.True(_sut.ApplyBaseQueryPostProcessing);
+            //Arrange
+            var expectedResult = A<CrossOrganizationReadAccess>();
+            _authContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(expectedResult);
+
+            //Act
+            var result = _sut.GetCrossOrganizationReadAccess();
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
+
 
         [Theory]
         [InlineData(true)]
