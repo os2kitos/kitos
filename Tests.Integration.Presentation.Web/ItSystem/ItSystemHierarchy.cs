@@ -23,10 +23,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<IEnumerable<ItSystemDTO>>();
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponse<IEnumerable<ItSystemDTO>>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotEmpty(response.Result);
+                Assert.NotEmpty(response);
             }
         }
 
@@ -40,11 +40,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<IEnumerable<ItSystemDTO>>();
                 //Assert
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponse<IEnumerable<ItSystemDTO>>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotEmpty(response.Result);
-                Assert.Equal(TestEnvironment.DefaultItSystemId, response.Result.Where(x => x.Id == TestEnvironment.SecondItSystemId).First().ParentId);
+                Assert.NotEmpty(response);
+                Assert.Equal(TestEnvironment.DefaultItSystemId, response.First(x => x.Id == TestEnvironment.SecondItSystemId).ParentId);
             }
         }
     }

@@ -27,11 +27,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
-                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
-
                 //Assert
-                Assert.NotNull(response.Result);
+                var response = await httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
+                Assert.NotNull(response);
+                var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
                 Assert.Equal(interfacesCreated.Length, filteredResult.Count);
                 Assert.True(interfacesCreated.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
             }
@@ -54,12 +53,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
-                var filteredResult = response.Result.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
-
                 //Assert
-                Assert.NotNull(response.Result);
-
+                var response = await httpResponse.ReadOdataListResponseBodyAs<ItInterface>();
+                Assert.NotNull(response);
+                var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
                 Assert.Equal(expectedResults.Count, filteredResult.Count);
                 Assert.True(expectedResults.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
             }
@@ -85,10 +82,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Act
                 using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
                 {
-                    var response = httpResponse.ReadResponseBodyAs<ItInterface>();
                     //Assert
+                    var response = await httpResponse.ReadResponseBodyAs<ItInterface>();
                     Assert.NotNull(interfaceResultByName);
-                    Assert.Equal(key, response.Result.Id);
+                    Assert.Equal(key, response.Id);
                 }
             }
         }

@@ -22,10 +22,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotEmpty(response.Result);
+                Assert.NotEmpty(response);
             }
         }
 
@@ -40,10 +40,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotEmpty(response.Result);
+                Assert.NotEmpty(response);
             }
         }
 
@@ -56,12 +56,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystemUsages"), token.Token))
             {
-                var response = httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId));
-                Assert.True(response.Result.Exists(x => x.OrganizationId == TestEnvironment.SecondOrganizationId));
-                Assert.NotEmpty(response.Result);
+                Assert.True(response.Exists(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId));
+                Assert.True(response.Exists(x => x.OrganizationId == TestEnvironment.SecondOrganizationId));
             }
         }
 
@@ -78,10 +77,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadResponseBodyAs<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.True(response.Result.OrganizationId == TestEnvironment.DefaultOrganizationId);
+                Assert.True(response.OrganizationId == TestEnvironment.DefaultOrganizationId);
             }
         }
     }

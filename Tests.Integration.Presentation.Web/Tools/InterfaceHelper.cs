@@ -44,5 +44,26 @@ namespace Tests.Integration.Presentation.Web.Tools
                 await CreateInterface(dto);
             }
         }
+
+        public static async Task CreateItInterfaceUsageAsync(int itSystemUsageId, int interfaceId, int itSystemId, int organizationId, int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?usageId={itSystemUsageId}&interfaceId={interfaceId}&sysId={itSystemId}&organizationId={organizationId}");
+            var body = new
+            {
+                itContractId = contractId
+            };
+
+            using (var createdResponse = await HttpApi.PatchWithCookieAsync(url, cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.OK, createdResponse.StatusCode);
+                var response = await createdResponse.ReadResponseBodyAsKitosApiResponse<ItInterfaceUsageDTO>();
+
+                Assert.Equal(itSystemUsageId, response.ItSystemUsageId);
+                Assert.Equal(interfaceId, response.ItInterfaceId);
+                Assert.Equal(itSystemId, response.ItSystemId);
+            }
+        }
     }
 }

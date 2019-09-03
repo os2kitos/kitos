@@ -12,8 +12,13 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> ApiUsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
         private static readonly string DefaultUserPassword;
+        public const int DefaultItSystemId = 1;
+        public const int SecondItSystemId = 2;
         public const int DefaultOrganizationId = 1;
         public const int SecondOrganizationId = 2;
+        public const int DefaultContractId = 1;
+        public const int DefaultItInterfaceId = 1;
+        public const int DefaultUserId = 1;
 
         static TestEnvironment()
         {
@@ -176,13 +181,5 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             return DefaultUserPassword;
         }
-        
-        public static int DefaultItSystemId => 1;
-		public static int SecondItSystemId => 2;
-        public static int DefaultOrganizationId => 1;
-        public static int SecondOrganizationId => 2;
-        public static int DefaultContractId => 1;
-        public static int DefaultItInterfaceId => 1;       
-        public static int DefaultUserId => 1;
     }
 }
