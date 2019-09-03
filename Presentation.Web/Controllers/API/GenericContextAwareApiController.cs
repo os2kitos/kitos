@@ -1,6 +1,6 @@
-﻿using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {

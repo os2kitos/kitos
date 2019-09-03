@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API

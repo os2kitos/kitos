@@ -4,13 +4,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
-using Presentation.Web.Infrastructure.Authorization.Context;
 
 namespace Presentation.Web.Controllers.API
 {

@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using Core.DomainServices;
 
-namespace Core.ApplicationServices
+namespace Infrastructure.Services.Cryptography
 {
     public class CryptoService : ICryptoService
     {

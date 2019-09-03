@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainServices
+namespace Infrastructure.Services.Cryptography
 {
     public interface ICryptoService : IDisposable
     {
