@@ -27,5 +27,19 @@ namespace Core.DomainServices.Extensions
         {
             return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result); ;
         }
+
+        public static IQueryable<T> ExceptByInUsage<T>(this IQueryable<T> result, int organizationId) where T :
+            class,
+            IHasUsages
+        {
+            return new QueryByNotInUsageOfOrganizationId<T>(organizationId).Apply(result);
+        }
+
+        public static IQueryable<T> ByPartOfName<T>(this IQueryable<T> result, string nameContent) where T :
+            class,
+            IHasName
+        {
+            return new QueryByPartOfName<T>(nameContent).Apply(result);
+        }
     }
 }

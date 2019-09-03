@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.ItSystemUsageMigration
 {
@@ -20,19 +21,22 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             _itSystemRepository = itSystemRepository;
         }
 
-        public Return<IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string q, int limit)
+        public Return<IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int limit)
         {
-            if (!_authorizationContext.AllowReadsWithinOrganization(organizationId))
-            {
-                return new Return<IEnumerable<ItSystem>>
-                {
-                    StatusCode = HttpStatusCode.Forbidden
-                };
-            }
-            var itSystems = _itSystemRepository.Get(s =>
-                    s.Name.Contains(q) &&
-                    s.OrganizationId.Equals(organizationId) &&
-                    (s.Usages.Count == 0 || s.Usages.Count(x => x.OrganizationId == organizationId) == 0)
+
+            var itSystems = _itSystemRepository
+                .AsQueryable()
+                .ByPublicAccessOrOrganizationId(organizationId)
+                .ExceptByInUsage(organizationId)
+                .ByPartOfName(nameContent)
+                .OrderBy(x => x.Name)
+                .Take(limit);
+
+
+            _itSystemRepository.Get(s =>
+                s.Name.Contains(nameContent) &&
+                s.OrganizationId.Equals(organizationId) &&
+                (s.Usages.Count == 0 || s.Usages.Count(x => x.OrganizationId == organizationId) == 0)
             );
 
             return new Return<IEnumerable<ItSystem>>

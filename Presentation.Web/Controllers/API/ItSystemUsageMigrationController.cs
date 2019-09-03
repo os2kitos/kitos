@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
 using Core.DomainModel.ItSystem;
@@ -14,39 +13,46 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    //[RoutePrefix("api/v1/ItSystemUsageMigration")]
     public class ItSystemUsageMigrationController : BaseApiController
     {
         private IItSystemUsageMigrationService _itSystemUsageMigrationService;
 
-        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext) : base(authContext)
+        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext) 
+            : base(authContext)
         {
             _itSystemUsageMigrationService = itSystemUsageMigrationService;
         }
 
         [HttpGet]
-        //[Route("api/ItSystemUsageMigration/")]
+        //[Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        public HttpResponseMessage GetMigrationConflicts(int fromSystemId, int toSystemId)
+        public HttpResponseMessage GetMigrationConflicts([FromUri]int usageId, [FromUri]int toSystemId)
         {
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         [HttpPost]
-        //[Route("api/ItSystemUsageMigration/")]
+        //[Route("/{usageId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        public HttpResponseMessage ExecuteMigration(ItSystemUsageMigrationDTO toExecute)
+        public HttpResponseMessage ExecuteMigration(int usageId, [FromUri]int toSystemId)
         {
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         [HttpGet]
-        //[Route("api/ItSystemUsageMigration/UnusedItSystems/")]
+        //[Route("UnusedItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystem>))]
-        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(int organizationId, string q, int limit)
+        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization([FromUri]int organizationId, [FromUri]string nameContent, [FromUri]int limit)
         {
             try
             {
-                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, q, limit);
+                if (!AllowOrganizationReadAccess(organizationId))
+                {
+                    return Forbidden();
+                }
+
+                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, limit);
                 return CreateResponse(result.StatusCode, MapList<ItSystem, ItSystemDTO>(result.ReturnValue));
             }
             catch (Exception e)
