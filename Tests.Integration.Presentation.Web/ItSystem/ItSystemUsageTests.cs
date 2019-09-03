@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotEmpty(response);
@@ -40,7 +40,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotEmpty(response);
@@ -56,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystemUsages"), token.Token))
             {
-                var response = await httpResponse.ReadOdataListResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.True(response.Exists(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId));
@@ -77,7 +77,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = await httpResponse.ReadResponseBodyAs<ItSystemUsage>();
+                var response = await httpResponse.ReadResponseBodyAsAsync<ItSystemUsage>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.True(response.OrganizationId == TestEnvironment.DefaultOrganizationId);

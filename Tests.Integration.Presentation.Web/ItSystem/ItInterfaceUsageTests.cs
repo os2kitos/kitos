@@ -29,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponse<ItInterfaceUsageDTO>();
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.Equal(TestEnvironment.DefaultItSystemId, response.ItSystemUsageId);

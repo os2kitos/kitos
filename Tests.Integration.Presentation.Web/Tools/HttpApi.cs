@@ -110,13 +110,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-        public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
+        public static async Task<T> ReadResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<T>(responseAsJson);
         }
 
-        public static async Task<List<T>> ReadOdataListResponseBodyAs<T>(this HttpResponseMessage response)
+        public static async Task<List<T>> ReadOdataListResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var spec = new { value = new List<T>() };
@@ -124,9 +124,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return result.value;
         }
 
-        public static async Task<T> ReadResponseBodyAsKitosApiResponse<T>(this HttpResponseMessage response)
+        public static async Task<T> ReadResponseBodyAsKitosApiResponseAsync<T>(this HttpResponseMessage response)
         {
-            var apiReturnFormat = await response.ReadResponseBodyAs<ApiReturnDTO<T>>().ConfigureAwait(false);
+            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>().ConfigureAwait(false);
             return apiReturnFormat.Response;
         }
 
@@ -139,7 +139,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
             {
                 Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
+                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>().ConfigureAwait(false);
 
                 Assert.Equal(loginDto.Email, tokenResponse.Email);
                 Assert.True(tokenResponse.LoginSuccessful);
@@ -157,7 +157,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
             {
                 Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
+                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>().ConfigureAwait(false);
 
                 Assert.Equal(loginDto.Email, tokenResponse.Email);
                 Assert.True(tokenResponse.LoginSuccessful);
@@ -199,7 +199,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var createdResponse = await PostWithCookieAsync(TestEnvironment.CreateUrl("odata/Users/Users.Create"), cookie, createUserDto))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAs<UserDTO>();
+                var response = await createdResponse.ReadResponseBodyAsAsync<UserDTO>();
                 userId = response.Id;
 
                 Assert.Equal(userDto.Email, response.Email);

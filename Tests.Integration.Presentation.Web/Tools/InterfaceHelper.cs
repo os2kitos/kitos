@@ -33,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, input))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                await createdResponse.ReadResponseBodyAs<ItInterfaceDTO>();
+                await createdResponse.ReadResponseBodyAsAsync<ItInterfaceDTO>();
             }
         }
 
@@ -58,7 +58,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var createdResponse = await HttpApi.PatchWithCookieAsync(url, cookie, body))
             {
                 Assert.Equal(HttpStatusCode.OK, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAsKitosApiResponse<ItInterfaceUsageDTO>();
+                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
 
                 Assert.Equal(itSystemUsageId, response.ItSystemUsageId);
                 Assert.Equal(interfaceId, response.ItInterfaceId);

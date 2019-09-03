@@ -23,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = await httpResponse.ReadResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
+                var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotNull(response.Name);
@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems"), token.Token))
             {
-                var response = await httpResponse.ReadOdataListResponseBodyAs<Core.DomainModel.ItSystem.ItSystem>();
+                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.NotNull(response.First().Name);
@@ -62,7 +62,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem?getEntitiesAccessRights=true"), cookie))
             {
                 //Assert
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponse<EntitiesAccessRightsDTO>();
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntitiesAccessRightsDTO>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.Equal(canView, response.CanView);
                 Assert.Equal(canCreate, response.CanCreate);
@@ -82,7 +82,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id={TestEnvironment.DefaultItSystemId}&getEntityAccessRights=true"), cookie))
             {
                 //Assert
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponse<EntityAccessRightsDTO>();
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntityAccessRightsDTO>();
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 Assert.Equal(canView, response.CanView);
                 Assert.Equal(canEdit, response.CanEdit);
