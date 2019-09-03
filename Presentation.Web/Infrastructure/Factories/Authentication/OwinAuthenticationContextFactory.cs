@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Security.Principal;
+using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
 using Microsoft.Owin;
@@ -9,13 +10,13 @@ using Serilog;
 
 namespace Presentation.Web.Infrastructure.Factories.Authentication
 {
-    public class AuthenticationContextFactory : IAuthenticationContextFactory
+    public class OwinAuthenticationContextFactory : IAuthenticationContextFactory
     {
         private readonly ILogger _logger;
         private readonly IOwinContext _owinContext;
         private readonly IUserRepository _userRepository;
 
-        public AuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
+        public OwinAuthenticationContextFactory(ILogger logger, IOwinContext owinContext, IUserRepository userRepository)
         {
             _logger = logger;
             _owinContext = owinContext;
@@ -66,10 +67,8 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
             {
                 case "JWT":
                     return AuthenticationMethod.KitosToken;
-                    break;
                 case "Forms":
                     return AuthenticationMethod.Forms;
-                    break;
                 default:
                     _logger.Error("Unknown authentication method {authenticationMethod}", authenticationMethod);
                     return AuthenticationMethod.Anonymous;

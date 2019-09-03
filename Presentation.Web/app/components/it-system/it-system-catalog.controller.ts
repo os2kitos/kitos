@@ -6,7 +6,10 @@
         mainGridOptions: kendo.ui.GridOptions;
         usageGrid: kendo.ui.Grid;
         usageDetailsGrid: kendo.ui.GridOptions;
+        usageGridMigration: kendo.ui.Grid;
+        usageDetailsGridMigration: kendo.ui.GridOptions;
         modal: kendo.ui.Window;
+        modalMigration: kendo.ui.Window;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -24,7 +27,9 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
+        public usageGridMigration: kendo.ui.Grid;
         public modal: kendo.ui.Window;
+        public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
 
         public static $inject: Array<string> = [
@@ -715,7 +720,6 @@
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
             //Filter by usageId
-
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
             this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
@@ -724,6 +728,10 @@
         }
         public migrateItSystem(name : string) {
             console.log(name + " is selected");
+            //Set modal title
+            this.modalMigration.setOptions({ title: `Ledig systemer` });
+            //Open modal
+            this.modalMigration.center().open();
         }
 
         // usagedetails grid
@@ -747,14 +755,44 @@
                     field: "Organization.Name", title: "Organisation",
                     template: dataItem => {
                         var orgName = dataItem.Organization.Name;
-
-                        return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`
+                        //TODO CHANGE TO NEW ACCESS RIGHTS ( JMO )
+                        if (this.canCreate) {
+                            return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                        } else {
+                            return dataItem.Organization.Name; 
+                        }
                     },
                 }
             ],
             dataBound: this.detailsBound
         };
 
+        public usageDetailsGridMigration: kendo.ui.GridOptions = {
+            dataSource: {
+                type: "odata-v4",
+                transport:
+                {
+                    read: {
+                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        dataType: "json"
+                    }
+                },
+                serverPaging: true,
+                serverSorting: true,
+                serverFiltering: true
+            },
+            autoBind: false,
+            columns: [
+                {
+                    field: "Organization.Name", title: "Organisation",
+                    template: dataItem => {
+                        var orgName = dataItem.Organization.Name;
+                        return dataItem.Organization.Name;
+                    },
+                }
+            ],
+            dataBound: this.detailsBound
+        };
 
         private exportFlag = false;
         private exportToExcel = (e) => {

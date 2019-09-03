@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Core.ApplicationServices;
 using Core.DomainServices;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public class UserContextFactory : IUserContextFactory
     {

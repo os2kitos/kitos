@@ -10,6 +10,7 @@ using System.Text;
 using System.Web.Http;
 using Castle.Core.Internal;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -17,7 +18,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 

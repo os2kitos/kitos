@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
+using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
 using Microsoft.Owin;
@@ -13,12 +14,12 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Context
 {
-    public class AuthenticationContextFactoryTest : WithAutoFixture
+    public class OwinAuthenticationContextFactoryTest : WithAutoFixture
     {
         private readonly int _validUserId;
         private const string TokenAuth = "JWT";
 
-        public AuthenticationContextFactoryTest()
+        public OwinAuthenticationContextFactoryTest()
         {
             _validUserId = A<int>();
         }
@@ -27,7 +28,7 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Unauthenticated_User_Should_Return_AuthenticationContext_With_Anonymous_AuthenticationMethod()
         {
             //Arrange
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -45,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Context
             //Arrange
             var owinContext = MakeMockContext(authType: authType, defaultOrg: defaultOrg?.ToString() ?? A<string>(), userId: _validUserId.ToString(), isAuthenticated: "true");
             var userRepository = MakeMockUserRepository(false, _validUserId, defaultOrg);
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -62,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Context
             //Arrange
             var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "invalid", userId: _validUserId.ToString(), isAuthenticated: "true");
             var userRepository = MakeMockUserRepository(false, _validUserId);
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -78,7 +79,7 @@ namespace Tests.Unit.Presentation.Web.Context
             //Arrange
             var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: "invalid", isAuthenticated: "true");
             var userRepository = MakeMockUserRepository(false, _validUserId);
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -95,7 +96,7 @@ namespace Tests.Unit.Presentation.Web.Context
             //Arrange
             var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: _validUserId.ToString(), isAuthenticated: "true");
             var userRepository = MakeMockUserRepository(apiAccess, _validUserId);
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -109,7 +110,7 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Unauthenticated_User_Can_Not_Have_Api_Access()
         {
             //Arrange
-            var authenticationContextFactory = new AuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
 
             //Act
             var authContext = authenticationContextFactory.Create();

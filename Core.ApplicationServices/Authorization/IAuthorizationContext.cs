@@ -1,7 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainServices.Authorization;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public interface IAuthorizationContext
     {
