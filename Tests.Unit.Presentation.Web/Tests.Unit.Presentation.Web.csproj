@@ -196,7 +196,7 @@
     <Compile Include="Authorization\LegacyAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
-    <Compile Include="Context\AuthenticationContextFactoryTest.cs" />
+    <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="DomainServices\QueryAllByRestrictionCapabilitiesTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
@@ -229,6 +229,10 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
     <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
       <Project>{e75385a3-ea7c-4dff-b989-bee64bc506ed}</Project>

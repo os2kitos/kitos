@@ -81,12 +81,24 @@
   <ItemGroup>
     <Compile Include="AdviceService.cs" />
     <Compile Include="ApplicationServiceModule.cs" />
+    <Compile Include="Authentication\AuthenticationContext.cs" />
+    <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\IAuthenticationContext.cs" />
+    <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Authorization\AuthorizationContextFactory.cs" />
+    <Compile Include="Authorization\IAuthorizationContext.cs" />
+    <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
+    <Compile Include="Authorization\IOrganizationalUserContext.cs" />
+    <Compile Include="Authorization\IUserContextFactory.cs" />
+    <Compile Include="Authorization\OrganizationalUserContext.cs" />
+    <Compile Include="Authorization\OrganizationAuthorizationContext.cs" />
+    <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
+    <Compile Include="Authorization\UserContextFactory.cs" />
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
-    <Compile Include="CryptoService.cs" />
     <Compile Include="IAuthenticationService.cs" />
     <Compile Include="IExcelHandler.cs" />
     <Compile Include="IExcelService.cs" />
@@ -115,6 +127,10 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

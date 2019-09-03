@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Moq;
 using Presentation.Web.Controllers.API;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;

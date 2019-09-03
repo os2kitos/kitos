@@ -9,13 +9,13 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 

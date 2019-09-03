@@ -319,19 +319,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\OrganizationalUserContext.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\UnauthenticatedAuthorizationContext.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\UserContextFactory.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\IUserContextFactory.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContextFactory.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\IOrganizationalUserContext.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\OrganizationAuthorizationContext.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\AuthorizationContextFactory.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
@@ -501,6 +491,7 @@
     <Compile Include="Extensions\OwinContextExtensions.cs" />
     <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\InternalApiAttributeFilter.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\OwinAuthenticationContextFactory.cs" />
     <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
@@ -508,12 +499,7 @@
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\AuthenticationContext.cs" />
-    <Compile Include="Infrastructure\Factories\Authentication\AuthenticationContextFactory.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\AuthenticationMethod.cs" />
     <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\IAuthenticationContext.cs" />
-    <Compile Include="Infrastructure\Factories\Authentication\IAuthenticationContextFactory.cs" />
     <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
     <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
@@ -532,7 +518,6 @@
     <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
     <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
     <Compile Include="Models\GetTokenResponseDTO.cs" />
-    <Compile Include="Models\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\SSOConfigDTO.cs" />
@@ -1295,6 +1280,10 @@
     <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
       <Project>{5AE358F5-4F11-47FE-94BE-1588F357DCDC}</Project>
       <Name>Infrastructure.OpenXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
