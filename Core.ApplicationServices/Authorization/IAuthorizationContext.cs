@@ -1,9 +1,15 @@
 ﻿using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public interface IAuthorizationContext
     {
+        /// <summary>
+        /// Determine the granularity of cross organization read access supported by the current authorization context
+        /// </summary>
+        /// <returns></returns>
+        CrossOrganizationReadAccess GetCrossOrganizationReadAccess();
         /// <summary>
         /// Determines if high level read-access is allowed for objects within the target organizational context
         /// NOTE: Does not provide entity-level access rights. Just answers the question if ANY access at all can be granted.

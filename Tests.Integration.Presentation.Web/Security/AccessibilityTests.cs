@@ -10,12 +10,10 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests : WithAutoFixture
     {
-        private readonly KitosCredentials _regularApiUser;
         private readonly string _defaultPassword;
 
         public AccessibilityTests()
         {
-            _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
             _defaultPassword = TestEnvironment.GetDefaultUserPassword();
         }
 
@@ -68,14 +66,13 @@ namespace Tests.Integration.Presentation.Web.Security
             }
         }
 
-
         [Fact]
         public async Task Token_Can_Be_Invalidated_After_Creation()
         {
             //Arrange
             var email = CreateEmail();
             var userDto = ObjectCreateHelper.MakeSimpleApiUserDto(email, true);
-            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, "User");
+            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, OrganizationRole.User);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
             var token = await HttpApi.GetTokenAsync(loginDto);
             using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
@@ -93,7 +90,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             };
-            var deleteResponse = await HttpApi.DeleteOdataUserAsync(createdUserId);
+            await HttpApi.DeleteOdataUserAsync(createdUserId);
         }
 
         private static string CreateEmail()
@@ -101,7 +98,7 @@ namespace Tests.Integration.Presentation.Web.Security
             return $"{Guid.NewGuid():N}@test.dk";
         }
 
-        private async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
+        private static async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
         {
             userDto.HasApiAccess = false;
             await HttpApi.PatchOdataUserAsync(userDto, id);

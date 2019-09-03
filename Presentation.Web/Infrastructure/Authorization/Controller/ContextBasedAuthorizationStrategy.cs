@@ -1,5 +1,6 @@
-﻿using Core.DomainModel;
-using Presentation.Web.Infrastructure.Authorization.Context;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
@@ -12,7 +13,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _authorizationContext = authorizationContext;
         }
 
-        public bool ApplyBaseQueryPostProcessing { get; } = true;
+        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        {
+            return _authorizationContext.GetCrossOrganizationReadAccess();
+        }
 
         public bool AllowOrganizationReadAccess(int organizationId)
         {

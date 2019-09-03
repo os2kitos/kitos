@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Infrastructure.Services.Cryptography;
 
 namespace Core.ApplicationServices
 {

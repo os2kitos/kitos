@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -11,6 +12,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> ApiUsersFromEnvironment;
         private static readonly KitosTestEnvironment ActiveEnvironment;
         private static readonly string DefaultUserPassword;
+        public const int DefaultOrganizationId = 1;
+        public const int SecondOrganizationId = 2;
 
         static TestEnvironment()
         {
@@ -175,9 +178,11 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
         
         public static int DefaultItSystemId => 1;
+		public static int SecondItSystemId => 2;
         public static int DefaultOrganizationId => 1;
         public static int SecondOrganizationId => 2;
         public static int DefaultContractId => 1;
-        public static int DefaultItInterfaceId => 1;
+        public static int DefaultItInterfaceId => 1;       
+        public static int DefaultUserId => 1;
     }
 }

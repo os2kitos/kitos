@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -7,7 +6,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     /// <summary>
     /// Determines the user in a specific organizational context
@@ -77,9 +76,17 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return ActiveOrganizationId == organizationId;
         }
 
-        public bool IsActiveInSameOrganizationAs(IContextAware contextAwareOrg)
+        public bool IsActiveInSameOrganizationAs(IEntity entity)
         {
-            return contextAwareOrg.IsInContext(ActiveOrganizationId);
+            switch (entity)
+            {
+                case IContextAware contextAware:
+                    return contextAware.IsInContext(ActiveOrganizationId);
+                case IHasOrganization hasOrg:
+                    return IsActiveInOrganization(hasOrg.OrganizationId);
+                default:
+                    return false;
+            }
         }
 
         public bool HasAssignedWriteAccess(IEntity entity)

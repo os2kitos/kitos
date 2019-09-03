@@ -53,6 +53,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithRequired(t => t.ItSystem)
                 .HasForeignKey(t => t.ItSystemId)
                 .WillCascadeOnDelete(true);
+
+            TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }
     }
 }

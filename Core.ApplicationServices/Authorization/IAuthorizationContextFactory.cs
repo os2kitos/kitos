@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Infrastructure.Authorization.Context
+﻿namespace Core.ApplicationServices.Authorization
 {
     public interface IAuthorizationContextFactory
     {

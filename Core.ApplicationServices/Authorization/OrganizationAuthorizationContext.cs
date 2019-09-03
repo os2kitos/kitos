@@ -1,8 +1,9 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 
-namespace Presentation.Web.Infrastructure.Authorization.Context
+namespace Core.ApplicationServices.Authorization
 {
     public class OrganizationAuthorizationContext : IAuthorizationContext
     {
@@ -13,19 +14,27 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             _activeUserContext = activeUserContext;
         }
 
+        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        {
+            if (IsGlobalAdmin())
+            {
+                return CrossOrganizationReadAccess.All;
+            }
+
+            return IsUserInMunicipality() ? 
+                CrossOrganizationReadAccess.Public : 
+                CrossOrganizationReadAccess.None;
+        }
+
         public bool AllowReadsWithinOrganization(int organizationId)
         {
             var result = false;
 
-            if (IsGlobalAdmin())
+            if (TargetOrganizationMatchesActiveOrganization(organizationId))
             {
                 result = true;
             }
-            else if (TargetOrganizationMatchesActiveOrganization(organizationId))
-            {
-                result = true;
-            }
-            else if (IsUserInMunicipality())
+            else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public)
             {
                 result = true;
             }
@@ -51,7 +60,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
                 {
                     result = true;
                 }
-                else if (IsUserInMunicipality() && EntityIsNotRestrictedToLocalAccess(entity))
+                else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public && EntityIsShared(entity))
                 {
                     result = true;
                 }
@@ -102,8 +111,8 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             {
                 if (ActiveContextIsEntityContext(entity))
                 {
-                    result = 
-                        IsLocalAdmin() || 
+                    result =
+                        IsLocalAdmin() ||
                         AllowWritesToEntity(entity) ||
                         HasAssignedWriteAccess(entity);
                 }
@@ -169,9 +178,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
             return entity is User;
         }
 
-        private static bool EntityIsNotRestrictedToLocalAccess(IEntity entity)
+        private static bool EntityIsShared(IEntity entity)
         {
-            return (entity as IHasAccessModifier)?.AccessModifier != AccessModifier.Local;
+            //Only return true if entity supports cross-organization sharing and access is marked as public
+            return (entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public;
         }
 
         private bool IsUserInMunicipality()
@@ -191,12 +201,12 @@ namespace Presentation.Web.Infrastructure.Authorization.Context
 
         private static bool IsContextBound(IEntity entity)
         {
-            return entity is IContextAware;
+            return entity is IContextAware || entity is IHasOrganization;
         }
 
         private bool ActiveContextIsEntityContext(IEntity entity)
         {
-            return _activeUserContext.IsActiveInSameOrganizationAs((IContextAware)entity);
+            return _activeUserContext.IsActiveInSameOrganizationAs(entity);
         }
 
         private bool HasOwnership(IEntity ownedEntity)

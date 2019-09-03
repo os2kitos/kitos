@@ -10,13 +10,14 @@ using System.Text;
 using System.Web.Http;
 using Castle.Core.Internal;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Context;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 
@@ -48,20 +49,21 @@ namespace Presentation.Web.Controllers.API
             _attachedOptionsRepository = attachedOptionsRepository;
         }
 
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
         {
             try
             {
+                if (!AllowOrganizationReadAccess(organizationId))
+                {
+                    return Forbidden();
+                }
                 var usages = Repository.Get(
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
                         u.OrganizationId == organizationId);
-
-                usages = usages.Where(AllowRead);
 
                 return Ok(Map(usages));
             }
@@ -76,6 +78,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                if (!AllowOrganizationReadAccess(organizationId))
+                {
+                    return Forbidden();
+                }
+
                 pagingModel.Where(
                     u =>
                         // system usage is only within the context
@@ -83,8 +90,6 @@ namespace Presentation.Web.Controllers.API
                     );
 
                 if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-
-                pagingModel.WithPostProcessingFilter(AllowRead);
 
                 var usages = Page(Repository.AsQueryable(), pagingModel);
 

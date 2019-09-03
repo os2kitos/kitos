@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
+using Core.ApplicationServices.Authentication;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {

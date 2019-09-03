@@ -26,6 +26,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(t => t.OrganizationUnitId)
                 .WillCascadeOnDelete(false);
 
+            TypeMapping.AddIndexOnAccessModifier<EconomyStreamMap, EconomyStream>(this);
         }
     }
 }

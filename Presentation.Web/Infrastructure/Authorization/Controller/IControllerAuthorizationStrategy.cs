@@ -1,10 +1,11 @@
 ﻿using Core.DomainModel;
+using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public interface IControllerAuthorizationStrategy
     {
-        bool ApplyBaseQueryPostProcessing { get; }
+        CrossOrganizationReadAccess GetCrossOrganizationReadAccess();
         bool AllowOrganizationReadAccess(int organizationId);
         bool AllowRead(IEntity entity);
         bool AllowCreate<T>(IEntity entity);
