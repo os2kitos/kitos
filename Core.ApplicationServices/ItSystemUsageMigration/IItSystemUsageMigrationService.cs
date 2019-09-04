@@ -6,9 +6,9 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
 {
     public interface IItSystemUsageMigrationService
     {
-        Return<IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string q, int limit);
+        Result<ResultStatus, IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublic);
 
-        Return<string> GetMigrationConflicts(int fromSystemId, int toSystemId);
+        Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId);
 
         void toExecute(string input);
     }

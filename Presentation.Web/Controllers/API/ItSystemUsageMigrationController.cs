@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API
         [HttpGet]
         //[Route("UnusedItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystemDTO>))]
-        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization([FromUri]int organizationId, [FromUri]string nameContent, [FromUri]int limit)
+        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization([FromUri]int organizationId, [FromUri]string nameContent, [FromUri]int numberOfItSystems, [FromUri]bool getPublic)
         {
             try
             {
@@ -53,15 +53,15 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, limit);
+                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublic);
 
-                switch (result.ReturnCode)
+                switch (result.GetStatus())
                 {
-                    case ReturnType.Ok:
-                        return CreateResponse(HttpStatusCode.OK, MapList<ItSystem, ItSystemDTO>(result.ReturnValue));
-                    case ReturnType.Forbidden:
+                    case ResultStatus.Ok:
+                        return CreateResponse(HttpStatusCode.OK, MapList<ItSystem, ItSystemDTO>(result.GetResultValue()));
+                    case ResultStatus.Forbidden:
                         return Forbidden();
-                    case ReturnType.NotFound:
+                    case ResultStatus.NotFound:
                         return NotFound();
                     default:
                         return CreateResponse(HttpStatusCode.InternalServerError,

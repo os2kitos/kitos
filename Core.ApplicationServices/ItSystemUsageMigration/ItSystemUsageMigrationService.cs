@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -21,25 +20,36 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             _itSystemRepository = itSystemRepository;
         }
 
-        public Return<IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int limit)
+        public Result<ResultStatus, IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublic)
         {
 
-            var itSystems = _itSystemRepository
-                .AsQueryable()
-                .ByPublicAccessOrOrganizationId(organizationId)
-                .ExceptByInUsage(organizationId)
-                .ByPartOfName(nameContent)
-                .OrderBy(x => x.Name)
-                .Take(limit);
-
-            return new Return<IEnumerable<ItSystem>>
+            if (getPublic)
             {
-                ReturnCode = ReturnType.Ok,
-                ReturnValue = itSystems
-            };
+                var itSystems = _itSystemRepository
+                    .AsQueryable()
+                    .ByPublicAccessOrOrganizationId(organizationId)
+                    .ExceptByInUsage(organizationId)
+                    .ByPartOfName(nameContent)
+                    .OrderBy(x => x.Name)
+                    .Take(numberOfItSystems);
+
+                return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
+            }
+            else
+            {
+                var itSystems = _itSystemRepository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .ExceptByInUsage(organizationId)
+                    .ByPartOfName(nameContent)
+                    .OrderBy(x => x.Name)
+                    .Take(numberOfItSystems);
+
+                return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
+            }
         }
 
-        public Return<string> GetMigrationConflicts(int fromSystemId, int toSystemId)
+        public Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
         {
             throw new NotImplementedException();
         }

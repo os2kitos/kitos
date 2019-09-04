@@ -19,20 +19,49 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var itSystemName = CreateName();
-            var itSystem = await HttpApi.CreateItSystemInInitialOrganizationAsync(itSystemName);
+            var itSystem = await ItSystemHelper.CreateItSystemInInitialOrganizationAsync(itSystemName, 1);
 
             var token = await HttpApi.GetTokenAsync(role);
             var orgId = 1;
-            var url = TestEnvironment.CreateUrl($"api/ItSystemUsageMigration?organizationId={orgId}&nameContent={itSystemName[0]}&limit={10}");
+            var url = TestEnvironment.CreateUrl($"api/ItSystemUsageMigration?organizationId={orgId}&nameContent={itSystemName}&numberOfItSystems={10}&getPublic={true}");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
             {
-                var response = httpResponse.ReadResponseBodyAsKitosApiResponse<IEnumerable<Core.DomainModel.ItSystem.ItSystem>>();
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<Core.DomainModel.ItSystem.ItSystem>>();
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotEmpty(response.Result);
-                Assert.Equal(1, response.Result.Count(x => x.Name == itSystemName));
+                var itSystems = response.ToList();
+                Assert.NotEmpty(itSystems);
+                Assert.Equal(1, itSystems.Count(x => x.Name == itSystemName));
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task Api_User_Can_Limit_How_Many_Systems_To_Return(OrganizationRole role)
+        {
+            //Arrange
+            var prefix = "migrationTestSystem";
+            var itSystemName1 = prefix + CreateName();
+            var itSystemName2 = prefix + CreateName();
+            var itSystem1 = await ItSystemHelper.CreateItSystemInInitialOrganizationAsync(itSystemName1, 1);
+            var itSystem2 = await ItSystemHelper.CreateItSystemInInitialOrganizationAsync(itSystemName2, 1);
+
+            var token = await HttpApi.GetTokenAsync(role);
+            var orgId = 1;
+            var url = TestEnvironment.CreateUrl($"api/ItSystemUsageMigration?organizationId={orgId}&nameContent={prefix}&numberOfItSystems={2}&getPublic={true}");
+
+            //Act
+            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            {
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<Core.DomainModel.ItSystem.ItSystem>>();
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                var itSystems = response.ToList();
+                Assert.NotEmpty(itSystems);
+                Assert.Equal(2, itSystems.Count);
             }
         }
 
