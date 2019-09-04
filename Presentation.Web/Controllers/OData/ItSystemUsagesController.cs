@@ -41,8 +41,9 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
+            //Usages are local so full access is required
             var accessLevel = GetOrganizationReadAccessLevel(orgKey);
-            if (accessLevel == OrganizationDataReadAccessLevel.None)
+            if (accessLevel != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
@@ -58,7 +59,8 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            if (GetOrganizationReadAccessLevel(orgKey) == OrganizationDataReadAccessLevel.None)
+            //Usages are local so full access is required
+            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
