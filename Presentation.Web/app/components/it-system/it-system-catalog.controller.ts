@@ -23,7 +23,6 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
-
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
@@ -94,6 +93,7 @@
                     });
                 }
             });
+
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -583,6 +583,7 @@
                 });
             }
         }
+         
 
         public createITSystem() {
             var self = this;
@@ -726,12 +727,14 @@
             //Open modal
             this.modal.center().open();
         }
-        public migrateItSystem(name : string) {
-            console.log(name + " is selected");
+        public migrateItSystem = (name: string) => {
+
+            this.usageGridMigration.dataSource.read();
             //Set modal title
-            this.modalMigration.setOptions({ title: `Ledig systemer` });
+            this.modalMigration.setOptions({ title: `Ledige systemer` });
             //Open modal
             this.modalMigration.center().open();
+
         }
 
         // usagedetails grid
@@ -759,7 +762,7 @@
                         if (this.canCreate) {
                             return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
-                            return dataItem.Organization.Name; 
+                            return dataItem.Organization.Name;
                         }
                     },
                 }
@@ -773,7 +776,7 @@
                 transport:
                 {
                     read: {
-                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        url: "/odata/ItSystems",
                         dataType: "json"
                     }
                 },
@@ -784,11 +787,11 @@
             autoBind: false,
             columns: [
                 {
-                    field: "Organization.Name", title: "Organisation",
+                    field: "Name", title: "ItSystem",
                     template: dataItem => {
-                        var orgName = dataItem.Organization.Name;
-                        return dataItem.Organization.Name;
+                        return dataItem.Name;
                     },
+
                 }
             ],
             dataBound: this.detailsBound
@@ -952,6 +955,9 @@
                 change: applyFilter
             });
         }
+
+
+
     }
 
     angular
@@ -975,6 +981,7 @@
                         }]
                     }
                 });
+
             }
         ]);
 }

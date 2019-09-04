@@ -320,7 +320,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\ItSystemUsageMigration.cs" />
-    <Compile Include="Infrastructure\Authorization\Context\IAuthorizationContext.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
@@ -718,7 +717,6 @@
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-report.view.html" />
-    <Content Include="app\components\it-system\it-system-migration.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
     <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
