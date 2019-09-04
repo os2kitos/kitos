@@ -44,7 +44,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authorization\CrossOrganizationReadAccess.cs" />
+    <Compile Include="Authorization\CrossOrganizationDataReadAccessLevel.cs" />
+    <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
@@ -57,12 +58,14 @@
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
     <Compile Include="Queries\QueryByOrganizationId.cs" />
     <Compile Include="Queries\QueryByAccessModifier.cs" />
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
+    <Compile Include="Queries\IntersectionQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">

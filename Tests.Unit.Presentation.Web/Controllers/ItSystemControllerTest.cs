@@ -4,6 +4,7 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
@@ -37,7 +38,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         public void GetAccessRights_Returns_Forbidden_If_No_Access_In_Organization()
         {
             //Arrange
-            ExpectAllowReadsWithinOrganizationReturns(false);
+            ExpectAllowReadInOrganization(false);
 
             //Act
             var accessRights = _sut.GetAccessRights(true);
@@ -52,7 +53,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         public void GetAccessRights_With_Organization_Access_Returns_Based_On_AccessRights(bool allowCreate)
         {
             //Arrange
-            ExpectAllowReadsWithinOrganizationReturns(true);
+            ExpectAllowReadInOrganization(true);
             ExpectAllowCreateReturns(allowCreate);
 
             //Act
@@ -114,9 +115,10 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _authorizationContext.Setup(x => x.AllowCreate<ItSystem>()).Returns(allowWrite);
         }
 
-        private void ExpectAllowReadsWithinOrganizationReturns(bool value)
+        private void ExpectAllowReadInOrganization(bool success)
         {
-            _authorizationContext.Setup(x => x.AllowReadsWithinOrganization(KitosUser.DefaultOrganizationId.Value)).Returns(value);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(It.IsAny<int>()))
+                .Returns(success ? OrganizationDataReadAccessLevel.All : OrganizationDataReadAccessLevel.None);
         }
     }
 }
