@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -42,7 +43,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         //[Route("UnusedItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystem>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystemDTO>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization([FromUri]int organizationId, [FromUri]string nameContent, [FromUri]int limit)
         {
             try
@@ -53,7 +54,20 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, limit);
-                return CreateResponse(result.StatusCode, MapList<ItSystem, ItSystemDTO>(result.ReturnValue));
+
+                switch (result.ReturnCode)
+                {
+                    case ReturnType.Ok:
+                        return CreateResponse(HttpStatusCode.OK, MapList<ItSystem, ItSystemDTO>(result.ReturnValue));
+                    case ReturnType.Forbidden:
+                        return Forbidden();
+                    case ReturnType.NotFound:
+                        return NotFound();
+                    default:
+                        return CreateResponse(HttpStatusCode.InternalServerError,
+                            "An error occured when trying to get Unused It Systems");
+                }
+
             }
             catch (Exception e)
             {

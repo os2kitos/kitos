@@ -239,5 +239,28 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
+        public static async Task<ItSystemDTO> CreateItSystemInInitialOrganizationAsync(string itSystemName)
+        {
+            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var itSystem = new
+            {
+                name = itSystemName,
+                belongsToId = 1,
+                organizationId = 1
+            };
+
+            using (var createdResponse = await PostWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem"), cookie, itSystem))
+            {
+                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+                var response = await createdResponse.ReadResponseBodyAsKitosApiResponse<ItSystemDTO>();
+
+                Assert.Equal(1, response.OrganizationId);
+                Assert.Equal(1, response.BelongsToId);
+                Assert.Equal(itSystemName, response.Name);
+                return response;
+            }
+        }
+
     }
 }

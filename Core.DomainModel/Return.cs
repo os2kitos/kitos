@@ -2,9 +2,20 @@
 
 namespace Core.DomainModel
 {
+    public enum ReturnType
+    {
+        Ok,
+
+        NotFound,
+
+        Forbidden,
+
+        Error
+    }
+
     public class Return<T>
     {
-        public HttpStatusCode StatusCode;
+        public ReturnType ReturnCode;
 
         public T ReturnValue;
     }

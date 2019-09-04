@@ -32,16 +32,9 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
                 .OrderBy(x => x.Name)
                 .Take(limit);
 
-
-            _itSystemRepository.Get(s =>
-                s.Name.Contains(nameContent) &&
-                s.OrganizationId.Equals(organizationId) &&
-                (s.Usages.Count == 0 || s.Usages.Count(x => x.OrganizationId == organizationId) == 0)
-            );
-
             return new Return<IEnumerable<ItSystem>>
             {
-                StatusCode = HttpStatusCode.OK,
+                ReturnCode = ReturnType.Ok,
                 ReturnValue = itSystems
             };
         }
