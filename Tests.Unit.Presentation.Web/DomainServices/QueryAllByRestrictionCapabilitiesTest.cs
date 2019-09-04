@@ -24,7 +24,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
         public void RequiresPostFiltering_Returns_False_Full_Cross_Organizational_Read_Access(Type type)
         {
             //Arrange
-            var sut = CreateQuery(type, CrossOrganizationReadAccess.All, A<int>());
+            var sut = CreateQuery(type, OrganizationDataReadAccessLevel.All, A<int>());
 
             //Act
             bool result = sut.RequiresPostFiltering();
@@ -34,24 +34,24 @@ namespace Tests.Unit.Presentation.Web.DomainServices
         }
 
         [Theory]
-        [InlineData(typeof(ItSystem), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(ItSystem), CrossOrganizationReadAccess.None, false)]
-        [InlineData(typeof(ItSystemUsage), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(ItSystemUsage), CrossOrganizationReadAccess.None, false)]
-        [InlineData(typeof(ItInterface), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(ItInterface), CrossOrganizationReadAccess.None, false)]
-        [InlineData(typeof(ItContract), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(ItContract), CrossOrganizationReadAccess.None, false)]
-        [InlineData(typeof(ItProject), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(ItProject), CrossOrganizationReadAccess.None, false)]
-        [InlineData(typeof(Organization), CrossOrganizationReadAccess.Public, false)]
-        [InlineData(typeof(EconomyStream), CrossOrganizationReadAccess.Public, false)]
+        [InlineData(typeof(ItSystem), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(ItSystem), OrganizationDataReadAccessLevel.None, false)]
+        [InlineData(typeof(ItSystemUsage), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(ItSystemUsage), OrganizationDataReadAccessLevel.None, false)]
+        [InlineData(typeof(ItInterface), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(ItInterface), OrganizationDataReadAccessLevel.None, false)]
+        [InlineData(typeof(ItContract), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(ItContract), OrganizationDataReadAccessLevel.None, false)]
+        [InlineData(typeof(ItProject), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(ItProject), OrganizationDataReadAccessLevel.None, false)]
+        [InlineData(typeof(Organization), OrganizationDataReadAccessLevel.Public, false)]
+        [InlineData(typeof(EconomyStream), OrganizationDataReadAccessLevel.Public, false)]
 
         //No IHasOrganization but has access modifier AND context aware AND sharing access is NONE and context aware does not support generic query since it only holds a method
-        [InlineData(typeof(Organization), CrossOrganizationReadAccess.None, true)]
-        [InlineData(typeof(EconomyStream), CrossOrganizationReadAccess.None, true)]
+        [InlineData(typeof(Organization), OrganizationDataReadAccessLevel.None, true)]
+        [InlineData(typeof(EconomyStream), OrganizationDataReadAccessLevel.None, true)]
 
-        public void RequiresPostFiltering_Returns(Type type, CrossOrganizationReadAccess readAccess, bool expectedResult)
+        public void RequiresPostFiltering_Returns(Type type, OrganizationDataReadAccessLevel readAccess, bool expectedResult)
         {
             //Arrange
             var sut = CreateQuery(type, readAccess, A<int>());
@@ -63,12 +63,12 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             Assert.Equal(expectedResult, result);
         }
 
-        private static dynamic CreateQuery(Type type, CrossOrganizationReadAccess readAccess, int organizationId)
+        private static dynamic CreateQuery(Type type, OrganizationDataReadAccessLevel readAccess, int organizationId)
         {
             var constructor =
                 typeof(QueryAllByRestrictionCapabilities<>)
                     .MakeGenericType(type)
-                    .GetConstructor(new[] {typeof(CrossOrganizationReadAccess), typeof(int)});
+                    .GetConstructor(new[] {typeof(OrganizationDataReadAccessLevel), typeof(int)});
             dynamic sut = constructor?.Invoke(new object[] {readAccess, organizationId});
             return sut;
         }

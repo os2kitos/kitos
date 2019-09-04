@@ -1,12 +1,14 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public interface IControllerAuthorizationStrategy
     {
-        CrossOrganizationReadAccess GetCrossOrganizationReadAccess();
-        bool AllowOrganizationReadAccess(int organizationId);
+        CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess();
+        OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
+        [Obsolete("Use GetOrganizationReadAccessLevel")]
         bool AllowRead(IEntity entity);
         bool AllowCreate<T>(IEntity entity);
         bool AllowCreate<T>();

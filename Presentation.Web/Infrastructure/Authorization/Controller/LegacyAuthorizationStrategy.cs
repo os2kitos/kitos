@@ -16,24 +16,29 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _userId = userId;
         }
 
-        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
         {
             var userId = _userId();
 
             if (_authenticationService.IsGlobalAdmin(userId))
             {
-                return CrossOrganizationReadAccess.All;
+                return CrossOrganizationDataReadAccessLevel.All;
             }
 
             return _authenticationService.HasReadAccessOutsideContext(userId)
-                ? CrossOrganizationReadAccess.Public
-                : CrossOrganizationReadAccess.None;
+                ? CrossOrganizationDataReadAccessLevel.Public
+                : CrossOrganizationDataReadAccessLevel.None;
         }
 
-        public bool AllowOrganizationReadAccess(int organizationId)
+        public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            var loggedIntoOrgId = _authenticationService.GetCurrentOrganizationId(_userId());
-            return loggedIntoOrgId == organizationId || _authenticationService.HasReadAccessOutsideContext(_userId());
+            if (_authenticationService.HasReadAccessOutsideContext(_userId()) ||
+                _authenticationService.GetCurrentOrganizationId(_userId()) == organizationId)
+            {
+                //The legacy authorization was a binary decision. Even if municipality users should not see local data from other orgs the check allowed id and was rescued of the way KITOS UI asked for data.
+                return OrganizationDataReadAccessLevel.All;
+            }
+            return OrganizationDataReadAccessLevel.None;
         }
 
         public bool AllowRead(IEntity entity)

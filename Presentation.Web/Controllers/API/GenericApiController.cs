@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 
 namespace Presentation.Web.Controllers.API
@@ -43,7 +44,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
 
-                var crossOrganizationReadAccess = AuthorizationStrategy.GetCrossOrganizationReadAccess();
+                var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
                 var refinement = new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId);
 
@@ -127,7 +128,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
         {
-            if (!AllowOrganizationReadAccess(KitosUser.DefaultOrganizationId.GetValueOrDefault()))
+            if (GetOrganizationReadAccessLevel(AuthenticationService.GetCurrentOrganizationId(UserId)) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
