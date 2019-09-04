@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -10,12 +15,10 @@ namespace Tests.Integration.Presentation.Web.Security
 {
     public class AccessibilityTests : WithAutoFixture
     {
-        private readonly KitosCredentials _regularApiUser;
         private readonly string _defaultPassword;
 
         public AccessibilityTests()
         {
-            _regularApiUser = TestEnvironment.GetCredentials(OrganizationRole.User, true);
             _defaultPassword = TestEnvironment.GetDefaultUserPassword();
         }
 
@@ -48,6 +51,34 @@ namespace Tests.Integration.Presentation.Web.Security
             }
         }
 
+        [Theory]
+        [InlineData("odata/itsystems", typeof(Core.DomainModel.ItSystem.ItSystem))]
+        [InlineData("api/itsystem", typeof(Core.DomainModel.ItSystem.ItSystem))]
+        [InlineData("odata/itinterfaces", typeof(ItInterface))]
+        [InlineData("api/itinterface", typeof(ItInterface))]
+        [InlineData("odata/reports", typeof(Report))]
+        [InlineData("api/report", typeof(Report))]
+        [InlineData("odata/itsystemusages", typeof(ItSystemUsage))]
+        [InlineData("api/itsystemusage", typeof(ItSystemUsage))]
+        [InlineData("odata/itcontracts", typeof(ItContract))]
+        [InlineData("api/itcontract", typeof(ItContract))]
+        [InlineData("odata/itprojects", typeof(ItProject))]
+        [InlineData("api/itproject", typeof(ItProject))]
+        public async Task Api_Is_Read_Only(string path, Type inputType)
+        {
+            //Arrange
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), Activator.CreateInstance(inputType), globalAdminToken.Token))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
+                var message = await httpResponse.Content.ReadAsStringAsync();
+                Assert.Equal("Det er ikke tilladt at skrive data via APIet", message);
+            }
+        }
+
         [Fact]
         public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
@@ -58,16 +89,15 @@ namespace Tests.Integration.Presentation.Web.Security
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.User);
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("/api/Reference"), payload, token.Token))
+            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/Reference"), cookie, payload))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
             }
         }
-
 
         [Fact]
         public async Task Token_Can_Be_Invalidated_After_Creation()
@@ -75,7 +105,7 @@ namespace Tests.Integration.Presentation.Web.Security
             //Arrange
             var email = CreateEmail();
             var userDto = ObjectCreateHelper.MakeSimpleApiUserDto(email, true);
-            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, "User");
+            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, OrganizationRole.User);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
             var token = await HttpApi.GetTokenAsync(loginDto);
             using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/ItSystem/"), token.Token))
@@ -83,7 +113,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
             };
-            
+
             //Act
             await DisableApiAccessForUserAsync(userDto, createdUserId);
 
@@ -93,7 +123,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             };
-            var deleteResponse = await HttpApi.DeleteOdataUserAsync(createdUserId);
+            await HttpApi.DeleteOdataUserAsync(createdUserId);
         }
 
         private static string CreateEmail()
@@ -101,11 +131,11 @@ namespace Tests.Integration.Presentation.Web.Security
             return $"{Guid.NewGuid():N}@test.dk";
         }
 
-        private async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
+        private static async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
         {
             userDto.HasApiAccess = false;
             await HttpApi.PatchOdataUserAsync(userDto, id);
         }
-    
+
     }
 }
