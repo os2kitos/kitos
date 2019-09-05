@@ -4,12 +4,13 @@
     export interface ICatalogController {
         mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         mainGridOptions: kendo.ui.GridOptions;
-        usageGrid: kendo.ui.Grid;
-        usageDetailsGrid: kendo.ui.GridOptions;
-        usageGridMigration: kendo.ui.Grid;
         usageDetailsGridMigration: kendo.ui.GridOptions;
+        usageDetailsGrid: kendo.ui.GridOptions;
+        usageGrid: kendo.ui.Grid;
+        usageGridMigration: kendo.ui.Grid;
         modal: kendo.ui.Window;
         modalMigration: kendo.ui.Window;
+        modalMigrationConsequence: kendo.ui.Window;
 
         saveGridProfile(): void;
         loadGridProfile(): void;
@@ -27,9 +28,11 @@
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public usageGridMigration: kendo.ui.Grid;
+        public modalMigrationConsequence: kendo.ui.Window;
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
+         
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -64,6 +67,11 @@
             private userAccessRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
+            private oldItSystemUsageID,
+            private newItSystemID,
+            private municipality,
+            public migrationConsequenceText,
+
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
 
@@ -93,7 +101,6 @@
                     });
                 }
             });
-
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -583,7 +590,6 @@
                 });
             }
         }
-         
 
         public createITSystem() {
             var self = this;
@@ -720,21 +726,48 @@
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
+            this.oldItSystemUsageID = systemName;
             //Filter by usageId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
-            this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
+            this.modal.setOptions({ resizable: false , title: `Anvendelse af ${systemName}` });
             //Open modal
             this.modal.center().open();
         }
-        public migrateItSystem = (name: string) => {
 
+        public migrateItSystem = (name: string) => {
+            this.municipality = name;
             this.usageGridMigration.dataSource.read();
             //Set modal title
-            this.modalMigration.setOptions({ title: `Ledige systemer` });
+            this.modalMigration.setOptions({ resizable: false, title: `Ledige systemer` });
             //Open modal
             this.modalMigration.center().open();
 
+        }
+
+        public migrateSystemTo = (from: string) => {
+            var selectedItem = this.usageGridMigration.dataItem(this.usageGridMigration.select());
+            if (selectedItem == null) {
+                return;
+            }
+
+            this.newItSystemID = selectedItem.get("Name");
+            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " +  this.newItSystemID;
+            this.modalMigrationConsequence.setOptions({resizable: false, title: `Flytning af it-system ` });
+            this.modalMigrationConsequence.center().open();
+        }
+
+        public startMigration = () => {
+            if (this.oldItSystemUsageID != null || this.newItSystemID != null){
+                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemID );
+            }
+        }
+
+        public copyToClipBoard() {
+            window.getSelection().selectAllChildren(document.getElementById('copyPasteConsequence'));
+            document.execCommand("Copy");
+            window.getSelection().removeAllRanges();
+            this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
         }
 
         // usagedetails grid
@@ -785,6 +818,7 @@
                 serverFiltering: true
             },
             autoBind: false,
+            selectable: "row",
             columns: [
                 {
                     field: "Name", title: "ItSystem",
@@ -798,6 +832,7 @@
         };
 
         private exportFlag = false;
+
         private exportToExcel = (e) => {
             var columns = e.sender.columns;
 
@@ -956,8 +991,6 @@
             });
         }
 
-
-
     }
 
     angular
@@ -984,4 +1017,12 @@
 
             }
         ]);
+
+    app.controller('systemCatalogVm', [
+        '$rootScope', '$scope', '$http', '$state', 'notify', 
+        function ($rootScope, $scope, $http, $state, notify, ) {
+        }
+    ]);
+
+
 }

@@ -5,8 +5,28 @@
      data-k-visible="false" data-k-modal="true">
     <div data-kendo-grid="systemCatalogVm.usageGrid" data-k-options="systemCatalogVm.usageDetailsGrid"></div>
 </div>
+
 <div data-kendo-window="systemCatalogVm.modalMigration"
      data-k-title="'Migration'" data-k-width="800"
      data-k-visible="false" data-k-modal="true">
-    <div data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>
+    <div id="availableSystems" data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>
+    <button ng-click='systemCatalogVm.migrateSystemTo()' data-element-type='' class='k-primary pull-right'>Se konsekvens</button>
+</div>
+
+<div data-kendo-window="systemCatalogVm.modalMigrationConsequence" ng-controller="systemCatalogVm"
+     data-k-title="'Konsekvens'" data-k-width="1000"
+     data-k-visible="false" data-k-modal="true" >
+    <div id="copyPasteConsequence" >
+        <div>
+            <h5>{{systemCatalogVm.migrationConsequenceText}} </h5>
+            <ul>
+                <li>Fra: </li>
+                <li>Til: </li>
+                <li>Organisation: </li>
+                <li>Snitflader berørt: </li>
+            </ul>
+        </div>
+    </div>
+    <button ng-click='systemCatalogVm.copyToClipBoard()'>Copy</button>
+    <button ng-click='systemCatalogVm.startMigration()' class='k-primary pull-right'>Start flytning</button>
 </div>
