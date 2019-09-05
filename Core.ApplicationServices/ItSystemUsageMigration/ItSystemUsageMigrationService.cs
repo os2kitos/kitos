@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.ItSystemUsageMigration
@@ -26,44 +27,27 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             _itSystemUsageRepository = itSystemUsageRepository;
         }
 
-        public Result<ResultStatus, IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(
+        public Result<ResultStatus, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
             int organizationId, 
             string nameContent, 
             int numberOfItSystems, 
             bool getPublicFromOtherOrganizations)
         {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+            {
+                return Result<ResultStatus, IReadOnlyList<ItSystem>>.Fail(ResultStatus.Forbidden);
+            }
 
-            //var idsOfSystemsInUse =
-            //    _itSystemUsageRepository
-            //        .AsQueryable();
-            //    idsOfSystemsInUse = getPublicFromOtherOrganizations ? idsOfSystemsInUse.ByPublicAccessOrOrganizationId(organizationId) : idsOfSystemsInUse.ByOrganizationId(organizationId);
-
-
-            //    .ByOrganizationId(organizationId)
-                    
-            //        .Select(x => x.ItSystemId)
-            //        .ToList();
-
-            var itSystems = _itSystemRepository
-                .AsQueryable();
-            itSystems = getPublicFromOtherOrganizations ? itSystems.ByPublicAccessOrOrganizationId(organizationId) : itSystems.ByOrganizationId(organizationId);
-
-            itSystems = itSystems.ExceptByInUsage(organizationId)
-                .ByPartOfName(nameContent)
-                .OrderBy(x => x.Name)
-                .Take(numberOfItSystems);
-
-            return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
+            var idsOfSystemsInUse = GetIdsOfItSystemsInUseByOrganizationId(organizationId);
+            var unusedItSystems = GetUnusedItSystems(idsOfSystemsInUse, organizationId, nameContent, numberOfItSystems,
+                getPublicFromOtherOrganizations);
             
-            
+            return Result<ResultStatus, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
         }
 
         public Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
         {
-            
-
             return Result<ResultStatus, string>.Ok("Changed");
-
         }
 
         public void toExecute(string input)
@@ -76,6 +60,34 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             //_itSystemUsageRepository.Save();
 
             throw new NotImplementedException();
+        }
+
+
+        private IReadOnlyList<int> GetIdsOfItSystemsInUseByOrganizationId(int organizationId)
+        {
+            return _itSystemUsageRepository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId)
+                    .Select(x => x.ItSystemId)
+                    .ToList();
+        }
+
+        private IReadOnlyList<ItSystem> GetUnusedItSystems(IReadOnlyList<int> exceptIds, int organizationId, string nameContent, int numberOfItSystems,
+            bool getPublicFromOtherOrganizations)
+        {
+            var unusedItSystems = _itSystemRepository
+                .AsQueryable();
+            unusedItSystems = getPublicFromOtherOrganizations
+                ? unusedItSystems.ByPublicAccessOrOrganizationId(organizationId)
+                : unusedItSystems.ByOrganizationId(organizationId);
+            unusedItSystems = unusedItSystems
+                .ByEntitiesExceptWithIds(exceptIds)
+                .ByPartOfName(nameContent)
+                .OrderBy(x => x.Name)
+                .Take(numberOfItSystems);
+
+            return unusedItSystems.ToList();
+
         }
     }
 }

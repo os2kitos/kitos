@@ -58,7 +58,6 @@
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IHasName.cs" />
-    <Compile Include="IHasUsages.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />

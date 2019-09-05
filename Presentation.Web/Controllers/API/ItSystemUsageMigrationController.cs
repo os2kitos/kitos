@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -7,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -63,7 +65,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(organizationId))
+                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -73,7 +75,7 @@ namespace Presentation.Web.Controllers.API
                 switch (result.GetStatus())
                 {
                     case ResultStatus.Ok:
-                        return Ok(MapList<ItSystem, ItSystemDTO>(result.GetResultValue()));
+                        return Ok(MapItSystemToItSystemUsageMigrationDto(result.GetResultValue()));
                     case ResultStatus.Forbidden:
                         return Forbidden();
                     case ResultStatus.NotFound:
@@ -90,9 +92,10 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private IEnumerable<TOut> MapList<TIn, TOut>(IEnumerable<TIn> input)
+        private IReadOnlyList<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
         {
-            return Map<IEnumerable<TIn>, IEnumerable<TOut>>(input);
+            return input.Select(itSystem => new ItSystemSimpleDTO() {Id = itSystem.Id, Name = itSystem.Name}).ToList();
         }
+        
     }
 }
