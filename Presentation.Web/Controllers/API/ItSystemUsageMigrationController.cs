@@ -30,7 +30,22 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigrationConflicts([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            try
+            {
+                var result = _itSystemUsageMigrationService.GetMigrationConflicts(usageId, toSystemId);
+                switch (result.GetStatus())
+                {
+                    case ResultStatus.Ok:
+                        return Ok(result.GetResultValue());
+                    default:
+                        return CreateResponse(HttpStatusCode.InternalServerError,
+                            "An error occured when trying to get Unused It Systems");
+                }
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
         }
 
         [HttpPost]
@@ -58,7 +73,7 @@ namespace Presentation.Web.Controllers.API
                 switch (result.GetStatus())
                 {
                     case ResultStatus.Ok:
-                        return CreateResponse(HttpStatusCode.OK, MapList<ItSystem, ItSystemDTO>(result.GetResultValue()));
+                        return Ok(MapList<ItSystem, ItSystemDTO>(result.GetResultValue()));
                     case ResultStatus.Forbidden:
                         return Forbidden();
                     case ResultStatus.NotFound:

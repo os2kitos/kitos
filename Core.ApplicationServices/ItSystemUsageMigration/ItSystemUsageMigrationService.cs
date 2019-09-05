@@ -4,6 +4,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 
@@ -13,49 +14,67 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
     {
         private IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
+        private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
 
-        public ItSystemUsageMigrationService(IAuthorizationContext authorizationContext, IGenericRepository<ItSystem> itSystemRepository)
+        public ItSystemUsageMigrationService(
+            IAuthorizationContext authorizationContext, 
+            IGenericRepository<ItSystem> itSystemRepository, 
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
         {
             _authorizationContext = authorizationContext;
             _itSystemRepository = itSystemRepository;
+            _itSystemUsageRepository = itSystemUsageRepository;
         }
 
-        public Result<ResultStatus, IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublic)
+        public Result<ResultStatus, IEnumerable<ItSystem>> GetUnusedItSystemsByOrganization(
+            int organizationId, 
+            string nameContent, 
+            int numberOfItSystems, 
+            bool getPublicFromOtherOrganizations)
         {
 
-            if (getPublic)
-            {
-                var itSystems = _itSystemRepository
-                    .AsQueryable()
-                    .ByPublicAccessOrOrganizationId(organizationId)
-                    .ExceptByInUsage(organizationId)
-                    .ByPartOfName(nameContent)
-                    .OrderBy(x => x.Name)
-                    .Take(numberOfItSystems);
+            //var idsOfSystemsInUse =
+            //    _itSystemUsageRepository
+            //        .AsQueryable();
+            //    idsOfSystemsInUse = getPublicFromOtherOrganizations ? idsOfSystemsInUse.ByPublicAccessOrOrganizationId(organizationId) : idsOfSystemsInUse.ByOrganizationId(organizationId);
 
-                return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
-            }
-            else
-            {
-                var itSystems = _itSystemRepository
-                    .AsQueryable()
-                    .ByOrganizationId(organizationId)
-                    .ExceptByInUsage(organizationId)
-                    .ByPartOfName(nameContent)
-                    .OrderBy(x => x.Name)
-                    .Take(numberOfItSystems);
 
-                return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
-            }
+            //    .ByOrganizationId(organizationId)
+                    
+            //        .Select(x => x.ItSystemId)
+            //        .ToList();
+
+            var itSystems = _itSystemRepository
+                .AsQueryable();
+            itSystems = getPublicFromOtherOrganizations ? itSystems.ByPublicAccessOrOrganizationId(organizationId) : itSystems.ByOrganizationId(organizationId);
+
+            itSystems = itSystems.ExceptByInUsage(organizationId)
+                .ByPartOfName(nameContent)
+                .OrderBy(x => x.Name)
+                .Take(numberOfItSystems);
+
+            return Result<ResultStatus, IEnumerable<ItSystem>>.Ok(itSystems);
+            
+            
         }
 
         public Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
         {
-            throw new NotImplementedException();
+            
+
+            return Result<ResultStatus, string>.Ok("Changed");
+
         }
 
         public void toExecute(string input)
         {
+            //var itSystemUsage = _itSystemUsageRepository
+            //    .Get(x => x.Id == usageSystemId);
+            //var usage = itSystemUsage.First();
+            //usage.ItSystemId = toSystemId;
+            //_itSystemUsageRepository.Update(usage);
+            //_itSystemUsageRepository.Save();
+
             throw new NotImplementedException();
         }
     }
