@@ -14,32 +14,34 @@ namespace Core.ApplicationServices.Authorization
             _activeUserContext = activeUserContext;
         }
 
-        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
         {
             if (IsGlobalAdmin())
             {
-                return CrossOrganizationReadAccess.All;
+                return CrossOrganizationDataReadAccessLevel.All;
             }
 
-            return IsUserInMunicipality() ? 
-                CrossOrganizationReadAccess.Public : 
-                CrossOrganizationReadAccess.None;
+            return IsUserInMunicipality() ?
+                CrossOrganizationDataReadAccessLevel.Public :
+                CrossOrganizationDataReadAccessLevel.None;
         }
 
-        public bool AllowReadsWithinOrganization(int organizationId)
+        public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            var result = false;
-
             if (TargetOrganizationMatchesActiveOrganization(organizationId))
             {
-                result = true;
-            }
-            else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public)
-            {
-                result = true;
+                return OrganizationDataReadAccessLevel.All;
             }
 
-            return result;
+            switch (GetCrossOrganizationReadAccess())
+            {
+                case CrossOrganizationDataReadAccessLevel.Public:
+                    return OrganizationDataReadAccessLevel.Public;
+                case CrossOrganizationDataReadAccessLevel.All:
+                    return OrganizationDataReadAccessLevel.All;
+                default:
+                    return OrganizationDataReadAccessLevel.None;
+            }
         }
 
         public bool AllowReads(IEntity entity)
@@ -60,7 +62,7 @@ namespace Core.ApplicationServices.Authorization
                 {
                     result = true;
                 }
-                else if (GetCrossOrganizationReadAccess() >= CrossOrganizationReadAccess.Public && EntityIsShared(entity))
+                else if (GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public && EntityIsShared(entity))
                 {
                     result = true;
                 }

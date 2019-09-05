@@ -5,8 +5,8 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
 {
     public interface IControllerAuthorizationStrategy
     {
-        CrossOrganizationReadAccess GetCrossOrganizationReadAccess();
-        bool AllowOrganizationReadAccess(int organizationId);
+        CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess();
+        OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
         bool AllowRead(IEntity entity);
         bool AllowCreate<T>(IEntity entity);
         bool AllowCreate<T>();

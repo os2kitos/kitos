@@ -24,10 +24,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, OrganizationCategory.Other, CrossOrganizationReadAccess.All)]
-        [InlineData(false, OrganizationCategory.Municipality, CrossOrganizationReadAccess.Public)]
-        [InlineData(false, OrganizationCategory.Other, CrossOrganizationReadAccess.None)]
-        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, OrganizationCategory organizationCategory, CrossOrganizationReadAccess expectedResult)
+        [InlineData(true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
+        [InlineData(false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.None)]
+        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
@@ -41,11 +41,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, true)]
-        [InlineData(false, true, false, true)]
-        [InlineData(false, false, true, true)]
-        [InlineData(false, false, false, false)]
-        public void AllowReadsWithinOrganization_Returns(bool isGlobalAdmin, bool isActiveInOrganization, bool isMunicipality, bool expectedResult)
+        [InlineData(true, false, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, true, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, true, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, false, OrganizationDataReadAccessLevel.None)]
+        public void GetOrganizationReadAccessLevel_Returns(bool isGlobalAdmin, bool isActiveInOrganization, bool isMunicipality, OrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             var targetOrganization = A<int>();
@@ -54,7 +54,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectIsActiveInOrganizationOfTypeReturns(OrganizationCategory.Municipality, isMunicipality);
 
             //Act
-            var hasAccess = _sut.AllowReadsWithinOrganization(targetOrganization);
+            var hasAccess = _sut.GetOrganizationReadAccessLevel(targetOrganization);
 
             //Assert
             Assert.Equal(expectedResult, hasAccess);

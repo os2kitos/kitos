@@ -9,14 +9,14 @@ namespace Core.ApplicationServices.Authorization
         /// Determine the granularity of cross organization read access supported by the current authorization context
         /// </summary>
         /// <returns></returns>
-        CrossOrganizationReadAccess GetCrossOrganizationReadAccess();
+        CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess();
         /// <summary>
-        /// Determines if high level read-access is allowed for objects within the target organizational context
+        /// Determines, at a high level, the depth of read-access which is allowed on objects within the target organization wrt. the active organization.
         /// NOTE: Does not provide entity-level access rights. Just answers the question if ANY access at all can be granted.
         /// </summary>
         /// <param name="organizationId"></param>
         /// <returns></returns>
-        bool AllowReadsWithinOrganization(int organizationId);
+        OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
         /// <summary>
         /// Determines if read-access is allowed for the provided entity
         /// </summary>
@@ -26,7 +26,6 @@ namespace Core.ApplicationServices.Authorization
         /// <summary>
         /// Determines if create-access is allowed for the provided entity type
         /// </summary>
-        /// <param name="entity"></param>
         /// <returns></returns>
         bool AllowCreate<T>();
         /// <summary>

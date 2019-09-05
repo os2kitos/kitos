@@ -9,6 +9,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
@@ -222,9 +223,14 @@ namespace Presentation.Web.Controllers.API
 
         #region access control
 
-        protected bool AllowOrganizationReadAccess(int organizationId)
+        protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
-            return AuthorizationStrategy.AllowOrganizationReadAccess(organizationId);
+            return AuthorizationStrategy.GetCrossOrganizationReadAccess();
+        }
+
+        protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
+        {
+            return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
         protected bool AllowRead(IEntity entity)

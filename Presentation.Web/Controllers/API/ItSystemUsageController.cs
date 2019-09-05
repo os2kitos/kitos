@@ -16,7 +16,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -54,7 +54,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(organizationId))
+                //Local objects - must have full access to view
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -78,7 +79,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(organizationId))
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }

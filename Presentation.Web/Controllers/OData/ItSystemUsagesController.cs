@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -40,12 +41,14 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            //Usages are local so full access is required
+            var accessLevel = GetOrganizationReadAccessLevel(orgKey);
+            if (accessLevel != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByOrganizationId(orgKey);
+            var result = Repository.AsQueryable().ByOrganizationId(orgKey, accessLevel);
 
             return Ok(result);
         }
@@ -56,7 +59,8 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            //Usages are local so full access is required
+            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
