@@ -47,6 +47,12 @@ namespace Presentation.Web.Controllers.API
             _orgUnitRepository = orgUnitRepository;
         }
 
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
@@ -76,9 +82,13 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-        /// <summary>  
-        ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation
+        
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
         /// </summary>
+        /// <param name="q"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
@@ -266,6 +276,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
+        /// </summary>
+        /// <param name="catalog"></param>
+        /// <param name="orgId"></param>
+        /// <param name="q"></param>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
