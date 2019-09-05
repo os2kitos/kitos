@@ -16,7 +16,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    //[RoutePrefix("api/v1/ItSystemUsageMigration")]
+    [RoutePrefix("api/ItSystemUsageMigration")]
     public class ItSystemUsageMigrationController : BaseApiController
     {
         private IItSystemUsageMigrationService _itSystemUsageMigrationService;
@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        //[Route("")]
+        [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigrationConflicts([FromUri]int usageId, [FromUri]int toSystemId)
         {
@@ -51,15 +51,15 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpPost]
-        //[Route("/{usageId}")]
+        [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        public HttpResponseMessage ExecuteMigration(int usageId, [FromUri]int toSystemId)
+        public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
         [HttpGet]
-        //[Route("UnusedItSystems")]
+        [Route("UnusedItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystemDTO>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
             [FromUri]int organizationId, 
