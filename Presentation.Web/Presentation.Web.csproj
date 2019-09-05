@@ -319,10 +319,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\API\ItSystemUsageMigration.cs" />
+    <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
+    <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
@@ -491,8 +492,9 @@
     <Compile Include="Extensions\IdentityClaimExtension.cs" />
     <Compile Include="Extensions\OwinContextExtensions.cs" />
     <Compile Include="Helpers\Constants.cs" />
-    <Compile Include="Helpers\InternalApiAttributeFilter.cs" />
+    <Compile Include="Swagger\RemoveInternalApiOperationsFilter.cs" />
     <Compile Include="Infrastructure\Factories\Authentication\OwinAuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyModificationsThroughApiMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
     <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
     <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />

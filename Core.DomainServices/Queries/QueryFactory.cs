@@ -1,4 +1,6 @@
-﻿using Core.DomainModel;
+﻿using System.Collections.Generic;
+using Core.DomainModel;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 
 namespace Core.DomainServices.Queries
@@ -16,6 +18,34 @@ namespace Core.DomainServices.Queries
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(int) });
             return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationId });
+        }
+
+        public static IDomainQuery<T> ByOrganizationId<T>(int organizationId, OrganizationDataReadAccessLevel accessLevel)
+        {
+            var hasOrganization = typeof(IHasOrganization).IsAssignableFrom(typeof(T));
+            var hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));
+            if (!hasOrganization)
+            {
+                return new RejectAllResultsQuery<T>();
+            }
+
+            var queries = new List<IDomainQuery<T>>
+            {
+                ByOrganizationId<T>(organizationId)
+            };
+
+            switch (accessLevel)
+            {
+                case OrganizationDataReadAccessLevel.Public when hasAccessModifier:
+                    queries.Add(ByPublicAccessModifier<T>());
+                    break;
+                case OrganizationDataReadAccessLevel.All:
+                    break;
+                default:
+                    return new RejectAllResultsQuery<T>();
+            }
+
+            return new IntersectionQuery<T>(queries);
         }
 
         public static IDomainQuery<T> ByPublicAccessModifier<T>()

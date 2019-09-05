@@ -33,6 +33,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
+        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string token)
+        {
+            var requestMessage = CreatePostMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+
         public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
@@ -93,31 +100,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             return requestMessage;
         }
 
-        public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string tokenvalue)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
-            {
-                Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json"),
-            };
-            requestMessage.Headers.Add("Authorization", "bearer " + tokenvalue);
-
-            return StatelessHttpClient.SendAsync(requestMessage);
-        }
-
         public static Task<HttpResponseMessage> GetAsync(Uri url)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-
-        public static async Task<T> ReadResponseBodyAs<T>(this HttpResponseMessage response)
+        public static async Task<T> ReadResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return JsonConvert.DeserializeObject<T>(responseAsJson);
         }
 
-        public static async Task<List<T>> ReadOdataListResponseBodyAs<T>(this HttpResponseMessage response)
+        public static async Task<List<T>> ReadOdataListResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var spec = new { value = new List<T>() };
@@ -125,9 +120,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return result.value;
         }
 
-        public static async Task<T> ReadResponseBodyAsKitosApiResponse<T>(this HttpResponseMessage response)
+        public static async Task<T> ReadResponseBodyAsKitosApiResponseAsync<T>(this HttpResponseMessage response)
         {
-            var apiReturnFormat = await response.ReadResponseBodyAs<ApiReturnDTO<T>>().ConfigureAwait(false);
+            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>().ConfigureAwait(false);
             return apiReturnFormat.Response;
         }
 
@@ -137,17 +132,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostAsync(url, loginDto))
             {
-                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
-
-                Assert.Equal(loginDto.Email, tokenResponse.Email);
-                Assert.True(tokenResponse.LoginSuccessful);
-                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
-                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
-
-                return tokenResponse;
+                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
         }
 
@@ -155,18 +142,24 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
 
-            using (var httpResponseMessage = await HttpApi.PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostAsync(url, loginDto))
             {
-                Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-                var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponse<GetTokenResponseDTO>().ConfigureAwait(false);
-
-                Assert.Equal(loginDto.Email, tokenResponse.Email);
-                Assert.True(tokenResponse.LoginSuccessful);
-                Assert.True(tokenResponse.Expires > DateTime.UtcNow);
-                Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
-
-                return tokenResponse;
+                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
+        }
+
+        private static async Task<GetTokenResponseDTO> GetTokenResponseDtoAsync(LoginDTO loginDto, HttpResponseMessage httpResponseMessage)
+        {
+            Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
+            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>()
+                .ConfigureAwait(false);
+
+            Assert.Equal(loginDto.Email, tokenResponse.Email);
+            Assert.True(tokenResponse.LoginSuccessful);
+            Assert.True(tokenResponse.Expires > DateTime.UtcNow);
+            Assert.False(string.IsNullOrWhiteSpace(tokenResponse.Token));
+
+            return tokenResponse;
         }
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
@@ -190,7 +183,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, string role, int organizationId = 1)
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -200,7 +193,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var createdResponse = await PostWithCookieAsync(TestEnvironment.CreateUrl("odata/Users/Users.Create"), cookie, createUserDto))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAs<UserDTO>();
+                var response = await createdResponse.ReadResponseBodyAsAsync<UserDTO>();
                 userId = response.Id;
 
                 Assert.Equal(userDto.Email, response.Email);
@@ -209,7 +202,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var roleDto = new OrgRightDTO
             {
                 UserId = userId,
-                Role = role
+                Role = role.ToString("G")
             };
 
             using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto))
@@ -238,6 +231,5 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return response;
         }
-
     }
 }

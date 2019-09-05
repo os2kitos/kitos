@@ -22,14 +22,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, CrossOrganizationReadAccess.All)]
-        [InlineData(false, true, CrossOrganizationReadAccess.Public)]
-        [InlineData(false, false, CrossOrganizationReadAccess.None)]
-        public void GetCrossOrganizationReadAccess_Returns(bool isGlobalAdmin, bool hasReadAccessOutsideOfContext, CrossOrganizationReadAccess expectedResult)
+        [InlineData(true, false, CrossOrganizationDataReadAccessLevel.All)]
+        [InlineData(false, true, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, CrossOrganizationDataReadAccessLevel.None)]
+        public void GetCrossOrganizationReadAccess_Returns(bool isGlobalAdmin, bool hasReadAccessOutsideOfContext, CrossOrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             _authenticationService.Setup(x => x.IsGlobalAdmin(_userId)).Returns(isGlobalAdmin);
-            _authenticationService.Setup(x => x.HasReadAccessOutsideContext(_userId)).Returns(hasReadAccessOutsideOfContext);
+            ExpectHasReadAccessOutsideOfContextReturns(hasReadAccessOutsideOfContext);
 
             //Act
             var readAccess = _sut.GetCrossOrganizationReadAccess();
@@ -39,20 +39,21 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(19, 19, false, true)]
-        [InlineData(19, 10, true, true)]
-        [InlineData(19, 10, false, false)]
-        public void AllowOrganizationAccess_Returns(int loggedIntoOrg, int orgId, bool hasReadAccessOutsideOfContext, bool expectedResult)
+        [InlineData(true, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, true, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, OrganizationDataReadAccessLevel.None)]
+        public void GetOrganizationReadAccessLevel_Returns(bool sameOrg, bool readAccessOutsideOfContext, OrganizationDataReadAccessLevel expectedAccessLevel)
         {
             //Arrange
-            _authenticationService.Setup(x => x.GetCurrentOrganizationId(_userId)).Returns(loggedIntoOrg);
-            _authenticationService.Setup(x => x.HasReadAccessOutsideContext(_userId)).Returns(hasReadAccessOutsideOfContext);
+            var organizationId = A<int>();
+            _authenticationService.Setup(x => x.GetCurrentOrganizationId(_userId)).Returns(sameOrg ? organizationId : A<int>());
+            ExpectHasReadAccessOutsideOfContextReturns(readAccessOutsideOfContext);
 
             //Act
-            var result = _sut.AllowOrganizationReadAccess(orgId);
+            var readAccess = _sut.GetOrganizationReadAccessLevel(organizationId);
 
             //Assert
-            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedAccessLevel, readAccess);
         }
 
         [Theory]
@@ -101,6 +102,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, result);
+        }
+
+        private void ExpectHasReadAccessOutsideOfContextReturns(bool hasReadAccessOutsideOfContext)
+        {
+            _authenticationService.Setup(x => x.HasReadAccessOutsideContext(_userId)).Returns(hasReadAccessOutsideOfContext);
         }
     }
 }

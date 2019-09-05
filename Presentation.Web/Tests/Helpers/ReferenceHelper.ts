@@ -9,14 +9,14 @@ var inputFields = homePage.kendoToolbarWrapper.inputFields();
 class ReferenceHelper {
 
     public createReference(title: string, url: string, id: string) {
-        homePage.getPage();
-        browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds);
-        headerButtons.createReference.click();
-        browser.wait(homePage.isReferenceCreateFormLoaded(), waitUpTo.twentySeconds);
-        inputFields.referenceDocId.sendKeys(id);
-        inputFields.referenceDocTitle.sendKeys(title);
-        inputFields.referenceDocUrl.sendKeys(url);
-        headerButtons.editSaveReference.click();
+        return homePage.getPage()
+            .then(() => browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds))
+            .then(() => headerButtons.createReference.click())
+            .then(() => browser.wait(homePage.isReferenceCreateFormLoaded(), waitUpTo.twentySeconds))
+            .then(() => inputFields.referenceDocId.sendKeys(id))
+            .then(() => inputFields.referenceDocTitle.sendKeys(title))
+            .then(() => inputFields.referenceDocUrl.sendKeys(url))
+            .then(() => headerButtons.editSaveReference.click());
     }
 
     public deleteReference(id: string) {
@@ -48,6 +48,3 @@ class ReferenceHelper {
 }
 
 export = ReferenceHelper;
-
-
-//referenceDocTitle referenceDocId referenceDocUrl

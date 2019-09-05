@@ -14,6 +14,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -513,7 +514,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(orgId))
+                if (GetOrganizationReadAccessLevel(orgId) == OrganizationDataReadAccessLevel.None)
                 {
                     return Forbidden();
                 }

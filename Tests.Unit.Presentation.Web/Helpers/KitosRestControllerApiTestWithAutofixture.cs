@@ -3,6 +3,7 @@ using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 using Moq;
@@ -15,6 +16,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
     public abstract class KitosRestControllerApiTestWithAutofixture : WithAutoFixture
     {
         protected User KitosUser { get; private set; }
+        protected int CurrentOrganizationId { get; private set; }
 
         protected virtual void SetupControllerFrorTest(BaseApiController sut)
         {
@@ -43,6 +45,13 @@ namespace Tests.Unit.Presentation.Web.Helpers
                 DefaultOrganizationId = A<int>()
             };
             userRepository.Setup(x => x.GetByKey(userId)).Returns(KitosUser);
+
+            //Set authenticated user
+            var authService = new Mock<IAuthenticationService>();
+            CurrentOrganizationId = A<int>();
+            authService.Setup(x => x.GetCurrentOrganizationId(userId)).Returns(CurrentOrganizationId);
+            sut.AuthenticationService = authService.Object;
+
         }
 
         protected T ExpectResponseOf<T>(HttpResponseMessage message)

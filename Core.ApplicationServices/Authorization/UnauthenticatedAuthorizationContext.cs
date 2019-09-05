@@ -5,14 +5,14 @@ namespace Core.ApplicationServices.Authorization
 {
     public class UnauthenticatedAuthorizationContext : IAuthorizationContext
     {
-        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
         {
-            return CrossOrganizationReadAccess.None;
+            return CrossOrganizationDataReadAccessLevel.None;
         }
 
-        public bool AllowReadsWithinOrganization(int organizationId)
+        public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            return false;
+            return OrganizationDataReadAccessLevel.None;
         }
 
         public bool AllowReads(IEntity entity)

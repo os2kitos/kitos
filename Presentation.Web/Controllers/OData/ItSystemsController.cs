@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -30,12 +31,15 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            var readAccessLevel = GetOrganizationReadAccessLevel(orgKey);
+            if (readAccessLevel == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(orgKey);
+            var result = Repository
+                    .AsQueryable()
+                    .ByOrganizationDataAndPublicDataFromOtherOrganizations(orgKey, readAccessLevel, GetCrossOrganizationReadAccessLevel());
 
             return Ok(result);
         }
