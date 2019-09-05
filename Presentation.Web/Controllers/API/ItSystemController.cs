@@ -73,6 +73,13 @@ namespace Presentation.Web.Controllers.API
             _systemService.Delete(entity.Id);
         }
 
+        /// <summary>
+        /// Henter alle IT-Systemer i organisationen samt offentlige IT Systemer fra andre organisationer
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="paging"></param>
+        /// <param name="q"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
@@ -302,6 +309,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Henter alle IT Systemer ejet af organisationen samt IT Systemer fra andre organisationer som er anvendt i organisationen
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)

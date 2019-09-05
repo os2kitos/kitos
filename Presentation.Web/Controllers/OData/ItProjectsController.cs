@@ -39,7 +39,11 @@ namespace Presentation.Web.Controllers.OData
             return base.Get();
         }
 
-        // GET /Organizations(1)/ItProjects
+        /// <summary>
+        /// Henter organisationens projekter samt offentlige projekter fra andre organisationer
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItProjects")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProject>>))]

@@ -34,7 +34,11 @@ namespace Presentation.Web.Controllers.OData
             _accessTypeRepository = accessTypeRepository;
         }
 
-        // GET /Organizations(1)/ItSystemUsages
+        /// <summary>
+        /// Henter alle organisationens IT-Systemanvendelser.
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
@@ -53,6 +57,12 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
+        /// <summary>
+        /// Henter alle IT-Systemanvendelser for den pågældende organisationsenhed
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <param name="unitKey"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
