@@ -23,7 +23,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var token = await HttpApi.GetTokenAsync(role);
             var orgId = 1;
-            var url = TestEnvironment.CreateUrl($"api/ItSystemUsageMigration?organizationId={orgId}&nameContent={itSystemName}&numberOfItSystems={10}&getPublic={true}");
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
+                                                $"?organizationId={orgId}" +
+                                                $"&nameContent={itSystemName}" +
+                                                $"&numberOfItSystems={10}" +
+                                                $"&getPublicFromOtherOrganizations={true}");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
@@ -51,7 +55,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var token = await HttpApi.GetTokenAsync(role);
             var orgId = 1;
-            var url = TestEnvironment.CreateUrl($"api/ItSystemUsageMigration?organizationId={orgId}&nameContent={prefix}&numberOfItSystems={2}&getPublic={true}");
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
+                                                $"?organizationId={orgId}" +
+                                                $"&nameContent={prefix}" +
+                                                $"&numberOfItSystems={2}" +
+                                                $"&getPublicFromOtherOrganizations={true}");
 
             //Act
             using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
