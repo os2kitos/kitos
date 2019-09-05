@@ -55,6 +55,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
+            _itSystemUsageMigrationService.toExecute(usageId, toSystemId);
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 

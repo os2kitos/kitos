@@ -49,19 +49,28 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
 
         public Result<OperationResult, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
         {
+            var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
+            var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
+            var toItSystem = _itSystemRepository.GetByKey(toSystemId);
+
+            var affectedContracts = itSystemUsage.Contracts;
+            var affectedExhibitInterfaces = itSystemUsage.ItInterfaceExhibitUsages;
+            var affectedInterfaces = itSystemUsage.ItInterfaceUsages;
+            var affectedItProjects = itSystemUsage.ItProjects;
+
+
             return Result<OperationResult, string>.Ok("Changed");
         }
 
-        public void toExecute(string input)
+        public Result<OperationResult, int> toExecute(int usageSystemId, int toSystemId)
         {
-            //var itSystemUsage = _itSystemUsageRepository
-            //    .Get(x => x.Id == usageSystemId);
-            //var usage = itSystemUsage.First();
-            //usage.ItSystemId = toSystemId;
-            //_itSystemUsageRepository.Update(usage);
-            //_itSystemUsageRepository.Save();
-
-            throw new NotImplementedException();
+            var itSystemUsage = _itSystemUsageRepository
+                .Get(x => x.Id == usageSystemId);
+            var usage = itSystemUsage.First();
+            usage.ItSystemId = toSystemId;
+            _itSystemUsageRepository.Update(usage);
+            _itSystemUsageRepository.Save();
+            return Result<OperationResult, int>.Ok(1);
         }
 
 

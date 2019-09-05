@@ -10,6 +10,6 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
 
         Result<OperationResult, string> GetMigrationConflicts(int usageSystemId, int toSystemId);
 
-        void toExecute(string input);
+        Result<OperationResult, int> toExecute(int usageSystemId, int toSystemId);
     }
 }
