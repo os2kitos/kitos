@@ -99,6 +99,8 @@
     <Compile Include="IFeatureChecker.cs" />
     <Compile Include="ItSystemUsageMigration\IItSystemUsageMigrationService.cs" />
     <Compile Include="ItSystemUsageMigration\ItSystemUsageMigrationService.cs" />
+    <Compile Include="Model\OperationResult.cs" />
+    <Compile Include="Model\Result.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
     <Compile Include="IAuthenticationService.cs" />

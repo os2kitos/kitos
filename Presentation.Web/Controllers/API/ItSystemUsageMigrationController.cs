@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
-using Core.DomainModel;
+using Core.ApplicationServices.Model;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API
                 var result = _itSystemUsageMigrationService.GetMigrationConflicts(usageId, toSystemId);
                 switch (result.GetStatus())
                 {
-                    case ResultStatus.Ok:
+                    case OperationResult.Ok:
                         return Ok(result.GetResultValue());
                     default:
                         return CreateResponse(HttpStatusCode.InternalServerError,
@@ -61,24 +61,28 @@ namespace Presentation.Web.Controllers.API
         [HttpGet]
         //[Route("UnusedItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystemDTO>))]
-        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization([FromUri]int organizationId, [FromUri]string nameContent, [FromUri]int numberOfItSystems, [FromUri]bool getPublic)
+        public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
+            [FromUri]int organizationId, 
+            [FromUri]string nameContent, 
+            [FromUri]int numberOfItSystems, 
+            [FromUri]bool getPublicFromOtherOrganizations)
         {
             try
             {
-                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
                 {
                     return Forbidden();
                 }
 
-                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublic);
+                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
 
                 switch (result.GetStatus())
                 {
-                    case ResultStatus.Ok:
+                    case OperationResult.Ok:
                         return Ok(MapItSystemToItSystemUsageMigrationDto(result.GetResultValue()));
-                    case ResultStatus.Forbidden:
+                    case OperationResult.Forbidden:
                         return Forbidden();
-                    case ResultStatus.NotFound:
+                    case OperationResult.NotFound:
                         return NotFound();
                     default:
                         return CreateResponse(HttpStatusCode.InternalServerError,
@@ -92,7 +96,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private IReadOnlyList<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
+        private IEnumerable<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
         {
             return input.Select(itSystem => new ItSystemSimpleDTO() {Id = itSystem.Id, Name = itSystem.Name}).ToList();
         }

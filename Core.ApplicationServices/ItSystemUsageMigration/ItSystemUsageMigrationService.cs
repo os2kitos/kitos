@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
+using Core.ApplicationServices.Model;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -13,13 +13,13 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
 {
     public class ItSystemUsageMigrationService : IItSystemUsageMigrationService
     {
-        private IAuthorizationContext _authorizationContext;
+        private readonly IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
 
         public ItSystemUsageMigrationService(
-            IAuthorizationContext authorizationContext, 
-            IGenericRepository<ItSystem> itSystemRepository, 
+            IAuthorizationContext authorizationContext,
+            IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository)
         {
             _authorizationContext = authorizationContext;
@@ -27,27 +27,29 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             _itSystemUsageRepository = itSystemUsageRepository;
         }
 
-        public Result<ResultStatus, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
-            int organizationId, 
-            string nameContent, 
-            int numberOfItSystems, 
+        public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
+            int organizationId,
+            string nameContent,
+            int numberOfItSystems,
             bool getPublicFromOtherOrganizations)
         {
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
+
+            if (accessLevel < OrganizationDataReadAccessLevel.Public)
             {
-                return Result<ResultStatus, IReadOnlyList<ItSystem>>.Fail(ResultStatus.Forbidden);
+                return Result<OperationResult, IReadOnlyList<ItSystem>>.Fail(OperationResult.Forbidden);
             }
 
             var idsOfSystemsInUse = GetIdsOfItSystemsInUseByOrganizationId(organizationId);
             var unusedItSystems = GetUnusedItSystems(idsOfSystemsInUse, organizationId, nameContent, numberOfItSystems,
                 getPublicFromOtherOrganizations);
-            
-            return Result<ResultStatus, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
+
+            return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
         }
 
-        public Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
+        public Result<OperationResult, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
         {
-            return Result<ResultStatus, string>.Ok("Changed");
+            return Result<OperationResult, string>.Ok("Changed");
         }
 
         public void toExecute(string input)
@@ -72,16 +74,24 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
                     .ToList();
         }
 
-        private IReadOnlyList<ItSystem> GetUnusedItSystems(IReadOnlyList<int> exceptIds, int organizationId, string nameContent, int numberOfItSystems,
+        private IReadOnlyList<ItSystem> GetUnusedItSystems(
+            IReadOnlyList<int> idsOfSystemsInUse,
+            int organizationId,
+            string nameContent,
+            int numberOfItSystems,
             bool getPublicFromOtherOrganizations)
         {
-            var unusedItSystems = _itSystemRepository
-                .AsQueryable();
+            var crossLevelAccess = _authorizationContext.GetCrossOrganizationReadAccess();
+            var organizationAccess = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
+
+            var unusedItSystems = _itSystemRepository.AsQueryable();
+
             unusedItSystems = getPublicFromOtherOrganizations
-                ? unusedItSystems.ByPublicAccessOrOrganizationId(organizationId)
-                : unusedItSystems.ByOrganizationId(organizationId);
+                ? unusedItSystems.ByOrganizationDataAndPublicDataFromOtherOrganizations(organizationId, organizationAccess, crossLevelAccess)
+                : unusedItSystems.ByOrganizationId(organizationId, organizationAccess);
+
             unusedItSystems = unusedItSystems
-                .ByEntitiesExceptWithIds(exceptIds)
+                .ByEntitiesExceptWithIds(idsOfSystemsInUse)
                 .ByPartOfName(nameContent)
                 .OrderBy(x => x.Name)
                 .Take(numberOfItSystems);

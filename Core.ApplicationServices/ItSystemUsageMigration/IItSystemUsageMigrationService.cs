@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using Core.DomainModel;
+using Core.ApplicationServices.Model;
 using Core.DomainModel.ItSystem;
 
 namespace Core.ApplicationServices.ItSystemUsageMigration
 {
     public interface IItSystemUsageMigrationService
     {
-        Result<ResultStatus, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganizations);
+        Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganizations);
 
-        Result<ResultStatus, string> GetMigrationConflicts(int usageSystemId, int toSystemId);
+        Result<OperationResult, string> GetMigrationConflicts(int usageSystemId, int toSystemId);
 
         void toExecute(string input);
     }
