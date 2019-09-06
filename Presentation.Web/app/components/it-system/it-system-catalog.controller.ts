@@ -21,6 +21,11 @@
         removeUsage(dataItem): void;
     }
 
+    export interface ISelect2Scope extends ng.IScope
+    {
+        mySelectOptions: any;
+    }
+
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
@@ -33,8 +38,8 @@
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
 
-
-        public static $inject: Array<string> = [
+        public static $inject:
+            Array<string> = [
             "$rootScope",
             "$scope",
             "$http",
@@ -48,13 +53,14 @@
             "user",
             "userAccessRights",
             "gridStateService",
-            "$uibModal",
+            "$uibModal", 
             "needsWidthFixService"
         ];
 
         constructor(
             private $rootScope: IRootScope,
-            private $scope: ng.IScope,
+            //private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
+            private $scope: any,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -71,10 +77,8 @@
             private newItSystemID,
             private municipality,
             public migrationConsequenceText,
-
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
-
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
@@ -101,6 +105,43 @@
                     });
                 }
             });
+
+            $scope.mySelectOptions = {
+                minimumInputLength: 1,
+                ajax: {
+                    data: function (term, page) {
+                        return { query: term };
+                    },
+                    quietMillis: 500,
+                    transport: function (queryParams) {
+                        return  $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=a&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
+                        //res. = function () {
+                        //    return null;
+                        //};
+
+                        //return res;
+                    },
+
+                    results: function (data, page) {
+                        var results = [];
+
+                        //for each system usages
+                        _.each(data.data.response, function (usage: {id;  name; }) {
+                            results.push({
+                                    //the id of the system usage is the id, that is selected
+                                    id: usage.id,
+                                    //but the name of the system is the label for the select2
+                                    text: usage.name,
+                                    //saving the usage for later use
+                                    usage: usage
+                                });
+                            
+                        });
+
+                        return { results: results };
+                    }
+                }
+            };
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -729,7 +770,6 @@
             return regexp.test(Url.toLowerCase());
         };
 
-
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
             this.oldItSystemUsageID = systemName;
@@ -743,12 +783,11 @@
 
         public migrateItSystem = (name: string) => {
             this.municipality = name;
-            this.usageGridMigration.dataSource.read();
+         //   this.usageGridMigration.dataSource.read();
             //Set modal title
             this.modalMigration.setOptions({ resizable: false, title: `Ledige systemer` });
             //Open modal
             this.modalMigration.center().open();
-
         }
 
         public migrateSystemTo = (from: string) => {
@@ -776,7 +815,6 @@
             this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
         }
 
-        // usagedetails grid
         public usageDetailsGrid: kendo.ui.GridOptions = {
             dataSource: {
                 type: "odata-v4",
@@ -811,12 +849,11 @@
 
         public usageDetailsGridMigration: kendo.ui.GridOptions = {
             dataSource: {
-                type: "odata-v4",
                 transport:
                 {
                     read: {
-                        url: "/odata/ItSystems",
-                        dataType: "json"
+                        url: "/api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=a&numberOfItSystems=3&getPublicFromOtherOrganizations=true",
+                        dataType: "json",
                     }
                 },
                 serverPaging: true,
@@ -829,7 +866,7 @@
                 {
                     field: "Name", title: "ItSystem",
                     template: dataItem => {
-                        return dataItem.Name;
+                        return dataItem.name;
                     },
 
                 }
@@ -1012,6 +1049,7 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
+                        //TODO ADD CHECK FOR NEW MIGRATION FUNCTION
                         userAccessRights: ['$http', function ($http) {
                             return $http.get("api/itsystem/?getEntitiesAccessRights=true")
                                 .then(function (result) {
@@ -1023,12 +1061,4 @@
 
             }
         ]);
-
-    app.controller('systemCatalogVm', [
-        '$rootScope', '$scope', '$http', '$state', 'notify',
-        function ($rootScope, $scope, $http, $state, notify) {
-
-        }
-    ]);
-
 }
