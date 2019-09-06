@@ -91,6 +91,7 @@
     <Compile Include="ItSystem\ItSystemCatalogTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
     <Compile Include="ItSystem\ItIterfacesTest.cs" />
+    <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
+    <Compile Include="Tools\ItSystemHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />

@@ -4,6 +4,7 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.ItSystemUsageMigration;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
@@ -108,6 +109,7 @@ namespace Presentation.Web
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
             kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
+            kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
 
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
