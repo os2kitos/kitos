@@ -100,6 +100,8 @@
     <Compile Include="IFeatureChecker.cs" />
     <Compile Include="ItSystemUsageMigration\IItSystemUsageMigrationService.cs" />
     <Compile Include="ItSystemUsageMigration\ItSystemUsageMigrationService.cs" />
+    <Compile Include="Model\ItSystemUsage\ItSystemUsageMigration.cs" />
+    <Compile Include="Model\ItSystemUsage\SystemUsageContractMigration.cs" />
     <Compile Include="Model\Result\OperationResult.cs" />
     <Compile Include="Model\Result\Result.cs" />
     <Compile Include="OrganizationRoleService.cs" />

@@ -87,5 +87,6 @@ namespace Core.DomainServices.Extensions
         {
             return new QueryByPartOfName<T>(nameContent).Apply(result);
         }
+        
     }
 }
