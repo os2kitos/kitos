@@ -30,6 +30,7 @@ type ColumnHeaders = {
     contractName: protractor.ElementFinder,
     catalogName: protractor.ElementFinder,
     catalogUsage: protractor.ElementFinder,
+    usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userEmail: protractor.ElementFinder
 };
@@ -40,6 +41,7 @@ type ColumnObjects = {
     referenceId: protractor.ElementArrayFinder,
     contractName: protractor.ElementArrayFinder,
     catalogName: protractor.ElementArrayFinder,
+    usedByName: protractor.ElementArrayFinder,
     catalogUsage: protractor.ElementArrayFinder,
     userApi: protractor.ElementArrayFinder,
     UserEmail: protractor.ElementArrayFinder
@@ -90,7 +92,8 @@ class kendoToolbarWrapper {
             referenceName: kendo.getColumnHeaderClickable(consts.kendoReferencetNameHeader),
             referenceId: kendo.getColumnHeaderClickable(consts.kendoReferenceHeaderId),
             userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
-            userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader)
+            userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
+            usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeaderObject)
 
         };
         return columns;
@@ -108,7 +111,8 @@ class kendoToolbarWrapper {
             userApi: kendo.getColumnItemLinks(consts.kendoUserApiObject),
             UserEmail: kendo.getColumnItemLinks(consts.kendoUserEmailObject),
             referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects),
-            referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects)
+            referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects),
+            usedByName: kendo.getColumnItemLinks(consts.kendoUsedByObject)
         };
         return columns;
     }

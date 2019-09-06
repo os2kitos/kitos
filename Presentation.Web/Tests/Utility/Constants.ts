@@ -19,7 +19,8 @@ class Constants {
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
-    
+    readonly kendoUsedByHeaderObject = "usedByNameHeader";
+    readonly kendoUsedByObject = "usedByNameObject";
 
     readonly kendoUserEmailHeader = "userHeaderEmail";
     readonly kendoUserEmailObject = "userEmailObject";

@@ -32,7 +32,7 @@
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
-         
+
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -439,7 +439,13 @@
                             `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
-                        sortable: false
+                        sortable: false,
+                        attributes: {
+                            "data-element-type": "usedByNameObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "usedByNameHeader"
+                        },
                     },
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
@@ -730,7 +736,7 @@
             //Filter by usageId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
-            this.modal.setOptions({ resizable: false , title: `Anvendelse af ${systemName}` });
+            this.modal.setOptions({ resizable: false, title: `Anvendelse af ${systemName}` });
             //Open modal
             this.modal.center().open();
         }
@@ -752,14 +758,14 @@
             }
 
             this.newItSystemID = selectedItem.get("Name");
-            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " +  this.newItSystemID;
-            this.modalMigrationConsequence.setOptions({resizable: false, title: `Flytning af it-system ` });
+            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemID;
+            this.modalMigrationConsequence.setOptions({ resizable: false, title: `Flytning af it-system ` });
             this.modalMigrationConsequence.center().open();
         }
 
         public startMigration = () => {
-            if (this.oldItSystemUsageID != null || this.newItSystemID != null){
-                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemID );
+            if (this.oldItSystemUsageID != null || this.newItSystemID != null) {
+                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemID);
             }
         }
 
@@ -1019,10 +1025,10 @@
         ]);
 
     app.controller('systemCatalogVm', [
-        '$rootScope', '$scope', '$http', '$state', 'notify', 
-        function ($rootScope, $scope, $http, $state, notify, ) {
+        '$rootScope', '$scope', '$http', '$state', 'notify',
+        function ($rootScope, $scope, $http, $state, notify) {
+
         }
     ]);
-
 
 }
