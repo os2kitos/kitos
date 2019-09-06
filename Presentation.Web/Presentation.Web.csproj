@@ -327,6 +327,9 @@
     <Compile Include="Models\ItSystemUsageMigration\ItContractItSystemUsageDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
+    <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -505,15 +508,12 @@
     <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
-    <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
     <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
     <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
     <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
     <Compile Include="Infrastructure\TokenValidator.cs" />
-    <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
-    <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\ArchivePeriodDTO.cs" />
     <Compile Include="Models\ContactPersonDTO.cs" />
     <Compile Include="Models\DataResponsibleDTO.cs" />

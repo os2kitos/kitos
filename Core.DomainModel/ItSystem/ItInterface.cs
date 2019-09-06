@@ -9,7 +9,6 @@ namespace Core.DomainModel.ItSystem
         public ItInterface()
         {
             DataRows = new List<DataRow>();
-            //CanBeUsedBy = new List<ItInterfaceUse>();
             InterfaceLocalUsages = new List<ItInterfaceUsage>();
             InterfaceLocalExposure = new List<ItInterfaceExhibitUsage>();
         }
@@ -64,15 +63,6 @@ namespace Core.DomainModel.ItSystem
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }
 
-        /// <summary>
-        ///     Gets or sets it systems that can use this instance.
-        /// </summary>
-        /// <value>
-        ///     It systems that can used by this instance.
-        /// </value>
-        //public virtual ICollection<ItInterfaceUse> CanBeUsedBy { get; set; }
-
-        //public int? ExhibitedById { get; set; } TODO
         /// <summary>
         ///     Gets or sets it system that exhibits this interface instance.
         /// </summary>
