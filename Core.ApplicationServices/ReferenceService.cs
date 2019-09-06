@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
@@ -13,6 +12,7 @@ namespace Core.ApplicationServices
 
         [Inject]
         public IGenericRepository<ExternalReference> ReferenceRepository { get; set; }
+
         [Inject]
         public ILogger Logger { get; set; }
 

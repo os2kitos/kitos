@@ -14,8 +14,6 @@ namespace Core.DomainServices
         /// <returns></returns>
         ItProject AddProject(ItProject project);
 
-        //ItProject CloneProject(ItProject original, User newOwner, int newOrgId);
-
         void DeleteProject(int id);
     }
 }

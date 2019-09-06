@@ -14,22 +14,6 @@ namespace Core.DomainModel.ItContract
         
         public bool HasReadAccess { get; set; }
         public bool HasWriteAccess { get; set; }
-
-        /// <summary>
-        /// Gets or sets the receivers for an advice.
-        /// </summary>
-        /// <value>
-        /// The receivers for an advice.
-        /// </value>
-      //  public virtual ICollection<Advice.Advice> ReceiverFor { get; set; }
-        /// <summary>
-        /// Gets or sets the carbon copy receivers for an advice.
-        /// </summary>
-        /// <value>
-        /// The carbon copy receivers for an advice.
-        /// </value>
-        //public virtual ICollection<Advice.Advice> CarbonCopyReceiverFor { get; set; }
-
         public virtual ICollection<ItContractRight> References { get; set; } = new HashSet<ItContractRight>();
     }
 }

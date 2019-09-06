@@ -62,14 +62,14 @@ namespace Presentation.Web.Controllers.OData
                    switch (advice.Scheduling) {
                             case Scheduling.Immediate:
                             var jobId = BackgroundJob.Enqueue(
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id));
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id));
                                 break;
                             case Scheduling.Hour:
                             
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Day:
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.OData
                              cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Week:
@@ -87,7 +87,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Month:
@@ -96,7 +96,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Year:
@@ -106,7 +106,7 @@ namespace Presentation.Web.Controllers.OData
                              cron = "0 8 " + day + " " + month + " *";
                                 
                                 RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                             break;
                         }
@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.OData
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Day:
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Week:
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Month:
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Year:
@@ -173,7 +173,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " " + month + " *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                () => _adviceService.sendAdvice(key),
+                () => _adviceService.SendAdvice(key),
                 cron);
                             break;
                     }

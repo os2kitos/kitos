@@ -14,7 +14,7 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<User> _userRepository;
 
-        public readonly IFeatureChecker _featureChecker;
+        private readonly IFeatureChecker _featureChecker;
 
         public AuthenticationService(IGenericRepository<User> userRepository, IFeatureChecker featureChecker)
         {

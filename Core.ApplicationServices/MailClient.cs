@@ -1,11 +1,12 @@
-﻿using Core.DomainServices;
+﻿using System;
+using Core.DomainServices;
 using System.Net.Mail;
 
 namespace Core.ApplicationServices
 {
-    public class MailClient : IMailClient
+    public class MailClient : IMailClient, IDisposable
     {
-        public readonly SmtpClient _client;
+        private readonly SmtpClient _client;
 
         /// <summary>
         /// Construct a smtp client with configuration from web.config
@@ -33,6 +34,11 @@ namespace Core.ApplicationServices
         public void Send(MailMessage message)
         {
             _client.Send(message);
+        }
+
+        public void Dispose()
+        {
+            _client?.Dispose();
         }
     }
 }

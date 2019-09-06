@@ -5,7 +5,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using System.Web.Http.Description;
 using System.Web.OData;
 using System.Web.OData.Routing;
 
