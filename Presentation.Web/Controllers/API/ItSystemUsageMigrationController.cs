@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.ItSystemUsageMigration;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -19,9 +20,9 @@ namespace Presentation.Web.Controllers.API
     [RoutePrefix("api/v1/ItSystemUsageMigration")]
     public class ItSystemUsageMigrationController : BaseApiController
     {
-        private IItSystemUsageMigrationService _itSystemUsageMigrationService;
+        private readonly IItSystemUsageMigrationService _itSystemUsageMigrationService;
 
-        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext) 
+        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext)
             : base(authContext)
         {
             _itSystemUsageMigrationService = itSystemUsageMigrationService;
@@ -30,18 +31,61 @@ namespace Presentation.Web.Controllers.API
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        public HttpResponseMessage GetMigrationConsequences([FromUri]int usageId, [FromUri]int toSystemId)
+        public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            var result = _itSystemUsageMigrationService.GetMigrationConsequences(usageId, toSystemId);
-            switch (result.Status)
+            //TODO
+            var affectedItProjects = new List<NamedEntityDTO>();
+            affectedItProjects.Add(new NamedEntityDTO()
             {
-                case OperationResult.Ok:
-                    return Ok(result.ResultValue);
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get Unused It Systems");
-            }
-            
+                Id = 1,
+                Name = "ItProject"
+            });
+
+            var affectedInterfaceUsages = new List<NamedEntityDTO>();
+            affectedInterfaceUsages.Add(new NamedEntityDTO()
+            {
+                Id = 2,
+                Name = "InterfaceUsage"
+            });
+            var affectedInterfaceExhibitUsages = new List<NamedEntityDTO>();
+            affectedInterfaceExhibitUsages.Add(new NamedEntityDTO()
+            {
+                Id = 3,
+                Name = "InterfaceExhibitUsage"
+            });
+            var affectedItContracts = new List<ItContractItSystemUsageDTO>();
+            affectedItContracts.Add(new ItContractItSystemUsageDTO()
+            {
+                Contract = new NamedEntityDTO()
+                {
+                    Id = 4,
+                    Name = "Contract"
+                },
+                AffectedInterfaceUsages = affectedInterfaceUsages,
+                InterfaceExhibitUsagesToBeDeleted = affectedInterfaceExhibitUsages
+            });
+
+            return Ok(new ItSystemUsageMigrationDTO
+            {
+                TargetUsage = new NamedEntityDTO()
+                {
+                    Id = usageId,
+                    Name = "ItSystemUsage"
+                },
+                FromSystem = new NamedEntityDTO()
+                {
+                    Id = 1,
+                    Name = "FromSystem"
+                },
+                ToSystem = new NamedEntityDTO()
+                {
+                    Id = 2,
+                    Name = "ToSystem"
+                },
+                AffectedItProjects = affectedItProjects,
+                AffectedContracts = affectedItContracts
+            });
+
         }
 
         [HttpPost]
@@ -49,60 +93,63 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            _itSystemUsageMigrationService.toExecute(usageId, toSystemId);
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            //TODO
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("Accessibility")]
+        public HttpResponseMessage GetAccessibilityLevel()
+        {
+            return Ok(new
+            {
+                CanExecuteMigration = _itSystemUsageMigrationService.CanExecuteMigration()
+            });
         }
 
         [HttpGet]
         [Route("UnusedItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type=typeof(IEnumerable<ItSystemSimpleDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemSimpleDTO>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
-            [FromUri]int organizationId, 
-            [FromUri]string nameContent, 
-            [FromUri]int numberOfItSystems, 
+            [FromUri]int organizationId,
+            [FromUri]string nameContent,
+            [FromUri]int numberOfItSystems,
             [FromUri]bool getPublicFromOtherOrganizations)
         {
-            try
+            if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
             {
-                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
-                {
+                return Forbidden();
+            }
+            if (string.IsNullOrWhiteSpace(nameContent))
+            {
+                return Ok(MapItSystemToItSystemUsageMigrationDto(new List<ItSystem>()));
+            }
+            if (numberOfItSystems < 1 || numberOfItSystems > 25)
+            {
+                return BadRequest();
+            }
+
+            var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
+
+            switch (result.Status)
+            {
+                case OperationResult.Ok:
+                    return Ok(MapItSystemToItSystemUsageMigrationDto(result.ResultValue));
+                case OperationResult.Forbidden:
                     return Forbidden();
-                }
-                if (string.IsNullOrWhiteSpace(nameContent))
-                {
-                    return BadRequest();
-                }
-                if (numberOfItSystems < 1)
-                {
-                    return BadRequest();
-                }
-
-                var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
-
-                switch (result.Status)
-                {
-                    case OperationResult.Ok:
-                        return Ok(MapItSystemToItSystemUsageMigrationDto(result.ResultValue));
-                    case OperationResult.Forbidden:
-                        return Forbidden();
-                    case OperationResult.NotFound:
-                        return NotFound();
-                    default:
-                        return CreateResponse(HttpStatusCode.InternalServerError,
-                            "An error occured when trying to get Unused It Systems");
-                }
-
+                case OperationResult.NotFound:
+                    return NotFound();
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get Unused It Systems");
             }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+
         }
 
-        private IEnumerable<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
+        private static IEnumerable<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
         {
-            return input.Select(itSystem => new ItSystemSimpleDTO() {Id = itSystem.Id, Name = itSystem.Name}).ToList();
+            return input.Select(itSystem => new ItSystemSimpleDTO { Id = itSystem.Id, Name = itSystem.Name }).ToList();
         }
-        
+
     }
 }

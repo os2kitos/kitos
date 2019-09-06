@@ -324,7 +324,9 @@
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
-    <Compile Include="Models\ItSystemUsageMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItContractItSystemUsageDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
+    <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />

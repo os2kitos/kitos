@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.ItSystemUsage;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -57,8 +59,9 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
         }
 
-        public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetMigrationConsequences(int usageSystemId, int toSystemId)
+        public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
         {
+            //TODO
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
             var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
             var toItSystem = _itSystemRepository.GetByKey(toSystemId);
@@ -68,25 +71,30 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             var affectedInterfaces = itSystemUsage.ItInterfaceUsages;
             var affectedItProjects = itSystemUsage.ItProjects;
 
-            return Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration>.Ok(new Model.ItSystemUsage.ItSystemUsageMigration
-            {
-                ItSystemUsage = itSystemUsage,
-                FromItSystem = fromItSystem,
-                ToItSystem = toItSystem
-            });
+            var dummyAffectedContracts = new List<SystemUsageContractMigration>();
+
+            return Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration>.Ok(
+                new Model.ItSystemUsage.ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, dummyAffectedContracts));
         }
 
-        public Result<OperationResult, int> toExecute(int usageSystemId, int toSystemId)
+        public Result<OperationResult, int> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
         {
-            var itSystemUsage = _itSystemUsageRepository
-                .Get(x => x.Id == usageSystemId);
-            var usage = itSystemUsage.First();
-            usage.ItSystemId = toSystemId;
-            _itSystemUsageRepository.Update(usage);
-            _itSystemUsageRepository.Save();
+            //TODO
+            //var migration = GetSystemUsageMigration(usageSystemId,toSystemId);
+            
+            //var itSystemUsage = _itSystemUsageRepository
+            //    .Get(x => x.Id == usageSystemId);
+            //var usage = itSystemUsage.First();
+            //usage.ItSystemId = toSystemId;
+            //_itSystemUsageRepository.Update(usage);
+            //_itSystemUsageRepository.Save();
             return Result<OperationResult, int>.Ok(1);
         }
 
+        public bool CanExecuteMigration()
+        {
+            return _authorizationContext.AllowSystemUsageMigration();
+        }
 
         private IReadOnlyList<int> GetIdsOfItSystemsInUseByOrganizationId(int organizationId)
         {

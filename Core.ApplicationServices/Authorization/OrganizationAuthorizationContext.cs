@@ -154,6 +154,11 @@ namespace Core.ApplicationServices.Authorization
             return AllowModify(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
         }
 
+        public bool AllowSystemUsageMigration()
+        {
+            return IsGlobalAdmin() && IsReadOnly() == false;
+        }
+
         private bool AllowWritesToEntity(IEntity entity)
         {
             var result = false;

@@ -7,9 +7,8 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
     public interface IItSystemUsageMigrationService
     {
         Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganizations);
-
-        Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetMigrationConsequences(int usageSystemId, int toSystemId);
-
-        Result<OperationResult, int> toExecute(int usageSystemId, int toSystemId);
+        Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId);
+        Result<OperationResult, int> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId);
+        bool CanExecuteMigration();
     }
 }
