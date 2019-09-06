@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -33,30 +34,43 @@ namespace Presentation.Web.Controllers.OData
             _accessTypeRepository = accessTypeRepository;
         }
 
-        // GET /Organizations(1)/ItSystemUsages
+        /// <summary>
+        /// Henter alle organisationens IT-Systemanvendelser.
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            //Usages are local so full access is required
+            var accessLevel = GetOrganizationReadAccessLevel(orgKey);
+            if (accessLevel != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByOrganizationId(orgKey);
+            var result = Repository.AsQueryable().ByOrganizationId(orgKey, accessLevel);
 
             return Ok(result);
         }
 
+        /// <summary>
+        /// Henter alle IT-Systemanvendelser for den pågældende organisationsenhed
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <param name="unitKey"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            //Usages are local so full access is required
+            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }

@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -23,19 +24,27 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        // GET /Organizations(1)/ItSystems
+        /// <summary>
+        /// Henter alle organisationens IT-Systemer samt offentlige IT-systemer fra andre organisationer.
+        /// Resultatet filtreres i hht. brugerens læserettigheder i den opgældende organisation, samt på tværs af organisationer.
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <returns></returns>
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(int orgKey)
         {
-            if (!AllowOrganizationAccess(orgKey))
+            var readAccessLevel = GetOrganizationReadAccessLevel(orgKey);
+            if (readAccessLevel == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(orgKey);
+            var result = Repository
+                    .AsQueryable()
+                    .ByOrganizationDataAndPublicDataFromOtherOrganizations(orgKey, readAccessLevel, GetCrossOrganizationReadAccessLevel());
 
             return Ok(result);
         }

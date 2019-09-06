@@ -23,7 +23,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void GetCrossOrganizationReadAccess_Returns_Result_From_Context()
         {
             //Arrange
-            var expectedResult = A<CrossOrganizationReadAccess>();
+            var expectedResult = A<CrossOrganizationDataReadAccessLevel>();
             _authContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(expectedResult);
 
             //Act
@@ -33,18 +33,16 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void AllowOrganizationAccess_Returns_Response_From_Context(bool expectedResult)
+        [Fact]
+        public void GetOrganizationReadAccessLevel_Returns_Result_From_Context()
         {
             //Arrange
+            var expectedResult = A<OrganizationDataReadAccessLevel>();
             var organizationId = A<int>();
-            _authContext.Setup(x => x.AllowReadsWithinOrganization(organizationId)).Returns(expectedResult);
+            _authContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(expectedResult);
 
             //Act
-            var result = _sut.AllowOrganizationReadAccess(organizationId);
+            var result = _sut.GetOrganizationReadAccessLevel(organizationId);
 
             //Assert
             Assert.Equal(expectedResult, result);

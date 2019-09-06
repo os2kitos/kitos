@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 
 namespace Core.DomainServices.Extensions
@@ -11,6 +14,13 @@ namespace Core.DomainServices.Extensions
             IHasOrganization
         {
             return new QueryByOrganizationId<T>(organizationId).Apply(result);
+        }
+
+        public static IQueryable<T> ByOrganizationId<T>(this IQueryable<T> result, int organizationId, OrganizationDataReadAccessLevel accessLevel) where T :
+            class,
+            IHasOrganization
+        {
+            return QueryFactory.ByOrganizationId<T>(organizationId, accessLevel).Apply(result);
         }
 
         public static IQueryable<T> ByPublicAccessModifier<T>(this IQueryable<T> result) where T :
@@ -26,6 +36,43 @@ namespace Core.DomainServices.Extensions
             IHasOrganization
         {
             return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result); ;
+        }
+
+        public static IQueryable<T> ByOrganizationDataAndPublicDataFromOtherOrganizations<T>(
+            this IQueryable<T> result,
+            int organizationId,
+            OrganizationDataReadAccessLevel organizationAccessLevel,
+            CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccessLevel)
+            where T : class, IHasAccessModifier, IHasOrganization
+        {
+            var domainQueries = new List<IDomainQuery<T>>();
+
+            /****************/
+            /***MAIN QUERY***/
+            /****************/
+            if (organizationAccessLevel >= OrganizationDataReadAccessLevel.Public)
+            {
+                if (crossOrganizationDataReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public)
+                {
+                    domainQueries.Add(new QueryByPublicAccessOrOrganizationId<T>(organizationId));
+                }
+                else
+                {
+                    domainQueries.Add(new QueryByOrganizationId<T>(organizationId));
+                }
+
+                //Refine to public data only for the organization in question
+                if (organizationAccessLevel == OrganizationDataReadAccessLevel.Public)
+                {
+                    domainQueries.Add(new QueryByAccessModifier<T>(AccessModifier.Public));
+                }
+            }
+            else
+            {
+                domainQueries.Add(new RejectAllResultsQuery<T>());
+            }
+
+            return new IntersectionQuery<T>(domainQueries).Apply(result);
         }
     }
 }

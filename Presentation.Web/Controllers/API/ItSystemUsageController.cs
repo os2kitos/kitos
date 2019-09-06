@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Castle.Core.Internal;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -29,7 +23,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
-        private readonly IGenericRepository<ItSystemRole> _roleRepository;
         private readonly IGenericRepository<AttachedOption> _attachedOptionsRepository;
 
 
@@ -37,7 +30,6 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<ItSystemRole> roleRepository,
             IGenericRepository<AttachedOption> attachedOptionsRepository,
             IAuthorizationContext authorizationContext)
             : base(repository, authorizationContext)
@@ -45,7 +37,6 @@ namespace Presentation.Web.Controllers.API
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
-            _roleRepository = roleRepository;
             _attachedOptionsRepository = attachedOptionsRepository;
         }
 
@@ -54,7 +45,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(organizationId))
+                //Local objects - must have full access to view
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -78,7 +70,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!AllowOrganizationReadAccess(organizationId))
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -127,74 +119,6 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 return Ok(dto);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
-        {
-            try
-            {
-                var usages = Repository.Get(
-                    u =>
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    );
-
-                // mapping to DTOs for easy lazy loading of needed properties
-                usages = usages.Where(AllowRead);
-                var dtos = Map(usages);
-
-                var roles = _roleRepository.Get();
-                roles = roles.Where(AllowRead).ToList();
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
-                header.Add("Aktiv", "Aktiv");
-                header.Add("IT System", "IT System");
-                header.Add("OrgUnit", "Ansv. organisationsenhed");
-                foreach (var role in roles)
-                    header.Add(role.Name, role.Name);
-                header.Add("AppType", "Applikationtype");
-                header.Add("BusiType", "Forretningstype");
-                header.Add("Anvender", "Anvender");
-                header.Add("Udstiller", "Udstiller");
-                header.Add("Overblik", "Overblik");
-                list.Add(header);
-                foreach (var usage in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Aktiv", usage.MainContractIsActive);
-                    obj.Add("IT System", usage.ItSystem.Name);
-                    obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
-                    foreach (var role in roles)
-                    {
-                        var roleId = role.Id;
-                        obj.Add(role.Name,
-                                String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
-                    }
-                    obj.Add("AppType", usage.ItSystem.AppTypeOptionName);
-                    obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    obj.Add("Anvender", usage.ActiveInterfaceUseCount + "(" + usage.InterfaceUseCount + ")");
-                    obj.Add("Udstiller", usage.InterfaceExhibitCount);
-                    obj.Add("Overblik", usage.OverviewItSystemName);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itsystemanvendelsesoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
             }
             catch (Exception e)
             {

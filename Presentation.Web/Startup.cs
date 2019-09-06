@@ -36,12 +36,10 @@ namespace Presentation.Web
                 }
             });
 
-            // Initializing API Request Logging
-
             app.UseNinject(); 
             app.Use<ApiRequestsLoggingMiddleware>();
-            
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
+            app.Use<DenyModificationsThroughApiMiddleware>();
         }
     }
 }

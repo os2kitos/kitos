@@ -7,6 +7,7 @@ using System;
 using Core.DomainModel;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Controller;
@@ -36,7 +37,7 @@ namespace Presentation.Web.Controllers.OData
         {
             var organizationId = AuthService.GetCurrentOrganizationId(UserId);
 
-            var crossOrganizationReadAccess = _authorizationStrategy.GetCrossOrganizationReadAccess();
+            var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
             var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
 
@@ -73,16 +74,20 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetByOrganizationKey(int key)
         {
             if (typeof(IHasOrganization).IsAssignableFrom(typeof(T)) == false)
-                throw new InvalidCastException("Entity must implement IHasOrganization");
-
-            if (AllowOrganizationAccess(key))
             {
-                var result = QueryFactory.ByOrganizationId<T>(key).Apply(Repository.AsQueryable());
-
-                return Ok(result);
+                return BadRequest("Entity does not belong to an organization");
             }
 
-            return Forbidden();
+            var accessLevel = GetOrganizationReadAccessLevel(key);
+
+            if (accessLevel == OrganizationDataReadAccessLevel.None)
+            {
+                return Forbidden();
+            }
+
+            var entities = QueryFactory.ByOrganizationId<T>(key, accessLevel).Apply(Repository.AsQueryable());
+
+            return Ok(entities);
         }
 
         [System.Web.Http.Description.ApiExplorerSettings]
@@ -197,9 +202,14 @@ namespace Presentation.Web.Controllers.OData
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        protected bool AllowOrganizationAccess(int organizationId)
+        protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
-            return _authorizationStrategy.AllowOrganizationReadAccess(organizationId);
+            return _authorizationStrategy.GetCrossOrganizationReadAccess();
+        }
+
+        protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
+        {
+            return _authorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
         protected bool AllowRead(T entity)

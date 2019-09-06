@@ -13,14 +13,14 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
             _authorizationContext = authorizationContext;
         }
 
-        public CrossOrganizationReadAccess GetCrossOrganizationReadAccess()
+        public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
         {
             return _authorizationContext.GetCrossOrganizationReadAccess();
         }
 
-        public bool AllowOrganizationReadAccess(int organizationId)
+        public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            return _authorizationContext.AllowReadsWithinOrganization(organizationId);
+            return _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
         }
 
         public bool AllowRead(IEntity entity)
