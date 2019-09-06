@@ -10,6 +10,10 @@ var byDataElementType = new CssLocatorHelper().byDataElementType;
 
 class ItSystemCatalog implements IPageObject {
 
+    public kendoToolbarHelper = new KendoToolbarHelper();
+    public kendoToolbarWrapper = new KendoToolbarWrapper();
+    public createCatalogForm = element(byDataElementType(consts.catalogCreateForm));
+
     public getPage(): webdriver.promise.Promise<void> {
         return browser.getCurrentUrl()
             .then(url => {
@@ -23,10 +27,6 @@ class ItSystemCatalog implements IPageObject {
             });
     }
 
-    public kendoToolbarHelper = new KendoToolbarHelper();
-    public kendoToolbarWrapper = new KendoToolbarWrapper();
-    public createCatalogForm = element(byDataElementType(consts.catalogCreateForm));
-
     public isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(this.createCatalogForm);
     }
@@ -34,7 +34,5 @@ class ItSystemCatalog implements IPageObject {
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
-
 }
-
 export = ItSystemCatalog;

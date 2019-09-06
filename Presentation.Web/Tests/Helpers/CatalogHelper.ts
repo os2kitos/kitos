@@ -46,6 +46,17 @@ class CatalogHelper {
             });
     }
 
+    public static checkMigrationButtonVisibility(isVisible : boolean) {
+        return pageObject.getPage().then(() => {
+            return pageObject.waitForKendoGrid();
+        }).then(() => {
+            return pageObject.kendoToolbarWrapper.columnObjects().usedByName.first().click();
+        }).then(() => {
+            return expect(element(cssHelper.byDataElementType(consts.moveSystemButton)).isPresent()).toBe(isVisible);
+        });
+    }
+
+
     public static findCatalogColumnsFor(name: string) {
         return pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
     }
