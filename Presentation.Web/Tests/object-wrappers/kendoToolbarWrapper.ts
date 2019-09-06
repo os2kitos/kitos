@@ -101,7 +101,6 @@ class kendoToolbarWrapper {
 
     public columnObjects(): ColumnObjects {
         var kendo = new kendoHelper();
-        
 
         var columns: ColumnObjects = {
             systemName: kendo.getColumnItemLinks(consts.kendoSystemNameObjects),

@@ -37,6 +37,7 @@ class Constants {
     readonly contractNameVariable = "Name";
     readonly nameOfSystemInput = "nameOfItSystemInput";
     readonly saveCatalogButton = "itCatalogSaveButton";
+    readonly moveSystemButton = "migrateItSystem";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
     readonly createReferenceForm = "referenceCreatorForm";
