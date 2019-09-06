@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
 

@@ -1,12 +1,11 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Advice;
+﻿using Core.DomainModel.Advice;
 using System.Collections.Generic;
 
 namespace Core.ApplicationServices
 {
     public interface IAdviceService
     {
-        bool sendAdvice(int id);
+        bool SendAdvice(int id);
         IEnumerable<Advice> GetAdvicesForOrg(int orgKey);
     }
 }
