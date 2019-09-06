@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -114,71 +110,6 @@ namespace Presentation.Web.Controllers.API
 
                 var dtos = Map(interfaces);
                 return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
-        {
-            try
-            {
-                var interfaces = Repository.Get(
-                    x =>
-                        // global admin sees all within the context
-                        KitosUser.IsGlobalAdmin &&
-                        x.OrganizationId == organizationId ||
-                        // object owner sees his own objects
-                        x.ObjectOwnerId == KitosUser.Id ||
-                        // it's public everyone can see it
-                        x.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        x.AccessModifier == AccessModifier.Local &&
-                        x.OrganizationId == organizationId
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                    );
-                var dtos = Map(interfaces);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Snitflade", "Snitflade");
-                header.Add("Public", "(P)");
-                header.Add("Snitfladetype", "Snitfladetype");
-                header.Add("Interface", "Grænseflade");
-                header.Add("Metode", "Metode");
-                header.Add("TSA", "TSA");
-                header.Add("Udstillet af", "Udstillet af");
-                header.Add("Rettighedshaver", "Rettighedshaver");
-                header.Add("Oprettet af", "Oprettet af");
-                list.Add(header);
-                foreach (var itInterface in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Snitflade", itInterface.Name);
-                    obj.Add("Public", itInterface.AccessModifier == AccessModifier.Public ? "(P)" : "");
-                    obj.Add("Snitfladetype", itInterface.InterfaceTypeName);
-                    obj.Add("Interface", itInterface.InterfaceName);
-                    obj.Add("Metode", itInterface.MethodName);
-                    obj.Add("TSA", itInterface.TsaName);
-                    obj.Add("Udstillet af", itInterface.ExhibitedByItSystemName);
-                    obj.Add("Rettighedshaver", itInterface.BelongsToName);
-                    obj.Add("Oprettet af", itInterface.OrganizationName);
-                    list.Add(obj);
-                }
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "snitfladekatalog.csv", DispositionType = "ISO-8859-1" };
-                return result;
             }
             catch (Exception e)
             {

@@ -4,12 +4,12 @@ using Core.DomainModel;
 
 namespace Core.DomainServices.Queries
 {
-    public class QueryByEntitiesExceptWithIds<T> : IDomainQuery<T>
+    public class QueryExceptEntitiesWithIds<T> : IDomainQuery<T>
     where T: Entity
     {
         private readonly IReadOnlyList<int> _ids;
 
-        public QueryByEntitiesExceptWithIds(IEnumerable<int> ids)
+        public QueryExceptEntitiesWithIds(IEnumerable<int> ids)
         {
             _ids = ids.ToList().AsReadOnly();
         }

@@ -24,7 +24,12 @@ namespace Presentation.Web.Controllers.OData
         {
         }
 
-        // GET /Organizations(1)/ItSystems
+        /// <summary>
+        /// Henter alle organisationens IT-Systemer samt offentlige IT-systemer fra andre organisationer.
+        /// Resultatet filtreres i hht. brugerens læserettigheder i den opgældende organisation, samt på tværs af organisationer.
+        /// </summary>
+        /// <param name="orgKey"></param>
+        /// <returns></returns>
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]

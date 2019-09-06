@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
@@ -27,7 +23,6 @@ namespace Presentation.Web.Controllers.API
 
     {
         private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
-        private readonly IGenericRepository<ItContractRole> _roleRepository;
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IItContractService _itContractService;
@@ -35,14 +30,12 @@ namespace Presentation.Web.Controllers.API
         public ItContractController(IGenericRepository<ItContract> repository,
             IGenericRepository<ItSystemUsage> usageRepository,
             IGenericRepository<AgreementElementType> agreementElementRepository,
-            IGenericRepository<ItContractRole> roleRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
             IItContractService itContractService)
             : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
-            _roleRepository = roleRepository;
             _itContractItSystemUsageRepository = itContractItSystemUsageRepository;
             _itContractService = itContractService;
         }
@@ -309,69 +302,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
-        {
-            try
-            {
-                //Get contracts within organization
-                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
-
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-                //var contracts = Page(Repository.AsQueryable(), pagingModel);
-
-                var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractOverviewDTO>>(contracts);
-                var roles = _roleRepository.Get().ToList();
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Aktiv", "Aktiv");
-                header.Add("It Kontrakt", "It Kontrakt");
-                header.Add("OrgUnit", "Ansv. organisationsenhed");
-                header.Add("Underskriver", "KontraktUnderskriver");
-                foreach (var role in roles)
-                    header.Add(role.Name, role.Name);
-                header.Add("Leverandor", "Leverandør");
-                header.Add("Anskaffelse", "Anskaffelse");
-                header.Add("driftar", "Drift/år");
-                header.Add("Betalingsmodel", "Betalingsmodel");
-                header.Add("Audit", "Audit");
-                list.Add(header);
-                foreach (var contract in overviewDtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Aktiv", contract.IsActive);
-                    obj.Add("It Kontrakt", contract.Name);
-                    obj.Add("OrgUnit", contract.ResponsibleOrganizationUnitName);
-                    foreach (var role in roles)
-                    {
-                        var roleId = role.Id;
-                        obj.Add(role.Name,
-                                String.Join(",", contract.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
-                    }
-                    obj.Add("Leverandor", contract.SupplierName);
-                    obj.Add("Anskaffelse", contract.AcquisitionSum);
-                    obj.Add("driftar", contract.OperationSum);
-                    obj.Add("Betalingsmodel", contract.PaymentModelName);
-                    obj.Add("Audit", contract.FirstAuditDate);
-                    list.Add(obj);
-                }
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itkontraktoverblikokonomi.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractPlanDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
@@ -396,68 +326,6 @@ namespace Presentation.Web.Controllers.API
                 var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
 
                 return Ok(overviewDtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage GetExcelPlan(bool? csvplan, int organizationId)
-        {
-            try
-            {
-                //Get contracts within organization
-                var contracts = Repository.Get(contract => contract.OrganizationId == organizationId);
-
-
-                var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Aktiv", "Aktiv");
-                header.Add("It Kontrakt", "It Kontrakt");
-                header.Add("Type", "Kontrakttype");
-                header.Add("Skabelon", "Kontraktskabelon");
-                header.Add("Pur", "Indkøbsform");
-                header.Add("Indgaet", "Indgået");
-                header.Add("Varighed", "Varighed");
-                header.Add("Udlobsdato", "Udløbsdato");
-                header.Add("Option", "Option");
-                header.Add("Opsigelse", "Opsigelse");
-                header.Add("Uopsigelig", "Uopsigelig til");
-                header.Add("Udbudsstrategi", "Udbudsstrategi");
-                header.Add("Udbudsplan", "Udbudsplan");
-                list.Add(header);
-                foreach (var contract in overviewDtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Aktiv", contract.IsActive);
-                    obj.Add("It Kontrakt", contract.Name);
-                    obj.Add("Type", contract.ContractTypeName);
-                    obj.Add("Skabelon", contract.ContractTemplateName);
-                    obj.Add("Pur", contract.PurchaseFormName);
-                    obj.Add("Indgaet", contract.Concluded);
-                    obj.Add("Varighed", contract.Duration);
-                    obj.Add("Udlobsdato", contract.ExpirationDate);
-                    obj.Add("Option", contract.OptionExtendName);
-                    obj.Add("Opsigelse", contract.TerminationDeadlineName);
-                    obj.Add("Uopsigelig", contract.IrrevocableTo);
-                    obj.Add("Udbudsstrategi", contract.ProcurementStrategyName);
-                    obj.Add("Udbudsplan", contract.ProcurementPlanHalf + " | " + contract.ProcurementPlanYear);
-                    list.Add(obj);
-                }
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itkontraktoverbliktid.csv", DispositionType = "ISO-8859-1" };
-                return result;
             }
             catch (Exception e)
             {

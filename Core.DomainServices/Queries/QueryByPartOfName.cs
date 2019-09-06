@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries
 
         public QueryByPartOfName(string nameContent)
         {
-            _nameContent = nameContent;
+            _nameContent = string.IsNullOrWhiteSpace(nameContent) ? throw new ArgumentException(nameof(nameContent) + " must be string containing more than whitespaces") : nameContent;
         }
 
         public IQueryable<T> Apply(IQueryable<T> source)
