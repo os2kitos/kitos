@@ -2,6 +2,6 @@
 {
     public interface IAuthorizationContextFactory
     {
-        IAuthorizationContext Create();
+        IAuthorizationContext Create(IOrganizationalUserContext userContext);
     }
 }
