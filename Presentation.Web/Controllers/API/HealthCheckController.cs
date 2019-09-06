@@ -1,9 +1,6 @@
-﻿using System.Net;
-using System.Web.Http;
+﻿using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Properties;
-using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
