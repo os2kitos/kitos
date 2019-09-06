@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace Core.ApplicationServices.Model
+namespace Core.ApplicationServices.Model.Result
 {
     public class Result<TStatus, TResult>
     {
-        private readonly TStatus _status;
-        private readonly TResult _resultValue;
+        public TStatus Status { get; }
+        public TResult ResultValue { get; }
 
         private Result(TStatus status, TResult result)
         {
-            _status = status;
-            _resultValue = result;
+            Status = status;
+            ResultValue = result;
         }
 
         public static Result<OperationResult, TResult> Ok(TResult value)
@@ -25,16 +25,6 @@ namespace Core.ApplicationServices.Model
                 throw new ArgumentException($"{nameof(code)} cannot be {code:G}");
             }
             return new Result<OperationResult, TResult>(code, default(TResult));
-        }
-
-        public TStatus GetStatus()
-        {
-            return _status;
-        }
-
-        public TResult GetResultValue()
-        {
-            return _resultValue;
         }
     }
     

@@ -1,13 +1,10 @@
-﻿namespace Core.ApplicationServices.Model
+﻿namespace Core.ApplicationServices.Model.Result
 {
     public enum OperationResult
     {
         Ok,
-
         NotFound,
-
         Forbidden,
-
         Error
     }
 }

@@ -75,10 +75,10 @@ namespace Core.DomainServices.Extensions
             return new IntersectionQuery<T>(domainQueries).Apply(result);
         }
 
-        public static IQueryable<T> ByEntitiesExceptWithIds<T>(this IQueryable<T> result, IReadOnlyList<int> exceptIds) where T :
+        public static IQueryable<T> ExceptEntitiesWithIds<T>(this IQueryable<T> result, IReadOnlyList<int> exceptIds) where T :
             Entity
         {
-            return new QueryByEntitiesExceptWithIds<T>(exceptIds).Apply(result);
+            return new QueryExceptEntitiesWithIds<T>(exceptIds).Apply(result);
         }
 
         public static IQueryable<T> ByPartOfName<T>(this IQueryable<T> result, string nameContent) where T :

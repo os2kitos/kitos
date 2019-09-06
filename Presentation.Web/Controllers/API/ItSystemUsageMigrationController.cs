@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
-using Core.ApplicationServices.Model;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -32,22 +32,16 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigrationConflicts([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            try
+            var result = _itSystemUsageMigrationService.GetMigrationConflicts(usageId, toSystemId);
+            switch (result.Status)
             {
-                var result = _itSystemUsageMigrationService.GetMigrationConflicts(usageId, toSystemId);
-                switch (result.GetStatus())
-                {
-                    case OperationResult.Ok:
-                        return Ok(result.GetResultValue());
-                    default:
-                        return CreateResponse(HttpStatusCode.InternalServerError,
-                            "An error occured when trying to get Unused It Systems");
-                }
+                case OperationResult.Ok:
+                    return Ok(result.ResultValue);
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get Unused It Systems");
             }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+            
         }
 
         [HttpPost]
@@ -73,13 +67,21 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Forbidden();
                 }
+                if (string.IsNullOrWhiteSpace(nameContent))
+                {
+                    return BadRequest();
+                }
+                if (numberOfItSystems < 1)
+                {
+                    return BadRequest();
+                }
 
                 var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
 
-                switch (result.GetStatus())
+                switch (result.Status)
                 {
                     case OperationResult.Ok:
-                        return Ok(MapItSystemToItSystemUsageMigrationDto(result.GetResultValue()));
+                        return Ok(MapItSystemToItSystemUsageMigrationDto(result.ResultValue));
                     case OperationResult.Forbidden:
                         return Forbidden();
                     case OperationResult.NotFound:

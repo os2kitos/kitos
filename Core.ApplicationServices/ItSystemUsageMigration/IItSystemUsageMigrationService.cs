@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Model;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 
 namespace Core.ApplicationServices.ItSystemUsageMigration

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -33,6 +33,16 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             int numberOfItSystems,
             bool getPublicFromOtherOrganizations)
         {
+            if (string.IsNullOrWhiteSpace(nameContent))
+            {
+                throw new ArgumentException(nameof(nameContent) + " must be string containing more than whitespaces");
+            }
+            if (numberOfItSystems < 1)
+            {
+                throw new ArgumentException(nameof(numberOfItSystems) + $" Cannot be less than 1");
+            }
+
+
             var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
 
             if (accessLevel < OrganizationDataReadAccessLevel.Public)
@@ -68,10 +78,11 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
         private IReadOnlyList<int> GetIdsOfItSystemsInUseByOrganizationId(int organizationId)
         {
             return _itSystemUsageRepository
-                    .AsQueryable()
-                    .ByOrganizationId(organizationId)
-                    .Select(x => x.ItSystemId)
-                    .ToList();
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .Select(x => x.ItSystemId)
+                .ToList()
+                .AsReadOnly();
         }
 
         private IReadOnlyList<ItSystem> GetUnusedItSystems(
@@ -83,21 +94,17 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
         {
             var crossLevelAccess = _authorizationContext.GetCrossOrganizationReadAccess();
             var organizationAccess = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
-
             var unusedItSystems = _itSystemRepository.AsQueryable();
-
             unusedItSystems = getPublicFromOtherOrganizations
-                ? unusedItSystems.ByOrganizationDataAndPublicDataFromOtherOrganizations(organizationId, organizationAccess, crossLevelAccess)
+                ? unusedItSystems.ByOrganizationDataAndPublicDataFromOtherOrganizations(organizationId,
+                    organizationAccess, crossLevelAccess)
                 : unusedItSystems.ByOrganizationId(organizationId, organizationAccess);
-
             unusedItSystems = unusedItSystems
-                .ByEntitiesExceptWithIds(idsOfSystemsInUse)
+                .ExceptEntitiesWithIds(idsOfSystemsInUse)
                 .ByPartOfName(nameContent)
                 .OrderBy(x => x.Name)
                 .Take(numberOfItSystems);
-
-            return unusedItSystems.ToList();
-
+            return unusedItSystems.ToList().AsReadOnly();
         }
     }
 }

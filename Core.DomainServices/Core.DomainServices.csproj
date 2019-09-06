@@ -61,7 +61,7 @@
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
-    <Compile Include="Queries\QueryByEntitiesExceptWithIds.cs" />
+    <Compile Include="Queries\QueryExceptEntitiesWithIds.cs" />
     <Compile Include="Queries\QueryByOrganizationId.cs" />
     <Compile Include="Queries\QueryByAccessModifier.cs" />
     <Compile Include="Queries\QueryByPartOfName.cs" />
