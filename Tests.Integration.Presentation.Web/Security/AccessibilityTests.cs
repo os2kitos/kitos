@@ -25,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [Theory]
         [InlineData("api/User", HttpStatusCode.Forbidden)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.OK)]
+        [InlineData("odata/ItSystems", HttpStatusCode.OK)]
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
@@ -42,7 +42,7 @@ namespace Tests.Integration.Presentation.Web.Security
         [Theory]
         [InlineData("api/User", HttpStatusCode.Unauthorized)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Unauthorized)]
-        [InlineData("api/ItSystem/?csv&orgUnitId=1&onlyStarred=true&orgUnitId=1r", HttpStatusCode.Unauthorized)]
+        [InlineData("odata/ItSystems", HttpStatusCode.Unauthorized)]
         public async Task Anonymous_Api_Calls_Returns_401(string apiUrl, HttpStatusCode httpCode)
         {
             using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))

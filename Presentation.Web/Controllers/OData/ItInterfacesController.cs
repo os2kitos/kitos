@@ -32,7 +32,11 @@ namespace Presentation.Web.Controllers.OData
             return base.Get();
         }
 
-        // GET /Organizations(1)/ItInterfaces
+        /// <summary>
+        /// Henter alle snitflader i organisationen samt offentlige snitflader i andre organisationer
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [EnableQuery]
         [ODataRoute("Organizations({key})/ItInterfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItInterface>>))]
