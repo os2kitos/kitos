@@ -57,7 +57,7 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
         }
 
-        public Result<OperationResult, string> GetMigrationConflicts(int usageSystemId, int toSystemId)
+        public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetMigrationConsequences(int usageSystemId, int toSystemId)
         {
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
             var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
@@ -68,8 +68,12 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             var affectedInterfaces = itSystemUsage.ItInterfaceUsages;
             var affectedItProjects = itSystemUsage.ItProjects;
 
-
-            return Result<OperationResult, string>.Ok("Changed");
+            return Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration>.Ok(new Model.ItSystemUsage.ItSystemUsageMigration
+            {
+                ItSystemUsage = itSystemUsage,
+                FromItSystem = fromItSystem,
+                ToItSystem = toItSystem
+            });
         }
 
         public Result<OperationResult, int> toExecute(int usageSystemId, int toSystemId)

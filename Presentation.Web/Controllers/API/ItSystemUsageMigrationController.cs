@@ -30,9 +30,9 @@ namespace Presentation.Web.Controllers.API
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK)]
-        public HttpResponseMessage GetMigrationConflicts([FromUri]int usageId, [FromUri]int toSystemId)
+        public HttpResponseMessage GetMigrationConsequences([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            var result = _itSystemUsageMigrationService.GetMigrationConflicts(usageId, toSystemId);
+            var result = _itSystemUsageMigrationService.GetMigrationConsequences(usageId, toSystemId);
             switch (result.Status)
             {
                 case OperationResult.Ok:
