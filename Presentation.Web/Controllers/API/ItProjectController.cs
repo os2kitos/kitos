@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -27,7 +23,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
-        private readonly IGenericRepository<ItProjectRole> _roleRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -36,14 +31,12 @@ namespace Presentation.Web.Controllers.API
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItProjectRole> roleRepository)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
-            _roleRepository = roleRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
@@ -174,108 +167,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, [FromUri] int orgId)
-        {
-            try
-            {
-                //Get all projects inside the organizaton
-                var projects = Repository.Get(p => p.OrganizationId == orgId);
-
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-                //var projects = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
-
-                var roles = _roleRepository.Get().ToList();
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Arkiveret", "Arkiveret");
-                header.Add("Name", "It Projekt");
-                header.Add("OrgUnit", "Ansv. organisationsenhed");
-                foreach (var role in roles)
-                    header.Add(role.Name, role.Name);
-                header.Add("ID", "Projekt ID");
-                header.Add("Type", "Type");
-                header.Add("Strategisk", "Strategisk");
-                header.Add("Tværgaaende", "Tværgående");
-                header.Add("Fase", "Fase");
-                header.Add("Status", "Status projekt");
-                header.Add("Maal", "Status mål");
-                header.Add("Risiko", "Risiko");
-                header.Add("RO", "RO");
-                header.Add("Okonomi", "Økonomi");
-                header.Add("P1", "Prioritet 1");
-                header.Add("P2", "Prioritet 2");
-                list.Add(header);
-                foreach (var project in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Arkiveret", project.IsArchived);
-                    obj.Add("Name", project.Name);
-                    obj.Add("OrgUnit", project.ResponsibleOrgUnitName);
-
-                    foreach (var role in roles)
-                    {
-                        var roleId = role.Id;
-                        obj.Add(role.Name,
-                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
-                    }
-                    obj.Add("ID", project.ItProjectId);
-                    obj.Add("Type", project.ItProjectTypeName);
-                    obj.Add("Strategisk", project.IsStrategy);
-                    obj.Add("Tværgaaende", project.IsTransversal);
-
-                    switch (project.CurrentPhase)
-                    {
-                        case 1:
-                            obj.Add("Fase", project.Phase1.Name);
-                            break;
-                        case 2:
-                            obj.Add("Fase", project.Phase2.Name);
-                            break;
-                        case 3:
-                            obj.Add("Fase", project.Phase3.Name);
-                            break;
-                        case 4:
-                            obj.Add("Fase", project.Phase4.Name);
-                            break;
-                        case 5:
-                            obj.Add("Fase", project.Phase5.Name);
-                            break;
-                        default:
-                            obj.Add("Fase", "Ikke sat");
-                            break;
-                    }
-
-                    obj.Add("Status", project.StatusProject);
-                    obj.Add("Maal", project.GoalStatusStatus);
-                    obj.Add("Risiko", project.AverageRisk);
-                    obj.Add("RO", project.Roi);
-                    obj.Add("Okonomi", project.Bc);
-                    obj.Add("P1", project.Priority);
-                    obj.Add("P2", project.PriorityPf);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itprojektoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         /// <summary>
         /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
         /// </summary>
@@ -298,59 +189,6 @@ namespace Presentation.Web.Controllers.API
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
 
                 return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage GetExcelCat(bool? csvcat, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                //Get all projects inside the organizaton OR public
-                pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-
-                var projects = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Name", "It Projekt");
-                header.Add("Org", "Oprettet af: Organisation");
-                header.Add("Navn", "Oprettet af: Navn");
-                header.Add("ID", "Projekt ID");
-                header.Add("Type", "Type");
-                header.Add("Public", "Public");
-                header.Add("Arkiv", "Arkiv");
-                list.Add(header);
-                foreach (var project in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Name", project.Name);
-                    obj.Add("Org", project.OrganizationName);
-                    obj.Add("Navn", project.ObjectOwnerName);
-                    obj.Add("ID", project.ItProjectId);
-                    obj.Add("Type", project.ItProjectTypeName);
-                    obj.Add("Public", project.AccessModifier);
-                    obj.Add("Arkiv", project.IsArchived);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itprojektoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
             }
             catch (Exception e)
             {
