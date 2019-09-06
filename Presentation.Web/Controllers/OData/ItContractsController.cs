@@ -29,6 +29,11 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
+        /// <summary>
+        /// Hvis den autentificerede bruger er Global Admin, returneres alle kontrakter.
+        /// Ellers returneres organisationens kontrakter.
+        /// </summary>
+        /// <returns></returns>
         [EnableQuery]
         [ODataRoute("ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
@@ -84,7 +89,11 @@ namespace Presentation.Web.Controllers.OData
             return Forbidden();
         }
 
-        // GET /Organizations(1)/ItContracts
+        /// <summary>
+        /// Henter alle organisationens IT Kontrakter
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
@@ -103,7 +112,11 @@ namespace Presentation.Web.Controllers.OData
             return Ok(result);
         }
 
-        // GET /Organizations(1)/Supplier
+        /// <summary>
+        /// Henter alle kontrakter for den pågældende leverandør
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({key})/Supplier")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]

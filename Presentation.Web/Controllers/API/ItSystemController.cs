@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
@@ -73,6 +69,13 @@ namespace Presentation.Web.Controllers.API
             _systemService.Delete(entity.Id);
         }
 
+        /// <summary>
+        /// Henter alle IT-Systemer i organisationen samt offentlige IT Systemer fra andre organisationer
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="paging"></param>
+        /// <param name="q"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
@@ -101,72 +104,6 @@ namespace Presentation.Web.Controllers.API
                 var query = Page(Repository.AsQueryable(), paging);
 
                 return Ok(Map(query));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int organizationId)
-        {
-            try
-            {
-                var systems =
-                    Repository.AsQueryable()
-                        .Where(s =>
-                            // global admin sees all
-                            (KitosUser.IsGlobalAdmin ||
-                            // object owner sees his own objects
-                            s.ObjectOwnerId == KitosUser.Id ||
-                            // it's public everyone can see it
-                            s.AccessModifier == AccessModifier.Public ||
-                            // everyone in the same organization can see normal objects
-                            s.AccessModifier == AccessModifier.Local &&
-                            s.OrganizationId == organizationId
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
-                        ));
-
-                systems = systems.AsEnumerable().Where(AllowRead).AsQueryable();
-
-                var dtos = Map(systems);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("It System", "It System");
-                header.Add("Public", "(P)");
-                header.Add("AppTypeOption", "Applikationstype");
-                header.Add("BusiType", "Forretningstype");
-                header.Add("KLEID", "KLE ID");
-                header.Add("KLENavn", "KLE Navn");
-                header.Add("Rettighedshaver", "Rettighedshaver");
-                header.Add("Oprettet", "Oprettet af");
-                list.Add(header);
-                foreach (var system in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("It System", system.Name);
-                    obj.Add("Public", system.AccessModifier == AccessModifier.Public ? "(P)" : "");
-                    obj.Add("AppType", system.AppTypeOptionName);
-                    obj.Add("BusiType", system.BusinessTypeName);
-                    obj.Add("KLEID", String.Join(",", system.TaskRefs.Select(x => x.TaskKey)));
-                    obj.Add("KLENavn", String.Join(",", system.TaskRefs.Select(x => x.Description)));
-                    obj.Add("Rettighedshaver", system.BelongsToName);
-                    obj.Add("Oprettet", system.ObjectOwnerFullName);
-                    list.Add(obj);
-                }
-                var csvList = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(csvList);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itsystemkatalog.csv", DispositionType = "ISO-8859-1" };
-                return result;
             }
             catch (Exception e)
             {
@@ -302,6 +239,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        /// <summary>
+        /// Henter alle IT Systemer ejet af organisationen samt IT Systemer fra andre organisationer som er anvendt i organisationen
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)

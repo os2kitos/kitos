@@ -118,7 +118,7 @@ namespace Presentation.Web
 
             kernel.Bind<ILogger>().ToConstant(LogConfig.GlobalLogger).InTransientScope();
             kernel.Bind<IHttpModule>().To<ProviderInitializationHttpModule>();
-            
+
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
@@ -133,10 +133,32 @@ namespace Presentation.Web
 
         private static void RegisterAccessContext(IKernel kernel)
         {
-            kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
+            //User context
             kernel.Bind<IUserContextFactory>().To<UserContextFactory>().InRequestScope();
+            kernel.Bind<IOrganizationalUserContext>()
+                .ToMethod(ctx =>
+                {
+                    var factory = ctx.Kernel.Get<IUserContextFactory>();
+                    var authentication = ctx.Kernel.Get<IAuthenticationContext>();
+                    bool canCreateContext = authentication.Method != AuthenticationMethod.Anonymous && authentication.ActiveOrganizationId.HasValue;
+
+                    if (canCreateContext)
+                    {
+                        return factory.Create(authentication.UserId.GetValueOrDefault(), authentication.ActiveOrganizationId.GetValueOrDefault());
+                    }
+
+                    return new UnauthenticatedUserContext();
+                })
+                .InRequestScope();
+
+            //Authorization context
+            kernel.Bind<IAuthorizationContextFactory>().To<AuthorizationContextFactory>().InRequestScope();
             kernel.Bind<IAuthorizationContext>()
-                .ToMethod(ctx => ctx.Kernel.Get<IAuthorizationContextFactory>().Create())
+                .ToMethod(ctx =>
+                {
+                    var context = ctx.Kernel.Get<IOrganizationalUserContext>();
+                    return ctx.Kernel.Get<IAuthorizationContextFactory>().Create(context);
+                })
                 .InRequestScope();
         }
     }
