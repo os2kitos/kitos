@@ -21,8 +21,7 @@
         removeUsage(dataItem): void;
     }
 
-    export interface ISelect2Scope extends ng.IScope
-    {
+    export interface ISelect2Scope extends ng.IScope {
         mySelectOptions: any;
     }
 
@@ -40,27 +39,27 @@
 
         public static $inject:
             Array<string> = [
-            "$rootScope",
-            "$scope",
-            "$http",
-            "$timeout",
-            "$state",
-            "$sce",
-            "$",
-            "_",
-            "moment",
-            "notify",
-            "user",
-            "userAccessRights",
-            "gridStateService",
-            "$uibModal", 
-            "needsWidthFixService"
-        ];
+                "$rootScope",
+                "$scope",
+                "$http",
+                "$timeout",
+                "$state",
+                "$sce",
+                "$",
+                "_",
+                "moment",
+                "notify",
+                "user",
+                "userAccessRights",
+                "gridStateService",
+                "$uibModal",
+                "needsWidthFixService"
+            ];
 
         constructor(
             private $rootScope: IRootScope,
-            //private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
-            private $scope: any,
+            private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
+            // private $scope: ng.IScope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -108,34 +107,31 @@
 
             $scope.mySelectOptions = {
                 minimumInputLength: 1,
+                dropdownParent: $('#select2MigrationContainer'),
+                dropdownCss: { 'z-index': 10006, },
                 ajax: {
                     data: function (term, page) {
                         return { query: term };
                     },
                     quietMillis: 500,
                     transport: function (queryParams) {
-                        return  $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=a&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
-                        //res. = function () {
-                        //    return null;
-                        //};
-
-                        //return res;
+                        return $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=" + queryParams.data.query + "&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
                     },
 
                     results: function (data, page) {
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, function (usage: {id;  name; }) {
+                        _.each(data.data.response, function (usage: { id; name; }) {
                             results.push({
-                                    //the id of the system usage is the id, that is selected
-                                    id: usage.id,
-                                    //but the name of the system is the label for the select2
-                                    text: usage.name,
-                                    //saving the usage for later use
-                                    usage: usage
-                                });
-                            
+                                //the id of the system usage is the id, that is selected
+                                id: usage.id,
+                                //but the name of the system is the label for the select2
+                                text: usage.name,
+                                //saving the usage for later use
+                                usage: usage
+                            });
+
                         });
 
                         return { results: results };
@@ -776,29 +772,42 @@
             //Filter by usageId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
-            this.modal.setOptions({ resizable: false, title: `Anvendelse af ${systemName}` });
+            this.modal.setOptions({
+                close: function (e) {
+                    console.log("MODAL 1 CLOSING");
+                },
+                resizable: false,
+                title: `Anvendelse af ${systemName}`
+            });
             //Open modal
             this.modal.center().open();
         }
 
         public migrateItSystem = (name: string) => {
             this.municipality = name;
-         //   this.usageGridMigration.dataSource.read();
+            //   this.usageGridMigration.dataSource.read();
             //Set modal title
-            this.modalMigration.setOptions({ resizable: false, title: `Ledige systemer` });
+            this.modalMigration.setOptions({
+                close: function (e) {
+                    console.log("MODAL 2 CLOSING");
+                },
+                resizable: false,
+                title: `Ledige systemer`
+            });
+
             //Open modal
             this.modalMigration.center().open();
         }
 
         public migrateSystemTo = (from: string) => {
-            var selectedItem = this.usageGridMigration.dataItem(this.usageGridMigration.select());
-            if (selectedItem == null) {
-                return;
-            }
-
-            this.newItSystemID = selectedItem.get("Name");
             this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemID;
-            this.modalMigrationConsequence.setOptions({ resizable: false, title: `Flytning af it-system ` });
+            this.modalMigrationConsequence.setOptions({
+                close: function (e) {
+                    console.log("MODAL 3 CLOSING");
+                },
+                resizable: false,
+                title: `Flytning af it-system `
+            });
             this.modalMigrationConsequence.center().open();
         }
 

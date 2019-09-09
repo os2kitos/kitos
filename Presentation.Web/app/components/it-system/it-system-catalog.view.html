@@ -6,22 +6,23 @@
     <div data-kendo-grid="systemCatalogVm.usageGrid" data-k-options="systemCatalogVm.usageDetailsGrid"></div>
 </div>
 
-<div data-kendo-window="systemCatalogVm.modalMigration" ng-controller="systemCatalogVm"
+<div data-kendo-window="systemCatalogVm.modalMigration"
      data-k-title="'Migration'" data-k-width="800"
-     data-k-visible="false" data-k-modal="true">
+     data-k-visible="false" data-k-modal="true" id="migrationModelWindow2">
     <!--<div id="availableSystems" data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>-->
-    <input style="z-index: 99999"
-               type="hidden"
+    <div id="select2MigrationContainer">
+    <input type="hidden"
                id="new-system-usage"
                class="form-control input-sm"
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
-               data-ng-change="newAssociatedSystemUsage.save()"
+               data-ng-change=""
                data-placeholder="Vælg IT system">
-    <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right'>Se konsekvens</button>
+        <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right'>Se konsekvens</button>
+    </div>
 </div>
 
-<div data-kendo-window="systemCatalogVm.modalMigrationConsequence" ng-controller="systemCatalogVm"
+<div data-kendo-window="systemCatalogVm.modalMigrationConsequence" 
      data-k-title="'Konsekvens'" data-k-width="1000"
      data-k-visible="false" data-k-modal="true">
     <div id="copyPasteConsequence">
