@@ -58,8 +58,8 @@
 
         constructor(
             private $rootScope: IRootScope,
-            private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
-            // private $scope: ng.IScope,
+           // private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
+            private $scope: any,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -107,8 +107,7 @@
 
             $scope.mySelectOptions = {
                 minimumInputLength: 1,
-                dropdownParent: $('#select2MigrationContainer'),
-                dropdownCss: { 'z-index': 10006, },
+                dropdownCss: { 'z-index': 100000, },
                 ajax: {
                     data: function (term, page) {
                         return { query: term };
@@ -138,6 +137,13 @@
                     }
                 }
             };
+
+
+            //this.$('#new-system-usage').on('select2:opening', function (e) {
+            //    this.$('#new-system-usage').select2({
+            //        dropdownParent: $('#select2MigrationContainer')
+            //    });
+            //});
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -775,6 +781,7 @@
             this.modal.setOptions({
                 close: function (e) {
                     console.log("MODAL 1 CLOSING");
+                    return true;
                 },
                 resizable: false,
                 title: `Anvendelse af ${systemName}`
@@ -783,28 +790,39 @@
             this.modal.center().open();
         }
 
+        private convertToSelect2Object = (name: string) => {
+            return this.$(name) as any;
+        }
+
         public migrateItSystem = (name: string) => {
+            this.modal.close();
             this.municipality = name;
             //   this.usageGridMigration.dataSource.read();
             //Set modal title
             this.modalMigration.setOptions({
                 close: function (e) {
                     console.log("MODAL 2 CLOSING");
+
+                    return true;
                 },
                 resizable: false,
-                title: `Ledige systemer`
+                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemUsageID}`
             });
 
-            //Open modal
             this.modalMigration.center().open();
+            //this.convertToSelect2Object('#new-system-usage').select2({
+            //    dropdownParent: this.$('#migrationModelWindow2')
+            //});
         }
 
         public migrateSystemTo = (from: string) => {
-            this.newItSystemObject = this.$('#new-system-usage').select2('data');
+            this.modalMigration.close();
+            this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
             this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemObject.usage.name;
             this.modalMigrationConsequence.setOptions({
                 close: function (e) {
                     console.log("MODAL 3 CLOSING");
+                    return true;
                 },
 
                 resizable: false,

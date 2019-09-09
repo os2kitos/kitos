@@ -11,14 +11,14 @@
      data-k-visible="false" data-k-modal="true" id="migrationModelWindow2">
     <!--<div id="availableSystems" data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>-->
     <div id="select2MigrationContainer">
-    <input type="hidden"
-               id="new-system-usage"
+        <input type="hidden"
+                id="new-system-usage"
                class="form-control input-sm"
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
-    </div>
         <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right'>Se konsekvens</button>
+    </div>
 </div>
 
 <div data-kendo-window="systemCatalogVm.modalMigrationConsequence" 

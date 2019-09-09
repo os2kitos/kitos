@@ -15,7 +15,6 @@ namespace Presentation.Web
         protected void Application_Start()
         {
             LogConfig.RegisterLog();
-            //GlobalConfiguration.Configuration.MessageHandlers.Add(new MessageLoggingHandler());
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

@@ -10,7 +10,6 @@
         public int? ItContractId { get; set; }
         public ItContractSystemDTO ItContract { get; set; }
         public bool IsWishedFor { get; set; }
-        //public int ItInterfaceExhibitItSystemId { get; set; }
         public string ItInterfaceExhibitItSystemName { get; set; }
         public bool ItInterfaceExhibitItInterfaceDisabled { get; set; }
     }

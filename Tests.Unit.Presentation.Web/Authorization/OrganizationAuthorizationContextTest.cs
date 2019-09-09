@@ -366,6 +366,24 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allowUpdates);
         }
 
+        [Theory]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, false, false)]
+        public void AllowSystemUsageMigration_Returns(bool globalAdmin, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
+
+            //Act
+            var result = _sut.AllowSystemUsageMigration();
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
         private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
             //Arrange

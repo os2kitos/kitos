@@ -16,7 +16,9 @@ using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
+using Infrastructure.DataAccess.Services;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.DataAccess;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
@@ -82,10 +84,8 @@ namespace Presentation.Web
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<KitosContext>().ToSelf().InRequestScope();
+            RegisterDataAccess(kernel);
 
-            kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
-            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
@@ -122,6 +122,14 @@ namespace Presentation.Web
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
+        }
+
+        private static void RegisterDataAccess(IKernel kernel)
+        {
+            kernel.Bind<KitosContext>().ToSelf().InRequestScope();
+            kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
+            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
+            kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

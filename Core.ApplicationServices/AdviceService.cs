@@ -46,7 +46,7 @@ namespace Core.ApplicationServices
         public IGenericRepository<ItSystemUsage> _itSystemUsageRepository { get; set; }
         public AdviceService() {}
 
-        public bool sendAdvice(int id){
+        public bool SendAdvice(int id){
 
             var advice = _adviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
 
@@ -172,7 +172,6 @@ namespace Core.ApplicationServices
                     }
                     catch (Exception e)
                     {
-                        //todo log exception
                         this.Logger?.Error(e, "Error in Advis service");
                         return false;
                     }
@@ -304,7 +303,6 @@ namespace Core.ApplicationServices
                         }
                         catch (Exception e)
                         {
-                            //todo log exception
                             this.Logger?.Error(e, "Error in Advis service");
                             return false;
                         }
