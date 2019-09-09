@@ -73,7 +73,7 @@
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private oldItSystemUsageID,
-            private newItSystemID,
+            private newItSystemObject,
             private municipality,
             public migrationConsequenceText,
             private needsWidthFixService) {
@@ -800,11 +800,13 @@
         }
 
         public migrateSystemTo = (from: string) => {
-            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemID;
+            this.newItSystemObject = this.$('#new-system-usage').select2('data');
+            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemObject.usage.name;
             this.modalMigrationConsequence.setOptions({
                 close: function (e) {
                     console.log("MODAL 3 CLOSING");
                 },
+
                 resizable: false,
                 title: `Flytning af it-system `
             });
@@ -812,8 +814,8 @@
         }
 
         public startMigration = () => {
-            if (this.oldItSystemUsageID != null || this.newItSystemID != null) {
-                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemID);
+            if (this.oldItSystemUsageID != null || this.newItSystemObject != null) {
+                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemObject.usage.name);
             }
         }
 
