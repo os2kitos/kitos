@@ -100,6 +100,7 @@
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
+    <Compile Include="Tools\ItProjectHelper.cs" />
     <Compile Include="Tools\ItSystemHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />

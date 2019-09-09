@@ -12,8 +12,22 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    public class ItSystemUsageMigrationTests
+    public class ItSystemUsageMigrationTests : IAsyncLifetime
     {
+        private ItSystemDTO _oldSystemInUse;
+        private ItSystemUsageDTO _oldSystemUsage;
+
+        public async Task InitializeAsync()
+        {
+            _oldSystemInUse = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            _oldSystemUsage = await ItSystemHelper.TakeIntoUseAsync(_oldSystemInUse.Id, _oldSystemInUse.OrganizationId);
+        }
+
+        public Task DisposeAsync()
+        {
+            //Nothing to clean up
+            return Task.CompletedTask;
+        }
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
@@ -136,11 +150,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Not_Used_In_Contracts_Or_Projects()
         {
             //Arrange
-            var oldSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(oldSystem.Id, oldSystem.OrganizationId);
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={usage.Id}&toSystemId={newSystem.Id}");
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
 
             //Act
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
@@ -151,10 +163,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.NotNull(result);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedItProjects);
-                Assert.Equal(usage.Id, result.TargetUsage.Id);
-                Assert.Equal(oldSystem.Id, result.FromSystem.Id);
-                Assert.Equal(newSystem.Id, result.ToSystem.Id);
+                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
             }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Is_Used_In_A_Project()
+        {
+            //Arrange
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var project = await ItProjectHelper.CreateProject(CreateName(), TestEnvironment.DefaultOrganizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
+
+            //Act
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationDTO>();
+                Assert.NotNull(result);
+                Assert.Empty(result.AffectedContracts);
+                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
+                Assert.Equal(1, result.AffectedItProjects?.Count());
+                Assert.Equal(project.Id, result.AffectedItProjects?.FirstOrDefault()?.Id);
+            }
+        }
+
+        private static void AssertFromToSystemInfo(
+            ItSystemUsageDTO usage,
+            ItSystemUsageMigrationDTO result,
+            ItSystemDTO oldSystem,
+            ItSystemDTO newSystem)
+        {
+            Assert.Equal(usage.Id, result.TargetUsage.Id);
+            Assert.Equal(oldSystem.Id, result.FromSystem.Id);
+            Assert.Equal(newSystem.Id, result.ToSystem.Id);
         }
 
         private static string CreateName()
