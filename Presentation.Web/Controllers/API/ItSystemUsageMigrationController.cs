@@ -57,7 +57,19 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             //TODO
-            return Ok();
+            var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
+            switch (result.Status)
+            {
+                case OperationResult.Ok:
+                    return Ok(MapItSystemUsageDTO(result.ResultValue));
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.NotFound:
+                    return NotFound();
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get Unused It Systems");
+            }
         }
 
         [HttpGet]
@@ -127,6 +139,7 @@ namespace Presentation.Web.Controllers.API
             return new ItSystemUsageContractMigrationDTO
             {
                 Contract = input.Contract.MapToNamedEntityDTO(),
+                SystemAssociatedInContract = input.SystemAssociatedInContract,
                 AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(MapToInterfaceUsageDTO).ToList(),
                 InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(MapToInterfaceExhibitUsageDTO).ToList()
             };
@@ -136,7 +149,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new NamedEntityDTO
             {
-                Id = interfaceExhibit.ItInterfaceExhibitId,
+                Id = interfaceExhibit.ItInterfaceExhibit.ItInterface.Id,
                 Name = interfaceExhibit.ItInterfaceExhibit.ItInterface.Name
             };
         }
@@ -145,8 +158,17 @@ namespace Presentation.Web.Controllers.API
         {
             return new NamedEntityDTO
             {
-                Id = interfaceUsage.ItInterfaceId,
+                Id = interfaceUsage.ItInterface.Id,
                 Name = interfaceUsage.ItInterface.Name
+            };
+        }
+
+        private static NamedEntityDTO MapItSystemUsageDTO(ItSystemUsage input)
+        {
+            return new NamedEntityDTO
+            {
+                Id = input.Id,
+                Name = input.LocalCallName ?? input.ItSystem.Name
             };
         }
     }

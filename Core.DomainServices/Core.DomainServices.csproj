@@ -58,6 +58,7 @@
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
