@@ -35,11 +35,6 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            if (!_itSystemUsageMigrationService.CanExecuteMigration())
-            {
-                return Forbidden();
-            }
-
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
             switch (res.Status)
             {
