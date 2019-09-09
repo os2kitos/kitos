@@ -139,7 +139,7 @@ namespace Presentation.Web.Controllers.API
             return new ItSystemUsageContractMigrationDTO
             {
                 Contract = input.Contract.MapToNamedEntityDTO(),
-                SystemAssociatedInContract = input.ContractAppliesToSystem,
+                SystemAssociatedInContract = input.SystemAssociatedInContract,
                 AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(MapToInterfaceUsageDTO).ToList(),
                 InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(MapToInterfaceExhibitUsageDTO).ToList()
             };
