@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DTOMappingExtensions.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />

@@ -4,7 +4,6 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.ItSystemUsage;
 using Core.ApplicationServices.Model.Result;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -62,6 +61,9 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
         public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
         {
             //TODO Authorization + refactoring and database optimization
+
+
+
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
             var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
             var toItSystem = _itSystemRepository.GetByKey(toSystemId);
