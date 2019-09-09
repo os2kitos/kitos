@@ -17,11 +17,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     {
         private ItSystemDTO _oldSystemInUse;
         private ItSystemUsageDTO _oldSystemUsage;
+        private ItSystemDTO _newSystem;
 
         public async Task InitializeAsync()
         {
             _oldSystemInUse = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             _oldSystemUsage = await ItSystemHelper.TakeIntoUseAsync(_oldSystemInUse.Id, _oldSystemInUse.OrganizationId);
+            _newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
         }
 
         public Task DisposeAsync()
@@ -151,18 +153,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Not_Used_In_Contracts_Or_Projects()
         {
             //Arrange
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
+            var usage = _oldSystemUsage;
+            var newSystem = _newSystem;
 
             //Act
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            using (var response = await GetMigration(usage, newSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedItProjects);
-                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
+                AssertFromToSystemInfo(usage, result, _oldSystemInUse, newSystem);
             }
         }
 
@@ -170,19 +171,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Used_In_A_Project()
         {
             //Arrange
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var project = await ItProjectHelper.CreateProject(CreateName(), TestEnvironment.DefaultOrganizationId);
             await ItProjectHelper.AddSystemBinding(project.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
 
             //Act
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedContracts);
-                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
                 Assert.Equal(1, result.AffectedItProjects?.Count());
                 Assert.Equal(project.Id, result.AffectedItProjects?.FirstOrDefault()?.Id);
             }
@@ -192,19 +189,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Associated_In_Contract()
         {
             //Arrange
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
-            await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id,TestEnvironment.DefaultOrganizationId);
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
+            await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
                 Assert.Equal(1, result.AffectedContracts?.Count());
                 Assert.Equal(contract.Id, result.AffectedContracts?.FirstOrDefault()?.Contract?.Id);
                 //TODO: Missing assertion for new property regarding (marked as in use in contract = AssociatedItSystemUsage)
@@ -212,23 +205,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        //TODO: Remember to include unaffected
         public async Task GetMigration_When_System_Is_Associated_Through_UseInterface_Mappings_In_Contract()
         {
             //Arrange
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
             var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
 
             //Act
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
             {
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
                 Assert.Equal(1, result.AffectedContracts?.Count());
                 var migrationDto = result.AffectedContracts?.First();
                 Assert.Empty(migrationDto.InterfaceExhibitUsagesToBeDeleted);
@@ -237,11 +227,51 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        //TODO: Remember to include unaffected
+        public async Task GetMigration_When_System_Is_Associated_Through_InterfaceExhibit_Mappings_In_Contract()
+        {
+            //Arrange
+            var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(_oldSystemInUse.Id, createdInterface.Id);
+            var exhibitUsage = await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, _oldSystemUsage.Id, exhibit.Id);
+
+            //Act
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                Assert.Equal(1, result.AffectedContracts?.Count());
+                var migrationDto = result.AffectedContracts?.First();
+                Assert.Empty(migrationDto.InterfaceExhibitUsagesToBeDeleted);
+                Assert.Equal(1, migrationDto.AffectedInterfaceUsages?.Count());
+                AssertInterfaceMapping(exhibitUsage, migrationDto.AffectedInterfaceUsages?.First());
+            }
+        }
+
+        private static async Task<HttpResponseMessage> GetMigration(ItSystemUsageDTO usage, ItSystemDTO toSystem)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={usage.Id}&toSystemId={toSystem.Id}");
+
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
         private static void AssertInterfaceMapping(ItInterfaceUsageDTO createdBinding, NamedEntityDTO affectedUsage)
         {
             Assert.Equal(createdBinding.Id, affectedUsage.Id);
             Assert.Equal(createdBinding.Interface.Name, affectedUsage.Name);
         }
+
+        private static void AssertInterfaceMapping(ItInterfaceExhibitUsageDTO createdBinding, NamedEntityDTO affectedUsage)
+        {
+            Assert.Equal(createdBinding.ItInterfaceExhibitItInterfaceId, affectedUsage.Id);
+            Assert.Equal(createdBinding.ItInterfaceExhibitItInterfaceName, affectedUsage.Name);
+        }
+
 
         private static async Task<ItSystemUsageMigrationDTO> AssertMigrationReturned(HttpResponseMessage response)
         {
