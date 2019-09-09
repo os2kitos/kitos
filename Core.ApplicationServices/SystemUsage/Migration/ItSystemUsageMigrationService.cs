@@ -68,24 +68,21 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             }
 
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
-            var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
+            if (!_authorizationContext.AllowReads(itSystemUsage))
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
             var toItSystem = _itSystemRepository.GetByKey(toSystemId);
+            if (!_authorizationContext.AllowReads(toItSystem))
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
+
+            var fromItSystem = itSystemUsage.ItSystem;
             var affectedItProjects = itSystemUsage.ItProjects;
             var contracts = itSystemUsage.Contracts.Select(x => x.ItContract).ToList();
             var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages;
             var interfaceUsages = itSystemUsage.ItInterfaceUsages;
-
-            if (HasReadAccessToMigrationElements(
-                itSystemUsage, 
-                fromItSystem, 
-                toItSystem, 
-                affectedItProjects, 
-                contracts,
-                interfaceUsages,
-                interfaceExhibitUsages))
-            {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
-            }
 
             var affectedContracts = GetContractMigrations(contracts, interfaceExhibitUsages, interfaceUsages);
 
@@ -97,7 +94,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             //TODO
             //var migration = GetSystemUsageMigration(usageSystemId,toSystemId);
-            
+
             //var itSystemUsage = _itSystemUsageRepository
             //    .Get(x => x.Id == usageSystemId);
             //var usage = itSystemUsage.First();
@@ -149,25 +146,22 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IEnumerable<ItInterfaceExhibitUsage> interfaceExhibitUsage,
             IEnumerable<ItInterfaceUsage> itInterfaceUsage)
         {
-            return contracts.Select(contract => new ItContractMigration(contract, itInterfaceUsage.Where(x => x.ItContractId == contract.Id), interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id))).ToList().AsReadOnly();
+            return contracts
+                .Select(contract => CreateContractMigration(interfaceExhibitUsage, itInterfaceUsage, contract))
+                .ToList()
+                .AsReadOnly();
         }
 
-        private bool HasReadAccessToMigrationElements(
-            ItSystemUsage itSystemUsage, 
-            ItSystem fromItSystem, 
-            ItSystem toItSystem, 
-            IEnumerable<ItProject> itProjects,
-            IEnumerable<ItContract> itContracts,
-            IEnumerable<ItInterfaceUsage> itInterfaceUsages,
-            IEnumerable<ItInterfaceExhibitUsage> itInterfaceExhibitUsage)
+        private static ItContractMigration CreateContractMigration(
+            IEnumerable<ItInterfaceExhibitUsage> interfaceExhibitUsage,
+            IEnumerable<ItInterfaceUsage> itInterfaceUsage,
+            ItContract contract)
         {
-            return _authorizationContext.AllowReads(itSystemUsage) && 
-                   _authorizationContext.AllowReads(fromItSystem) &&
-                   _authorizationContext.AllowReads(toItSystem) &&
-                   itProjects.Any(x => !_authorizationContext.AllowReads(x)) &&
-                   itContracts.Any(x => !_authorizationContext.AllowReads(x)) &&
-                   itInterfaceUsages.Any(x => !_authorizationContext.AllowReads(x.ItInterface)) &&
-                   itInterfaceExhibitUsage.Any(x => !_authorizationContext.AllowReads(x.ItInterfaceExhibit.ItInterface));
+            return new ItContractMigration(
+                contract,
+                itInterfaceUsage.Where(x => x.ItContractId == contract.Id),
+                interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id));
         }
+
     }
 }
