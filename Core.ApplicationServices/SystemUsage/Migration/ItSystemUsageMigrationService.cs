@@ -192,11 +192,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IEnumerable<ItInterfaceExhibitUsage> interfaceExhibitUsage,
             IEnumerable<ItInterfaceUsage> itInterfaceUsage,
             ItContract contract,
-            bool contractAppliesToSystem)
+            bool systemAssociatedInContract)
         {
             return new ItContractMigration(
                 contract,
-                contractAppliesToSystem,
+                systemAssociatedInContract,
                 itInterfaceUsage.Where(x => x.ItContractId == contract.Id),
                 interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id));
         }
