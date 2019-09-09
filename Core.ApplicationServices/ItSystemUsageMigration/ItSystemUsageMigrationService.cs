@@ -61,20 +61,28 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
 
         public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
         {
-            //TODO
+            //TODO Authorization + refactoring and database optimization
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
             var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
             var toItSystem = _itSystemRepository.GetByKey(toSystemId);
-
-            var affectedContracts = itSystemUsage.Contracts;
-            var affectedExhibitInterfaces = itSystemUsage.ItInterfaceExhibitUsages;
-            var affectedInterfaces = itSystemUsage.ItInterfaceUsages;
             var affectedItProjects = itSystemUsage.ItProjects;
 
-            var dummyAffectedContracts = new List<SystemUsageContractMigration>();
+            var contracts = itSystemUsage.Contracts;
+            var exhibitInterfaceUsages = itSystemUsage.ItInterfaceExhibitUsages;
+            var interfaceUsages = itSystemUsage.ItInterfaceUsages;
+
+            var affectedContracts = new List<ItSystemUsageContractMigration>();
+            foreach (var contract in contracts)
+            {
+                affectedContracts.Add(new ItSystemUsageContractMigration(
+                    contract.ItContract,
+                    interfaceUsages.Where(x=>x.ItContractId == contract.ItContractId),
+                    exhibitInterfaceUsages.Where(x => x.ItContractId == contract.ItContractId)
+                ));
+            }
 
             return Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration>.Ok(
-                new Model.ItSystemUsage.ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, dummyAffectedContracts));
+                new Model.ItSystemUsage.ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
         }
 
         public Result<OperationResult, int> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)

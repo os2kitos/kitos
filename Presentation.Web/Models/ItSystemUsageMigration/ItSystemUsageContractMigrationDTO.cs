@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.ItSystemUsageMigration
 {
-    public class ItContractItSystemUsageDTO
+    public class ItSystemUsageContractMigrationDTO
     {
         public NamedEntityDTO Contract { get; set; }
         public IEnumerable<NamedEntityDTO> AffectedInterfaceUsages { get; set; }

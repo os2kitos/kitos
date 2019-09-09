@@ -6,8 +6,11 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ItSystemUsageMigration;
+using Core.ApplicationServices.Model.ItSystemUsage;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -33,58 +36,16 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            //TODO
-            var affectedItProjects = new List<NamedEntityDTO>();
-            affectedItProjects.Add(new NamedEntityDTO()
+            //TODO authorization
+            var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
+            switch (res.Status)
             {
-                Id = 1,
-                Name = "ItProject"
-            });
-
-            var affectedInterfaceUsages = new List<NamedEntityDTO>();
-            affectedInterfaceUsages.Add(new NamedEntityDTO()
-            {
-                Id = 2,
-                Name = "InterfaceUsage"
-            });
-            var affectedInterfaceExhibitUsages = new List<NamedEntityDTO>();
-            affectedInterfaceExhibitUsages.Add(new NamedEntityDTO()
-            {
-                Id = 3,
-                Name = "InterfaceExhibitUsage"
-            });
-            var affectedItContracts = new List<ItContractItSystemUsageDTO>();
-            affectedItContracts.Add(new ItContractItSystemUsageDTO()
-            {
-                Contract = new NamedEntityDTO()
-                {
-                    Id = 4,
-                    Name = "Contract"
-                },
-                AffectedInterfaceUsages = affectedInterfaceUsages,
-                InterfaceExhibitUsagesToBeDeleted = affectedInterfaceExhibitUsages
-            });
-
-            return Ok(new ItSystemUsageMigrationDTO
-            {
-                TargetUsage = new NamedEntityDTO()
-                {
-                    Id = usageId,
-                    Name = "ItSystemUsage"
-                },
-                FromSystem = new NamedEntityDTO()
-                {
-                    Id = 1,
-                    Name = "FromSystem"
-                },
-                ToSystem = new NamedEntityDTO()
-                {
-                    Id = 2,
-                    Name = "ToSystem"
-                },
-                AffectedItProjects = affectedItProjects,
-                AffectedContracts = affectedItContracts
-            });
+                case OperationResult.Ok :
+                    return Ok(MapItSystemUsageMigration(res.ResultValue));
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get migration consequences");
+            }
 
         }
 
@@ -151,5 +112,50 @@ namespace Presentation.Web.Controllers.API
             return input.Select(itSystem => new ItSystemSimpleDTO { Id = itSystem.Id, Name = itSystem.Name }).ToList();
         }
 
+        private static ItSystemUsageMigrationDTO MapItSystemUsageMigration(
+            ItSystemUsageMigration input)
+        {
+            return new ItSystemUsageMigrationDTO()
+            {
+                TargetUsage = new NamedEntityDTO(){Id = input.ItSystemUsage.Id,Name = input.ItSystemUsage.LocalCallName ?? input.FromItSystem.Name} ,
+                FromSystem = MapToNamedEntityDTO(input.FromItSystem),
+                ToSystem = MapToNamedEntityDTO(input.ToItSystem),
+                AffectedItProjects = input.AffectedProjects.Select(MapToNamedEntityDTO).ToList(),
+                AffectedContracts = input.AffectedContracts.Select(MapToItContractItSystemUsageDTO).ToList()
+            };
+        }
+
+        private static NamedEntityDTO MapToNamedEntityDTO<T>(T input) where T : IEntity, IHasName
+        {
+            return new NamedEntityDTO(){Id = input.Id, Name = input.Name};
+        }
+
+        private static ItSystemUsageContractMigrationDTO MapToItContractItSystemUsageDTO(ItSystemUsageContractMigration input)
+        {
+            return new ItSystemUsageContractMigrationDTO()
+            {
+                Contract = MapToNamedEntityDTO(input.Contract),
+                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(MapToInterfaceUsageDTO).ToList(),
+                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(MapToInterfaceExhibitUsageDTO).ToList()
+            };
+        }
+
+        private static NamedEntityDTO MapToInterfaceExhibitUsageDTO(ItInterfaceExhibitUsage interfaceExhibit)
+        {
+            return new NamedEntityDTO()
+            {
+                Id = interfaceExhibit.ItInterfaceExhibitId,
+                Name = interfaceExhibit.ItInterfaceExhibit.ItInterface.Name
+            };
+        }
+
+        private static NamedEntityDTO MapToInterfaceUsageDTO(ItInterfaceUsage interfaceUsage)
+        {
+            return new NamedEntityDTO()
+            {
+                Id = interfaceUsage.ItInterfaceId,
+                Name = interfaceUsage.ItInterface.Name
+            };
+        }
     }
 }

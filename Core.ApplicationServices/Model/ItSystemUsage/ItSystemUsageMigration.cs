@@ -11,14 +11,14 @@ namespace Core.ApplicationServices.Model.ItSystemUsage
         public ItSystem FromItSystem { get; }
         public ItSystem ToItSystem { get; }
         public IReadOnlyList<ItProject> AffectedProjects { get; }
-        public IReadOnlyList<SystemUsageContractMigration> AffectedContracts { get; }
+        public IReadOnlyList<ItSystemUsageContractMigration> AffectedContracts { get; }
 
         public ItSystemUsageMigration(
             DomainModel.ItSystemUsage.ItSystemUsage itSystemUsage,
             ItSystem fromItSystem,
             ItSystem itSystem,
             IEnumerable<ItProject> affectedProjects, 
-            IEnumerable<SystemUsageContractMigration> affectedContracts)
+            IEnumerable<ItSystemUsageContractMigration> affectedContracts)
         {
             ItSystemUsage = itSystemUsage;
             FromItSystem = fromItSystem;
