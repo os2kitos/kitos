@@ -200,18 +200,22 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Equal(1, result.AffectedContracts?.Count());
                 Assert.Equal(contract.Id, result.AffectedContracts?.FirstOrDefault()?.Contract?.Id);
-                //TODO: Missing assertion for new property regarding (marked as in use in contract = AssociatedItSystemUsage)
+                Assert.True(result.AffectedContracts?.FirstOrDefault()?.SystemAssociatedInContract);
             }
         }
 
         [Fact]
-        //TODO: Remember to include unaffected
         public async Task GetMigration_When_System_Is_Associated_Through_UseInterface_Mappings_In_Contract()
         {
             //Arrange
             var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
             var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Adding an uneffected usage (not same system usage source)
+            var unaffectedItSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var unaffectedUsage = await ItSystemHelper.TakeIntoUseAsync(unaffectedItSystem.Id, TestEnvironment.DefaultOrganizationId);
+            await InterfaceUsageHelper.CreateAsync(contract.Id, unaffectedUsage.Id, unaffectedItSystem.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
