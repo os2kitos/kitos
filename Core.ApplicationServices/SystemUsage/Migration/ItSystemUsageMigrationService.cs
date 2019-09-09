@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 new ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
         }
 
-        public Result<OperationResult, int> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
+        public Result<OperationResult, ItSystemUsage> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
         {
             //TODO
             //var migration = GetSystemUsageMigration(usageSystemId,toSystemId);
@@ -101,7 +101,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             //usage.ItSystemId = toSystemId;
             //_itSystemUsageRepository.Update(usage);
             //_itSystemUsageRepository.Save();
-            return Result<OperationResult, int>.Ok(1);
+            return Result<OperationResult, ItSystemUsage>.Ok(new ItSystemUsage());
         }
 
         public bool CanExecuteMigration()
