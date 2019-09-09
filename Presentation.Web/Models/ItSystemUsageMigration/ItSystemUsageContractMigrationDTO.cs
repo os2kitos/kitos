@@ -5,6 +5,7 @@ namespace Presentation.Web.Models.ItSystemUsageMigration
     public class ItSystemUsageContractMigrationDTO
     {
         public NamedEntityDTO Contract { get; set; }
+        public bool appliesToSystem { get; set; }
         public IEnumerable<NamedEntityDTO> AffectedInterfaceUsages { get; set; }
         public IEnumerable<NamedEntityDTO> InterfaceExhibitUsagesToBeDeleted { get; set; }
 
