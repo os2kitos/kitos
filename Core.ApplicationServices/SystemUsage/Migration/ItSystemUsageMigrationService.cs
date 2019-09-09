@@ -12,6 +12,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DataAccess;
+using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
@@ -22,6 +23,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly ITransactionManager _transactionManager;
+        private readonly ILogger _logger;
 
 
         public ItSystemUsageMigrationService(
@@ -29,13 +31,15 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItContract> itContractRepository,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            ILogger logger)
         {
             _authorizationContext = authorizationContext;
             _itSystemRepository = itSystemRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _itContractRepository = itContractRepository;
             _transactionManager = transactionManager;
+            _logger = logger;
         }
 
         public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
@@ -106,6 +110,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 {
                     var migration = GetSystemUsageMigration(usageSystemId, toSystemId);
                     var systemUsage = migration.ResultValue.ItSystemUsage;
+                    if (!_authorizationContext.AllowModify(systemUsage))
+                    {
+                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
+                    }
+
                     systemUsage.ItSystemId = toSystemId;
                     systemUsage.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
                     _itSystemUsageRepository.Update(systemUsage);
@@ -117,8 +126,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 catch (Exception e)
                 {
                     transaction.Rollback();
-                    //TODO Logger
-                    throw;
+                    _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
+                    return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
                 }
                 
             }
