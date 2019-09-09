@@ -4,6 +4,8 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -60,28 +62,32 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
         {
-            //TODO Authorization + refactoring and database optimization
-
-
+            if (!CanExecuteMigration())
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
 
             var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
             var fromItSystem = _itSystemRepository.GetByKey(itSystemUsage.ItSystemId);
             var toItSystem = _itSystemRepository.GetByKey(toSystemId);
             var affectedItProjects = itSystemUsage.ItProjects;
-
-            var contracts = itSystemUsage.Contracts;
-            var exhibitInterfaceUsages = itSystemUsage.ItInterfaceExhibitUsages;
+            var contracts = itSystemUsage.Contracts.Select(x => x.ItContract).ToList();
+            var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages;
             var interfaceUsages = itSystemUsage.ItInterfaceUsages;
 
-            var affectedContracts = new List<ItContractMigration>();
-            foreach (var contract in contracts)
+            if (HasReadAccessToMigrationElements(
+                itSystemUsage, 
+                fromItSystem, 
+                toItSystem, 
+                affectedItProjects, 
+                contracts,
+                interfaceUsages,
+                interfaceExhibitUsages))
             {
-                affectedContracts.Add(new ItContractMigration(
-                    contract.ItContract,
-                    interfaceUsages.Where(x=>x.ItContractId == contract.ItContractId),
-                    exhibitInterfaceUsages.Where(x => x.ItContractId == contract.ItContractId)
-                ));
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
+
+            var affectedContracts = GetContractMigrations(contracts, interfaceExhibitUsages, interfaceUsages);
 
             return Result<OperationResult, ItSystemUsageMigration>.Ok(
                 new ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
@@ -136,6 +142,32 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .OrderBy(x => x.Name)
                 .Take(numberOfItSystems);
             return unusedItSystems.ToList().AsReadOnly();
+        }
+
+        private static IReadOnlyList<ItContractMigration> GetContractMigrations(
+            IEnumerable<ItContract> contracts,
+            IEnumerable<ItInterfaceExhibitUsage> interfaceExhibitUsage,
+            IEnumerable<ItInterfaceUsage> itInterfaceUsage)
+        {
+            return contracts.Select(contract => new ItContractMigration(contract, itInterfaceUsage.Where(x => x.ItContractId == contract.Id), interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id))).ToList().AsReadOnly();
+        }
+
+        private bool HasReadAccessToMigrationElements(
+            ItSystemUsage itSystemUsage, 
+            ItSystem fromItSystem, 
+            ItSystem toItSystem, 
+            IEnumerable<ItProject> itProjects,
+            IEnumerable<ItContract> itContracts,
+            IEnumerable<ItInterfaceUsage> itInterfaceUsages,
+            IEnumerable<ItInterfaceExhibitUsage> itInterfaceExhibitUsage)
+        {
+            return _authorizationContext.AllowReads(itSystemUsage) && 
+                   _authorizationContext.AllowReads(fromItSystem) &&
+                   _authorizationContext.AllowReads(toItSystem) &&
+                   itProjects.Any(x => !_authorizationContext.AllowReads(x)) &&
+                   itContracts.Any(x => !_authorizationContext.AllowReads(x)) &&
+                   itInterfaceUsages.Any(x => !_authorizationContext.AllowReads(x.ItInterface)) &&
+                   itInterfaceExhibitUsage.Any(x => !_authorizationContext.AllowReads(x.ItInterfaceExhibit.ItInterface));
         }
     }
 }
