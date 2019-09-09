@@ -65,7 +65,7 @@ namespace Presentation.Web.Controllers.API
         [Route("Accessibility")]
         public HttpResponseMessage GetAccessibilityLevel()
         {
-            return Ok(new
+            return Ok(new ItSystemUsageMigrationAccessDTO
             {
                 CanExecuteMigration = _itSystemUsageMigrationService.CanExecuteMigration()
             });

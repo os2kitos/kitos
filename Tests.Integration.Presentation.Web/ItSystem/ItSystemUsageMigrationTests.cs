@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.ItSystemUsageMigration;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
@@ -80,16 +81,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Api_User_Can_Get_Public_It_Systems_From_Other_Organizations(OrganizationRole role)
+        public async Task Api_User_Can_Get_Public_It_Systems_From_Other_Organizations_And_All_From_Own(OrganizationRole role)
         {
             //Arrange
             var prefix = CreateName();
             var itSystemName1 = prefix + CreateName();
             var itSystemName2 = prefix + CreateName();
             var itSystemName3 = prefix + CreateName();
-            var itSystem1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName1, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itSystem2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName2, TestEnvironment.SecondOrganizationId, AccessModifier.Public);
-            await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName3, TestEnvironment.SecondOrganizationId, AccessModifier.Local);
+            var ownLocalSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName1, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var sharedSystemFromOtherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName2, TestEnvironment.SecondOrganizationId, AccessModifier.Public);
+            await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName3, TestEnvironment.SecondOrganizationId, AccessModifier.Local); //Private system in other org
 
             var token = await HttpApi.GetTokenAsync(role);
             var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
@@ -106,42 +107,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 var itSystemIds = response.Select(x => x.Id).ToList();
                 Assert.Equal(2, itSystemIds.Count);
-                Assert.Contains(itSystem1.Id, itSystemIds);
-                Assert.Contains(itSystem2.Id, itSystemIds);
+                Assert.Contains(ownLocalSystem.Id, itSystemIds);
+                Assert.Contains(sharedSystemFromOtherOrg.Id, itSystemIds);
             }
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.User)]
-        public async Task Api_User_Can_Get_It_Systems_From_Own_Organization(OrganizationRole role)
+        [InlineData(OrganizationRole.User, false)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        public async Task GetAccessibilityLevel_Returns(OrganizationRole role, bool expectedMigrationAvailability)
         {
             //Arrange
-            var prefix = CreateName();
-            var itSystemName1 = prefix + CreateName();
-            var itSystemName2 = prefix + CreateName();
-            var itSystem1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName1, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itSystem2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName2, TestEnvironment.SecondOrganizationId, AccessModifier.Public);
-
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
-                                                $"?organizationId={TestEnvironment.DefaultOrganizationId}" +
-                                                $"&nameContent={prefix}" +
-                                                $"&numberOfItSystems={2}" +
-                                                $"&getPublicFromOtherOrganizations={false}");
+            var url = TestEnvironment.CreateUrl("api/v1/ItSystemUsageMigration/Accessibility");
+            var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
                 //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystemIds = response.Select(x => x.Id).ToList();
-                Assert.Single(itSystemIds);
-                Assert.Contains(itSystem1.Id, itSystemIds);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationAccessDTO>();
+                Assert.Equal(expectedMigrationAvailability, result.CanExecuteMigration);
             }
         }
-
 
         private static string CreateName()
         {
