@@ -12,13 +12,13 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var itSystem = new
+            var body = new
             {
                 name = name,
                 organizationId = organizationId,
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itproject"), cookie, itSystem))
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itproject"), cookie, body))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItProjectDTO>();

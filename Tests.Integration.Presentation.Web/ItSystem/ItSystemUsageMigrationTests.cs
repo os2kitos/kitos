@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -158,9 +159,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationDTO>();
-                Assert.NotNull(result);
+                var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedItProjects);
                 AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
@@ -181,14 +180,52 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationDTO>();
-                Assert.NotNull(result);
+                var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedContracts);
                 AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
                 Assert.Equal(1, result.AffectedItProjects?.Count());
                 Assert.Equal(project.Id, result.AffectedItProjects?.FirstOrDefault()?.Id);
             }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Is_UseInterface_Mappings_In_Contract()
+        {
+            //Arrange
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
+            var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
+
+            //Act
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
+                Assert.Equal(1, result.AffectedContracts?.Count());
+                var migrationDto = result.AffectedContracts?.First();
+                Assert.Empty(migrationDto.InterfaceExhibitUsagesToBeDeleted);
+                Assert.Equal(1, migrationDto.AffectedInterfaceUsages?.Count());
+                AssertInterfaceMapping(usage, migrationDto.AffectedInterfaceUsages?.First());
+            }
+        }
+
+        private static void AssertInterfaceMapping(ItInterfaceUsageDTO createdBinding, NamedEntityDTO affectedUsage)
+        {
+            Assert.Equal(createdBinding.Id, affectedUsage.Id);
+            Assert.Equal(createdBinding.Interface.Name, affectedUsage.Name);
+        }
+
+        private static async Task<ItSystemUsageMigrationDTO> AssertMigrationReturned(HttpResponseMessage response)
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationDTO>();
+            Assert.NotNull(result);
+            return result;
         }
 
         private static void AssertFromToSystemInfo(
