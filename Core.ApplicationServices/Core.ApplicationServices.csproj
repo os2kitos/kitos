@@ -98,10 +98,10 @@
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
-    <Compile Include="ItSystemUsageMigration\IItSystemUsageMigrationService.cs" />
-    <Compile Include="ItSystemUsageMigration\ItSystemUsageMigrationService.cs" />
-    <Compile Include="Model\ItSystemUsage\ItSystemUsageMigration.cs" />
-    <Compile Include="Model\ItSystemUsage\ItSystemUsageContractMigration.cs" />
+    <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
+    <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItContractMigration.cs" />
     <Compile Include="Model\Result\OperationResult.cs" />
     <Compile Include="Model\Result\Result.cs" />
     <Compile Include="OrganizationRoleService.cs" />

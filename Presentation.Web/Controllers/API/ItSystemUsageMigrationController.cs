@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.ItSystemUsageMigration;
-using Core.ApplicationServices.Model.ItSystemUsage;
 using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
@@ -123,7 +123,7 @@ namespace Presentation.Web.Controllers.API
             };
         }
 
-        private static ItSystemUsageContractMigrationDTO MapToItContractItSystemUsageDTO(ItSystemUsageContractMigration input)
+        private static ItSystemUsageContractMigrationDTO MapToItContractItSystemUsageDTO(ItContractMigration input)
         {
             return new ItSystemUsageContractMigrationDTO
             {

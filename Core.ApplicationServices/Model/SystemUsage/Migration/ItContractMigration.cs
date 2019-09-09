@@ -3,15 +3,15 @@ using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 
-namespace Core.ApplicationServices.Model.ItSystemUsage
+namespace Core.ApplicationServices.Model.SystemUsage.Migration
 {
-    public class ItSystemUsageContractMigration
+    public class ItContractMigration
     {
         public ItContract Contract { get; }
         public IReadOnlyList<ItInterfaceUsage> AffectedInterfaceUsages { get; }
         public IReadOnlyList<ItInterfaceExhibitUsage> ExhibitUsagesToBeDeleted { get; }
 
-        public ItSystemUsageContractMigration(
+        public ItContractMigration(
             ItContract contract,
             IEnumerable<ItInterfaceUsage> affectedUsages,
             IEnumerable<ItInterfaceExhibitUsage> exhibitUsagesToBeDeleted)

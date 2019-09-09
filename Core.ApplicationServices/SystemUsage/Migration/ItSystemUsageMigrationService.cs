@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.ItSystemUsage;
 using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 
-namespace Core.ApplicationServices.ItSystemUsageMigration
+namespace Core.ApplicationServices.SystemUsage.Migration
 {
     public class ItSystemUsageMigrationService : IItSystemUsageMigrationService
     {
@@ -58,7 +58,7 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
         }
 
-        public Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
+        public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
         {
             //TODO Authorization + refactoring and database optimization
 
@@ -73,18 +73,18 @@ namespace Core.ApplicationServices.ItSystemUsageMigration
             var exhibitInterfaceUsages = itSystemUsage.ItInterfaceExhibitUsages;
             var interfaceUsages = itSystemUsage.ItInterfaceUsages;
 
-            var affectedContracts = new List<ItSystemUsageContractMigration>();
+            var affectedContracts = new List<ItContractMigration>();
             foreach (var contract in contracts)
             {
-                affectedContracts.Add(new ItSystemUsageContractMigration(
+                affectedContracts.Add(new ItContractMigration(
                     contract.ItContract,
                     interfaceUsages.Where(x=>x.ItContractId == contract.ItContractId),
                     exhibitInterfaceUsages.Where(x => x.ItContractId == contract.ItContractId)
                 ));
             }
 
-            return Result<OperationResult, Model.ItSystemUsage.ItSystemUsageMigration>.Ok(
-                new Model.ItSystemUsage.ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
+            return Result<OperationResult, ItSystemUsageMigration>.Ok(
+                new ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
         }
 
         public Result<OperationResult, int> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)

@@ -4,7 +4,7 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.ItSystemUsageMigration;
+using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
