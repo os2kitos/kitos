@@ -189,7 +189,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Is_UseInterface_Mappings_In_Contract()
+        public async Task GetMigration_When_System_Is_Associated_In_Contract()
+        {
+            //Arrange
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
+            await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id,TestEnvironment.DefaultOrganizationId);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={_oldSystemUsage.Id}&toSystemId={newSystem.Id}");
+
+            //Act
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                Assert.Empty(result.AffectedItProjects);
+                AssertFromToSystemInfo(_oldSystemUsage, result, _oldSystemInUse, newSystem);
+                Assert.Equal(1, result.AffectedContracts?.Count());
+                Assert.Equal(contract.Id, result.AffectedContracts?.FirstOrDefault()?.Contract?.Id);
+                //TODO: Missing assertion for new property regarding (marked as in use in contract = AssociatedItSystemUsage)
+            }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Is_Associated_Through_UseInterface_Mappings_In_Contract()
         {
             //Arrange
             var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
