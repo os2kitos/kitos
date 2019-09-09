@@ -22,6 +22,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItContract> _itContractRepository;
+        private readonly IGenericRepository<ItInterfaceExhibitUsage> _itInterfaceExhibitUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
 
@@ -31,6 +32,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItContract> itContractRepository,
+            IGenericRepository<ItInterfaceExhibitUsage> itInterfaceExhibitUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger)
         {
@@ -38,6 +40,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _itSystemRepository = itSystemRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
             _itContractRepository = itContractRepository;
+            _itInterfaceExhibitUsageRepository = itInterfaceExhibitUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
         }
@@ -116,7 +119,17 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     }
 
                     systemUsage.ItSystemId = toSystemId;
-                    systemUsage.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
+
+                    var exhibitsToBeDeleted =
+                        migration.ResultValue.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted).Distinct();
+
+                    foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
+                    {
+                        _itInterfaceExhibitUsageRepository.Delete(itInterfaceExhibitUsage);
+                        _itInterfaceExhibitUsageRepository.Save();
+                    }
+
+                    //systemUsage.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemRepository.Save();
 
