@@ -245,9 +245,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Equal(1, result.AffectedContracts?.Count());
                 var migrationDto = result.AffectedContracts?.First();
-                Assert.Empty(migrationDto.InterfaceExhibitUsagesToBeDeleted);
-                Assert.Equal(1, migrationDto.AffectedInterfaceUsages?.Count());
-                AssertInterfaceMapping(exhibitUsage, migrationDto.AffectedInterfaceUsages?.First());
+                Assert.Empty(migrationDto.AffectedInterfaceUsages);
+                Assert.Equal(1, migrationDto.InterfaceExhibitUsagesToBeDeleted?.Count());
+                AssertInterfaceMapping(exhibitUsage, migrationDto.InterfaceExhibitUsagesToBeDeleted?.First());
             }
         }
 
@@ -262,8 +262,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static void AssertInterfaceMapping(ItInterfaceUsageDTO createdBinding, NamedEntityDTO affectedUsage)
         {
-            Assert.Equal(createdBinding.Id, affectedUsage.Id);
-            Assert.Equal(createdBinding.Interface.Name, affectedUsage.Name);
+            Assert.Equal(createdBinding.ItInterfaceId, affectedUsage.Id);
+            Assert.Equal(createdBinding.ItInterfaceItInterfaceName, affectedUsage.Name);
         }
 
         private static void AssertInterfaceMapping(ItInterfaceExhibitUsageDTO createdBinding, NamedEntityDTO affectedUsage)
