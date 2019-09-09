@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -33,6 +29,28 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(orgId, response.OrganizationId);
                 Assert.Equal(orgId, response.BelongsToId);
                 Assert.Equal(itSystemName, response.Name);
+                return response;
+            }
+        }
+
+        public static async Task<ItSystemUsageDTO> TakeIntoUseAsync(int itSystemId, int orgId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var itSystem = new
+            {
+                itSystemId = itSystemId,
+                organizationId = orgId,
+                dataLevel = "NONE",
+            };
+
+            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itSystemUsage"), cookie, itSystem))
+            {
+                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+
+                Assert.Equal(orgId, response.OrganizationId);
+                Assert.Equal(itSystemId, response.ItSystemId);
                 return response;
             }
         }

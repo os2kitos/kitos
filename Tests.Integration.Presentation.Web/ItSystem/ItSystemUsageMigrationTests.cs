@@ -132,6 +132,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Fact]
+        public async Task GetMigration_When_System_Is_Not_Used_In_Contracts_Or_Projects()
+        {
+            //Arrange
+            var oldSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(oldSystem.Id, oldSystem.OrganizationId);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration?usageId={usage.Id}&toSystemId={newSystem.Id}");
+
+            //Act
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationDTO>();
+                Assert.NotNull(result);
+                Assert.Empty(result.AffectedContracts);
+                Assert.Empty(result.AffectedItProjects);
+                Assert.Equal(usage.Id, result.TargetUsage.Id);
+                Assert.Equal(oldSystem.Id, result.FromSystem.Id);
+                Assert.Equal(newSystem.Id, result.ToSystem.Id);
+            }
+        }
+
         private static string CreateName()
         {
             return $"{Guid.NewGuid():N}";
