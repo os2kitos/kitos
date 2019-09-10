@@ -199,8 +199,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
                 Assert.Equal(1, result.AffectedContracts?.Count());
-                Assert.Equal(contract.Id, result.AffectedContracts?.FirstOrDefault()?.Contract?.Id);
-                Assert.True(result.AffectedContracts?.FirstOrDefault()?.SystemAssociatedInContract);
+
+                var dto = result.AffectedContracts?.FirstOrDefault();
+                Assert.Equal(contract.Id, dto?.Contract?.Id);
+                Assert.Empty(dto.AffectedInterfaceUsages);
+                Assert.Empty(dto.InterfaceExhibitUsagesToBeDeleted);
+                Assert.True(dto.SystemAssociatedInContract);
             }
         }
 
@@ -212,7 +216,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
             var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
 
-            //Adding an uneffected usage (not same system usage source)
+            //Adding an unaffected usage (not same system usage source)
             var unaffectedItSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var unaffectedUsage = await ItSystemHelper.TakeIntoUseAsync(unaffectedItSystem.Id, TestEnvironment.DefaultOrganizationId);
             await InterfaceUsageHelper.CreateAsync(contract.Id, unaffectedUsage.Id, unaffectedItSystem.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
@@ -232,7 +236,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        //TODO: Remember to include unaffected
         public async Task GetMigration_When_System_Is_Associated_Through_InterfaceExhibit_Mappings_In_Contract()
         {
             //Arrange
@@ -240,6 +243,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
             var exhibit = await InterfaceExhibitHelper.CreateExhibit(_oldSystemInUse.Id, createdInterface.Id);
             var exhibitUsage = await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, _oldSystemUsage.Id, exhibit.Id);
+
+            //Adding an unaffected exhibit usage (not same system usage source)
+            var unaffectedItSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var unaffectedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var unaffectedUsage = await ItSystemHelper.TakeIntoUseAsync(unaffectedItSystem.Id, TestEnvironment.DefaultOrganizationId);
+            var unAffectedExhibit = await InterfaceExhibitHelper.CreateExhibit(unaffectedItSystem.Id, unaffectedInterface.Id);
+            await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, unaffectedUsage.Id, unAffectedExhibit.Id);
+
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
