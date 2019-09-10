@@ -326,23 +326,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task PostMigration_When_System_Is_Associated_In_Contract()
-        {
-            //Arrange
-            var contract = await CreateContractAsync();
-            await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
-
-            //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(_oldSystemUsage.Id, result.Id);
-                Assert.Equal(_newSystem.Name, result.Name);
-            }
-        }
-
-        [Fact]
         public async Task PostMigration_Interface_Exhibit_Usage_Is_Removed()
         {
             //Arrange
@@ -388,6 +371,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var contract = await CreateContractAsync();
             await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
             var createdContract = await ItContractHelper.GetItContract(contract.Id);
+
             //Act
             using (var response = await PostMigration(_oldSystemUsage, _newSystem))
             {
@@ -399,7 +383,77 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
-        
+        [Fact]
+        public async Task PostMigration_Associated_Project_Is_Not_Changed()
+        {
+            //Arrange
+            var fromItSystem = await CreateSystemAsync(name: CreateName());
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
+            var project = await ItProjectHelper.CreateProject(CreateName(), TestEnvironment.DefaultOrganizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, fromItSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
+            var toItSystem = await CreateSystemAsync(name: CreateName());
+            var updatedFromItSystemUsage = await ItSystemHelper.GetItSystemUsage(fromItSystemUsage.Id);
+            //Act
+            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationExecutionReturned(response);
+                Assert.Equal(fromItSystemUsage.Id, result.Id);
+                Assert.Equal(toItSystem.Name, result.Name);
+                await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_Can_Migrate_System_Usage_With_No_Associated_Entities()
+        {
+            //Arrange
+            var fromItSystem = await CreateSystemAsync(name: CreateName());
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
+            var toItSystem = await CreateSystemAsync(name: CreateName());
+
+            //Act
+            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationExecutionReturned(response);
+                Assert.Equal(fromItSystemUsage.Id, result.Id);
+                Assert.Equal(toItSystem.Name, result.Name);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_Can_Migrate_All_Usage_Data()
+        {
+            //Arrange
+            var fromItSystem = await CreateSystemAsync(name: CreateName());
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
+            var project = await ItProjectHelper.CreateProject(CreateName(), TestEnvironment.DefaultOrganizationId);
+            await ItProjectHelper.AddSystemBinding(project.Id, fromItSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
+            var contract = await CreateContractAsync();
+            await ItContractHelper.AddItSystemUsage(contract.Id, fromItSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
+            var createdInterface = await CreateInterfaceAsync();
+            var exhibit = await CreateExhibitAsync(createdInterface, fromItSystem);
+            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, fromItSystemUsage);
+            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, fromItSystemUsage, fromItSystem);
+            var toItSystem = await CreateSystemAsync(name: CreateName());
+
+            var updatedFromItSystemUsage = await ItSystemHelper.GetItSystemUsage(fromItSystemUsage.Id);
+            var createdContract = await ItContractHelper.GetItContract(contract.Id);
+
+            //Act
+            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationExecutionReturned(response);
+                Assert.Equal(fromItSystemUsage.Id, result.Id);
+                Assert.Equal(toItSystem.Name, result.Name);
+                await AssertExhibitUsageRemovedAfterMigration(contract.Id);
+                await AssertInterfaceUsageUpdatedAfterMigration(interfaceUsage, toItSystem.Id);
+                await AssertContractInUsageNotChanged(createdContract);
+                await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
+            }
+        }
 
         private static async Task<HttpResponseMessage> PostMigration(ItSystemUsageDTO usage, ItSystemDTO toSystem)
         {
@@ -473,56 +527,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static async Task AssertExhibitUsageRemovedAfterMigration(int contractId)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl($"api/ItInterfaceExhibitUsage?contractId={contractId}");
-            using (var result = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                var exhibitUsages = await result.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItInterfaceExhibitUsageDTO>>();
-                Assert.Empty(exhibitUsages);
-            }
+            var exhibitUsages = await InterfaceExhibitHelper.GetExhibitInterfaceUsages(contractId);
+            Assert.Empty(exhibitUsages);
         }
 
 
-        private async Task AssertInterfaceUsageUpdatedAfterMigration(ItInterfaceUsageDTO interfaceUsage, int sysId)
+        private static async Task AssertInterfaceUsageUpdatedAfterMigration(ItInterfaceUsageDTO interfaceUsage, int sysId)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
             // Checking the old interface usage key is removed
-            var oldInterfaceUrl = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?" +
-                                                            $"usageId={interfaceUsage.ItSystemUsageId}&" +
-                                                            $"sysId={interfaceUsage.ItSystemId}&" +
-                                                            $"interfaceId={interfaceUsage.ItInterfaceId}");
-            using (var result = await HttpApi.GetWithCookieAsync(oldInterfaceUrl, cookie))
-            {
-                Assert.Null(await result.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>());
-            }
+            Assert.Null(await InterfaceUsageHelper.GetItInterfaceUsage(
+                interfaceUsage.ItSystemUsageId,
+                interfaceUsage.ItSystemId,
+                interfaceUsage.ItInterfaceId));
 
             // Checking the new interface usage key exists
-            var newInterfaceUrl = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?" +
-                                                            $"usageId={interfaceUsage.ItSystemUsageId}&" +
-                                                            $"sysId={sysId}&" +
-                                                            $"interfaceId={interfaceUsage.ItInterfaceId}");
-            using (var result = await HttpApi.GetWithCookieAsync(newInterfaceUrl, cookie))
-            {
-                var newInterfaceUsage = await result.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
-                Assert.Equal(interfaceUsage.ItSystemUsageId, newInterfaceUsage.ItSystemUsageId);
-                Assert.Equal(sysId, newInterfaceUsage.ItSystemId);
-                Assert.Equal(interfaceUsage.ItInterfaceId, newInterfaceUsage.ItInterfaceId);
-            }
+            var newInterfaceUsage = await InterfaceUsageHelper.GetItInterfaceUsage(
+                interfaceUsage.ItSystemUsageId,
+                sysId,
+                interfaceUsage.ItInterfaceId);
+            Assert.Equal(interfaceUsage.ItSystemUsageId, newInterfaceUsage.ItSystemUsageId);
+            Assert.Equal(sysId, newInterfaceUsage.ItSystemId);
+            Assert.Equal(interfaceUsage.ItInterfaceId, newInterfaceUsage.ItInterfaceId);
         }
 
-        private async Task AssertContractInUsageNotChanged(ItContractDTO contract)
+        private static async Task AssertContractInUsageNotChanged(ItContractDTO contract)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var postMigrationContract = await ItContractHelper.GetItContract(contract.Id);
+            Assert.Equal(contract.AssociatedSystemUsages.First().Id,
+                postMigrationContract.AssociatedSystemUsages.First().Id);
+        }
 
-            var url = TestEnvironment.CreateUrl($"api/ItContract/{contract.Id}");
-            using (var result = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                var postMigrationContract = await result.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
-                Assert.Equal(contract.AssociatedSystemUsages.First().Id, 
-                    postMigrationContract.AssociatedSystemUsages.First().Id);
-            }
+        private static async Task AssertAssociatedProjectNotChanged(ItSystemUsageDTO oldItSystemUsage)
+        {
+            var itSystemUsage = await ItSystemHelper.GetItSystemUsage(oldItSystemUsage.Id);
+            Assert.Equal(oldItSystemUsage.ItProjects.First().Id,
+                itSystemUsage.ItProjects.First().Id);
+            Assert.Equal(oldItSystemUsage.ItProjects.First().Name,
+                itSystemUsage.ItProjects.First().Name);
         }
 
         private static Task<ItSystemDTO> CreateSystemAsync(
