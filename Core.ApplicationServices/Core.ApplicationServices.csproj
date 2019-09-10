@@ -95,6 +95,7 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />

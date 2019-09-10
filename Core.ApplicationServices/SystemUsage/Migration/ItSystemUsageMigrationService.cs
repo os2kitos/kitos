@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItContract;
@@ -11,6 +12,8 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Model;
+using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -26,6 +29,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IGenericRepository<ItInterfaceUsage> _itInterfaceUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
+        private readonly IItSystemRepository _systemsRepository;
 
 
         public ItSystemUsageMigrationService(
@@ -36,7 +40,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IGenericRepository<ItInterfaceExhibitUsage> itInterfaceExhibitUsageRepository,
             IGenericRepository<ItInterfaceUsage> itInterfaceUsageRepository,
             ITransactionManager transactionManager,
-            ILogger logger)
+            ILogger logger,
+            IItSystemRepository systemsRepository)
         {
             _authorizationContext = authorizationContext;
             _itSystemRepository = itSystemRepository;
@@ -46,6 +51,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _itInterfaceUsageRepository = itInterfaceUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
+            _systemsRepository = systemsRepository;
         }
 
         public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
@@ -63,19 +69,25 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 throw new ArgumentException(nameof(numberOfItSystems) + $" Cannot be less than 1");
             }
 
+            var dataAccessLevel = _authorizationContext.GetDataAccessLevel(organizationId);
 
-            var accessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
-
-            if (accessLevel < OrganizationDataReadAccessLevel.Public)
+            if (dataAccessLevel.CurrentOrganization < OrganizationDataReadAccessLevel.Public)
             {
                 return Result<OperationResult, IReadOnlyList<ItSystem>>.Fail(OperationResult.Forbidden);
             }
 
-            var idsOfSystemsInUse = GetIdsOfItSystemsInUseByOrganizationId(organizationId);
-            var unusedItSystems = GetUnusedItSystems(idsOfSystemsInUse, organizationId, nameContent, numberOfItSystems,
-                getPublicFromOtherOrganizations);
+            var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
+            var unusedSystems = _systemsRepository.GetUnusedSystems(new OrganizationDataQueryParameters(organizationId, queryBreadth, dataAccessLevel));
 
-            return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(unusedItSystems);
+            //Refine, order and take the amount requested
+            var result = unusedSystems
+                .ByPartOfName(nameContent)
+                .OrderBy(x => x.Name)
+                .Take(numberOfItSystems)
+                .ToList()
+                .AsReadOnly();
+
+            return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(result);
         }
 
         public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
@@ -98,7 +110,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
             var fromItSystem = itSystemUsage.ItSystem;
             var affectedItProjects = itSystemUsage.ItProjects;
-            var usageContractIds= itSystemUsage.Contracts.Select(x => x.ItContractId).ToList();
+            var usageContractIds = itSystemUsage.Contracts.Select(x => x.ItContractId).ToList();
             var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages;
             var interfaceUsages = itSystemUsage.ItInterfaceUsages;
 
@@ -164,7 +176,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         _itInterfaceUsageRepository.Delete(interfaceUsage);
                         _itInterfaceUsageRepository.Save();
                     }
-                    
+
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemRepository.Save();
 
@@ -177,46 +189,12 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                     return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
                 }
-                
             }
-
         }
 
         public bool CanExecuteMigration()
         {
             return _authorizationContext.AllowSystemUsageMigration();
-        }
-
-        private IReadOnlyList<int> GetIdsOfItSystemsInUseByOrganizationId(int organizationId)
-        {
-            return _itSystemUsageRepository
-                .AsQueryable()
-                .ByOrganizationId(organizationId)
-                .Select(x => x.ItSystemId)
-                .ToList()
-                .AsReadOnly();
-        }
-
-        private IReadOnlyList<ItSystem> GetUnusedItSystems(
-            IReadOnlyList<int> idsOfSystemsInUse,
-            int organizationId,
-            string nameContent,
-            int numberOfItSystems,
-            bool getPublicFromOtherOrganizations)
-        {
-            var crossLevelAccess = _authorizationContext.GetCrossOrganizationReadAccess();
-            var organizationAccess = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);
-            var unusedItSystems = _itSystemRepository.AsQueryable();
-            unusedItSystems = getPublicFromOtherOrganizations
-                ? unusedItSystems.ByOrganizationDataAndPublicDataFromOtherOrganizations(organizationId,
-                    organizationAccess, crossLevelAccess)
-                : unusedItSystems.ByOrganizationId(organizationId, organizationAccess);
-            unusedItSystems = unusedItSystems
-                .ExceptEntitiesWithIds(idsOfSystemsInUse)
-                .ByPartOfName(nameContent)
-                .OrderBy(x => x.Name)
-                .Take(numberOfItSystems);
-            return unusedItSystems.ToList().AsReadOnly();
         }
 
         private IReadOnlyList<ItContractMigration> GetContractMigrations(
