@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -21,8 +22,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         public async Task InitializeAsync()
         {
-            _oldSystemInUse = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            _oldSystemUsage = await ItSystemHelper.TakeIntoUseAsync(_oldSystemInUse.Id, _oldSystemInUse.OrganizationId);
+            _oldSystemInUse = await CreateSystemAsync();
+            _oldSystemUsage = await TakeSystemIntoUseAsync(_oldSystemInUse);
             _newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
         }
 
@@ -35,21 +36,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Api_User_Can_Get_Specific_Unused_It_System(OrganizationRole role)
+        public async Task GetUnusedItSystems_Can_Get_Specific_Unused_It_System(OrganizationRole role)
         {
             //Arrange
             var itSystemName = CreateName();
-            var itSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
-                                                $"?organizationId={TestEnvironment.DefaultOrganizationId}" +
-                                                $"&nameContent={itSystemName}" +
-                                                $"&numberOfItSystems={10}" +
-                                                $"&getPublicFromOtherOrganizations={true}");
+            var itSystem = await CreateSystemAsync(name: itSystemName, accessModifier: AccessModifier.Public);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, itSystemName, 10, true))
             {
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
                 //Assert
@@ -64,27 +58,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Api_User_Can_Limit_How_Many_Systems_To_Return(OrganizationRole role)
+        public async Task GetUnusedItSystems_Can_Limit_How_Many_Systems_To_Return(OrganizationRole role)
         {
             //Arrange
             var prefix = CreateName();
             var itSystemName1 = prefix + CreateName();
             var itSystemName2 = prefix + CreateName();
             var itSystemName3 = prefix + CreateName();
-            var itSystem1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName1, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itSystem2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName2, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itSystem3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName3, TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var itSystem1 = await CreateSystemAsync(name: itSystemName1);
+            var itSystem2 = await CreateSystemAsync(name: itSystemName2);
+            var itSystem3 = await CreateSystemAsync(name: itSystemName3);
             var createdSystemsIds = new[] { itSystem1.Id, itSystem2.Id, itSystem3.Id };
 
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
-                                                $"?organizationId={TestEnvironment.DefaultOrganizationId}" +
-                                                $"&nameContent={prefix}" +
-                                                $"&numberOfItSystems={2}" +
-                                                $"&getPublicFromOtherOrganizations={true}");
-
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, true))
             {
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
                 //Assert
@@ -98,26 +85,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Api_User_Can_Get_Public_It_Systems_From_Other_Organizations_And_All_From_Own(OrganizationRole role)
+        public async Task GetUnusedItSystems_Can_Include_Public_It_Systems_From_Other_Organizations_And_All_From_Own(OrganizationRole role)
         {
             //Arrange
             var prefix = CreateName();
             var itSystemName1 = prefix + CreateName();
             var itSystemName2 = prefix + CreateName();
             var itSystemName3 = prefix + CreateName();
-            var ownLocalSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName1, TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var sharedSystemFromOtherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName2, TestEnvironment.SecondOrganizationId, AccessModifier.Public);
-            await ItSystemHelper.CreateItSystemInOrganizationAsync(itSystemName3, TestEnvironment.SecondOrganizationId, AccessModifier.Local); //Private system in other org
-
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
-                                                $"?organizationId={TestEnvironment.DefaultOrganizationId}" +
-                                                $"&nameContent={prefix}" +
-                                                $"&numberOfItSystems={3}" +
-                                                $"&getPublicFromOtherOrganizations={true}");
+            var ownLocalSystem = await CreateSystemAsync(name: itSystemName1);
+            var sharedSystemFromOtherOrg = await CreateSystemAsync(TestEnvironment.SecondOrganizationId, itSystemName2, AccessModifier.Public);
+            await CreateSystemAsync(TestEnvironment.SecondOrganizationId, itSystemName3); //Private system in other org
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
+            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
             {
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
                 //Assert
@@ -126,6 +106,86 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(2, itSystemIds.Count);
                 Assert.Contains(ownLocalSystem.Id, itSystemIds);
                 Assert.Contains(sharedSystemFromOtherOrg.Id, itSystemIds);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task GetUnusedItSystems_Can_Include_It_Systems_From_Own_Organization_Only(OrganizationRole role)
+        {
+            //Arrange
+            var prefix = CreateName();
+            var itSystemName1 = prefix + CreateName();
+            var itSystemName2 = prefix + CreateName();
+            var ownLocalSystem = await CreateSystemAsync(name: itSystemName1);
+            await CreateSystemAsync(TestEnvironment.SecondOrganizationId, itSystemName2, AccessModifier.Public); //shared system should not be returned when not asked to
+
+            //Act
+            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, false))
+            {
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                var itSystemIds = response.Select(x => x.Id).ToList();
+                Assert.Single(itSystemIds);
+                Assert.Contains(ownLocalSystem.Id, itSystemIds);
+            }
+        }
+
+        [Fact, Description("Systems in use in our own organization should not be included")]
+        public async Task GetUnusedItSystems_Does_Not_Include_Systems_In_Use()
+        {
+            //Arrange
+            var prefix = CreateName();
+            var itSystemName1 = prefix + CreateName();
+            var itSystemName2 = prefix + CreateName();
+            var itSystemName3 = prefix + CreateName();
+            var itSystem1 = await CreateSystemAsync(name: itSystemName1);
+
+            //These two - one local and one shared in other org - should not be returned since they are in use in own organization
+            var itSystem2 = await CreateSystemAsync(name: itSystemName2);
+            var itSystem3 = await CreateSystemAsync(name: itSystemName3, organizationId: TestEnvironment.SecondOrganizationId, accessModifier: AccessModifier.Public);
+            await TakeSystemIntoUseAsync(itSystem2, organizationId: TestEnvironment.DefaultOrganizationId);
+            await TakeSystemIntoUseAsync(itSystem3, organizationId: TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            using (var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
+            {
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                var itSystems = response.ToList();
+                var dto = Assert.Single(itSystems);
+                Assert.Equal(itSystem1.Id, dto.Id);
+            }
+        }
+
+        [Fact, Description("Systems in use applies to current org only, do not expect results to be omitted if it system is used in another organization.")]
+        public async Task GetUnusedItSystems_Does_Not_Include_Filter_Systems_In_Use_In_Other_Orgs()
+        {
+            //Arrange
+            var prefix = CreateName();
+            var itSystemName1 = prefix + CreateName();
+            var itSystemName2 = prefix + CreateName();
+            var itSystemName3 = prefix + CreateName();
+            var itSystem1 = await CreateSystemAsync(name: itSystemName1);
+
+            //These two - one local and one shared in other org - should not be returned since they are in use in own organization
+            var itSystem2 = await CreateSystemAsync(name: itSystemName2);
+            var itSystem3 = await CreateSystemAsync(name: itSystemName3, organizationId: TestEnvironment.SecondOrganizationId, accessModifier: AccessModifier.Public);
+            await TakeSystemIntoUseAsync(itSystem2, organizationId: TestEnvironment.SecondOrganizationId);
+            await TakeSystemIntoUseAsync(itSystem3, organizationId: TestEnvironment.SecondOrganizationId);
+            var createdSystemsIds = new[] { itSystem1.Id, itSystem2.Id, itSystem3.Id };
+
+            //Act
+            using (var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
+            {
+                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                var itSystems = response.ToList();
+                Assert.Equal(3, itSystems.Count);
+                Assert.True(itSystems.All(x => createdSystemsIds.Contains(x.Id)));
             }
         }
 
@@ -217,8 +277,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
 
             //Adding an unaffected usage (not same system usage source)
-            var unaffectedItSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var unaffectedUsage = await ItSystemHelper.TakeIntoUseAsync(unaffectedItSystem.Id, TestEnvironment.DefaultOrganizationId);
+            var unaffectedItSystem = await CreateSystemAsync();
+            var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
             await InterfaceUsageHelper.CreateAsync(contract.Id, unaffectedUsage.Id, unaffectedItSystem.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
@@ -245,9 +305,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var exhibitUsage = await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, _oldSystemUsage.Id, exhibit.Id);
 
             //Adding an unaffected exhibit usage (not same system usage source)
-            var unaffectedItSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var unaffectedItSystem = await CreateSystemAsync();
             var unaffectedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var unaffectedUsage = await ItSystemHelper.TakeIntoUseAsync(unaffectedItSystem.Id, TestEnvironment.DefaultOrganizationId);
+            var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
             var unAffectedExhibit = await InterfaceExhibitHelper.CreateExhibit(unaffectedItSystem.Id, unaffectedInterface.Id);
             await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, unaffectedUsage.Id, unAffectedExhibit.Id);
 
@@ -264,6 +324,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Equal(1, migrationDto.InterfaceExhibitUsagesToBeDeleted?.Count());
                 AssertInterfaceMapping(exhibitUsage, migrationDto.InterfaceExhibitUsagesToBeDeleted?.First());
             }
+        }
+
+        private static async Task<HttpResponseMessage> GetUnusedSystemsAsync(OrganizationRole role, int organizationId, string nameContent, int take, bool getPublic)
+        {
+            var token = await HttpApi.GetTokenAsync(role);
+            var url = TestEnvironment.CreateUrl($"api/v1/ItSystemUsageMigration/UnusedItSystems" +
+                                                $"?organizationId={organizationId}" +
+                                                $"&nameContent={nameContent}" +
+                                                $"&numberOfItSystems={take}" +
+                                                $"&getPublicFromOtherOrganizations={getPublic}");
+
+            return await HttpApi.GetWithTokenAsync(url, token.Token);
         }
 
         private static async Task<HttpResponseMessage> GetMigration(ItSystemUsageDTO usage, ItSystemDTO toSystem)
@@ -305,6 +377,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(usage.Id, result.TargetUsage.Id);
             Assert.Equal(oldSystem.Id, result.FromSystem.Id);
             Assert.Equal(newSystem.Id, result.ToSystem.Id);
+        }
+
+        private static Task<ItSystemDTO> CreateSystemAsync(
+            int organizationId = TestEnvironment.DefaultOrganizationId,
+            string name = null,
+            AccessModifier accessModifier = AccessModifier.Local)
+        {
+            return ItSystemHelper.CreateItSystemInOrganizationAsync(name ?? CreateName(), organizationId, accessModifier);
+        }
+
+        private static async Task<ItSystemUsageDTO> TakeSystemIntoUseAsync(ItSystemDTO system, int? organizationId = null)
+        {
+            return await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId ?? system.OrganizationId);
         }
 
         private static string CreateName()
