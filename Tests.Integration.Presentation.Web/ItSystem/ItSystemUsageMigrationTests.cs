@@ -405,6 +405,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task PostMigration_Can_Migrate_System_Usage_With_No_Associated_Entities()
+        {
+            //Arrange
+            var fromItSystem = await CreateSystemAsync(name: CreateName());
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
+            var toItSystem = await CreateSystemAsync(name: CreateName());
+
+            //Act
+            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            {
+                //Assert
+                var result = await AssertMigrationExecutionReturned(response);
+                Assert.Equal(fromItSystemUsage.Id, result.Id);
+                Assert.Equal(toItSystem.Name, result.Name);
+            }
+        }
+
+        [Fact]
         public async Task PostMigration_Can_Migrate_All_Usage_Data()
         {
             //Arrange
