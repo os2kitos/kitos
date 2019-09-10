@@ -149,8 +149,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                             return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
                         }
 
-                        //_itInterfaceUsageRepository.Delete(interfaceUsage);
-
                         item = _itInterfaceUsageRepository.Create();
                         item.ItSystemUsageId = interfaceUsage.ItSystemUsageId;
                         item.ItSystemId = toSystemId;
@@ -166,8 +164,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         _itInterfaceUsageRepository.Delete(interfaceUsage);
                         _itInterfaceUsageRepository.Save();
                     }
-
-                    //systemUsage.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
+                    
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemRepository.Save();
 
