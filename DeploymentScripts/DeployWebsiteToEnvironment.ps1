@@ -18,6 +18,7 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -logLevel "$Env:LogLevel" `
                 -esUrl "$Env:EsUrl" `
                 -ssoGateway "$Env:SsoGateway" `
+                -securityKeyString "$Env:SecurityKeyString" `
                 -smtpFromMail "$Env:SmtpFromMail" `
                 -smtpNwHost "$Env:SmtpNetworkHost" `
                 -resetPwTtl "$Env:ResetPasswordTtl" `
@@ -26,4 +27,6 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -kitosEnvName "$Env:KitosEnvName" `
                 -buildNumber $Env:BUILD_NUMBER `
                 -kitosDbConnectionString $Env:KitosDbConnectionStringForIIsApp `
-                -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp
+                -hangfireConnectionString $Env:HangfireDbConnectionStringForIIsApp `
+                -defaultUserPassword $Env:DefaultUserPassword `
+                -useDefaultUserPassword $Env:UseDefaultUserPassword

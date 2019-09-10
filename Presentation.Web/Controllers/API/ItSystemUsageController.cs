@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
-using AutoMapper.Internal;
 using Castle.Core.Internal;
-using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
-        private readonly IGenericRepository<ItSystemRole> _roleRepository;
         private readonly IGenericRepository<AttachedOption> _attachedOptionsRepository;
 
 
@@ -33,28 +30,32 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<ItSystemRole> roleRepository,
-            IGenericRepository<AttachedOption> attachedOptionsRepository)
-            : base(repository)
+            IGenericRepository<AttachedOption> attachedOptionsRepository,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
             _itSystemUsageService = itSystemUsageService;
-            _roleRepository = roleRepository;
             _attachedOptionsRepository = attachedOptionsRepository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetSearchByOrganization(int organizationId, string q)
         {
             try
             {
+                //Local objects - must have full access to view
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
+                {
+                    return Forbidden();
+                }
                 var usages = Repository.Get(
                     u =>
                         // filter by system usage name
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    );
+                        u.OrganizationId == organizationId);
 
                 return Ok(Map(usages));
             }
@@ -64,10 +65,16 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? overview)
         {
             try
             {
+                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
+                {
+                    return Forbidden();
+                }
+
                 pagingModel.Where(
                     u =>
                         // system usage is only within the context
@@ -86,6 +93,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageDTO>))]
         public override HttpResponseMessage GetSingle(int id)
         {
 
@@ -93,12 +101,15 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
-                    return Unauthorized();
+                    return Forbidden();
                 }
 
-                if (item == null) return NotFound();
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 var dto = Map(item);
 
@@ -115,82 +126,26 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, int organizationId)
-        {
-            try
-            {
-                var usages = Repository.Get(
-                    u =>
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    );
-
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-                //var usages = Page(Repository.AsQueryable(), pagingModel);
-
-                // mapping to DTOs for easy lazy loading of needed properties
-                var dtos = Map(usages);
-
-                var roles = _roleRepository.Get().ToList();
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
-                header.Add("Aktiv", "Aktiv");
-                header.Add("IT System", "IT System");
-                header.Add("OrgUnit", "Ansv. organisationsenhed");
-                foreach (var role in roles)
-                    header.Add(role.Name, role.Name);
-                header.Add("AppType", "Applikationtype");
-                header.Add("BusiType", "Forretningstype");
-                header.Add("Anvender", "Anvender");
-                header.Add("Udstiller", "Udstiller");
-                header.Add("Overblik", "Overblik");
-                list.Add(header);
-                foreach (var usage in dtos)
-                {
-                    var obj = new ExpandoObject() as System.Collections.Generic.IDictionary<string, Object>;
-                    obj.Add("Aktiv", usage.MainContractIsActive);
-                    obj.Add("IT System", usage.ItSystem.Name);
-                    obj.Add("OrgUnit", usage.ResponsibleOrgUnitName);
-                    foreach (var role in roles)
-                    {
-                        var roleId = role.Id;
-                        obj.Add(role.Name,
-                                String.Join(",", usage.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
-                    }
-                    obj.Add("AppType", usage.ItSystem.AppTypeOptionName);
-                    obj.Add("BusiType", usage.ItSystem.BusinessTypeName);
-                    obj.Add("Anvender", usage.ActiveInterfaceUseCount + "(" + usage.InterfaceUseCount + ")");
-                    obj.Add("Udstiller", usage.InterfaceExhibitCount);
-                    obj.Add("Overblik", usage.OverviewItSystemName);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itsystemanvendelsesoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageDTO>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetByItSystemAndOrganization(int itSystemId, int organizationId)
         {
             try
             {
                 var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
 
-                return usage == null ? NotFound() : Ok(Map(usage));
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowRead(usage))
+                {
+                    return Forbidden();
+                }
+
+                return Ok(Map(usage));
             }
             catch (Exception e)
             {
@@ -202,15 +157,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //check for isreadonly here since no object has been created to check on yet
-                //if (!KitosUser.IsReadOnly) return Unauthorized();
                 var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!HasWriteAccess(itsystemUsage, Int32.Parse(KitosUser.DefaultOrganizationId.ToString()))) return Unauthorized();
+                if (!AllowCreate<ItSystemUsage>(itsystemUsage))
+                {
+                    return Forbidden();
+                }
 
                 if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
                                             && usage.OrganizationId == dto.OrganizationId).Any())
+                {
                     return Conflict("Usage already exist");
+                }
 
                 var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
@@ -240,7 +198,10 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
                 //This will make sure we check for permissions and such...
                 return base.Delete(usage.Id, organizationId);
@@ -257,12 +218,20 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+                if (!AllowModify(usage))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
-
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
@@ -284,15 +253,27 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (!AllowModify(usage))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
                 var entity = usage.UsedBy.SingleOrDefault(x => x.ItSystemUsageId == id && x.OrganizationUnitId == organizationUnit);
-                if (entity == null) return NotFound();
+                if (entity == null)
+                {
+                    return NotFound();
+                }
 
                 usage.UsedBy.Remove(entity);
 
@@ -315,7 +296,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
                 if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (!AllowModify(usage))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -368,8 +352,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
-                if (usage == null) return NotFound();
-                if (!HasWriteAccess(usage, organizationId)) return Unauthorized();
+                if (usage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(usage))
+                {
+                    return Forbidden();
+                }
                 var optOut = false;
 
                 List<TaskRef> tasks;
@@ -429,6 +420,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="taskGroup">Optional filtering on task group</param>
         /// <param name="pagingModel">Paging model</param>
         /// <returns>List of TaskRefSelectedDTO</returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskRefSelectedDTO>>))]
         public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
         {
             try
@@ -458,6 +450,7 @@ namespace Presentation.Web.Controllers.API
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
@@ -480,19 +473,6 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItSystemUsage entity)
         {
             _itSystemUsageService.Delete(entity.Id);
-        }
-
-        protected override bool HasWriteAccess(ItSystemUsage obj, User user, int organizationId)
-        {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.SystemModuleAdmin)))
-                return true;
-
-            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

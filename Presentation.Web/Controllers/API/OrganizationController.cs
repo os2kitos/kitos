@@ -9,10 +9,12 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
@@ -150,7 +152,7 @@ namespace Presentation.Web.Controllers.API
                 if (obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase) != null)
                 {
                     // only global admin is allowed to change the type of an organization
-                    return Unauthorized();
+                    return Forbidden();
                 }
             }
 

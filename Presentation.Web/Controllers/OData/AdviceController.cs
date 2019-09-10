@@ -4,30 +4,31 @@ using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Hangfire;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using System.Web.Http.Results;
 using System.Web.OData;
 using System.Web.OData.Results;
-using System.Web.OData.Routing;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.OData
 {
     using Core.DomainModel.AdviceSent;
     using System.Net;
 
+    [PublicApi]
     public class AdviceController : BaseEntityController<Advice>
     {
-
-        IAuthenticationService _authService;
-        IAdviceService _adviceService;
-        IGenericRepository<Advice> _repository;
-        IGenericRepository<AdviceSent> _sentRepository;
+        readonly IAdviceService _adviceService;
+        readonly IGenericRepository<Advice> _repository;
+        readonly IGenericRepository<AdviceSent> _sentRepository;
 
         public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
             : base(repository, authService)
         {
-            _authService = authService;
             _adviceService = adviceService;
             _repository = repository;
             _sentRepository = sentRepository;
@@ -36,7 +37,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Advice advice)
         {
-
             var response = base.Post(advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>)) {
@@ -62,14 +62,14 @@ namespace Presentation.Web.Controllers.OData
                    switch (advice.Scheduling) {
                             case Scheduling.Immediate:
                             var jobId = BackgroundJob.Enqueue(
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id));
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id));
                                 break;
                             case Scheduling.Hour:
                             
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Day:
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.OData
                              cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Week:
@@ -87,7 +87,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Month:
@@ -96,7 +96,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " * *";
 
                             RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                                 break;
                             case Scheduling.Year:
@@ -106,7 +106,7 @@ namespace Presentation.Web.Controllers.OData
                              cron = "0 8 " + day + " " + month + " *";
                                 
                                 RecurringJob.AddOrUpdate(name,
-                    () => _adviceService.sendAdvice(createdRepsonse.Entity.Id),
+                    () => _adviceService.SendAdvice(createdRepsonse.Entity.Id),
                     cron);
                             break;
                         }
@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 try
                 {
-                    var advice = delta.GetEntity();
+                    var advice = delta.GetInstance();
 
                     switch (advice.Scheduling)
                     {
@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.OData
                             string cron = "0 * * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Day:
@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 * * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Week:
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 *  * " + weekDay;
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Month:
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " * *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                    () => _adviceService.sendAdvice(key),
+                    () => _adviceService.SendAdvice(key),
                     cron);
                             break;
                         case Scheduling.Year:
@@ -173,7 +173,7 @@ namespace Presentation.Web.Controllers.OData
                             cron = "0 8 " + day + " " + month + " *";
 
                             RecurringJob.AddOrUpdate(advice.JobId,
-                () => _adviceService.sendAdvice(key),
+                () => _adviceService.SendAdvice(key),
                 cron);
                             break;
                     }
@@ -189,31 +189,28 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [ODataRoute("GetAdvicesByObjectID(id={id},type={type})")]
-        public IHttpActionResult GetByObjectID(int id,ObjectType type)
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
+        public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
-            if (UserId == 0)
-                return Unauthorized();
-
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(Advice));
 
-            if (_authService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
                 return Ok(Repository.AsQueryable().Where(x=> x.RelationId == id && x.Type == type));
 
             return Ok(Repository.AsQueryable()
-                    .Where(x => ((IHasOrganization)x).OrganizationId == _authService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
+                    .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId) && x.RelationId == id && x.Type == type));
         }
 
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Advice")]
-        public IHttpActionResult GetByOrganization(int orgKey)
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
-            if (UserId == 0)
-                return Unauthorized();
-
-            var currentOrgId = _authService.GetCurrentOrganizationId(UserId);
+            var currentOrgId = AuthService.GetCurrentOrganizationId(UserId);
             if (orgKey != currentOrgId)
-                return Unauthorized();
+            {
+                return Forbidden();
+            }
 
             var result = _adviceService.GetAdvicesForOrg(orgKey);
 
@@ -225,17 +222,20 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
             if (entity == null)
+            {
                 return NotFound();
+            }
 
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
             if (anySents) {
-                return StatusCode(HttpStatusCode.Forbidden);
+                return Forbidden();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity))
-                return StatusCode(HttpStatusCode.Forbidden);
-
+            if (!AuthService.HasWriteAccess(UserId, entity))
+            {
+                return Forbidden();
+            }
 
             try
             {

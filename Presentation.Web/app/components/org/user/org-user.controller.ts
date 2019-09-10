@@ -1,7 +1,8 @@
 ﻿module Kitos.Organization.Users {
     "use strict";
 
-    interface IGridModel extends Models.IUser {
+    interface  IGridModel extends Models.IUser {
+        hasApi: boolean;
         canEdit: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
@@ -34,7 +35,7 @@
                     type: "odata-v4",
                     transport: {
                         read: {
-                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Users`,
+                            url: `/odata/Organizations(${this.user.currentOrganizationId})/Organizations.GetUsers`,
                             dataType: "json",
                             data: {
                                 $expand: `ObjectOwner,OrganizationUnitRights($expand=Role($select=Name)),OrganizationRights($filter=OrganizationId eq ${this.user.currentOrganizationId})`
@@ -105,6 +106,7 @@
                                 usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
                                 usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
                                 usr.isReadOnly = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReadOnly) !== undefined;
+                                
                             });
                             return response;
                         }
@@ -123,7 +125,7 @@
                 sortable: {
                     mode: "single"
                 },
-                editable: true,
+                editable: false,
                 reorderable: true,
                 resizable: true,
                 filterable: {
@@ -160,6 +162,12 @@
                         persistId: "email", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Email}`,
                         excelTemplate: (dataItem) => dataItem.Email,
+                        headerAttributes: {
+                            "data-element-type": "userHeaderEmail"
+                        },
+                        attributes: {
+                             "data-element-type": "userEmailObject"
+                        },
                         hidden: false,
                         filterable: {
                             cell: {
@@ -210,6 +218,20 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+
+                        field: "hasApi", title: "API adgang", width: 96, 
+                        persistId: "apiaccess", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center", "data-element-type": "userObject"},
+                        headerAttributes: {
+                            "data-element-type": "userHeader"
+                        },
+                        template: (dataItem) => dataItem.HasApiAccess ? `<span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span>` : `<span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span>`,
+                        hidden: !(this.user.isGlobalAdmin || this.user.isLocalAdmin),
+                        filterable: false,
+                        sortable: false,
+                        menu: (this.user.isGlobalAdmin || this.user.isLocalAdmin),
                     },
                     {
                         field: "isLocalAdmin", title: "Lokal Admin", width: 96,

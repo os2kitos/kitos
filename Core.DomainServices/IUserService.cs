@@ -1,8 +1,9 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 
 namespace Core.DomainServices
 {
-    public interface IUserService
+    public interface IUserService : IDisposable
     {
         /* TODO: This doesn't really conform to single responsibility principle */
         User AddUser(User user, bool sendMailOnCreation, int orgId);
@@ -10,6 +11,7 @@ namespace Core.DomainServices
         PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
         PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
-        //int GetCurrentOrganizationId(int userId);
+
+        User GetUserById(int id);
     }
 }

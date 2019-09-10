@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,12 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
-using System.Runtime.Caching;
+using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -30,6 +32,21 @@ namespace Presentation.Web.Controllers.API
 
         [Inject]
         public ILogger Logger { get; set; }
+
+        //Lazy to make sure auth service is available when resolved
+        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
+
+        protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
+
+        protected BaseApiController(IAuthorizationContext authorizationContext = null)
+        {
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
+
+                authorizationContext == null
+                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
+                    : new ContextBasedAuthorizationStrategy(authorizationContext)
+            );
+        }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
@@ -80,14 +97,22 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual HttpResponseMessage Error<T>(T response)
         {
-            if (response is SecurityException) return Unauthorized();
+            if (response is SecurityException)
+            {
+                return Unauthorized();
+            }
 
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
+        protected virtual HttpResponseMessage BadRequest()
+        {
+            return CreateResponse(HttpStatusCode.BadRequest);
+        }
+
         protected virtual HttpResponseMessage Unauthorized()
         {
-            return CreateResponse(HttpStatusCode.Unauthorized);
+            return CreateResponse(HttpStatusCode.Unauthorized, Constants.StatusCodeMessages.UnauthorizedErrorMessage);
         }
 
         protected virtual HttpResponseMessage Unauthorized<T>(T response)
@@ -117,8 +142,14 @@ namespace Presentation.Web.Controllers.API
 
         protected HttpResponseMessage Forbidden()
         {
-            return CreateResponse(HttpStatusCode.Forbidden);
+            return CreateResponse(HttpStatusCode.Forbidden, Constants.StatusCodeMessages.ForbiddenErrorMessage);
         }
+
+        protected HttpResponseMessage Forbidden(string msg)
+        {
+            return CreateResponse(HttpStatusCode.Forbidden, msg);
+        }
+
 
         protected bool IsGlobalAdmin()
         {
@@ -141,8 +172,7 @@ namespace Presentation.Web.Controllers.API
             {
                 try
                 {
-                    var id = Convert.ToInt32(User.Identity.Name);
-                    var user = UserRepository.GetByKey(id);
+                    var user = UserRepository.GetByKey(UserId);
 
                     if (user == null)
                         throw new SecurityException();
@@ -156,6 +186,8 @@ namespace Presentation.Web.Controllers.API
                 }
             }
         }
+
+        protected int UserId => Convert.ToInt32(User.Identity.Name);
 
         protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
@@ -177,7 +209,60 @@ namespace Presentation.Web.Controllers.API
                                                                 Newtonsoft.Json.JsonConvert.SerializeObject(
                                                                     paginationHeader));
 
-            return query.OrderByField(paging.OrderBy, paging.Descending).Skip(paging.Skip).Take(paging.Take);
+            //Make sure query is ordered
+            query = query.OrderByField(paging.OrderBy, paging.Descending);
+
+            //Apply post-processing
+            query = paging.ApplyPostProcessing(query);
+
+            //Load the page
+            return query
+                .Skip(paging.Skip)
+                .Take(paging.Take);
         }
+
+        #region access control
+
+        protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
+        {
+            return AuthorizationStrategy.GetCrossOrganizationReadAccess();
+        }
+
+        protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
+        {
+            return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
+        }
+
+        protected bool AllowRead(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowRead(entity);
+        }
+
+        protected bool AllowModify(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowCreate<T>(entity);
+        }
+
+        protected bool AllowCreate<T>()
+        {
+            return AuthorizationStrategy.AllowCreate<T>();
+        }
+
+        protected bool AllowDelete(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowDelete(entity);
+        }
+
+        protected bool AllowEntityVisibilityControl(IEntity entity)
+        {
+            return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
+        }
+       
+        #endregion
     }
 }

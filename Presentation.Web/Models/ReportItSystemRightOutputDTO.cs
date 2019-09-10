@@ -1,6 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItSystem;
-using System;
+﻿using System;
 
 namespace Presentation.Web.Models
 {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Models;
 
@@ -18,7 +18,11 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
-        protected GenericRightsController(IGenericRepository<TRight> rightRepository, IGenericRepository<TObject> objectRepository)
+        protected GenericRightsController(
+            IGenericRepository<TRight> rightRepository,
+            IGenericRepository<TObject> objectRepository,
+            IAuthorizationContext authorizationContext = null)
+        : base(authorizationContext)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;
@@ -44,6 +48,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var theRights = GetRightsQuery(id);
+                theRights = theRights.Where(AllowRead);
                 var dtos = Map<IEnumerable<TRight>, IEnumerable<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
@@ -65,8 +70,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
+                if (!HasWriteAccess(id))
+                {
+                    return Forbidden();
+                }
 
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
@@ -102,8 +109,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id, KitosUser, organizationId))
-                    return Unauthorized();
+                if (!HasWriteAccess(id))
+                {
+                    return Forbidden();
+                }
+
 
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
 
@@ -120,23 +130,11 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private bool HasWriteAccess(int objectId, User user, int organizationId)
+        private bool HasWriteAccess(int objectId)
         {
-            
-            if (user.IsGlobalAdmin)
-                return true;
-
             var obj = _objectRepository.GetByKey(objectId);
 
-            return AuthenticationService.HasWriteAccess(user.Id, obj);
-
-
-            //// local admin have write access if the obj is in context
-            //if (obj.IsInContext(organizationId) &&
-            //    user.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin))
-            //    return true;
-
-            //return obj.HasUserWriteAccess(user);
+            return AllowModify(obj);
         }
     }
 }

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
@@ -15,16 +11,18 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
-        private readonly IGenericRepository<ItProjectRole> _roleRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
         //TODO: Man, this constructor smells ...
@@ -33,17 +31,22 @@ namespace Presentation.Web.Controllers.API
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItProjectRole> roleRepository)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
             : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
-            _roleRepository = roleRepository;
             _orgUnitRepository = orgUnitRepository;
         }
 
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
+        /// </summary>
+        /// <param name="orgId"></param>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -72,9 +75,14 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-        /// <summary>  
-        ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation
-        /// </summary>  
+        
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="orgId"></param>
+        /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
             try
@@ -103,6 +111,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -126,6 +135,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
         public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -157,108 +167,15 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel(bool? csv, [FromUri] int orgId)
-        {
-            try
-            {
-                //Get all projects inside the organizaton
-                var projects = Repository.Get(p => p.OrganizationId == orgId);
-
-                //if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-                //var projects = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
-
-                var roles = _roleRepository.Get().ToList();
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Arkiveret", "Arkiveret");
-                header.Add("Name", "It Projekt");
-                header.Add("OrgUnit", "Ansv. organisationsenhed");
-                foreach (var role in roles)
-                    header.Add(role.Name, role.Name);
-                header.Add("ID", "Projekt ID");
-                header.Add("Type", "Type");
-                header.Add("Strategisk", "Strategisk");
-                header.Add("Tværgaaende", "Tværgående");
-                header.Add("Fase", "Fase");
-                header.Add("Status", "Status projekt");
-                header.Add("Maal", "Status mål");
-                header.Add("Risiko", "Risiko");
-                header.Add("RO", "RO");
-                header.Add("Okonomi", "Økonomi");
-                header.Add("P1", "Prioritet 1");
-                header.Add("P2", "Prioritet 2");
-                list.Add(header);
-                foreach (var project in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Arkiveret", project.IsArchived);
-                    obj.Add("Name", project.Name);
-                    obj.Add("OrgUnit", project.ResponsibleOrgUnitName);
-
-                    foreach (var role in roles)
-                    {
-                        var roleId = role.Id;
-                        obj.Add(role.Name,
-                                String.Join(",", project.Rights.Where(x => x.RoleId == roleId).Select(x => x.User.FullName)));
-                    }
-                    obj.Add("ID", project.ItProjectId);
-                    obj.Add("Type", project.ItProjectTypeName);
-                    obj.Add("Strategisk", project.IsStrategy);
-                    obj.Add("Tværgaaende", project.IsTransversal);
-
-                    switch (project.CurrentPhase)
-                    {
-                        case 1:
-                            obj.Add("Fase", project.Phase1.Name);
-                            break;
-                        case 2:
-                            obj.Add("Fase", project.Phase2.Name);
-                            break;
-                        case 3:
-                            obj.Add("Fase", project.Phase3.Name);
-                            break;
-                        case 4:
-                            obj.Add("Fase", project.Phase4.Name);
-                            break;
-                        case 5:
-                            obj.Add("Fase", project.Phase5.Name);
-                            break;
-                        default:
-                            obj.Add("Fase", "Ikke sat");
-                            break;
-                    }
-
-                    obj.Add("Status", project.StatusProject);
-                    obj.Add("Maal", project.GoalStatusStatus);
-                    obj.Add("Risiko", project.AverageRisk);
-                    obj.Add("RO", project.Roi);
-                    obj.Add("Okonomi", project.Bc);
-                    obj.Add("P1", project.Priority);
-                    obj.Add("P2", project.PriorityPf);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itprojektoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
+        /// <summary>
+        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
+        /// </summary>
+        /// <param name="catalog"></param>
+        /// <param name="orgId"></param>
+        /// <param name="q"></param>
+        /// <param name="pagingModel"></param>
+        /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -279,77 +196,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcelCat(bool? csvcat, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                //Get all projects inside the organizaton OR public
-                pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-
-                var projects = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Name", "It Projekt");
-                header.Add("Org", "Oprettet af: Organisation");
-                header.Add("Navn", "Oprettet af: Navn");
-                header.Add("ID", "Projekt ID");
-                header.Add("Type", "Type");
-                header.Add("Public", "Public");
-                header.Add("Arkiv", "Arkiv");
-                list.Add(header);
-                foreach (var project in dtos)
-                {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Name", project.Name);
-                    obj.Add("Org", project.OrganizationName);
-                    obj.Add("Navn", project.ObjectOwnerName);
-                    obj.Add("ID", project.ItProjectId);
-                    obj.Add("Type", project.ItProjectTypeName);
-                    obj.Add("Public", project.AccessModifier);
-                    obj.Add("Arkiv", project.IsArchived);
-                    list.Add(obj);
-                }
-
-                var s = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(s);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "itprojektoversigt.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        // TODO cloning has been disabled for now, reviewed at a later date
-        //public HttpResponseMessage PostCloneProject(int id, bool? clone, [FromBody] ItProjectDTO dto)
-        //{
-        //    try
-        //    {
-        //        //make sure we only clone projects that the is accessible from the organization
-        //        var project = _itProjectService.GetAll(dto.OrganizationId).FirstOrDefault(p => p.Id == id);
-
-        //        var clonedProject = _itProjectService.CloneProject(project, KitosUser, dto.OrganizationId);
-
-        //        return Created(Map(clonedProject), new Uri(Request.RequestUri + "/" + clonedProject.Id));
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return Error(e);
-        //    }
-        //}
-
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
             try
@@ -364,12 +211,16 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrgUnitDTO>>))]
         public HttpResponseMessage GetOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
         {
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
                 var dtos =
                     Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(
@@ -388,12 +239,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
-                if (orgUnit == null) return NotFound();
+                if (orgUnit == null)
+                {
+                    return NotFound();
+                }
 
                 project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
 
@@ -422,12 +282,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 var entity = project.UsedByOrgUnits.SingleOrDefault(x => x.ItProjectId == id && x.OrganizationUnitId == organizationUnit);
-                if (entity == null) return NotFound();
+                if (entity == null)
+                {
+                    return NotFound();
+                }
                 project.UsedByOrgUnits.Remove(entity);
 
                 project.LastChanged = DateTime.UtcNow;
@@ -448,8 +317,14 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (project == null)
+                {
+                    return NotFound();
+                }
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -472,7 +347,9 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 if (!tasks.Any())
+                {
                     return NotFound();
+                }
 
                 foreach (var task in tasks)
                 {
@@ -494,8 +371,15 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
@@ -514,7 +398,9 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 if (!tasks.Any())
+                {
                     return NotFound();
+                }
 
                 foreach (var task in tasks)
                 {
@@ -540,6 +426,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="taskGroup">Optional filtering on task group</param>
         /// <param name="pagingModel">Paging model</param>
         /// <returns>List of TaskRefSelectedDTO</returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskRefSelectedDTO>>))]
         public HttpResponseMessage GetTasks(int id, bool? tasks, bool onlySelected, int? taskGroup, [FromUri] PagingModel<TaskRef> pagingModel)
         {
             try
@@ -581,6 +468,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
         public HttpResponseMessage GetItSystemsUsedByThisProject(int id, [FromUri] bool? usages)
         {
             try
@@ -601,13 +489,22 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
-                if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+                if (!HasWriteAccess(project, organizationId))
+                {
+                    return Forbidden();
+                }
 
                 //TODO: should also we check for write access to the system usage?
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
-                if (systemUsage == null) return NotFound();
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
 
                 project.ItSystemUsages.Add(systemUsage);
 
@@ -629,14 +526,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
-                if (project == null) return NotFound();
+                if (project == null)
+                {
+                    return NotFound();
+                }
 
                 if (!HasWriteAccess(project, organizationId))
-                    return Unauthorized();
+                {
+                    return Forbidden();
+                }
 
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
                 if (systemUsage == null)
+                {
                     return NotFound();
+                }
 
                 project.ItSystemUsages.Remove(systemUsage);
                 project.LastChanged = DateTime.UtcNow;
@@ -657,6 +561,8 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <param name="itProjects"></param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] bool itProjects)
         {
             try
@@ -677,6 +583,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <param name="usageId"></param>
         /// <returns></returns>
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] int usageId)
         {
             try
@@ -712,7 +619,7 @@ namespace Presentation.Web.Controllers.API
             // only global admin can set access mod to public
             if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
-                return Unauthorized();
+                return Forbidden();
             }
             //force set access modifier to 0
             dto.AccessModifier = 0;
@@ -723,8 +630,14 @@ namespace Presentation.Web.Controllers.API
         {
             var project = Repository.GetByKey(id);
 
-            if (project == null) return NotFound();
-            if (!HasWriteAccess(project, organizationId)) return Unauthorized();
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (!HasWriteAccess(project, organizationId))
+            {
+                return Forbidden();
+            }
 
             const string propertyName = "Phase";
             var phaseRef = project.GetType().GetProperty(propertyName + phaseNum);
@@ -776,16 +689,13 @@ namespace Presentation.Web.Controllers.API
             if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public &&
                 !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
             {
-                return Unauthorized();
+                return Forbidden();
             }
             return base.Patch(id, organizationId, obj);
         }
 
         protected override bool HasWriteAccess(ItProject obj, User user, int organizationId)
         {
-            //if readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
             // local admin have write access if the obj is in context
             if (obj.IsInContext(organizationId) &&
                 user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ProjectModuleAdmin)))

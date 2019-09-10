@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
     {
         public DataRowController(IGenericRepository<DataRow> repository)
@@ -13,6 +18,7 @@ namespace Presentation.Web.Controllers.API
         {
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<DataRowDTO>>))]
         public virtual HttpResponseMessage GetByInterface(int interfaceId)
         {
             try

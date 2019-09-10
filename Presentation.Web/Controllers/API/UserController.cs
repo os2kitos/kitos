@@ -1,41 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Web.Http;
 using AutoMapper;
-using Core.ApplicationServices;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using Ninject;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
+    [InternalApi]
     public class UserController : GenericApiController<User, UserDTO>
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly IKernel _kernel;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService, IKernel kernel)
+        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
-
-            // TODO: this is bad crosscutting of concerns. refactor / extract into separate controller
-            _kernel = kernel; // we need this for retrieving userroles when creating a csv file.
         }
 
         public override HttpResponseMessage Post(UserDTO dto)
@@ -142,24 +130,6 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
-        //public HttpResponseMessage PostTokenRequest(bool? token, int userId)
-        //{
-        //    try
-        //    {
-        //        var user = Repository.GetByKey(userId);
-        //        if (user == null)
-        //            return NotFound();
-
-        //        user.UniqueId = Guid.NewGuid();
-        //        PatchQuery(user, null);
-        //        return Ok(user.Uuid);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return LogError(e);
-        //    }
-        //}
-
         public HttpResponseMessage GetBySearch(string q)
         {
             try
@@ -226,125 +196,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage GetExcel([FromUri] bool? csv, [FromUri] int orgId)
-        {
-            try
-            {
-                var users = Repository.Get(u => u.OrganizationRights.Count(r => r.OrganizationId == orgId) != 0);
-
-                var dtos = Map(users);
-
-                var list = new List<dynamic>();
-                var header = new ExpandoObject() as IDictionary<string, Object>;
-                header.Add("Fornavn", "Fornavn");
-                header.Add("Efternavn", "Efternavn");
-                header.Add("Email", "Email");
-                header.Add("DefaultUserStartPreference", "DefaultUserStartPreference");
-                header.Add("Organisationsenhed", "Default org.enhed");
-                header.Add("Advis", "Advis");
-                header.Add("Oprettet", "Oprettet Af");
-                header.Add("OrgRoller", "Organisations roller");
-                header.Add("ITProjektRoller", "ITProjekt roller");
-                header.Add("ITSystemRoller", "ITSystem roller");
-                header.Add("ITKontraktRoller", "ITKontrakt roller");
-                list.Add(header);
-
-                foreach (var user in dtos)
-                    {
-                    var obj = new ExpandoObject() as IDictionary<string, Object>;
-                    obj.Add("Fornavn", user.Name);
-                    obj.Add("Efternavn", user.LastName);
-                    obj.Add("Email", user.Email);
-                    obj.Add("DefaultUserStartPreference", user.DefaultUserStartPreference);
-                    obj.Add("Organisationsenhed", user.DefaultOrganizationUnitName);
-                    obj.Add("Advis", user.LastAdvisDate.HasValue ? user.LastAdvisDate.Value.ToString("dd-MM-yy") : "Ikke sendt");
-                    obj.Add("Oprettet", user.ObjectOwnerName + " " + user.ObjectOwnerLastName);
-                    obj.Add("OrgRoller", GetOrgRights(orgId, user.Id));
-                    obj.Add("ITProjektRoller", GetProjectRights(user.Id));
-                    obj.Add("ITSystemRoller", GetSystemRights(user.Id));
-                    obj.Add("ITKontraktRoller", GetContractRights(user.Id));
-                    list.Add(obj);
-                }
-
-                var csvList = list.ToCsv();
-                var bytes = Encoding.Unicode.GetBytes(csvList);
-                var stream = new MemoryStream();
-                stream.Write(bytes, 0, bytes.Length);
-                stream.Seek(0, SeekOrigin.Begin);
-
-                var result = new HttpResponseMessage(HttpStatusCode.OK);
-                result.Content = new StreamContent(stream);
-                result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
-                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileNameStar = "brugerkatalog.csv", DispositionType = "ISO-8859-1" };
-                return result;
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        #region GetRights
-
-        private string GetOrgRights(int orgId, int userId)
-        {
-            var rightsRepository = _kernel.Get<IGenericRepository<OrganizationUnitRight>>();
-            var orgUnitService = _kernel.Get<IOrgUnitService>();
-
-            var orgUnits = orgUnitService.GetSubTree(orgId);
-
-            var theRights = new List<OrganizationUnitRight>();
-            foreach (var orgUnit in orgUnits)
-            {
-                var id = orgUnit.Id;
-                theRights.AddRange(rightsRepository.Get(r => r.ObjectId == id && r.UserId == userId));
-            }
-            var dtos = Mapper.Map<List<RightOutputDTO>>(theRights);
-
-            return StringifyRights(dtos);
-        }
-
-        private string GetProjectRights(int userId)
-        {
-            var rightsRepository = _kernel.Get<IGenericRepository<ItProjectRight>>();
-
-            var theRights = rightsRepository.Get(r => r.UserId == userId);
-
-            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
-        }
-
-        private string GetSystemRights(int userId)
-        {
-            var rightsRepository = _kernel.Get<IGenericRepository<ItSystemRight>>();
-
-            var theRights = rightsRepository.Get(r => r.UserId == userId);
-
-            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
-        }
-
-        private string GetContractRights(int userId)
-        {
-            var rightsRepository = _kernel.Get<IGenericRepository<ItContractRight>>();
-
-            var theRights = rightsRepository.Get(r => r.UserId == userId);
-
-            return StringifyRights(Mapper.Map<List<RightOutputDTO>>(theRights));
-        }
-
-        private static string StringifyRights(List<RightOutputDTO> dtos)
-        {
-            var builder = new StringBuilder();
-            foreach (var dto in dtos)
-            {
-                builder.Append(dto.ObjectName).Append(':').Append(dto.RoleName);
-                if (dtos.Last() != dto)
-                    builder.Append(',');
-            }
-            return builder.ToString();
-        }
-
-        #endregion
-
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
         {
             try
@@ -402,11 +253,23 @@ namespace Presentation.Web.Controllers.API
             if (user.IsReadOnly && !user.IsGlobalAdmin)
                 return false;
 
-            var isLocalAdmin = KitosUser.OrganizationRights.Any(x => x.OrganizationId == organizationId && x.Role == OrganizationRole.LocalAdmin);
-            if (isLocalAdmin)
-                return true;
-
             return base.HasWriteAccess(obj, user, organizationId);
+        }
+
+        /// <summary>
+        /// Deletes user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <param name="organizationId">Not used in this case. Should remain empty</param>
+        /// <returns></returns>
+        public override HttpResponseMessage Delete(int id, int organizationId = 0)
+        {
+            if (!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
+            {
+                return Forbidden();
+            }
+
+            return base.Delete(id, organizationId);
         }
     }
 }

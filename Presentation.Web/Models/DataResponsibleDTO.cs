@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Presentation.Web.Models
+﻿namespace Presentation.Web.Models
 {
     public class DataResponsibleDTO
     {

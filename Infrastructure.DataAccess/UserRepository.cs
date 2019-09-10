@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Core.DomainServices;
 using Core.DomainModel;
 
@@ -23,6 +22,11 @@ namespace Infrastructure.DataAccess
         public User GetByUuid(string uniqueId)
         {
             return _context.Users.SingleOrDefault(u => u.UniqueId == uniqueId);
+        }
+
+        public User GetById(int id)
+        {
+            return _context.Users.SingleOrDefault(u => u.Id == id);
         }
     }
 }

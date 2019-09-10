@@ -6,6 +6,7 @@
         email: string;
         lastName: string;
         phoneNumber: string;
+        hasApi: boolean;
         isLocalAdmin: boolean;
         isOrgAdmin: boolean;
         isProjectAdmin: boolean;
@@ -13,6 +14,8 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isReadOnly: boolean;
+        
+
     }
 
     class EditOrganizationUserController {
@@ -25,6 +28,7 @@
         public isUserContractAdmin = false;
         public isUserReportAdmin = false;
         public isUserReadOnly = false;
+        public hasApi = false;
 
         private userId: number;
         private originalVm;
@@ -42,6 +46,7 @@
             var userVm: IEditViewModel = {
                 email: user.Email,
                 name: user.Name,
+                hasApi: user.HasApiAccess,
                 lastName: user.LastName,
                 phoneNumber: user.PhoneNumber,
                 isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
@@ -53,8 +58,9 @@
                 isReadOnly: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReadOnly }) !== undefined
             };
             this.originalVm = _.clone(userVm);
-            this.vm = userVm;
 
+            this.vm = userVm;
+            this.hasApi = currentUser.hasApi;
             this.isUserGlobalAdmin = currentUser.isGlobalAdmin;
             this.isUserLocalAdmin = currentUser.isLocalAdmin;
             this.isUserOrgAdmin = currentUser.isOrgAdmin;
@@ -68,7 +74,9 @@
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
             // check if the requested property exsists in the diff
             if (Object.keys(diffRights).indexOf(property) === -1)
+            {
                 return; // if it doesn't then it wasn't changed and we abort
+            }
 
             if (diffRights[property]) {
                 // add role to user
@@ -102,8 +110,11 @@
                 Name: this.vm.name,
                 LastName: this.vm.lastName,
                 PhoneNumber: this.vm.phoneNumber,
-                Email: this.vm.email
-            };
+                Email: this.vm.email,
+                HasApiAccess: this.vm.hasApi
+
+
+        };
             this.$http.patch(`/odata/Users(${this.userId})`, payload);
 
             // when all requests are done

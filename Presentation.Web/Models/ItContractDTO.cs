@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItSystem.DataTypes;
+﻿using Core.DomainModel.ItSystem.DataTypes;
 using System;
 using System.Collections.Generic;
 

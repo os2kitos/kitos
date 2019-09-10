@@ -20,11 +20,12 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
+
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
         public modal: kendo.ui.Window;
-        public canCreate: boolean;
+        public canCreate = this.userAccessRights.canCreate;
 
         public static $inject: Array<string> = [
             "$rootScope",
@@ -38,6 +39,7 @@
             "moment",
             "notify",
             "user",
+            "userAccessRights",
             "gridStateService",
             "$uibModal",
             "needsWidthFixService"
@@ -55,6 +57,7 @@
             private moment: moment.MomentStatic,
             private notify,
             private user,
+            private userAccessRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private needsWidthFixService) {
@@ -96,7 +99,6 @@
                 itSystemBaseUrl = `/odata/Organizations(${user.currentOrganizationId})/ItSystems`;
             }
             var itSystemUrl = itSystemBaseUrl + "?$expand=AppTypeOption,BusinessType,AssociatedDataWorkers,BelongsTo,TaskRefs,Parent,Organization,ObjectOwner,Usages($expand=Organization),LastChangedByUser,Reference";
-            this.canCreate = !this.user.isReadOnly;
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler
@@ -157,7 +159,7 @@
 
                             });
                             return response;
-                        }                    
+                        }
                     },
                     pageSize: 100,
                     serverPaging: true,
@@ -503,17 +505,15 @@
                             var reference = dataItem.Reference;
                             if (reference != null) {
                                 var url = reference.URL;
-                                if (url != null)
-                                {
+                                if (url != null) {
                                     if (Utility.Validation.validateUrl(url)) {
                                         return "<a target=\"_blank\" style=\"float:left;\" href=\"" + url + "\">" + reference.Title + "</a>";
                                     }
-                                    else
-                                    {
+                                    else {
                                         return reference.Title;
                                     }
                                 }
-       
+
                             }
                             return "";
                         },
@@ -916,7 +916,13 @@
                     resolve: {
                         user: [
                             "userService", userService => userService.getUser()
-                        ]
+                        ],
+                        userAccessRights: ['$http', function ($http) {
+                            return $http.get("api/itsystem/?getEntitiesAccessRights=true")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }]
                     }
                 });
             }

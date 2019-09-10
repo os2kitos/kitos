@@ -2,14 +2,14 @@
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Web;
 using System.Web.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
         IGenericRepository<AdviceUserRelation> _repository;
@@ -17,7 +17,11 @@ namespace Presentation.Web.Controllers.API
         {
             _repository = repository;
         }
-
+        /// <summary>
+        /// Sletter adviser med det specificerede id fra en genereisk advis
+        /// </summary>
+        /// <param name="adviceId"></param>
+        /// <returns></returns>
         [HttpDelete]
         public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
         {

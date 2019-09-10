@@ -4,11 +4,14 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
+    [PublicApi]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;
@@ -37,6 +40,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         // GET api/PasswordResetRequest
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<PasswordResetRequestDTO>))]
         public HttpResponseMessage Get(string requestId)
         {
             try

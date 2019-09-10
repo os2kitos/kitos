@@ -15,10 +15,13 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class TaskUsageController : GenericHierarchyApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -31,11 +34,17 @@ namespace Presentation.Web.Controllers.API
             _taskRepository = taskRepository;
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
         public HttpResponseMessage Get(int orgUnitId, int organizationId, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             return Get(orgUnitId, organizationId, false, pagingModel);
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
         public HttpResponseMessage Get(int orgUnitId, int organizationId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             try
@@ -65,6 +74,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/taskGroup")]
         public HttpResponseMessage PostTaskGroup(int orgUnitId, int? taskId)
         {
             try
@@ -116,6 +127,36 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPost]
+        [Route("api/taskUsage/")]
+        public HttpResponseMessage Post(TaskUsageDTO taskUsageDto)
+        {
+            try
+            {
+                var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
+                item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
+
+                var savedItem = PostQuery(item);
+
+                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+            }
+            catch (Exception e)
+            {
+                // check if inner message is a duplicate, if so return conflict
+                if (e.InnerException?.InnerException != null)
+                {
+                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
+                    {
+                        return Conflict(e.InnerException.InnerException.Message);
+                    }
+                }
+                return LogError(e);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage DeleteTaskGroup(int orgUnitId, int? taskId)
         {
             try
@@ -152,6 +193,8 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpGet]
+        [Route("api/taskUsage/")]
         public HttpResponseMessage GetExcel(bool? csv, int orgUnitId, bool onlyStarred)
         {
             try

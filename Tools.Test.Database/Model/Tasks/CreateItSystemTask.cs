@@ -11,18 +11,22 @@ namespace Tools.Test.Database.Model.Tasks
     public class CreateItSystemTask : DatabaseTask
     {
         private readonly string _name;
+        private readonly string _organizationName;
+        private readonly int? _parentId;
 
-        public CreateItSystemTask(string connectionString, string name)
+        public CreateItSystemTask(string connectionString, string name, string organizationName, int? parentId)
             : base(connectionString)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
+            _organizationName = organizationName;
+            _parentId = parentId;
         }
 
         public override bool Execute()
         {
             using (var context = CreateKitosContext())
             {
-                var commonOrg = context.GetCommonOrganization();
+                var organization = context.GetOrganization(_organizationName);
                 var globalAdmin = context.GetGlobalAdmin();
 
                 //Create the new it system
@@ -37,9 +41,10 @@ namespace Tools.Test.Database.Model.Tasks
                 {
                     Name = _name,
                     ObjectOwnerId = globalAdmin.Id,
-                    OrganizationId = commonOrg.Id,
+                    OrganizationId = organization.Id,
                     LastChangedByUserId = globalAdmin.Id,
-                    Uuid = Guid.NewGuid()
+                    Uuid = Guid.NewGuid(),
+                    ParentId = _parentId
                 };
 
                 context.ItSystems.Add(itSystem);
@@ -49,7 +54,7 @@ namespace Tools.Test.Database.Model.Tasks
                 var itSystemUsage = new ItSystemUsage
                 {
                     ItSystemId = itSystem.Id,
-                    OrganizationId = commonOrg.Id,
+                    OrganizationId = organization.Id,
                     ObjectOwnerId = globalAdmin.Id,
                     LastChangedByUserId = globalAdmin.Id,
                     DataLevel = itSystem.DataLevel,
@@ -61,6 +66,15 @@ namespace Tools.Test.Database.Model.Tasks
                         DataWorkerId = x.DataWorkerId
                     }).ToList()
                 };
+
+                itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage()
+                {
+                    ItSystemUsage = itSystemUsage,
+                    ItSystemUsageId = itSystemUsage.Id,
+                    OrganizationUnit = organization.OrgUnits.First(),
+                    OrganizationUnitId = organization.Id
+                };
+
                 context.ItSystemUsages.Add(itSystemUsage);
                 context.SaveChanges();
 

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class ItInterfaceExhibitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;
@@ -17,6 +21,7 @@ namespace Presentation.Web.Controllers.API
             _repository = repository;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
         public HttpResponseMessage GetByContract(int contractId)
         {
             try
@@ -32,6 +37,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItInterfaceExhibitUsageDTO>))]
         public HttpResponseMessage GetSingle(int usageId, int exhibitId)
         {
             try

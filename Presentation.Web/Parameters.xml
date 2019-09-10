@@ -17,6 +17,12 @@
     </parameterentry>
   </parameter>
 
+  <!-- Kitos token configuration -->
+  <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
+    </parameterentry>
+  </parameter>
+
   <!-- Email -->
   <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">
@@ -52,6 +58,17 @@
 
   <parameter name="DeploymentVersion" description="" defaultvalue="__DeploymentVersion__" tags="">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DeploymentVersion']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
+    <parameterValidation kind="AllowEmpty" />
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DefaultUserPassword']/value/text()">
+    </parameterentry>
+  </parameter>
+
+  <parameter name="UseDefaultPassword" description="" defaultvalue="__UseDefaultPassword__" tags="">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='UseDefaultPassword']/value/text()">
     </parameterentry>
   </parameter>
 

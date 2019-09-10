@@ -8,8 +8,6 @@ using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
@@ -18,8 +16,6 @@ using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
-
-//https://datatellblog.wordpress.com/2015/05/05/unit-testing-asp-net-mvc-authorization/
 
 namespace Tests.Unit.Presentation.Web.OData
 {
@@ -198,10 +194,10 @@ namespace Tests.Unit.Presentation.Web.OData
             var result = _itContractsController.GetItContractsByOrgUnit(orgKey, 2);
 
             // assert
-            Assert.IsType<StatusCodeResult>(result);
-            var statusCode = result as StatusCodeResult;
+            Assert.IsType<ResponseMessageResult>(result);
+            var statusCode = result as ResponseMessageResult;
             // ReSharper disable once PossibleNullReferenceException
-            Assert.True(statusCode.StatusCode == HttpStatusCode.Forbidden);
+            Assert.True(statusCode.Response.StatusCode == HttpStatusCode.Forbidden);
         }
 
         [Fact]

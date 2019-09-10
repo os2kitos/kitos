@@ -59,9 +59,11 @@
     <Compile Include="Model\Tasks\CreateItContractTask.cs" />
     <Compile Include="Model\Tasks\CreateItSystemTask.cs" />
     <Compile Include="Model\Tasks\CreateKitosUserTask.cs" />
+    <Compile Include="Model\Tasks\CreateOrganizationTask.cs" />
     <Compile Include="Model\Tasks\DatabaseTask.cs" />
     <Compile Include="Model\Tasks\DropDatabaseTask.cs" />
     <Compile Include="Model\Tasks\EnableAllOptionsTask.cs" />
+    <Compile Include="Model\TestOrganizations.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -85,6 +87,10 @@
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
       <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
     {
         public RiskController(IGenericRepository<Risk> repository) : base(repository)
         {
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<RiskDTO>>))]
         public HttpResponseMessage GetByProject(bool? getByProject, int projectId)
         {
             try

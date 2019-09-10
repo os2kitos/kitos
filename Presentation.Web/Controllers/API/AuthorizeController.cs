@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web.Http;
 using System.Web.Security;
 using Core.DomainModel;
@@ -11,9 +10,13 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
+using System.Net;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
+    [PublicApi]
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
@@ -26,6 +29,7 @@ namespace Presentation.Web.Controllers.API
             _organizationService = organizationService;
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
         public HttpResponseMessage GetLogin()
         {
             var user = KitosUser;
@@ -43,6 +47,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [Route("api/authorize/GetOrganizations")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
         public HttpResponseMessage GetOrganizations()
         {
             var user = KitosUser;
@@ -52,10 +57,11 @@ namespace Presentation.Web.Controllers.API
         }
 
         [Route("api/authorize/GetOrganization({orgId})")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<OrganizationAndDefaultUnitDTO>))]
         public HttpResponseMessage GetOrganization(int orgId)
         {
             var user = KitosUser;
-            var org = _organizationService.GetOrganizations(user).Single(o=>o.Id == orgId);
+            var org = _organizationService.GetOrganizations(user).Single(o => o.Id == orgId);
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
             var dto = new OrganizationAndDefaultUnitDTO()
             {
@@ -77,7 +83,7 @@ namespace Presentation.Web.Controllers.API
 
             if (principal.Claims.Any(c => c.Type == ClaimTypes.Email || c.Type == ClaimTypes.NameIdentifier))
             {
-                
+
                 var emailClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.Email);
                 var uuidClaim = principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 if (uuidClaim != null && !String.IsNullOrEmpty(uuidClaim.Value))
@@ -97,15 +103,76 @@ namespace Presentation.Web.Controllers.API
             }
             return user;
         }
+        //Post api/authorize/gettoken
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("api/authorize/GetToken")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<GetTokenResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public HttpResponseMessage GetToken(LoginDTO loginDto)
+        {
+            if (loginDto == null)
+            {
+                return BadRequest();
+            }
+
+            if (string.IsNullOrWhiteSpace(loginDto.Email) || string.IsNullOrWhiteSpace(loginDto.Password))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
+                {
+                    Logger.Info("Attempt to login with bad credentials");
+                    return Unauthorized("Bad credentials");
+                }
+
+                var user = _userRepository.GetByEmail(loginDto.Email);
+                if (user == null)
+                {
+                    Logger.Error("User found during membership validation but could not be found by email: {email}", loginDto.Email);
+                    return BadRequest();
+                }
+
+                if (!user.HasApiAccess.GetValueOrDefault())
+                {
+                    Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
+                    return Forbidden();
+                }
+
+                var token = new TokenValidator().CreateToken(user);
+
+                var response = new GetTokenResponseDTO
+                {
+                    Token = token.Value,
+                    Email = loginDto.Email,
+                    LoginSuccessful = true,
+                    Expires = token.Expiration
+                };
+
+                Logger.Info($"Created token for user with Id {user.Id}");
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to create token");
+                return LogError(e);
+            }
+        }
 
         // POST api/Authorize
         [AllowAnonymous]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
-            var loginInfo = new { Token="", Email = "", Password = "", LoginSuccessful = false };
+            if (loginDto == null)
+            {
+                return BadRequest();
+            }
 
-            if (loginDto != null)
-                loginInfo = new { Token = loginDto.Token, Email = loginDto.Email, Password = "********", LoginSuccessful = false };
+            var loginInfo = new { Email = loginDto.Email, LoginSuccessful = false };
 
             try
             {
@@ -115,33 +182,32 @@ namespace Presentation.Web.Controllers.API
                     user = LoginWithToken(loginDto.Token);
                     if (user == null)
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with token. {loginInfo}");
+                        return Unauthorized("Invalid token");
                     }
-
                 }
                 else
                 {
                     if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
                     {
-                        throw new ArgumentException();
+                        Logger.Info($"Uservalidation: Unsuccessful login with credentials. {loginInfo}");
+                        return Unauthorized("Bad credentials");
                     }
 
                     user = _userRepository.GetByEmail(loginDto.Email);
+                    if (user == null)
+                    {
+                        Logger.Error($"User found during membership validation but could not be found by email: {loginDto.Email}");
+                        return BadRequest();
+                    }
                 }
 
-                
                 FormsAuthentication.SetAuthCookie(user.Id.ToString(), loginDto.RememberMe);
                 var response = Map<User, UserDTO>(user);
-                loginInfo = new { loginDto.Token, loginDto.Email, Password = "********", LoginSuccessful = true };
+                loginInfo = new { loginDto.Email, LoginSuccessful = true };
                 Logger.Info($"Uservalidation: Successful {loginInfo}");
 
                 return Created(response);
-            }
-            catch (ArgumentException)
-            {
-                Logger.Info($"Uservalidation: Unsuccessful. {loginInfo}");
-
-                return Unauthorized("Bad credentials");
             }
             catch (Exception e)
             {
@@ -180,31 +246,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        // helper function
-        private LoginResponseDTO CreateLoginResponse(User user, IEnumerable<Organization> organizations)
-        {
-            var userDto = AutoMapper.Mapper.Map<User, UserDTO>(user);
-
-            // getting the default org units (one or null for each organization)
-            var defaultUnits = organizations.Select(org => _organizationService.GetDefaultUnit(org, user));
-
-            // creating DTOs
-            var orgsDto = organizations.Zip(defaultUnits, (org, defaultUnit) => new OrganizationAndDefaultUnitDTO()
-            {
-                Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
-                DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
-            });
-
-
-            var response = new LoginResponseDTO()
-            {
-                User = userDto,
-                Organizations = orgsDto
-            };
-
-            return response;
         }
     }
 }

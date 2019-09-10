@@ -33,6 +33,8 @@ namespace Infrastructure.DataAccess.Mapping
                 {
                     t.ToTable("TaskRefItSystemUsageOptOut");
                 });
+
+            TypeMapping.AddIndexOnAccessModifier<TaskRefMap, TaskRef>(this);
         }
     }
 }

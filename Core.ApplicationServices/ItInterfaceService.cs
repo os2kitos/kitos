@@ -1,6 +1,4 @@
-﻿// Udkommenteret ifm. OS2KITOS-663
-
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Linq;
 
@@ -9,17 +7,11 @@ namespace Core.ApplicationServices
     public class ItInterfaceService : IItInterfaceService
     {
         private readonly IGenericRepository<DataRow> _dataRowRepository;
-        private readonly IGenericRepository<ItInterfaceExhibit> _exhibitRepository;
         private readonly IGenericRepository<ItInterface> _repository;
-        //private readonly IGenericRepository<ItInterfaceUse> _useRepository;
-
-        //public ItInterfaceService(IGenericRepository<ItInterface> repository, IGenericRepository<DataRow> dataRowRepository, IGenericRepository<ItInterfaceExhibit> exhibitRepository, IGenericRepository<ItInterfaceUse> useRepository)
-        public ItInterfaceService(IGenericRepository<ItInterface> repository, IGenericRepository<DataRow> dataRowRepository, IGenericRepository<ItInterfaceExhibit> exhibitRepository)
+        public ItInterfaceService(IGenericRepository<ItInterface> repository, IGenericRepository<DataRow> dataRowRepository)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
-            _exhibitRepository = exhibitRepository;
-            //_useRepository = useRepository;
         }
         public void Delete(int id)
         {

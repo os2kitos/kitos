@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    //TODO refactor this into OrganizationRightsController
+    [InternalApi]
     public class GlobalAdminController : BaseApiController
     {
         public HttpResponseMessage Get()
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
 
                 var users = UserRepository.Get(u => u.IsGlobalAdmin);
 
@@ -32,12 +36,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (!IsGlobalAdmin())
+                {
+                    return Forbidden();
+                }
 
                 var user = UserRepository.GetByKey(dto.UserId);
 
                 //if already global admin, return conflict
-                if (user.IsGlobalAdmin) return Conflict(user.Name + " is already global admin");
+                if (user.IsGlobalAdmin)
+                {
+                    return Conflict(user.Name + " is already global admin");
+                }
 
                 user.IsGlobalAdmin = true;
                 user.LastChanged = DateTime.UtcNow;
@@ -59,16 +69,19 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin()) return Unauthorized();
+                if (IsGlobalAdmin())
+                {
+                    var user = UserRepository.GetByKey(userId);
 
-                var user = UserRepository.GetByKey(userId);
+                    user.IsGlobalAdmin = false;
+                    UserRepository.Save();
 
-                user.IsGlobalAdmin = false;
-                UserRepository.Save();
+                    var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
 
-                var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
+                    return Ok(outDto);
+                }
 
-                return Ok(outDto);
+                return Forbidden();
 
             }
             catch (Exception e)
