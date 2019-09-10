@@ -29,5 +29,18 @@ namespace Tests.Integration.Presentation.Web.Tools
                 return response;
             }
         }
+
+        public static async Task<ItInterfaceUsageDTO> GetItInterfaceUsage(int usageId, int systemId, int interfaceId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var oldInterfaceUrl = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?" +
+                                                            $"usageId={usageId}&" +
+                                                            $"sysId={systemId}&" +
+                                                            $"interfaceId={interfaceId}");
+            using (var response = await HttpApi.GetWithCookieAsync(oldInterfaceUrl, cookie))
+            {
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
+            }
+        }
     }
 }

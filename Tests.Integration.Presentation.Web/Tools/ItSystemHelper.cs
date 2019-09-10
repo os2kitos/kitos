@@ -54,5 +54,17 @@ namespace Tests.Integration.Presentation.Web.Tools
                 return response;
             }
         }
+
+        public static async Task<ItSystemUsageDTO> GetItSystemUsage(int itSystemUsageId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/ItSystemUsage/{itSystemUsageId}");
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                var itSystemUsage = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+                Assert.Equal(itSystemUsageId, itSystemUsage.Id);
+                return itSystemUsage;
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
@@ -27,6 +29,18 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(systemId,response.ItSystemId);
 
                 return response;
+            }
+        }
+
+        public static async Task<IReadOnlyList<ItInterfaceExhibitUsageDTO>> GetExhibitInterfaceUsages(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/ItInterfaceExhibitUsage?contractId={contractId}");
+            using (var result = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                var exhibitUsages =
+                    await result.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItInterfaceExhibitUsageDTO>>();
+                return exhibitUsages.ToList().AsReadOnly();
             }
         }
 
