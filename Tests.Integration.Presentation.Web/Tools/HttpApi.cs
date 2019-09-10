@@ -79,7 +79,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             //Make sure state does not bleed into stateless handler
             var cookieContainer = new CookieContainer();
             cookieContainer.Add(cookie);
-            using (var client = new HttpClient(new HttpClientHandler {CookieContainer = cookieContainer}))
+            using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
             {
                 return await client.SendAsync(requestMessage);
             }
@@ -170,8 +170,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             using (var client = new HttpClient())
             {
-                var request = CreatePostMessage(url,loginDto);
+                var request = CreatePostMessage(url, loginDto);
                 var cookieResponse = await client.SendAsync(request);
+                Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
                 var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
                 var cookieName = cookieParts[0];
                 var cookieValue = cookieParts[1].Split(';')[0];

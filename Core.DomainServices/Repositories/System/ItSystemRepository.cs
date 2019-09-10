@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -22,6 +23,9 @@ namespace Core.DomainServices.Repositories.System
 
         public IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters)
         {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
             var idsOfSystemsInUse = GetIdsOfSystemsInUse(parameters.ActiveOrganizationId);
 
             return _systemRepository

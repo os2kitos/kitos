@@ -111,8 +111,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             var fromItSystem = itSystemUsage.ItSystem;
             var affectedItProjects = itSystemUsage.ItProjects;
             var usageContractIds = itSystemUsage.Contracts.Select(x => x.ItContractId).ToList();
-            var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages;
-            var interfaceUsages = itSystemUsage.ItInterfaceUsages;
+            var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages.ToList();
+            var interfaceUsages = itSystemUsage.ItInterfaceUsages.ToList();
 
             var affectedContracts = GetContractMigrations(usageContractIds, interfaceExhibitUsages, interfaceUsages);
 
@@ -198,16 +198,15 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         }
 
         private IReadOnlyList<ItContractMigration> GetContractMigrations(
-            IEnumerable<int> contracts,
-            IEnumerable<ItInterfaceExhibitUsage> interfaceExhibitUsage,
-            IEnumerable<ItInterfaceUsage> itInterfaceUsage)
+            IReadOnlyList<int> idsOfContractsThatHaveSystemAssociations,
+            IReadOnlyList<ItInterfaceExhibitUsage> interfaceExhibitUsage,
+            IReadOnlyList<ItInterfaceUsage> itInterfaceUsages)
         {
-            var itInterfaceExhibitUsages = interfaceExhibitUsage.ToList();
-            var itInterfaceUsages = itInterfaceUsage.ToList();
-            var contractsAsList = contracts.ToList();
+            #region to refactor service call om ContractService: GetBySystemUsage(organizationId)
 
-            var allContractIds = contractsAsList
-                .Concat(itInterfaceExhibitUsages.Select(x => x.ItContract.Id))
+            var allContractIds = 
+                idsOfContractsThatHaveSystemAssociations
+                .Concat(interfaceExhibitUsage.Select(x => x.ItContract.Id))
                 .Concat(itInterfaceUsages.Select(x => x.ItContract.Id))
                 .Distinct()
                 .ToList();
@@ -217,8 +216,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .ByIds(allContractIds)
                 .ToList();
 
+            #endregion to refactor service call om ContractService: GetBySystemUsage(organizationId)
+
             return allContracts
-                .Select(contract => CreateContractMigration(itInterfaceExhibitUsages, itInterfaceUsages, contract, contractsAsList.Contains(contract.Id)))
+                .Select(contract => CreateContractMigration(interfaceExhibitUsage, itInterfaceUsages, contract, idsOfContractsThatHaveSystemAssociations.Contains(contract.Id)))
                 .ToList()
                 .AsReadOnly();
         }
@@ -229,11 +230,14 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             ItContract contract,
             bool systemAssociatedInContract)
         {
+            var itInterfaceUsages = itInterfaceUsage.Where(x => x.ItContractId == contract.Id);
+            var interfaceExhibitUsages = interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id);
+
             return new ItContractMigration(
                 contract,
                 systemAssociatedInContract,
-                itInterfaceUsage.Where(x => x.ItContractId == contract.Id),
-                interfaceExhibitUsage.Where(x => x.ItContractId == contract.Id));
+                itInterfaceUsages,
+                interfaceExhibitUsages);
         }
 
     }
