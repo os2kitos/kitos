@@ -13,6 +13,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -24,34 +25,34 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
-        private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _itInterfaceExhibitUsageRepository;
         private readonly IGenericRepository<ItInterfaceUsage> _itInterfaceUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemsRepository;
+        private readonly IItContractRepository _contractRepository;
 
 
         public ItSystemUsageMigrationService(
             IAuthorizationContext authorizationContext,
             IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<ItInterfaceExhibitUsage> itInterfaceExhibitUsageRepository,
             IGenericRepository<ItInterfaceUsage> itInterfaceUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger,
-            IItSystemRepository systemsRepository)
+            IItSystemRepository systemsRepository,
+            IItContractRepository contractRepository)
         {
             _authorizationContext = authorizationContext;
             _itSystemRepository = itSystemRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
-            _itContractRepository = itContractRepository;
             _itInterfaceExhibitUsageRepository = itInterfaceExhibitUsageRepository;
             _itInterfaceUsageRepository = itInterfaceUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
             _systemsRepository = systemsRepository;
+            _contractRepository = contractRepository;
         }
 
         public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
@@ -90,14 +91,14 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(result);
         }
 
-        public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageSystemId, int toSystemId)
+        public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
-            var itSystemUsage = _itSystemUsageRepository.GetByKey(usageSystemId);
+            var itSystemUsage = _itSystemUsageRepository.GetByKey(usageId);
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
@@ -108,16 +109,24 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
-            var fromItSystem = itSystemUsage.ItSystem;
-            var affectedItProjects = itSystemUsage.ItProjects;
+            //Map all contract migrations
             var usageContractIds = itSystemUsage.Contracts.Select(x => x.ItContractId).ToList();
             var interfaceExhibitUsages = itSystemUsage.ItInterfaceExhibitUsages.ToList();
             var interfaceUsages = itSystemUsage.ItInterfaceUsages.ToList();
 
-            var affectedContracts = GetContractMigrations(usageContractIds, interfaceExhibitUsages, interfaceUsages);
+            var contractMigrations = _contractRepository.GetBySystemUsageAssociation(usageId)
+                .AsEnumerable()
+                .Select(contract => CreateContractMigration(interfaceExhibitUsages, interfaceUsages, contract, usageContractIds.Contains(contract.Id)))
+                .ToList()
+                .AsReadOnly();
 
             return Result<OperationResult, ItSystemUsageMigration>.Ok(
-                new ItSystemUsageMigration(itSystemUsage, fromItSystem, toItSystem, affectedItProjects, affectedContracts));
+                new ItSystemUsageMigration(
+                    systemUsage: itSystemUsage,
+                    fromItSystem: itSystemUsage.ItSystem,
+                    toItSystem: toItSystem,
+                    affectedProjects: itSystemUsage.ItProjects,
+                    affectedContracts: contractMigrations));
         }
 
         public Result<OperationResult, ItSystemUsage> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
@@ -127,7 +136,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 try
                 {
                     var migration = GetSystemUsageMigration(usageSystemId, toSystemId);
-                    var systemUsage = migration.ResultValue.ItSystemUsage;
+                    var systemUsage = migration.ResultValue.SystemUsage;
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
                         return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
@@ -195,33 +204,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         public bool CanExecuteMigration()
         {
             return _authorizationContext.AllowSystemUsageMigration();
-        }
-
-        private IReadOnlyList<ItContractMigration> GetContractMigrations(
-            IReadOnlyList<int> idsOfContractsThatHaveSystemAssociations,
-            IReadOnlyList<ItInterfaceExhibitUsage> interfaceExhibitUsage,
-            IReadOnlyList<ItInterfaceUsage> itInterfaceUsages)
-        {
-            #region to refactor service call om ContractService: GetBySystemUsage(organizationId)
-
-            var allContractIds = 
-                idsOfContractsThatHaveSystemAssociations
-                .Concat(interfaceExhibitUsage.Select(x => x.ItContract.Id))
-                .Concat(itInterfaceUsages.Select(x => x.ItContract.Id))
-                .Distinct()
-                .ToList();
-
-            var allContracts = _itContractRepository
-                .AsQueryable()
-                .ByIds(allContractIds)
-                .ToList();
-
-            #endregion to refactor service call om ContractService: GetBySystemUsage(organizationId)
-
-            return allContracts
-                .Select(contract => CreateContractMigration(interfaceExhibitUsage, itInterfaceUsages, contract, idsOfContractsThatHaveSystemAssociations.Contains(contract.Id)))
-                .ToList()
-                .AsReadOnly();
         }
 
         private static ItContractMigration CreateContractMigration(

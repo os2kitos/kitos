@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
@@ -131,6 +132,7 @@ namespace Presentation.Web
             kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IItSystemRepository>().To<ItSystemRepository>().InRequestScope();
+            kernel.Bind<IItContractRepository>().To<ItContractRepository>().InRequestScope();
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
         }
 

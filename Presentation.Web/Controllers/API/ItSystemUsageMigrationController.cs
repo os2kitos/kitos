@@ -126,7 +126,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new ItSystemUsageMigrationDTO
             {
-                TargetUsage = new NamedEntityDTO{Id = input.ItSystemUsage.Id,Name = input.ItSystemUsage.LocalCallName ?? input.FromItSystem.Name} ,
+                TargetUsage = new NamedEntityDTO{Id = input.SystemUsage.Id,Name = input.SystemUsage.LocalCallName ?? input.FromItSystem.Name} ,
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
                 AffectedItProjects = input.AffectedProjects.Select(x => x.MapToNamedEntityDTO()).ToList(),

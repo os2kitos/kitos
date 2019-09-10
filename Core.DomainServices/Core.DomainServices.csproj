@@ -72,6 +72,8 @@
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\Contract\IItContractRepository.cs" />
+    <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="Repositories\System\IItSystemRepository.cs" />
     <Compile Include="Repositories\System\ItSystemRepository.cs" />
   </ItemGroup>
