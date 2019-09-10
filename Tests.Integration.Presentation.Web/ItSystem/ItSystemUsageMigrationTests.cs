@@ -24,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             _oldSystemInUse = await CreateSystemAsync();
             _oldSystemUsage = await TakeSystemIntoUseAsync(_oldSystemInUse);
-            _newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            _newSystem = await CreateSystemAsync();
         }
 
         public Task DisposeAsync()
@@ -249,7 +249,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Associated_In_Contract()
         {
             //Arrange
-            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
+            var contract = await CreateContractAsync();
             await ItContractHelper.AddItSystemUsage(contract.Id, _oldSystemUsage.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
@@ -272,14 +272,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Associated_Through_UseInterface_Mappings_In_Contract()
         {
             //Arrange
-            var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
-            var usage = await InterfaceUsageHelper.CreateAsync(contract.Id, _oldSystemUsage.Id, _oldSystemInUse.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
+            var createdInterface = await CreateInterfaceAsync();
+            var contract = await CreateContractAsync();
+            var usage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
 
             //Adding an unaffected usage (not same system usage source)
             var unaffectedItSystem = await CreateSystemAsync();
             var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
-            await InterfaceUsageHelper.CreateAsync(contract.Id, unaffectedUsage.Id, unaffectedItSystem.Id, createdInterface.Id, TestEnvironment.DefaultOrganizationId);
+            await CreateInterfaceUsageAsync(contract, createdInterface, unaffectedUsage, unaffectedItSystem);
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
@@ -299,18 +299,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Associated_Through_InterfaceExhibit_Mappings_In_Contract()
         {
             //Arrange
-            var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var contract = await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
-            var exhibit = await InterfaceExhibitHelper.CreateExhibit(_oldSystemInUse.Id, createdInterface.Id);
-            var exhibitUsage = await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, _oldSystemUsage.Id, exhibit.Id);
+            var createdInterface = await CreateInterfaceAsync();
+            var contract = await CreateContractAsync();
+            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
+            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
 
             //Adding an unaffected exhibit usage (not same system usage source)
             var unaffectedItSystem = await CreateSystemAsync();
-            var unaffectedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var unaffectedInterface = await CreateInterfaceAsync();
             var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
-            var unAffectedExhibit = await InterfaceExhibitHelper.CreateExhibit(unaffectedItSystem.Id, unaffectedInterface.Id);
-            await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, unaffectedUsage.Id, unAffectedExhibit.Id);
-
+            var unAffectedExhibit = await CreateExhibitAsync(unaffectedInterface, unaffectedItSystem);
+            await CreateExhibitUsageAsync(contract, unAffectedExhibit, unaffectedUsage);
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
@@ -387,9 +386,36 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return ItSystemHelper.CreateItSystemInOrganizationAsync(name ?? CreateName(), organizationId, accessModifier);
         }
 
+        private static async Task<ItInterfaceExhibitDTO> CreateExhibitAsync(ItInterfaceDTO exposedInterface, ItSystemDTO exposingSystem)
+        {
+            return await InterfaceExhibitHelper.CreateExhibit(exposingSystem.Id, exposedInterface.Id);
+        }
+
         private static async Task<ItSystemUsageDTO> TakeSystemIntoUseAsync(ItSystemDTO system, int? organizationId = null)
         {
             return await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId ?? system.OrganizationId);
+        }
+
+        private static async Task<ItContractDTO> CreateContractAsync()
+        {
+            return await ItContractHelper.CreateContract(CreateName(), TestEnvironment.DefaultOrganizationId);
+        }
+
+        private static async Task<ItInterfaceDTO> CreateInterfaceAsync()
+        {
+            var createdInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(),
+                CreateName(), TestEnvironment.DefaultUserId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            return createdInterface;
+        }
+
+        private static async Task<ItInterfaceUsageDTO> CreateInterfaceUsageAsync(ItContractDTO contract, ItInterfaceDTO targetInterface, ItSystemUsageDTO usage, ItSystemDTO system)
+        {
+            return await InterfaceUsageHelper.CreateAsync(contract.Id, usage.Id, system.Id, targetInterface.Id, TestEnvironment.DefaultOrganizationId);
+        }
+
+        private static async Task<ItInterfaceExhibitUsageDTO> CreateExhibitUsageAsync(ItContractDTO contract, ItInterfaceExhibitDTO exhibit, ItSystemUsageDTO systemUsage)
+        {
+            return await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, systemUsage.Id, exhibit.Id);
         }
 
         private static string CreateName()
