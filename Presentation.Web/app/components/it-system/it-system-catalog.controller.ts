@@ -36,6 +36,7 @@
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
+        public canMigrate = this.userMigrationRights.canExecuteMigration;
 
         public static $inject:
             Array<string> = [
@@ -51,6 +52,7 @@
                 "notify",
                 "user",
                 "userAccessRights",
+                "userMigrationRights",
                 "gridStateService",
                 "$uibModal",
                 "needsWidthFixService"
@@ -70,12 +72,15 @@
             private notify,
             private user,
             private userAccessRights,
+            private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
-            private oldItSystemUsageID,
+            private oldItSystemUsageName,
+            private oldItSystemUsageId,
             private newItSystemObject,
             private municipality,
             public migrationConsequenceText,
+            public migrationReportDTO,
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -103,6 +108,7 @@
                         kendo.ui.progress(this.mainGrid.element, true);
                     });
                 }
+
             });
 
             $scope.mySelectOptions = {
@@ -114,7 +120,7 @@
                     },
                     quietMillis: 500,
                     transport: function (queryParams) {
-                        return $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=" + queryParams.data.query + "&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
+                        return $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=" + user.currentOrganizationId + "&nameContent=" + queryParams.data.query + "&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
                     },
 
                     results: function (data, page) {
@@ -137,13 +143,6 @@
                     }
                 }
             };
-
-
-            //this.$('#new-system-usage').on('select2:opening', function (e) {
-            //    this.$('#new-system-usage').select2({
-            //        dropdownParent: $('#select2MigrationContainer')
-            //    });
-            //});
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -478,8 +477,16 @@
                     {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
-                        template: dataItem =>
-                            `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
+                        template: dataItem => {
+                            if (dataItem.Usages.length > 0) {
+                                return `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${
+                                    dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
+                                    }</a>`;
+                            }
+                            else {
+                                return `<label class="col-xs-7 text-center" )">Anvendes ikke</label>`;
+                            }
+                        },
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
                         sortable: false,
@@ -709,7 +716,7 @@
         // usagedetails grid empty-grid handling
         private detailsBound(e) {
             var grid = e.sender;
-            if (grid.dataSource.total() == 0) {
+            if (grid.dataSource.total() === 0) {
                 var colCount = grid.columns.length;
                 this.$(e.sender.wrapper)
                     .find("tbody")
@@ -770,11 +777,12 @@
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
-        };
+        }; 
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (usageId, systemName) => {
-            this.oldItSystemUsageID = systemName;
+            this.oldItSystemUsageName = systemName;
+            this.oldItSystemUsageId = usageId;
             //Filter by usageId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
             //Set modal title
@@ -795,45 +803,62 @@
         }
 
         public migrateItSystem = (name: string) => {
+            var self = this;
             this.modal.close();
             this.municipality = name;
-            //   this.usageGridMigration.dataSource.read();
             //Set modal title
             this.modalMigration.setOptions({
                 close: function (e) {
                     console.log("MODAL 2 CLOSING");
-
+                    let element: any = self.convertToSelect2Object('#select2-drop');
+                    if (element != null) {
+                        element.select2('close');
+                    }
                     return true;
                 },
                 resizable: false,
-                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemUsageID}`
+                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemUsageName}`
             });
 
             this.modalMigration.center().open();
-            //this.convertToSelect2Object('#new-system-usage').select2({
-            //    dropdownParent: this.$('#migrationModelWindow2')
-            //});
         }
 
-        public migrateSystemTo = (from: string) => {
-            this.modalMigration.close();
-            this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
-            this.migrationConsequenceText = this.municipality + " vil gerne overflytte relation fra " + this.oldItSystemUsageID + " til " + this.newItSystemObject.usage.name;
-            this.modalMigrationConsequence.setOptions({
-                close: function (e) {
-                    console.log("MODAL 3 CLOSING");
-                    return true;
-                },
+        public migrateSystemTo = () => {
 
-                resizable: false,
-                title: `Flytning af it-system `
+            this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
+            this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.usage.id)
+                .success(dto => {
+                    console.log(dto.response);
+                    this.migrationReportDTO = dto;
+                    console.log("TEST" + this.migrationReportDTO);
+                    this.modalMigrationConsequence.setOptions({
+                        close: function (e) {
+                            console.log("MODAL 3 CLOSING");
+                            return true;
+                        },
+
+                        resizable: false,
+                        title: `Flytning af it-system `
+                    });
+                    this.modalMigration.close();
+                    this.modalMigrationConsequence.center().open();
+                })
+                .error(() => {
+                    this.notify.addErrorMessage("Problem med at hente flytte rapport");
+                });
+        }
+
+        private getMigrationReport: any = (usageId, toSystemId) => {
+            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=1${toSystemId}`;
+            return this.$http({
+                method: 'GET',
+                url: url,
             });
-            this.modalMigrationConsequence.center().open();
         }
 
         public startMigration = () => {
-            if (this.oldItSystemUsageID != null || this.newItSystemObject != null) {
-                console.log("Requesting migration! " + this.oldItSystemUsageID + " to " + this.newItSystemObject.usage.name);
+            if (this.oldItSystemUsageName != null || this.newItSystemObject != null) {
+                console.log("Requesting migration! " + this.oldItSystemUsageName + " to " + this.newItSystemObject.usage.name);
             }
         }
 
@@ -842,6 +867,10 @@
             document.execCommand("Copy");
             window.getSelection().removeAllRanges();
             this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+        }
+
+        public cancelMigration() {
+            this.modalMigrationConsequence.close();
         }
 
         public usageDetailsGrid: kendo.ui.GridOptions = {
@@ -864,8 +893,7 @@
                     field: "Organization.Name", title: "Organisation",
                     template: dataItem => {
                         var orgName = dataItem.Organization.Name;
-                        //TODO CHANGE TO NEW ACCESS RIGHTS ( JMO )
-                        if (this.canCreate) {
+                        if (this.canMigrate) {
                             return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
                             return dataItem.Organization.Name;
@@ -1078,13 +1106,18 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        //TODO ADD CHECK FOR NEW MIGRATION FUNCTION
                         userAccessRights: ['$http', function ($http) {
                             return $http.get("api/itsystem/?getEntitiesAccessRights=true")
                                 .then(function (result) {
                                     return result.data.response;
                                 });
-                        }]
+                        }],
+                        userMigrationRights: ['$http', function ($http) {
+                            return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
+                                .then(function (result) {
+                                return result.data.response;
+                            });
+                        }],
                     }
                 });
 
