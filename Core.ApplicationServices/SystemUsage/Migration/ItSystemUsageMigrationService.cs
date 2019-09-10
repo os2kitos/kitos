@@ -135,57 +135,36 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             {
                 try
                 {
-                    var migration = GetSystemUsageMigration(usageSystemId, toSystemId);
-                    var systemUsage = migration.ResultValue.SystemUsage;
+                    var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
+                    if (migrationConsequences.Status != OperationResult.Ok)
+                    {
+                        return Result<OperationResult, ItSystemUsage>.Fail(migrationConsequences.Status);
+                    }
+                    var migration = migrationConsequences.ResultValue;
+                    var systemUsage = migration.SystemUsage;
+
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
                         return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
                     }
-
-                    systemUsage.ItSystemId = toSystemId;
+                    if (systemUsage.ItSystemId == toSystemId)
+                    {
+                        return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
+                    }
+                    
+                    var interfaceUsagesToBeUpdated =
+                        migration.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages).Distinct();
+                    var interfaceMigration = UpdateInterfaceUsages(interfaceUsagesToBeUpdated, toSystemId);
+                    if (!interfaceMigration)
+                    {
+                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
+                    }
 
                     var exhibitsToBeDeleted =
-                        migration.ResultValue.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted).Distinct();
+                        migration.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted).Distinct();
+                    DeleteExhibits(exhibitsToBeDeleted);
 
-                    foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
-                    {
-                        _itInterfaceExhibitUsageRepository.Delete(itInterfaceExhibitUsage);
-                        _itInterfaceExhibitUsageRepository.Save();
-                    }
-
-                    var interfaceUsagesToBeUpdated =
-                        migration.ResultValue.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages).Distinct();
-
-                    foreach (var interfaceUsage in interfaceUsagesToBeUpdated)
-                    {
-                        var key = new object[] { interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId };
-                        var item = _itInterfaceUsageRepository.GetByKey(key);
-
-                        if (item != null)
-                        {
-                            _logger.Error($"Migrating failed as ItInterfaceUsage with key {{ " +
-                                          $"ItSystemUsageId: {interfaceUsage.ItSystemUsageId}, " +
-                                          $"ItSystemId: {toSystemId}," +
-                                          $"ItInterfaceId: {interfaceUsage.ItInterfaceId} }} already exists");
-                            return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
-                        }
-
-                        item = _itInterfaceUsageRepository.Create();
-                        item.ItSystemUsageId = interfaceUsage.ItSystemUsageId;
-                        item.ItSystemId = toSystemId;
-                        item.ItInterfaceId = interfaceUsage.ItInterfaceId;
-                        _itInterfaceUsageRepository.Insert(item);
-
-                        item.InfrastructureId = interfaceUsage.InfrastructureId;
-                        item.IsWishedFor = interfaceUsage.IsWishedFor;
-                        item.ItContractId = interfaceUsage.ItContractId;
-
-                        _itInterfaceUsageRepository.Save();
-
-                        _itInterfaceUsageRepository.Delete(interfaceUsage);
-                        _itInterfaceUsageRepository.Save();
-                    }
-
+                    systemUsage.ItSystemId = toSystemId;
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemRepository.Save();
 
@@ -220,6 +199,53 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 systemAssociatedInContract,
                 itInterfaceUsages,
                 interfaceExhibitUsages);
+        }
+
+        private void DeleteExhibits(IEnumerable<ItInterfaceExhibitUsage> exhibitsToBeDeleted)
+        {
+            foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
+            {
+                _itInterfaceExhibitUsageRepository.Delete(itInterfaceExhibitUsage);
+                _itInterfaceExhibitUsageRepository.Save();
+            }
+        }
+
+        private bool UpdateInterfaceUsages(IEnumerable<ItInterfaceUsage> usagesToBeUpdated, int toSystemId)
+        {
+            foreach (var interfaceUsage in usagesToBeUpdated)
+            {
+                var key = new object[] { interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId };
+
+                if (_itInterfaceUsageRepository.GetByKey(key) != null)
+                {
+                    _logger.Error($"Migrating failed as ItInterfaceUsage with key {{ " +
+                                  $"ItSystemUsageId: {interfaceUsage.ItSystemUsageId}, " +
+                                  $"ItSystemId: {toSystemId}," +
+                                  $"ItInterfaceId: {interfaceUsage.ItInterfaceId} }} already exists");
+                    return false;
+                }
+
+                CreateInterfaceUsage(interfaceUsage, toSystemId);
+
+                _itInterfaceUsageRepository.Delete(interfaceUsage);
+                _itInterfaceUsageRepository.Save();
+            }
+            return true;
+        }
+
+        private void CreateInterfaceUsage(ItInterfaceUsage interfaceUsage, int toSystemId)
+        {
+            var item = _itInterfaceUsageRepository.Create();
+            item.ItSystemUsageId = interfaceUsage.ItSystemUsageId;
+            item.ItSystemId = toSystemId;
+            item.ItInterfaceId = interfaceUsage.ItInterfaceId;
+            _itInterfaceUsageRepository.Insert(item);
+
+            item.InfrastructureId = interfaceUsage.InfrastructureId;
+            item.IsWishedFor = interfaceUsage.IsWishedFor;
+            item.ItContractId = interfaceUsage.ItContractId;
+
+            _itInterfaceUsageRepository.Save();
         }
 
     }
