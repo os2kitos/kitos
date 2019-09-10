@@ -68,7 +68,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get Unused It Systems");
+                        "An error occured when trying to migrate It System Usage");
             }
         }
 

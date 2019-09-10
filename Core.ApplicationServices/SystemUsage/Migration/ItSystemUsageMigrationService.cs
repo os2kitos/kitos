@@ -23,6 +23,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<ItContract> _itContractRepository;
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _itInterfaceExhibitUsageRepository;
+        private readonly IGenericRepository<ItInterfaceUsage> _itInterfaceUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
 
@@ -33,6 +34,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<ItInterfaceExhibitUsage> itInterfaceExhibitUsageRepository,
+            IGenericRepository<ItInterfaceUsage> itInterfaceUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger)
         {
@@ -41,6 +43,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _itSystemUsageRepository = itSystemUsageRepository;
             _itContractRepository = itContractRepository;
             _itInterfaceExhibitUsageRepository = itInterfaceExhibitUsageRepository;
+            _itInterfaceUsageRepository = itInterfaceUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
         }
@@ -127,6 +130,41 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     {
                         _itInterfaceExhibitUsageRepository.Delete(itInterfaceExhibitUsage);
                         _itInterfaceExhibitUsageRepository.Save();
+                    }
+
+                    var interfaceUsagesToBeUpdated =
+                        migration.ResultValue.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages).Distinct();
+
+                    foreach (var interfaceUsage in interfaceUsagesToBeUpdated)
+                    {
+                        var key = new object[] { interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId };
+                        var item = _itInterfaceUsageRepository.GetByKey(key);
+
+                        if (item != null)
+                        {
+                            _logger.Error($"Migrating failed as ItInterfaceUsage with key {{ " +
+                                          $"ItSystemUsageId: {interfaceUsage.ItSystemUsageId}, " +
+                                          $"ItSystemId: {toSystemId}," +
+                                          $"ItInterfaceId: {interfaceUsage.ItInterfaceId} }} already exists");
+                            return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
+                        }
+
+                        //_itInterfaceUsageRepository.Delete(interfaceUsage);
+
+                        item = _itInterfaceUsageRepository.Create();
+                        item.ItSystemUsageId = interfaceUsage.ItSystemUsageId;
+                        item.ItSystemId = toSystemId;
+                        item.ItInterfaceId = interfaceUsage.ItInterfaceId;
+                        _itInterfaceUsageRepository.Insert(item);
+
+                        item.InfrastructureId = interfaceUsage.InfrastructureId;
+                        item.IsWishedFor = interfaceUsage.IsWishedFor;
+                        item.ItContractId = interfaceUsage.ItContractId;
+
+                        _itInterfaceUsageRepository.Save();
+
+                        _itInterfaceUsageRepository.Delete(interfaceUsage);
+                        _itInterfaceUsageRepository.Save();
                     }
 
                     //systemUsage.ItInterfaceExhibitUsages = new List<ItInterfaceExhibitUsage>();
