@@ -49,9 +49,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 var itSystems = response.ToList();
-                Assert.Single(itSystems);
-                Assert.Equal(itSystemName, itSystems[0].Name);
-                Assert.Equal(itSystem.Id, itSystems[0].Id);
+                var dto = Assert.Single(itSystems);
+                Assert.Equal(itSystemName, dto.Name);
+                Assert.Equal(itSystem.Id, dto.Id);
             }
         }
 
@@ -127,8 +127,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
                 var itSystemIds = response.Select(x => x.Id).ToList();
-                Assert.Single(itSystemIds);
-                Assert.Contains(ownLocalSystem.Id, itSystemIds);
+                var id = Assert.Single(itSystemIds);
+                Assert.Equal(ownLocalSystem.Id, id);
             }
         }
 
@@ -231,8 +231,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetMigration_When_System_Is_Used_In_A_Project()
         {
             //Arrange
-            var project = await CreateProjectAsync(CreateName());
-            await AddProjectSystemBindingAsync(project.Id, _oldSystemUsage.Id);
+            var project = await CreateProjectAsync();
+            await AddProjectSystemBindingAsync(project, _oldSystemUsage);
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
@@ -240,8 +240,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedContracts);
-                Assert.Equal(1, result.AffectedItProjects?.Count());
-                Assert.Equal(project.Id, result.AffectedItProjects?.FirstOrDefault()?.Id);
+                var dto = Assert.Single(result.AffectedItProjects);
+                Assert.Equal(project.Id, dto.Id);
             }
         }
 
@@ -250,7 +250,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var contract = await CreateContractAsync();
-            await AddItSystemUsageToContractAsync(contract.Id, _oldSystemUsage.Id);
+            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
 
             //Act
             using (var response = await GetMigration(_oldSystemUsage, _newSystem))
@@ -258,9 +258,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                Assert.Equal(1, result.AffectedContracts?.Count());
-
-                var dto = result.AffectedContracts?.FirstOrDefault();
+                var dto = Assert.Single(result.AffectedContracts);
                 Assert.Equal(contract.Id, dto?.Contract?.Id);
                 Assert.Empty(dto.AffectedInterfaceUsages);
                 Assert.Empty(dto.InterfaceExhibitUsagesToBeDeleted);
@@ -287,11 +285,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                Assert.Equal(1, result.AffectedContracts?.Count());
-                var migrationDto = result.AffectedContracts?.First();
+                var migrationDto = Assert.Single(result.AffectedContracts);
                 Assert.Empty(migrationDto.InterfaceExhibitUsagesToBeDeleted);
-                Assert.Equal(1, migrationDto.AffectedInterfaceUsages?.Count());
-                AssertInterfaceMapping(usage, migrationDto.AffectedInterfaceUsages?.First());
+                var dto = Assert.Single(migrationDto.AffectedInterfaceUsages);
+                AssertInterfaceMapping(usage, dto);
             }
         }
 
@@ -317,90 +314,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 //Assert
                 var result = await AssertMigrationReturned(response);
                 Assert.Empty(result.AffectedItProjects);
-                Assert.Equal(1, result.AffectedContracts?.Count());
-                var migrationDto = result.AffectedContracts?.First();
+                var migrationDto = Assert.Single(result.AffectedContracts);
                 Assert.Empty(migrationDto.AffectedInterfaceUsages);
-                Assert.Equal(1, migrationDto.InterfaceExhibitUsagesToBeDeleted?.Count());
-                AssertInterfaceMapping(exhibitUsage, migrationDto.InterfaceExhibitUsagesToBeDeleted?.First());
-            }
-        }
-
-        [Fact]
-        public async Task PostMigration_Interface_Exhibit_Usage_Is_Removed()
-        {
-            //Arrange
-            var createdInterface = await CreateInterfaceAsync();
-            var contract = await CreateContractAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
-            await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
-
-            //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(_oldSystemUsage.Id, result.Id);
-                Assert.Equal(_newSystem.Name, result.Name);
-                await AssertExhibitUsageRemovedAfterMigration(contract.Id);
-            }
-        }
-
-        [Fact]
-        public async Task PostMigration_Interface_Usage_Is_Updated()
-        {
-            //Arrange
-            var createdInterface = await CreateInterfaceAsync();
-            var contract = await CreateContractAsync();
-            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
-
-            //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(_oldSystemUsage.Id, result.Id);
-                Assert.Equal(_newSystem.Name, result.Name);
-                await AssertInterfaceUsageUpdatedAfterMigration(interfaceUsage, _newSystem.Id);
-            }
-        }
-
-        [Fact]
-        public async Task PostMigration_Contract_In_Usage_Is_Not_Changed()
-        {
-            //Arrange
-            var contract = await CreateContractAsync();
-            await AddItSystemUsageToContractAsync(contract.Id, _oldSystemUsage.Id);
-            var createdContract = await GetItContractAsync(contract.Id);
-
-            //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(_oldSystemUsage.Id, result.Id);
-                Assert.Equal(_newSystem.Name, result.Name);
-                await AssertContractInUsageNotChanged(createdContract);
-            }
-        }
-
-        [Fact]
-        public async Task PostMigration_Associated_Project_Is_Not_Changed()
-        {
-            //Arrange
-            var fromItSystem = await CreateSystemAsync(name: CreateName());
-            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
-            var project = await CreateProjectAsync(CreateName());
-            await AddProjectSystemBindingAsync(project.Id, fromItSystemUsage.Id);
-            var toItSystem = await CreateSystemAsync(name: CreateName());
-            var updatedFromItSystemUsage = await GetItSystemUsageAsync(fromItSystemUsage.Id);
-            //Act
-            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
-            {
-                //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(fromItSystemUsage.Id, result.Id);
-                Assert.Equal(toItSystem.Name, result.Name);
-                await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
+                var dto = Assert.Single(migrationDto.InterfaceExhibitUsagesToBeDeleted);
+                AssertInterfaceMapping(exhibitUsage, dto);
             }
         }
 
@@ -416,9 +333,92 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var response = await PostMigration(fromItSystemUsage, toItSystem))
             {
                 //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(fromItSystemUsage.Id, result.Id);
-                Assert.Equal(toItSystem.Name, result.Name);
+                AssertMigrationSucceeded(response);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_Results_In_Interface_Exhibit_Usage_Being_Removed()
+        {
+            //Arrange
+            var createdInterface = await CreateInterfaceAsync();
+            var contract = await CreateContractAsync();
+            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
+            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
+
+            //Adding a usage which should not be affected
+            var unaffectedItSystem = await CreateSystemAsync();
+            var unaffectedInterface = await CreateInterfaceAsync();
+            var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
+            var unAffectedExhibit = await CreateExhibitAsync(unaffectedInterface, unaffectedItSystem);
+            var unaffectedExhibitUsage = await CreateExhibitUsageAsync(contract, unAffectedExhibit, unaffectedUsage);
+
+            //Act
+            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                AssertMigrationSucceeded(response);
+                await AssertExhibitExists(contract, exhibitUsage, false);
+                await AssertExhibitExists(contract, unaffectedExhibitUsage, true);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_Results_In_Interface_Usage_Being_Updated()
+        {
+            //Arrange
+            var createdInterface = await CreateInterfaceAsync();
+            var contract = await CreateContractAsync();
+            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
+
+            //Adding an unaffected usage (not same system usage source)
+            var unaffectedItSystem = await CreateSystemAsync();
+            var unaffectedUsage = await TakeSystemIntoUseAsync(unaffectedItSystem);
+            var unaffectedInterfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, unaffectedUsage, unaffectedItSystem);
+
+            //Act
+            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                AssertMigrationSucceeded(response);
+                await AssertInterfaceUsageUpdatedAfterMigration(interfaceUsage, _newSystem.Id);
+                await AssertInterfaceUsageSystemBinding(unaffectedInterfaceUsage, unaffectedItSystem.Id);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_SystemUsageAssociation_In_Contract_Is_Not_Changed()
+        {
+            //Arrange
+            var contract = await CreateContractAsync();
+            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
+            var createdContract = await GetItContractAsync(contract.Id);
+
+            //Act
+            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                AssertMigrationSucceeded(response);
+                await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
+            }
+        }
+
+        [Fact]
+        public async Task PostMigration_Associated_Project_Is_Not_Changed()
+        {
+            //Arrange
+            var fromItSystem = await CreateSystemAsync(name: CreateName());
+            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
+            var project = await CreateProjectAsync();
+            await AddProjectSystemBindingAsync(project, fromItSystemUsage);
+            var toItSystem = await CreateSystemAsync(name: CreateName());
+            var updatedFromItSystemUsage = await GetItSystemUsageAsync(fromItSystemUsage.Id);
+            //Act
+            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            {
+                //Assert
+                AssertMigrationSucceeded(response);
+                await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
             }
         }
 
@@ -426,31 +426,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task PostMigration_Can_Migrate_All_Usage_Data()
         {
             //Arrange
-            var fromItSystem = await CreateSystemAsync(name: CreateName());
-            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
-            var project = await CreateProjectAsync(CreateName());
-            await AddProjectSystemBindingAsync(project.Id, fromItSystemUsage.Id);
+            var project = await CreateProjectAsync();
+            await AddProjectSystemBindingAsync(project, _oldSystemUsage);
             var contract = await CreateContractAsync();
-            await AddItSystemUsageToContractAsync(contract.Id, fromItSystemUsage.Id);
+            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, fromItSystem);
-            await CreateExhibitUsageAsync(contract, exhibit, fromItSystemUsage);
-            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, fromItSystemUsage, fromItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
+            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
+            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
             var toItSystem = await CreateSystemAsync(name: CreateName());
 
-            var updatedFromItSystemUsage = await GetItSystemUsageAsync(fromItSystemUsage.Id);
+            var updatedFromItSystemUsage = await GetItSystemUsageAsync(_oldSystemUsage.Id);
             var createdContract = await GetItContractAsync(contract.Id);
 
             //Act
-            using (var response = await PostMigration(fromItSystemUsage, toItSystem))
+            using (var response = await PostMigration(_oldSystemUsage, toItSystem))
             {
                 //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(fromItSystemUsage.Id, result.Id);
-                Assert.Equal(toItSystem.Name, result.Name);
-                await AssertExhibitUsageRemovedAfterMigration(contract.Id);
+                AssertMigrationSucceeded(response);
+                await AssertExhibitExists(contract, exhibitUsage, false);
                 await AssertInterfaceUsageUpdatedAfterMigration(interfaceUsage, toItSystem.Id);
-                await AssertContractInUsageNotChanged(createdContract);
+                await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
                 await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
             }
         }
@@ -459,30 +455,26 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task PostMigration_To_Own_System_Does_Nothing()
         {
             //Arrange
-            var fromItSystem = await CreateSystemAsync(name: CreateName());
-            var fromItSystemUsage = await TakeSystemIntoUseAsync(fromItSystem, TestEnvironment.DefaultOrganizationId);
-            var project = await CreateProjectAsync(CreateName());
-            await AddProjectSystemBindingAsync(project.Id, fromItSystemUsage.Id);
+            var project = await CreateProjectAsync();
+            await AddProjectSystemBindingAsync(project, _oldSystemUsage);
             var contract = await CreateContractAsync();
-            await AddItSystemUsageToContractAsync(contract.Id, fromItSystemUsage.Id);
+            await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
             var createdInterface = await CreateInterfaceAsync();
-            var exhibit = await CreateExhibitAsync(createdInterface, fromItSystem);
-            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, fromItSystemUsage);
-            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, fromItSystemUsage, fromItSystem);
+            var exhibit = await CreateExhibitAsync(createdInterface, _oldSystemInUse);
+            var exhibitUsage = await CreateExhibitUsageAsync(contract, exhibit, _oldSystemUsage);
+            var interfaceUsage = await CreateInterfaceUsageAsync(contract, createdInterface, _oldSystemUsage, _oldSystemInUse);
 
-            var updatedFromItSystemUsage = await GetItSystemUsageAsync(fromItSystemUsage.Id);
+            var updatedFromItSystemUsage = await GetItSystemUsageAsync(_oldSystemUsage.Id);
             var createdContract = await GetItContractAsync(contract.Id);
 
             //Act
-            using (var response = await PostMigration(fromItSystemUsage, fromItSystem))
+            using (var response = await PostMigration(_oldSystemUsage, _oldSystemInUse))
             {
                 //Assert
-                var result = await AssertMigrationExecutionReturned(response);
-                Assert.Equal(fromItSystemUsage.Id, result.Id);
-                Assert.Equal(fromItSystem.Name, result.Name);
+                AssertMigrationSucceeded(response);
                 await AssertExhibitUsageStillExistsAfterNotMigratingToOwnSystem(exhibitUsage, contract.Id);
-                await AssertInterfaceUsageNotUpdatedAfterMigratingToOwnSystem(interfaceUsage, fromItSystem.Id);
-                await AssertContractInUsageNotChanged(createdContract);
+                await AssertInterfaceUsageNotUpdatedAfterMigratingToOwnSystem(interfaceUsage, _oldSystemInUse.Id);
+                await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
                 await AssertAssociatedProjectNotChanged(updatedFromItSystemUsage);
             }
         }
@@ -539,12 +531,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return result;
         }
 
-        private static async Task<NamedEntityDTO> AssertMigrationExecutionReturned(HttpResponseMessage response)
+        private static void AssertMigrationSucceeded(HttpResponseMessage response)
         {
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<NamedEntityDTO>();
-            Assert.NotNull(result);
-            return result;
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         private static void AssertFromToSystemInfo(
@@ -558,10 +547,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(newSystem.Id, result.ToSystem.Id);
         }
 
-        private static async Task AssertExhibitUsageRemovedAfterMigration(int contractId)
+        private static async Task AssertExhibitExists(ItContractDTO contract, ItInterfaceExhibitUsageDTO exhibit, bool exists)
         {
-            var exhibitUsages = await InterfaceExhibitHelper.GetExhibitInterfaceUsages(contractId);
-            Assert.Empty(exhibitUsages);
+            var exhibitUsages = await InterfaceExhibitHelper.GetExhibitInterfaceUsages(contract.Id);
+            Assert.Equal(exists ? 1 : 0, exhibitUsages.Count(x => x.ItSystemUsageId == exhibit.ItSystemUsageId && x.ItInterfaceExhibitItInterfaceId == exhibit.ItInterfaceExhibitItInterfaceId));
         }
 
 
@@ -571,23 +560,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Null(await InterfaceUsageHelper.GetItInterfaceUsage(
                 interfaceUsage.ItSystemUsageId,
                 interfaceUsage.ItSystemId,
-                interfaceUsage.ItInterfaceId));
+                interfaceUsage.ItInterfaceId, true));
 
-            // Checking the new interface usage key exists
+            await AssertInterfaceUsageSystemBinding(interfaceUsage, sysId);
+        }
+
+        private static async Task AssertInterfaceUsageSystemBinding(ItInterfaceUsageDTO interfaceUsage, int sysId)
+        {
             var newInterfaceUsage = await InterfaceUsageHelper.GetItInterfaceUsage(
                 interfaceUsage.ItSystemUsageId,
                 sysId,
                 interfaceUsage.ItInterfaceId);
+
             Assert.Equal(interfaceUsage.ItSystemUsageId, newInterfaceUsage.ItSystemUsageId);
             Assert.Equal(sysId, newInterfaceUsage.ItSystemId);
             Assert.Equal(interfaceUsage.ItInterfaceId, newInterfaceUsage.ItInterfaceId);
         }
 
-        private static async Task AssertContractInUsageNotChanged(ItContractDTO contract)
+        private static async Task AssertSystemUsageAssociationExistsInContract(ItContractDTO contract, ItSystemUsageDTO usage)
         {
-            var postMigrationContract = await GetItContractAsync(contract.Id);
-            Assert.Equal(contract.AssociatedSystemUsages.First().Id,
-                postMigrationContract.AssociatedSystemUsages.First().Id);
+            var contractFromServer = await GetItContractAsync(contract.Id);
+
+            Assert.Equal(1, contractFromServer.AssociatedSystemUsages.Count(x => x.Id == usage.Id));
         }
 
         private static async Task AssertAssociatedProjectNotChanged(ItSystemUsageDTO oldItSystemUsage)
@@ -658,19 +652,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             return await InterfaceExhibitHelper.CreateExhibitUsage(contract.Id, systemUsage.Id, exhibit.Id);
         }
 
-        private static async Task<ItProjectDTO> CreateProjectAsync(string name, int organizationId=TestEnvironment.DefaultOrganizationId)
+        private static async Task<ItProjectDTO> CreateProjectAsync(int organizationId = TestEnvironment.DefaultOrganizationId)
         {
-            return await ItProjectHelper.CreateProject(name, organizationId);
+            return await ItProjectHelper.CreateProject(CreateName(), organizationId);
         }
 
-        private static async Task<ItSystemUsageDTO> AddProjectSystemBindingAsync(int projectId, int usageId, int organizationId = TestEnvironment.DefaultOrganizationId)
+        private static async Task<ItSystemUsageDTO> AddProjectSystemBindingAsync(ItProjectDTO project, ItSystemUsageDTO systemUsage, int organizationId = TestEnvironment.DefaultOrganizationId)
         {
-            return await ItProjectHelper.AddSystemBinding(projectId, usageId, organizationId);
+            return await ItProjectHelper.AddSystemBinding(project.Id, systemUsage.Id, organizationId);
         }
 
-        private static async Task<ItSystemUsageSimpleDTO> AddItSystemUsageToContractAsync(int contractId, int usageId, int organizationId = TestEnvironment.DefaultOrganizationId)
+        private static async Task<ItSystemUsageSimpleDTO> AddItSystemUsageToContractAsync(ItContractDTO contract, ItSystemUsageDTO systemUsage, int organizationId = TestEnvironment.DefaultOrganizationId)
         {
-            return await ItContractHelper.AddItSystemUsage(contractId, usageId, organizationId);
+            return await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
         }
 
         private static async Task<ItContractDTO> GetItContractAsync(int contractId)

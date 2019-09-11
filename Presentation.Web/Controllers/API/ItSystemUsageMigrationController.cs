@@ -56,12 +56,11 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            //TODO
             var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
             switch (result.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(MapItSystemUsageDTO(result.ResultValue));
+                    return NoContent();
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:

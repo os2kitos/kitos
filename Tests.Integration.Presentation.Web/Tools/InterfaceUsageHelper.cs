@@ -30,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<ItInterfaceUsageDTO> GetItInterfaceUsage(int usageId, int systemId, int interfaceId)
+        public static async Task<ItInterfaceUsageDTO> GetItInterfaceUsage(int usageId, int systemId, int interfaceId, bool allowErrorResponse = false)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var oldInterfaceUrl = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?" +
@@ -39,6 +39,10 @@ namespace Tests.Integration.Presentation.Web.Tools
                                                             $"interfaceId={interfaceId}");
             using (var response = await HttpApi.GetWithCookieAsync(oldInterfaceUrl, cookie))
             {
+                if (!allowErrorResponse)
+                {
+                    Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+                }
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
             }
         }
