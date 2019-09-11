@@ -4,6 +4,8 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface.ExhibitUsage;
+using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -112,7 +114,8 @@ namespace Presentation.Web
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
             kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
-
+            kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
+            kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
