@@ -12,34 +12,34 @@ class CatalogHelper {
     private static waitUpTo = new WaitTimers();
 
     public static createCatalog(name: string) {
-        return this.pageObject.getPage()
+        return CatalogHelper.pageObject.getPage()
             .then(() => {
-                return this.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
+                return CatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
             })
             .then(() => {
-                return browser.wait(this.pageObject.isCreateCatalogAvailable(), this.waitUpTo.twentySeconds);
+                return browser.wait(CatalogHelper.pageObject.isCreateCatalogAvailable(), CatalogHelper.waitUpTo.twentySeconds);
             })
             .then(() => {
-                return element(this.cssHelper.byDataElementType(this.consts.nameOfSystemInput)).sendKeys(name);
+                return element(CatalogHelper.cssHelper.byDataElementType(CatalogHelper.consts.nameOfSystemInput)).sendKeys(name);
             })
             .then(() => {
-                return element(this.cssHelper.byDataElementType(this.consts.saveCatalogButton)).click();
+                return element(CatalogHelper.cssHelper.byDataElementType(CatalogHelper.consts.saveCatalogButton)).click();
             });
     }
 
     public static deleteCatalog(name: string) {
-        return this.pageObject.getPage()
+        return CatalogHelper.pageObject.getPage()
             .then(() => {
-                return this.waitForKendoGrid();
+                return CatalogHelper.waitForKendoGrid();
             })
             .then(() => {
-                return this.findCatalogColumnsFor(name).first().click();
+                return CatalogHelper.findCatalogColumnsFor(name).first().click();
             })
             .then(() => {
-                return browser.wait(this.systemPage.isDeleteButtonLoaded(), this.waitUpTo.twentySeconds);
+                return browser.wait(CatalogHelper.systemPage.isDeleteButtonLoaded(), CatalogHelper.waitUpTo.twentySeconds);
             })
             .then(() => {
-                return this.systemPage.getDeleteButton().click();
+                return CatalogHelper.systemPage.getDeleteButton().click();
             })
             .then(() => {
                 return browser.switchTo().alert().accept();
@@ -47,12 +47,12 @@ class CatalogHelper {
     }
 
     public static findCatalogColumnsFor(name: string) {
-        return this.pageObject.kendoToolbarWrapper.getFilteredColumnElement(this.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+        return CatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(CatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
     }
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(this.pageObject.waitForKendoGrid(), this.waitUpTo.twentySeconds);
+        return browser.wait(CatalogHelper.pageObject.waitForKendoGrid(), CatalogHelper.waitUpTo.twentySeconds);
     }
 }
 
