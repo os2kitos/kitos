@@ -12,7 +12,7 @@
     <!--<div id="availableSystems" data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>-->
     <div id="select2MigrationContainer">
         <input type="hidden"
-                id="new-system-usage"
+               id="new-system-usage"
                class="form-control input-sm"
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
@@ -21,35 +21,36 @@
     </div>
 </div>
 
-<div data-kendo-window="systemCatalogVm.modalMigrationConsequence" 
+<div data-kendo-window="systemCatalogVm.modalMigrationConsequence"
      data-k-title="'Konsekvens'" data-k-width="1000"
      data-k-visible="false" data-k-modal="true">
     <div id="copyPasteConsequence" style="">
         <div>
             <h3>Opsummering af ændringer ifm. flytning af ”IT-System anvendelse” til et nyt hovedsystem </h3>
             <br>
-            <table>
+            <br>
+            <h4>Systemanvendelse flyttes</h4>
+            <br>
+            <!--<table>
                 <tr style="background-color: black; color: white">
                     <th style="font-size: large">Fra</th>
                     <th style="font-size: large">Til</th>
                 </tr>
                 <tr style="background-color: gray;">
                     <td style="font-size: large">
-                        Systemnavn: {{systemCatalogVm.migrationReportDTO.response.fromSystem.name }}
+                        Systemnavn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
                         <br />
-                        System ID: {{ systemCatalogVm.migrationReportDTO.response.fromSystem.id}}
+                        System ID: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
                     </td>
                     <td style="font-size: large">
-                        Systemnavn: {{systemCatalogVm.migrationReportDTO.response.toSystem.name }}
+                        Systemnavn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
                         <br />
-                        System ID: {{ systemCatalogVm.migrationReportDTO.response.toSystem.id}}
+                        System ID: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
                     </td>
                 </tr>
 
-            </table>
-            <br>
-            <h4>Systemanvendelse flyttes</h4>
-            <br>
+            </table>-->
+            <div id="migrationReportContractGrid" data-kendo-grid="systemCatalogVm.migrationContractReportGrid" data-k-options="systemCatalogVm.migrationContractReportGridOptions"></div>
             <br>
             <h4>Følgene kontrakter berøres</h4>
             <br>

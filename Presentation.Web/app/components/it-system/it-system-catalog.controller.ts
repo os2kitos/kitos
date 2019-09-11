@@ -4,14 +4,13 @@
     export interface ICatalogController {
         mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         mainGridOptions: kendo.ui.GridOptions;
-        usageDetailsGridMigration: kendo.ui.GridOptions;
         usageDetailsGrid: kendo.ui.GridOptions;
         usageGrid: kendo.ui.Grid;
-        usageGridMigration: kendo.ui.Grid;
+        migrationContractReportGrid: kendo.ui.Grid;
+        migrationContractReportGridOptions: kendo.ui.GridOptions;
         modal: kendo.ui.Window;
         modalMigration: kendo.ui.Window;
         modalMigrationConsequence: kendo.ui.Window;
-
         saveGridProfile(): void;
         loadGridProfile(): void;
         clearGridProfile(): void;
@@ -31,12 +30,13 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
-        public usageGridMigration: kendo.ui.Grid;
+        public migrationContractReportGrid: kendo.ui.Grid;
         public modalMigrationConsequence: kendo.ui.Window;
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
         public canMigrate = this.userMigrationRights.canExecuteMigration;
+        public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigration;
 
         public static $inject:
             Array<string> = [
@@ -60,8 +60,8 @@
 
         constructor(
             private $rootScope: IRootScope,
-           // private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
-            private $scope: any,
+            private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
+          //  private $scope: any,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -80,7 +80,6 @@
             private newItSystemObject,
             private municipality,
             public migrationConsequenceText,
-            public migrationReportDTO,
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -824,13 +823,12 @@
         }
 
         public migrateSystemTo = () => {
-
             this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
             this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.usage.id)
                 .success(dto => {
-                    console.log(dto.response);
-                    this.migrationReportDTO = dto;
-                    console.log("TEST" + this.migrationReportDTO);
+                    let systemUsageMigration: Models.ItSystemUsage.Migration.IItSystemUsageMigration = dto.response;
+                    this.migrationReportDTO = systemUsageMigration;
+
                     this.modalMigrationConsequence.setOptions({
                         close: function (e) {
                             console.log("MODAL 3 CLOSING");
@@ -841,6 +839,18 @@
                         title: `Flytning af it-system `
                     });
                     this.modalMigration.close();
+
+                    var kendoGridDataSource = new kendo.data.DataSource({
+                        data: systemUsageMigration.affectedContracts,
+                        schema:
+                        {
+                            type: 'json',
+                            data: 'affectedContracts',
+                        }
+                });
+
+
+                    this.migrationContractReportGrid.dataSource.add(kendoGridDataSource);
                     this.modalMigrationConsequence.center().open();
                 })
                 .error(() => {
@@ -850,10 +860,8 @@
 
         private getMigrationReport: any = (usageId, toSystemId) => {
             var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=1${toSystemId}`;
-            return this.$http({
-                method: 'GET',
-                url: url,
-            });
+
+            return this.$http({method: 'GET',url: url,});
         }
 
         public startMigration = () => {
@@ -904,31 +912,16 @@
             dataBound: this.detailsBound
         };
 
-        public usageDetailsGridMigration: kendo.ui.GridOptions = {
-            dataSource: {
-                transport:
-                {
-                    read: {
-                        url: "/api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=1&nameContent=a&numberOfItSystems=3&getPublicFromOtherOrganizations=true",
-                        dataType: "json",
-                    }
-                },
-                serverPaging: true,
-                serverSorting: true,
-                serverFiltering: true
-            },
-            autoBind: false,
-            selectable: "row",
+        public migrationContractReportGridOptions: kendo.ui.GridOptions = {
             columns: [
                 {
-                    field: "Name", title: "ItSystem",
+                    field: "id", title: "Contract name",
                     template: dataItem => {
-                        return dataItem.name;
+                        return dataItem[0].contract.name;
                     },
-
                 }
             ],
-            dataBound: this.detailsBound
+            
         };
 
         private exportFlag = false;
