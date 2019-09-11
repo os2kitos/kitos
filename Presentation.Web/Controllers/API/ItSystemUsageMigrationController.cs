@@ -7,7 +7,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Migration;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Extensions;
@@ -38,7 +37,7 @@ namespace Presentation.Web.Controllers.API
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
             switch (res.Status)
             {
-                case OperationResult.Ok :
+                case OperationResult.Ok:
                     return Ok(MapItSystemUsageMigration(res.ResultValue));
                 case OperationResult.Forbidden:
                     return Forbidden();
@@ -48,7 +47,6 @@ namespace Presentation.Web.Controllers.API
                     return CreateResponse(HttpStatusCode.InternalServerError,
                         "An error occured when trying to get migration consequences");
             }
-
         }
 
         [HttpPost]
@@ -96,11 +94,11 @@ namespace Presentation.Web.Controllers.API
             }
             if (string.IsNullOrWhiteSpace(nameContent))
             {
-                return Ok(new List<ItSystem>().Select(x => x.MapToNamedEntityDTO()));
+                return Ok(Enumerable.Empty<NamedEntityDTO>());
             }
             if (numberOfItSystems < 1 || numberOfItSystems > 25)
             {
-                return BadRequest();
+                return BadRequest($"{nameof(numberOfItSystems)} must satisfy constraint: 1 <= n <= 25");
             }
 
             var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
@@ -117,7 +115,6 @@ namespace Presentation.Web.Controllers.API
                     return CreateResponse(HttpStatusCode.InternalServerError,
                         "An error occured when trying to get Unused It Systems");
             }
-
         }
 
         private static ItSystemUsageMigrationDTO MapItSystemUsageMigration(
@@ -125,7 +122,7 @@ namespace Presentation.Web.Controllers.API
         {
             return new ItSystemUsageMigrationDTO
             {
-                TargetUsage = new NamedEntityDTO{Id = input.SystemUsage.Id,Name = input.SystemUsage.LocalCallName ?? input.FromItSystem.Name} ,
+                TargetUsage = new NamedEntityDTO { Id = input.SystemUsage.Id, Name = input.SystemUsage.LocalCallName ?? input.FromItSystem.Name },
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
                 AffectedItProjects = input.AffectedProjects.Select(x => x.MapToNamedEntityDTO()).ToList(),
