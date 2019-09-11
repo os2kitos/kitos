@@ -37,7 +37,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 null);
         }
 
-
         [Theory]
         [InlineData("")]
         [InlineData(" ")]
