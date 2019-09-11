@@ -19,7 +19,7 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             _logger = logger;
         }
 
-        public OperationResult DeleteByKey(int systemUsageId, int interfaceExhibitId)
+        public OperationResult Delete(int systemUsageId, int interfaceExhibitId)
         {
             var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
             try

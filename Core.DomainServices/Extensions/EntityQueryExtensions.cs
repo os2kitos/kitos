@@ -118,7 +118,7 @@ namespace Core.DomainServices.Extensions
         public static T ById<T>(this IQueryable<T> result, int id) where T :
             Entity
         {
-            return new QueryById<T>(id).Apply(result).Single();
+            return new QueryById<T>(id).Apply(result).SingleOrDefault();
         }
     }
 }

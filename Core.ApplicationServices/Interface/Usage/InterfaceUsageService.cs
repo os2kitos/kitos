@@ -19,10 +19,15 @@ namespace Core.ApplicationServices.Interface.Usage
             _logger = logger;
         }
 
-        public Result<OperationResult, ItInterfaceUsage> AssociateInContract(int systemUsageId, int systemId, int interfaceId, int? contractId, int? infrastructureId,
+        public Result<OperationResult, ItInterfaceUsage> AssociateInContract(
+            int systemUsageId,
+            int systemId,
+            int interfaceId,
+            int? contractId,
+            int? infrastructureId,
             bool isWishedFor)
         {
-            var key = new object[] { systemUsageId, systemId, interfaceId };
+            var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);
 
             if (_interfaceUsageRepository.GetByKey(key) != null)
             {
@@ -37,11 +42,14 @@ namespace Core.ApplicationServices.Interface.Usage
             newInterfaceUsage.ItSystemUsageId = systemUsageId;
             newInterfaceUsage.ItSystemId = systemId;
             newInterfaceUsage.ItInterfaceId = interfaceId;
+            //TODO: Insert all at once in stead of two times..
+
             var createdInterfaceUsage = _interfaceUsageRepository.Insert(newInterfaceUsage);
             createdInterfaceUsage.ItContractId = contractId;
             createdInterfaceUsage.InfrastructureId = infrastructureId;
             createdInterfaceUsage.IsWishedFor = isWishedFor;
             _interfaceUsageRepository.Save();
+
             return Result<OperationResult, ItInterfaceUsage>.Ok(createdInterfaceUsage);
         }
 

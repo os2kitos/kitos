@@ -169,7 +169,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         return Result<OperationResult, ItSystemUsage>.Fail(deletedStatus);
                     }
 
-                    //TODO: Add ItSystemSystemService::ChangeMainSystem
+                    //TODO: Add ItSystemUsageRepository::Update
                     systemUsage.ItSystemId = toSystemId;
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemUsageRepository.Save();
@@ -211,7 +211,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
             {
-                var deletedStatus = _interfaceExhibitUsageService.DeleteByKey(
+                var deletedStatus = _interfaceExhibitUsageService.Delete(
                     itInterfaceExhibitUsage.ItSystemUsageId, 
                     itInterfaceExhibitUsage.ItInterfaceExhibitId);
                 if (deletedStatus != OperationResult.Ok)
