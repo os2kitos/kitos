@@ -15,7 +15,7 @@ namespace Tests.Unit.Core.ApplicationServices.Model
         {
             var result = Result<OperationResult, T>.Ok(input);
             Assert.Equal(OperationResult.Ok, result.Status);
-            Assert.Equal(input, result.ResultValue);
+            Assert.Equal(input, result.Value);
         }
 
         [Theory]
@@ -26,7 +26,7 @@ namespace Tests.Unit.Core.ApplicationServices.Model
         {
             var result = Result<OperationResult, T>.Fail(code);
             Assert.Equal(code, result.Status);
-            Assert.Null(result.ResultValue);
+            Assert.Null(result.Value);
         }
 
         [Fact]

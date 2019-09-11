@@ -5,12 +5,12 @@ namespace Core.ApplicationServices.Model.Result
     public class Result<TStatus, TResult>
     {
         public TStatus Status { get; }
-        public TResult ResultValue { get; }
+        public TResult Value { get; }
 
         private Result(TStatus status, TResult result)
         {
             Status = status;
-            ResultValue = result;
+            Value = result;
         }
 
         public static Result<OperationResult, TResult> Ok(TResult value)

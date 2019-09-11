@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             switch (res.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(Map(res.ResultValue));
+                    return Ok(Map(res.Value));
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
@@ -106,7 +106,7 @@ namespace Presentation.Web.Controllers.API
             switch (result.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(result.ResultValue.Select(x => x.MapToNamedEntityDTO()));
+                    return Ok(result.Value.Select(x => x.MapToNamedEntityDTO()));
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
