@@ -161,14 +161,5 @@ namespace Presentation.Web.Controllers.API
                 Name = interfaceUsage.ItInterface.Name
             };
         }
-
-        private static NamedEntityDTO MapItSystemUsageDTO(ItSystemUsage input)
-        {
-            return new NamedEntityDTO
-            {
-                Id = input.Id,
-                Name = input.LocalCallName ?? input.ItSystem.Name
-            };
-        }
     }
 }
