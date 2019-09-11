@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
             switch (res.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(MapItSystemUsageMigration(res.ResultValue));
+                    return Ok(Map(res.ResultValue));
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
@@ -117,46 +117,37 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private static ItSystemUsageMigrationDTO MapItSystemUsageMigration(
-            ItSystemUsageMigration input)
+        private static ItSystemUsageMigrationDTO Map(ItSystemUsageMigration input)
         {
             return new ItSystemUsageMigrationDTO
             {
                 TargetUsage = new NamedEntityDTO { Id = input.SystemUsage.Id, Name = input.SystemUsage.LocalCallName ?? input.FromItSystem.Name },
                 FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
                 ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
-                AffectedItProjects = input.AffectedProjects.Select(x => x.MapToNamedEntityDTO()).ToList(),
-                AffectedContracts = input.AffectedContracts.Select(MapToItContractItSystemUsageDTO).ToList()
+                AffectedItProjects = input.AffectedProjects.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
+                AffectedContracts = input.AffectedContracts.Select(Map).ToList()
             };
         }
 
-        private static ItSystemUsageContractMigrationDTO MapToItContractItSystemUsageDTO(ItContractMigration input)
+        private static ItSystemUsageContractMigrationDTO Map(ItContractMigration input)
         {
             return new ItSystemUsageContractMigrationDTO
             {
                 Contract = input.Contract.MapToNamedEntityDTO(),
                 SystemAssociatedInContract = input.SystemAssociatedInContract,
-                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(MapToInterfaceUsageDTO).ToList(),
-                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(MapToInterfaceExhibitUsageDTO).ToList()
+                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(Map).ToList(),
+                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(Map).ToList()
             };
         }
 
-        private static NamedEntityDTO MapToInterfaceExhibitUsageDTO(ItInterfaceExhibitUsage interfaceExhibit)
+        private static NamedEntityDTO Map(ItInterfaceExhibitUsage interfaceExhibit)
         {
-            return new NamedEntityDTO
-            {
-                Id = interfaceExhibit.ItInterfaceExhibit.ItInterface.Id,
-                Name = interfaceExhibit.ItInterfaceExhibit.ItInterface.Name
-            };
+            return interfaceExhibit.ItInterfaceExhibit.ItInterface.MapToNamedEntityDTO();
         }
 
-        private static NamedEntityDTO MapToInterfaceUsageDTO(ItInterfaceUsage interfaceUsage)
+        private static NamedEntityDTO Map(ItInterfaceUsage interfaceUsage)
         {
-            return new NamedEntityDTO
-            {
-                Id = interfaceUsage.ItInterface.Id,
-                Name = interfaceUsage.ItInterface.Name
-            };
+            return interfaceUsage.ItInterface.MapToNamedEntityDTO();
         }
     }
 }
