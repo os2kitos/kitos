@@ -17,6 +17,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -25,10 +26,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
     public class ItSystemUsageMigrationService : IItSystemUsageMigrationService
     {
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;//TODO: We should use other services
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
-        private readonly IItSystemRepository _systemsRepository;
+        private readonly IItSystemRepository _systemRepository;
+        private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository;
         private readonly IInterfaceExhibitUsageService _interfaceExhibitUsageService;
         private readonly IInterfaceUsageService _interfaceUsageService;
@@ -36,19 +37,19 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         public ItSystemUsageMigrationService(
             IAuthorizationContext authorizationContext,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger,
-            IItSystemRepository systemsRepository,
+            IItSystemRepository systemRepository,
+            IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IInterfaceExhibitUsageService interfaceExhibitUsageService,
             IInterfaceUsageService interfaceUsageService)
         {
             _authorizationContext = authorizationContext;
-            _itSystemUsageRepository = itSystemUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
-            _systemsRepository = systemsRepository;
+            _systemRepository = systemRepository;
+            _systemUsageRepository = systemUsageRepository;
             _contractRepository = contractRepository;
             _interfaceExhibitUsageService = interfaceExhibitUsageService;
             _interfaceUsageService = interfaceUsageService;
@@ -77,7 +78,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             }
 
             var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
-            var unusedSystems = _systemsRepository.GetUnusedSystems(new OrganizationDataQueryParameters(organizationId, queryBreadth, dataAccessLevel));
+            var unusedSystems = _systemRepository.GetUnusedSystems(new OrganizationDataQueryParameters(organizationId, queryBreadth, dataAccessLevel));
 
             //Refine, order and take the amount requested
             var result = unusedSystems
@@ -97,13 +98,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
-            var itSystemUsage = _itSystemUsageRepository.GetByKey(usageId);
+            var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
-            var toItSystem = _systemsRepository.GetSystem(toSystemId);
+            var toItSystem = _systemRepository.GetSystem(toSystemId);
             if (!_authorizationContext.AllowReads(toItSystem))
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
@@ -168,11 +169,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     {
                         return Result<OperationResult, ItSystemUsage>.Fail(deletedStatus);
                     }
-
-                    //TODO: Add ItSystemUsageRepository::Update
+                    
                     systemUsage.ItSystemId = toSystemId;
-                    _itSystemUsageRepository.Update(systemUsage);
-                    _itSystemUsageRepository.Save();
+                    _systemUsageRepository.Update(systemUsage);
 
                     transaction.Commit();
                     return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
@@ -227,13 +226,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             foreach (var interfaceUsage in usagesToBeUpdated)
             {
-                var interfaceCreationResult = _interfaceUsageService.AssociateInContract(
+                var interfaceCreationResult = _interfaceUsageService.Create(
                     interfaceUsage.ItSystemUsageId, 
                     toSystemId, 
                     interfaceUsage.ItInterfaceId,
-                    interfaceUsage.ItContractId,
-                    interfaceUsage.InfrastructureId,
-                    interfaceUsage.IsWishedFor);
+                    interfaceUsage.IsWishedFor,
+                    interfaceUsage.ItContractId.GetValueOrDefault(),
+                    interfaceUsage.InfrastructureId);
                 if (interfaceCreationResult.Status != OperationResult.Ok)
                 {
                     _logger.Error($"Creating new interface usages failed with {interfaceCreationResult.Status}");

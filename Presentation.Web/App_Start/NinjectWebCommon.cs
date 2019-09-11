@@ -10,6 +10,7 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -137,6 +138,7 @@ namespace Presentation.Web
             kernel.Bind<IItSystemRepository>().To<ItSystemRepository>().InRequestScope();
             kernel.Bind<IItContractRepository>().To<ItContractRepository>().InRequestScope();
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
+            kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

@@ -1,5 +1,4 @@
-﻿using System;
-using Core.ApplicationServices.Model.Result;
+﻿using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Serilog;
@@ -19,13 +18,14 @@ namespace Core.ApplicationServices.Interface.Usage
             _logger = logger;
         }
 
-        public Result<OperationResult, ItInterfaceUsage> AssociateInContract(
+        public Result<OperationResult, ItInterfaceUsage> Create(
             int systemUsageId,
             int systemId,
             int interfaceId,
-            int? contractId,
-            int? infrastructureId,
-            bool isWishedFor)
+            bool isWishedFor,
+            int contractId,
+            int? infrastructureId = null
+            )
         {
             var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);
 
@@ -42,37 +42,27 @@ namespace Core.ApplicationServices.Interface.Usage
             newInterfaceUsage.ItSystemUsageId = systemUsageId;
             newInterfaceUsage.ItSystemId = systemId;
             newInterfaceUsage.ItInterfaceId = interfaceId;
-            //TODO: Insert all at once in stead of two times..
-
-            var createdInterfaceUsage = _interfaceUsageRepository.Insert(newInterfaceUsage);
-            createdInterfaceUsage.ItContractId = contractId;
-            createdInterfaceUsage.InfrastructureId = infrastructureId;
-            createdInterfaceUsage.IsWishedFor = isWishedFor;
+            newInterfaceUsage.ItContractId = contractId;
+            newInterfaceUsage.InfrastructureId = infrastructureId;
+            newInterfaceUsage.IsWishedFor = isWishedFor;
+            _interfaceUsageRepository.Insert(newInterfaceUsage);
             _interfaceUsageRepository.Save();
 
-            return Result<OperationResult, ItInterfaceUsage>.Ok(createdInterfaceUsage);
+            return Result<OperationResult, ItInterfaceUsage>.Ok(newInterfaceUsage);
         }
 
         public OperationResult Delete(int systemUsageId, int systemId, int interfaceId)
         {
             var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);
-            try
+            var interfaceUsageToBeDeleted = _interfaceUsageRepository.GetByKey(key);
+            if (interfaceUsageToBeDeleted == null)
             {
-                var interfaceUsageToBeDeleted = _interfaceUsageRepository.GetByKey(key);
-                if (interfaceUsageToBeDeleted == null)
-                {
-                    _logger.Error($"Could not find interface usage with key {key}");
-                    return OperationResult.NotFound;
-                }
-                _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
-                _interfaceUsageRepository.Save();
-                return OperationResult.Ok;
+                _logger.Error($"Could not find interface usage with key {key}");
+                return OperationResult.NotFound;
             }
-            catch (Exception e)
-            {
-                _logger.Error(e, $"Failed to delete interface usage with key {key}");
-                return OperationResult.UnknownError;
-            }
+            _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
+            _interfaceUsageRepository.Save();
+            return OperationResult.Ok;
         }
     }
 }

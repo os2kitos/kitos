@@ -1,5 +1,4 @@
-﻿using System;
-using Core.ApplicationServices.Model.Result;
+﻿using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Serilog;
@@ -22,23 +21,15 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
         public OperationResult Delete(int systemUsageId, int interfaceExhibitId)
         {
             var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
-            try
+            var interfaceExhibitUsageToBeDeleted = _itInterfaceExhibitUsageRepository.GetByKey(key);
+            if (interfaceExhibitUsageToBeDeleted == null)
             {
-                var interfaceExhibitUsageToBeDeleted = _itInterfaceExhibitUsageRepository.GetByKey(key);
-                if (interfaceExhibitUsageToBeDeleted == null)
-                {
-                    _logger.Error($"Could not find interface exhibit usage with key {key}");
-                    return OperationResult.NotFound;
-                }
-                _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
-                _itInterfaceExhibitUsageRepository.Save();
-                return OperationResult.Ok;
+                _logger.Error($"Could not find interface exhibit usage with key {key}");
+                return OperationResult.NotFound;
             }
-            catch (Exception e)
-            {
-                _logger.Error(e, $"Failed to delete interface exhibit usage with key {key}");
-                return OperationResult.UnknownError;
-            }
+            _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
+            _itInterfaceExhibitUsageRepository.Save();
+            return OperationResult.Ok;
         }
     }
 }
