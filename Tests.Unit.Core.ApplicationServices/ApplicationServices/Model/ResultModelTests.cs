@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.ApplicationServices.Model
         [Theory]
         [InlineData(OperationResult.Forbidden, "string test")]
         [InlineData(OperationResult.NotFound, "string test")]
-        [InlineData(OperationResult.Error, "string test")]
+        [InlineData(OperationResult.UnknownError, "string test")]
         public void Result_Fail_Makes_Status_With_Default_Value<T>(OperationResult code, T input)
         {
             var result = Result<OperationResult, T>.Fail(code);

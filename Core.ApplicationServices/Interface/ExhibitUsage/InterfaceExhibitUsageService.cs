@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             catch (Exception e)
             {
                 _logger.Error(e, $"Failed to delete interface exhibit usage with key {key}");
-                return Result<OperationResult, object>.Fail(OperationResult.Error);
+                return Result<OperationResult, object>.Fail(OperationResult.UnknownError);
             }
         }
     }

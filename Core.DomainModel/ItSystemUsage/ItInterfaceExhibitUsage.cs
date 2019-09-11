@@ -11,6 +11,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItInterfaceExhibitUsage : ISystemModule
     {
+        //TODO: No - add as static which takes the named components and returns them in the right order
         public object[] GetKey()
         {
             return new object[]{ItSystemUsageId, ItInterfaceExhibitId};

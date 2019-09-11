@@ -12,6 +12,12 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItInterfaceUsage : ISystemModule
     {
+
+        //public static object[] GetKey(int usageId, int systemId, int interfaceId)
+        //{
+        //    return new object[]{ usageId, systemId, interfaceId}
+        //}
+        //TODO: No - add as static which takes the named components and returns them in the right order (see above)
         public object[] GetKey()
         {
             return new object[]{ItSystemUsageId, ItSystemId, ItInterfaceId};

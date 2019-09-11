@@ -29,7 +29,9 @@ namespace Core.ApplicationServices.Interface.Usage
                               $"ItSystemUsageId: {systemUsageId}, " +
                               $"ItSystemId: {systemId}," +
                               $"ItInterfaceId: {interfaceId} }} already exists");
-                return Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.Error);
+
+                //TODO: Add new operationResult: Conflict
+                return Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.UnknownError);
             }
 
             var newInterfaceUsage = _interfaceUsageRepository.Create();
@@ -62,13 +64,14 @@ namespace Core.ApplicationServices.Interface.Usage
             try
             {
                 _interfaceUsageRepository.DeleteByKey(key);
+                //TODO: Get by key, if null, return notfound, if not, delete and save
                 _interfaceUsageRepository.Save();
                 return Result<OperationResult, object>.Ok(null);
             }
             catch (Exception e)
             {
                 _logger.Error(e, $"Failed to delete interface usage with key {key}");
-                return Result<OperationResult, object>.Fail(OperationResult.Error);
+                return Result<OperationResult, object>.Fail(OperationResult.UnknownError);
             }
         }
     }

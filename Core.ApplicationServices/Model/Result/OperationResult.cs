@@ -5,6 +5,6 @@
         Ok,
         NotFound,
         Forbidden,
-        Error
+        UnknownError
     }
 }

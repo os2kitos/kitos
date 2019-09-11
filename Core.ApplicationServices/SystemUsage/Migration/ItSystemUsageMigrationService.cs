@@ -25,8 +25,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
     public class ItSystemUsageMigrationService : IItSystemUsageMigrationService
     {
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IGenericRepository<ItSystem> _itSystemRepository;
-        private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
+        private readonly IGenericRepository<ItSystem> _itSystemRepository; //TODO: We should use other services
+        private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;//TODO: We should use other services
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemsRepository;
@@ -176,6 +176,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         return Result<OperationResult, ItSystemUsage>.Fail(deletedStatus);
                     }
 
+                    //TODO: Add ItSystemSystemService::ChangeMainSystem
                     systemUsage.ItSystemId = toSystemId;
                     _itSystemUsageRepository.Update(systemUsage);
                     _itSystemRepository.Save();
@@ -186,8 +187,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 catch (Exception e)
                 {
                     transaction.Rollback();
+                    //TODO: Log before rolling back
                     _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
-                    return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
+                    return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
                 }
             }
         }
@@ -213,6 +215,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 interfaceExhibitUsages);
         }
 
+        //TODO: Just operationResult
         private Result<OperationResult, object> DeleteExhibits(IEnumerable<ItInterfaceExhibitUsage> exhibitsToBeDeleted)
         {
             foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
@@ -220,6 +223,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 var deletedStatus = _interfaceExhibitUsageService.DeleteByKey(itInterfaceExhibitUsage.GetKey()).Status;
                 if (deletedStatus != OperationResult.Ok)
                 {
+                    //TODO: Log the actual error and return unknownerror
                     return Result<OperationResult, object>.Fail(deletedStatus);
                 }
             }
@@ -234,6 +238,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 var interfaceCreationResult = _interfaceUsageService.Create(interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId);
                 if (interfaceCreationResult.Status != OperationResult.Ok)
                 {
+                    //TODO: Log the actual error and return unknownerror
                     return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(interfaceCreationResult.Status);
                 }
 
@@ -243,12 +248,14 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     interfaceUsage.IsWishedFor);
                 if (interfaceUpdateResult.Status != OperationResult.Ok)
                 {
+                    //TODO: Log the actual error and return unknownerror
                     return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(interfaceUpdateResult.Status);
                 }
 
                 var deletedStatus = _interfaceUsageService.DeleteByKey(interfaceUsage.GetKey()).Status;
                 if (deletedStatus != OperationResult.Ok)
                 {
+                    //TODO: Log the actual error and return unknownerror
                     return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(deletedStatus);
                 }
 
