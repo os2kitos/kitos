@@ -4,31 +4,31 @@ import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 
-var consts = new Constants();
-var cssHelper = new CSSLocator();
-var pageObject = new CatalogPage();
-var systemPage = new SystemPage();
-var waitUpTo = new WaitTimers();
-
 class CatalogHelper {
+    private static consts = new Constants();
+    private static cssHelper = new CSSLocator();
+    private static pageObject = new CatalogPage();
+    private static systemPage = new SystemPage();
+    private static waitUpTo = new WaitTimers();
+
     public static createCatalog(name: string) {
-        return pageObject.getPage()
+        return this.pageObject.getPage()
             .then(() => {
-                return  pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
+                return this.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
             })
             .then(() => {
-                return  browser.wait(pageObject.isCreateCatalogAvailable(), waitUpTo.twentySeconds);
+                return browser.wait(this.pageObject.isCreateCatalogAvailable(), this.waitUpTo.twentySeconds);
             })
             .then(() => {
-                return  element(cssHelper.byDataElementType(consts.nameOfSystemInput)).sendKeys(name);
+                return element(this.cssHelper.byDataElementType(this.consts.nameOfSystemInput)).sendKeys(name);
             })
             .then(() => {
-                return  element(cssHelper.byDataElementType(consts.saveCatalogButton)).click();
+                return element(this.cssHelper.byDataElementType(this.consts.saveCatalogButton)).click();
             });
     }
 
     public static deleteCatalog(name: string) {
-        return pageObject.getPage()
+        return this.pageObject.getPage()
             .then(() => {
                 return this.waitForKendoGrid();
             })
@@ -36,10 +36,10 @@ class CatalogHelper {
                 return this.findCatalogColumnsFor(name).first().click();
             })
             .then(() => {
-                return browser.wait(systemPage.isDeleteButtonLoaded(), waitUpTo.twentySeconds);
+                return browser.wait(this.systemPage.isDeleteButtonLoaded(), this.waitUpTo.twentySeconds);
             })
             .then(() => {
-                return systemPage.getDeleteButton().click();
+                return this.systemPage.getDeleteButton().click();
             })
             .then(() => {
                 return browser.switchTo().alert().accept();
@@ -47,12 +47,12 @@ class CatalogHelper {
     }
 
     public static findCatalogColumnsFor(name: string) {
-        return pageObject.kendoToolbarWrapper.getFilteredColumnElement(pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+        return this.pageObject.kendoToolbarWrapper.getFilteredColumnElement(this.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
     }
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds);
+        return browser.wait(this.pageObject.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 }
 
