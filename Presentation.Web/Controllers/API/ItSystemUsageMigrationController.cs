@@ -47,6 +47,11 @@ namespace Presentation.Web.Controllers.API
                 Id = 2,
                 Name = "InterfaceUsage"
             });
+            affectedInterfaceUsages.Add(new NamedEntityDTO()
+            {
+                Id = 22,
+                Name = "InterfaceUsage22"
+            });
             var affectedInterfaceExhibitUsages = new List<NamedEntityDTO>();
             affectedInterfaceExhibitUsages.Add(new NamedEntityDTO()
             {

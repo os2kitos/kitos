@@ -6,8 +6,6 @@
         mainGridOptions: kendo.ui.GridOptions;
         usageDetailsGrid: kendo.ui.GridOptions;
         usageGrid: kendo.ui.Grid;
-        migrationContractReportGrid: kendo.ui.Grid;
-        migrationContractReportGridOptions: kendo.ui.GridOptions;
         modal: kendo.ui.Window;
         modalMigration: kendo.ui.Window;
         modalMigrationConsequence: kendo.ui.Window;
@@ -30,7 +28,6 @@
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
-        public migrationContractReportGrid: kendo.ui.Grid;
         public modalMigrationConsequence: kendo.ui.Window;
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
@@ -418,7 +415,6 @@
                     {
                         field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
                         persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -839,18 +835,6 @@
                         title: `Flytning af it-system `
                     });
                     this.modalMigration.close();
-
-                    var kendoGridDataSource = new kendo.data.DataSource({
-                        data: systemUsageMigration.affectedContracts,
-                        schema:
-                        {
-                            type: 'json',
-                            data: 'affectedContracts',
-                        }
-                });
-
-
-                    this.migrationContractReportGrid.dataSource.add(kendoGridDataSource);
                     this.modalMigrationConsequence.center().open();
                 })
                 .error(() => {
@@ -910,18 +894,6 @@
                 }
             ],
             dataBound: this.detailsBound
-        };
-
-        public migrationContractReportGridOptions: kendo.ui.GridOptions = {
-            columns: [
-                {
-                    field: "id", title: "Contract name",
-                    template: dataItem => {
-                        return dataItem[0].contract.name;
-                    },
-                }
-            ],
-            
         };
 
         private exportFlag = false;

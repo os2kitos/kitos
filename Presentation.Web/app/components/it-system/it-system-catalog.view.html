@@ -22,43 +22,104 @@
 </div>
 
 <div data-kendo-window="systemCatalogVm.modalMigrationConsequence"
-     data-k-title="'Konsekvens'" data-k-width="1000"
-     data-k-visible="false" data-k-modal="true">
+     data-k-title="'Konsekvens'" data-k-width="1100"
+     data-k-visible="false" data-k-modal="true" >
     <div id="copyPasteConsequence" style="">
         <div>
             <h3>Opsummering af ændringer ifm. flytning af ”IT-System anvendelse” til et nyt hovedsystem </h3>
             <br>
-            <br>
             <h4>Systemanvendelse flyttes</h4>
             <br>
-            <!--<table>
-                <tr style="background-color: black; color: white">
-                    <th style="font-size: large">Fra</th>
-                    <th style="font-size: large">Til</th>
+            <table class="fromToItsystems full-width table org-role-table">
+                <tr >
+                    <th >Fra</th>
+                    <th >Til</th>
                 </tr>
-                <tr style="background-color: gray;">
-                    <td style="font-size: large">
+                <tr>
+                    <td>
                         Systemnavn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
                         <br />
                         System ID: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
                     </td>
-                    <td style="font-size: large">
+                    <td>
                         Systemnavn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
                         <br />
                         System ID: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
                     </td>
                 </tr>
-
-            </table>-->
-            <div id="migrationReportContractGrid" data-kendo-grid="systemCatalogVm.migrationContractReportGrid" data-k-options="systemCatalogVm.migrationContractReportGridOptions"></div>
+            </table>
             <br>
             <h4>Følgene kontrakter berøres</h4>
             <br>
-            <br>
+            <table class="affectedInterfaces full-width table org-role-table">
+                <tr > 
+                    <th >Id</th>
+                    <th>Navn</th>
+                    <th >System anvendes</th>
+                    <th >“Anvender relationer der flyttes”</th>
+                    <th >“Udstiller” relationer der slettes</th>
+                </tr>
+                <tbody ng-repeat="aff in systemCatalogVm.migrationReportDTO.affectedContracts">
+                    <tr>
+                        <td>{{aff.contract.id}}</td>
+                        <td>{{aff.contract.name}}</td>
+                        <td>ja</td>
+                        <!--<td ng-repeat="aiu in aff.affectedInterfaceUsages">{{aiu.id}} - {{aiu.name}}</td>
+                        <td ng-repeat="aed in aff.interfaceExhibitUsagesToBeDeleted">{{aed.id}} - {{aed.name}}</td>-->
+                        <td> <ul> <li ng-repeat="aiu in aff.affectedInterfaceUsages">{{aiu.id}} - {{aiu.name}}</li></ul></td>
+                        <td> <ul> <li ng-repeat="aed in aff.interfaceExhibitUsagesToBeDeleted">{{aed.id}} - {{aed.name}}</li></ul></td>
+                    </tr>
+            </table>
+            <br/>
             <h4>Følgende projekter, hvor IT-Systemet anvendes, berørers</h4>
+            <br/>
+            <table class="affecteditProjects full-width table org-role-table">
+                <tr > 
+                    <th >Id</th>
+                    <th >Navn</th>
+                </tr>
+                <tbody ng-repeat="aip in systemCatalogVm.migrationReportDTO.affectedItProjects">
+                <tr>
+                    <td>{{aip.id}}</td>
+                    <td>{{aip.name}}</td>
+                </tr>
+            </table>
         </div>
     </div>
     <button ng-click='systemCatalogVm.copyToClipBoard()'>Copy</button>
     <button ng-click='systemCatalogVm.cancelMigration()' class='k-primary pull-left'>Annullere</button>
     <button ng-click='systemCatalogVm.startMigration()' class='k-primary pull-right'>Start flytning</button>
+    <style>
+        /*.affectedInterfaces table {
+            width: 900px;
+        }
+        .fromToItsystems table {
+            
+            width: 900px;
+        }
+        .fromToItsystems .affectedInterfaces table 
+        {
+            table-layout: fixed;
+            border-collapse: collapse;
+            border-spacing: 0;
+            border: 1px solid white;
+        }
+        table tr:nth-child(even) {
+            background: gray;
+        }
+        table tr:nth-child(odd) {
+            background: white;
+        }
+        th {
+            align-content: center;
+            font-size: medium;
+        }
+        tr {
+            align-content: center;
+        }
+        th, td {
+            padding-right: 30px;
+
+        }*/
+    </style>
 </div>
