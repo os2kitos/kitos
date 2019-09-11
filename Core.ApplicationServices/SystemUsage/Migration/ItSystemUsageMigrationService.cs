@@ -4,6 +4,8 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Interface.ExhibitUsage;
+using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItContract;
@@ -25,34 +27,34 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IGenericRepository<ItSystem> _itSystemRepository;
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
-        private readonly IGenericRepository<ItInterfaceExhibitUsage> _itInterfaceExhibitUsageRepository;
-        private readonly IGenericRepository<ItInterfaceUsage> _itInterfaceUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemsRepository;
         private readonly IItContractRepository _contractRepository;
+        private readonly IInterfaceExhibitUsageService _interfaceExhibitUsageService;
+        private readonly IInterfaceUsageService _interfaceUsageService;
 
 
         public ItSystemUsageMigrationService(
             IAuthorizationContext authorizationContext,
             IGenericRepository<ItSystem> itSystemRepository,
             IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IGenericRepository<ItInterfaceExhibitUsage> itInterfaceExhibitUsageRepository,
-            IGenericRepository<ItInterfaceUsage> itInterfaceUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger,
             IItSystemRepository systemsRepository,
-            IItContractRepository contractRepository)
+            IItContractRepository contractRepository,
+            IInterfaceExhibitUsageService interfaceExhibitUsageService,
+            IInterfaceUsageService interfaceUsageService)
         {
             _authorizationContext = authorizationContext;
             _itSystemRepository = itSystemRepository;
             _itSystemUsageRepository = itSystemUsageRepository;
-            _itInterfaceExhibitUsageRepository = itInterfaceExhibitUsageRepository;
-            _itInterfaceUsageRepository = itInterfaceUsageRepository;
             _transactionManager = transactionManager;
             _logger = logger;
             _systemsRepository = systemsRepository;
             _contractRepository = contractRepository;
+            _interfaceExhibitUsageService = interfaceExhibitUsageService;
+            _interfaceUsageService = interfaceUsageService;
         }
 
         public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
@@ -138,6 +140,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
                     if (migrationConsequences.Status != OperationResult.Ok)
                     {
+                        transaction.Rollback();
                         return Result<OperationResult, ItSystemUsage>.Fail(migrationConsequences.Status);
                     }
                     var migration = migrationConsequences.ResultValue;
@@ -145,24 +148,33 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
+                        transaction.Rollback();
                         return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
                     }
                     if (systemUsage.ItSystemId == toSystemId)
                     {
+                        transaction.Rollback();
                         return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
                     }
                     
                     var interfaceUsagesToBeUpdated =
                         migration.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages).Distinct();
                     var interfaceMigration = UpdateInterfaceUsages(interfaceUsagesToBeUpdated, toSystemId);
-                    if (!interfaceMigration)
+                    if (interfaceMigration.Status != OperationResult.Ok)
                     {
-                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Error);
+                        transaction.Rollback();
+                        return Result<OperationResult, ItSystemUsage>.Fail(interfaceMigration.Status);
                     }
 
                     var exhibitsToBeDeleted =
                         migration.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted).Distinct();
-                    DeleteExhibits(exhibitsToBeDeleted);
+
+                    var deletedStatus = DeleteExhibits(exhibitsToBeDeleted).Status;
+                    if (deletedStatus != OperationResult.Ok)
+                    {
+                        transaction.Rollback();
+                        return Result<OperationResult, ItSystemUsage>.Fail(deletedStatus);
+                    }
 
                     systemUsage.ItSystemId = toSystemId;
                     _itSystemUsageRepository.Update(systemUsage);
@@ -201,51 +213,48 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 interfaceExhibitUsages);
         }
 
-        private void DeleteExhibits(IEnumerable<ItInterfaceExhibitUsage> exhibitsToBeDeleted)
+        private Result<OperationResult, object> DeleteExhibits(IEnumerable<ItInterfaceExhibitUsage> exhibitsToBeDeleted)
         {
             foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
             {
-                _itInterfaceExhibitUsageRepository.Delete(itInterfaceExhibitUsage);
-                _itInterfaceExhibitUsageRepository.Save();
+                var deletedStatus = _interfaceExhibitUsageService.DeleteByKey(itInterfaceExhibitUsage.GetKey()).Status;
+                if (deletedStatus != OperationResult.Ok)
+                {
+                    return Result<OperationResult, object>.Fail(deletedStatus);
+                }
             }
+            return Result<OperationResult, object>.Ok(null);
         }
 
-        private bool UpdateInterfaceUsages(IEnumerable<ItInterfaceUsage> usagesToBeUpdated, int toSystemId)
+        private Result<OperationResult, IReadOnlyList<ItInterfaceUsage>> UpdateInterfaceUsages(IEnumerable<ItInterfaceUsage> usagesToBeUpdated, int toSystemId)
         {
+            var updatedInterfaceUsages = new List<ItInterfaceUsage>();
             foreach (var interfaceUsage in usagesToBeUpdated)
             {
-                var key = new object[] { interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId };
-
-                if (_itInterfaceUsageRepository.GetByKey(key) != null)
+                var interfaceCreationResult = _interfaceUsageService.Create(interfaceUsage.ItSystemUsageId, toSystemId, interfaceUsage.ItInterfaceId);
+                if (interfaceCreationResult.Status != OperationResult.Ok)
                 {
-                    _logger.Error($"Migrating failed as ItInterfaceUsage with key {{ " +
-                                  $"ItSystemUsageId: {interfaceUsage.ItSystemUsageId}, " +
-                                  $"ItSystemId: {toSystemId}," +
-                                  $"ItInterfaceId: {interfaceUsage.ItInterfaceId} }} already exists");
-                    return false;
+                    return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(interfaceCreationResult.Status);
                 }
 
-                CreateInterfaceUsage(interfaceUsage, toSystemId);
+                var interfaceUpdateResult = _interfaceUsageService.Update(interfaceCreationResult.ResultValue.GetKey(),
+                    interfaceUsage.ItContractId,
+                    interfaceUsage.InfrastructureId,
+                    interfaceUsage.IsWishedFor);
+                if (interfaceUpdateResult.Status != OperationResult.Ok)
+                {
+                    return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(interfaceUpdateResult.Status);
+                }
 
-                _itInterfaceUsageRepository.Delete(interfaceUsage);
-                _itInterfaceUsageRepository.Save();
+                var deletedStatus = _interfaceUsageService.DeleteByKey(interfaceUsage.GetKey()).Status;
+                if (deletedStatus != OperationResult.Ok)
+                {
+                    return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Fail(deletedStatus);
+                }
+
+                updatedInterfaceUsages.Add(interfaceUpdateResult.ResultValue);
             }
-            return true;
-        }
-
-        private void CreateInterfaceUsage(ItInterfaceUsage interfaceUsage, int toSystemId)
-        {
-            var item = _itInterfaceUsageRepository.Create();
-            item.ItSystemUsageId = interfaceUsage.ItSystemUsageId;
-            item.ItSystemId = toSystemId;
-            item.ItInterfaceId = interfaceUsage.ItInterfaceId;
-            _itInterfaceUsageRepository.Insert(item);
-
-            item.InfrastructureId = interfaceUsage.InfrastructureId;
-            item.IsWishedFor = interfaceUsage.IsWishedFor;
-            item.ItContractId = interfaceUsage.ItContractId;
-
-            _itInterfaceUsageRepository.Save();
+            return Result<OperationResult, IReadOnlyList<ItInterfaceUsage>>.Ok(updatedInterfaceUsages);
         }
 
     }

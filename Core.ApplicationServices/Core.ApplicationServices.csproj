@@ -99,6 +99,10 @@
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
+    <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
+    <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />

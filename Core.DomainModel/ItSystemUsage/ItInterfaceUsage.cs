@@ -12,6 +12,11 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItInterfaceUsage : ISystemModule
     {
+        public object[] GetKey()
+        {
+            return new object[]{ItSystemUsageId, ItSystemId, ItInterfaceId};
+        }
+
         public ItInterfaceUsage()
         {
             this.DataRowUsages = new List<DataRowUsage>();
