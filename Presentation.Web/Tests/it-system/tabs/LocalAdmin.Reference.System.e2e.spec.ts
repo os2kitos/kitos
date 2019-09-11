@@ -32,8 +32,6 @@ describe("Can add and remove reference",
 
         it("",
             () => {
-                browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds);
-                expect(colObjects.referenceName).toBeEmptyArray();
                 refHelper.createReference(consts.refTitle, consts.validUrl, consts.refId);
                 expect(colObjects.referenceName.first().getText()).toEqual(consts.refTitle);
                 refHelper.deleteReference(consts.refId);

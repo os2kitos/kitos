@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.ItSystemUsageMigration;
 using Core.ApplicationServices.Model.Result;
-using Core.DomainModel.ItSystem;
+using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.ApplicationServices.SystemUsage.Migration;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystemUsageMigration;
@@ -16,7 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/ItSystemUsageMigration")]
     public class ItSystemUsageMigrationController : BaseApiController
     {
@@ -33,59 +34,19 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            //TODO
-            var affectedItProjects = new List<NamedEntityDTO>();
-            affectedItProjects.Add(new NamedEntityDTO()
+            var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
+            switch (res.Status)
             {
-                Id = 1,
-                Name = "ItProject"
-            });
-
-            var affectedInterfaceUsages = new List<NamedEntityDTO>();
-            affectedInterfaceUsages.Add(new NamedEntityDTO()
-            {
-                Id = 2,
-                Name = "InterfaceUsage"
-            });
-            var affectedInterfaceExhibitUsages = new List<NamedEntityDTO>();
-            affectedInterfaceExhibitUsages.Add(new NamedEntityDTO()
-            {
-                Id = 3,
-                Name = "InterfaceExhibitUsage"
-            });
-            var affectedItContracts = new List<ItContractItSystemUsageDTO>();
-            affectedItContracts.Add(new ItContractItSystemUsageDTO()
-            {
-                Contract = new NamedEntityDTO()
-                {
-                    Id = 4,
-                    Name = "Contract"
-                },
-                AffectedInterfaceUsages = affectedInterfaceUsages,
-                InterfaceExhibitUsagesToBeDeleted = affectedInterfaceExhibitUsages
-            });
-
-            return Ok(new ItSystemUsageMigrationDTO
-            {
-                TargetUsage = new NamedEntityDTO()
-                {
-                    Id = usageId,
-                    Name = "ItSystemUsage"
-                },
-                FromSystem = new NamedEntityDTO()
-                {
-                    Id = 1,
-                    Name = "FromSystem"
-                },
-                ToSystem = new NamedEntityDTO()
-                {
-                    Id = 2,
-                    Name = "ToSystem"
-                },
-                AffectedItProjects = affectedItProjects,
-                AffectedContracts = affectedItContracts
-            });
-
+                case OperationResult.Ok:
+                    return Ok(Map(res.ResultValue));
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.NotFound:
+                    return NotFound();
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get migration consequences");
+            }
         }
 
         [HttpPost]
@@ -93,15 +54,26 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
-            //TODO
-            return Ok();
+            var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
+            switch (result.Status)
+            {
+                case OperationResult.Ok:
+                    return NoContent();
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.NotFound:
+                    return NotFound();
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to migrate It System Usage");
+            }
         }
 
         [HttpGet]
         [Route("Accessibility")]
         public HttpResponseMessage GetAccessibilityLevel()
         {
-            return Ok(new
+            return Ok(new ItSystemUsageMigrationAccessDTO
             {
                 CanExecuteMigration = _itSystemUsageMigrationService.CanExecuteMigration()
             });
@@ -122,11 +94,11 @@ namespace Presentation.Web.Controllers.API
             }
             if (string.IsNullOrWhiteSpace(nameContent))
             {
-                return Ok(MapItSystemToItSystemUsageMigrationDto(new List<ItSystem>()));
+                return Ok(Enumerable.Empty<NamedEntityDTO>());
             }
             if (numberOfItSystems < 1 || numberOfItSystems > 25)
             {
-                return BadRequest();
+                return BadRequest($"{nameof(numberOfItSystems)} must satisfy constraint: 1 <= n <= 25");
             }
 
             var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
@@ -134,7 +106,7 @@ namespace Presentation.Web.Controllers.API
             switch (result.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(MapItSystemToItSystemUsageMigrationDto(result.ResultValue));
+                    return Ok(result.ResultValue.Select(x => x.MapToNamedEntityDTO()));
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
@@ -143,13 +115,39 @@ namespace Presentation.Web.Controllers.API
                     return CreateResponse(HttpStatusCode.InternalServerError,
                         "An error occured when trying to get Unused It Systems");
             }
-
         }
 
-        private static IEnumerable<ItSystemSimpleDTO> MapItSystemToItSystemUsageMigrationDto(IReadOnlyList<ItSystem> input)
+        private static ItSystemUsageMigrationDTO Map(ItSystemUsageMigration input)
         {
-            return input.Select(itSystem => new ItSystemSimpleDTO { Id = itSystem.Id, Name = itSystem.Name }).ToList();
+            return new ItSystemUsageMigrationDTO
+            {
+                TargetUsage = new NamedEntityDTO { Id = input.SystemUsage.Id, Name = input.SystemUsage.LocalCallName ?? input.FromItSystem.Name },
+                FromSystem = input.FromItSystem.MapToNamedEntityDTO(),
+                ToSystem = input.ToItSystem.MapToNamedEntityDTO(),
+                AffectedItProjects = input.AffectedProjects.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList(),
+                AffectedContracts = input.AffectedContracts.Select(Map).ToList()
+            };
         }
 
+        private static ItSystemUsageContractMigrationDTO Map(ItContractMigration input)
+        {
+            return new ItSystemUsageContractMigrationDTO
+            {
+                Contract = input.Contract.MapToNamedEntityDTO(),
+                SystemAssociatedInContract = input.SystemAssociatedInContract,
+                AffectedInterfaceUsages = input.AffectedInterfaceUsages.Select(Map).ToList(),
+                InterfaceExhibitUsagesToBeDeleted = input.ExhibitUsagesToBeDeleted.Select(Map).ToList()
+            };
+        }
+
+        private static NamedEntityDTO Map(ItInterfaceExhibitUsage interfaceExhibit)
+        {
+            return interfaceExhibit.ItInterfaceExhibit.ItInterface.MapToNamedEntityDTO();
+        }
+
+        private static NamedEntityDTO Map(ItInterfaceUsage interfaceUsage)
+        {
+            return interfaceUsage.ItInterface.MapToNamedEntityDTO();
+        }
     }
 }

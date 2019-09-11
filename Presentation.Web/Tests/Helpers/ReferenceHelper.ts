@@ -1,47 +1,42 @@
 ﻿import RefePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
 import WaitTimers = require("../Utility/WaitTimers");
-
-var homePage = new RefePage();
-var waitUpTo = new WaitTimers();
-var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
-var inputFields = homePage.kendoToolbarWrapper.inputFields();
+import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 
 class ReferenceHelper {
+    private homePage = new RefePage();
+    private waitUpTo = new WaitTimers();
+    private headerButtons = new RefePage().kendoToolbarWrapper.headerButtons();
+    private inputFields = new RefePage().kendoToolbarWrapper.inputFields();
+    private cssLocator = new CSSLocator();
 
     public createReference(title: string, url: string, id: string) {
-        return homePage.getPage()
-            .then(() => browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds))
-            .then(() => headerButtons.createReference.click())
-            .then(() => browser.wait(homePage.isReferenceCreateFormLoaded(), waitUpTo.twentySeconds))
-            .then(() => inputFields.referenceDocId.sendKeys(id))
-            .then(() => inputFields.referenceDocTitle.sendKeys(title))
-            .then(() => inputFields.referenceDocUrl.sendKeys(url))
-            .then(() => headerButtons.editSaveReference.click());
+        return this.homePage.getPage()
+            .then(() => browser.wait(this.homePage.isCreateReferenceLoaded(), this.waitUpTo.twentySeconds))
+            .then(() => this.headerButtons.createReference.click())
+            .then(() => browser.wait(this.homePage.isReferenceCreateFormLoaded(), this.waitUpTo.twentySeconds))
+            .then(() => this.inputFields.referenceDocId.sendKeys(id))
+            .then(() => this.inputFields.referenceDocTitle.sendKeys(title))
+            .then(() => this.inputFields.referenceDocUrl.sendKeys(url))
+            .then(() => this.headerButtons.editSaveReference.click());
     }
 
     public deleteReference(id: string) {
-        homePage.getPage();
-        browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds);
+        return this.homePage.getPage()
+            .then(() => browser.wait(this.homePage.isCreateReferenceLoaded(), this.waitUpTo.twentySeconds))
+            .then(() => {
+                element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
+                    ele.all(by.tagName("td")).each((tdele) => {
 
-        element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
+                        tdele.getText().then(val => {
 
-            ele.all(by.tagName("td")).each((tdele) => {
-
-                tdele.getText().then(val => {
-
-                         if (val === id) {
-                             ele.element(by.css("[data-element-type='" + "deleteReference" + "']")).click();
-                             browser.switchTo().alert().accept();
-                         }
+                            if (val === id) {
+                                return ele.element(this.cssLocator.byDataElementType("deleteReference")).click()
+                                    .then(() => browser.switchTo().alert().accept());
+                            }
+                        });
                     });
-
-               
+                });
             });
-
-
-        });
-
-
     }
 
 

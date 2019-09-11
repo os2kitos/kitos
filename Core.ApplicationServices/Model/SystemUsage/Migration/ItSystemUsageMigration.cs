@@ -3,26 +3,26 @@ using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 
-namespace Core.ApplicationServices.Model.ItSystemUsage
+namespace Core.ApplicationServices.Model.SystemUsage.Migration
 {
     public class ItSystemUsageMigration
     {
-        public DomainModel.ItSystemUsage.ItSystemUsage ItSystemUsage { get; }
+        public DomainModel.ItSystemUsage.ItSystemUsage SystemUsage { get; }
         public ItSystem FromItSystem { get; }
         public ItSystem ToItSystem { get; }
         public IReadOnlyList<ItProject> AffectedProjects { get; }
-        public IReadOnlyList<SystemUsageContractMigration> AffectedContracts { get; }
+        public IReadOnlyList<ItContractMigration> AffectedContracts { get; }
 
         public ItSystemUsageMigration(
-            DomainModel.ItSystemUsage.ItSystemUsage itSystemUsage,
+            DomainModel.ItSystemUsage.ItSystemUsage systemUsage,
             ItSystem fromItSystem,
-            ItSystem itSystem,
+            ItSystem toItSystem,
             IEnumerable<ItProject> affectedProjects, 
-            IEnumerable<SystemUsageContractMigration> affectedContracts)
+            IEnumerable<ItContractMigration> affectedContracts)
         {
-            ItSystemUsage = itSystemUsage;
+            SystemUsage = systemUsage;
             FromItSystem = fromItSystem;
-            ToItSystem = itSystem;
+            ToItSystem = toItSystem;
             AffectedProjects = affectedProjects.ToList().AsReadOnly();
             AffectedContracts = affectedContracts.ToList().AsReadOnly();
         }

@@ -240,7 +240,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         /// <summary>
-        /// Henter alle IT Systemer ejet af organisationen samt IT Systemer fra andre organisationer som er anvendt i organisationen
+        /// Henter alle IT Systemer ejet af organisationen samt alle IT systemer fra nadre organisationer som er taget i anvendelse.
         /// </summary>
         /// <param name="orgId"></param>
         /// <returns></returns>
