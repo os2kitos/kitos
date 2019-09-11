@@ -41,6 +41,11 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().ByIds(idsOfSystemsInUse);
         }
 
+        public ItSystem GetSystem(int systemId)
+        {
+            return _systemRepository.AsQueryable().ById(systemId);
+        }
+
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)
         {
             var idsOfSystemsInUse = _systemUsageRepository

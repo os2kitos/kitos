@@ -5,6 +5,6 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
 {
     public interface IInterfaceExhibitUsageService
     {
-        Result<OperationResult, object> DeleteByKey(object[] key);
+        OperationResult DeleteByKey(int systemUsageId, int interfaceExhibitId);
     }
 }

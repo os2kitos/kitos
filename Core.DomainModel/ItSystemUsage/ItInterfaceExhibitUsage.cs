@@ -11,11 +11,11 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItInterfaceExhibitUsage : ISystemModule
     {
-        //TODO: No - add as static which takes the named components and returns them in the right order
-        public object[] GetKey()
+        public static object[] GetKey(int systemUsageId, int interfaceExhibitId)
         {
-            return new object[]{ItSystemUsageId, ItInterfaceExhibitId};
+            return new object[] { systemUsageId, interfaceExhibitId };
         }
+        
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The local usage of the system that is exposing the interface.

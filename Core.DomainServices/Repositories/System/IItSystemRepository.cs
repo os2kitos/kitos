@@ -9,5 +9,7 @@ namespace Core.DomainServices.Repositories.System
         IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters);
 
         IQueryable<ItSystem> GetSystemsInUse(int organizationId);
+
+        ItSystem GetSystem(int systemId);
     }
 }

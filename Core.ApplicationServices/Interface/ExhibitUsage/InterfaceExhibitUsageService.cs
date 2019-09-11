@@ -19,18 +19,25 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             _logger = logger;
         }
 
-        public Result<OperationResult, object> DeleteByKey(object[] key)
+        public OperationResult DeleteByKey(int systemUsageId, int interfaceExhibitId)
         {
+            var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
             try
             {
-                _itInterfaceExhibitUsageRepository.DeleteByKey(key);
+                var interfaceExhibitUsageToBeDeleted = _itInterfaceExhibitUsageRepository.GetByKey(key);
+                if (interfaceExhibitUsageToBeDeleted == null)
+                {
+                    _logger.Error($"Could not find interface exhibit usage with key {key}");
+                    return OperationResult.NotFound;
+                }
+                _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
                 _itInterfaceExhibitUsageRepository.Save();
-                return Result<OperationResult, object>.Ok(null);
+                return OperationResult.Ok;
             }
             catch (Exception e)
             {
                 _logger.Error(e, $"Failed to delete interface exhibit usage with key {key}");
-                return Result<OperationResult, object>.Fail(OperationResult.UnknownError);
+                return OperationResult.UnknownError;
             }
         }
     }
