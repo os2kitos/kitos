@@ -3,16 +3,11 @@ import KendoToolbarHelper = require("../../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
 import CssLocatorHelper = require("../../../object-wrappers/CSSLocatorHelper");
 import Constants = require("../../../Utility/Constants");
-var consts = new Constants();
-var ec = protractor.ExpectedConditions;
-var byDataElementType = new CssLocatorHelper().byDataElementType;
-
 
 class ItSystemCatalog implements IPageObject {
-
-    public kendoToolbarHelper = new KendoToolbarHelper();
-    public kendoToolbarWrapper = new KendoToolbarWrapper();
-    public createCatalogForm = element(byDataElementType(consts.catalogCreateForm));
+    private consts = new Constants();
+    private ec = protractor.ExpectedConditions;
+    private byDataElementType = new CssLocatorHelper().byDataElementType;
 
     public getPage(): webdriver.promise.Promise<void> {
         return browser.getCurrentUrl()
@@ -27,12 +22,17 @@ class ItSystemCatalog implements IPageObject {
             });
     }
 
+    public kendoToolbarHelper = new KendoToolbarHelper();
+    public kendoToolbarWrapper = new KendoToolbarWrapper();
+    public createCatalogForm = element(this.byDataElementType(this.consts.catalogCreateForm));
+
     public isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
-        return ec.visibilityOf(this.createCatalogForm);
+        return this.ec.visibilityOf(this.createCatalogForm);
     }
 
     public waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
     }
 }
+
 export = ItSystemCatalog;

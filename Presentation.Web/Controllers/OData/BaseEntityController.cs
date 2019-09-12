@@ -9,7 +9,6 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Ninject.Infrastructure.Language;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.OData
@@ -45,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (refinement.RequiresPostFiltering())
             {
-                result = result.ToEnumerable().Where(AllowRead).AsQueryable();
+                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
             }
 
             return Ok(result);

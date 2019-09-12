@@ -319,12 +319,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\DTOMappingExtensions.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\ContextBasedAuthorizationStrategy.cs" />
-    <Compile Include="Models\ItSystemUsageMigration\ItContractItSystemUsageDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageContractMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />

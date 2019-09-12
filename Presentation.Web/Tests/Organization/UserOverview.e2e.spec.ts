@@ -3,14 +3,12 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import Login = require("../Helpers/LoginHelper");
 import WaitTimers = require("../Utility/waitTimers");
 
-var testFixture = new TestFixtureWrapper();
-var pageObject = new HomePage();
-var loginHelper = new Login();
-var waitUpTo = new WaitTimers();
-var ec = protractor.ExpectedConditions;
-
-
 describe("Only Global and Local Admins can view API column in user overview", () => {
+    var testFixture = new TestFixtureWrapper();
+    var pageObject = new HomePage();
+    var loginHelper = new Login();
+    var waitUpTo = new WaitTimers();
+    var ec = protractor.ExpectedConditions;
 
     beforeEach(() => {
        

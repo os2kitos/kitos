@@ -1,26 +1,25 @@
 ﻿import NavigationBarWrapper = require("../object-wrappers/NavigationBarWrapper");
 
-var navigationBar = new NavigationBarWrapper();
 class NavigationBarHelper {
-
+    private navigationBar = new NavigationBarWrapper();
     public dropDownExpand() {
-        return  navigationBar.dropDownMenu.dropDownElement.click();
+        return  this.navigationBar.dropDownMenu.dropDownElement.click();
     }
 
     public logout() {
-        return navigationBar.dropDownMenu.logOut.click();
+        return this.navigationBar.dropDownMenu.logOut.click();
     }
 
     public isMyProfileDisplayed(): webdriver.promise.Promise<Boolean>{
-        return navigationBar.dropDownMenu.myProfile.isPresent();
+        return this.navigationBar.dropDownMenu.myProfile.isPresent();
     }
 
     public isGlobalAdminDisplayed(): webdriver.promise.Promise<Boolean> {
-        return navigationBar.dropDownMenu.globalAdmin.isPresent();
+        return this.navigationBar.dropDownMenu.globalAdmin.isPresent();
     }
 
     public isLocalAdminDisplayed(): webdriver.promise.Promise<Boolean> {
-        return navigationBar.dropDownMenu.localAdmin.isPresent();
+        return this.navigationBar.dropDownMenu.localAdmin.isPresent();
     }
     
 }

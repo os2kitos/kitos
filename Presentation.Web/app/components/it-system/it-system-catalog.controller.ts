@@ -72,7 +72,8 @@
             private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
-            private oldItSystemUsageName,
+            private oldItSystemName,
+            private oldItSystemId,
             private oldItSystemUsageId,
             private newItSystemObject,
             private municipality,
@@ -123,14 +124,14 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, function (usage: { id; name; }) {
+                        _.each(data.data.response, function (system: { id; name; }) {
                             results.push({
                                 //the id of the system usage is the id, that is selected
-                                id: usage.id,
+                                id: system.id,
                                 //but the name of the system is the label for the select2
-                                text: usage.name,
+                                text: system.name,
                                 //saving the usage for later use
-                                usage: usage
+                                system: system
                             });
 
                         });
@@ -775,11 +776,11 @@
         }; 
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        public showUsageDetails = (usageId, systemName) => {
-            this.oldItSystemUsageName = systemName;
-            this.oldItSystemUsageId = usageId;
+        public showUsageDetails = (systemId, systemName) => {
+            this.oldItSystemName = systemName;
+            this.oldItSystemId = systemId;
             //Filter by usageId
-            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
+            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
             //Set modal title
             this.modal.setOptions({
                 close: function (e) {
@@ -797,10 +798,11 @@
             return this.$(name) as any;
         }
 
-        public migrateItSystem = (name: string) => {
+        public migrateItSystem = (name: string, usageId: number) => {
             var self = this;
             this.modal.close();
             this.municipality = name;
+            this.oldItSystemUsageId = usageId;
             //Set modal title
             this.modalMigration.setOptions({
                 close: function (e) {
@@ -812,7 +814,7 @@
                     return true;
                 },
                 resizable: false,
-                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemUsageName}`
+                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemName}`
             });
 
             this.modalMigration.center().open();
@@ -820,7 +822,7 @@
 
         public migrateSystemTo = () => {
             this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
-            this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.usage.id)
+            this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
                 .success(dto => {
                     let systemUsageMigration: Models.ItSystemUsage.Migration.IItSystemUsageMigration = dto.response;
                     this.migrationReportDTO = systemUsageMigration;
@@ -843,14 +845,29 @@
         }
 
         private getMigrationReport: any = (usageId, toSystemId) => {
-            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=1${toSystemId}`;
+            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
 
             return this.$http({method: 'GET',url: url,});
         }
 
+        private executeMigration: any = (usageId, toSystemId) => {
+            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
+
+            return this.$http({ method: 'POST', url: url, });
+        }
+
         public startMigration = () => {
-            if (this.oldItSystemUsageName != null || this.newItSystemObject != null) {
-                console.log("Requesting migration! " + this.oldItSystemUsageName + " to " + this.newItSystemObject.usage.name);
+            if (this.oldItSystemName != null || this.newItSystemObject != null) {
+                this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
+                    .success(dto => {
+                        this.modalMigrationConsequence.close();
+                        this.mainGrid.dataSource.fetch();
+                        this.notify.addSuccessMessage("Systemets anvendelse er flyttet");
+                    })
+                    .error(() => {
+
+                    });
+                //console.log("Requesting migration! " + this.oldItSystemUsageName + " to " + this.newItSystemObject.system.name);
             }
         }
 
@@ -885,8 +902,9 @@
                     field: "Organization.Name", title: "Organisation",
                     template: dataItem => {
                         var orgName = dataItem.Organization.Name;
+                        var usageId = dataItem.Id;
                         if (this.canMigrate) {
-                            return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}")' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                            return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
                             return dataItem.Organization.Name;
                         }

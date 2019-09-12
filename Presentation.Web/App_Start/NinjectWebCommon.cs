@@ -4,8 +4,13 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.ItSystemUsageMigration;
+using Core.ApplicationServices.Interface.ExhibitUsage;
+using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -110,7 +115,8 @@ namespace Presentation.Web
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
             kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
-
+            kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
+            kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -129,7 +135,10 @@ namespace Presentation.Web
             kernel.Bind<KitosContext>().ToSelf().InRequestScope();
             kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
             kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
+            kernel.Bind<IItSystemRepository>().To<ItSystemRepository>().InRequestScope();
+            kernel.Bind<IItContractRepository>().To<ItContractRepository>().InRequestScope();
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
+            kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

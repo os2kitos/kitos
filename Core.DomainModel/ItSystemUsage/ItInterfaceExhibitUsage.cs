@@ -11,6 +11,11 @@ namespace Core.DomainModel.ItSystemUsage
     /// </summary>
     public class ItInterfaceExhibitUsage : ISystemModule
     {
+        public static object[] GetKey(int systemUsageId, int interfaceExhibitId)
+        {
+            return new object[] { systemUsageId, interfaceExhibitId };
+        }
+        
         public int ItSystemUsageId { get; set; }
         /// <summary>
         /// The local usage of the system that is exposing the interface.
