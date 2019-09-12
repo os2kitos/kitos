@@ -16,7 +16,8 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            return source.Where(x => _ids.Contains(x.Id));
+            //If no ids provided, remove all results. If not filter by ids
+            return _ids.Any() ? source.Where(x => _ids.Contains(x.Id)) : new RejectAllResultsQuery<T>().Apply(source);
         }
     }
 }
