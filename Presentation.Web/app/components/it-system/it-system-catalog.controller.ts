@@ -58,7 +58,7 @@
         constructor(
             private $rootScope: IRootScope,
             private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
-          //  private $scope: any,
+            //  private $scope: any,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -126,11 +126,11 @@
                         //for each system usages
                         _.each(data.data.response, function (system: { id; name; }) {
                             results.push({
-                                //the id of the system usage is the id, that is selected
+                                //the id of the system is the id, that is selected
                                 id: system.id,
                                 //but the name of the system is the label for the select2
                                 text: system.name,
-                                //saving the usage for later use
+                                //saving the system for later use
                                 system: system
                             });
 
@@ -480,7 +480,7 @@
                                     }</a>`;
                             }
                             else {
-                                return `<label class="col-xs-7 text-center" )">Anvendes ikke</label>`;
+                                return ``;
                             }
                         },
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
@@ -773,7 +773,7 @@
         public isValidUrl(Url) {
             var regexp = /(http || https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
             return regexp.test(Url.toLowerCase());
-        }; 
+        };
 
         // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
         public showUsageDetails = (systemId, systemName) => {
@@ -800,11 +800,13 @@
         public migrateItSystem = (name: string, usageId: number) => {
             var self = this;
             this.modal.close();
+            this.newItSystemObject = null;
+            this.convertToSelect2Object("#new-system-usage").select2('data', null); //Reset selection control
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
             //Set modal title
             this.modalMigration.setOptions({
-                close: function (e) {
+                close: (e) => {
                     let element: any = self.convertToSelect2Object('#select2-drop');
                     if (element != null) {
                         element.select2('close');
@@ -812,7 +814,7 @@
                     return true;
                 },
                 resizable: false,
-                title: `Flyt af ${this.municipality} relation til ${this.oldItSystemName}`
+                title: `Flyt af relation for ${this.municipality}`
             });
 
             this.modalMigration.center().open();
@@ -820,31 +822,30 @@
 
         public migrateSystemTo = () => {
             this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
-            this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
-                .success(dto => {
-                    let systemUsageMigration: Models.ItSystemUsage.Migration.IItSystemUsageMigration = dto.response;
-                    this.migrationReportDTO = systemUsageMigration;
+            if (this.newItSystemObject != null) {
+                this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
+                    .success(dto => {
+                        let systemUsageMigration: Models.ItSystemUsage.Migration.IItSystemUsageMigration = dto.response;
+                        this.migrationReportDTO = systemUsageMigration;
 
-                    this.modalMigrationConsequence.setOptions({
-                        close: function (e) {
-                            return true;
-                        },
-
-                        resizable: false,
-                        title: `Flytning af it-system `
+                        this.modalMigrationConsequence.setOptions({
+                            close: (_) => true,
+                            resizable: false,
+                            title: `Flytning af it-system `
+                        });
+                        this.modalMigration.close();
+                        this.modalMigrationConsequence.center().open();
+                    })
+                    .error(() => {
+                        this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
                     });
-                    this.modalMigration.close();
-                    this.modalMigrationConsequence.center().open();
-                })
-                .error(() => {
-                    this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
-                });
+            }
         }
 
         private getMigrationReport: any = (usageId, toSystemId) => {
             var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
 
-            return this.$http({method: 'GET',url: url,});
+            return this.$http({ method: 'GET', url: url, });
         }
 
         private executeMigration: any = (usageId, toSystemId) => {
@@ -856,7 +857,7 @@
         public startMigration = () => {
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
                 this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
-                    .success(dto => {
+                    .success(() => {
                         this.modalMigrationConsequence.close();
                         this.mainGrid.dataSource.fetch();
                         this.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
@@ -1094,8 +1095,8 @@
                         userMigrationRights: ['$http', function ($http) {
                             return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
                                 .then(function (result) {
-                                return result.data.response;
-                            });
+                                    return result.data.response;
+                                });
                         }],
                     }
                 });
