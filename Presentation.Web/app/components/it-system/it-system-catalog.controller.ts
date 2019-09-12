@@ -784,7 +784,6 @@
             //Set modal title
             this.modal.setOptions({
                 close: function (e) {
-                    console.log("MODAL 1 CLOSING");
                     return true;
                 },
                 resizable: false,
@@ -806,7 +805,6 @@
             //Set modal title
             this.modalMigration.setOptions({
                 close: function (e) {
-                    console.log("MODAL 2 CLOSING");
                     let element: any = self.convertToSelect2Object('#select2-drop');
                     if (element != null) {
                         element.select2('close');
@@ -829,7 +827,6 @@
 
                     this.modalMigrationConsequence.setOptions({
                         close: function (e) {
-                            console.log("MODAL 3 CLOSING");
                             return true;
                         },
 
@@ -840,7 +837,7 @@
                     this.modalMigrationConsequence.center().open();
                 })
                 .error(() => {
-                    this.notify.addErrorMessage("Problem med at hente flytte rapport");
+                    this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
                 });
         }
 
@@ -862,12 +859,11 @@
                     .success(dto => {
                         this.modalMigrationConsequence.close();
                         this.mainGrid.dataSource.fetch();
-                        this.notify.addSuccessMessage("Systemets anvendelse er flyttet");
+                        this.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
                     })
                     .error(() => {
-
+                        this.notify.addErrorMessage("Flytning af system anvendelse fejlede");
                     });
-                //console.log("Requesting migration! " + this.oldItSystemUsageName + " to " + this.newItSystemObject.system.name);
             }
         }
 
