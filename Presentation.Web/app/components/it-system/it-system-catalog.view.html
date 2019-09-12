@@ -17,11 +17,12 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
+        <br/>
         <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right migrationReportButton'>Se konsekvens</button>
     </div>
 </div>
 
-<div data-kendo-window="systemCatalogVm.modalMigrationConsequence"
+<div data-kendo-window="systemCatalogVm.modalMigrationConsequence">
      data-k-title="'Konsekvens'" 
      data-k-visible="false" data-k-modal="true" data-k-width="800" >
     <div >
@@ -116,5 +117,5 @@
             }
             
         </style>
-    </divid="copyPasteConsequence">
+    </div >
 </div>
