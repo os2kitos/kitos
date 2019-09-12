@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Interface.Usage
             _interfaceUsageRepository = interfaceUsageRepository;
             _logger = logger;
         }
-
+        //TODO: Check authorization
         public Result<OperationResult, ItInterfaceUsage> Create(
             int systemUsageId,
             int systemId,
@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.Interface.Usage
 
             return Result<OperationResult, ItInterfaceUsage>.Ok(newInterfaceUsage);
         }
-
+        //TODO: Check authorization
         public OperationResult Delete(int systemUsageId, int systemId, int interfaceId)
         {
             var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);

@@ -4,10 +4,15 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Moq;
 using Serilog;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -20,19 +25,23 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly ItSystemUsageMigrationService _sut;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
+        private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
+        private readonly Mock<IItContractRepository> _itContractRepository;
 
         public ItSystemUsageMigrationServiceTest()
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
 
+            _systemUsageRepository = new Mock<IItSystemUsageRepository>();
+            _itContractRepository = new Mock<IItContractRepository>();
             _sut = new ItSystemUsageMigrationService(
                 _authorizationContext.Object,
                 null,
                 Mock.Of<ILogger>(),
                 _systemRepository.Object,
-                null,
-                null,
+                _systemUsageRepository.Object,
+                _itContractRepository.Object, 
                 null,
                 null);
         }
@@ -130,6 +139,144 @@ namespace Tests.Unit.Presentation.Web.Services
             var itSystem = Assert.Single(result.Value);
             Assert.Equal(resultSet.First().Id, itSystem.Id);
         }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Forbidden_If_Migration_Is_UnAuthorized()
+        {
+            //Arrange
+            ExpectAllowSystemMigrationReturns(false);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(A<int>(), A<int>());
+
+            //Assert
+            Assert.Equal(OperationResult.Forbidden, result.Status);
+        }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Forbidden_If_Read_Access_To_SystemUsage_Is_Unauthorized()
+        {
+            //Arrange
+            var usageId = A<int>();
+            var systemUsage = new ItSystemUsage { Id = A<int>() };
+            ExpectAllowSystemMigrationReturns(true);
+            ExpectGetSystemUsageReturns(usageId, systemUsage);
+            ExpectAllowReadsReturns(systemUsage, false);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(usageId, A<int>());
+
+            //Assert
+            Assert.Equal(OperationResult.Forbidden, result.Status);
+        }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Forbidden_If_Read_Access_To_System_Is_Unauthorized()
+        {
+            //Arrange
+            var usageId = A<int>();
+            var systemId = A<int>();
+            var systemUsage = new ItSystemUsage { Id = A<int>() };
+            var system = new ItSystem { Id = A<int>() };
+            ExpectAllowSystemMigrationReturns(true);
+            ExpectGetSystemUsageReturns(usageId, systemUsage);
+            ExpectAllowReadsReturns(systemUsage, true);
+            ExpectGetSystemReturns(systemId, system);
+            ExpectAllowReadsReturns(system, false);
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(usageId, systemId);
+
+            //Assert
+            Assert.Equal(OperationResult.Forbidden, result.Status);
+        }
+
+        //[Fact]
+        //public void GetSystemUsageMigration_Returns_Ok_With_MigrationDescription()
+        //{
+        //    //Arrange
+        //    var usageId = A<int>();
+        //    var systemId = A<int>();
+        //    var systemUsage = new ItSystemUsage
+        //    {
+        //        Id = A<int>(),
+                
+        //    };
+        //    var system = new ItSystem { Id = A<int>() };
+        //    ExpectAllowSystemMigrationReturns(true);
+        //    ExpectGetSystemUsageReturns(usageId, systemUsage);
+        //    ExpectAllowReadsReturns(systemUsage, true);
+        //    ExpectGetSystemReturns(systemId, system);
+        //    ExpectAllowReadsReturns(system, true);
+
+        //    _itContractRepository.Setup(x => x.GetBySystemUsageAssociation(usageId)).Returns(new[]
+        //    {
+        //        new ItContract()
+        //        {
+
+        //        }
+        //    }.AsQueryable());
+
+        //    //Act
+        //    var result = _sut.GetSystemUsageMigration(usageId, systemId);
+
+        //    //Assert
+        //    Assert.Equal(OperationResult.Forbidden, result.Status);
+        //}
+
+        private void ExpectGetSystemReturns(int systemId, ItSystem system)
+        {
+            _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(system);
+        }
+
+        private void ExpectAllowReadsReturns(IEntity systemUsage, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowReads(systemUsage)).Returns(value);
+        }
+
+        private void ExpectGetSystemUsageReturns(int usageId, ItSystemUsage systemUsage)
+        {
+            _systemUsageRepository.Setup(x => x.GetSystemUsage(usageId)).Returns(systemUsage);
+        }
+
+        private void ExpectAllowSystemMigrationReturns(bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowSystemUsageMigration()).Returns(value);
+        }
+
+        /*
+         *public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageId, int toSystemId)
+        {
+            if (!CanExecuteMigration())
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
+
+            var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
+            if (!_authorizationContext.AllowReads(itSystemUsage))
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
+
+            var toItSystem = _systemRepository.GetSystem(toSystemId);
+            if (!_authorizationContext.AllowReads(toItSystem))
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+            }
+
+            //Map all contract migrations
+            var contractMigrations = GetContractMigrations(itSystemUsage);
+
+            return Result<OperationResult, ItSystemUsageMigration>.Ok(
+                new ItSystemUsageMigration(
+                    systemUsage: itSystemUsage,
+                    fromItSystem: itSystemUsage.ItSystem,
+                    toItSystem: toItSystem,
+                    affectedProjects: itSystemUsage.ItProjects,
+                    affectedContracts: contractMigrations));
+        }
+         *
+         */
 
         private static List<ItSystem> CreateItSystemSequenceWithNamePrefix(int amount, string prefix)
         {

@@ -18,6 +18,7 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             _logger = logger;
         }
 
+        //TODO: Check authorization
         public OperationResult Delete(int systemUsageId, int interfaceExhibitId)
         {
             var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
