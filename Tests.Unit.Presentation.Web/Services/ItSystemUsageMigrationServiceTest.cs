@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface.ExhibitUsage;
+using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel;
@@ -14,6 +17,7 @@ using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -28,6 +32,9 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
         private readonly Mock<IItContractRepository> _itContractRepository;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IInterfaceExhibitUsageService> _interfaceExhibitUsageService;
+        private readonly Mock<IInterfaceUsageService> _interfaceUsageService;
 
         public ItSystemUsageMigrationServiceTest()
         {
@@ -36,15 +43,18 @@ namespace Tests.Unit.Presentation.Web.Services
 
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
             _itContractRepository = new Mock<IItContractRepository>();
+            _transactionManager = new Mock<ITransactionManager>();
+            _interfaceExhibitUsageService = new Mock<IInterfaceExhibitUsageService>();
+            _interfaceUsageService = new Mock<IInterfaceUsageService>();
             _sut = new ItSystemUsageMigrationService(
                 _authorizationContext.Object,
-                null,
+                _transactionManager.Object,
                 Mock.Of<ILogger>(),
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _itContractRepository.Object,
-                null,
-                null);
+                _interfaceExhibitUsageService.Object,
+                _interfaceUsageService.Object);
         }
 
         [Theory]
@@ -174,17 +184,16 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Forbidden_If_Read_Access_To_System_Is_Unauthorized()
         {
             //Arrange
-            var systemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var system = CreateSystem();
             ExpectAllowSystemMigrationReturns(true);
             ExpectGetSystemUsageReturns(systemUsage.Id, systemUsage);
             ExpectAllowReadsReturns(systemUsage, true);
-            ExpectGetSystemReturns(systemId, system);
+            ExpectGetSystemReturns(system.Id, system);
             ExpectAllowReadsReturns(system, false);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, systemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Forbidden, result.Status);
@@ -194,14 +203,13 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Ok_With_From_And_To_Mappings()
         {
             //Arrange
-            var newSystemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var newSystem = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystemId, newSystem);
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, Enumerable.Empty<ItContract>());
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert OK and correct marking of contract WITH and WITHOUT associations
             Assert.Equal(OperationResult.Ok, result.Status);
@@ -217,10 +225,9 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Ok_With_ContractThatHasSystemAssociation()
         {
             //Arrange
-            var newSystemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var system = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystemId, system);
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
 
             var contractWithAssociatedUsage = CreateItContract(new[] { systemUsage.Id, A<int>() });
             var contractWithNoMigrationEffects = CreateItContract();
@@ -235,7 +242,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, itContracts);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert OK and correct marking of contract WITH and WITHOUT associations
             Assert.Equal(OperationResult.Ok, result.Status);
@@ -253,10 +260,9 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Ok_With_ContractThatHasInterfaceUsage()
         {
             //Arrange
-            var newSystemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var system = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystemId, system);
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
 
             var contractWithInterfaceUsage = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id, A<int>() });
             var contractWithNoMigrationEffects = CreateItContract(idsOfSystemUsagesInInterfaceUsages: Many<int>());
@@ -271,7 +277,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, itContracts);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result.Status);
@@ -290,10 +296,9 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Ok_With_ContractThatHasInterfaceExposuresThatMustBeDeleted()
         {
             //Arrange
-            var newSystemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var system = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystemId, system);
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
 
             var contractWithInterfaceUsage = CreateItContract(idsOfSystemUsagesInInterfaceExposures: new[] { systemUsage.Id, A<int>() });
             var contractWithNoMigrationEffects = CreateItContract(idsOfSystemUsagesInInterfaceExposures: Many<int>());
@@ -308,7 +313,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, itContracts);
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result.Status);
@@ -327,15 +332,14 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetSystemUsageMigration_Returns_Ok_With_Affected_Projects()
         {
             //Arrange
-            var newSystemId = A<int>();
             var systemUsage = CreateSystemUsage();
             var system = CreateSystem();
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystemId, system);
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, Enumerable.Empty<ItContract>());
             systemUsage.ItProjects = new List<ItProject> { CreateProject(), CreateProject() };
 
             //Act
-            var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystemId);
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result.Status);
@@ -344,17 +348,214 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(systemUsage.ItProjects.SequenceEqual(migration.AffectedProjects));
         }
 
+        [Fact]
+        public void ExecuteMigration_Returns_Forbidden_If_Migration_Is_UnAuthorized()
+        {
+            //Arrange
+            ExpectAllowSystemMigrationReturns(false);
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(A<int>(), A<int>());
+
+            //Assert
+            Assert.Equal(OperationResult.Forbidden, result.Status);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Forbidden_If_Modification_Of_ItSystemUsage_UnAuthorized()
+        {
+            //Arrange
+            var systemUsage = CreateSystemUsage();
+            var system = CreateSystem();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
+            ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, false);
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, system.Id);
+
+            //Assert
+            Assert.Equal(OperationResult.Forbidden, result.Status);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_If_Existing_System_Is_Target()
+        {
+            //Arrange
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, systemUsage.ItSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, systemUsage.ItSystem.Id);
+
+            //Assert
+            Assert.Equal(OperationResult.Ok, result.Status);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_And_Deletes_Affected_InterfaceExposures()
+        {
+            //Arrange
+            var newSystem = CreateSystem();
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceExposures: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
+            var exhibitsAffected =
+                contract
+                    .AssociatedInterfaceExposures
+                    .Where(x => x.ItSystemUsageId == systemUsage.Id)
+                    .ToList();
+
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
+
+            //Assert - check that all affected exhibits are deleted
+            Assert.Equal(OperationResult.Ok, result.Status);
+
+            foreach (var exhibit in exhibitsAffected)
+            {
+                _interfaceExhibitUsageService.Verify(x => x.Delete(exhibit.ItSystemUsageId, exhibit.ItInterfaceExhibitId), Times.Once);
+            }
+            VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_Ok_And_Updates_Affected_InterfaceUsages()
+        {
+            //Arrange
+            var newSystem = CreateSystem();
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
+            var usagesAffected =
+                contract
+                    .AssociatedInterfaceUsages
+                    .Where(x => x.ItSystemUsageId == systemUsage.Id)
+                    .ToList();
+
+            //Expect the following interface usage creations with binding to the new system
+            foreach (var itInterfaceUsage in usagesAffected)
+            {
+                ExpectCreateInterfaceUsageReturns(itInterfaceUsage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
+            }
+
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
+
+            //Assert - check that all affected exhibits are deleted
+            Assert.Equal(OperationResult.Ok, result.Status);
+
+            foreach (var usage in usagesAffected)
+            {
+                _interfaceUsageService.Verify(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId), Times.Once);
+            }
+            _interfaceUsageService.VerifyAll(); //Verify that all "create" calls were performed
+            VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_UnknownError_And_Updates_Affected_InterfaceUsages()
+        {
+            //Arrange
+            var newSystem = CreateSystem();
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
+            var usagesAffected =
+                contract
+                    .AssociatedInterfaceUsages
+                    .Where(x => x.ItSystemUsageId == systemUsage.Id)
+                    .ToList();
+
+            //Expect the following interface usage creations with binding to the new system
+            foreach (var itInterfaceUsage in usagesAffected)
+            {
+                ExpectCreateInterfaceUsageReturns(itInterfaceUsage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
+            }
+
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
+
+            //Assert - check that all affected exhibits are deleted
+            Assert.Equal(OperationResult.Ok, result.Status);
+
+            foreach (var usage in usagesAffected)
+            {
+                _interfaceUsageService.Verify(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId), Times.Once);
+            }
+            _interfaceUsageService.VerifyAll(); //Verify that all "create" calls were performed
+            VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
+        }
+
+        //TODO: Test Error case if overlap found
+
+
+        private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, Result<OperationResult, ItInterfaceUsage> result)
+        {
+            _interfaceUsageService.Setup(
+                    x => x.Create(
+                        itInterfaceUsage.ItSystemUsageId,
+                        newSystem.Id,
+                        itInterfaceUsage.ItInterfaceId,
+                        itInterfaceUsage.IsWishedFor,
+                        itInterfaceUsage.ItContractId.GetValueOrDefault(),
+                        itInterfaceUsage.InfrastructureId))
+                .Returns(result);
+        }
+
+        private void VerifySystemMigrationCommitted(ItSystemUsage systemUsage, ItSystem newSystem, Mock<IDatabaseTransaction> transaction)
+        {
+            //Verify update call to system usage with changed system id that points to the new system
+            _systemUsageRepository
+                .Verify(x => x.Update(It.Is<ItSystemUsage>(usage => usage == systemUsage && systemUsage.ItSystemId == newSystem.Id)),
+                Times.Once);
+
+            //Verify that transaction is committed
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        private Mock<IDatabaseTransaction> ExpectBeginTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable))
+                .Returns(transaction.Object);
+            return transaction;
+        }
+
+        private void ExpectAllowModifyReturns(ItSystemUsage systemUsage, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowModify(systemUsage)).Returns(value);
+        }
+
         private void ExpectGetContractsBySystemUsageReturns(int usageId, IEnumerable<ItContract> itContracts)
         {
             _itContractRepository.Setup(x => x.GetBySystemUsageAssociation(usageId)).Returns(itContracts.AsQueryable());
         }
 
-        private void ExpectAllowedGetMigration(int usageId, ItSystemUsage systemUsage, int systemId, ItSystem system)
+        private void ExpectAllowedGetMigration(int usageId, ItSystemUsage systemUsage, ItSystem system)
         {
             ExpectAllowSystemMigrationReturns(true);
             ExpectGetSystemUsageReturns(usageId, systemUsage);
             ExpectAllowReadsReturns(systemUsage, true);
-            ExpectGetSystemReturns(systemId, system);
+            ExpectGetSystemReturns(system.Id, system);
             ExpectAllowReadsReturns(system, true);
         }
 
@@ -372,14 +573,27 @@ namespace Tests.Unit.Presentation.Web.Services
             };
         }
 
-        private static List<ItInterfaceExhibitUsage> CreateAssociatedInterfaceExposures(IEnumerable<int> systemUsageIds)
+        private List<ItInterfaceExhibitUsage> CreateAssociatedInterfaceExposures(IEnumerable<int> systemUsageIds)
         {
-            return systemUsageIds.Select(usageId => new ItInterfaceExhibitUsage { ItSystemUsageId = usageId }).ToList();
+            return systemUsageIds.Select(usageId =>
+                new ItInterfaceExhibitUsage
+                {
+                    ItSystemUsageId = usageId,
+                    ItContractId = A<int>(),
+                    ItInterfaceExhibitId = A<int>()
+                }).ToList();
         }
 
-        private static List<ItInterfaceUsage> CreateAssociatedInterfaceUsages(IEnumerable<int> systemUsageIds)
+        private List<ItInterfaceUsage> CreateAssociatedInterfaceUsages(IEnumerable<int> systemUsageIds)
         {
-            return systemUsageIds.Select(usageId => new ItInterfaceUsage { ItSystemUsageId = usageId }).ToList();
+            return systemUsageIds.Select(usageId => new ItInterfaceUsage
+            {
+                ItSystemUsageId = usageId,
+                ItSystemId = A<int>(),
+                ItInterfaceId = A<int>(),
+                InfrastructureId = A<int>(),
+                IsWishedFor = A<bool>()
+            }).ToList();
         }
 
         private static List<ItContractItSystemUsage> CreateAssociatedSystemUsages(IEnumerable<int> systemUsageIds)
@@ -446,11 +660,13 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystemUsage CreateSystemUsage()
         {
+            var itSystem = CreateSystem();
             return new ItSystemUsage
             {
                 Id = A<int>(),
                 ItProjects = new List<ItProject>(),
-                ItSystem = CreateSystem()
+                ItSystem = itSystem,
+                ItSystemId = itSystem.Id
             };
         }
 

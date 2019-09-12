@@ -97,19 +97,29 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
+            // Get usage
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
+            if (itSystemUsage == null)
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.BadInput);
+            }
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
+            // Get system
             var toItSystem = _systemRepository.GetSystem(toSystemId);
+            if (toItSystem == null)
+            {
+                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.BadInput);
+            }
             if (!_authorizationContext.AllowReads(toItSystem))
             {
                 return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
             }
 
-            //Map all contract migrations
+            // Map all contract migrations
             var contractMigrations = GetContractMigrations(itSystemUsage);
 
             return Result<OperationResult, ItSystemUsageMigration>.Ok(
