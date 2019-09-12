@@ -106,7 +106,8 @@ namespace Presentation.Web.Controllers.API
             switch (result.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(result.Value.Select(x => x.MapToNamedEntityDTO()));
+                    var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
+                    return Ok(unusedItSystems);
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
