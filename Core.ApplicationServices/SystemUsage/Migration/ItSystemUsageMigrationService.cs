@@ -159,6 +159,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             {
                 try
                 {
+                    // **********************************
+                    // *** Check migration conditions ***
+                    // **********************************
+
+                    // If migration description cannot be retrieved, bail out
                     var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
                     if (migrationConsequences.Status != OperationResult.Ok)
                     {
@@ -167,31 +172,39 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     var migration = migrationConsequences.Value;
                     var systemUsage = migration.SystemUsage;
 
+                    //If modification of the target usage is not allowed, bail out
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
                         return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
                     }
-                    if (systemUsage.ItSystemId == toSystemId)
+
+                    // If target equals current system, bail out
+                    if (systemUsage.ItSystemId == migration.ToItSystem.Id)
                     {
                         return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
                     }
 
-                    var interfaceUsagesToBeUpdated = migration.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages);
-
-                    var interfaceMigration = UpdateInterfaceUsages(interfaceUsagesToBeUpdated, toSystemId);
-                    if (interfaceMigration != OperationResult.Ok)
+                    // *************************
+                    // *** Perform migration ***
+                    // *************************
+                    
+                    // Migrate interface usages
+                    var interfaceMigration = UpdateInterfaceUsages(migration);
+                    if (interfaceMigration == false)
                     {
-                        return Result<OperationResult, ItSystemUsage>.Fail(interfaceMigration);
+                        transaction.Rollback();
+                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
                     }
 
-                    var exhibitsToBeDeleted = migration.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted);
-
-                    var deletedStatus = DeleteExhibits(exhibitsToBeDeleted);
-                    if (deletedStatus != OperationResult.Ok)
+                    // Delete interface exhibit usages
+                    var deletedStatus = DeleteExhibits(migration);
+                    if (deletedStatus == false)
                     {
-                        return Result<OperationResult, ItSystemUsage>.Fail(deletedStatus);
+                        transaction.Rollback();
+                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
                     }
 
+                    //Perform final switchover of "source IT-System"
                     systemUsage.ItSystemId = toSystemId;
                     _systemUsageRepository.Update(systemUsage);
 
@@ -212,24 +225,29 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return _authorizationContext.AllowSystemUsageMigration();
         }
 
-        private OperationResult DeleteExhibits(IEnumerable<ItInterfaceExhibitUsage> exhibitsToBeDeleted)
+        private bool DeleteExhibits(ItSystemUsageMigration migration)
         {
+            var exhibitsToBeDeleted = migration.AffectedContracts.SelectMany(x => x.ExhibitUsagesToBeDeleted);
             foreach (var itInterfaceExhibitUsage in exhibitsToBeDeleted)
             {
                 var deletedStatus = _interfaceExhibitUsageService.Delete(
                     itInterfaceExhibitUsage.ItSystemUsageId,
                     itInterfaceExhibitUsage.ItInterfaceExhibitId);
+
                 if (deletedStatus != OperationResult.Ok)
                 {
                     _logger.Error($"Deleting interface exhibit usages failed with {deletedStatus}");
-                    return OperationResult.UnknownError;
+                    return false;
                 }
             }
-            return OperationResult.Ok;
+            return true;
         }
 
-        private OperationResult UpdateInterfaceUsages(IEnumerable<ItInterfaceUsage> usagesToBeUpdated, int toSystemId)
+        private bool UpdateInterfaceUsages(ItSystemUsageMigration migration)
         {
+            var usagesToBeUpdated = migration.AffectedContracts.SelectMany(x => x.AffectedInterfaceUsages);
+            var toSystemId = migration.ToItSystem.Id;
+
             foreach (var interfaceUsage in usagesToBeUpdated)
             {
                 var interfaceCreationResult = _interfaceUsageService.Create(
@@ -239,24 +257,26 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     interfaceUsage.IsWishedFor,
                     interfaceUsage.ItContractId.GetValueOrDefault(),
                     interfaceUsage.InfrastructureId);
+
                 if (interfaceCreationResult.Status != OperationResult.Ok)
                 {
                     _logger.Error($"Creating new interface usages failed with {interfaceCreationResult.Status}");
-                    return OperationResult.UnknownError;
+                    return false;
                 }
 
                 var deletedStatus = _interfaceUsageService.Delete(
                     interfaceUsage.ItSystemUsageId,
                     interfaceUsage.ItSystemId,
                     interfaceUsage.ItInterfaceId);
+
                 if (deletedStatus != OperationResult.Ok)
                 {
                     _logger.Error($"Deleting old interface usages failed with {deletedStatus}");
-                    return OperationResult.UnknownError;
+                    return false;
                 }
 
             }
-            return OperationResult.Ok;
+            return true;
         }
 
     }
