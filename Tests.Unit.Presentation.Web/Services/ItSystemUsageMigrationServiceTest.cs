@@ -406,24 +406,25 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(systemUsage, true);
 
             var contract = CreateItContract(idsOfSystemUsagesInInterfaceExposures: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
             var exhibitsAffected =
                 contract
                     .AssociatedInterfaceExposures
                     .Where(x => x.ItSystemUsageId == systemUsage.Id)
                     .ToList();
 
-            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+            foreach (var exhibit in exhibitsAffected)
+            {
+                ExpectDeleteExhibitReturns(exhibit, OperationResult.Ok);
+            }
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
             Assert.Equal(OperationResult.Ok, result.Status);
-
-            foreach (var exhibit in exhibitsAffected)
-            {
-                _interfaceExhibitUsageService.Verify(x => x.Delete(exhibit.ItSystemUsageId, exhibit.ItInterfaceExhibitId), Times.Once);
-            }
+            _interfaceExhibitUsageService.VerifyAll();
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
 
@@ -438,36 +439,32 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(systemUsage, true);
 
             var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
+
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
             var usagesAffected =
                 contract
                     .AssociatedInterfaceUsages
                     .Where(x => x.ItSystemUsageId == systemUsage.Id)
                     .ToList();
 
-            //Expect the following interface usage creations with binding to the new system
-            foreach (var itInterfaceUsage in usagesAffected)
+            foreach (var usage in usagesAffected)
             {
-                ExpectCreateInterfaceUsageReturns(itInterfaceUsage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
+                ExpectCreateInterfaceUsageReturns(usage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
+                ExpectDeleteInterfaceUsageReturns(usage, OperationResult.Ok);
             }
-
-            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
             Assert.Equal(OperationResult.Ok, result.Status);
-
-            foreach (var usage in usagesAffected)
-            {
-                _interfaceUsageService.Verify(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId), Times.Once);
-            }
-            _interfaceUsageService.VerifyAll(); //Verify that all "create" calls were performed
+            _interfaceUsageService.VerifyAll();
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
 
         [Fact]
-        public void ExecuteMigration_Returns_UnknownError_And_Updates_Affected_InterfaceUsages()
+        public void ExecuteMigration_Returns_UnknownError_If_Usage_Creation_Fails()
         {
             //Arrange
             var newSystem = CreateSystem();
@@ -476,37 +473,87 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = ExpectBeginTransaction();
             ExpectAllowModifyReturns(systemUsage, true);
 
-            var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id, A<int>(), systemUsage.Id });
-            var usagesAffected =
-                contract
-                    .AssociatedInterfaceUsages
-                    .Where(x => x.ItSystemUsageId == systemUsage.Id)
-                    .ToList();
-
-            //Expect the following interface usage creations with binding to the new system
-            foreach (var itInterfaceUsage in usagesAffected)
-            {
-                ExpectCreateInterfaceUsageReturns(itInterfaceUsage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
-            }
-
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id });
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            var usageAffected = contract.AssociatedInterfaceUsages.Single();
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.Ok, result.Status);
-
-            foreach (var usage in usagesAffected)
-            {
-                _interfaceUsageService.Verify(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId), Times.Once);
-            }
-            _interfaceUsageService.VerifyAll(); //Verify that all "create" calls were performed
-            VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
+            Assert.Equal(OperationResult.UnknownError, result.Status);
+            VerifyTransactionRollback(transaction);
         }
 
-        //TODO: Test Error case if overlap found
+        [Fact]
+        public void ExecuteMigration_Returns_UnknownError_If_Usage_Deletion_Fails()
+        {
+            //Arrange
+            var newSystem = CreateSystem();
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
 
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceUsages: new[] { systemUsage.Id });
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            var usageAffected = contract.AssociatedInterfaceUsages.Single();
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(usageAffected));
+            ExpectDeleteInterfaceUsageReturns(usageAffected, OperationResult.UnknownError);
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
+
+            //Assert - check that all affected exhibits are deleted
+            Assert.Equal(OperationResult.UnknownError, result.Status);
+            _interfaceUsageService.VerifyAll();
+            VerifyTransactionRollback(transaction);
+        }
+
+        [Fact]
+        public void ExecuteMigration_Returns_UnknownError_If_InterfaceExposure_Deletion_Fails()
+        {
+            //Arrange
+            var newSystem = CreateSystem();
+            var systemUsage = CreateSystemUsage();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
+            var transaction = ExpectBeginTransaction();
+            ExpectAllowModifyReturns(systemUsage, true);
+
+            var contract = CreateItContract(idsOfSystemUsagesInInterfaceExposures: new[] { systemUsage.Id });
+            ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
+
+            var exhibitUsage = contract.AssociatedInterfaceExposures.Single();
+            ExpectDeleteExhibitReturns(exhibitUsage, OperationResult.UnknownError);
+
+            //Act
+            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
+
+            //Assert - check that all affected exhibits are deleted
+            Assert.Equal(OperationResult.UnknownError, result.Status);
+            _interfaceExhibitUsageService.VerifyAll();
+            VerifyTransactionRollback(transaction);
+        }
+
+        private void ExpectDeleteExhibitReturns(ItInterfaceExhibitUsage exhibit, OperationResult operationResult)
+        {
+            _interfaceExhibitUsageService.Setup(x => x.Delete(exhibit.ItSystemUsageId, exhibit.ItInterfaceExhibitId))
+                .Returns(operationResult);
+        }
+
+        private void ExpectDeleteInterfaceUsageReturns(ItInterfaceUsage usage, OperationResult operationResult)
+        {
+            _interfaceUsageService.Setup(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId))
+                .Returns(operationResult);
+        }
+
+        private static void VerifyTransactionRollback(Mock<IDatabaseTransaction> transaction)
+        {
+            transaction.Verify(x => x.Rollback(), Times.Once);
+        }
 
         private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, Result<OperationResult, ItInterfaceUsage> result)
         {
