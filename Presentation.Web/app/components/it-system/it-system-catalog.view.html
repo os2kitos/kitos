@@ -26,12 +26,14 @@
      data-k-visible="false" data-k-modal="true" data-k-width="800" >
     <div >
         <div id="copyPasteConsequence">
-            <h3>Opsummering af ændringer ifm flytning af ”IT-system anvendelse” til nyt IT-system </h3>
+            <div class="migrationDivPadding">
+                <h3>Opsummering af ændringer ifm flytning af ”IT-system anvendelse” til nyt IT-system </h3>
+            </div>
             <div class="migrationDivPadding">
                 For at sikre datakvaliteten i Kitos – og f.eks. komme redundante registreringer til livs - har Global admin mulighed for at flytte jeres anvendelse fra et it-system til et andet. <br/>
             </div>
             <div class="migrationDivPadding">
-            I forbindelse med at Global admin har flyttet jeres systemanvendelse fra et IT-system til et andet, kan oplyses at:
+                I forbindelse med at Global admin har flyttet jeres systemanvendelse fra et IT-system til et andet, kan oplyses at:
             </div>
             <div>
                 <div class="panel panel-default">
@@ -46,12 +48,12 @@
                         <tr>
                             <td>
                                 Navn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
-                                <br />
+                                <br/>
                                 Id: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
                             </td>
                             <td>
                                 Navn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
-                                <br />
+                                <br/>
                                 Id: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
                             </td>
                         </tr>
@@ -60,7 +62,7 @@
                 <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">Følgende kontrakter i Kitos berøres:</h4>
                 <div class="panel panel-default " ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
                     <div class="panel-heading">
-                        Navn: {{affectedContracts.contract.name}} 
+                        Navn: {{affectedContracts.contract.name}}
                         <br/>
                         Id: {{affectedContracts.contract.id}}
                     </div >
