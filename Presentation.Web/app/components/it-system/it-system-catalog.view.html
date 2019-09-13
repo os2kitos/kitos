@@ -17,7 +17,7 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
-        <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right migrationReportButton'>Se konsekvens</button>
+        <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvens</button>
     </div>
 </div>
 
@@ -26,11 +26,17 @@
      data-k-visible="false" data-k-modal="true" data-k-width="800" >
     <div >
         <div id="copyPasteConsequence">
-            <h3>Opsummering af ændringer ifm. flytning af ”IT-System anvendelse” til et nyt hovedsystem </h3>
+            <h3>Opsummering af ændringer ifm flytning af ”IT-system anvendelse” til nyt IT-system </h3>
+            <div class="migrationDivPadding">
+                For at sikre datakvaliteten i Kitos – og f.eks. komme redundante registreringer til livs - har Global admin mulighed for at flytte jeres anvendelse fra et it-system til et andet. <br/>
+            </div>
+            <div class="migrationDivPadding">
+            I forbindelse med at Global admin har flyttet jeres systemanvendelse fra et IT-system til et andet, kan oplyses at:
+            </div>
             <div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Systemanvendelse med Id '{{systemCatalogVm.migrationReportDTO.targetUsage.id}}' flyttes
+                        Systemanvendelse flyttes:
                     </div>
                     <table class="table org-role-table">
                         <tr>
@@ -51,7 +57,7 @@
                         </tr>
                     </table>
                 </div>
-                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">Følgende kontrakter berøres</h4>
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">Følgende kontrakter i Kitos berøres:</h4>
                 <div class="panel panel-default " ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
                     <div class="panel-heading">
                         Navn: {{affectedContracts.contract.name}} 
@@ -60,23 +66,23 @@
                     </div >
                     <div>
                         <div class="migrationDivBorders migrationDivPadding">
-                            Kontrakten gælder for systemet:<strong> {{affectedContracts.systemAssociatedInContract ? 'Ja' : 'Nej' }}</strong>
+                            IT-systemet er omfattet af kontrakten <strong> {{affectedContracts.systemAssociatedInContract ? 'Ja' : 'Nej' }}</strong>
                         </div>
                         <div class="migrationDivPadding" ng-if="affectedContracts.affectedInterfaceUsages.length > 0" ng-class="{'migrationDivBorders': affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0}">
-                            “Anvender” relationer der flyttes:
+                            Anvender snitfladerelation, der flyttes
                             <ul>
                                 <li ng-repeat="interfaceToBeMoved in affectedContracts.affectedInterfaceUsages">{{interfaceToBeMoved.name}} ( Id: {{interfaceToBeMoved.id}} )</li>
                             </ul>
                         </div>
                         <div class="migrationDivPadding" ng-if="affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0">
-                            “Udstiller" relationer der fjernes:
+                            Udstiller snitfladerelation, der slettes
                             <ul>
                                 <li ng-repeat="interfaceToBeDeleted in affectedContracts.interfaceExhibitUsagesToBeDeleted">{{interfaceToBeDeleted.name}} ( Id: {{interfaceToBeDeleted.id}} )</li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">Følgende projekter, hvor IT-Systemet anvendes, berørers</h4>
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">Følgende projekter, hvor IT-systemet anvendes, berøres:</h4>
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">
                     <div class="panel-heading">
                     </div>
@@ -95,6 +101,6 @@
         </div>
         <button ng-click='systemCatalogVm.copyToClipBoard()' class="migrationReportButton">Kopiere til udklipsholder</button>
         <button ng-click='systemCatalogVm.cancelMigration()' class='k-primary pull-left migrationReportButton'>Annullere</button>
-        <button ng-click='systemCatalogVm.startMigration()' class='k-primary pull-right migrationReportButton'>Start flytning</button>
+        <button ng-click='systemCatalogVm.startMigration()' class='k-primary pull-right migrationReportButton' data-element-type="startMigration">Start flytning</button>
     </div >
 </div>

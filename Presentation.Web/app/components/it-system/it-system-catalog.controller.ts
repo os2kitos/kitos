@@ -284,12 +284,12 @@
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button type="button" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
-                                return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
                             "data-element-type": "catalogUsageObject"
@@ -474,7 +474,7 @@
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem => {
                             if (dataItem.Usages.length > 0) {
-                                return `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${
+                                return `<a class="col-xs-7 text-center" data-element-type="usagesLinkText" data-ng-click="systemCatalogVm.showUsageDetails(${
                                     dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
                                     }</a>`;
                             }
