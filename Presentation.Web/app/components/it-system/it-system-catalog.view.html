@@ -17,6 +17,7 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
+        <br/>
         <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right migrationReportButton'>Se konsekvens</button>
     </div>
 </div>
@@ -114,7 +115,9 @@
                 padding: 3px;
                 margin: 4px;
             }
-            
+            #copyPasteConsequence  > div {
+                max-width: 800px
+            }
         </style>
-    </divid="copyPasteConsequence">
+    </div >
 </div>

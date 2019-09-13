@@ -834,10 +834,15 @@
                         this.modalMigrationConsequence.setOptions({
                             close: (_) => true,
                             resizable: false,
-                            title: `Flytning af it-system `
+                            title: `Flytning af it-system `,
+                            position: {
+                                top: "20%", 
+                                left: "35%"
+                            }
+
                         });
                         this.modalMigration.close();
-                        this.modalMigrationConsequence.center().open();
+                        this.modalMigrationConsequence.open();
                     })
                     .error(() => {
                         this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
