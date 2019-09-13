@@ -3,6 +3,7 @@
     public enum OperationResult
     {
         Ok,
+        BadInput,
         NotFound,
         Forbidden,
         Conflict,

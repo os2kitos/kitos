@@ -38,9 +38,11 @@ namespace Presentation.Web.Controllers.API
             switch (res.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(Map(res.ResultValue));
+                    return Ok(Map(res.Value));
                 case OperationResult.Forbidden:
                     return Forbidden();
+                case OperationResult.BadInput:
+                    return BadRequest();
                 case OperationResult.NotFound:
                     return NotFound();
                 default:
@@ -59,6 +61,8 @@ namespace Presentation.Web.Controllers.API
             {
                 case OperationResult.Ok:
                     return NoContent();
+                case OperationResult.BadInput:
+                    return BadRequest();
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
@@ -106,7 +110,8 @@ namespace Presentation.Web.Controllers.API
             switch (result.Status)
             {
                 case OperationResult.Ok:
-                    return Ok(result.ResultValue.Select(x => x.MapToNamedEntityDTO()));
+                    var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
+                    return Ok(unusedItSystems);
                 case OperationResult.Forbidden:
                     return Forbidden();
                 case OperationResult.NotFound:
