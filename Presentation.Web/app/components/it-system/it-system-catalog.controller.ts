@@ -819,7 +819,7 @@
 
             this.modalMigration.center().open();
         }
-
+        
         public migrateSystemTo = () => {
             this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
             if (this.newItSystemObject != null) {
@@ -832,14 +832,9 @@
                             close: (_) => true,
                             resizable: false,
                             title: `Flytning af it-system `,
-                            position: {
-                                top: "20%", 
-                                left: "35%"
-                            }
-
                         });
                         this.modalMigration.close();
-                        this.modalMigrationConsequence.open();
+                        this.modalMigrationConsequence.center().open();
                     })
                     .error(() => {
                         this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
@@ -878,7 +873,11 @@
             document.execCommand("Copy");
             window.getSelection().removeAllRanges();
             this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+
         }
+
+
+
 
         public cancelMigration() {
             this.modalMigrationConsequence.close();
@@ -906,7 +905,7 @@
                         var orgName = dataItem.Organization.Name;
                         var usageId = dataItem.Id;
                         if (this.canMigrate) {
-                            return ` ${dataItem.Organization.Name} - <button ng-click='systemCatalogVm.migrateItSystem("${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                            return ` ${dataItem.Organization.Name} <button ng-click='systemCatalogVm.migrateItSystem("${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
                             return dataItem.Organization.Name;
                         }
