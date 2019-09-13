@@ -1,6 +1,9 @@
-﻿using Core.ApplicationServices.Model.Result;
+﻿using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
 using Serilog;
 
 namespace Core.ApplicationServices.Interface.Usage
@@ -9,15 +12,20 @@ namespace Core.ApplicationServices.Interface.Usage
     {
         private readonly IGenericRepository<ItInterfaceUsage> _interfaceUsageRepository;
         private readonly ILogger _logger;
+        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IItContractRepository _contractRepository;
 
         public InterfaceUsageService(
             IGenericRepository<ItInterfaceUsage> interfaceUsageRepository,
-            ILogger logger)
+            ILogger logger,
+            IAuthorizationContext authorizationContext,
+            IItContractRepository contractRepository)
         {
             _interfaceUsageRepository = interfaceUsageRepository;
             _logger = logger;
+            _authorizationContext = authorizationContext;
+            _contractRepository = contractRepository;
         }
-
         public Result<OperationResult, ItInterfaceUsage> Create(
             int systemUsageId,
             int systemId,
@@ -38,6 +46,18 @@ namespace Core.ApplicationServices.Interface.Usage
                 return Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.Conflict);
             }
 
+            var contract = _contractRepository.GetById(contractId);
+            if (contract == null)
+            {
+                _logger.Error("Contract with id: {id} not found. Cannot create interface usage", contractId);
+                return Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.BadInput);
+            }
+
+            if (!AllowCreateInterfaceUsageIn(contract))
+            {
+                return Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.Forbidden);
+            }
+
             var newInterfaceUsage = _interfaceUsageRepository.Create();
             newInterfaceUsage.ItSystemUsageId = systemUsageId;
             newInterfaceUsage.ItSystemId = systemId;
@@ -51,6 +71,12 @@ namespace Core.ApplicationServices.Interface.Usage
             return Result<OperationResult, ItInterfaceUsage>.Ok(newInterfaceUsage);
         }
 
+        private bool AllowCreateInterfaceUsageIn(ItContract contract)
+        {
+            // interface usages belong to contracts so authorize modification access to that
+            return _authorizationContext.AllowModify(contract);
+        }
+
         public OperationResult Delete(int systemUsageId, int systemId, int interfaceId)
         {
             var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);
@@ -60,9 +86,22 @@ namespace Core.ApplicationServices.Interface.Usage
                 _logger.Error($"Could not find interface usage with key {key}");
                 return OperationResult.NotFound;
             }
+
+            if (!AllowDelete(interfaceUsageToBeDeleted))
+            {
+                return OperationResult.Forbidden;
+            }
+
             _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
             _interfaceUsageRepository.Save();
             return OperationResult.Ok;
+        }
+
+        private bool AllowDelete(ItInterfaceUsage interfaceExhibitUsageToBeDeleted)
+        {
+            //InterfaceUsage belongs to a contract, hence a deletion is a modification of the contract
+            return interfaceExhibitUsageToBeDeleted.ItContract == null ||
+                   _authorizationContext.AllowModify(interfaceExhibitUsageToBeDeleted.ItContract);
         }
     }
 }
