@@ -33,7 +33,7 @@
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
         public canMigrate = this.userMigrationRights.canExecuteMigration;
-        public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigration;
+        public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
 
         public static $inject:
             Array<string> = [
@@ -111,16 +111,16 @@
                 minimumInputLength: 1,
                 dropdownCss: { 'z-index': 100000, },
                 ajax: {
-                    data: (term, page) => {
+                    data: (term, _) => {
                         return { query: term };
                     },
                     quietMillis: 500,
                     transport: (queryParams) => {
-                        var request = $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?" +
-                            "organizationId=" + user.currentOrganizationId +
-                            "&nameContent=" +
-                            queryParams.data.query +
-                            "&numberOfItSystems=3" +
+                        var request = $http.get(
+                            "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
+                            `organizationId=${user.currentOrganizationId}` +
+                            `&nameContent=${queryParams.data.query}` +
+                            "&numberOfItSystems=25" +
                             "&getPublicFromOtherOrganizations=true");
                         request.then(queryParams.success);
 
@@ -485,14 +485,7 @@
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
                         template: dataItem => {
-                            if (dataItem.Usages.length > 0) {
-                                return `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${
-                                    dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
-                                    }</a>`;
-                            }
-                            else {
-                                return ``;
-                            }
+                            return this.showUsagesAsNumberOrNothing(dataItem);
                         },
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
@@ -649,7 +642,7 @@
             };
             function customFilter(args) {
                 args.element.kendoAutoComplete({
-                    noDataTemplate: ''
+                    noDataTemplate: ""
                 });
             }
         }
@@ -660,12 +653,12 @@
             var modalInstance = this.$uibModal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                windowClass: 'modal fade in',
-                templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
-                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-system/it-system-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
                     $scope.formData = {};
-                    $scope.type = 'IT System';
-                    $scope.checkAvailableUrl = 'api/itSystem/';
+                    $scope.type = "IT System";
+                    $scope.checkAvailableUrl = "api/itSystem/";
 
                     $scope.saveAndProceed = function () {
                         var payload = {
@@ -675,17 +668,17 @@
                             taskRefIds: []
                         };
 
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
+                        var msg = self.notify.addInfoMessage("Opretter system...", false);
+                        self.$http.post("api/itsystem", payload)
                             .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                msg.toSuccessMessage("Et nyt system er oprettet!");
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
-                                    self.$state.go('it-system.edit.main', { id: systemId });
+                                    self.$state.go("it-system.edit.main", { id: systemId });
                                 }
                             }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
 
@@ -697,10 +690,10 @@
                             taskRefIds: []
                         };
 
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
+                        var msg = self.notify.addInfoMessage("Opretter system...", false);
+                        self.$http.post("api/itsystem", payload)
                             .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                msg.toSuccessMessage("Et nyt system er oprettet!");
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
@@ -708,7 +701,7 @@
                                 }
 
                             }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
                 }]
@@ -811,21 +804,21 @@
         }
 
         private resetItSystemSelection = () => {
-            this.convertToSelect2Object("#new-system-usage").select2('data', null);
+            this.convertToSelect2Object("#new-system-usage").select2("data", null);
         }
 
         private getItSystemSelection = () => {
-            return this.convertToSelect2Object('#new-system-usage').select2('data');
+            return this.convertToSelect2Object("#new-system-usage").select2("data");
         }
 
         private getSelectionDropdown = () => {
-            return this.convertToSelect2Object('#select2-drop');
+            return this.convertToSelect2Object("#select2-drop");
         }
 
         private closeSelectionDropdown = () => {
             var dropdown = this.getSelectionDropdown();
             if (dropdown != null) {
-                dropdown.select2('close');
+                dropdown.select2("close");
             }
         }
 
@@ -841,7 +834,6 @@
             this.modalMigration.setOptions({
                 close: (e) => {
                     this.closeSelectionDropdown();
-                    return true;
                 },
                 resizable: false,
                 title: `Flyt af relation for ${this.municipality}`
@@ -855,8 +847,7 @@
             if (this.newItSystemObject != null) {
                 this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
                     .success(dto => {
-                        let systemUsageMigration: Models.ItSystemUsage.Migration.IItSystemUsageMigration = dto.response;
-                        this.migrationReportDTO = systemUsageMigration;
+                        this.migrationReportDTO = dto.response;
 
                         this.modalMigrationConsequence.setOptions({
                             close: (_) => true,
@@ -875,14 +866,25 @@
         private getMigrationReport: any = (usageId, toSystemId) => {
             var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
 
-            return this.$http({ method: 'GET', url: url, });
+            return this.$http({ method: "GET", url: url, });
         }
 
         private executeMigration: any = (usageId, toSystemId) => {
             var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
 
-            return this.$http({ method: 'POST', url: url, });
+            return this.$http({ method: "POST", url: url, });
         }
+
+        private showUsagesAsNumberOrNothing(dataItem): string {
+            if (dataItem.Usages.length > 0) {
+                return `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${
+                    dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
+                    }</a>`;
+            }
+            else {
+                return ``;
+            }
+        };
 
         public startMigration = () => {
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
@@ -899,15 +901,12 @@
         }
 
         public copyToClipBoard() {
-            window.getSelection().selectAllChildren(document.getElementById('copyPasteConsequence'));
+            window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
             document.execCommand("Copy");
             window.getSelection().removeAllRanges();
             this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
 
         }
-
-
-
 
         public cancelMigration() {
             this.modalMigrationConsequence.close();
@@ -1120,13 +1119,13 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ['$http', function ($http) {
+                        userAccessRights: ["$http", function ($http) {
                             return $http.get("api/itsystem/?getEntitiesAccessRights=true")
                                 .then(function (result) {
                                     return result.data.response;
                                 });
                         }],
-                        userMigrationRights: ['$http', function ($http) {
+                        userMigrationRights: ["$http", function ($http) {
                             return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
                                 .then(function (result) {
                                     return result.data.response;
