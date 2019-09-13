@@ -111,19 +111,31 @@
                 minimumInputLength: 1,
                 dropdownCss: { 'z-index': 100000, },
                 ajax: {
-                    data: function (term, page) {
+                    data: (term, page) => {
                         return { query: term };
                     },
                     quietMillis: 500,
-                    transport: function (queryParams) {
-                        return $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?organizationId=" + user.currentOrganizationId + "&nameContent=" + queryParams.data.query + "&numberOfItSystems=3&getPublicFromOtherOrganizations=true").then(queryParams.success);
+                    transport: (queryParams) => {
+                        var request = $http.get("api/v1/ItSystemUsageMigration/UnusedItSystems?" +
+                            "organizationId=" + user.currentOrganizationId +
+                            "&nameContent=" +
+                            queryParams.data.query +
+                            "&numberOfItSystems=3" +
+                            "&getPublicFromOtherOrganizations=true");
+                        request.then(queryParams.success);
+
+                        request.catch(() => {
+                            this.closeSelectionDropdown();
+                            this.notify.addErrorMessage("Der skete en fejl. Kunne ikke hente it systemer.");
+                        });
+                        return request;
                     },
 
-                    results: function (data, page) {
+                    results: (data, page) => {
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, function (system: { id; name; }) {
+                        _.each(data.data.response, (system: { id; name; }) => {
                             results.push({
                                 //the id of the system is the id, that is selected
                                 id: system.id,
@@ -792,10 +804,29 @@
 
         private resetMigrationFlow = () => {
             this.newItSystemObject = null;
-            this.convertToSelect2Object("#new-system-usage").select2('data', null);
             this.municipality = null;
             this.oldItSystemUsageId = null;
             this.oldItSystemName = null;
+            this.resetItSystemSelection();
+        }
+
+        private resetItSystemSelection = () => {
+            this.convertToSelect2Object("#new-system-usage").select2('data', null);
+        }
+
+        private getItSystemSelection = () => {
+            return this.convertToSelect2Object('#new-system-usage').select2('data');
+        }
+
+        private getSelectionDropdown = () => {
+            return this.convertToSelect2Object('#select2-drop');
+        }
+
+        private closeSelectionDropdown = () => {
+            var dropdown = this.getSelectionDropdown();
+            if (dropdown != null) {
+                dropdown.select2('close');
+            }
         }
 
         private convertToSelect2Object = (name: string) => {
@@ -803,17 +834,13 @@
         }
 
         public migrateItSystem = (name: string, usageId: number) => {
-            var self = this;
             this.modal.close();
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
             //Set modal title
             this.modalMigration.setOptions({
                 close: (e) => {
-                    let element: any = self.convertToSelect2Object('#select2-drop');
-                    if (element != null) {
-                        element.select2('close');
-                    }
+                    this.closeSelectionDropdown();
                     return true;
                 },
                 resizable: false,
@@ -824,7 +851,7 @@
         }
 
         public migrateSystemTo = () => {
-            this.newItSystemObject = this.convertToSelect2Object('#new-system-usage').select2('data');
+            this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
                 this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
                     .success(dto => {
