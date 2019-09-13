@@ -73,7 +73,6 @@
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private oldItSystemName,
-            private oldItSystemId,
             private oldItSystemUsageId,
             private newItSystemObject,
             private municipality,
@@ -775,22 +774,28 @@
             return regexp.test(Url.toLowerCase());
         };
 
-        // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
+        // show usageDetailsGrid - takes a itSystemId for data and systemName for modal title
         public showUsageDetails = (systemId, systemName) => {
+            this.resetMigrationFlow(); //Migration flow starts freshly from this function
             this.oldItSystemName = systemName;
-            this.oldItSystemId = systemId;
-            //Filter by usageId
+            //Filter by systemId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
             //Set modal title
             this.modal.setOptions({
-                close: function (e) {
-                    return true;
-                },
+                close: (_) => true,
                 resizable: false,
                 title: `Anvendelse af ${systemName}`
             });
             //Open modal
             this.modal.center().open();
+        }
+
+        private resetMigrationFlow = () => {
+            this.newItSystemObject = null;
+            this.convertToSelect2Object("#new-system-usage").select2('data', null);
+            this.municipality = null;
+            this.oldItSystemUsageId = null;
+            this.oldItSystemName = null;
         }
 
         private convertToSelect2Object = (name: string) => {
@@ -800,8 +805,6 @@
         public migrateItSystem = (name: string, usageId: number) => {
             var self = this;
             this.modal.close();
-            this.newItSystemObject = null;
-            this.convertToSelect2Object("#new-system-usage").select2('data', null); //Reset selection control
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
             //Set modal title
