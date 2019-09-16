@@ -509,7 +509,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     SystemUsageId = usingOrganization.ItSystemUsageId,
                     Organization = usingOrganization.Organization.MapToNamedEntityDTO()
-                });
+                })
+                .ToList();
         }
     }
 }
