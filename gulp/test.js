@@ -73,7 +73,7 @@ function runProtractorLocal(done) {
 
     gutil.log("e2e arguments: " + args);
 
-    var singleSpec = "Presentation.Web/Tests/**/Migration.System.e2e.spec.js";
+    var singleSpec = "Presentation.Web/Tests/**/*.System.e2e.spec.js";
     gulp.src(singleSpec) 
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",

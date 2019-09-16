@@ -763,11 +763,6 @@
             this.resetMigrationFlow();
             this.oldItSystemName = systemName;
             this.oldItSystemId = systemId;
-            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-            this.modal.setOptions({
-                close: (_) => true,
-                resizable: false,
-                title: `Anvendelse af ${systemName}`
             this.usageGrid.dataSource.fetch(() => {
                 this.modal.setOptions({
                     close: (_) => true,
