@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authorization\CrossOrganizationDataReadAccessLevel.cs" />
+    <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
@@ -57,15 +58,27 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
+    <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\QueryById.cs" />
+    <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />
+    <Compile Include="Queries\QueryExceptEntitiesWithIds.cs" />
     <Compile Include="Queries\QueryByOrganizationId.cs" />
     <Compile Include="Queries\QueryByAccessModifier.cs" />
+    <Compile Include="Queries\QueryByPartOfName.cs" />
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationId.cs" />
     <Compile Include="Queries\QueryFactory.cs" />
     <Compile Include="Queries\IntersectionQuery.cs" />
+    <Compile Include="Repositories\Contract\IItContractRepository.cs" />
+    <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\IItSystemUsageRepository.cs" />
+    <Compile Include="Repositories\SystemUsage\ItSystemUsageRepository.cs" />
+    <Compile Include="Repositories\System\IItSystemRepository.cs" />
+    <Compile Include="Repositories\System\ItSystemRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
@@ -76,6 +89,7 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
   </Target>

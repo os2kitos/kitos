@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
+    <Compile Include="DataAccess\IDatabaseTransaction.cs" />
+    <Compile Include="DataAccess\ITransactionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

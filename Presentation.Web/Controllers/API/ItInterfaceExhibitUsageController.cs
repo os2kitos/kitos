@@ -42,7 +42,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var item = _repository.GetByKey(new object[] { usageId, exhibitId });
+                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
+                var item = _repository.GetByKey(key);
                 if (item == null)
                     return NotFound();
 
@@ -60,7 +61,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var item = _repository.GetByKey(new object[] { usageId, exhibitId });
+                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
+                var item = _repository.GetByKey(key);
                 if (item != null)
                     return Conflict("Already exists");
 
@@ -81,7 +83,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var key = new object[] { usageId, exhibitId };
+                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
                 var item = _repository.GetByKey(key);
                 if (item == null)
                     return NotFound();
@@ -109,7 +111,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var key = new object[] { usageId, exhibitId };
+                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
                 var item = _repository.GetByKey(key);
                 // create if doesn't exists
                 if (item == null)

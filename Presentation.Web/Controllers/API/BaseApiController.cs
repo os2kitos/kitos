@@ -105,9 +105,9 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected virtual HttpResponseMessage BadRequest()
+        protected virtual HttpResponseMessage BadRequest(string message = "")
         {
-            return CreateResponse(HttpStatusCode.BadRequest);
+            return CreateResponse(HttpStatusCode.BadRequest, message);
         }
 
         protected virtual HttpResponseMessage Unauthorized()
@@ -262,7 +262,7 @@ namespace Presentation.Web.Controllers.API
         {
             return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
         }
-       
+
         #endregion
     }
 }

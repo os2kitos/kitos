@@ -95,9 +95,20 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
+    <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
+    <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+    <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
+    <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItContractMigration.cs" />
+    <Compile Include="Model\Result\OperationResult.cs" />
+    <Compile Include="Model\Result\Result.cs" />
     <Compile Include="OrganizationRoleService.cs" />
     <Compile Include="AuthenticationService.cs" />
     <Compile Include="IAuthenticationService.cs" />
@@ -138,6 +149,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

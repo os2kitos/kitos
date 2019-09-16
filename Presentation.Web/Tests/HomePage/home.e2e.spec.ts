@@ -1,10 +1,9 @@
 ﻿import HomePage = require("../PageObjects/HomePage/HomePage.po");
 import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
-var testFixture = new TestFixtureWrapper();
-var pageObject = new HomePage();
-
 describe("home view", () => {
+    var testFixture = new TestFixtureWrapper();
+    var pageObject = new HomePage();
 
     beforeEach(() => {
         pageObject.getPage();
