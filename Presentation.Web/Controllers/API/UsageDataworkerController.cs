@@ -1,6 +1,8 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using System;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -30,29 +32,25 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool AllowModify(IEntity entity)
         {
-            return AllowModifyAssociatedSystemUsage(entity);
+            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
         }
 
         protected override bool AllowDelete(IEntity entity)
         {
-            return AllowModifyAssociatedSystemUsage(entity);
-        }
-
-        private bool AllowModifyAssociatedSystemUsage(IEntity entity)
-        {
-            if (entity is ItSystemUsageDataWorkerRelation relation)
-            {
-                return base.AllowModify(relation.ItSystemUsage);
-            }
-
-            return false;
+            //Check if modification, not deletion, of parent usage (the root aggregate) is allowed 
+            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
         }
 
         protected override bool AllowRead(IEntity entity)
         {
+            return GeAuthorizationFromParentUsage(entity, base.AllowRead);
+        }
+
+        private static bool GeAuthorizationFromParentUsage(IEntity entity, Predicate<ItSystemUsage> condition)
+        {
             if (entity is ItSystemUsageDataWorkerRelation relation)
             {
-                return base.AllowRead(relation.ItSystemUsage);
+                return condition.Invoke(relation.ItSystemUsage);
             }
 
             return false;
