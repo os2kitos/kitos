@@ -135,7 +135,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         [InlineData(OperationResult.Conflict)]
         [InlineData(OperationResult.BadInput)]
         [InlineData(OperationResult.UnknownError)]
-        public void GetUsingOrganizations_Returns_Forbidden(OperationResult operationResult)
+        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationResult operationResult)
         {
             //Arrange
             var itSystemId = A<int>();

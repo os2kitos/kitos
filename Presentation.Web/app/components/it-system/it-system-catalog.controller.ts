@@ -76,7 +76,7 @@
             private oldItSystemUsageId,
             private newItSystemObject,
             private municipalityId,
-            private municipality,
+            private municipalityName,
             public migrationConsequenceText,
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
@@ -777,7 +777,7 @@
         private resetMigrationFlow = () => {
             this.newItSystemObject = null;
             this.municipalityId = null;
-            this.municipality = null;
+            this.municipalityName = null;
             this.oldItSystemUsageId = null;
             this.oldItSystemName = null;
             this.oldItSystemId = null;
@@ -785,15 +785,18 @@
         }
 
         private resetItSystemSelection = () => {
-            this.convertToSelect2Object("#new-system-usage").select2("data", null);
+            this.getItSystemSelectionControl().select2("data", null);
         }
 
         private getItSystemSelection = () => {
-            return this.convertToSelect2Object("#new-system-usage").select2("data");
+            return this.getItSystemSelectionControl().select2("data");
         }
 
         private getSelectionDropdown = () => {
-            return this.convertToSelect2Object("#select2-drop");
+            return this.convertToJQueryLocator("#select2-drop");
+        }
+        private getItSystemSelectionControl = () => {
+            return this.convertToJQueryLocator("#new-system-usage");
         }
 
         private closeSelectionDropdown = () => {
@@ -803,21 +806,21 @@
             }
         }
 
-        private convertToSelect2Object = (name: string) => {
+        private convertToJQueryLocator = (name: string) => {
             return this.$(name) as any;
         }
 
-        public migrateItSystem = (orgId: number, name: string, usageId: number) => {
+        public beginItSystemMigration = (municipalityId: number, municipalityName: string, usageId: number) => {
             this.modal.close();
-            this.municipalityId = orgId;
-            this.municipality = name;
+            this.municipalityId = municipalityId;
+            this.municipalityName = municipalityName;
             this.oldItSystemUsageId = usageId;
             this.modalMigration.setOptions({
                 close: (e) => {
                     this.closeSelectionDropdown();
                 },
                 resizable: false,
-                title: `Flyt af relation for ${this.municipality}`
+                title: `Flyt af relation for ${this.municipalityName}`
             });
             this.modalMigration.center().open();
         }
@@ -902,9 +905,7 @@
                     }
                 },
                 schema: {
-                    data: (response) => {
-                        return response.response;
-                    }
+                    data: (response) => response.response
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -919,7 +920,7 @@
                         var orgName = dataItem.organization.name;
                         var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
+                            return ` ${orgName} <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {
                             return orgName;
                         }
