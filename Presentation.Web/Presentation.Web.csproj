@@ -679,7 +679,7 @@
     </Compile>
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
-    <TypeScriptCompile Include="Tests\Helpers\CatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />

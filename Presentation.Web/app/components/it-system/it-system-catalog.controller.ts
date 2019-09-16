@@ -57,8 +57,7 @@
 
         constructor(
             private $rootScope: IRootScope,
-            private $scope: ISelect2Scope, //TODO: Revert back and try with controller object in stead
-            //  private $scope: any,
+            private $scope: ISelect2Scope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
