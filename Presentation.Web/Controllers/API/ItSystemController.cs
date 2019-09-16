@@ -500,10 +500,10 @@ namespace Presentation.Web.Controllers.API
             return !system.Any();
         }
 
-        private IEnumerable<UsingOrganizationsDTO> MapToUsingOrganizationsDTO(IEnumerable<UsingOrganization> usingOrganizations)
+        private IEnumerable<UsingOrganizationDTO> MapToUsingOrganizationsDTO(IEnumerable<UsingOrganization> usingOrganizations)
         {
             return usingOrganizations.Select(
-                usingOrganization => new UsingOrganizationsDTO
+                usingOrganization => new UsingOrganizationDTO
                 {
                     SystemUsageId = usingOrganization.ItSystemUsageId,
                     Organization = new NamedEntityDTO

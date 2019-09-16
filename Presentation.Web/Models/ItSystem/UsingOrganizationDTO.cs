@@ -1,6 +1,6 @@
 ﻿namespace Presentation.Web.Models.ItSystem
 {
-    public class UsingOrganizationsDTO
+    public class UsingOrganizationDTO
     {
         public int SystemUsageId { get; set; }
         public NamedEntityDTO Organization { get; set; }
