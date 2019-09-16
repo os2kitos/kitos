@@ -17,7 +17,7 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
-        <button ng-click='systemCatalogVm.migrateSystemTo()' class='k-primary pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvens</button>
+        <button ng-click='systemCatalogVm.migrateSystemTo()' class='btn btn-success pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvens</button>
     </div>
 </div>
 
@@ -101,8 +101,8 @@
                 </div>
             </div>
         </div>
-        <button ng-click='systemCatalogVm.copyToClipBoard()' class="migrationReportButton">Kopiere til udklipsholder</button>
-        <button ng-click='systemCatalogVm.cancelMigration()' class='k-primary pull-left migrationReportButton'>Annullere</button>
-        <button ng-click='systemCatalogVm.startMigration()' class='k-primary pull-right migrationReportButton' data-element-type="startMigration">Start flytning</button>
+        <button ng-click='systemCatalogVm.copyToClipBoard()' class="btn migrationReportButton">Kopiere til udklipsholder</button>
+        <button ng-click='systemCatalogVm.cancelMigration()' class='btn btn-danger pull-left migrationReportButton'>Annullere</button>
+        <button ng-click='systemCatalogVm.startMigration()' class='btn btn-success pull-right migrationReportButton' data-element-type="startMigration">Start flytning</button>
     </div >
 </div>

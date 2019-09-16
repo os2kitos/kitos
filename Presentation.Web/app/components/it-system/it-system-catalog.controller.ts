@@ -924,7 +924,7 @@
                         var orgName = dataItem.organization.name;
                         var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {
                             return orgName;
                         }
