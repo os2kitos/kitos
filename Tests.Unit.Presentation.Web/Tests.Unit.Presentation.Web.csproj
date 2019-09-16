@@ -215,6 +215,7 @@
     <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="OData\AuthenticationServiceTest.cs" />
+    <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
