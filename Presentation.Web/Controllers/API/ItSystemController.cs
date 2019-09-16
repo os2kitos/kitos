@@ -11,7 +11,6 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -487,13 +486,13 @@ namespace Presentation.Web.Controllers.API
                 case OperationResult.NotFound:
                     return NotFound();
                 case OperationResult.Ok:
-                    var usingOrganizationsDTO = MapToUsingOrganizationsDTO(itSystemUsages.Value);
-                    return Ok(usingOrganizationsDTO);
+                    var dto = Map(itSystemUsages.Value);
+                    return Ok(dto);
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,
                         "An error occured when trying to get using organizations");
             }
-            
+
         }
 
         private bool IsAvailable(string name, int orgId)
@@ -502,7 +501,7 @@ namespace Presentation.Web.Controllers.API
             return !system.Any();
         }
 
-        private IEnumerable<UsingOrganizationDTO> MapToUsingOrganizationsDTO(IReadOnlyList<UsingOrganization> usingOrganizations)
+        private static IEnumerable<UsingOrganizationDTO> Map(IEnumerable<UsingOrganization> usingOrganizations)
         {
             return usingOrganizations.Select(
                 usingOrganization => new UsingOrganizationDTO
