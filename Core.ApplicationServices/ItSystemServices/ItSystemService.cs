@@ -1,20 +1,34 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using System.Linq;
+using Core.DomainServices.Repositories.System;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.ItSystemServices
 {
     public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
-        private readonly IGenericRepository<ItSystemRight> _Rightsrepository;
+        private readonly IGenericRepository<ItSystemRight> _rightsRepository;
+        private readonly IItSystemRepository _itSystemRepository;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public ItSystemService(IGenericRepository<ItSystem> repository, IGenericRepository<ItSystemRight> rightsrepository)
+        public ItSystemService(
+            IGenericRepository<ItSystem> repository, 
+            IGenericRepository<ItSystemRight> rightsRepository, 
+            IItSystemRepository itSystemRepository,
+            IAuthorizationContext authorizationContext)
         {
             _repository = repository;
-            _Rightsrepository = rightsrepository;
+            _rightsRepository = rightsRepository;
+            _itSystemRepository = itSystemRepository;
+            _authorizationContext = authorizationContext;
         }
 
 
@@ -111,9 +125,31 @@ namespace Core.ApplicationServices
 
         public IEnumerable<ItSystem> ReportItSystemRights()
         {
-            var rights = _Rightsrepository.Get();
+            var rights = _rightsRepository.Get();
 
             return null;
+        }
+
+        public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)
+        {
+            var itSystem = _itSystemRepository.GetSystem(systemId);
+            if (! _authorizationContext.AllowReads(itSystem))
+            {
+                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden);
+            }
+
+            return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(MapToUsingOrganization(itSystem.Usages));
+        }
+
+        private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
+        {
+            return itSystemUsages.Select(
+                itSystemUsage => new UsingOrganization(
+                    itSystemUsage.Id, 
+                    new NamedEntity(
+                        itSystemUsage.Organization.Id, 
+                        itSystemUsage.Organization.Name))
+                ).ToList().AsReadOnly();
         }
 
     }
