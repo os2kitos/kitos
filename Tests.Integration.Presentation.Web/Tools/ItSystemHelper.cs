@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Xunit;
@@ -62,8 +63,25 @@ namespace Tests.Integration.Presentation.Web.Tools
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var itSystemUsage = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
-                return itSystemUsage;
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+            }
+        }
+
+        public static async Task<ItSystemUsageDataWorkerRelationDTO> SetUsageDataWorkerAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("/api/UsageDataworker/");
+
+            var body = new
+            {
+                ItSystemUsageId = systemUsageId,
+                DataWorkerId = organizationId
+            };
+
+            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDataWorkerRelationDTO>();
             }
         }
     }
