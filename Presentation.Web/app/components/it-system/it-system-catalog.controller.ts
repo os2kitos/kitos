@@ -76,6 +76,7 @@
             private oldItSystemId,
             private oldItSystemUsageId,
             private newItSystemObject,
+            private municipalityId,
             private municipality,
             public migrationConsequenceText,
             private needsWidthFixService) {
@@ -119,7 +120,7 @@
                     transport: (queryParams) => {
                         var request = $http.get(
                             "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
-                            `organizationId=${user.currentOrganizationId}` +
+                            `organizationId=${this.municipalityId}` +
                             `&nameContent=${queryParams.data.query}` +
                             "&numberOfItSystems=25" +
                             "&getPublicFromOtherOrganizations=true");
@@ -786,6 +787,7 @@
 
         private resetMigrationFlow = () => {
             this.newItSystemObject = null;
+            this.municipalityId = null;
             this.municipality = null;
             this.oldItSystemUsageId = null;
             this.oldItSystemName = null;
@@ -816,8 +818,9 @@
             return this.$(name) as any;
         }
 
-        public migrateItSystem = (name: string, usageId: number) => {
+        public migrateItSystem = (orgId: number, name: string, usageId: number) => {
             this.modal.close();
+            this.municipalityId = orgId;
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
             //Set modal title
@@ -925,10 +928,11 @@
                 {
                     field: "organization.name", title: "Organisation",
                     template: dataItem => {
+                        var orgId = dataItem.organization.id;
                         var orgName = dataItem.organization.name;
                         var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem("${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
                             return orgName;
                         }

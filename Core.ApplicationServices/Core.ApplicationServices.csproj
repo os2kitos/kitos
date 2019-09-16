@@ -121,8 +121,8 @@
     <Compile Include="ItContractService.cs" />
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItInterfaceService.cs" />
-    <Compile Include="ItSystemServices\IItSystemService.cs" />
-    <Compile Include="ItSystemServices\ItSystemService.cs" />
+    <Compile Include="System\IItSystemService.cs" />
+    <Compile Include="System\ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
     <Compile Include="ExcelImportError.cs" />

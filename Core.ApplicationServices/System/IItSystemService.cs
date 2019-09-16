@@ -4,7 +4,7 @@ using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 
-namespace Core.ApplicationServices.ItSystemServices
+namespace Core.ApplicationServices.System
 {
     public interface IItSystemService
     {

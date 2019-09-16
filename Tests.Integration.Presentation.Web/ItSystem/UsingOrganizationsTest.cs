@@ -64,7 +64,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory]
         [InlineData(OrganizationRole.LocalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task GetUsingOrganizations_Non_Global_Admin_Cannot_Get_Data_On_Other_Organization_Systems(OrganizationRole role)
+        public async Task GetUsingOrganizations_Non_Global_Admin_Cannot_Get_Local_Data_On_Other_Organization_Systems(OrganizationRole role)
         {
             //Arrange
             var newSystem = await CreateSystemAsync(organizationId: TestEnvironment.SecondOrganizationId);
@@ -76,6 +76,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task GetUsingOrganizations_Cannot_Find_Non_Existing_System(OrganizationRole role)
+        {
+            //Act
+            using (var httpResponse = await GetUsingOrganizations(role, int.MaxValue))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.NotFound, httpResponse.StatusCode);
             }
         }
 

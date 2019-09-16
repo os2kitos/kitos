@@ -10,7 +10,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
 
-namespace Core.ApplicationServices.ItSystemServices
+namespace Core.ApplicationServices.System
 {
     public class ItSystemService : IItSystemService
     {
@@ -133,6 +133,10 @@ namespace Core.ApplicationServices.ItSystemServices
         public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)
         {
             var itSystem = _itSystemRepository.GetSystem(systemId);
+            if (itSystem == null)
+            {
+                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound);
+            }
             if (! _authorizationContext.AllowReads(itSystem))
             {
                 return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden);
@@ -148,8 +152,9 @@ namespace Core.ApplicationServices.ItSystemServices
                     itSystemUsage.Id, 
                     new NamedEntity(
                         itSystemUsage.Organization.Id, 
-                        itSystemUsage.Organization.Name))
-                ).ToList().AsReadOnly();
+                        itSystemUsage.Organization.Name)))
+                .ToList()
+                .AsReadOnly();
         }
 
     }

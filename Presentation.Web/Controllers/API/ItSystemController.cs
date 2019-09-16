@@ -6,9 +6,9 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.ItSystemServices;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -476,7 +476,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("api/v1/ItSystem/{id}/usingOrganizations")]
-        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UsingOrganizationDTO>))]
         public HttpResponseMessage GetUsingOrganizations([FromUri] int id)
         {
             var itSystemUsages = _systemService.GetUsingOrganizations(id);
@@ -484,6 +484,8 @@ namespace Presentation.Web.Controllers.API
             {
                 case OperationResult.Forbidden:
                     return Forbidden();
+                case OperationResult.NotFound:
+                    return NotFound();
                 case OperationResult.Ok:
                     var usingOrganizationsDTO = MapToUsingOrganizationsDTO(itSystemUsages.Value);
                     return Ok(usingOrganizationsDTO);
@@ -500,18 +502,14 @@ namespace Presentation.Web.Controllers.API
             return !system.Any();
         }
 
-        private IEnumerable<UsingOrganizationDTO> MapToUsingOrganizationsDTO(IEnumerable<UsingOrganization> usingOrganizations)
+        private IEnumerable<UsingOrganizationDTO> MapToUsingOrganizationsDTO(IReadOnlyList<UsingOrganization> usingOrganizations)
         {
             return usingOrganizations.Select(
                 usingOrganization => new UsingOrganizationDTO
                 {
                     SystemUsageId = usingOrganization.ItSystemUsageId,
-                    Organization = new NamedEntityDTO
-                    {
-                        Id = usingOrganization.Organization.Id,
-                        Name = usingOrganization.Organization.Name
-                    }
-                }).ToList();
+                    Organization = usingOrganization.Organization.MapToNamedEntityDTO()
+                });
         }
     }
 }
