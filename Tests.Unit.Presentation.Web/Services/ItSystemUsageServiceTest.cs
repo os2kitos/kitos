@@ -87,7 +87,6 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(systemUsage, true);
             ExpectAllowCreateDataWorkerReturns(true);
 
-
             //Act
             var result = _sut.CanAddDataWorkerRelation(usageId, organizationId);
 
@@ -108,7 +107,6 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemUsageReturns(usageId, systemUsage);
             ExpectAllowModifyReturns(systemUsage, true);
             ExpectAllowCreateDataWorkerReturns(true);
-
 
             //Act
             var result = _sut.CanAddDataWorkerRelation(usageId, organizationId);
