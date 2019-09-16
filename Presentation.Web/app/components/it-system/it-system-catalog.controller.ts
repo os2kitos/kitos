@@ -73,8 +73,10 @@
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private oldItSystemName,
+            private oldItSystemId,
             private oldItSystemUsageId,
             private newItSystemObject,
+            private municipalityId,
             private municipality,
             public migrationConsequenceText,
             private needsWidthFixService) {
@@ -118,7 +120,7 @@
                     transport: (queryParams) => {
                         var request = $http.get(
                             "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
-                            `organizationId=${user.currentOrganizationId}` +
+                            `organizationId=${this.municipalityId}` +
                             `&nameContent=${queryParams.data.query}` +
                             "&numberOfItSystems=25" +
                             "&getPublicFromOtherOrganizations=true");
@@ -707,22 +709,7 @@
                 }]
             });
 
-            /*modalInstance.result.then(function (id) {
-                // modal was closed with OK
-                self.$state.go('it-system.edit.interfaces', { id: id });
-            });*/
         };
-
-        // usagedetails grid empty-grid handling
-        private detailsBound(e) {
-            var grid = e.sender;
-            if (grid.dataSource.total() === 0) {
-                var colCount = grid.columns.length;
-                this.$(e.sender.wrapper)
-                    .find("tbody")
-                    .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
-            }
-        }
 
         // saves grid state to localStorage
         private saveGridOptions = () => {
@@ -783,23 +770,28 @@
         public showUsageDetails = (systemId, systemName) => {
             this.resetMigrationFlow(); //Migration flow starts freshly from this function
             this.oldItSystemName = systemName;
+            this.oldItSystemId = systemId;
             //Filter by systemId
-            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-            //Set modal title
-            this.modal.setOptions({
-                close: (_) => true,
-                resizable: false,
-                title: `Anvendelse af ${systemName}`
+            this.usageGrid.dataSource.fetch(() => {
+                //Set modal title
+                this.modal.setOptions({
+                    close: (_) => true,
+                    resizable: false,
+                    title: `Anvendelse af ${systemName}`
+                });
+                //Open modal
+                this.modal.center().open();
             });
-            //Open modal
-            this.modal.center().open();
+            
         }
 
         private resetMigrationFlow = () => {
             this.newItSystemObject = null;
+            this.municipalityId = null;
             this.municipality = null;
             this.oldItSystemUsageId = null;
             this.oldItSystemName = null;
+            this.oldItSystemId = null;
             this.resetItSystemSelection();
         }
 
@@ -826,8 +818,9 @@
             return this.$(name) as any;
         }
 
-        public migrateItSystem = (name: string, usageId: number) => {
+        public migrateItSystem = (orgId: number, name: string, usageId: number) => {
             this.modal.close();
+            this.municipalityId = orgId;
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
             //Set modal title
@@ -914,12 +907,16 @@
 
         public usageDetailsGrid: kendo.ui.GridOptions = {
             dataSource: {
-                type: "odata-v4",
                 transport:
                 {
                     read: {
-                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        url: () => `/api/v1/ItSystem/${this.oldItSystemId}/usingOrganizations`,
                         dataType: "json"
+                    }
+                },
+                schema: {
+                    data: (response) => {
+                        return response.response;
                     }
                 },
                 serverPaging: true,
@@ -929,19 +926,19 @@
             autoBind: false,
             columns: [
                 {
-                    field: "Organization.Name", title: "Organisation",
+                    field: "organization.name", title: "Organisation",
                     template: dataItem => {
-                        var orgName = dataItem.Organization.Name;
-                        var usageId = dataItem.Id;
+                        var orgId = dataItem.organization.id;
+                        var orgName = dataItem.organization.name;
+                        var usageId = dataItem.systemUsageId;
                         if (this.canMigrate) {
-                            return ` ${dataItem.Organization.Name} <button ng-click='systemCatalogVm.migrateItSystem("${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
+                            return ` ${orgName} <button ng-click='systemCatalogVm.migrateItSystem(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-primary pull-right'>Flyt</button>`;
                         } else {
-                            return dataItem.Organization.Name;
+                            return orgName;
                         }
                     },
                 }
-            ],
-            dataBound: this.detailsBound
+            ]
         };
 
         private exportFlag = false;

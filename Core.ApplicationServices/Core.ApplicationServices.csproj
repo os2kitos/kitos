@@ -103,6 +103,8 @@
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+    <Compile Include="Model\Shared\NamedEntity.cs" />
+    <Compile Include="Model\System\UsingOrganization.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
@@ -119,7 +121,8 @@
     <Compile Include="ItContractService.cs" />
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItInterfaceService.cs" />
-    <Compile Include="ItSystemService.cs" />
+    <Compile Include="System\IItSystemService.cs" />
+    <Compile Include="System\ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
     <Compile Include="ExcelImportError.cs" />
