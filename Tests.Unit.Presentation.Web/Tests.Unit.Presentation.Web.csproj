@@ -216,6 +216,7 @@
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="OData\AuthenticationServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
+    <Compile Include="Services\ItSystemUsageServiceTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
