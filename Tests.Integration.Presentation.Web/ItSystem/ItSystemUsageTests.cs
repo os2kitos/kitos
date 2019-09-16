@@ -89,7 +89,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [Theory, Description("Validates: KITOSUDV-276")]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
-        [InlineData(OrganizationRole.User)]
         public async Task Can_Add_SystemUsage_Data_Worker(OrganizationRole role)
         {
             //Arrange
@@ -105,6 +104,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Assert
             Assert.Equal(organizationId, result.DataWorkerId);
             Assert.Equal(usage.Id, result.ItSystemUsageId);
+        }
+
+        [Theory, Description("Validates: KITOSUDV-276")]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_SystemUsage_Data_Worker(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+            //Act
+            var result = await ItSystemHelper.SendSetUsageDataWorkerRequestAsync(usage.Id, organizationId, optionalLogin: login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
     }
 }
