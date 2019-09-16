@@ -12,7 +12,11 @@ class SystemCatalogHelper {
     private static waitUpTo = new WaitTimers();
 
     public static createSystem(name: string) {
+        console.log(`Creating system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
+            .then(() => {
+                return SystemCatalogHelper.waitForKendoGrid();
+            })
             .then(() => {
                 return SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
             })
@@ -28,6 +32,7 @@ class SystemCatalogHelper {
     }
 
     public static deleteSystem(name: string) {
+        console.log(`Deleting system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => {
                 return SystemCatalogHelper.waitForKendoGrid();

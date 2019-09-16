@@ -25,28 +25,16 @@ describe("Global Administrator is able to migrate from one system to another", (
     });
 
     it("Local admin is not able to see the move button", () => {
-        var systemNameFrom = createItSystemName(1);
-        var systemNameTo = createItSystemName(2);
         loginHelper.loginAsLocalAdmin()
             .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
-            .then(() => SystemCatalogHelper.createSystem(systemNameTo))
-            .then(() => toggleSystemActivation(systemNameFrom))
-            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
+            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
             .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
     });
 
     it("Regular user is not able to see the move button", () => {
-        var systemNameFrom = createItSystemName(1);
-        var systemNameTo = createItSystemName(2);
         loginHelper.loginAsRegularUser()
             .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
-            .then(() => SystemCatalogHelper.createSystem(systemNameTo))
-            .then(() => toggleSystemActivation(systemNameFrom))
-            .then(() => openMigrationOnSpecificSystem(systemNameFrom))
+            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
             .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
     });
 
@@ -55,7 +43,6 @@ describe("Global Administrator is able to migrate from one system to another", (
         var systemNameTo = createItSystemName(2);
         loginHelper.loginAsGlobalAdmin()
             .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
             .then(() => SystemCatalogHelper.createSystem(systemNameTo))
             .then(() => toggleSystemActivation(systemNameFrom))
@@ -75,34 +62,37 @@ describe("Global Administrator is able to migrate from one system to another", (
     });
 
     function createItSystemName(index: number) {
-        return `It-System${new Date().getTime()}-${index}`;
+        return `ItSystem${new Date().getTime()}_${index}`;
     }
 
     function toggleSystemActivation(name: string) {
+        console.log(`toggleSystemActivation: ${name}`);
         return pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//*/button')).click());
     }
 
     function openMigrationOnSpecificSystem(name: string) {
+        console.log(`openMigrationOnSpecificSystem: ${name}`);
         return pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//*/a[@data-element-type="usagesLinkText"]')).click());
     }
 
     function waitForElement(name: string) {
+        console.log(`waitForElement: ${name}`);
         var EC = protractor.ExpectedConditions;
         return browser.wait(EC.visibilityOf(element(cssHelper.byDataElementType(name))),
             20000);
     }
 
     function waitForSelect2DataAndSelect() {
+        console.log(`waitForSelect2DataAndSelect`);
         var EC = protractor.ExpectedConditions;
         return browser.wait(EC.visibilityOf(element(by.className("select2-result-label"))), 20000)
             .then(() => element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
     function select2SearchForSystem(name: string) {
+        console.log(`select2SearchForSystem: ${name}`);
         return element(by.className("select2-choice")).click()
             .then(() => element(by.className("select2-input")).click())
             .then(() => element(by.className("select2-input")).sendKeys(name));

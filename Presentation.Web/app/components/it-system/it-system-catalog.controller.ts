@@ -110,9 +110,7 @@
                 minimumInputLength: 1,
                 dropdownCss: { 'z-index': 100000, },
                 ajax: {
-                    data: (term, _) => {
-                        return { query: term };
-                    },
+                    data: (term, _) => { return { query: term } },
                     quietMillis: 500,
                     transport: (queryParams) => {
                         var request = $http.get(
@@ -483,9 +481,7 @@
                     {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            return this.showUsagesAsNumberOrNothing(dataItem);
-                        },
+                        template: dataItem => this.showUsagesAsNumberOrNothing(dataItem),
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
                         sortable: false,
@@ -759,13 +755,11 @@
             return this.gridState.doesGridProfileExist();
         };
 
-        // clears grid filters by removing the localStorageItem and reloading the page
         public clearOptions() {
             this.gridState.removeProfile();
             this.gridState.removeLocal();
             this.gridState.removeSession();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :( works with this.loadGridOptions() and this.mainGrid.dataSource.read();
             this.reload();
         };
 
@@ -778,19 +772,15 @@
             return regexp.test(Url.toLowerCase());
         };
 
-        // show usageDetailsGrid - takes a itSystemId for data and systemName for modal title
         public showUsageDetails = (systemId, systemName) => {
-            this.resetMigrationFlow(); //Migration flow starts freshly from this function
+            this.resetMigrationFlow();
             this.oldItSystemName = systemName;
-            //Filter by systemId
             this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: systemId });
-            //Set modal title
             this.modal.setOptions({
                 close: (_) => true,
                 resizable: false,
                 title: `Anvendelse af ${systemName}`
             });
-            //Open modal
             this.modal.center().open();
         }
 
@@ -829,7 +819,6 @@
             this.modal.close();
             this.municipality = name;
             this.oldItSystemUsageId = usageId;
-            //Set modal title
             this.modalMigration.setOptions({
                 close: (e) => {
                     this.closeSelectionDropdown();
@@ -837,7 +826,6 @@
                 resizable: false,
                 title: `Flyt af relation for ${this.municipality}`
             });
-
             this.modalMigration.center().open();
         }
         
@@ -857,7 +845,7 @@
                         this.modalMigrationConsequence.center().open();
                     })
                     .error(() => {
-                        this.notify.addErrorMessage("Kunne ikke oprette flytnings konsekvens rapport");
+                        this.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
                     });
             }
         }
@@ -876,7 +864,7 @@
 
         private showUsagesAsNumberOrNothing(dataItem): string {
             if (dataItem.Usages.length > 0) {
-                return `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${
+                return `<a class="col-xs-7 text-center" data-element-type="usagesLinkText" data-ng-click="systemCatalogVm.showUsageDetails(${
                     dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
                     }</a>`;
             }
