@@ -1,6 +1,10 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -9,6 +13,7 @@ using Core.DomainServices.Authorization;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
+using Presentation.Web.Models.ItSystem;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -19,15 +24,17 @@ namespace Tests.Unit.Presentation.Web.Controllers
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IGenericRepository<ItSystem>> _systemRepository;
         private readonly ItSystemController _sut;
+        private readonly Mock<IItSystemService> _systemService;
 
         public ItSystemControllerTest()
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IGenericRepository<ItSystem>>();
+            _systemService = new Mock<IItSystemService>();
             _sut = new ItSystemController(
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
-                Mock.Of<IItSystemService>(),
+                _systemService.Object,
                 new ReferenceService(),
                 _authorizationContext.Object
                 );
@@ -86,7 +93,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             ExpectAllowDeleteReturns(allowDelete, itSystem);
 
             //Act
-            var responseMessage = _sut.GetAccessRightsForEntity(id,true);
+            var responseMessage = _sut.GetAccessRightsForEntity(id, true);
 
             //Assert
             var dto = ExpectResponseOf<EntityAccessRightsDTO>(responseMessage);
@@ -94,6 +101,96 @@ namespace Tests.Unit.Presentation.Web.Controllers
             Assert.Equal(allowRead, dto.CanView);
             Assert.Equal(allowModify, dto.CanEdit);
             Assert.Equal(allowDelete, dto.CanDelete);
+        }
+
+        [Fact]
+        public void GetUsingOrganizations_Returns_NotFound()
+        {
+            //Arrange
+            var itSystemId = A<int>();
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound));
+
+            //Act
+            var responseMessage = _sut.GetUsingOrganizations(itSystemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, responseMessage.StatusCode);
+        }
+
+        [Fact]
+        public void GetUsingOrganizations_Returns_Forbidden()
+        {
+            //Arrange
+            var itSystemId = A<int>();
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden));
+
+            //Act
+            var responseMessage = _sut.GetUsingOrganizations(itSystemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, responseMessage.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(OperationResult.Conflict)]
+        [InlineData(OperationResult.BadInput)]
+        [InlineData(OperationResult.UnknownError)]
+        public void GetUsingOrganizations_Returns_Forbidden(OperationResult operationResult)
+        {
+            //Arrange
+            var itSystemId = A<int>();
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(operationResult));
+
+            //Act
+            var responseMessage = _sut.GetUsingOrganizations(itSystemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.InternalServerError, responseMessage.StatusCode);
+        }
+
+        [Fact]
+        public void GetUsingOrganizations_Returns_Ok()
+        {
+            //Arrange
+            var itSystemId = A<int>();
+            var usingOrganizations = Many<UsingOrganization>().ToList();
+
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(usingOrganizations));
+
+            //Act
+            var responseMessage = _sut.GetUsingOrganizations(itSystemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+            var dtos = ExpectResponseOf<IEnumerable<UsingOrganizationDTO>>(responseMessage);
+            Assert.True(
+                usingOrganizations.Select(x => new
+                {
+                    usageId = x.ItSystemUsageId,
+                    org = new
+                    {
+                        id = x.Organization.Id,
+                        name = x.Organization.Name
+                    }
+                })
+                    .SequenceEqual(
+                        dtos.Select(x => new
+                        {
+                            usageId = x.SystemUsageId,
+                            org = new
+                            {
+                                id = x.Organization.Id,
+                                name = x.Organization.Name
+                            }
+                        })));
+        }
+
+        private void ExpectGetUsingOrganizationsReturn(
+            int itSystemId,
+            Result<OperationResult, IReadOnlyList<UsingOrganization>> result)
+        {
+            _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
+                .Returns(result);
         }
 
         private void ExpectAllowDeleteReturns(bool allowDelete, ItSystem itSystem)
