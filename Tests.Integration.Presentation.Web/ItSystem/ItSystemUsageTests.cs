@@ -98,7 +98,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItSystemHelper.SetUsageDataWorkerAsync(usage.Id, organizationId, optionalLogin: login);
 
             //Assert
@@ -137,7 +137,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItSystemHelper.CreateWishAsync(usage.Id, text, optionalLogin: login);
 
             //Assert

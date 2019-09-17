@@ -16,8 +16,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         /*
          *It Projekt
 
-            - Lokal admin kan ikke oprette milepæl: Status projekt. Har ikke rettigheder
-            - Lokal admin kan ikke oprette interessenter: Interessenter. Har ikke rettigheder
             - Lokal admin kan ikke oprette risiko: risiko. Har ikke rettigheder
             - Lokal admin kan ikke oprette kommunikation: kommunikation. Har ikke rettigheder
          *
@@ -47,7 +45,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var goalDate2 = A<DateTime>().Date;
             var goalDate3 = A<DateTime>().Date;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItProjectHelper.AddGoalAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login);
 
             //Assert
@@ -71,7 +69,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var goalDate2 = A<DateTime>().Date;
             var goalDate3 = A<DateTime>().Date;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await ItProjectHelper.SendAddGoalRequestAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login))
             {
                 //Assert
@@ -86,8 +84,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-
-            //Act - perform the POST with the actual role
             var description = A<string>();
             var name = A<string>();
             var note = A<string>();
@@ -96,6 +92,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var startDate = A<DateTime>().Date;
             var endDate = startDate.AddDays(10);
 
+            //Act - perform the action with the actual role
             var result = await ItProjectHelper.AddAssignmentAsync(OrganizationId, _project.Id, description, name, note, statusPercentage, timeEstimate, startDate, endDate, login);
 
             //Assert
@@ -117,7 +114,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var description = A<string>();
             var name = A<string>();
             var note = A<string>();
@@ -141,8 +138,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-
-            //Act - perform the POST with the actual role
             var description = A<string>();
             var name = A<string>();
             var note = A<string>();
@@ -150,6 +145,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var humanReadableId = A<string>();
             var date = A<DateTime>().Date;
 
+            //Act - perform the action with the actual role
             var result = await ItProjectHelper.AddMileStoneAsync(OrganizationId, _project.Id, description, name, note, humanReadableId, timeEstimate, date, login);
 
             //Assert
@@ -169,7 +165,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
 
-            //Act - perform the POST with the actual role
             var description = A<string>();
             var name = A<string>();
             var note = A<string>();
@@ -179,6 +174,57 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act - perform the action with the actual role
             using (var result = await ItProjectHelper.SendAddMileStoneRequestAsync(OrganizationId, _project.Id, description, name, note, humanReadableId, timeEstimate, date, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Stakeholder(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the action with the actual role
+            var howToHandle = A<string>();
+            var name = A<string>();
+            var roleName = A<string>();
+            var downsides = howToHandle;
+            var benefits = howToHandle;
+            var significance = A<int>() % 5;
+
+            var result = await ItProjectHelper.AddStakeholderAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
+
+            //Assert
+            Assert.Equal(_project.Id, result.ItProjectId);
+            Assert.Equal(name, result.Name);
+            Assert.Equal(roleName, result.Role);
+            Assert.Equal(downsides, result.Downsides);
+            Assert.Equal(benefits, result.Benefits);
+            Assert.Equal(howToHandle, result.HowToHandle);
+            Assert.Equal(significance, result.Significance);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_Stakeholder(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the action with the actual role
+            var howToHandle = A<string>();
+            var name = A<string>();
+            var roleName = A<string>();
+            var downsides = howToHandle;
+            var benefits = howToHandle;
+            var significance = A<int>() % 5;
+
+            //Act - perform the action with the actual role
+            using (var result = await ItProjectHelper.SendAddStakeholderRequestAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);

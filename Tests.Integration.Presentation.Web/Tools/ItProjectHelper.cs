@@ -135,5 +135,33 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<StakeholderDTO> AddStakeholderAsync(int projectId, string name, string role, string downsides, string benefits, string howToHandle, int significance, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddStakeholderRequestAsync(projectId, name, role, downsides, benefits, howToHandle, significance, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<StakeholderDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddStakeholderRequestAsync(int projectId, string name, string role, string downsides, string benefits, string howToHandle, int significance, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/stakeholder");
+            var body = new
+            {
+                benefits = benefits,
+                downsides = downsides,
+                howToHandle = howToHandle,
+                itProjectId = projectId,
+                name = name,
+                role = role,
+                significance = significance
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
     }
 }

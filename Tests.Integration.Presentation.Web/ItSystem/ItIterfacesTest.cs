@@ -101,8 +101,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
 
-
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await InterfaceHelper.CreateDataRowAsync(interfaceDto.Id, login);
 
             //Assert
@@ -118,8 +117,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
 
-
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.Id, login))
             {
                 //Assert
@@ -138,7 +136,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await InterfaceExhibitHelper.CreateExhibit(system.Id, interfaceDto.Id, login);
 
             //Assert
@@ -156,7 +154,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id, login))
             {
                 //Assert

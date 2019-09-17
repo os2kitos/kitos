@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var approved = A<DateTime>().Date;
             var expected = A<DateTime>().Date;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItContractHelper.AddHandOverTrialAsync(contract.Id, approved, expected, login);
 
             //Assert
@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var approved = A<DateTime>().Date;
             var expected = A<DateTime>().Date;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await ItContractHelper.SendAddHandOverTrialAsync(contract.Id, approved, expected, login))
             {
                 //Assert
@@ -61,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var expected = A<DateTime>().Date;
             var title = A<string>();
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItContractHelper.AddPaymentMilestoneAsync(contract.Id, approved, expected, title, login);
 
             //Assert
@@ -81,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var expected = A<DateTime>().Date;
             var title = A<string>();
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await ItContractHelper.SendAddPaymentMilestoneRequestAsync(contract.Id, approved, expected, title, login))
             {
                 //Assert

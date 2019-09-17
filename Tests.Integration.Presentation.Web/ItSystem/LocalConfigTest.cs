@@ -18,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             };
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert
@@ -35,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             };
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert

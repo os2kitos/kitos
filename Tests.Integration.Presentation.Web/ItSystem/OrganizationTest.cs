@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var email = A<string>();
             var phone = A<string>();
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await OrganizationHelper.ChangeContactPersonAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login);
 
             //Assert
@@ -47,7 +47,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var email = A<string>();
             var phone = A<string>();
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             using (var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login))
             {
                 //Assert

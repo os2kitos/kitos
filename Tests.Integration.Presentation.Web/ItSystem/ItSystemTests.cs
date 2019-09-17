@@ -117,7 +117,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
-            //Act - perform the POST with the actual role
+            //Act - perform the action with the actual role
             var result = await ItSystemHelper.SetDataWorkerAsync(system.Id, organizationId, optionalLogin: login);
 
             //Assert
