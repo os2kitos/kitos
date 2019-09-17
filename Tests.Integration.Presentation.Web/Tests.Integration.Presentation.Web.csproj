@@ -93,6 +93,7 @@
     <Compile Include="ItSystem\ItIterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
+    <Compile Include="ItSystem\OrganizationTest.cs" />
     <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
+    <Compile Include="Tools\OrganizationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\WithAutoFixture.cs" />
   </ItemGroup>
