@@ -10,6 +10,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.DataAccess;
@@ -26,9 +27,7 @@ using Infrastructure.DataAccess.Services;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Microsoft.Owin;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
@@ -140,6 +139,7 @@ namespace Presentation.Web
             kernel.Bind<IItContractRepository>().To<ItContractRepository>().InRequestScope();
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
+            kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)
