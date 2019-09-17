@@ -475,7 +475,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("api/v1/ItSystem/{id}/usingOrganizations")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UsingOrganizationDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<UsingOrganizationDTO>>))]
         public HttpResponseMessage GetUsingOrganizations([FromUri] int id)
         {
             var itSystemUsages = _systemService.GetUsingOrganizations(id);
