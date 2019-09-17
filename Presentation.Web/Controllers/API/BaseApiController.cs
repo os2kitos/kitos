@@ -35,8 +35,10 @@ namespace Presentation.Web.Controllers.API
 
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
+        private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
 
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
+        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
         protected BaseApiController(IAuthorizationContext authorizationContext = null)
         {
@@ -46,6 +48,7 @@ namespace Presentation.Web.Controllers.API
                     ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
                     : new ContextBasedAuthorizationStrategy(authorizationContext)
             );
+            _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
@@ -223,6 +226,11 @@ namespace Presentation.Web.Controllers.API
 
         #region access control
 
+        protected virtual IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new RootEntityCrudAuthorization(AuthorizationStrategy);
+        }
+
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
             return AuthorizationStrategy.GetCrossOrganizationReadAccess();
@@ -233,24 +241,19 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
-        protected virtual IControllerCrudAuthorization GetCrudAuthorization()
-        {
-            return new RootEntityCrudAuthorization(AuthorizationStrategy);
-        }
-
         protected bool AllowRead(IEntity entity)
         {
-            return GetCrudAuthorization().AllowRead(entity);
+            return CrudAuthorization.AllowRead(entity);
         }
 
         protected bool AllowModify(IEntity entity)
         {
-            return GetCrudAuthorization().AllowModify(entity);
+            return CrudAuthorization.AllowModify(entity);
         }
 
         protected bool AllowCreate<T>(IEntity entity)
         {
-            return GetCrudAuthorization().AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(entity);
         }
 
         protected bool AllowCreate<T>()
@@ -260,7 +263,7 @@ namespace Presentation.Web.Controllers.API
 
         protected bool AllowDelete(IEntity entity)
         {
-            return GetCrudAuthorization().AllowDelete(entity);
+            return CrudAuthorization.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
