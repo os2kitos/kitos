@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -88,6 +89,41 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                     Assert.Equal(key, response.Id);
                 }
             }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Data_Row(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(),A<string>(),null,organizationId,AccessModifier.Public));
+            
+
+            //Act - perform the POST with the actual role
+            var result = await InterfaceHelper.CreateDataRowAsync(interfaceDto.Id, login);
+
+            //Assert
+            Assert.Equal(interfaceDto.Id, result.ItInterfaceId);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_Data_Row(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), null, organizationId, AccessModifier.Public));
+
+
+            //Act - perform the POST with the actual role
+            var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.Id, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         private string CreateInterFacePrefixName()

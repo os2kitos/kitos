@@ -124,7 +124,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
-        [Theory, Description("Validates: KITOSUDV-276")]
+        [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
         public async Task Can_Add_SystemUsage_Wish(OrganizationRole role)
@@ -144,7 +144,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(text, result.Text);
         }
 
-        [Theory, Description("Validates: KITOSUDV-276")]
+        [Theory]
         [InlineData(OrganizationRole.User)]
         public async Task Cannot_Add_SystemUsage_Wish(OrganizationRole role)
         {

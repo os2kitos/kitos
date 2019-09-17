@@ -88,7 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItSystem\ItInterfaceUsageTests.cs" />
-    <Compile Include="ItSystem\ItSystemCatalogTests.cs" />
+    <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
     <Compile Include="ItSystem\ItIterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
