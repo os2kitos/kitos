@@ -120,10 +120,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
 
             //Act - perform the POST with the actual role
-            var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.Id, login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.Id, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
 
         [Theory]
@@ -156,10 +157,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act - perform the POST with the actual role
-            var result = await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id, login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
 
         private string CreateInterFacePrefixName()

@@ -136,10 +136,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act
-            var result = await ItSystemHelper.SendSetDataWorkerRequestAsync(system.Id, organizationId, optionalLogin: login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await ItSystemHelper.SendSetDataWorkerRequestAsync(system.Id, organizationId, optionalLogin: login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
     }
 }

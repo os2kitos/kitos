@@ -24,7 +24,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
         {
             return
                 typeof(T1) == typeof(T) &&
-                DelegateToRootEntity(entity, _crudAuthorization.AllowModify);
+                AllowModify(entity); //Even though it is AllowCreate, we delegate to AllowModify on the root
         }
 
         public bool AllowModify(IEntity entity)
@@ -34,7 +34,8 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
 
         public bool AllowDelete(IEntity entity)
         {
-            return DelegateToRootEntity(entity, _crudAuthorization.AllowDelete);
+            //Even though it is AllowDelete, we delegate to AllowModify on the root
+            return AllowModify(entity);
         }
 
         private bool DelegateToRootEntity(IEntity entity, Predicate<IEntity> authorize)

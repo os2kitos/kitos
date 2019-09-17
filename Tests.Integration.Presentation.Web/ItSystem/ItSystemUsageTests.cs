@@ -118,10 +118,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
             //Act
-            var result = await ItSystemHelper.SendSetUsageDataWorkerRequestAsync(usage.Id, organizationId, optionalLogin: login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await ItSystemHelper.SendSetUsageDataWorkerRequestAsync(usage.Id, organizationId, optionalLogin: login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
 
         [Theory]
@@ -156,10 +157,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
 
             //Act
-            var result = await ItSystemHelper.SendCreateWishRequestAsync(usage.Id, text, optionalLogin: login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await ItSystemHelper.SendCreateWishRequestAsync(usage.Id, text, optionalLogin: login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
     }
 }

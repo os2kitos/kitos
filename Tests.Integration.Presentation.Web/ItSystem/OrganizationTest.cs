@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
@@ -24,8 +23,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var phone = A<string>();
 
             //Act - perform the POST with the actual role
-
-
             var result = await OrganizationHelper.ChangeContactPersonAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login);
 
             //Assert
@@ -51,12 +48,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var phone = A<string>();
 
             //Act - perform the POST with the actual role
-
-
-            var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            using (var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
         }
     }
 }

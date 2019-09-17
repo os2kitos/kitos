@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
@@ -58,10 +60,60 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemUsageSimpleDTO>>();
 
-                var addedMapping = response.FirstOrDefault(x=>x.Id == usageId);
+                var addedMapping = response.FirstOrDefault(x => x.Id == usageId);
                 Assert.NotNull(addedMapping);
                 return addedMapping;
             }
+        }
+
+        public static async Task<HandoverTrialDTO> AddHandOverTrialAsync(int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddHandOverTrialAsync(contractId, approved, expected, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<HandoverTrialDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddHandOverTrialAsync(int contractId, DateTime approved, DateTime expected, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/handoverTrial/");
+            var body = new
+            {
+                approved = approved,
+                expected = expected,
+                handoverTrialTypeId = "1",
+                itContractId = contractId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<PaymentMilestoneDTO> AddPaymentMilestoneAsync(int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddPaymentMilestoneRequestAsync(contractId, approved, expected, title, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<PaymentMilestoneDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddPaymentMilestoneRequestAsync(int contractId, DateTime approved, DateTime expected, string title, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/paymentMilestone/");
+            var body = new
+            {
+                approved = approved,
+                expected = expected,
+                title = title,
+                itContractId = contractId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
     }
 }
