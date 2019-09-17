@@ -20,25 +20,6 @@ class ReferenceHelper {
             .then(() => this.headerButtons.editSaveReference.click());
     }
 
-    public deleteReference(id: string) {
-        return this.homePage.getPage()
-            .then(() => browser.wait(this.homePage.isCreateReferenceLoaded(), this.waitUpTo.twentySeconds))
-            .then(() => {
-                element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
-                    ele.all(by.tagName("td")).each((tdele) => {
-
-                        tdele.getText().then(val => {
-
-                            if (val === id) {
-                                return ele.element(this.cssLocator.byDataElementType("deleteReference")).click()
-                                    .then(() => browser.switchTo().alert().accept());
-                            }
-                        });
-                    });
-                });
-            });
-    }
-
     public goToSpecificItSystemReferences(name: string) {
         return this.itSystemCatalogPage.getPage()
             .then(() => browser.wait(this.itSystemCatalogPage.waitForKendoGrid(), this.waitUpTo.twentySeconds))

@@ -11,15 +11,20 @@ var testFixture = new TestFixtureWrapper();
 var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
 var inputFields = homePage.kendoToolbarWrapper.inputFields();
 
-
 describe("Local Admin is able to create,edit and delete",
     () => {
+
+        var itSystemName = createItSystemName();
+
         beforeAll(() => {
+            loginHelper.loginAsGlobalAdmin()
+                .then(() => ItSystemHelper.createSystem(itSystemName))
+                .then(() => testFixture.cleanupState());
         });
 
         beforeEach(() => {
+            testFixture.cleanupState();
             testFixture.enableLongRunningTest();
-            homePage.getPage();
         });
 
         afterAll(() => {
@@ -27,33 +32,50 @@ describe("Local Admin is able to create,edit and delete",
             testFixture.cleanupState();
         });
 
-        it("Can add, edit and delete a reference",
+        it("Can add reference to IT-System",
             () => {
-                var itSystemName = createItSystemName();
+                var referenceName = createReferenceName();
+                var referenceId = createReferenceId();
+                var validUrl = generateValidUrl();
+
+                loginHelper.loginAsLocalAdmin()
+                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                    .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+                    .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
+                    .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl));
+            });
+
+        it("Can edit a reference in a IT-System",
+            () => {
                 var referenceName = createReferenceName();
                 var referenceId = createReferenceId();
                 var validUrl = generateValidUrl();
                 var invalidUrl = generateInvalidUrl();
-                 
-                loginHelper.loginAsGlobalAdmin()
-                    .then(() => ItSystemHelper.createSystem(itSystemName))
-                    .then(() => testFixture.cleanupState())
-                    .then(() => loginHelper.loginAsLocalAdmin())
+
+                loginHelper.loginAsLocalAdmin()
                     .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
                     .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
-                    .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
-                    .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
                     .then(() => expect(getEditButtonFromReference(referenceName).isPresent()).toBe(true))
                     .then(() => getEditButtonFromReference(referenceName).click())
                     .then(() => inputFields.referenceDocUrl.clear())
                     .then(() => inputFields.referenceDocUrl.sendKeys(invalidUrl))
                     .then(() => headerButtons.editSaveReference.click())
-                    .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy())
-                    .then(() => getDeleteButtonFromInvalidUrlReference(referenceName).click())
-                    .then(() => browser.switchTo().alert().accept())
-                    .then(() => expect(element.all(by.xpath('//*/tbody/tr'))).toBeEmptyArray());
+                    .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy());
             });
 
+        it("Can delete a reference in a IT-system",
+            () => {
+                var referenceName = createReferenceName();
+                var referenceId = createReferenceId();
+                var validUrl = generateValidUrl();
+
+                loginHelper.loginAsLocalAdmin()
+                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                    .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+                    .then(() => getDeleteButtonFromReference(referenceName).click())
+                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => expect(getReferenceId(referenceId).isPresent()).toBeFalse());
+            });
     });
 
 function createItSystemName() {
@@ -85,8 +107,8 @@ function getEditButtonFromReference(refName: string) {
     return element(by.xpath('//*/tbody/*/td/a[text()="'+refName+'"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
 }
 
-function getDeleteButtonFromInvalidUrlReference(refName: string) {
-    return element(by.xpath('//*/tbody/*/td[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
+function getDeleteButtonFromReference(refName: string) {
+    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
 }
 
 function getUrlFromReference(refName: string) {
