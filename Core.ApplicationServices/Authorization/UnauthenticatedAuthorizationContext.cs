@@ -44,5 +44,10 @@ namespace Core.ApplicationServices.Authorization
         {
             return false;
         }
+
+        public bool AllowSystemUsageMigration()
+        {
+            return false;
+        }
     }
 }

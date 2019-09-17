@@ -105,9 +105,9 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.InternalServerError, response);
         }
 
-        protected virtual HttpResponseMessage BadRequest()
+        protected virtual HttpResponseMessage BadRequest(string message = "")
         {
-            return CreateResponse(HttpStatusCode.BadRequest);
+            return CreateResponse(HttpStatusCode.BadRequest, message);
         }
 
         protected virtual HttpResponseMessage Unauthorized()
@@ -233,17 +233,17 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
-        protected bool AllowRead(IEntity entity)
+        protected virtual bool AllowRead(IEntity entity)
         {
             return AuthorizationStrategy.AllowRead(entity);
         }
 
-        protected bool AllowModify(IEntity entity)
+        protected virtual bool AllowModify(IEntity entity)
         {
             return AuthorizationStrategy.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(IEntity entity)
+        protected virtual bool AllowCreate<T>(IEntity entity)
         {
             return AuthorizationStrategy.AllowCreate<T>(entity);
         }
@@ -253,7 +253,7 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.AllowCreate<T>();
         }
 
-        protected bool AllowDelete(IEntity entity)
+        protected virtual bool AllowDelete(IEntity entity)
         {
             return AuthorizationStrategy.AllowDelete(entity);
         }
@@ -262,7 +262,7 @@ namespace Presentation.Web.Controllers.API
         {
             return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
         }
-       
+
         #endregion
     }
 }

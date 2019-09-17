@@ -4,10 +4,11 @@
     export interface ICatalogController {
         mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         mainGridOptions: kendo.ui.GridOptions;
-        usageGrid: kendo.ui.Grid;
         usageDetailsGrid: kendo.ui.GridOptions;
+        usageGrid: kendo.ui.Grid;
         modal: kendo.ui.Window;
-
+        modalMigration: kendo.ui.Window;
+        modalMigrationConsequence: kendo.ui.Window;
         saveGridProfile(): void;
         loadGridProfile(): void;
         clearGridProfile(): void;
@@ -17,37 +18,46 @@
         removeUsage(dataItem): void;
     }
 
+    export interface ISelect2Scope extends ng.IScope {
+        mySelectOptions: any;
+    }
+
     export class CatalogController implements ICatalogController {
         private storageKey = "it-system-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey);
-
         public mainGrid: IKendoGrid<Models.ItSystem.IItSystem>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItSystem>;
         public usageGrid: kendo.ui.Grid;
+        public modalMigrationConsequence: kendo.ui.Window;
         public modal: kendo.ui.Window;
+        public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
+        public canMigrate = this.userMigrationRights.canExecuteMigration;
+        public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
 
-        public static $inject: Array<string> = [
-            "$rootScope",
-            "$scope",
-            "$http",
-            "$timeout",
-            "$state",
-            "$sce",
-            "$",
-            "_",
-            "moment",
-            "notify",
-            "user",
-            "userAccessRights",
-            "gridStateService",
-            "$uibModal",
-            "needsWidthFixService"
-        ];
+        public static $inject:
+            Array<string> = [
+                "$rootScope",
+                "$scope",
+                "$http",
+                "$timeout",
+                "$state",
+                "$sce",
+                "$",
+                "_",
+                "moment",
+                "notify",
+                "user",
+                "userAccessRights",
+                "userMigrationRights",
+                "gridStateService",
+                "$uibModal",
+                "needsWidthFixService"
+            ];
 
         constructor(
             private $rootScope: IRootScope,
-            private $scope: ng.IScope,
+            private $scope: ISelect2Scope,
             private $http: ng.IHttpService,
             private $timeout: ng.ITimeoutService,
             private $state: ng.ui.IStateService,
@@ -58,11 +68,18 @@
             private notify,
             private user,
             private userAccessRights,
+            private userMigrationRights,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
+            private oldItSystemName,
+            private oldItSystemId,
+            private oldItSystemUsageId,
+            private newItSystemObject,
+            private municipalityId,
+            private municipalityName,
+            public migrationConsequenceText,
             private needsWidthFixService) {
             $rootScope.page.title = "IT System - Katalog";
-
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
@@ -88,7 +105,51 @@
                         kendo.ui.progress(this.mainGrid.element, true);
                     });
                 }
+
             });
+
+            $scope.mySelectOptions = {
+                minimumInputLength: 1,
+                dropdownCss: { 'z-index': 100000, },
+                ajax: {
+                    data: (term, _) => { return { query: term } },
+                    quietMillis: 500,
+                    transport: (queryParams) => {
+                        var request = $http.get(
+                            "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
+                            `organizationId=${this.municipalityId}` +
+                            `&nameContent=${queryParams.data.query}` +
+                            "&numberOfItSystems=25" +
+                            "&getPublicFromOtherOrganizations=true");
+                        request.then(queryParams.success);
+
+                        request.catch(() => {
+                            this.closeSelectionDropdown();
+                            this.notify.addErrorMessage("Der skete en fejl. Kunne ikke hente it systemer.");
+                        });
+                        return request;
+                    },
+
+                    results: (data, page) => {
+                        var results = [];
+
+                        //for each system usages
+                        _.each(data.data.response, (system: { id; name; }) => {
+                            results.push({
+                                //the id of the system is the id, that is selected
+                                id: system.id,
+                                //but the name of the system is the label for the select2
+                                text: system.name,
+                                //saving the system for later use
+                                system: system
+                            });
+
+                        });
+
+                        return { results: results };
+                    }
+                }
+            };
 
             var itSystemBaseUrl: string;
             if (user.isGlobalAdmin) {
@@ -234,12 +295,12 @@
                             var systemHasUsages = this._.find(dataItem.Usages, (d: any) => (d.OrganizationId == this.user.currentOrganizationId));
 
                             if (systemHasUsages)
-                                return `<div class="text-center"><button type="button" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" data-ng-click="systemCatalogVm.removeUsage(${dataItem.Id})"><span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span></button></div>`;
 
                             if (dataItem.Disabled)
-                                return `<div class="text-center"><button type="button" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                                return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link" disabled><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
 
-                            return `<div class="text-center"><button type="button" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
+                            return `<div class="text-center"><button type="button" data-element-type="toggleActivatingSystem" class="btn btn-link " data-ng-click="systemCatalogVm.enableUsage(dataItem)"><span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span></button></div>`;
                         },
                         attributes: {
                             "data-element-type": "catalogUsageObject"
@@ -365,7 +426,6 @@
                     {
                         field: "AppTypeOption.Name", title: "Applikationstype", width: 150,
                         persistId: "apptype", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem.AppTypeOption ? dataItem.AppTypeOption.Name : "",
                         hidden: true,
                         filterable: {
                             cell: {
@@ -423,11 +483,16 @@
                     {
                         field: "Usages.length", title: "IT System: Anvendes af", width: 95,
                         persistId: "usages", // DON'T YOU DARE RENAME!
-                        template: dataItem =>
-                            `<a class="col-xs-7 text-center" data-ng-click="systemCatalogVm.showUsageDetails(${dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length}</a>`,
+                        template: dataItem => this.showUsagesAsNumberOrNothing(dataItem),
                         excelTemplate: dataItem => dataItem && dataItem.Usages && dataItem.Usages.length.toString() || "",
                         filterable: false,
-                        sortable: false
+                        sortable: false,
+                        attributes: {
+                            "data-element-type": "usedByNameObject"
+                        },
+                        headerAttributes: {
+                            "data-element-type": "usedByNameHeader"
+                        },
                     },
                     {
                         field: "Organization.Name", title: "Oprettet af: Organisation", width: 150,
@@ -574,7 +639,7 @@
             };
             function customFilter(args) {
                 args.element.kendoAutoComplete({
-                    noDataTemplate: ''
+                    noDataTemplate: ""
                 });
             }
         }
@@ -585,12 +650,12 @@
             var modalInstance = this.$uibModal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
-                windowClass: 'modal fade in',
-                templateUrl: 'app/components/it-system/it-system-modal-create.view.html',
-                controller: ['$scope', '$uibModalInstance', function ($scope, $modalInstance) {
+                windowClass: "modal fade in",
+                templateUrl: "app/components/it-system/it-system-modal-create.view.html",
+                controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
                     $scope.formData = {};
-                    $scope.type = 'IT System';
-                    $scope.checkAvailableUrl = 'api/itSystem/';
+                    $scope.type = "IT System";
+                    $scope.checkAvailableUrl = "api/itSystem/";
 
                     $scope.saveAndProceed = function () {
                         var payload = {
@@ -600,17 +665,17 @@
                             taskRefIds: []
                         };
 
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
+                        var msg = self.notify.addInfoMessage("Opretter system...", false);
+                        self.$http.post("api/itsystem", payload)
                             .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                msg.toSuccessMessage("Et nyt system er oprettet!");
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
-                                    self.$state.go('it-system.edit.main', { id: systemId });
+                                    self.$state.go("it-system.edit.main", { id: systemId });
                                 }
                             }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
 
@@ -622,10 +687,10 @@
                             taskRefIds: []
                         };
 
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
-                        self.$http.post('api/itsystem', payload)
+                        var msg = self.notify.addInfoMessage("Opretter system...", false);
+                        self.$http.post("api/itsystem", payload)
                             .success(function (result: any) {
-                                msg.toSuccessMessage('Et nyt system er oprettet!');
+                                msg.toSuccessMessage("Et nyt system er oprettet!");
                                 var systemId = result.response.id;
                                 $modalInstance.close(systemId);
                                 if (systemId) {
@@ -633,28 +698,13 @@
                                 }
 
                             }).error(function () {
-                                msg.toErrorMessage('Fejl! Kunne ikke oprette et nyt system!');
+                                msg.toErrorMessage("Fejl! Kunne ikke oprette et nyt system!");
                             });
                     };
                 }]
             });
 
-            /*modalInstance.result.then(function (id) {
-                // modal was closed with OK
-                self.$state.go('it-system.edit.interfaces', { id: id });
-            });*/
         };
-
-        // usagedetails grid empty-grid handling
-        private detailsBound(e) {
-            var grid = e.sender;
-            if (grid.dataSource.total() == 0) {
-                var colCount = grid.columns.length;
-                this.$(e.sender.wrapper)
-                    .find("tbody")
-                    .append(`<tr class="kendo-data-row"><td colspan="${colCount}" class="no-data text-muted">System anvendens ikke</td></tr>`);
-            }
-        }
 
         // saves grid state to localStorage
         private saveGridOptions = () => {
@@ -692,13 +742,11 @@
             return this.gridState.doesGridProfileExist();
         };
 
-        // clears grid filters by removing the localStorageItem and reloading the page
         public clearOptions() {
             this.gridState.removeProfile();
             this.gridState.removeLocal();
             this.gridState.removeSession();
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
-            // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :( works with this.loadGridOptions() and this.mainGrid.dataSource.read();
             this.reload();
         };
 
@@ -711,26 +759,153 @@
             return regexp.test(Url.toLowerCase());
         };
 
-        // show usageDetailsGrid - takes a itSystemUsageId for data and systemName for modal title
-        public showUsageDetails = (usageId, systemName) => {
-            //Filter by usageId
-            this.usageGrid.dataSource.filter({ field: "ItSystemId", operator: "eq", value: usageId });
-            //Set modal title
-            this.modal.setOptions({ title: `Anvendelse af ${systemName}` });
-            //Open modal
+        public showUsageDetails = (systemId, systemName) => {
+            this.resetMigrationFlow();
+            this.oldItSystemName = systemName;
+            this.oldItSystemId = systemId;
+            this.usageGrid.dataSource.fetch(() => {
+                this.modal.setOptions({
+                    close: (_) => true,
+                    resizable: false,
+                    title: `Anvendelse af ${systemName}`
+                });
+                this.modal.center().open();
+            });
             this.modal.center().open();
         }
 
-        // usagedetails grid
+        private resetMigrationFlow = () => {
+            this.newItSystemObject = null;
+            this.municipalityId = null;
+            this.municipalityName = null;
+            this.oldItSystemUsageId = null;
+            this.oldItSystemName = null;
+            this.oldItSystemId = null;
+            this.resetItSystemSelection();
+        }
+
+        private resetItSystemSelection = () => {
+            this.getItSystemSelectionControl().select2("data", null);
+        }
+
+        private getItSystemSelection = () => {
+            return this.getItSystemSelectionControl().select2("data");
+        }
+
+        private getSelectionDropdown = () => {
+            return this.convertToJQueryLocator("#select2-drop");
+        }
+        private getItSystemSelectionControl = () => {
+            return this.convertToJQueryLocator("#new-system-usage");
+        }
+
+        private closeSelectionDropdown = () => {
+            var dropdown = this.getSelectionDropdown();
+            if (dropdown != null) {
+                dropdown.select2("close");
+            }
+        }
+
+        private convertToJQueryLocator = (name: string) => {
+            return this.$(name) as any;
+        }
+
+        public beginItSystemMigration = (municipalityId: number, municipalityName: string, usageId: number) => {
+            this.modal.close();
+            this.municipalityId = municipalityId;
+            this.municipalityName = municipalityName;
+            this.oldItSystemUsageId = usageId;
+            this.modalMigration.setOptions({
+                close: (e) => {
+                    this.closeSelectionDropdown();
+                },
+                resizable: false,
+                title: `Flyt af relation for ${this.municipalityName}`
+            });
+            this.modalMigration.center().open();
+        }
+        
+        public onNewTargetSystemSelected = () => {
+            this.newItSystemObject = this.getItSystemSelection();
+            if (this.newItSystemObject != null) {
+                this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
+                    .success(dto => {
+                        this.migrationReportDTO = dto.response;
+
+                        this.modalMigrationConsequence.setOptions({
+                            close: (_) => true,
+                            resizable: false,
+                            title: `Flytning af it-system `,
+                        });
+                        this.modalMigration.close();
+                        this.modalMigrationConsequence.center().open();
+                    })
+                    .error(() => {
+                        this.notify.addErrorMessage("Kunne ikke oprette konsekvens-rapport for flytningen");
+                    });
+            }
+        }
+
+        private getMigrationReport: any = (usageId, toSystemId) => {
+            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
+
+            return this.$http({ method: "GET", url: url, });
+        }
+
+        private executeMigration: any = (usageId, toSystemId) => {
+            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
+
+            return this.$http({ method: "POST", url: url, });
+        }
+
+        private showUsagesAsNumberOrNothing(dataItem): string {
+            if (dataItem.Usages.length > 0) {
+                return `<a class="col-xs-7 text-center" data-element-type="usagesLinkText" data-ng-click="systemCatalogVm.showUsageDetails(${
+                    dataItem.Id},'${this.$sce.getTrustedHtml(dataItem.Name)}')">${dataItem.Usages.length
+                    }</a>`;
+            }
+            else {
+                return ``;
+            }
+        };
+
+        public performMigration = () => {
+            if (this.oldItSystemName != null || this.newItSystemObject != null) {
+                this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
+                    .success(() => {
+                        this.modalMigrationConsequence.close();
+                        this.mainGrid.dataSource.fetch();
+                        this.notify.addSuccessMessage("Flytning af system anvendelse lykkedes");
+                    })
+                    .error(() => {
+                        this.notify.addErrorMessage("Flytning af system anvendelse fejlede");
+                    });
+            }
+        }
+
+        public copyToClipBoard() {
+            window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
+            document.execCommand("Copy");
+            window.getSelection().removeAllRanges();
+            this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+
+        }
+
+        public cancelMigration() {
+            this.modalMigrationConsequence.close();
+        }
+
         public usageDetailsGrid: kendo.ui.GridOptions = {
             dataSource: {
-                type: "odata-v4",
                 transport:
                 {
                     read: {
-                        url: "/odata/ItSystemUsages?$expand=Organization",
+                        url: () => `/api/v1/ItSystem/${this.oldItSystemId}/usingOrganizations`,
                         dataType: "json"
                     }
+                },
+                schema: {
+                    data: (response) => response.response
                 },
                 serverPaging: true,
                 serverSorting: true,
@@ -739,14 +914,23 @@
             autoBind: false,
             columns: [
                 {
-                    field: "Organization.Name",
-                    title: "Organisation"
+                    field: "organization.name", title: "Organisation",
+                    template: dataItem => {
+                        var orgId = dataItem.organization.id;
+                        var orgName = dataItem.organization.name;
+                        var usageId = dataItem.systemUsageId;
+                        if (this.canMigrate) {
+                            return ` ${orgName} <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
+                        } else {
+                            return orgName;
+                        }
+                    },
                 }
-            ],
-            dataBound: this.detailsBound
+            ]
         };
 
         private exportFlag = false;
+
         private exportToExcel = (e) => {
             var columns = e.sender.columns;
 
@@ -888,6 +1072,8 @@
                 dataSource.filter(newFilter);
             }
 
+
+
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({
@@ -902,6 +1088,7 @@
                 change: applyFilter
             });
         }
+
     }
 
     angular
@@ -917,14 +1104,21 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ['$http', function ($http) {
+                        userAccessRights: ["$http", function ($http) {
                             return $http.get("api/itsystem/?getEntitiesAccessRights=true")
                                 .then(function (result) {
                                     return result.data.response;
                                 });
-                        }]
+                        }],
+                        userMigrationRights: ["$http", function ($http) {
+                            return $http.get("api/v1/ItSystemUsageMigration/Accessibility")
+                                .then(function (result) {
+                                    return result.data.response;
+                                });
+                        }],
                     }
                 });
+
             }
         ]);
 }

@@ -1,5 +1,5 @@
 ﻿import Login = require("../../Helpers/LoginHelper");
-import CatalogHelper = require("../../Helpers/CatalogHelper");
+import CatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po")
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 
@@ -48,7 +48,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     });
 
     it("Local Admin can still delete IT-system Catalogs that have been created locally", () => {
-        const catalogName = createCatalogName();
+        const systemName = createSystemName();
         loginHelper.loginAsGlobalAdmin()
             .then(() => {
                 return loadPage();
@@ -57,10 +57,10 @@ describe("ITSystem Catalog accessibility tests", () => {
             }).then(() => {
                 return expectCreateButtonVisibility(true);
             }).then(() => {
-                return expectNoCatalogWithName(catalogName);
+                return expectNoSystemWithName(systemName);
             }).then(() => {
-                console.log("Creating catalog");
-                return CatalogHelper.createCatalog(catalogName);
+                console.log("Creating system");
+                return CatalogHelper.createSystem(systemName);
             }).then(() => {
                 console.log("Deleting cookies");
                 return testFixture.cleanupState();
@@ -72,22 +72,22 @@ describe("ITSystem Catalog accessibility tests", () => {
             }).then(() => {
                 return waitForKendoGrid();
             }).then(() => {
-                return expectCatalogWithName(catalogName);
+                return expectSystemWithName(systemName);
             }).then(() => {
-                console.log("Deleting catalog");
-                return CatalogHelper.deleteCatalog(catalogName);
+                console.log("Deleting system");
+                return CatalogHelper.deleteSystem(systemName);
             }).then(() => {
                 return loadPage();
             }).then(() => {
                 return waitForKendoGrid();
             }).then(() => {
                 console.log("Checking that the catalog have been deleted");
-                return expectNoCatalogWithName(catalogName);
+                return expectNoSystemWithName(systemName);
             });
     });
 
         it("Global Admin can create and delete It-system catalog", () => {
-            const catalogName = createCatalogName();
+            const systemName = createSystemName();
              loginHelper.loginAsGlobalAdmin()
             .then(() => {
                 return loadPage();
@@ -99,11 +99,11 @@ describe("ITSystem Catalog accessibility tests", () => {
                 return expectCreateButtonVisibility(true);
             })
             .then(() => {
-                return expectNoCatalogWithName(catalogName);
+                return expectNoSystemWithName(systemName);
             })
             .then(() => {
-                console.log("Creating catalog");
-                return CatalogHelper.createCatalog(catalogName);
+                console.log("Creating system");
+                return CatalogHelper.createSystem(systemName);
             })
             .then(() => {
                 console.log("Loading page after catalog creation");
@@ -113,11 +113,11 @@ describe("ITSystem Catalog accessibility tests", () => {
                 return waitForKendoGrid();
             })
             .then(() => {
-                return expectCatalogWithName(catalogName);
+                return expectSystemWithName(systemName);
             })
             .then(() => {
                 console.log("Deleting catalog");
-                return CatalogHelper.deleteCatalog(catalogName);
+                return CatalogHelper.deleteSystem(systemName);
             })
             .then(() => {
                 console.log("Verify that catalog is deleted");
@@ -127,7 +127,7 @@ describe("ITSystem Catalog accessibility tests", () => {
                 return waitForKendoGrid();
             })
             .then(() => {
-                return expectNoCatalogWithName(catalogName);
+                return expectNoSystemWithName(systemName);
             });
     });
 
@@ -141,20 +141,20 @@ describe("ITSystem Catalog accessibility tests", () => {
     }
 
     function loadPage() {
-        console.log("Loading catalog page");
+        console.log("Loading system catalog page");
         return pageObject.getPage();
     }
 
-    function createCatalogName() {
-        return "Catalog" + new Date().getTime();
+    function createSystemName() {
+        return "System" + new Date().getTime();
     }
 
-    function expectCatalogWithName(name: string) {
+    function expectSystemWithName(name: string) {
         console.log("Making sure " + name + " does exist");
         return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
     }
 
-    function expectNoCatalogWithName(name: string) {
+    function expectNoSystemWithName(name: string) {
         console.log("Making sure " + name + " does not exist");
         return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
     }
