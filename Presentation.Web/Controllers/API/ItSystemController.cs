@@ -6,14 +6,19 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.ItSystem;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -468,10 +473,43 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpGet]
+        [Route("api/v1/ItSystem/{id}/usingOrganizations")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<UsingOrganizationDTO>>))]
+        public HttpResponseMessage GetUsingOrganizations([FromUri] int id)
+        {
+            var itSystemUsages = _systemService.GetUsingOrganizations(id);
+            switch (itSystemUsages.Status)
+            {
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.NotFound:
+                    return NotFound();
+                case OperationResult.Ok:
+                    var dto = Map(itSystemUsages.Value);
+                    return Ok(dto);
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError,
+                        "An error occured when trying to get using organizations");
+            }
+
+        }
+
         private bool IsAvailable(string name, int orgId)
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
+        }
+
+        private static IEnumerable<UsingOrganizationDTO> Map(IEnumerable<UsingOrganization> usingOrganizations)
+        {
+            return usingOrganizations.Select(
+                usingOrganization => new UsingOrganizationDTO
+                {
+                    SystemUsageId = usingOrganization.ItSystemUsageId,
+                    Organization = usingOrganization.Organization.MapToNamedEntityDTO()
+                })
+                .ToList();
         }
     }
 }

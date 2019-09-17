@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 
-namespace Core.DomainServices
+namespace Core.ApplicationServices.System
 {
     public interface IItSystemService
     {
@@ -10,6 +12,7 @@ namespace Core.DomainServices
         IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
+        Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId);
         void Delete(int id);
     }
 }
