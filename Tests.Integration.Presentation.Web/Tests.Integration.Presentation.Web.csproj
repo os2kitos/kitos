@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="ItSystem\ItContractTest.cs" />
     <Compile Include="ItSystem\ItInterfaceUsageTests.cs" />
+    <Compile Include="ItSystem\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
     <Compile Include="ItSystem\ItIterfacesTest.cs" />

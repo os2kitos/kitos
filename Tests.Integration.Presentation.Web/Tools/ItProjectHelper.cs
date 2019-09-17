@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
@@ -41,6 +43,37 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(usageId, response.Id);
                 return response;
             }
+        }
+
+        public static async Task<GoalDTO> AddGoalAsync(int projectId, string humanReadableId, bool measurable, string name, string description, DateTime goalDate1, DateTime goalDate2, DateTime goalDate3, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddGoalAsyncRequestAsync(projectId, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<GoalDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddGoalAsyncRequestAsync(int projectId, string humanReadableId, bool measurable, string name, string description, DateTime goalDate1, DateTime goalDate2, DateTime goalDate3, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/goal/");
+            var body = new
+            {
+                description = description,
+                goalStatusId = projectId, //yep that's not a mistake. goalStatusId ::= project.id
+                goalTypeId = "2",
+                measurable = measurable,
+                name = name,
+                status = 1,
+                subGoalDate1 = goalDate1,
+                subGoalDate2 = goalDate2,
+                subGoalDate3 = goalDate3,
+                humanReadableId = humanReadableId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
     }
 }
