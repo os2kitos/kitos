@@ -123,5 +123,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
+
+        [Theory, Description("Validates: KITOSUDV-276")]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_SystemUsage_Wish(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var text = A<string>();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+            //Act - perform the POST with the actual role
+            var result = await ItSystemHelper.CreateWishAsync(usage.Id, text, optionalLogin: login);
+
+            //Assert
+            Assert.Equal(usage.Id, result.ItSystemUsageId);
+            Assert.Equal(text, result.Text);
+        }
+
+        [Theory, Description("Validates: KITOSUDV-276")]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_SystemUsage_Wish(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var text = A<string>();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, system.OrganizationId);
+
+            //Act
+            var result = await ItSystemHelper.SendCreateWishRequestAsync(usage.Id, text, optionalLogin: login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
     }
 }

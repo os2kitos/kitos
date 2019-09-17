@@ -1,7 +1,4 @@
-﻿using System;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
-using Core.DomainModel.ItProject;
+﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
