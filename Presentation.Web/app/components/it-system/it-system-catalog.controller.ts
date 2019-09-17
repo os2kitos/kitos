@@ -825,7 +825,7 @@
             this.modalMigration.center().open();
         }
         
-        public migrateSystemTo = () => {
+        public onNewTargetSystemSelected = () => {
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
                 this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)

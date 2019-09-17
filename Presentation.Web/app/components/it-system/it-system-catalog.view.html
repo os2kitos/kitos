@@ -9,7 +9,6 @@
 <div data-kendo-window="systemCatalogVm.modalMigration"
      data-k-title="'Migration'" data-k-width="800"
      data-k-visible="false" data-k-modal="true" id="migrationModelWindow2">
-    <!--<div id="availableSystems" data-kendo-grid="systemCatalogVm.usageGridMigration" data-k-options="systemCatalogVm.usageDetailsGridMigration"></div>-->
     <div id="select2MigrationContainer">
         <input type="hidden"
                id="new-system-usage"
@@ -17,7 +16,7 @@
                data-ui-select2="mySelectOptions"
                data-ng-model="mySelectOptionsModel"
                data-placeholder="Vælg IT system">
-        <button ng-click='systemCatalogVm.migrateSystemTo()' class='btn btn-success pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvens</button>
+        <button ng-click='systemCatalogVm.onNewTargetSystemSelected()' class='btn btn-success pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvens</button>
     </div>
 </div>
 
@@ -27,13 +26,13 @@
     <div >
         <div id="copyPasteConsequence">
             <div class="migrationDivPadding">
-                <h3>Opsummering af ændringer ifm flytning af ”IT-system anvendelse” til nyt IT-system </h3>
+                <h3>Opsummering af ændringer ifm. flytning af "IT-system anvendelse" til nyt IT-system </h3>
             </div>
             <div class="migrationDivPadding">
-                For at sikre datakvaliteten i Kitos – og f.eks. komme redundante registreringer til livs - har Global admin mulighed for at flytte jeres anvendelse fra et it-system til et andet. <br/>
+                For at sikre datakvaliteten i Kitos – og f.eks. komme redundante registreringer til livs - har Global admin mulighed for at flytte jeres anvendelse fra et it-system til et andet.
             </div>
             <div class="migrationDivPadding">
-                I forbindelse med at Global admin har flyttet jeres systemanvendelse fra et IT-system til et andet, kan oplyses at:
+                I forbindelse med at Global admin har flyttet jeres systemanvendelse fra et IT-system til et andet, kan det oplyses at:
             </div>
             <div>
                 <div class="panel panel-default">
@@ -71,13 +70,13 @@
                             IT-systemet er omfattet af kontrakten <strong> {{affectedContracts.systemAssociatedInContract ? 'Ja' : 'Nej' }}</strong>
                         </div>
                         <div class="migrationDivPadding" ng-if="affectedContracts.affectedInterfaceUsages.length > 0" ng-class="{'migrationDivBorders': affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0}">
-                            Anvender snitfladerelation, der flyttes
+                            "Anvender" snitfladerelation, der flyttes
                             <ul>
                                 <li ng-repeat="interfaceToBeMoved in affectedContracts.affectedInterfaceUsages">{{interfaceToBeMoved.name}} ( Id: {{interfaceToBeMoved.id}} )</li>
                             </ul>
                         </div>
                         <div class="migrationDivPadding" ng-if="affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0">
-                            Udstiller snitfladerelation, der slettes
+                            "Udstiller" snitfladerelation, der slettes
                             <ul>
                                 <li ng-repeat="interfaceToBeDeleted in affectedContracts.interfaceExhibitUsagesToBeDeleted">{{interfaceToBeDeleted.name}} ( Id: {{interfaceToBeDeleted.id}} )</li>
                             </ul>
@@ -101,8 +100,8 @@
                 </div>
             </div>
         </div>
-        <button ng-click='systemCatalogVm.copyToClipBoard()' class="btn migrationReportButton">Kopiere til udklipsholder</button>
-        <button ng-click='systemCatalogVm.cancelMigration()' class='btn btn-danger pull-left migrationReportButton'>Annullere</button>
-        <button ng-click='systemCatalogVm.startMigration()' class='btn btn-success pull-right migrationReportButton' data-element-type="startMigration">Start flytning</button>
+        <button ng-click='systemCatalogVm.copyToClipBoard()' class="btn migrationReportButton">Kopiér til udklipsholder</button>
+        <button ng-click='systemCatalogVm.cancelMigration()' class='btn btn-danger pull-left migrationReportButton'>Annullér</button>
+        <button ng-click='systemCatalogVm.startMigration()' class='btn btn-success pull-right migrationReportButton' data-element-type="startMigration">Gennemfør flytning</button>
     </div >
 </div>
