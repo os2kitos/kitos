@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("")]
-        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageMigrationDTO>))]
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
@@ -53,7 +53,10 @@ namespace Presentation.Web.Controllers.API
 
         [HttpPost]
         [Route("")]
-        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NoContent,"Migration completed")]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
@@ -75,6 +78,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("Accessibility")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageMigrationAccessDTO>))]
         public HttpResponseMessage GetAccessibilityLevel()
         {
             return Ok(new ItSystemUsageMigrationAccessDTO
@@ -85,7 +89,7 @@ namespace Presentation.Web.Controllers.API
 
         [HttpGet]
         [Route("UnusedItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemSimpleDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemSimpleDTO>>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
             [FromUri]int organizationId,
             [FromUri]string nameContent,
