@@ -1,10 +1,9 @@
-﻿using System;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -16,51 +15,31 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<GoalStatus> _goalStatusRepository;
 
         public GoalController(
-            IGenericRepository<Goal> repository, 
-            IAuthorizationContext authorization, 
+            IGenericRepository<Goal> repository,
+            IAuthorizationContext authorization,
             IItProjectRepository projectRepository,
-            IGenericRepository<GoalStatus> goalStatusRepository) 
+            IGenericRepository<GoalStatus> goalStatusRepository)
             : base(repository, authorization)
         {
             _projectRepository = projectRepository;
             _goalStatusRepository = goalStatusRepository;
         }
 
-        protected override bool AllowCreate<T>(IEntity entity)
+        private ItProject GetItProject(Goal relation)
         {
-            if (entity is Goal relation)
+            var goalStatus = _goalStatusRepository.GetByKey(relation.GoalStatusId);
+            if (goalStatus != null)
             {
-                var goalStatus = _goalStatusRepository.GetByKey(relation.GoalStatusId);
                 var project = _projectRepository.GetById(goalStatus.ItProject.Id);
-                return project != null && base.AllowModify(project);
-            }
-            return false;
-        }
-
-        protected override bool AllowModify(IEntity entity)
-        {
-            return GeAuthorizationFromRoot(entity, base.AllowModify);
-        }
-
-        protected override bool AllowDelete(IEntity entity)
-        {
-            //Check if modification, not deletion, of parent usage (the root aggregate) is allowed 
-            return GeAuthorizationFromRoot(entity, base.AllowModify);
-        }
-
-        protected override bool AllowRead(IEntity entity)
-        {
-            return GeAuthorizationFromRoot(entity, base.AllowRead);
-        }
-
-        private static bool GeAuthorizationFromRoot(IEntity entity, Predicate<ItProject> condition)
-        {
-            if (entity is Goal relation)
-            {
-                return condition.Invoke(relation.GoalStatus.ItProject);
+                return project;
             }
 
-            return false;
+            return default(ItProject);
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Goal>(GetItProject, base.GetCrudAuthorization());
         }
     }
 }

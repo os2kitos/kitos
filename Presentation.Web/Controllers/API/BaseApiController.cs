@@ -233,19 +233,24 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
-        protected virtual bool AllowRead(IEntity entity)
+        protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return AuthorizationStrategy.AllowRead(entity);
+            return new RootEntityCrudAuthorization(AuthorizationStrategy);
         }
 
-        protected virtual bool AllowModify(IEntity entity)
+        protected bool AllowRead(IEntity entity)
         {
-            return AuthorizationStrategy.AllowModify(entity);
+            return GetCrudAuthorization().AllowRead(entity);
         }
 
-        protected virtual bool AllowCreate<T>(IEntity entity)
+        protected bool AllowModify(IEntity entity)
         {
-            return AuthorizationStrategy.AllowCreate<T>(entity);
+            return GetCrudAuthorization().AllowModify(entity);
+        }
+
+        protected bool AllowCreate<T>(IEntity entity)
+        {
+            return GetCrudAuthorization().AllowCreate<T>(entity);
         }
 
         protected bool AllowCreate<T>()
@@ -253,9 +258,9 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.AllowCreate<T>();
         }
 
-        protected virtual bool AllowDelete(IEntity entity)
+        protected bool AllowDelete(IEntity entity)
         {
-            return AuthorizationStrategy.AllowDelete(entity);
+            return GetCrudAuthorization().AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)

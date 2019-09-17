@@ -1,11 +1,13 @@
 ﻿using System;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
 using Presentation.Web.Models;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -23,40 +25,9 @@ namespace Presentation.Web.Controllers.API
             _systemRepository = systemRepository;
         }
 
-        protected override bool AllowCreate<T>(IEntity entity)
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            if (entity is ItSystemDataWorkerRelation relation)
-            {
-                var itSystem = _systemRepository.GetSystem(relation.ItSystemId);
-                return itSystem != null && base.AllowModify(itSystem);
-            }
-            return false;
-        }
-
-        protected override bool AllowModify(IEntity entity)
-        {
-            return GeAuthorizationFromRoot(entity, base.AllowModify);
-        }
-
-        protected override bool AllowDelete(IEntity entity)
-        {
-            //Check if modification, not deletion, of parent usage (the root aggregate) is allowed 
-            return GeAuthorizationFromRoot(entity, base.AllowModify);
-        }
-
-        protected override bool AllowRead(IEntity entity)
-        {
-            return GeAuthorizationFromRoot(entity, base.AllowRead);
-        }
-
-        private static bool GeAuthorizationFromRoot(IEntity entity, Predicate<ItSystem> condition)
-        {
-            if (entity is ItSystemDataWorkerRelation relation)
-            {
-                return condition.Invoke(relation.ItSystem);
-            }
-
-            return false;
+            return new ChildEntityCrudAuthorization<ItSystemDataWorkerRelation>(x => _systemRepository.GetSystem(x.ItSystemId), base.GetCrudAuthorization());
         }
     }
 }

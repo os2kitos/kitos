@@ -2,26 +2,17 @@
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using System.Linq;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItSystem;
-using Core.DomainServices.Repositories.SystemUsage;
 
 namespace Core.ApplicationServices
 {
     public class ItSystemUsageService : IItSystemUsageService
     {
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
-        private readonly IItSystemUsageRepository _repository;
-        private readonly IAuthorizationContext _authorizationContext;
 
         public ItSystemUsageService(
-            IGenericRepository<ItSystemUsage> usageRepository,
-            IItSystemUsageRepository repository,
-            IAuthorizationContext authorizationContext)
+            IGenericRepository<ItSystemUsage> usageRepository)
         {
             _usageRepository = usageRepository;
-            _repository = repository;
-            _authorizationContext = authorizationContext;
         }
 
         public ItSystemUsage Add(ItSystemUsage ItSystemUsage, User objectOwner)
@@ -49,25 +40,6 @@ namespace Core.ApplicationServices
             // delete it system usage
             _usageRepository.Delete(itSystemUsage);
             _usageRepository.Save();
-        }
-
-        public bool CanAddDataWorkerRelation(int usageId, int organizationId)
-        {
-            var systemUsage = _repository.GetSystemUsage(usageId);
-            if (AllowDataWorkerCreation(systemUsage))
-            {
-                //Do not allow overlaps
-                return systemUsage.AssociatedDataWorkers.Any(x => x.DataWorkerId == organizationId) == false;
-            }
-
-            return false;
-        }
-
-        private bool AllowDataWorkerCreation(IEntity systemUsage)
-        {
-            return systemUsage != null &&
-                   _authorizationContext.AllowModify(systemUsage) &&
-                   _authorizationContext.AllowCreate<ItSystemUsageDataWorkerRelation>();
         }
     }
 }
