@@ -47,14 +47,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<GoalDTO> AddGoalAsync(int projectId, string humanReadableId, bool measurable, string name, string description, DateTime goalDate1, DateTime goalDate2, DateTime goalDate3, Cookie optionalLogin = null)
         {
-            using (var response = await SendAddGoalAsyncRequestAsync(projectId, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, optionalLogin))
+            using (var response = await SendAddGoalRequestAsync(projectId, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<GoalDTO>();
             }
         }
 
-        public static async Task<HttpResponseMessage> SendAddGoalAsyncRequestAsync(int projectId, string humanReadableId, bool measurable, string name, string description, DateTime goalDate1, DateTime goalDate2, DateTime goalDate3, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendAddGoalRequestAsync(int projectId, string humanReadableId, bool measurable, string name, string description, DateTime goalDate1, DateTime goalDate2, DateTime goalDate3, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -71,6 +71,36 @@ namespace Tests.Integration.Presentation.Web.Tools
                 subGoalDate2 = goalDate2,
                 subGoalDate3 = goalDate3,
                 humanReadableId = humanReadableId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<AssignmentDTO> AddAssignmentAsync(int organizationId, int projectId, string description, string name, string note, int statusPercentage, int timeEstimate, DateTime startDate, DateTime endDate, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddAssignmentRequestAsync(organizationId, projectId, description, name, note, statusPercentage, timeEstimate, startDate, endDate, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<AssignmentDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddAssignmentRequestAsync(int organizationId, int projectId, string description, string name, string note, int statusPercentage, int timeEstimate, DateTime startDate, DateTime endDate, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/assignment/?organizationId={organizationId}");
+            var body = new
+            {
+                associatedItProjectId = projectId,
+                associatedPhaseNum = 2,
+                description = description,
+                startDate = startDate,
+                endDate = endDate,
+                name = name,
+                note = note,
+                statusProcentage = statusPercentage, //yep spelling monkey on the left
+                timeEstimate = timeEstimate
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);

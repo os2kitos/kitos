@@ -16,7 +16,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         /*
          *It Projekt
 
-            - Lokal admin kan ikke oprette mål: status: Mål. Har ikke rettigheder
             - Lokal admin kan ikke oprette opgave: Status projekt. Har ikke rettigheder
             - Lokal admin kan ikke oprette milepæl: Status projekt. Har ikke rettigheder
             - Lokal admin kan ikke oprette interessenter: Interessenter. Har ikke rettigheder
@@ -74,7 +73,62 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var goalDate3 = A<DateTime>().Date;
 
             //Act - perform the POST with the actual role
-            using (var result = await ItProjectHelper.SendAddGoalAsyncRequestAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login))
+            using (var result = await ItProjectHelper.SendAddGoalRequestAsync(_project.Id, humanReadableId, measurable, name, description, goalDate1, goalDate2, goalDate3, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Assignment(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the POST with the actual role
+            var description = A<string>();
+            var name = A<string>();
+            var note = A<string>();
+            var statusPercentage = A<int>() % 100;
+            var timeEstimate = A<int>();
+            var startDate = A<DateTime>().Date;
+            var endDate = startDate.AddDays(10);
+
+            var result = await ItProjectHelper.AddAssignmentAsync(OrganizationId, _project.Id, description, name, note, statusPercentage, timeEstimate, startDate, endDate, login);
+
+            //Assert
+            Assert.Equal(_project.Id, result.AssociatedItProjectId.GetValueOrDefault());
+            Assert.Equal(description, result.Description);
+            Assert.Equal(name, result.Name);
+            Assert.Equal(note, result.Note);
+            Assert.Equal(statusPercentage, result.StatusProcentage);
+            Assert.Equal(timeEstimate, result.TimeEstimate);
+            Assert.Equal(startDate, result.StartDate);
+            Assert.Equal(endDate, result.EndDate);
+
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_Assignment(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the POST with the actual role
+            var description = A<string>();
+            var name = A<string>();
+            var note = A<string>();
+            var statusPercentage = A<int>() % 100;
+            var timeEstimate = A<int>();
+            var startDate = A<DateTime>().Date;
+            var endDate = startDate.AddDays(10);
+
+            //Act - perform the action with the actual role
+            using (var result = await ItProjectHelper.SendAddAssignmentRequestAsync(OrganizationId, _project.Id, description, name, note, statusPercentage, timeEstimate, startDate, endDate, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
