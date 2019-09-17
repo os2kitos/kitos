@@ -94,6 +94,7 @@
     <Compile Include="ItSystem\ItIterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
+    <Compile Include="ItSystem\LocalConfigTest.cs" />
     <Compile Include="ItSystem\OrganizationTest.cs" />
     <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Tools\ItContractHelper.cs" />
     <Compile Include="Tools\ItProjectHelper.cs" />
     <Compile Include="Tools\ItSystemHelper.cs" />
+    <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />

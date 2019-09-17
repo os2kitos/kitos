@@ -137,6 +137,10 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
 
+            if (delta == null)
+            {
+                return BadRequest();
+            }
             // does the entity exist?
             if (entity == null)
             {
