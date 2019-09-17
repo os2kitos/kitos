@@ -2,7 +2,7 @@
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller;
 
@@ -11,21 +11,21 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItInterfaceExhibitsController : BaseEntityController<ItInterfaceExhibit>
     {
-        private readonly IItSystemRepository _systemRepository;
+        private readonly IGenericRepository<ItInterface> _interfaceRepository;
 
         public ItInterfaceExhibitsController(
             IGenericRepository<ItInterfaceExhibit> repository, 
             IAuthenticationService authService,
             IAuthorizationContext authorizationContext,
-            IItSystemRepository systemRepository)
+            IGenericRepository<ItInterface> interfaceRepository)
             : base(repository, authService, authorizationContext)
         {
-            _systemRepository = systemRepository;
+            _interfaceRepository = interfaceRepository;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemDataWorkerRelation>(x => _systemRepository.GetSystem(x.ItSystemId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItInterfaceExhibit>(x => _interfaceRepository.AsQueryable().ById(x.Id), base.GetCrudAuthorization());
         }
     }
 }
