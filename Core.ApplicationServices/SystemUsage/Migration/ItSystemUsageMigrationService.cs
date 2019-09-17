@@ -8,7 +8,6 @@ using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
