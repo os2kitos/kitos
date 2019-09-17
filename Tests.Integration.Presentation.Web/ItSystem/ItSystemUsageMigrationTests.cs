@@ -132,6 +132,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, " ")]
+        [InlineData(OrganizationRole.GlobalAdmin, "")]
+        public async Task GetUnusedItSystems_Returns_Empty_List_On_Whitespace_Or_Empty(OrganizationRole role, string nameContent)
+        {
+            //Act
+            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, nameContent, 25, true))
+            {
+                var response = await httpResponse.Content.ReadAsStringAsync();
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+                Assert.Equal(TestEnvironment.EmptyListApiJson, response);
+            }
+        }
+
         [Fact, Description("Systems in use in our own organization should not be included")]
         public async Task GetUnusedItSystems_Does_Not_Include_Systems_In_Use()
         {
