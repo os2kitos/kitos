@@ -32,21 +32,21 @@ namespace Presentation.Web.Controllers.API
 
         protected override bool AllowModify(IEntity entity)
         {
-            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
+            return GeAuthorizationFromRoot(entity, base.AllowModify);
         }
 
         protected override bool AllowDelete(IEntity entity)
         {
             //Check if modification, not deletion, of parent usage (the root aggregate) is allowed 
-            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
+            return GeAuthorizationFromRoot(entity, base.AllowModify);
         }
 
         protected override bool AllowRead(IEntity entity)
         {
-            return GeAuthorizationFromParentUsage(entity, base.AllowRead);
+            return GeAuthorizationFromRoot(entity, base.AllowRead);
         }
 
-        private static bool GeAuthorizationFromParentUsage(IEntity entity, Predicate<ItSystemUsage> condition)
+        private static bool GeAuthorizationFromRoot(IEntity entity, Predicate<ItSystemUsage> condition)
         {
             if (entity is ItSystemUsageDataWorkerRelation relation)
             {
