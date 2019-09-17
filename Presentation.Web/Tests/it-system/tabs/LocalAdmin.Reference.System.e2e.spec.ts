@@ -1,86 +1,94 @@
 ﻿import login = require("../../Helpers/LoginHelper");
 import HomePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
-import WaitUpTo = require("../../Utility/WaitTimers");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
-import Constants = require("../../Utility/Constants");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
+import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
 var loginHelper = new login();
 var homePage = new HomePage();
-var waitUpTo = new WaitUpTo();
 var refHelper = new ReferenceHelper();
-var consts = new Constants();
 var testFixture = new TestFixtureWrapper();
-
 var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
 var inputFields = homePage.kendoToolbarWrapper.inputFields();
-var colObjects = homePage.kendoToolbarWrapper.columnObjects();
 
-describe("Can add and remove reference",
+
+describe("Local Admin is able to create,edit and delete",
     () => {
         beforeAll(() => {
-            loginHelper.loginAsLocalAdmin();
         });
 
         beforeEach(() => {
+            testFixture.enableLongRunningTest();
             homePage.getPage();
         });
 
         afterAll(() => {
+            testFixture.disableLongRunningTest();
             testFixture.cleanupState();
         });
 
-        it("",
+        it("Can add, edit and delete a reference",
             () => {
-                refHelper.createReference(consts.refTitle, consts.validUrl, consts.refId);
-                expect(colObjects.referenceName.first().getText()).toEqual(consts.refTitle);
-                refHelper.deleteReference(consts.refId);
-                expect(colObjects.referenceName).toBeEmptyArray();
+                var itSystemName = createItSystemName();
+                var referenceName = createReferenceName();
+                var referenceId = createReferenceId();
+                var validUrl = generateValidUrl();
+                var invalidUrl = generateInvalidUrl();
+                 
+                loginHelper.loginAsGlobalAdmin()
+                    .then(() => ItSystemHelper.createSystem(itSystemName))
+                    .then(() => testFixture.cleanupState())
+                    .then(() => loginHelper.loginAsLocalAdmin())
+                    .then(() => refHelper.goToSpecificItSystemReferences(itSystemName))
+                    .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
+                    .then(() => expect(getReferenceId(referenceName).getText()).toEqual(referenceId))
+                    .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
+                    .then(() => expect(getEditButtonFromReference(referenceName).isPresent()).toBe(true))
+                    .then(() => getEditButtonFromReference(referenceName).click())
+                    .then(() => inputFields.referenceDocUrl.clear())
+                    .then(() => inputFields.referenceDocUrl.sendKeys(invalidUrl))
+                    .then(() => headerButtons.editSaveReference.click())
+                    .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy())
+                    .then(() => getDeleteButtonFromInvalidUrlReference(referenceName).click())
+                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => expect(element.all(by.xpath('//*/tbody/tr'))).toBeEmptyArray());
             });
 
     });
 
-describe("Can edit reference URL",
-    () => {
+function createItSystemName() {
+    return `ItSystemRefTest${new Date().getTime()}`;
+}
 
-        beforeAll(() => {
-            loginHelper.loginAsLocalAdmin();
-            refHelper.createReference(consts.refTitle, consts.validUrl, consts.refId);
-        });
+function createReferenceName() {
+    return `Reference${new Date().getTime()}`;
+}
 
-        beforeEach(() => {
-            homePage.getPage();
-            browser.waitForAngular();
-        });
+function createReferenceId() {
+    return `ID${new Date().getTime()}`;
+}
 
-        afterAll(() => {
-            refHelper.deleteReference(consts.refId);
-            testFixture.cleanupState();
-        });
+function generateValidUrl() {
+    return `http://www.${new Date().getTime()}.dk/`;
+}
 
+function generateInvalidUrl()
+{
+    return `${new Date().getTime()}.dk/`;
+}
 
-        it("Able to edit references", () => {
-            browser.wait(homePage.isEditReferenceLoaded(), waitUpTo.twentySeconds);
-            expect(headerButtons.editReference.isEnabled()).toBe(true);
-        });
+function getReferenceId(refName : string) {
+    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName +'"]/parent::*/parent::*//td[@data-element-type="referenceIdObject"]'));
+}
 
-        it("Able to insert invalid url", () => {
-            browser.wait(homePage.isEditReferenceLoaded(), waitUpTo.twentySeconds);
-            headerButtons.editReference.click();
-            inputFields.referenceDocUrl.clear();
-            inputFields.referenceDocUrl.sendKeys(consts.invalidUrl);
-            headerButtons.editSaveReference.click();
+function getEditButtonFromReference(refName: string) {
+    return element(by.xpath('//*/tbody/*/td/a[text()="'+refName+'"]/parent::*/parent::*//*/button[@data-element-type="editReference"]'));
+}
 
-            expect(colObjects.referenceName.getAttribute("href")).not.toContain(consts.invalidUrl);
-        });
+function getDeleteButtonFromInvalidUrlReference(refName: string) {
+    return element(by.xpath('//*/tbody/*/td[text()="' + refName + '"]/parent::*/parent::*//*/button[@data-element-type="deleteReference"]'));
+}
 
-        it("Able to insert valid url", () => {
-            browser.wait(homePage.isEditReferenceLoaded(), waitUpTo.twentySeconds);
-            headerButtons.editReference.click();
-            inputFields.referenceDocUrl.clear();
-            inputFields.referenceDocUrl.sendKeys(consts.validUrl);
-            headerButtons.editSaveReference.click();
-            expect(colObjects.referenceName.getAttribute("href")).toContain(consts.validUrl);
-        });
-
-    });
+function getUrlFromReference(refName: string) {
+    return element(by.xpath('//*/tbody/*/td/a[text()="' + refName + '"]/parent::*/parent::*//td[@data-element-type="referenceObject"]/a'));
+}

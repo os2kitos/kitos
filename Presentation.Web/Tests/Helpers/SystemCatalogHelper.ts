@@ -3,6 +3,7 @@ import SystemPage = require("../PageObjects/It-system/Tabs/ItSystemFrontpage.po"
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
+import loginHelper = require("./LoginHelper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -10,25 +11,16 @@ class SystemCatalogHelper {
     private static pageObject = new CatalogPage();
     private static systemPage = new SystemPage();
     private static waitUpTo = new WaitTimers();
+    private static loginHelper = new loginHelper();
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
-            .then(() => {
-                return SystemCatalogHelper.waitForKendoGrid();
-            })
-            .then(() => {
-                return SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
-            })
-            .then(() => {
-                return browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                return element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name);
-            })
-            .then(() => {
-                return element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click();
-            });
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
+            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(),SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click());
     }
 
     public static deleteSystem(name: string) {

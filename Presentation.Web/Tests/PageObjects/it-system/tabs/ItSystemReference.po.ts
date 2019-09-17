@@ -6,7 +6,7 @@ var ec = protractor.ExpectedConditions;
 class ItSystemReference implements IPageObject { 
 
     public getPage(): webdriver.promise.Promise<void> {
-        return browser.get(browser.baseUrl + "/#/system/edit/1/reference");
+        return browser.get(browser.baseUrl + "/#/system/catalog");
     }
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 
