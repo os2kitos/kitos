@@ -3,7 +3,6 @@ import SystemPage = require("../PageObjects/It-system/Tabs/ItSystemFrontpage.po"
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
-import loginHelper = require("./LoginHelper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -11,7 +10,6 @@ class SystemCatalogHelper {
     private static pageObject = new CatalogPage();
     private static systemPage = new SystemPage();
     private static waitUpTo = new WaitTimers();
-    private static loginHelper = new loginHelper();
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
@@ -26,21 +24,11 @@ class SystemCatalogHelper {
     public static deleteSystem(name: string) {
         console.log(`Deleting system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
-            .then(() => {
-                return SystemCatalogHelper.waitForKendoGrid();
-            })
-            .then(() => {
-                return SystemCatalogHelper.findCatalogColumnsFor(name).first().click();
-            })
-            .then(() => {
-                return browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                return SystemCatalogHelper.systemPage.getDeleteButton().click();
-            })
-            .then(() => {
-                return browser.switchTo().alert().accept();
-            });
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
+            .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => SystemCatalogHelper.systemPage.getDeleteButton().click())
+            .then(() => browser.switchTo().alert().accept());
     }
 
     public static findCatalogColumnsFor(name: string) {
@@ -52,5 +40,4 @@ class SystemCatalogHelper {
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
 }
-
 export = SystemCatalogHelper;

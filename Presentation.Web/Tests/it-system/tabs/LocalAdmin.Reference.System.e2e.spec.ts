@@ -1,19 +1,18 @@
 ﻿import login = require("../../Helpers/LoginHelper");
-import HomePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
+import ItSystemHomePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
 var loginHelper = new login();
-var homePage = new HomePage();
+var itSystemHomePage = new ItSystemHomePage();
 var refHelper = new ReferenceHelper();
 var testFixture = new TestFixtureWrapper();
-var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
-var inputFields = homePage.kendoToolbarWrapper.inputFields();
+var headerButtons = itSystemHomePage.kendoToolbarWrapper.headerButtons();
+var inputFields = itSystemHomePage.kendoToolbarWrapper.inputFields();
 
 describe("Local Admin is able to create,edit and delete",
     () => {
-
         var itSystemName = createItSystemName();
 
         beforeAll(() => {
@@ -94,8 +93,7 @@ function generateValidUrl() {
     return `http://www.${new Date().getTime()}.dk/`;
 }
 
-function generateInvalidUrl()
-{
+function generateInvalidUrl(){
     return `${new Date().getTime()}.dk/`;
 }
 

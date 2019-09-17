@@ -24,11 +24,8 @@ class ReferenceHelper {
         return this.itSystemCatalogPage.getPage()
             .then(() => browser.wait(this.itSystemCatalogPage.waitForKendoGrid(), this.waitUpTo.twentySeconds))
             .then(() => element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]')).click())
-            .then(() => browser.wait(element(this.cssLocator.byDataElementType("organizationButton")),
-                this.waitUpTo.twentySeconds))
+            .then(() => browser.wait(element(this.cssLocator.byDataElementType("organizationButton")),this.waitUpTo.twentySeconds))
             .then(() => element(this.cssLocator.byDataElementType("ReferenceTabButton")).click());
-
     }
 }
-
 export = ReferenceHelper;
