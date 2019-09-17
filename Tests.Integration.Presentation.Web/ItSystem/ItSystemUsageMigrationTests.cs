@@ -137,9 +137,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         [InlineData(OrganizationRole.GlobalAdmin, "")]
         public async Task GetUnusedItSystems_Returns_Empty_List_On_Whitespace_Or_Empty(OrganizationRole role, string nameContent)
         {
-            //Arrange
-            var itSystemName = CreateName();
-            var ownLocalSystem = await CreateSystemAsync(name: itSystemName);
             //Act
             using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, nameContent, 25, true))
             {
