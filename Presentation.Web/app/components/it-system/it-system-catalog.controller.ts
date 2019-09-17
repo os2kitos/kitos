@@ -869,7 +869,7 @@
             }
         };
 
-        public startMigration = () => {
+        public performMigration = () => {
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
                 this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
                     .success(() => {
