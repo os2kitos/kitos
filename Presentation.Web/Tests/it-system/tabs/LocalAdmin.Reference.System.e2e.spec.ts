@@ -1,15 +1,15 @@
 ﻿import login = require("../../Helpers/LoginHelper");
-import ItSystemHomePage = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
+import ItSystemReferenceHelper = require("../../PageObjects/it-system/tabs/ItSystemReference.po");
 import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
 var loginHelper = new login();
-var itSystemHomePage = new ItSystemHomePage();
+var itSystemReference = new ItSystemReferenceHelper();
 var refHelper = new ReferenceHelper();
 var testFixture = new TestFixtureWrapper();
-var headerButtons = itSystemHomePage.kendoToolbarWrapper.headerButtons();
-var inputFields = itSystemHomePage.kendoToolbarWrapper.inputFields();
+var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
+var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
 
 describe("Local Admin is able to create,edit and delete",
     () => {

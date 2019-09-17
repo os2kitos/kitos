@@ -1,13 +1,9 @@
-﻿import IPageObject = require("../../IPageObject.po");
-import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
+﻿import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
 
 var ec = protractor.ExpectedConditions;
 
-class ItSystemReference implements IPageObject { 
+class ItSystemReference{ 
 
-    public getPage(): webdriver.promise.Promise<void> {
-        return browser.get(browser.baseUrl + "/#/system/catalog");
-    }
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 
     public isReferenceCreateFormLoaded(): webdriver.until.Condition<boolean> {
@@ -25,7 +21,6 @@ class ItSystemReference implements IPageObject {
     public isElementLoaded(element: protractor.ElementFinder): webdriver.until.Condition<boolean> {
         return ec.visibilityOf(element);
     }
-
 }
 
 export = ItSystemReference;

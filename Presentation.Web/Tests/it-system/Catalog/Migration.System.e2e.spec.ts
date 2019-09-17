@@ -28,6 +28,7 @@ describe("Global Administrator is able to migrate from one system to another", (
     it("Local admin is not able to see the move button", () => {
         loginHelper.loginAsLocalAdmin()
             .then(() => pageObject.getPage())
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
             .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
     });
@@ -35,6 +36,7 @@ describe("Global Administrator is able to migrate from one system to another", (
     it("Regular user is not able to see the move button", () => {
         loginHelper.loginAsRegularUser()
             .then(() => pageObject.getPage())
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
             .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
     });

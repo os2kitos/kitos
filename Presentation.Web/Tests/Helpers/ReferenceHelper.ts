@@ -1,14 +1,14 @@
-﻿import RefePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
+﻿import ReferencePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
 import WaitTimers = require("../Utility/WaitTimers");
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import ItSystemCatalogPage = require("../PageObjects/it-system/Catalog/ItSystemCatalog.po");
 
 class ReferenceHelper {
-    private homePage = new RefePage();
+    private homePage = new ReferencePage();
     private itSystemCatalogPage = new ItSystemCatalogPage();
     private waitUpTo = new WaitTimers();
-    private headerButtons = new RefePage().kendoToolbarWrapper.headerButtons();
-    private inputFields = new RefePage().kendoToolbarWrapper.inputFields();
+    private headerButtons = new ReferencePage().kendoToolbarWrapper.headerButtons();
+    private inputFields = new ReferencePage().kendoToolbarWrapper.inputFields();
     private cssLocator = new CSSLocator();
 
     public createReference(title: string, url: string, id: string) {
