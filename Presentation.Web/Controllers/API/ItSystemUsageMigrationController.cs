@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.API
             }
             if (string.IsNullOrWhiteSpace(nameContent))
             {
-                return Ok(Enumerable.Empty<NamedEntityDTO>());
+                return Ok(Enumerable.Empty<NamedEntityDTO>().ToList());
             }
             if (numberOfItSystems < 1 || numberOfItSystems > 25)
             {
