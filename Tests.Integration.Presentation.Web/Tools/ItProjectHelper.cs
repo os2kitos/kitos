@@ -105,5 +105,35 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<MilestoneDTO> AddMileStoneAsync(int organizationId, int projectId, string description, string name, string note, string humanReadableId, int timeEstimate, DateTime date, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddMileStoneRequestAsync(organizationId, projectId, description, name, note, humanReadableId, timeEstimate, date, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<MilestoneDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddMileStoneRequestAsync(int organizationId, int projectId, string description, string name, string note, string humanReadableId, int timeEstimate, DateTime date, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/milestone/?organizationId={organizationId}");
+            var body = new
+            {
+                associatedItProjectId = projectId,
+                associatedPhaseNum = 2,
+                date = date,
+                name = name,
+                note = note,
+                humanReadableId = humanReadableId,
+                description = description,
+                timeEstimate = timeEstimate,
+                status = 2
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
     }
 }

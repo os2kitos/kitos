@@ -16,7 +16,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         /*
          *It Projekt
 
-            - Lokal admin kan ikke oprette opgave: Status projekt. Har ikke rettigheder
             - Lokal admin kan ikke oprette milepæl: Status projekt. Har ikke rettigheder
             - Lokal admin kan ikke oprette interessenter: Interessenter. Har ikke rettigheder
             - Lokal admin kan ikke oprette risiko: risiko. Har ikke rettigheder
@@ -129,6 +128,57 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act - perform the action with the actual role
             using (var result = await ItProjectHelper.SendAddAssignmentRequestAsync(OrganizationId, _project.Id, description, name, note, statusPercentage, timeEstimate, startDate, endDate, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_MileStone(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the POST with the actual role
+            var description = A<string>();
+            var name = A<string>();
+            var note = A<string>();
+            var timeEstimate = A<int>();
+            var humanReadableId = A<string>();
+            var date = A<DateTime>().Date;
+
+            var result = await ItProjectHelper.AddMileStoneAsync(OrganizationId, _project.Id, description, name, note, humanReadableId, timeEstimate, date, login);
+
+            //Assert
+            Assert.Equal(_project.Id, result.AssociatedItProjectId.GetValueOrDefault());
+            Assert.Equal(description, result.Description);
+            Assert.Equal(name, result.Name);
+            Assert.Equal(note, result.Note);
+            Assert.Equal(timeEstimate, result.TimeEstimate);
+            Assert.Equal(date, result.Date.Value);
+            Assert.Equal(humanReadableId, result.HumanReadableId);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_MileStone(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the POST with the actual role
+            var description = A<string>();
+            var name = A<string>();
+            var note = A<string>();
+            var timeEstimate = A<int>();
+            var humanReadableId = A<string>();
+            var date = A<DateTime>().Date;
+
+            //Act - perform the action with the actual role
+            using (var result = await ItProjectHelper.SendAddMileStoneRequestAsync(OrganizationId, _project.Id, description, name, note, humanReadableId, timeEstimate, date, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
