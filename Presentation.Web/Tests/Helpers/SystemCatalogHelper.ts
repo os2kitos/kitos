@@ -14,41 +14,21 @@ class SystemCatalogHelper {
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
-            .then(() => {
-                return SystemCatalogHelper.waitForKendoGrid();
-            })
-            .then(() => {
-                return SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click();
-            })
-            .then(() => {
-                return browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                return element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name);
-            })
-            .then(() => {
-                return element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click();
-            });
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
+            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(),SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click());
     }
 
     public static deleteSystem(name: string) {
         console.log(`Deleting system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
-            .then(() => {
-                return SystemCatalogHelper.waitForKendoGrid();
-            })
-            .then(() => {
-                return SystemCatalogHelper.findCatalogColumnsFor(name).first().click();
-            })
-            .then(() => {
-                return browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds);
-            })
-            .then(() => {
-                return SystemCatalogHelper.systemPage.getDeleteButton().click();
-            })
-            .then(() => {
-                return browser.switchTo().alert().accept();
-            });
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
+            .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(), SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => SystemCatalogHelper.systemPage.getDeleteButton().click())
+            .then(() => browser.switchTo().alert().accept());
     }
 
     public static findCatalogColumnsFor(name: string) {
@@ -60,5 +40,4 @@ class SystemCatalogHelper {
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
 }
-
 export = SystemCatalogHelper;
