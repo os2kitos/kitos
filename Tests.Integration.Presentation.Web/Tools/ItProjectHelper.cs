@@ -190,5 +190,33 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<CommunicationDTO> AddCommunicationAsync(int projectId, string media, string message, string purpose, int responsibleUserId, string targetAudience, DateTime dueDate, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddCommunicationRequestAsync(projectId, media, message, purpose, responsibleUserId, targetAudience, dueDate, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<CommunicationDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddCommunicationRequestAsync(int projectId, string media, string message, string purpose, int responsibleUserId, string targetAudience, DateTime dueDate, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/communication");
+            var body = new
+            {
+                dueDate = dueDate,
+                itProjectId = projectId,
+                media = media,
+                message = message,
+                purpose = purpose,
+                responsibleUserId = responsibleUserId,
+                targetAudiance = targetAudience
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
     }
 }

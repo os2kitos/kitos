@@ -13,12 +13,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private ItProjectDTO _project;
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
-        /*
-         *It Projekt
-
-            - Lokal admin kan ikke oprette kommunikation: kommunikation. Har ikke rettigheder
-         *
-         */
         public async Task InitializeAsync()
         {
             _project = await ItProjectHelper.CreateProject(A<string>(), OrganizationId);
@@ -259,6 +253,48 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act - perform the action with the actual role
             using (var result = await ItProjectHelper.SendAddRiskRequestAsync(_project.Id, A<string>(), A<string>(), A<int>() % 5, A<int>() % 5, TestEnvironment.DefaultUserId, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Communication(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var media = A<string>();
+            var message = A<string>();
+            var purpose = A<string>();
+            var targetAudience = A<string>();
+            var date = A<DateTime>().Date;
+            var responsibleUserId = TestEnvironment.DefaultUserId;
+
+            //Act - perform the action with the actual role
+            var result = await ItProjectHelper.AddCommunicationAsync(_project.Id, media, message, purpose, responsibleUserId, targetAudience, date, login);
+
+            //Assert
+            Assert.Equal(_project.Id, result.ItProjectId);
+            Assert.Equal(media, result.Media);
+            Assert.Equal(message, result.Message);
+            Assert.Equal(purpose, result.Purpose);
+            Assert.Equal(targetAudience, result.TargetAudiance);
+            Assert.Equal(date, result.DueDate.GetValueOrDefault());
+            Assert.Equal(responsibleUserId, result.ResponsibleUserId.GetValueOrDefault());
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_Communication(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the action with the actual role
+            using (var result = await ItProjectHelper.SendAddCommunicationRequestAsync(_project.Id, A<string>(), A<string>(), A<string>(), TestEnvironment.DefaultUserId, A<string>(), A<DateTime>().Date, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
