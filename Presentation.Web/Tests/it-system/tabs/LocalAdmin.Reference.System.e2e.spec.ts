@@ -11,7 +11,7 @@ var testFixture = new TestFixtureWrapper();
 var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
 var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
 
-describe("Local Admin is able to create,edit and delete",
+describe("Local Admin can",
     () => {
         var itSystemName = createItSystemName();
 
@@ -31,7 +31,7 @@ describe("Local Admin is able to create,edit and delete",
             testFixture.cleanupState();
         });
 
-        it("Can add reference to IT-System",
+        it("Add reference to IT-System",
             () => {
                 var referenceName = createReferenceName();
                 var referenceId = createReferenceId();
@@ -44,7 +44,7 @@ describe("Local Admin is able to create,edit and delete",
                     .then(() => expect(getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl));
             });
 
-        it("Can edit a reference in a IT-System",
+        it("Edit a reference in a IT-System",
             () => {
                 var referenceName = createReferenceName();
                 var referenceId = createReferenceId();
@@ -62,7 +62,7 @@ describe("Local Admin is able to create,edit and delete",
                     .then(() => expect(getUrlFromReference(referenceName).isPresent()).toBeFalsy());
             });
 
-        it("Can delete a reference in a IT-system",
+        it("Delete a reference in a IT-system",
             () => {
                 var referenceName = createReferenceName();
                 var referenceId = createReferenceId();
