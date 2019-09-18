@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
@@ -36,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         [Theory]
         [InlineData(OrganizationRole.User)]
-        public async Task Cannot_Set_Exposing_System(OrganizationRole role)
+        public async Task Cannot_Set_ContactPerson(OrganizationRole role)
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
@@ -49,6 +50,58 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act - perform the action with the actual role
             using (var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.AndenOffentligMyndighed)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Interessefællesskab)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Kommune)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Virksomhed)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Interessefællesskab)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Virksomhed)]
+        public async Task Can_Create_Organization_Of_Type(OrganizationRole role, OrganizationTypeKeys organizationType)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var userDto = await AuthorizationHelper.GetUser(login);
+            const int objectOwnerId = TestEnvironment.DefaultUserId;
+            var name = A<string>();
+            var cvr = A<int>().ToString("D");
+            const AccessModifier accessModifier = AccessModifier.Public;
+
+            //Act - perform the action with the actual role
+            var result = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, objectOwnerId, name, cvr, organizationType, accessModifier, login);
+
+            //Assert
+            Assert.Equal(userDto.Id, result.ObjectOwnerId.GetValueOrDefault()); //Even if a different id is passed in the method, the authenticated user is always set as owner
+            Assert.Equal(accessModifier, result.AccessModifier);
+            Assert.Equal(name, result.Name);
+            Assert.Equal(cvr, result.Cvr);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User, OrganizationTypeKeys.AndenOffentligMyndighed)]
+        [InlineData(OrganizationRole.User, OrganizationTypeKeys.Interessefællesskab)]
+        [InlineData(OrganizationRole.User, OrganizationTypeKeys.Kommune)]
+        [InlineData(OrganizationRole.User, OrganizationTypeKeys.Virksomhed)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Kommune)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.AndenOffentligMyndighed)]
+        public async Task Cannot_Create_Organization_Of_Type(OrganizationRole role, OrganizationTypeKeys organizationType)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var userDto = await AuthorizationHelper.GetUser(login);
+            const int objectOwnerId = TestEnvironment.DefaultUserId;
+            var name = A<string>();
+            var cvr = A<int>().ToString("D");
+            const AccessModifier accessModifier = AccessModifier.Public;
+
+            //Act - perform the action with the actual role
+            using (var result = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, objectOwnerId, name, cvr, organizationType, accessModifier, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
