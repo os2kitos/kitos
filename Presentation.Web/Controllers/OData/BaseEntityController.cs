@@ -9,7 +9,8 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
+using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -17,6 +18,8 @@ namespace Presentation.Web.Controllers.OData
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
         private readonly IControllerAuthorizationStrategy _authorizationStrategy;
+        private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
+        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
         protected BaseEntityController(
             IGenericRepository<T> repository,
@@ -29,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
                     ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
                     : new ContextBasedAuthorizationStrategy(authorizationContext);
             AuthService = authService;
+            _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         [EnableQuery]
@@ -134,6 +138,10 @@ namespace Presentation.Web.Controllers.OData
         {
             var entity = Repository.GetByKey(key);
 
+            if (delta == null)
+            {
+                return BadRequest();
+            }
             // does the entity exist?
             if (entity == null)
             {
@@ -213,12 +221,12 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowRead(T entity)
         {
-            return _authorizationStrategy.AllowRead(entity);
+            return CrudAuthorization.AllowRead(entity);
         }
 
         protected bool AllowWrite(T entity)
         {
-            return _authorizationStrategy.AllowModify(entity);
+            return CrudAuthorization.AllowModify(entity);
         }
 
         protected bool AllowCreate<T>()
@@ -228,17 +236,22 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowCreate<T>(IEntity entity)
         {
-            return _authorizationStrategy.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(entity);
         }
 
         protected bool AllowDelete(IEntity entity)
         {
-            return _authorizationStrategy.AllowDelete(entity);
+            return CrudAuthorization.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
             return _authorizationStrategy.AllowEntityVisibilityControl(entity);
+        }
+
+        protected virtual IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new RootEntityCrudAuthorization(_authorizationStrategy);
         }
     }
 }

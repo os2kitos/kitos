@@ -1,8 +1,11 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Moq;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.General;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -94,8 +97,40 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowEntityVisibilityControl_Returns_Result_From_AuthenticationService_FeatureCheck(bool expectedResult)
         {
             //Arrange
-            var entity = Mock.Of<IEntity>();
+            var entity = new ItSystem();
             _authenticationService.Setup(x => x.CanExecute(_userId, Feature.CanSetAccessModifierToPublic)).Returns(expectedResult);
+
+            //Act
+            var result = _sut.AllowEntityVisibilityControl(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AllowEntityVisibilityControl_For_Organization_Returns_Result_From_AuthenticationService_FeatureCheck(bool expectedResult)
+        {
+            //Arrange
+            var entity = new Organization();
+            _authenticationService.Setup(x => x.CanExecute(_userId, Feature.CanSetOrganizationAccessModifierToPublic)).Returns(expectedResult);
+
+            //Act
+            var result = _sut.AllowEntityVisibilityControl(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AllowEntityVisibilityControl_For_ContractElements_Returns_Result_From_AuthenticationService_FeatureCheck(bool expectedResult)
+        {
+            //Arrange
+            var entity = new EconomyStream();
+            _authenticationService.Setup(x => x.CanExecute(_userId, Feature.CanSetContractElementsAccessModifierToPublic)).Returns(expectedResult);
 
             //Act
             var result = _sut.AllowEntityVisibilityControl(entity);

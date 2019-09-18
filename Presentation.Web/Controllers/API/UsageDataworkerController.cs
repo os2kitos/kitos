@@ -1,59 +1,29 @@
-﻿using System;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     public class UsageDataworkerController : GenericApiController<ItSystemUsageDataWorkerRelation, ItSystemUsageDataWorkerRelationDTO>
     {
-        private readonly IItSystemUsageService _systemUsageService;
+        private readonly IItSystemUsageRepository _systemUsageRepository;
 
         public UsageDataworkerController(
             IGenericRepository<ItSystemUsageDataWorkerRelation> repository,
-            IItSystemUsageService systemUsageService, IAuthorizationContext authorizationContext)
+            IItSystemUsageRepository systemUsageRepository,
+            IAuthorizationContext authorizationContext)
             : base(repository, authorizationContext)
         {
-            _systemUsageService = systemUsageService;
+            _systemUsageRepository = systemUsageRepository;
         }
 
-        protected override bool AllowCreate<T>(IEntity entity)
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            if (entity is ItSystemUsageDataWorkerRelation relation)
-            {
-                return _systemUsageService.CanAddDataWorkerRelation(relation.ItSystemUsageId, relation.DataWorkerId);
-            }
-            return false;
-        }
-
-        protected override bool AllowModify(IEntity entity)
-        {
-            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
-        }
-
-        protected override bool AllowDelete(IEntity entity)
-        {
-            //Check if modification, not deletion, of parent usage (the root aggregate) is allowed 
-            return GeAuthorizationFromParentUsage(entity, base.AllowModify);
-        }
-
-        protected override bool AllowRead(IEntity entity)
-        {
-            return GeAuthorizationFromParentUsage(entity, base.AllowRead);
-        }
-
-        private static bool GeAuthorizationFromParentUsage(IEntity entity, Predicate<ItSystemUsage> condition)
-        {
-            if (entity is ItSystemUsageDataWorkerRelation relation)
-            {
-                return condition.Invoke(relation.ItSystemUsage);
-            }
-
-            return false;
+            return new ChildEntityCrudAuthorization<ItSystemUsageDataWorkerRelation>(x => _systemUsageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
         }
     }
 }

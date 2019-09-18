@@ -7,6 +7,5 @@ namespace Core.DomainServices
     {
         ItSystemUsage Add(ItSystemUsage ItSystemUsage, User objectOwner);
         void Delete(int id);
-        bool CanAddDataWorkerRelation(int usageId, int organizationId);
     }
 }

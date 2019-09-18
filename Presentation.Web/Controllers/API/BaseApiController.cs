@@ -14,7 +14,8 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
+using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -35,8 +36,10 @@ namespace Presentation.Web.Controllers.API
 
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
+        private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
 
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
+        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
         protected BaseApiController(IAuthorizationContext authorizationContext = null)
         {
@@ -46,6 +49,7 @@ namespace Presentation.Web.Controllers.API
                     ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
                     : new ContextBasedAuthorizationStrategy(authorizationContext)
             );
+            _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
@@ -223,6 +227,11 @@ namespace Presentation.Web.Controllers.API
 
         #region access control
 
+        protected virtual IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new RootEntityCrudAuthorization(AuthorizationStrategy);
+        }
+
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
             return AuthorizationStrategy.GetCrossOrganizationReadAccess();
@@ -233,19 +242,19 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
-        protected virtual bool AllowRead(IEntity entity)
+        protected bool AllowRead(IEntity entity)
         {
-            return AuthorizationStrategy.AllowRead(entity);
+            return CrudAuthorization.AllowRead(entity);
         }
 
-        protected virtual bool AllowModify(IEntity entity)
+        protected bool AllowModify(IEntity entity)
         {
-            return AuthorizationStrategy.AllowModify(entity);
+            return CrudAuthorization.AllowModify(entity);
         }
 
-        protected virtual bool AllowCreate<T>(IEntity entity)
+        protected bool AllowCreate<T>(IEntity entity)
         {
-            return AuthorizationStrategy.AllowCreate<T>(entity);
+            return CrudAuthorization.AllowCreate<T>(entity);
         }
 
         protected bool AllowCreate<T>()
@@ -253,9 +262,9 @@ namespace Presentation.Web.Controllers.API
             return AuthorizationStrategy.AllowCreate<T>();
         }
 
-        protected virtual bool AllowDelete(IEntity entity)
+        protected bool AllowDelete(IEntity entity)
         {
-            return AuthorizationStrategy.AllowDelete(entity);
+            return CrudAuthorization.AllowDelete(entity);
         }
 
         protected bool AllowEntityVisibilityControl(IEntity entity)

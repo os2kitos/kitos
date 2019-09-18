@@ -1,9 +1,11 @@
 ﻿using System;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 
-namespace Presentation.Web.Infrastructure.Authorization.Controller
+namespace Presentation.Web.Infrastructure.Authorization.Controller.General
 {
     public class LegacyAuthorizationStrategy : IControllerAuthorizationStrategy
     {
@@ -69,7 +71,20 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller
 
         public bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return _authenticationService.CanExecute(_userId(), Feature.CanSetAccessModifierToPublic);
+            if (entity is IHasAccessModifier)
+            {
+                switch (entity)
+                {
+                    case IContractModule _:
+                        return _authenticationService.CanExecute(_userId(), Feature.CanSetContractElementsAccessModifierToPublic);
+                    case IOrganizationModule _:
+                        return _authenticationService.CanExecute(_userId(), Feature.CanSetOrganizationAccessModifierToPublic);
+                }
+
+                return _authenticationService.CanExecute(_userId(), Feature.CanSetAccessModifierToPublic);
+            }
+
+            return false;
         }
     }
 }

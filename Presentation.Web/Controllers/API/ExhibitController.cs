@@ -4,10 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 
@@ -17,11 +20,13 @@ namespace Presentation.Web.Controllers.API
     public class ExhibitController : GenericContextAwareApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
+        private readonly IGenericRepository<ItInterface> _interfaceRepository;
 
-        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository)
-            : base(repository)
+        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository, IAuthorizationContext authorizationContext, IGenericRepository<ItInterface> interfaceRepository)
+            : base(repository, authorizationContext)
         {
             _repository = repository;
+            _interfaceRepository = interfaceRepository;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
@@ -53,6 +58,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<ItInterfaceExhibit>(x => _interfaceRepository.AsQueryable().ById(x.Id), base.GetCrudAuthorization());
         }
     }
 }

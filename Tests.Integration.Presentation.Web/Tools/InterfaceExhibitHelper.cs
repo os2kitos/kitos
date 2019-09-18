@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
@@ -10,17 +11,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class InterfaceExhibitHelper
     {
-        public static async Task<ItInterfaceExhibitDTO> CreateExhibit(int systemId, int interfaceId)
+        public static async Task<ItInterfaceExhibitDTO> CreateExhibit(int systemId, int interfaceId, Cookie optionalLogin = null)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var body = new
-            {
-                id = interfaceId,
-                itSystemId = systemId
-            };
-
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit"), cookie, body))
+            using (var createdResponse = await SendCreateExhibitRequest(systemId,interfaceId,optionalLogin))
             {
                 Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
                 var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceExhibitDTO>();
@@ -30,6 +23,19 @@ namespace Tests.Integration.Presentation.Web.Tools
 
                 return response;
             }
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateExhibitRequest(int systemId, int interfaceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var body = new
+            {
+                id = interfaceId,
+                itSystemId = systemId
+            };
+
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/exhibit"), cookie, body);
         }
 
         public static async Task<IReadOnlyList<ItInterfaceExhibitUsageDTO>> GetExhibitInterfaceUsages(int contractId)

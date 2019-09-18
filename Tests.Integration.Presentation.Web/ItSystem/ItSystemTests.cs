@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.ComponentModel;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
@@ -8,7 +10,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    public class ItSystemCatalogTests : WithAutoFixture
+    public class ItSystemTests : WithAutoFixture
     {
 
         [Theory]
@@ -101,6 +103,43 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.NotFound, httpResponse.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Data_Worker(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+
+            //Act - perform the action with the actual role
+            var result = await ItSystemHelper.SetDataWorkerAsync(system.Id, organizationId, optionalLogin: login);
+
+            //Assert
+            Assert.Equal(organizationId, result.DataWorkerId);
+            Assert.Equal(system.Id, result.ItSystemId);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_SystemUsage_Data_Worker(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+
+            //Act
+            using (var result = await ItSystemHelper.SendSetDataWorkerRequestAsync(system.Id, organizationId, optionalLogin: login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
         }
     }
