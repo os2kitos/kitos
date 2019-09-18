@@ -112,7 +112,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest();
             }
 
-            if (organization.Cvr.Length > 10 || organization.Cvr.Length < 8)
+            if (IsCvrInvalid(organization))
             {
                 return BadRequest("Invalid CVR format");
             }
@@ -152,6 +152,15 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return Created(organization);
+        }
+
+        private static bool IsCvrInvalid(Organization organization)
+        {
+            //Cvr is optional
+            var isCvrProvided = string.IsNullOrWhiteSpace(organization.Cvr) == false;
+
+            //If cvr is defined, it must be valid
+            return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
         }
 
         [EnableQuery]
