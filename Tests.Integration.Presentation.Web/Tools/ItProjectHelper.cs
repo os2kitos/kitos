@@ -163,5 +163,32 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
+
+        public static async Task<RiskDTO> AddRiskAsync(int projectId, string name, string action, int consequence, int probability, int responsibleUserId, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddRiskRequestAsync(projectId, name, action, consequence, probability, responsibleUserId, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<RiskDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddRiskRequestAsync(int projectId, string name, string action, int consequence, int probability, int responsibleUserId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl("api/risk");
+            var body = new
+            {
+                action = action,
+                consequence = consequence,
+                itProjectId = projectId,
+                name = name,
+                probability = probability,
+                responsibleUserId = responsibleUserId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
     }
 }

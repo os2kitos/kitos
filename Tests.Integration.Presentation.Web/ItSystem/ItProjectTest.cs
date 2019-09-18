@@ -16,7 +16,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         /*
          *It Projekt
 
-            - Lokal admin kan ikke oprette risiko: risiko. Har ikke rettigheder
             - Lokal admin kan ikke oprette kommunikation: kommunikation. Har ikke rettigheder
          *
          */
@@ -113,8 +112,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-
-            //Act - perform the action with the actual role
             var description = A<string>();
             var name = A<string>();
             var note = A<string>();
@@ -187,8 +184,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-
-            //Act - perform the action with the actual role
             var howToHandle = A<string>();
             var name = A<string>();
             var roleName = A<string>();
@@ -196,6 +191,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var benefits = howToHandle;
             var significance = A<int>() % 5;
 
+            //Act - perform the action with the actual role
             var result = await ItProjectHelper.AddStakeholderAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
 
             //Assert
@@ -214,8 +210,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-
-            //Act - perform the action with the actual role
             var howToHandle = A<string>();
             var name = A<string>();
             var roleName = A<string>();
@@ -225,6 +219,46 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act - perform the action with the actual role
             using (var result = await ItProjectHelper.SendAddStakeholderRequestAsync(_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            }
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Add_Risk(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            var name = A<string>();
+            var action = A<string>();
+            var consequence = A<int>() % 5;
+            var probability = A<int>() % 5;
+            var responsibleUserId = TestEnvironment.DefaultUserId;
+
+            //Act - perform the action with the actual role
+            var result = await ItProjectHelper.AddRiskAsync(_project.Id, name, action, consequence, probability, responsibleUserId, login);
+
+            //Assert
+            Assert.Equal(_project.Id, result.ItProjectId);
+            Assert.Equal(name, result.Name);
+            Assert.Equal(action, result.Action);
+            Assert.Equal(consequence, result.Consequence);
+            Assert.Equal(probability, result.Probability);
+            Assert.Equal(responsibleUserId, result.ResponsibleUserId.GetValueOrDefault());
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        public async Task Cannot_Add_Risk(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+
+            //Act - perform the action with the actual role
+            using (var result = await ItProjectHelper.SendAddRiskRequestAsync(_project.Id, A<string>(), A<string>(), A<int>() % 5, A<int>() % 5, TestEnvironment.DefaultUserId, login))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
