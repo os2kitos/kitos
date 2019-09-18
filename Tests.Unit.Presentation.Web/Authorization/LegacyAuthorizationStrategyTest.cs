@@ -5,7 +5,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Moq;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.General;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

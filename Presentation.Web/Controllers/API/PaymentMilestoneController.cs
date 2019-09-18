@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 

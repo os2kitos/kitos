@@ -4,7 +4,7 @@ using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
 using Presentation.Web.Models;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Infrastructure.Authorization.Controller;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API
 {

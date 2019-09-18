@@ -1,7 +1,7 @@
 ﻿using System;
 using Core.DomainModel;
 
-namespace Presentation.Web.Infrastructure.Authorization.Controller
+namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 {
     public class ChildEntityCrudAuthorization<T> : IControllerCrudAuthorization
     {

@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
+using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
-namespace Presentation.Web.Infrastructure.Authorization.Controller
+namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 {
     public class RootEntityCrudAuthorization : IControllerCrudAuthorization
     {
