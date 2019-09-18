@@ -111,6 +111,12 @@ namespace Presentation.Web.Controllers.OData
             {
                 return BadRequest();
             }
+
+            if (organization.Cvr.Length > 10 || organization.Cvr.Length < 8)
+            {
+                return BadRequest("Invalid CVR format");
+            }
+
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
             {

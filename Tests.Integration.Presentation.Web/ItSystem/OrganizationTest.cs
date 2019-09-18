@@ -70,7 +70,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var userDto = await AuthorizationHelper.GetUser(login);
             const int objectOwnerId = TestEnvironment.DefaultUserId;
             var name = A<string>();
-            var cvr = A<int>().ToString("D");
+            var cvr = (A<int>() % 9999999999).ToString("D10");
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var userDto = await AuthorizationHelper.GetUser(login);
             const int objectOwnerId = TestEnvironment.DefaultUserId;
             var name = A<string>();
-            var cvr = A<int>().ToString("D");
+            var cvr = (A<int>() % 9999999999).ToString("D10");
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
