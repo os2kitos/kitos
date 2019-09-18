@@ -192,6 +192,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\LegacyAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
