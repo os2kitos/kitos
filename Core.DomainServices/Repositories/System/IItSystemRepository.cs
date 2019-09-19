@@ -11,5 +11,7 @@ namespace Core.DomainServices.Repositories.System
         IQueryable<ItSystem> GetSystemsInUse(int organizationId);
 
         ItSystem GetSystem(int systemId);
+
+        void DeleteSystem(ItSystem itSystem);
     }
 }

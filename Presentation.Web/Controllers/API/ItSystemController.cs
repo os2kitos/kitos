@@ -46,27 +46,31 @@ namespace Presentation.Web.Controllers.API
         // DELETE api/T
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
-            try
+        
+            var readAccessLevel = GetOrganizationReadAccessLevel(organizationId);
+            if (readAccessLevel == OrganizationDataReadAccessLevel.None)
             {
-                var item = Repository.GetByKey(id);
-
-                // check if system has any usages, if it does it's may not be deleted
-                if (item.Usages.Any())
-                    return Conflict("Cannot delete a system in use!");
-
-                // OS2KITOS-796: Handles cascading delete of references when deleting an IT System
-                if (item.ExternalReferences.Any())
-                {
-                    var ids = item.ExternalReferences.ToList().Select(t => t.Id);
-                    _referenceService.Delete(ids);
-                }
-
-                return base.Delete(id, organizationId);
+                return Forbidden();
             }
-            catch (Exception e)
+            var deleteResult = _systemService.Delete(id);
+            switch (deleteResult)
             {
-                return LogError(e);
+                case SystemDeleteResult.Forbidden:
+                    return Forbidden();
+                case SystemDeleteResult.InUse:
+                    return Error("");
+                case SystemDeleteResult.HasChildren:
+                    return Error("");
+                case SystemDeleteResult.HasExhibitInterfaces:
+                    return Error("");
+                case SystemDeleteResult.UnknownError:
+                    return Error("");
+                case SystemDeleteResult.Ok:
+                    return NoContent();
+                default:
+                    return Error("");
             }
+
         }
 
         protected override void DeleteQuery(ItSystem entity)
