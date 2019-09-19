@@ -26,7 +26,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var item = _repository.GetByKey(new object[] {usageId, sysId, interfaceId});
+                var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
+                var item = _repository.GetByKey(key);
                 var dto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
                 return Ok(dto);
             }
@@ -80,7 +81,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var key = new object[] { usageId, sysId, interfaceId };
+                var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
                 var item = _repository.GetByKey(key);
                 // create if doesn't exists
                 if (item == null)

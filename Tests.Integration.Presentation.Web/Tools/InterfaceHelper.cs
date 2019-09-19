@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -64,6 +65,28 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(interfaceId, response.ItInterfaceId);
                 Assert.Equal(itSystemId, response.ItSystemId);
             }
+        }
+
+        public static async Task<DataRowDTO> CreateDataRowAsync(int interfaceId, Cookie optionalLogin = null)
+        {
+            using (var response = await SendCreateDataRowRequestAsync(interfaceId, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<DataRowDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateDataRowRequestAsync(int interfaceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("/api/dataRow/");
+
+            var body = new
+            {
+                itInterfaceId = interfaceId
+            };
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
     }
 }

@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Diagnostics;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -621,18 +619,11 @@ namespace Infrastructure.DataAccess.Migrations
                 var orgType = context.OrganizationTypes.Single(x => x.Name == "Kommune");
 
                 var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
-                //var muni1 = CreateOrganization("Test kommune1", OrganizationType.Municipality, globalAdmin);
-                //var muni2 = CreateOrganization("Test kommune2", OrganizationType.Municipality, globalAdmin);
 
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
 
-                //commonOrganization = context.Organizations.Single(x => x.Name == "Fælles Kommune");
-
-                //SetUserDefaultOrganizationUnit(globalAdmin, commonOrganization);
-                //SetUserDefaultOrganizationUnit(user1, commonOrganization);
-                //SetUserDefaultOrganizationUnit(user2, muni1);
-                //SetUserDefaultOrganizationUnit(user3, muni2);
+                
 
 
                 #endregion
@@ -729,14 +720,6 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
                 }
 
                 #endregion
-
-                //#region KLE
-
-                //var orgUnit = context.Organizations.Single(x => x.Name == "Fælles Kommune").OrgUnits.First();
-                //var kle = GenerateAllTasks(globalAdmin, orgUnit);
-                //context.TaskRefs.AddRange(kle);
-
-                //#endregion
             }
         }
 
@@ -746,50 +729,6 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
         }
 
         #region Helper methods
-
-        private static List<TaskRef> GenerateTasks(User objectOwner, OrganizationUnit orgUnitOwner, string type, int n = 20,
-                                                     TaskRef parent = null, string parentTaskKey = null)
-        {
-            var result = new List<TaskRef>();
-
-            if (parentTaskKey != null) parentTaskKey = parentTaskKey + ".";
-
-            for (var i = 0; i < n; i++)
-            {
-                var taskKey = parentTaskKey + i.ToString().PadLeft(2, '0');
-
-                result.Add(new TaskRef()
-                {
-                    Type = type,
-                    Description = "...",
-                    TaskKey = taskKey,
-                    OwnedByOrganizationUnit = orgUnitOwner,
-                    ObjectOwner = objectOwner,
-                    LastChangedByUser = objectOwner,
-                    AccessModifier = AccessModifier.Public,
-                    Parent = parent
-                });
-            }
-
-            return result;
-        }
-
-        private static IEnumerable<TaskRef> GenerateAllTasks(User objectOwner, OrganizationUnit orgUnitOwner)
-        {
-            var maingroups = GenerateTasks(objectOwner, orgUnitOwner, "KLE-Hovedgruppe", 3);
-            var subgroups =
-                maingroups.SelectMany(
-                    parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Gruppe", 5, parent, parent.TaskKey)).ToList();
-
-            var leafs = subgroups.SelectMany(parent => GenerateTasks(objectOwner, orgUnitOwner, "KLE-Emne", 10, parent, parent.TaskKey)).ToList();
-
-            var result = new List<TaskRef>();
-            result.AddRange(maingroups);
-            result.AddRange(subgroups);
-            result.AddRange(leafs);
-
-            return result;
-        }
 
         /// <summary>
         /// Creates and returns an Option entity.
@@ -844,29 +783,6 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
             }
         }
 
-        /// <summary>
-        /// Creates and returns a User
-        /// </summary>
-        /// <param name="name">User name</param>
-        /// <param name="email">User email</param>
-        /// <param name="password">User password</param>
-        /// <param name="cryptoService">The cryptoservice used to encrypt the password of the user</param>
-        /// <param name="objectOwner"></param>
-        /// <returns></returns>
-        private static User CreateUser(string name, string email, string password, CryptoService cryptoService, User objectOwner = null)
-        {
-            var salt = cryptoService.Encrypt(name + "salt");
-            return new User()
-            {
-                Name = name,
-                Email = email,
-                Salt = salt,
-                Password = cryptoService.Encrypt(password + salt),
-                ObjectOwnerId = objectOwner?.Id,
-                LastChangedByUserId = objectOwner?.Id
-            };
-        }
-
         private static Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)
         {
             var org = new Organization
@@ -887,20 +803,7 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
             return org;
         }
-
-        /// <summary>
-        /// Helper function for setting the CreatedIn and DefaultOrganizationUnit properties.
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="organization"></param>
-        private static void SetUserDefaultOrganizationUnit(User user, Organization organization)
-        {
-            var rootOrgUnit = organization.GetRoot();
-            var right = organization.Rights.FirstOrDefault(x => x.UserId == user.Id);
-            Debug.Assert(right != null, "right != null");
-            right.DefaultOrgUnitId = rootOrgUnit.Id;
-        }
-
+       
         #endregion
     }
 }

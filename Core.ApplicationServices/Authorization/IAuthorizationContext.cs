@@ -53,5 +53,10 @@ namespace Core.ApplicationServices.Authorization
         /// <param name="entity"></param>
         /// <returns></returns>
         bool AllowEntityVisibilityControl(IEntity entity);
+        /// <summary>
+        /// Determines if the current context allows system migration
+        /// </summary>
+        /// <returns></returns>
+        bool AllowSystemUsageMigration();
     }
 }

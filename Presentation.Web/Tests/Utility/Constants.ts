@@ -19,7 +19,8 @@ class Constants {
     readonly kendoCatalogUsageHeader = "catalogUsageHeader";
     readonly kendoCatalogUsageObjects = "catalogUsageObject";
     readonly kendoCreateReferenceButton = "createReferenceButton";
-    
+    readonly kendoUsedByHeaderObject = "usedByNameHeader";
+    readonly kendoUsedByObject = "usedByNameObject";
 
     readonly kendoUserEmailHeader = "userHeaderEmail";
     readonly kendoUserEmailObject = "userEmailObject";
@@ -36,6 +37,10 @@ class Constants {
     readonly contractNameVariable = "Name";
     readonly nameOfSystemInput = "nameOfItSystemInput";
     readonly saveCatalogButton = "itCatalogSaveButton";
+    readonly toggleActivatingSystem = "toggleActivatingSystem";
+    readonly moveSystemButton = "migrateItSystem";
+    readonly consequenceButton = "consequenceButton";
+    readonly startMigrationButton = "startMigration";
     readonly loginFormField = "loginFormField";
     readonly catalogCreateForm = "catalogCreateForm";
     readonly createReferenceForm = "referenceCreatorForm";

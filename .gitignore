@@ -31,6 +31,7 @@ Presentation.Web/Scripts/*.min.js
 Presentation.Web/Content/css/fonts/*.svg
 Presentation.Web/Content/fonts/*.svg
 Presentation.Web/Content/css/app.min.css
+Presentation.Web/Content/css/maps/*.map
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/

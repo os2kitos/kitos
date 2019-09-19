@@ -2,22 +2,22 @@
 import CSSLocatorHelper = require("../../object-wrappers/CSSLocatorHelper")
 import Constants = require("../../Utility/Constants");
 
-var ec = protractor.ExpectedConditions;
-var byDataElementType = new CSSLocatorHelper().byDataElementType;
-var consts = new Constants();
-
 class HomePagePo implements IPageObject {
+    private ec = protractor.ExpectedConditions;
+    private byDataElementType = new CSSLocatorHelper().byDataElementType;
+    private consts = new Constants();
+
     public getPage(): webdriver.promise.Promise<void> {
         return browser.get(browser.baseUrl);
     }
 
-    public loginFormField = element(byDataElementType(consts.loginFormField));
+    public loginFormField = element(this.byDataElementType(this.consts.loginFormField));
     public emailField = element(by.model("email"));
     public pwdField = element(by.model("password"));
-    public loginButton = element(byDataElementType("loginButton"));
+    public loginButton = element(this.byDataElementType("loginButton"));
 
     public isLoginAvailable(): webdriver.until.Condition<boolean> {
-        return ec.visibilityOf(this.loginFormField);
+        return this.ec.visibilityOf(this.loginFormField);
     }
 }
 

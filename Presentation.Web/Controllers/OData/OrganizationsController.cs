@@ -107,6 +107,16 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Organization organization)
         {
+            if (organization == null)
+            {
+                return BadRequest();
+            }
+
+            if (IsCvrInvalid(organization))
+            {
+                return BadRequest("Invalid CVR format");
+            }
+
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
             if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
             {
@@ -115,7 +125,14 @@ namespace Presentation.Web.Controllers.OData
 
             var user = _userRepository.GetByKey(UserId);
 
-            CheckOrgTypeRights(organization);
+            try
+            {
+                CheckOrgTypeRights(organization);
+            }
+            catch (SecurityException e)
+            {
+                return Forbidden();
+            }
 
             _organizationService.SetupDefaultOrganization(organization, user);
 
@@ -137,6 +154,15 @@ namespace Presentation.Web.Controllers.OData
             return Created(organization);
         }
 
+        private static bool IsCvrInvalid(Organization organization)
+        {
+            //Cvr is optional
+            var isCvrProvided = string.IsNullOrWhiteSpace(organization.Cvr) == false;
+
+            //If cvr is defined, it must be valid
+            return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
+        }
+
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
@@ -152,9 +178,16 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Patch(int key, Delta<Organization> delta)
         {
-            var organization = delta.GetInstance();
 
-            CheckOrgTypeRights(organization);
+            try
+            {
+                var organization = delta.GetInstance();
+                CheckOrgTypeRights(organization);
+            }
+            catch (SecurityException e)
+            {
+                return Forbidden();
+            }
             return base.Patch(key, delta);
         }
 
@@ -162,7 +195,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (organization.TypeId > 0)
             {
-                var typeKey = (OrganizationTypeKeys) organization.TypeId;
+                var typeKey = (OrganizationTypeKeys)organization.TypeId;
                 switch (typeKey)
                 {
                     case OrganizationTypeKeys.Kommune:

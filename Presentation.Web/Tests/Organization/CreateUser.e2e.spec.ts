@@ -4,15 +4,14 @@ import Login = require("../Helpers/LoginHelper");
 import WaitTimers = require("../Utility/waitTimers");
 import createUserHelper = require("../Helpers/CreateUserHelper");
 
-var testFixture = new TestFixtureWrapper();
-var userHelper = new createUserHelper();
-var pageObject = new HomePage();
-var loginHelper = new Login();
-var waitUpTo = new WaitTimers();
-var ec = protractor.ExpectedConditions;
-
 describe("Only Global Admins can create user with API access",
     () => {
+        var testFixture = new TestFixtureWrapper();
+        var userHelper = new createUserHelper();
+        var pageObject = new HomePage();
+        var loginHelper = new Login();
+        var waitUpTo = new WaitTimers();
+        var ec = protractor.ExpectedConditions;
 
         afterEach(() => {
             testFixture.cleanupState();

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model;
 using Core.DomainServices.Queries;
 
 namespace Core.DomainServices.Extensions
@@ -72,6 +74,51 @@ namespace Core.DomainServices.Extensions
             }
 
             return new IntersectionQuery<T>(domainQueries).Apply(result);
+        }
+
+        public static IQueryable<T> ByOrganizationDataQueryParameters<T>(
+            this IQueryable<T> result,
+            OrganizationDataQueryParameters parameters)
+            where T : class, IHasAccessModifier, IHasOrganization
+        {
+            var activeOrganizationId = parameters.ActiveOrganizationId;
+            var dataAccessLevel = parameters.DataAccessLevel;
+
+            //Apply query breadth
+            switch (parameters.Breadth)
+            {
+                case OrganizationDataQueryBreadth.TargetOrganization:
+                    return result.ByOrganizationId(activeOrganizationId, dataAccessLevel.CurrentOrganization);
+                case OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations:
+                    return result.ByOrganizationDataAndPublicDataFromOtherOrganizations(activeOrganizationId, dataAccessLevel.CurrentOrganization, dataAccessLevel.CrossOrganizational);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(parameters.Breadth));
+            }
+        }
+
+        public static IQueryable<T> ExceptEntitiesWithIds<T>(this IQueryable<T> result, IReadOnlyList<int> exceptIds) where T :
+            Entity
+        {
+            return new QueryExceptEntitiesWithIds<T>(exceptIds).Apply(result);
+        }
+
+        public static IQueryable<T> ByPartOfName<T>(this IQueryable<T> result, string nameContent) where T :
+            class,
+            IHasName
+        {
+            return new QueryByPartOfName<T>(nameContent).Apply(result);
+        }
+
+        public static IQueryable<T> ByIds<T>(this IQueryable<T> result, IReadOnlyList<int> ids) where T :
+            Entity
+        {
+            return new QueryByIds<T>(ids).Apply(result);
+        }
+
+        public static T ById<T>(this IQueryable<T> result, int id) where T :
+            Entity
+        {
+            return new QueryById<T>(id).Apply(result).SingleOrDefault();
         }
     }
 }

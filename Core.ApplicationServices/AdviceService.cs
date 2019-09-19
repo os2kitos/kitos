@@ -11,12 +11,12 @@ using System;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Core.ApplicationServices
 {
     using DomainModel.ItSystemUsage;
     using Ninject.Extensions.Logging;
-    using System.Collections.Generic;
 
     public class AdviceService: IAdviceService
     {

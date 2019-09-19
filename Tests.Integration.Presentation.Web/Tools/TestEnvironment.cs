@@ -19,6 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public const int SecondOrganizationId = 2;
         public const int DefaultContractId = 1;
         public const int DefaultUserId = 1;
+        public const string EmptyListApiJson = "{\"msg\":\"\",\"response\":[]}";
 
         static TestEnvironment()
         {

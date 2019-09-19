@@ -192,12 +192,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\LegacyAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
+    <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
+    <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\QueryAllByRestrictionCapabilitiesTest.cs" />
+    <Compile Include="DomainServices\QueryByAccessModifierTest.cs" />
+    <Compile Include="DomainServices\QueryByIdsTest.cs" />
+    <Compile Include="DomainServices\QueryByIdTest.cs" />
+    <Compile Include="DomainServices\QueryByOrganizationIdTest.cs" />
+    <Compile Include="DomainServices\QueryByPartOfNameTest.cs" />
+    <Compile Include="DomainServices\QueryByPublicAccessOrOrganizationIdTest.cs" />
+    <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
+    <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\UserMock.cs" />
@@ -206,6 +217,8 @@
     <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="OData\AuthenticationServiceTest.cs" />
+    <Compile Include="Services\ItSystemServiceTest.cs" />
+    <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

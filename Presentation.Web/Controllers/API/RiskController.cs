@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 
@@ -13,8 +16,15 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
     {
-        public RiskController(IGenericRepository<Risk> repository) : base(repository)
+        private readonly IItProjectRepository _projectRepository;
+
+        public RiskController(
+            IGenericRepository<Risk> repository,
+            IAuthorizationContext authorizationContext,
+            IItProjectRepository projectRepository)
+            : base(repository, authorizationContext)
         {
+            _projectRepository = projectRepository;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<RiskDTO>>))]
@@ -30,6 +40,11 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Risk>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
         }
     }
 }

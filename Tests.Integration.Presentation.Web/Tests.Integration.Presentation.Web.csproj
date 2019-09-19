@@ -87,24 +87,40 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ItSystem\ItInterfaceUsageTests.cs" />
-    <Compile Include="ItSystem\ItSystemCatalogTests.cs" />
+    <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="Interfaces\ItInterfaceUsageTests.cs" />
+    <Compile Include="Projects\ItProjectTest.cs" />
+    <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
-    <Compile Include="ItSystem\ItIterfacesTest.cs" />
+    <Compile Include="Interfaces\ItIterfacesTest.cs" />
+    <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
+    <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
+    <Compile Include="Organizations\OrganizationTest.cs" />
+    <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
     <Compile Include="Security\AuthorizationTests.cs" />
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
+    <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
+    <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
+    <Compile Include="Tools\InterfaceUsageHelper.cs" />
+    <Compile Include="Tools\ItContractHelper.cs" />
+    <Compile Include="Tools\ItProjectHelper.cs" />
+    <Compile Include="Tools\ItSystemHelper.cs" />
+    <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
+    <Compile Include="Tools\Model\EnableAccessTypeInput.cs" />
+    <Compile Include="Tools\Model\GetAccessTypesResponse.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
+    <Compile Include="Tools\OrganizationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\WithAutoFixture.cs" />
   </ItemGroup>
@@ -125,6 +141,7 @@
       <Name>Presentation.Web</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

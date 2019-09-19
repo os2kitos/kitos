@@ -4,7 +4,15 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface.ExhibitUsage;
+using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.System;
+using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.DataAccess;
 using Infrastructure.OpenXML;
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
@@ -15,11 +23,11 @@ using Presentation.Web;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Properties;
 using Hangfire;
+using Infrastructure.DataAccess.Services;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.DataAccess;
 using Microsoft.Owin;
-using Presentation.Web.Infrastructure.Authorization;
 using Presentation.Web.Infrastructure.Factories.Authentication;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Serilog;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(NinjectWebCommon), "Start")]
@@ -81,10 +89,8 @@ namespace Presentation.Web
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
-            kernel.Bind<KitosContext>().ToSelf().InRequestScope();
+            RegisterDataAccess(kernel);
 
-            kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
-            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
             kernel.Bind<IMailClient>().To<MailClient>().InRequestScope();
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InRequestScope()
@@ -108,7 +114,9 @@ namespace Presentation.Web
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
             kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
-
+            kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
+            kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
+            kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -120,6 +128,18 @@ namespace Presentation.Web
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
+        }
+
+        private static void RegisterDataAccess(IKernel kernel)
+        {
+            kernel.Bind<KitosContext>().ToSelf().InRequestScope();
+            kernel.Bind(typeof(IGenericRepository<>)).To(typeof(GenericRepository<>)).InRequestScope();
+            kernel.Bind<IUserRepository>().To<UserRepository>().InRequestScope();
+            kernel.Bind<IItSystemRepository>().To<ItSystemRepository>().InRequestScope();
+            kernel.Bind<IItContractRepository>().To<ItContractRepository>().InRequestScope();
+            kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
+            kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
+            kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

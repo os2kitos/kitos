@@ -99,9 +99,9 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [AcceptVerbs("POST", "PUT")]
-        public IHttpActionResult CreateRef([FromODataUri] int systemUsageKey, string navigationProperty, [FromBody] Uri link)
+        public IHttpActionResult CreateRef([FromODataUri] int key, string navigationProperty, [FromBody] Uri link)
         {
-            var itSystemUsage = Repository.GetByKey(systemUsageKey);
+            var itSystemUsage = Repository.GetByKey(key);
             if (itSystemUsage == null)
             {
                 return NotFound();

@@ -1,50 +1,31 @@
-﻿import RefePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
+﻿import ReferencePage = require("../PageObjects/It-system/Tabs/ItSystemReference.po");
 import WaitTimers = require("../Utility/WaitTimers");
-
-var homePage = new RefePage();
-var waitUpTo = new WaitTimers();
-var headerButtons = homePage.kendoToolbarWrapper.headerButtons();
-var inputFields = homePage.kendoToolbarWrapper.inputFields();
+import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
+import ItSystemCatalogPage = require("../PageObjects/it-system/Catalog/ItSystemCatalog.po");
 
 class ReferenceHelper {
+    private homePage = new ReferencePage();
+    private itSystemCatalogPage = new ItSystemCatalogPage();
+    private waitUpTo = new WaitTimers();
+    private headerButtons = new ReferencePage().kendoToolbarWrapper.headerButtons();
+    private inputFields = new ReferencePage().kendoToolbarWrapper.inputFields();
+    private cssLocator = new CSSLocator();
 
     public createReference(title: string, url: string, id: string) {
-        return homePage.getPage()
-            .then(() => browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds))
-            .then(() => headerButtons.createReference.click())
-            .then(() => browser.wait(homePage.isReferenceCreateFormLoaded(), waitUpTo.twentySeconds))
-            .then(() => inputFields.referenceDocId.sendKeys(id))
-            .then(() => inputFields.referenceDocTitle.sendKeys(title))
-            .then(() => inputFields.referenceDocUrl.sendKeys(url))
-            .then(() => headerButtons.editSaveReference.click());
+        return this.headerButtons.createReference.click()
+            .then(() => browser.wait(this.homePage.isReferenceCreateFormLoaded(), this.waitUpTo.twentySeconds))
+            .then(() => this.inputFields.referenceDocId.sendKeys(id))
+            .then(() => this.inputFields.referenceDocTitle.sendKeys(title))
+            .then(() => this.inputFields.referenceDocUrl.sendKeys(url))
+            .then(() => this.headerButtons.editSaveReference.click());
     }
 
-    public deleteReference(id: string) {
-        homePage.getPage();
-        browser.wait(homePage.isCreateReferenceLoaded(), waitUpTo.twentySeconds);
-
-        element.all(by.id("mainGrid")).all(by.tagName("tr")).each((ele) => {
-
-            ele.all(by.tagName("td")).each((tdele) => {
-
-                tdele.getText().then(val => {
-
-                         if (val === id) {
-                             ele.element(by.css("[data-element-type='" + "deleteReference" + "']")).click();
-                             browser.switchTo().alert().accept();
-                         }
-                    });
-
-               
-            });
-
-
-        });
-
-
+    public goToSpecificItSystemReferences(name: string) {
+        return this.itSystemCatalogPage.getPage()
+            .then(() => browser.wait(this.itSystemCatalogPage.waitForKendoGrid(), this.waitUpTo.twentySeconds))
+            .then(() => element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]')).click())
+            .then(() => browser.wait(element(this.cssLocator.byDataElementType("organizationButton")),this.waitUpTo.twentySeconds))
+            .then(() => element(this.cssLocator.byDataElementType("ReferenceTabButton")).click());
     }
-
-
 }
-
 export = ReferenceHelper;

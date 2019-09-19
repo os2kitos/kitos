@@ -80,10 +80,11 @@ namespace Core.ApplicationServices.Authorization
         {
             switch (entity)
             {
-                case IContextAware contextAware:
-                    return contextAware.IsInContext(ActiveOrganizationId);
+                //Prefer match on hasOrganization first since it has static knowledge of organization relationship
                 case IHasOrganization hasOrg:
                     return IsActiveInOrganization(hasOrg.OrganizationId);
+                case IContextAware contextAware:
+                    return contextAware.IsInContext(ActiveOrganizationId);
                 default:
                     return false;
             }

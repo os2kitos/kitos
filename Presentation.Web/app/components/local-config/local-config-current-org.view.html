@@ -8,7 +8,7 @@
             </div>
             <div class="form-group">
                 <label>CVR</label>
-                <input type="text" class="form-control" data-ng-model="currentOrgCtrl.organization.cvr" data-autosave="{{ currentOrgCtrl.orgAutosaveUrl }}" data-field="cvr" data-ng-pattern="/[0-9]{8}/">
+                <input type="text" class="form-control" data-ng-model="currentOrgCtrl.organization.cvr" data-autosave="{{ currentOrgCtrl.orgAutosaveUrl }}" data-field="cvr" data-ng-pattern="/^[0-9]{8}$|^[a-zA-Z]{2}[0-9]{8}$/">
             </div>
             <div class="form-group">
                 <div>
@@ -32,19 +32,19 @@
         <div class="col-xs-10">
             <div>
                 <label>
-                    <input type="checkbox" data-ng-model="config.showTabOverview" data-autosave="{{config.autosaveUrl}}" data-field="showTabOverview" tabindex="1" />
+                    <input type="checkbox" data-ng-model="config.showTabOverview" data-autosave="{{config.autosaveUrl}}" data-field="ShowTabOverview" tabindex="1" />
                     Medtag fanen 'Overblik'
                 </label>
             </div>
             <div>
                 <label>
-                    <input type="checkbox" data-ng-model="config.showColumnTechnology" data-autosave="{{config.autosaveUrl}}" data-field="showColumnTechnology" tabindex="2" />
+                    <input type="checkbox" data-ng-model="config.showColumnTechnology" data-autosave="{{config.autosaveUrl}}" data-field="ShowColumnTechnology" tabindex="2" />
                     Medtag kolonnen 'Teknologi'
                 </label>
             </div>
             <div>
                 <label>
-                    <input type="checkbox" data-ng-model="config.showColumnUsage" data-autosave="{{config.autosaveUrl}}" data-field="showColumnUsage" tabindex="3" />
+                    <input type="checkbox" data-ng-model="config.showColumnUsage" data-autosave="{{config.autosaveUrl}}" data-field="ShowColumnUsage" tabindex="3" />
                     Medtag kolonnen 'Anvendelse'
                 </label>
             </div>

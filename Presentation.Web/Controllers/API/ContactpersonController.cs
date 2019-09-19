@@ -5,8 +5,11 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -17,11 +20,19 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ContactPerson> _repository;
         private readonly IGenericRepository<Organization> _orgRepository;
 
-        public ContactpersonController(IGenericRepository<ContactPerson> repository, IGenericRepository<Organization> orgRepository)
-            : base(repository)
+        public ContactpersonController(
+            IGenericRepository<ContactPerson> repository,
+            IGenericRepository<Organization> orgRepository,
+            IAuthorizationContext authorization)
+            : base(repository, authorization)
         {
             _repository = repository;
             _orgRepository = orgRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<ContactPerson>(x => _orgRepository.AsQueryable().ById(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId

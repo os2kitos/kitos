@@ -5,3 +5,103 @@
      data-k-visible="false" data-k-modal="true">
     <div data-kendo-grid="systemCatalogVm.usageGrid" data-k-options="systemCatalogVm.usageDetailsGrid"></div>
 </div>
+
+<div data-kendo-window="systemCatalogVm.modalMigration"
+     data-k-title="'Migration'" data-k-width="800"
+     data-k-visible="false" data-k-modal="true" id="migrationModelWindow2">
+    <div id="select2MigrationContainer">
+        <input type="hidden"
+               id="new-system-usage"
+               class="form-control input-sm"
+               data-ui-select2="mySelectOptions"
+               data-ng-model="mySelectOptionsModel"
+               data-placeholder="Vælg IT system">
+        <button ng-click='systemCatalogVm.onNewTargetSystemSelected()' class='btn btn-success pull-right migrationReportButton' data-element-type="consequenceButton">Se konsekvenser</button>
+    </div>
+</div>
+
+<div data-kendo-window="systemCatalogVm.modalMigrationConsequence"
+     data-k-title="'Konsekvens'" 
+     data-k-visible="false" data-k-modal="true" data-k-width="800" >
+    <div >
+        <div id="copyPasteConsequence">
+            <div class="migrationDivPadding">
+                <h3>Opsummering af ændringer ifm. flytning af "IT-system anvendelse" til nyt IT-system </h3>
+            </div>
+            <div class="migrationDivPadding">
+                For at sikre datakvaliteten i Kitos – og f.eks. komme redundante registreringer til livs - har Global admin mulighed for at flytte jeres anvendelse fra et IT-system til et andet.
+            </div>
+            <div class="migrationDivPadding">
+                I forbindelse med at Global admin har flyttet jeres system anvendelse fra et IT-system til et andet, kan det oplyses at:
+            </div>
+            <div class="migrationDivPadding">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        System anvendelsen flyttes:
+                    </div>
+                    <table class="table org-role-table">
+                        <tr>
+                            <th>Fra</th>
+                            <th>Til</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                Navn: {{systemCatalogVm.migrationReportDTO.fromSystem.name }}
+                                <br/>
+                                Id: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
+                            </td>
+                            <td>
+                                Navn: {{systemCatalogVm.migrationReportDTO.toSystem.name }}
+                                <br/>
+                                Id: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">Følgende kontrakter i Kitos berøres:</h4>
+                <div class="panel panel-default " ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
+                    <div class="panel-heading">
+                        Navn: {{affectedContracts.contract.name}}
+                        <br/>
+                        Id: {{affectedContracts.contract.id}}
+                    </div >
+                    <div>
+                        <div class="migrationDivBorders migrationDivPadding">
+                            IT-systemet er omfattet af kontrakten <strong> {{affectedContracts.systemAssociatedInContract ? 'Ja' : 'Nej' }}</strong>
+                        </div>
+                        <div class="migrationDivPadding" ng-if="affectedContracts.affectedInterfaceUsages.length > 0" ng-class="{'migrationDivBorders': affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0}">
+                            "Anvender" snitfladerelation, der flyttes
+                            <ul>
+                                <li ng-repeat="interfaceToBeMoved in affectedContracts.affectedInterfaceUsages">{{interfaceToBeMoved.name}} ( Id: {{interfaceToBeMoved.id}} )</li>
+                            </ul>
+                        </div>
+                        <div class="migrationDivPadding" ng-if="affectedContracts.interfaceExhibitUsagesToBeDeleted.length > 0">
+                            "Udstiller" snitfladerelation, der slettes
+                            <ul>
+                                <li ng-repeat="interfaceToBeDeleted in affectedContracts.interfaceExhibitUsagesToBeDeleted">{{interfaceToBeDeleted.name}} ( Id: {{interfaceToBeDeleted.id}} )</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <h4 ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">Følgende projekter, hvor IT-systemet anvendes, berøres:</h4>
+                <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedItProjects.length > 0">
+                    <div class="panel-heading">
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>Id</th>
+                            <th>Navn</th>
+                        </tr>
+                        <tr ng-repeat="ItProjects in systemCatalogVm.migrationReportDTO.affectedItProjects">
+                            <td class="idTableDataCellFormat">{{ItProjects.id}}</td>
+                            <td>{{ItProjects.name}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <button ng-click='systemCatalogVm.copyToClipBoard()' class="btn migrationReportButton">Kopiér til udklipsholder</button>
+        <button ng-click='systemCatalogVm.cancelMigration()' class='btn btn-danger pull-left migrationReportButton'>Annullér</button>
+        <button ng-click='systemCatalogVm.performMigration()' class='btn btn-success pull-right migrationReportButton' data-element-type="startMigration">Gennemfør flytning</button>
+    </div >
+</div>
