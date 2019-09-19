@@ -213,7 +213,14 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                         return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
                     }
 
+                    //***********************************************
                     //Perform final switchover of "source IT-System"
+                    //***********************************************
+
+                    // Delete access types (they are bound to the system)
+                    DeleteAccessTypes(systemUsage);
+
+                    // Switch the ID
                     systemUsage.ItSystemId = toSystemId;
                     _systemUsageRepository.Update(systemUsage);
 
@@ -225,6 +232,17 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                     transaction.Rollback();
                     return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
+                }
+            }
+        }
+
+        private static void DeleteAccessTypes(ItSystemUsage systemUsage)
+        {
+            if (systemUsage.AccessTypes?.Any() == true)
+            {
+                foreach (var accessType in systemUsage.AccessTypes.ToList())
+                {
+                    systemUsage.AccessTypes.Remove(accessType);
                 }
             }
         }

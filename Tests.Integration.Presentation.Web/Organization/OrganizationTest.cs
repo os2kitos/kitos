@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.ItSystem
+namespace Tests.Integration.Presentation.Web.Organization
 {
     public class OrganizationTest : WithAutoFixture
     {
@@ -79,8 +79,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Assert
             Assert.Equal(userDto.Id, result.ObjectOwnerId.GetValueOrDefault()); //Even if a different id is passed in the method, the authenticated user is always set as owner
             Assert.Equal(accessModifier, result.AccessModifier);
-            Assert.Equal(name, result.Name);
-            Assert.Equal(cvr, result.Cvr);
+            Assert.Equal(name, (string) result.Name);
+            Assert.Equal(cvr, (string) result.Cvr);
         }
 
         [Theory]
@@ -94,7 +94,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var login = await HttpApi.GetCookieAsync(role);
-            var userDto = await AuthorizationHelper.GetUser(login);
             const int objectOwnerId = TestEnvironment.DefaultUserId;
             var name = A<string>();
             var cvr = (A<int>() % 9999999999).ToString("D10");
