@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.Result;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -187,30 +189,30 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(SystemDeleteResult.InUse)]
-        [InlineData(SystemDeleteResult.HasChildren)]
-        [InlineData(SystemDeleteResult.HasExhibitInterfaces)]
-        public async Task Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult result)
+        [InlineData(SystemDeleteResult.InUse, SystemDeleteConflict.InUse)]
+        [InlineData(SystemDeleteResult.HasChildren, SystemDeleteConflict.HasChildren)]
+        [InlineData(SystemDeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits)]
+        public void Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult deleteResult, SystemDeleteConflict deleteConflict)
         {
             //Arrange
             var systemId = A<int>();
             _systemService.Setup(x => x.Delete(systemId))
-                .Returns(result);
+                .Returns(deleteResult);
 
             //Act
             var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, responseMessage.StatusCode);
-            var responseValue = await responseMessage.ReadApiResponse<SystemDeleteResult>();
-            Assert.True(result == responseValue.Response);
+            var responseValue = ExpectResponseOf<string>(responseMessage);
+            Assert.Equal(deleteConflict, Enum.Parse(typeof(SystemDeleteConflict), responseValue));
         }
 
         [Theory]
         [InlineData(HttpStatusCode.Forbidden, SystemDeleteResult.Forbidden)]
         [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.InUse)]
         [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasChildren)]
-        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasExhibitInterfaces)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasInterfaceExhibits)]
         [InlineData(HttpStatusCode.InternalServerError, SystemDeleteResult.UnknownError)]
         public void Delete_Returns_Failed(HttpStatusCode code, SystemDeleteResult result)
         {
