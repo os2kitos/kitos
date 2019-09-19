@@ -17,9 +17,25 @@ namespace Presentation.Web.Models
             Descending = false;
         }
 
+        /// <summary>
+        /// Page size.
+        /// Default value is 100
+        /// </summary>
         public int Take { get; set; }
+        /// <summary>
+        /// Items to skip before taking the ''page size'' of items.
+        /// Default value is '0'
+        /// </summary>
         public int Skip { get; set; }
+        /// <summary>
+        /// Determine by which field the result set should be ordered before paging is applied.
+        /// Default value is 'Id'
+        /// </summary>
         public string OrderBy { get; set; }
+        /// <summary>
+        /// Determines if ordering should be descending with respect to 'OrderBy'.
+        /// Default value is 'false'
+        /// </summary>
         public bool Descending { get; set; }
 
         private readonly List<Expression<Func<TModel, bool>>> _dbFilters;
