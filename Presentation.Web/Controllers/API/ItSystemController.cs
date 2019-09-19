@@ -43,8 +43,9 @@ namespace Presentation.Web.Controllers.API
             _referenceService = referenceService;
         }
 
+        
         // DELETE api/T
-        public override HttpResponseMessage Delete(int id, int organizationId)
+        public override HttpResponseMessage Delete(int id, int organizationId) //OrganizationId is not used. Also doesn't make much sense as ItSystems are global
         {
             var deleteResult = _systemService.Delete(id);
             switch (deleteResult)

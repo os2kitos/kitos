@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
@@ -183,6 +184,61 @@ namespace Tests.Unit.Presentation.Web.Controllers
                                 name = x.Organization.Name
                             }
                         })));
+        }
+
+        [Theory]
+        [InlineData(SystemDeleteResult.InUse)]
+        [InlineData(SystemDeleteResult.HasChildren)]
+        [InlineData(SystemDeleteResult.HasExhibitInterfaces)]
+        public async Task Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult result)
+        {
+            //Arrange
+            var systemId = A<int>();
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(result);
+
+            //Act
+            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, responseMessage.StatusCode);
+            var responseValue = await responseMessage.ReadApiResponse<SystemDeleteResult>();
+            Assert.True(result == responseValue.Response);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.Forbidden, SystemDeleteResult.Forbidden)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.InUse)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasChildren)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasExhibitInterfaces)]
+        [InlineData(HttpStatusCode.InternalServerError, SystemDeleteResult.UnknownError)]
+        public void Delete_Returns_Failed(HttpStatusCode code, SystemDeleteResult result)
+        {
+            //Arrange
+            var systemId = A<int>();
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(result);
+
+            //Act
+            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+
+            //Assert
+            Assert.Equal(code, responseMessage.StatusCode);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(SystemDeleteResult.Forbidden);
+
+            //Act
+            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, responseMessage.StatusCode);
         }
 
         private void ExpectGetUsingOrganizationsReturn(

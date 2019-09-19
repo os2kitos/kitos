@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -25,12 +26,15 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
-            
             _sut = new ItSystemService(
                 null, 
                 null, 
                 _systemRepository.Object, 
-                _authorizationContext.Object);
+                _authorizationContext.Object,
+                null,
+                null,
+                null
+                );
         }
 
         [Fact]
