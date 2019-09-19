@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.InUse:
                 case SystemDeleteResult.HasChildren:
                 case SystemDeleteResult.HasInterfaceExhibits:
-                    return Conflict(MapSystemDeleteResult(deleteResult));
+                    return DeleteConflict(MapSystemDeleteResult(deleteResult));
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
@@ -66,6 +66,11 @@ namespace Presentation.Web.Controllers.API
                 default:
                     return Error("");
             }
+        }
+
+        private HttpResponseMessage DeleteConflict(string response)
+        {
+            return CreateResponse(HttpStatusCode.Conflict, response, "");
         }
 
         private static string MapSystemDeleteResult(SystemDeleteResult input)

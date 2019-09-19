@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.Result;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
@@ -199,8 +199,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<SystemDeleteResult>();
-                Assert.True(resultValue == SystemDeleteResult.InUse);
+                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
+                Assert.Equal(SystemDeleteConflict.InUse.ToString("G"), resultValue);
                 await AssertSystemNotDeletedAsync(system.Id);
             }
         }
@@ -224,8 +224,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<SystemDeleteResult>();
-                Assert.True(resultValue == SystemDeleteResult.HasChildren);
+                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
+                Assert.Equal(SystemDeleteConflict.HasChildren.ToString("G"), resultValue);
                 await AssertSystemNotDeletedAsync(mainSystem.Id);
             }
         }
@@ -254,8 +254,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<SystemDeleteResult>();
-                Assert.True(resultValue == SystemDeleteResult.HasExhibitInterfaces);
+                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
+                Assert.Equal(SystemDeleteConflict.HasInterfaceExhibits.ToString("G"), resultValue);
                 await AssertSystemNotDeletedAsync(system.Id);
             }
         }
