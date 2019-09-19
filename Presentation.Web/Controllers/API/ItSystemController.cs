@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,6 +20,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.Result;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -53,11 +55,9 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.Forbidden:
                     return Forbidden();
                 case SystemDeleteResult.InUse:
-                    return Conflict(deleteResult);
                 case SystemDeleteResult.HasChildren:
-                    return Conflict(deleteResult);
-                case SystemDeleteResult.HasExhibitInterfaces:
-                    return Conflict(deleteResult);
+                case SystemDeleteResult.HasInterfaceExhibits:
+                    return Conflict(MapSystemDeleteResult(deleteResult));
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
@@ -68,10 +68,21 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private HttpResponseMessage Conflict(SystemDeleteResult systemDeleteResult)
+        private static string MapSystemDeleteResult(SystemDeleteResult input)
         {
-            return CreateResponse(HttpStatusCode.Conflict, systemDeleteResult, "");
+            switch (input)
+            {
+                case SystemDeleteResult.InUse:
+                    return SystemDeleteConflict.InUse.ToString("G");
+                case SystemDeleteResult.HasChildren:
+                    return SystemDeleteConflict.HasChildren.ToString("G");
+                case SystemDeleteResult.HasInterfaceExhibits:
+                    return SystemDeleteConflict.HasInterfaceExhibits.ToString("G");
+                default:
+                    throw new InvalidEnumArgumentException($"{input} cannot be mapped to {typeof(SystemDeleteConflict)}");
+            }
         }
+            
 
         protected override void DeleteQuery(ItSystem entity)
         {

@@ -6,7 +6,7 @@
         Forbidden,
         InUse,
         HasChildren,
-        HasExhibitInterfaces,
+        HasInterfaceExhibits,
         UnknownError
     }
 }

@@ -147,7 +147,7 @@ namespace Core.ApplicationServices.System
 
             if (system.ItInterfaceExhibits.Any())
             {
-                return SystemDeleteResult.HasExhibitInterfaces;
+                return SystemDeleteResult.HasInterfaceExhibits;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
