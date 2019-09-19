@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.Organization
+namespace Tests.Integration.Presentation.Web.Organizations
 {
     public class OrganizationTest : WithAutoFixture
     {
