@@ -14,7 +14,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using DocumentFormat.OpenXml.Office2010.Word;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -61,7 +60,8 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
-                    return NoContent();
+                    return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
+                                  // This means the request fails with 500 since the system is already delete in the first pass
                 default:
                     return Error("");
             }
