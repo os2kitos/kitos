@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -136,6 +137,41 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SetParentSystem(
+            int systemId, 
+            int parentSystemId,
+            int organizationId, 
+            Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                parentId = parentSystemId
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> GetSystem(int systemId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}");
+
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
     }
 }
