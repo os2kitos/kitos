@@ -116,11 +116,16 @@
                             $state.go('it-system.catalog');
                         })
                         .error(function (data, status) {
-                            if (status === 401)
+                            if (status === 401) {
                                 msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
-                            else
-                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemConflictResponse(data.msg));
-                         //   msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                            }
+                            else if (status === 409) {
+                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemDeletionConflictResponse(data.msg));
+                            }
+                            else {
+                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                            }
+
                         });
                 }
             }

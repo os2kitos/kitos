@@ -3,20 +3,20 @@
 
     export class ToastTranslatorTool {
 
-        static translateItSystemConflictResponse(response: string): string {
+        static translateItSystemDeletionConflictResponse(response: string): string {
 
             switch (response) {
                 case "InUse":
                     {
-                        return "Systemet kan ikke slettes! Da Systemet er i brug";
+                        return "Systemet kan ikke slettes! <br/>Da Systemet er i brug";
                     }
                 case "HasChildren":
                     {
-                        return "Systemet kan ikke slettes! Da andre systemer afhænger af dette system";
+                        return "Systemet kan ikke slettes! <br/>Da andre systemer afhænger af dette system";
                     }
-                case "HasInterfaceExibits":
+                case "HasInterfaceExhibits":
                     {
-                        return "Systemet kan ikke slettes! Da en snitflade afhænger af dette system";
+                        return "Systemet kan ikke slettes! <br/>Da en snitflade afhænger af dette system";
                     }
 
                 default:
