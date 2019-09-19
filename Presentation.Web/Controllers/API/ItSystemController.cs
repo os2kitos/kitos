@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="organizationId"></param>
         /// <param name="paging"></param>
-        /// <param name="q"></param>
+        /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
