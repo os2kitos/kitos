@@ -10,7 +10,7 @@ using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.ItSystem
+namespace Tests.Integration.Presentation.Web.Interfaces
 {
     public class ItIterfacesTest : WithAutoFixture
     {
