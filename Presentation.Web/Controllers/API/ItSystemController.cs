@@ -14,6 +14,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using DocumentFormat.OpenXml.Office2010.Word;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -46,23 +47,17 @@ namespace Presentation.Web.Controllers.API
         // DELETE api/T
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
-        
-            var readAccessLevel = GetOrganizationReadAccessLevel(organizationId);
-            if (readAccessLevel == OrganizationDataReadAccessLevel.None)
-            {
-                return Forbidden();
-            }
             var deleteResult = _systemService.Delete(id);
             switch (deleteResult)
             {
                 case SystemDeleteResult.Forbidden:
                     return Forbidden();
                 case SystemDeleteResult.InUse:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.HasChildren:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.HasExhibitInterfaces:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
@@ -70,7 +65,11 @@ namespace Presentation.Web.Controllers.API
                 default:
                     return Error("");
             }
+        }
 
+        private HttpResponseMessage Conflict(SystemDeleteResult systemDeleteResult)
+        {
+            return CreateResponse(HttpStatusCode.Conflict, systemDeleteResult, "");
         }
 
         protected override void DeleteQuery(ItSystem entity)
