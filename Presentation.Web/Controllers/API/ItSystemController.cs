@@ -43,34 +43,34 @@ namespace Presentation.Web.Controllers.API
             _referenceService = referenceService;
         }
 
-        // DELETE api/T
-        public override HttpResponseMessage Delete(int id, int organizationId)
-        {
         
-            var readAccessLevel = GetOrganizationReadAccessLevel(organizationId);
-            if (readAccessLevel == OrganizationDataReadAccessLevel.None)
-            {
-                return Forbidden();
-            }
+        // DELETE api/T
+        public override HttpResponseMessage Delete(int id, int organizationId) //OrganizationId is not used. Also doesn't make much sense as ItSystems are global
+        {
             var deleteResult = _systemService.Delete(id);
             switch (deleteResult)
             {
                 case SystemDeleteResult.Forbidden:
                     return Forbidden();
                 case SystemDeleteResult.InUse:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.HasChildren:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.HasExhibitInterfaces:
-                    return Error("");
+                    return Conflict(deleteResult);
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
-                    return NoContent();
+                    return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
+                                  // This means the request fails with 500 since the system is already delete in the first pass
                 default:
                     return Error("");
             }
+        }
 
+        private HttpResponseMessage Conflict(SystemDeleteResult systemDeleteResult)
+        {
+            return CreateResponse(HttpStatusCode.Conflict, systemDeleteResult, "");
         }
 
         protected override void DeleteQuery(ItSystem entity)
