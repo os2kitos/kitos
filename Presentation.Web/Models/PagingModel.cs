@@ -18,23 +18,23 @@ namespace Presentation.Web.Models
         }
 
         /// <summary>
-        /// Page size.
-        /// Default value is 100
+        /// Størrelse på resultatsættet.
+        /// Standardværdien er '100'
         /// </summary>
         public int Take { get; set; }
         /// <summary>
-        /// Items to skip before taking the ''page size'' of items.
-        /// Default value is '0'
+        /// Antal der skal ignoreres inden resultatsættet dannes.
+        /// Standardværdien er '0'
         /// </summary>
         public int Skip { get; set; }
         /// <summary>
-        /// Determine by which field the result set should be ordered before paging is applied.
-        /// Default value is 'Id'
+        /// Bestemmer hvilket felt der sorteres på inden resultatsættet dannes.
+        /// Standardværdien er 'Id'
         /// </summary>
         public string OrderBy { get; set; }
         /// <summary>
-        /// Determines if ordering should be descending with respect to 'OrderBy'.
-        /// Default value is 'false'
+        /// Bestemmer om sorteringen skal være faldende
+        /// Standardværdien er 'false'
         /// </summary>
         public bool Descending { get; set; }
 
