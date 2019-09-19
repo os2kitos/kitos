@@ -454,20 +454,6 @@
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
-                        //{
-                        //    cell: {
-                        //        template: args => {
-                        //            args.element.kendoDropDownList({
-                        //                dataSource: [ { type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false } ],
-                        //                dataTextField: "type",
-                        //                dataValueField: "value",
-                        //                valuePrimitive: true
-                        //            });
-                        //        },
-                        //        showOperators: false
-                           
-                        //    }
-                        //}
                     },
                     {
                         field: "ItContractId", title: "KontraktID", width: 150,
@@ -824,14 +810,7 @@
             this.mainGridOptions = mainGridOptions;
         }
 
-        //private nextAdviceTemplate(dataItem) {
-        //    if (dataItem.Advices.length > 0)
-        //        return this.moment(this._.chain(dataItem.Advices).sortBy("AlarmDate").first().AlarmDate).format("DD-MM-YYYY");
-        //    return "";
-        //}
-
         private isContractActive(dataItem) {
-
 
             if (!dataItem.Active) {
                 var today = this.moment().startOf('day');

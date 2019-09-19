@@ -28,11 +28,6 @@ app.config([
 
 app.config(["$authProvider", $authProvider => {
 
-    //var xmlHttp = new XMLHttpRequest();
-    //xmlHttp.open("GET", "/api/SSOConfig", false);
-    //xmlHttp.send(null);
-    //var config = JSON.parse(xmlHttp.response);
-    
     $authProvider.configure({
         redirectUri: location.origin + "/#/?",
         scope: "openid email",

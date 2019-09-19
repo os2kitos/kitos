@@ -22,7 +22,6 @@
                             var rights = rightResult.data.response;
 
                             //get the role names
-                            //return $http.get("odata/LocalItProjectRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc")
                             return $http.get("odata/ItProjectRoles?%24format=json&%24top=100&%24orderby=priority+desc&%24count=true")
                                 .then(function(roleResult) {
                                     var roles: { Name }[] = roleResult.data.value;
