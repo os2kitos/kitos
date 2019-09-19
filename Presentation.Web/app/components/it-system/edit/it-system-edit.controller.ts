@@ -116,12 +116,11 @@
                             $state.go('it-system.catalog');
                         })
                         .error(function (data, status) {
-                            if (status === 409)
-                                msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
-                            else if (status === 401)
+                            if (status === 401)
                                 msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             else
-                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemConflictResponse(data.response));
+                         //   msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
                         });
                 }
             }
