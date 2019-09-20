@@ -4,13 +4,16 @@ import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCat
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import InterfaceHelper = require("../../Helpers/InterfaceCatalogHelper");
+import waitUpTo = require("../../Utility/WaitTimers");
 
-describe("ITSystem Catalog accessibility tests", () => {
+describe("Getting correct error message when a conflict occur on deleting IT-System", () => {
     var loginHelper = new Login();
     var itSystemPage = new ItSystemEditPo();
     var testFixture = new TestFixtureWrapper();
     var cssHelper = new CssHelper();
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
+    var EC = protractor.ExpectedConditions;
+    var waitTimer = new waitUpTo();
 
     afterEach(() => {
         testFixture.enableAutoBrowserWaits();
@@ -37,8 +40,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => expectSystemWithName(systemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => console.log("Waiting for toast message"))
-            .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("IT System  er slettet!"));
+            .then(() => expectToastMessageToBeShown("IT System er slettet!"));
     });
 
     it("Correct error message when trying to delete system in use", () => {
@@ -53,7 +55,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => toggleSystemInUse(systemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"));
+            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da Systemet er i brug"));
     });
 
     it("Correct error message when trying to delete system with a interface binded", () => {
@@ -70,7 +72,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"));
+            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"));
     });
 
     it("Correct error message when trying to delete system with child system", () => {
@@ -92,7 +94,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(mainSystemName))
             .then(() => console.log("Waiting for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"));
+            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"));
     });
 
 
@@ -123,11 +125,6 @@ describe("ITSystem Catalog accessibility tests", () => {
         return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
     }
 
-    function expectNoSystemWithName(name: string) {
-        console.log("Making sure " + name + " does not exist");
-        return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
-    }
-
     function toggleSystemInUse(name: string) {
         return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//button')).click();
     }
@@ -137,8 +134,11 @@ describe("ITSystem Catalog accessibility tests", () => {
     }
 
     function getToastText() {
-        //notification-message-block
         return getToastElement().getText();
     }
-    
+
+    function expectToastMessageToBeShown(msg: string) {
+        return browser.wait(EC.textToBePresentInElement(getToastElement(), msg), waitTimer.twentySeconds);
+    }
+
 });
