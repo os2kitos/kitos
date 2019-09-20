@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.InUse:
                 case SystemDeleteResult.HasChildren:
                 case SystemDeleteResult.HasInterfaceExhibits:
-                    return Conflict(MapSystemDeleteResult(deleteResult));
+                    return DeleteConflict(MapSystemDeleteResult(deleteResult));
                 case SystemDeleteResult.UnknownError:
                     return Error("");
                 case SystemDeleteResult.Ok:
@@ -68,21 +68,10 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private static string MapSystemDeleteResult(SystemDeleteResult input)
+        private HttpResponseMessage DeleteConflict(string response)
         {
-            switch (input)
-            {
-                case SystemDeleteResult.InUse:
-                    return SystemDeleteConflict.InUse.ToString("G");
-                case SystemDeleteResult.HasChildren:
-                    return SystemDeleteConflict.HasChildren.ToString("G");
-                case SystemDeleteResult.HasInterfaceExhibits:
-                    return SystemDeleteConflict.HasInterfaceExhibits.ToString("G");
-                default:
-                    throw new InvalidEnumArgumentException($"{input} cannot be mapped to {typeof(SystemDeleteConflict)}");
-            }
+            return CreateResponse(HttpStatusCode.Conflict, response, "");
         }
-            
 
         protected override void DeleteQuery(ItSystem entity)
         {
@@ -525,6 +514,21 @@ namespace Presentation.Web.Controllers.API
                     Organization = usingOrganization.Organization.MapToNamedEntityDTO()
                 })
                 .ToList();
+        }
+
+        private static string MapSystemDeleteResult(SystemDeleteResult input)
+        {
+            switch (input)
+            {
+                case SystemDeleteResult.InUse:
+                    return SystemDeleteConflict.InUse.ToString("G");
+                case SystemDeleteResult.HasChildren:
+                    return SystemDeleteConflict.HasChildren.ToString("G");
+                case SystemDeleteResult.HasInterfaceExhibits:
+                    return SystemDeleteConflict.HasInterfaceExhibits.ToString("G");
+                default:
+                    throw new InvalidEnumArgumentException($"{input} cannot be mapped to {typeof(SystemDeleteConflict)}");
+            }
         }
     }
 }
