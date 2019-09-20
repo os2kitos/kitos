@@ -24,7 +24,7 @@ class InterfaceCatalogHelper {
         console.log(`Binding interface with name ${interfaceName} to system with name ${systemName}`);
         return this.gotoSpecificInterface(interfaceName)
             .then(() => element(this.cssHelper.byDataElementType("interfaceDetailsLink")).click())
-            .then(() => this.getExhibitsOfSelect2AndInputData(systemName))
+            .then(() => this.select2SearchForInterface(systemName))
             .then(() => this.waitForSelect2DataAndSelect());
     }
 
@@ -39,33 +39,22 @@ class InterfaceCatalogHelper {
             .then(() => this.findSpecificInterfaceInKendo(name).click());
     }
 
-    private static findSpecificInterfaceInKendo(name : string) {
+    private static findSpecificInterfaceInKendo(name: string) {
+        console.log(`Finding interface with name : ${name}`);
         return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//a'));
     }
-    
-    private static getExhibitsOfSelect2AndInputData(search: string) {
-        console.log(`Finding interface ${search}`);
-        this.getSelect2ExhibitBox().click()
-            .then(() => this.getSelect2ExhibitInputField().sendKeys(search));
-    }
 
-    private static  waitForSelect2DataAndSelect() {
+    public static waitForSelect2DataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(this.EC.visibilityOf(this.getSelect2ExhibitsResultsList()), 20000)
-            .then(() => this.getSelect2ExhibitInputField().sendKeys(protractor.Key.ENTER))
-            .then(() => browser.sleep(5000));
+        return browser.wait(this.EC.visibilityOf(element(by.className("select2-result-label"))), 20000)
+            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
-    private static getSelect2ExhibitBox() {
-        return element(by.id("s2id_interface-exposed-by")).element(by.tagName("a"));
-    }
-
-    private static getSelect2ExhibitInputField() {
-        return element(by.id("s2id_interface-exposed-by")).element(by.tagName("input"));
-    }
-
-    private static getSelect2ExhibitsResultsList() {
-        return element(by.xpath('//*/div[@class="select2-search"]/label[text()="Udstillet af"]/parent::*/parent::*/ul'));
+    public static select2SearchForInterface(name: string) {
+        console.log(`select2SearchForMainSystem: ${name}`);
+        return element(by.id("s2id_interface-exposed-by")).element(by.tagName('a')).click()
+            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).click())
+            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(name));
     }
 
 }

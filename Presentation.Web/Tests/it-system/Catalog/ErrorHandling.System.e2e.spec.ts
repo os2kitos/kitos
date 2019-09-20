@@ -25,22 +25,22 @@ describe("ITSystem Catalog accessibility tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    //it("Correct error message when trying to delete system in use", () => {
-    //    var systemName = createSystemName();
-    //    var testFixture = new TestFixtureWrapper();
+    it("Correct error message when trying to delete system in use", () => {
+        var systemName = createSystemName();
+        var testFixture = new TestFixtureWrapper();
 
-    //    loginHelper.loginAsGlobalAdmin()
-    //        .then(() => loadPage())
-    //        .then(() => waitForKendoGrid())
-    //        .then(() => expectCreateButtonVisibility(true))
-    //        .then(() => CatalogHelper.createSystem(systemName))
-    //        .then(() => expectSystemWithName(systemName))
-    //        .then(() => toggleSystemInUse(systemName))
-    //        .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
-    //        .then(() => browser.wait(getToastElement().isPresent(), 20000))
-    //        .then(() => expect(getToastText()).toEqual("Fejl! Kunne ikke slette IT System!"))
-    //        .then(() => testFixture.enableAutoBrowserWaits());
-    //});
+        loginHelper.loginAsGlobalAdmin()
+            .then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => expectCreateButtonVisibility(true))
+            .then(() => CatalogHelper.createSystem(systemName))
+            .then(() => expectSystemWithName(systemName))
+            .then(() => toggleSystemInUse(systemName))
+            .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
+            .then(() => browser.wait(getToastElement().isPresent(), 20000))
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"))
+            .then(() => testFixture.enableAutoBrowserWaits());
+    });
 
     it("Correct error message when trying to delete system with a interface binded", () => {
         var systemName = createSystemName();
@@ -51,11 +51,12 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => waitForKendoGrid())
             .then(() => expectCreateButtonVisibility(true))
             .then(() => CatalogHelper.createSystem(systemName))
+            .then(() => expectSystemWithName(systemName))
             .then(() => InterfaceHelper.createInterface(interfaceName))
             .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"))
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"))
             .then(() => testFixture.enableAutoBrowserWaits());
 
     });
