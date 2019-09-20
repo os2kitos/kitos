@@ -195,7 +195,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
 
-        public static async Task<HttpResponseMessage> SetParentSystem(
+        public static async Task<HttpResponseMessage> SetParentSystemAsync(
             int systemId, 
             int parentSystemId,
             int organizationId, 
@@ -212,7 +212,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> GetSystem(int systemId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> GetSystemAsync(int systemId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
