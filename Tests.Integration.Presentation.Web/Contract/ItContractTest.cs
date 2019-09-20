@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.ItSystem
+namespace Tests.Integration.Presentation.Web.Contract
 {
     public class ItContractTest : WithAutoFixture
     {
