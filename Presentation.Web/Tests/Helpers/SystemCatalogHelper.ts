@@ -67,7 +67,7 @@ class SystemCatalogHelper {
 
     public static waitForSelect2DataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(this.ec.visibilityOf(element(by.className("select2-result-label"))), 20000)
+        return browser.wait(this.ec.visibilityOf(element(by.className("select2-result-label"))), SystemCatalogHelper.waitUpTo.twentySeconds)
             .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
