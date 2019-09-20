@@ -3,12 +3,14 @@ import CatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import ItSystemEditPo = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po")
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
+import InterfaceHelper = require("../../Helpers/InterfaceCatalogHelper");
 
 describe("ITSystem Catalog accessibility tests", () => {
     var loginHelper = new Login();
-    var pageObject = new ItSystemEditPo();
+    var itSystemPage = new ItSystemEditPo();
     var testFixture = new TestFixtureWrapper();
     var cssHelper = new CssHelper();
+    var interfaceHelper = new InterfaceHelper();
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
 
     afterEach(() => {
@@ -23,32 +25,44 @@ describe("ITSystem Catalog accessibility tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Correct error message when trying to delete system in use", () => {
+    //it("Correct error message when trying to delete system in use", () => {
+    //    var systemName = createSystemName();
+    //    var testFixture = new TestFixtureWrapper();
+
+    //    loginHelper.loginAsGlobalAdmin()
+    //        .then(() => loadPage())
+    //        .then(() => waitForKendoGrid())
+    //        .then(() => expectCreateButtonVisibility(true))
+    //        .then(() => CatalogHelper.createSystem(systemName))
+    //        .then(() => expectSystemWithName(systemName))
+    //        .then(() => toggleSystemInUse(systemName))
+    //        .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
+    //        .then(() => browser.wait(getToastElement().isPresent(), 20000))
+    //        .then(() => expect(getToastText()).toEqual("Fejl! Kunne ikke slette IT System!"))
+    //        .then(() => testFixture.enableAutoBrowserWaits());
+    //});
+
+    it("Correct error message when trying to delete system with a interface binded", () => {
         var systemName = createSystemName();
-        var testFixture = new TestFixtureWrapper();
+        var interfaceName = createInterfaceName();
 
         loginHelper.loginAsGlobalAdmin()
-            .then(() => loadPage())
+            .then(() => itSystemPage.getPage())
             .then(() => waitForKendoGrid())
             .then(() => expectCreateButtonVisibility(true))
             .then(() => CatalogHelper.createSystem(systemName))
-            .then(() => console.log("Expecting systme with name " + systemName))
-            .then(() => expectSystemWithName(systemName))
-            .then(() => console.log("Toggling system " + systemName))
-            .then(() => toggleSystemInUse(systemName))
-            .then(() => console.log("Trying to delete IT-System"))
+            .then(() => InterfaceHelper.createInterface(interfaceName))
+            .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
-            .then(() => console.log("Waitng for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Fejl! Kunne ikke slette IT System!"))
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"))
             .then(() => testFixture.enableAutoBrowserWaits());
-
     });
 
 
     function expectCreateButtonVisibility(expectedEnabledState: boolean) {
         console.log("Expecting createCatalog visibility to be:" + expectedEnabledState);
-        return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
+        return expect(itSystemPage.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
     }
 
     function waitForKendoGrid() {
@@ -57,11 +71,15 @@ describe("ITSystem Catalog accessibility tests", () => {
 
     function loadPage() {
         console.log("Loading system catalog page");
-        return pageObject.getPage();
+        return itSystemPage.getPage();
     }
 
     function createSystemName() {
         return "System" + new Date().getTime();
+    }
+
+    function createInterfaceName() {
+        return "inteface" + new Date().getTime();
     }
 
     function expectSystemWithName(name: string) {
@@ -86,4 +104,8 @@ describe("ITSystem Catalog accessibility tests", () => {
         //notification-message-block
         return getToastElement().getText();
     }
+
+
+
+
 });

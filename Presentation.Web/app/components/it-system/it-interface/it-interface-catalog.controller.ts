@@ -148,7 +148,7 @@
                     {
                         name: "createSnitflade",
                         text: "Opret Snitflade",
-                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
+                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' data-element-type='createInterfaceButton' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
