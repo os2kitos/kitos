@@ -1,12 +1,10 @@
 ﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import WaitTimers = require("../Utility/WaitTimers");
-import TestFixture = require("../Utility/TestFixtureWrapper");
 
 class InterfaceCatalogHelper {
     private static cssHelper = new CSSLocator();
     private static waitUpTo = new WaitTimers();
-    private static testFixture = new TestFixture();
     private static interfacePage = new InterfaceCatalogPage();
     private static EC = protractor.ExpectedConditions;
 

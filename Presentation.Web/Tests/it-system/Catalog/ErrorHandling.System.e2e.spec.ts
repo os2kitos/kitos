@@ -10,10 +10,10 @@ describe("ITSystem Catalog accessibility tests", () => {
     var itSystemPage = new ItSystemEditPo();
     var testFixture = new TestFixtureWrapper();
     var cssHelper = new CssHelper();
-    var interfaceHelper = new InterfaceHelper();
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
 
     afterEach(() => {
+        testFixture.enableAutoBrowserWaits();
         testFixture.cleanupState();
     });
 
@@ -25,9 +25,8 @@ describe("ITSystem Catalog accessibility tests", () => {
         testFixture.disableLongRunningTest();
     });
 
-    it("Correct error message when succesfulle deleting system", () => {
+    it("Correct error message when succesfully deleting system", () => {
         var systemName = createSystemName();
-        var testFixture = new TestFixtureWrapper();
 
         loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
@@ -39,13 +38,11 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => console.log("Waiting for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("IT System  er slettet!"))
-            .then(() => testFixture.enableAutoBrowserWaits());
+            .then(() => expect(getToastText()).toEqual("IT System  er slettet!"));
     });
 
     it("Correct error message when trying to delete system in use", () => {
         var systemName = createSystemName();
-        var testFixture = new TestFixtureWrapper();
 
         loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
@@ -56,8 +53,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => toggleSystemInUse(systemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"))
-            .then(() => testFixture.enableAutoBrowserWaits());
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"));
     });
 
     it("Correct error message when trying to delete system with a interface binded", () => {
@@ -74,15 +70,12 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"))
-            .then(() => testFixture.enableAutoBrowserWaits());
-
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"));
     });
 
     it("Correct error message when trying to delete system with child system", () => {
         var mainSystemName = "main" + createSystemName();
         var childSystemName = "child" + createSystemName();
-        var testFixture = new TestFixtureWrapper();
 
         loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
@@ -99,8 +92,7 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(mainSystemName))
             .then(() => console.log("Waiting for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"))
-            .then(() => testFixture.enableAutoBrowserWaits());
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"));
     });
 
 
