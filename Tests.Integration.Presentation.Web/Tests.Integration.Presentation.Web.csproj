@@ -87,16 +87,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ItSystem\ItContractTest.cs" />
-    <Compile Include="ItSystem\ItInterfaceUsageTests.cs" />
-    <Compile Include="ItSystem\ItProjectTest.cs" />
+    <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="Interfaces\ItInterfaceUsageTests.cs" />
+    <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
-    <Compile Include="ItSystem\ItIterfacesTest.cs" />
+    <Compile Include="Interfaces\ItIterfacesTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
-    <Compile Include="ItSystem\LocalConfigTest.cs" />
-    <Compile Include="ItSystem\OrganizationTest.cs" />
+    <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
+    <Compile Include="Organizations\OrganizationTest.cs" />
     <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
@@ -114,6 +114,8 @@
     <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
+    <Compile Include="Tools\Model\EnableAccessTypeInput.cs" />
+    <Compile Include="Tools\Model\GetAccessTypesResponse.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
@@ -139,9 +141,7 @@
       <Name>Presentation.Web</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

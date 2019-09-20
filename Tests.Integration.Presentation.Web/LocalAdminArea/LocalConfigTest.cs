@@ -1,11 +1,10 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.ItSystem
+namespace Tests.Integration.Presentation.Web.LocalAdminArea
 {
     public class LocalConfigTest : WithAutoFixture
     {

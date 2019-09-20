@@ -1,10 +1,13 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Newtonsoft.Json;
 using Presentation.Web.Models;
+using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -136,6 +139,51 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<AccessType> CreateAccessTypeAsync(int id, string name, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl("odata/AccessTypes");
+            var body = new
+            {
+                ItSystemId = id,
+                Name = name
+            };
+
+            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                return await response.ReadResponseBodyAsAsync<AccessType>();
+            }
+        }
+
+        public static async Task EnableAccessTypeAsync(int systemUsageId, int accessTypeId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})/AccessTypes/$ref");
+            var linkUrl = TestEnvironment.CreateUrl($"odata/AccessTypes({accessTypeId})");
+            var body = new EnableAccessTypeInput
+            {
+                Id = linkUrl.AbsoluteUri
+            };
+
+            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
+            {
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            }
+        }
+
+        public static async Task<AccessType[]> GetEnabledAccessTypesAsync(int systemUsageId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})?$select=Id&$expand=AccessTypes");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url,cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
+            }
         }
 
         public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie login)

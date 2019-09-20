@@ -430,6 +430,42 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
+        public async Task PostMigration_Access_Types_Are_Removed()
+        {
+            //Arrange
+            var accessType1 = CreateName();
+            var accessType2 = CreateName();
+            var type1 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.Id, accessType1);
+            var type2 = await ItSystemHelper.CreateAccessTypeAsync(_oldSystemInUse.Id, accessType2);
+
+            await ItSystemHelper.EnableAccessTypeAsync(_oldSystemUsage.Id, type1.Id);
+            await ItSystemHelper.EnableAccessTypeAsync(_oldSystemUsage.Id, type2.Id);
+            var enabledAccessTypes = await ItSystemHelper.GetEnabledAccessTypesAsync(_oldSystemUsage.Id);
+
+            //Make sure the access types were added
+            Assert.True(
+                new[]
+                    {
+                        type1.Id,
+                        type2.Id
+                    }
+                    .OrderBy(x => x).SequenceEqual(
+                        enabledAccessTypes
+                            .Select(x => x.Id)
+                            .OrderBy(x => x))
+            );
+
+            //Act
+            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert - access types should have been removed
+                AssertMigrationSucceeded(response);
+                enabledAccessTypes = await ItSystemHelper.GetEnabledAccessTypesAsync(_oldSystemUsage.Id);
+                Assert.Empty(enabledAccessTypes);
+            }
+        }
+
+        [Fact]
         public async Task PostMigration_Can_Migrate_All_Usage_Data()
         {
             //Arrange
