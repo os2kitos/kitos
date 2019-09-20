@@ -470,27 +470,12 @@
 
         // updates the users default org unit in the current organization
         updateDefaultOrgUnit = (newDefaultOrgUnitId) => {
-            //var deferred = this.$q.defer();
-
             var payload = {
                 orgId: this._user.currentOrganizationId,
                 orgUnitId: newDefaultOrgUnitId
             };
 
             return this.$http.post("api/user?updateDefaultOrgUnit", payload);
-            //    .success(function (result) {
-            //    // now we gotta update the saved user in the userService.
-            //    // the simplest is just to re-auth the user.
-            //    this.getUser().then(function (user) {
-            //        deferred.resolve(user);
-            //    }, function () {
-            //        deferred.reject("Couldn't update default org unit!");
-            //    });
-            //}).error(function () {
-            //    deferred.reject("Couldn't update default org unit!");
-            //});
-
-            //return deferred.promise;
         }
     }
     app.service("userService", UserService);

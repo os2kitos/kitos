@@ -12,7 +12,6 @@
         ["$scope", "$http", "$timeout", "$state", "$stateParams", "project", "$confirm", "notify", "$", "hasWriteAccess",
             function ($scope, $http, $timeout, $state, $stateParams, project, $confirm, notify, $, hasWriteAccess) {
                 $scope.hasWriteAccess = hasWriteAccess;
-              //  $scope.chosenReference = project.ReferenceId;
                 $scope.reference = project;
 
                 $scope.deleteReference = function (id) {

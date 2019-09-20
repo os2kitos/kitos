@@ -94,8 +94,6 @@
                 }
             });
 
-            //this.needsWidthFixService.fixWidthOnClick();
-
             this.activate();
         }
         public isValidUrl(Url) {

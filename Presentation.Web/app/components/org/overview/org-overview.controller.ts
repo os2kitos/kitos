@@ -38,17 +38,6 @@
             $scope.csvUrl = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true' + '&orgUnitId=' + user.currentOrganizationId;
 
             $scope.$watchCollection('pagination', function() {
-                //var url = 'api/taskusage/?csv&orgUnitId=' + $scope.orgUnitId + '&onlyStarred=true';
-
-                //url += '&skip=' + $scope.pagination.skip;
-                //url += '&take=' + $scope.pagination.take;
-
-                //if ($scope.pagination.orderBy) {
-                //    url += '&orderBy=' + $scope.pagination.orderBy;
-                //    if ($scope.pagination.descending) url += '&descending=' + $scope.pagination.descending;
-                //}
-
-                //$scope.csvUrl = url;
                 loadUsages();
             });
 

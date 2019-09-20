@@ -88,7 +88,7 @@
         public opretITProjekt() {
             var self = this;
 
-            var modalInstance = this.$modal.open({
+            this.$modal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                 windowClass: 'modal fade in',
