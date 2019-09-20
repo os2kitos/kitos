@@ -5,12 +5,6 @@
         mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: any;
-        //modal: kendo.ui.Window;
-        //usageGrid: kendo.ui.Grid;
-        //usageDetailsGrid: kendo.ui.GridOptions;
-        //exhibitModal: kendo.ui.Window;
-        //exhibitGrid: kendo.ui.Grid;
-        //exhibitDetailsGrid: kendo.ui.GridOptions;
     }
 
     export interface IItSystemUsageOverview extends Models.ItSystemUsage.IItSystemUsage {
@@ -26,13 +20,6 @@
 
         public mainGrid: Kitos.IKendoGrid<IItSystemUsageOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
-
-        //public usageGrid: kendo.ui.Grid;
-        //public modal: kendo.ui.Window;
-
-        //public exhibitGrid: kendo.ui.Grid;
-        //public exhibitModal: kendo.ui.Window;
-
         public static $inject: Array<string> = [
             "$rootScope",
             "$scope",
@@ -346,19 +333,6 @@
                         attributes: { "class": "text-center" },
                         sortable: false,
                         filterable: false
-                        //{
-                        //    cell: {
-                        //        template: args => {
-                        //            args.element.kendoDropDownList({
-                        //                dataSource: [{ type: "Gyldig", value: true }, { type: "Ikke gyldig", value: false }],
-                        //                dataTextField: "type",
-                        //                dataValueField: "value",
-                        //                valuePrimitive: true
-                        //            });
-                        //        },
-                        //        showOperators: false
-                        //    }
-                        //}
                     },
                     {
                         field: "LocalSystemId", title: "Lokal system ID", width: 150,

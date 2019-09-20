@@ -1056,7 +1056,6 @@
     <TypeScriptCompile Include="app\models\api\organization-role.ts" />
     <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-project\it-project-overview.spec.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />
     <TypeScriptCompile Include="app\kitos.ts" />

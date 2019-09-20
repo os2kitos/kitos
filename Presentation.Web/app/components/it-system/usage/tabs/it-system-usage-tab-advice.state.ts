@@ -20,9 +20,6 @@
                 object: ['itSystemUsage', function (itSystemUsage) {
                     return itSystemUsage;
                 }],
-                //users: ['UserGetService', function (UserGetService) {
-                //    return UserGetService.GetAllUsers();
-                //}],
                 type: [function () {
                     return "itSystemUsage";
                 }],

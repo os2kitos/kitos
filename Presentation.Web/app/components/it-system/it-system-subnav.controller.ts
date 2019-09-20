@@ -22,34 +22,11 @@
                 ];
                 
                 $rootScope.page.subnav.buttons = [
-                   // { func: createInterface, text: 'Opret Snitflade', style: 'btn-success', icon: 'glyphicon-plus' },
                     { func: removeUsage, text: 'Fjern anvendelse', style: 'btn-danger', showWhen: 'it-system.usage' },
-                    //{ func: removeSystem, text: 'Slet IT System', style: 'btn-danger', showWhen: 'it-system.edit' },
                     { func: removeInterface, text: 'Slet Snitflade', style: 'btn-danger', showWhen: 'it-system.interface-edit' }
                 ];
 
                 $rootScope.subnavPositionCenter = false;
-
-                //function removeSystem() {
-                //    if (!confirm('Er du sikker på du vil slette systemet?')) {
-                //        return;
-                //    }
-                //    var systemId = $state.params.id;
-                //    var msg = notify.addInfoMessage('Sletter IT System...', false);
-                //    $http.delete('api/itsystem/' + systemId + '?organizationId=' + user.currentOrganizationId)
-                //        .success(function (result) {
-                //            msg.toSuccessMessage('IT System  er slettet!');
-                //            $state.go('it-system.catalog');
-                //        })
-                //        .error(function (data, status) {
-                //            if (status === 409)
-                //                msg.toErrorMessage('Fejl! IT Systemet er i lokal anvendelse!');
-                //            else if (status === 401)
-                //                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
-                //            else
-                //                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
-                //        });
-                //}
 
                 function removeUsage() {
                     if (!confirm('Er du sikker på at du vil fjerne den lokale anvendelse af systemet? Dette sletter ikke systemet, men vil slette alle lokale detaljer vedrørende anvendelsen.')) {

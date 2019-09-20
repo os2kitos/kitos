@@ -100,7 +100,6 @@
                 }
 
                 //otherwise, we should delete the old entry, then add a new one
-
                 var msg = notify.addInfoMessage("Arbejder ...", false);
 
                 $http.delete("api/globaladmin?userId=" + uIdOld, { handleBusy: true }).success(function(deleteResult) {
@@ -125,7 +124,6 @@
 
                     }).error(function(result) {
                         //we successfully deleted the old entry, but didn't add a new one
-                        //fuck
                         admin.show = false;
 
                         msg.toErrorMessage("Kunne ikke gøre " + user.text + " til global administrator");
@@ -137,7 +135,6 @@
                     msg.toErrorMessage("Fejl!");
                 });
             };
-
 
             $scope.adminSortBy = "userName";
             $scope.adminSortReverse = false;

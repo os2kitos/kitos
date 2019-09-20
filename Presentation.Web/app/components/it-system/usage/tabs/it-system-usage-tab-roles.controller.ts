@@ -152,8 +152,6 @@
                 }).error(function (result) {
 
                     // we successfully deleted the old entry, but didn't add a new one
-                    // fuck
-
                     right.show = false;
 
                     notify.addErrorMessage("Fejl!");
