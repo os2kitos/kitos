@@ -40,7 +40,32 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => console.log("Waitng for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expect(getToastText()).toEqual("Fejl! Kunne ikke slette IT System!"))
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da Systemet er i brug"))
+            .then(() => testFixture.enableAutoBrowserWaits());
+
+    });
+
+    it("Correct error message when trying to delete system with child system", () => {
+        var mainSystemName = "main" + createSystemName();
+        var childSystemName = "child" + createSystemName();
+        var testFixture = new TestFixtureWrapper();
+
+        loginHelper.loginAsGlobalAdmin()
+            .then(() => loadPage())
+            .then(() => waitForKendoGrid())
+            .then(() => expectCreateButtonVisibility(true))
+            .then(() => CatalogHelper.createSystem(mainSystemName))
+            .then(() => console.log("Expecting system with name " + mainSystemName))
+            .then(() => expectSystemWithName(mainSystemName))
+            .then(() => expectCreateButtonVisibility(true))
+            .then(() => CatalogHelper.createSystem(childSystemName))
+            .then(() => console.log("Expecting system with name " + childSystemName))
+            .then(() => expectSystemWithName(childSystemName))
+            .then(() => CatalogHelper.setMainSystem(mainSystemName, childSystemName))
+            .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(mainSystemName))
+            .then(() => console.log("Waitng for toast message"))
+            .then(() => browser.wait(getToastElement().isPresent(), 20000))
+            .then(() => expect(getToastText()).toEqual("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"))
             .then(() => testFixture.enableAutoBrowserWaits());
 
     });
@@ -86,4 +111,5 @@ describe("ITSystem Catalog accessibility tests", () => {
         //notification-message-block
         return getToastElement().getText();
     }
+    
 });

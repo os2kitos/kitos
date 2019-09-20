@@ -120,7 +120,7 @@
                                 msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
                             }
                             else if (status === 409) {
-                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemDeletionConflictResponse(data.msg));
+                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemDeletionConflictResponse(data.response));
                             }
                             else {
                                 msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
