@@ -1,10 +1,6 @@
 ﻿module Kitos.Utility {
-
-
     export class ToastTranslatorTool {
-
         static translateItSystemDeletionConflictResponse(response: string): string {
-
             switch (response) {
                 case "InUse":
                     {
@@ -18,7 +14,6 @@
                     {
                         return "Systemet kan ikke slettes! <br/>Da en snitflade afhænger af dette system";
                     }
-
                 default:
                     {
                         return "Systemet kan ikke slettes!";
