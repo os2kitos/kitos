@@ -211,7 +211,6 @@
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
-    <Compile Include="Helpers\ResponseMessageHelper.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Helpers\WithAutoFixture.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
