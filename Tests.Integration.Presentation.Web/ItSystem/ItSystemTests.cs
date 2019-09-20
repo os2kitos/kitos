@@ -217,7 +217,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var mainSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var childSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SetParentSystem(childSystem.Id, mainSystem.Id, organizationId, login);
+            await ItSystemHelper.SetParentSystemAsync(childSystem.Id, mainSystem.Id, organizationId, login);
 
             //Act
             using (var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login))
@@ -262,13 +262,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static async Task AssertSystemNotDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.GetSystem(systemId);
+            var result = await ItSystemHelper.GetSystemAsync(systemId);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
         private static async Task AssertSystemDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.GetSystem(systemId);
+            var result = await ItSystemHelper.GetSystemAsync(systemId);
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         }
     }

@@ -17,9 +17,25 @@ namespace Presentation.Web.Models
             Descending = false;
         }
 
+        /// <summary>
+        /// Størrelse på resultatsættet.
+        /// Standardværdien er '100'
+        /// </summary>
         public int Take { get; set; }
+        /// <summary>
+        /// Antal der skal ignoreres inden resultatsættet dannes.
+        /// Standardværdien er '0'
+        /// </summary>
         public int Skip { get; set; }
+        /// <summary>
+        /// Bestemmer hvilket felt der sorteres på inden resultatsættet dannes.
+        /// Standardværdien er 'Id'
+        /// </summary>
         public string OrderBy { get; set; }
+        /// <summary>
+        /// Bestemmer om sorteringen skal være faldende
+        /// Standardværdien er 'false'
+        /// </summary>
         public bool Descending { get; set; }
 
         private readonly List<Expression<Func<TModel, bool>>> _dbFilters;

@@ -4,15 +4,15 @@
             switch (response) {
                 case "InUse":
                     {
-                        return "Systemet kan ikke slettes! <br/>Da Systemet er i brug";
+                        return "Systemet kan ikke slettes! \nDa Systemet er i brug";
                     }
                 case "HasChildren":
                     {
-                        return "Systemet kan ikke slettes! <br/>Da andre systemer afhænger af dette system";
+                        return "Systemet kan ikke slettes! \nDa andre systemer afhænger af dette system";
                     }
                 case "HasInterfaceExhibits":
                     {
-                        return "Systemet kan ikke slettes! <br/>Da en snitflade afhænger af dette system";
+                        return "Systemet kan ikke slettes! \nDa en snitflade afhænger af dette system";
                     }
                 default:
                     {
