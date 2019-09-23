@@ -1,20 +1,21 @@
 ﻿module Kitos.Utility {
     import SystemDeleteMessages = Models.ItSystem.SystemDeleteMessages;
-
     export class ToastTranslatorTool {
         static translateItSystemDeletionConflictResponse(response: string): string {
+            var errorMsg = new SystemDeleteMessages();
             switch (response) {
-                case "InUse":{
-                        return SystemDeleteMessages.errorMessagesSystemDelete509Status[0];
-                    }
+                case "InUse":
+                {
+                    return errorMsg.errorMessageSystemInUse;
+                }
                 case "HasChildren":{
-                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[1];
+                    return errorMsg.errorMessageSystemDependsOnThis;
                     }
                 case "HasInterfaceExhibits":{
-                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[2];
+                    return errorMsg.errorMessageInterfaceDependsOnThis;
                     }
                 default:{
-                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[3];
+                    return errorMsg.errorMessageDeleteDefault;
                 }
             }
         }

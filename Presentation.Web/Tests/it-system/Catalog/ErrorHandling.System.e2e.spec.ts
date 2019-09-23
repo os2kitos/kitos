@@ -5,6 +5,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import InterfaceHelper = require("../../Helpers/InterfaceCatalogHelper");
 import waitUpTo = require("../../Utility/WaitTimers");
+import errorDeleteMessages = require("../../Models/systemDeleteMessages");
 
 describe("Getting correct error message when a conflict occur on deleting IT-System", () => {
     var loginHelper = new Login();
@@ -14,6 +15,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
     var EC = protractor.ExpectedConditions;
     var waitTimer = new waitUpTo();
+    var errorMsg = new errorDeleteMessages();
 
     afterEach(() => {
         testFixture.enableAutoBrowserWaits();
@@ -55,7 +57,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => toggleSystemInUse(systemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da Systemet er i brug"));
+            .then(() => expectToastMessageToBeShown(errorMsg.errorMessageSystemInUse));
     });
 
     it("Correct error message when trying to delete system with a interface binded", () => {
@@ -72,7 +74,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"));
+            .then(() => expectToastMessageToBeShown(errorMsg.errorMessageInterfaceDependsOnThis));
     });
 
     it("Correct error message when trying to delete system with child system", () => {
@@ -94,7 +96,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(mainSystemName))
             .then(() => console.log("Waiting for toast message"))
             .then(() => browser.wait(getToastElement().isPresent(), 20000))
-            .then(() => expectToastMessageToBeShown("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"));
+            .then(() => expectToastMessageToBeShown(errorMsg.errorMessageSystemDependsOnThis));
     });
 
 
