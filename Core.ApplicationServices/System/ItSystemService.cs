@@ -23,7 +23,7 @@ namespace Core.ApplicationServices.System
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
-        private readonly ReferenceService _referenceService;
+        private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
 
         public ItSystemService(
@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.System
             IItSystemRepository itSystemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            ReferenceService referenceService,
+            IReferenceService referenceService,
             ILogger logger
             )
         {

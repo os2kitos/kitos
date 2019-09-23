@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -38,7 +36,6 @@ namespace Tests.Unit.Presentation.Web.Controllers
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
                 _systemService.Object,
-                new ReferenceService(),
                 _authorizationContext.Object
                 );
 

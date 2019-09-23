@@ -1,5 +1,4 @@
 ﻿using System.Data;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.System;
@@ -10,7 +9,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
-using Serilog;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -22,21 +20,20 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<ReferenceService> _referenceService;
 
         public ItSystemServiceTest()
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
             _transactionManager = new Mock<ITransactionManager>();
-            _referenceService = new Mock<ReferenceService>();
+            var referenceService = new Mock<IReferenceService>();
             _sut = new ItSystemService(
                 null, 
                 null, 
                 _systemRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
-                _referenceService.Object,
+                referenceService.Object,
                 null
                 );
         }

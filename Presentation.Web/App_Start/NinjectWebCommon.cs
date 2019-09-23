@@ -117,6 +117,7 @@ namespace Presentation.Web
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
             kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
+            kernel.Bind<IReferenceService>().To<ReferenceService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

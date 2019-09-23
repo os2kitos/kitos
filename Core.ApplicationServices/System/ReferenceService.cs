@@ -5,9 +5,9 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.System
 {
-    public class ReferenceService
+    public class ReferenceService : IReferenceService
     {
 
         [Inject]
