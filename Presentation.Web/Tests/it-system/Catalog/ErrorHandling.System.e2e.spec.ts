@@ -5,7 +5,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import CssHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import InterfaceHelper = require("../../Helpers/InterfaceCatalogHelper");
 import waitUpTo = require("../../Utility/WaitTimers");
-import errorDeleteMessages = require("../../Models/systemDeleteMessages");
+import errorMsg = require("../../Models/systemDeleteMessages");
 
 describe("Getting correct error message when a conflict occur on deleting IT-System", () => {
     var loginHelper = new Login();
@@ -15,7 +15,6 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
     var findCatalogColumnsFor = CatalogHelper.findCatalogColumnsFor;
     var EC = protractor.ExpectedConditions;
     var waitTimer = new waitUpTo();
-    var errorMsg = new errorDeleteMessages();
     var interfaceHelper = new InterfaceHelper();
 
     afterEach(() => {
