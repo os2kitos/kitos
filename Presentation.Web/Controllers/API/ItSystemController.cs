@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -30,24 +29,21 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
-        private readonly ReferenceService _referenceService;
 
         public ItSystemController(
             IGenericRepository<ItSystem> repository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemService systemService,
-            ReferenceService referenceService,
             IAuthorizationContext authorizationContext)
             : base(repository, authorizationContext)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
-            _referenceService = referenceService;
         }
 
         
         // DELETE api/T
-        public override HttpResponseMessage Delete(int id, int organizationId) //OrganizationId is not used. Also doesn't make much sense as ItSystems are global
+        public override HttpResponseMessage Delete(int id, int organizationId)
         {
             var deleteResult = _systemService.Delete(id);
             switch (deleteResult)

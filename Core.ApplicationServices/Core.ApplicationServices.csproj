@@ -123,6 +123,7 @@
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItInterfaceService.cs" />
     <Compile Include="System\IItSystemService.cs" />
+    <Compile Include="System\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
@@ -132,7 +133,7 @@
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailClient.cs" />
-    <Compile Include="ReferenceService.cs" />
+    <Compile Include="System\ReferenceService.cs" />
     <Compile Include="UserService.cs" />
   </ItemGroup>
   <ItemGroup>
