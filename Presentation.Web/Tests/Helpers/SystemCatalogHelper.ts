@@ -52,7 +52,7 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.findCatalogColumnsFor(childSystemName).first().click())
-            .then(() => Select2.SearchFor(mainSystemName, "s2id_system-parent"))
+            .then(() => Select2.searchFor(mainSystemName, "s2id_system-parent"))
             .then(() => Select2.waitForDataAndSelect());
     }
 

@@ -38,7 +38,7 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
-                var errormsg = new Kitos.Models.ItSystem.SystemDeleteMessages();
+                var errormsg = Kitos.Models.ItSystem.SystemDeleteMessages;
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {

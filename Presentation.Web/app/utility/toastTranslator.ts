@@ -1,7 +1,7 @@
 ﻿module Kitos.Utility {
     export class ToastTranslatorTool {
         static translateItSystemDeletionConflictResponse(response: string): string {
-            var errorMsg = new Models.ItSystem.SystemDeleteMessages();
+            var errorMsg = Models.ItSystem.SystemDeleteMessages;
             switch (response) {
                 case "InUse":{
                     return errorMsg.errorMessageSystemInUse;

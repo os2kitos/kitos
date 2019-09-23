@@ -11,7 +11,7 @@ class Select2Helper {
             .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
     }
 
-    public static SearchFor(name: string, elementId: string) {
+    public static searchFor(name: string, elementId: string) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId}`);
         return element(by.id(elementId)).element(by.tagName('a')).click()
             .then(() => console.log("next"))

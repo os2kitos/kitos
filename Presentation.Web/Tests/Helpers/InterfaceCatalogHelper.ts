@@ -7,7 +7,6 @@ class InterfaceCatalogHelper {
     private cssHelper = new CSSLocator();
     private waitUpTo = new WaitTimers();
     private interfacePage = new InterfaceCatalogPage();
-    private EC = protractor.ExpectedConditions;
 
     public createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
@@ -23,7 +22,7 @@ class InterfaceCatalogHelper {
         console.log(`Binding interface with name ${interfaceName} to system with name ${systemName}`);
         return this.gotoSpecificInterface(interfaceName)
             .then(() => element(this.cssHelper.byDataElementType("interfaceDetailsLink")).click())
-            .then(() => Select2.SearchFor(systemName, "s2id_interface-exposed-by"))
+            .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
             .then(() => Select2.waitForDataAndSelect());
     }
 
