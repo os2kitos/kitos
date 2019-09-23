@@ -126,28 +126,33 @@ namespace Core.ApplicationServices.System
             return parents;
         }
 
-        public SystemDeleteResult Delete(int id)
+        public DeleteResult Delete(int id)
         {
             var system = _itSystemRepository.GetSystem(id);
 
+            if (system == null)
+            {
+                return DeleteResult.NotFound;
+            }
+
             if (! _authorizationContext.AllowDelete(system))
             {
-                return SystemDeleteResult.Forbidden;
+                return DeleteResult.Forbidden;
             }
 
             if (system.Usages.Any())
             {
-                return SystemDeleteResult.InUse;
+                return DeleteResult.InUse;
             }
 
             if (system.Children.Any())
             {
-                return SystemDeleteResult.HasChildren;
+                return DeleteResult.HasChildren;
             }
 
             if (system.ItInterfaceExhibits.Any())
             {
-                return SystemDeleteResult.HasInterfaceExhibits;
+                return DeleteResult.HasInterfaceExhibits;
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -156,19 +161,19 @@ namespace Core.ApplicationServices.System
                 {
                     if (system.ExternalReferences.Any())
                     {
-                        var ids = system.ExternalReferences.ToList().Select(t => t.Id);
+                        var ids = system.ExternalReferences.ToList().Select(t => t.Id).ToList().AsReadOnly();
                         _referenceService.Delete(ids);
                     }
 
                     _itSystemRepository.DeleteSystem(system);
                     transaction.Commit();
-                    return SystemDeleteResult.Ok;
+                    return DeleteResult.Ok;
                 }
                 catch (Exception e)
                 {
                     _logger.Error(e, $"Failed to delete it system with id: {system.Id}");
                     transaction.Rollback();
-                    return SystemDeleteResult.UnknownError;
+                    return DeleteResult.UnknownError;
                 }
             }
         }

@@ -4,6 +4,6 @@ namespace Core.ApplicationServices.System
 {
     public interface IReferenceService
     {
-        void Delete(IEnumerable<int> referenceIds);
+        void Delete(IReadOnlyList<int> referenceIds);
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
-using Presentation.Web.Models.Result;
+using Presentation.Web.Models.ItSystem;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 

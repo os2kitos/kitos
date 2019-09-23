@@ -103,7 +103,7 @@
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
-    <Compile Include="Model\Result\SystemDeleteResult.cs" />
+    <Compile Include="Model\System\DeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />

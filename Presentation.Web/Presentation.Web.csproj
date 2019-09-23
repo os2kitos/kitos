@@ -322,6 +322,7 @@
     <Compile Include="Extensions\DTOMappingExtensions.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
+    <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
@@ -336,7 +337,7 @@
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
-    <Compile Include="Models\Result\SystemDeleteConflict.cs" />
+    <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -1319,6 +1320,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\Result\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />

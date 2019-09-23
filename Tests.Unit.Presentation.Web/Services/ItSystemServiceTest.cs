@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Web.ModelBinding;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -129,7 +129,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.Forbidden, result);
+            Assert.Equal(DeleteResult.Forbidden, result);
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.InUse, result);
+            Assert.Equal(DeleteResult.InUse, result);
         }
 
         [Fact]
@@ -163,7 +163,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.HasChildren, result);
+            Assert.Equal(DeleteResult.HasChildren, result);
         }
 
         [Fact]
@@ -179,7 +179,22 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.HasInterfaceExhibits, result);
+            Assert.Equal(DeleteResult.HasInterfaceExhibits, result);
+        }
+
+        [Fact]
+        public void Delete_Returns_Not_Found_If_System_Does_Not_Exist()
+        {
+            //Arrange
+            var system = CreateSystem();
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, null);
+
+            //Act
+            var result = _sut.Delete(system.Id);
+
+            //Assert
+            Assert.Equal(DeleteResult.NotFound, result);
         }
 
         [Fact]
@@ -195,7 +210,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.Ok, result);
+            Assert.Equal(DeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
 
@@ -215,7 +230,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.Ok, result);
+            Assert.Equal(DeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
             _referenceService.Verify(x => x.Delete(referenceIds), Times.Once);
         }

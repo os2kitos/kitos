@@ -14,7 +14,6 @@ using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystem;
-using Presentation.Web.Models.Result;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -186,10 +185,10 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(SystemDeleteResult.InUse, SystemDeleteConflict.InUse)]
-        [InlineData(SystemDeleteResult.HasChildren, SystemDeleteConflict.HasChildren)]
-        [InlineData(SystemDeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits)]
-        public void Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult deleteResult, SystemDeleteConflict deleteConflict)
+        [InlineData(DeleteResult.InUse, SystemDeleteConflict.InUse)]
+        [InlineData(DeleteResult.HasChildren, SystemDeleteConflict.HasChildren)]
+        [InlineData(DeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits)]
+        public void Delete_Returns_Conflict_With_SystemDeleteResults(DeleteResult deleteResult, SystemDeleteConflict deleteConflict)
         {
             //Arrange
             var systemId = A<int>();
@@ -206,12 +205,13 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(HttpStatusCode.Forbidden, SystemDeleteResult.Forbidden)]
-        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.InUse)]
-        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasChildren)]
-        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasInterfaceExhibits)]
-        [InlineData(HttpStatusCode.InternalServerError, SystemDeleteResult.UnknownError)]
-        public void Delete_Returns_Failed(HttpStatusCode code, SystemDeleteResult result)
+        [InlineData(HttpStatusCode.Forbidden, DeleteResult.Forbidden)]
+        [InlineData(HttpStatusCode.Conflict, DeleteResult.InUse)]
+        [InlineData(HttpStatusCode.Conflict, DeleteResult.HasChildren)]
+        [InlineData(HttpStatusCode.Conflict, DeleteResult.HasInterfaceExhibits)]
+        [InlineData(HttpStatusCode.NotFound, DeleteResult.NotFound)]
+        [InlineData(HttpStatusCode.InternalServerError, DeleteResult.UnknownError)]
+        public void Delete_Returns_Failed(HttpStatusCode code, DeleteResult result)
         {
             //Arrange
             var systemId = A<int>();
@@ -231,7 +231,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             //Arrange
             var systemId = A<int>();
             _systemService.Setup(x => x.Delete(systemId))
-                .Returns(SystemDeleteResult.Forbidden);
+                .Returns(DeleteResult.Forbidden);
 
             //Act
             var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.

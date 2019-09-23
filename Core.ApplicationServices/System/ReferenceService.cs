@@ -16,7 +16,7 @@ namespace Core.ApplicationServices.System
         [Inject]
         public ILogger Logger { get; set; }
 
-        public void Delete(IEnumerable<int> referenceIds)
+        public void Delete(IReadOnlyList<int> referenceIds)
         {
             if (referenceIds != null)
             {
