@@ -4,6 +4,7 @@ import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import TestFixture = require("../Utility/TestFixtureWrapper");
+import Select2 = require("./Select2Helper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -12,7 +13,6 @@ class SystemCatalogHelper {
     private static systemPage = new SystemPage();
     private static waitUpTo = new WaitTimers();
     private static testFixture = new TestFixture();
-    private static ec = protractor.ExpectedConditions;
     
 
     public static createSystem(name: string) {
@@ -52,8 +52,8 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.findCatalogColumnsFor(childSystemName).first().click())
-            .then(() => SystemCatalogHelper.select2SearchForMainSystem(mainSystemName))
-            .then(() => SystemCatalogHelper.waitForSelect2DataAndSelect());
+            .then(() => Select2.SearchFor(mainSystemName, "s2id_system-parent"))
+            .then(() => Select2.waitForDataAndSelect());
     }
 
     public static findCatalogColumnsFor(name: string) {
@@ -65,18 +65,5 @@ class SystemCatalogHelper {
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
 
-    public static waitForSelect2DataAndSelect() {
-        console.log(`waitForSelect2DataAndSelect`);
-        return browser.wait(this.ec.visibilityOf(element(by.className("select2-result-label"))), SystemCatalogHelper.waitUpTo.twentySeconds)
-            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(protractor.Key.ENTER));
-    }
-
-    public static select2SearchForMainSystem(name: string) {
-        console.log(`select2SearchForMainSystem: ${name}`);
-        return element(by.id("s2id_system-parent")).element(by.tagName('a')).click()
-            .then(() => console.log("next"))
-            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).click())
-            .then(() => element(by.id("select2-drop")).element(by.className("select2-input")).sendKeys(name));
-    }
 }
 export = SystemCatalogHelper;
