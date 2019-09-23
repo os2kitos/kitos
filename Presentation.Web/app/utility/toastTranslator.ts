@@ -3,8 +3,7 @@
         static translateItSystemDeletionConflictResponse(response: string): string {
             var errorMsg = new Models.ItSystem.SystemDeleteMessages();
             switch (response) {
-                case "InUse":
-                {
+                case "InUse":{
                     return errorMsg.errorMessageSystemInUse;
                 }
                 case "HasChildren":{

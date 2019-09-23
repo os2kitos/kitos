@@ -38,6 +38,7 @@
             function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
+                var errormsg = new Kitos.Models.ItSystem.SystemDeleteMessages();
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
@@ -117,13 +118,13 @@
                         })
                         .error(function (data, status) {
                             if (status === 401) {
-                                msg.toErrorMessage('Fejl! Du har ikke tilladelse!');
+                                msg.toErrorMessage(errormsg.errorMessageNoPermission);
                             }
                             else if (status === 409) {
                                 msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemDeletionConflictResponse(data.response));
                             }
                             else {
-                                msg.toErrorMessage('Fejl! Kunne ikke slette IT System!');
+                                msg.toErrorMessage(errormsg.errorMessageDeleteDefault);
                             }
 
                         });
