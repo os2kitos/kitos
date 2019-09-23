@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Web.ModelBinding;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.System;
@@ -20,20 +22,23 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IDatabaseTransaction> _dbTransaction;
+        private readonly Mock<IReferenceService> _referenceService;
 
         public ItSystemServiceTest()
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
             _transactionManager = new Mock<ITransactionManager>();
-            var referenceService = new Mock<IReferenceService>();
+            _dbTransaction = new Mock<IDatabaseTransaction>();
+            _referenceService = new Mock<IReferenceService>();
             _sut = new ItSystemService(
                 null, 
                 null, 
                 _systemRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
-                referenceService.Object,
+                _referenceService.Object,
                 null
                 );
         }
@@ -191,6 +196,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.Ok, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
 
         [Fact]
@@ -198,7 +204,9 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var system = CreateSystem();
-            AddExternalReference(system, CreateExternalReference());
+            var externalReference = CreateExternalReference();
+            var referenceIds = new List<int> { externalReference.Id };
+            AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
@@ -208,6 +216,8 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.Ok, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            _referenceService.Verify(x => x.Delete(referenceIds), Times.Once);
         }
 
         private Organization CreateOrganization()
@@ -252,8 +262,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectTransactionToBeSet()
         {
-            var dbTransAction = new Mock<IDatabaseTransaction>().Object;
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(dbTransAction);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(_dbTransaction.Object);
         }
 
         private static void AddUsage(ItSystem system, ItSystemUsage usage)
