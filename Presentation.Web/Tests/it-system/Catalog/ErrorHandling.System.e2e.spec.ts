@@ -56,7 +56,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => expectSystemWithName(systemName))
             .then(() => toggleSystemInUse(systemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
-            .then(() => browser.wait(getToastElement().isPresent(), 20000))
+            .then(() => browser.wait(getToastElement().isPresent(), waitTimer.twentySeconds))
             .then(() => expectToastMessageToBeShown(errorMsg.errorMessageSystemInUse));
     });
 
@@ -73,7 +73,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => InterfaceHelper.createInterface(interfaceName))
             .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(systemName))
-            .then(() => browser.wait(getToastElement().isPresent(), 20000))
+            .then(() => browser.wait(getToastElement().isPresent(), waitTimer.twentySeconds))
             .then(() => expectToastMessageToBeShown(errorMsg.errorMessageInterfaceDependsOnThis));
     });
 
@@ -95,7 +95,7 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
             .then(() => CatalogHelper.setMainSystem(mainSystemName, childSystemName))
             .then(() => CatalogHelper.deleteSystemWithoutBrowserWait(mainSystemName))
             .then(() => console.log("Waiting for toast message"))
-            .then(() => browser.wait(getToastElement().isPresent(), 20000))
+            .then(() => browser.wait(getToastElement().isPresent(), waitTimer.twentySeconds))
             .then(() => expectToastMessageToBeShown(errorMsg.errorMessageSystemDependsOnThis));
     });
 
