@@ -687,6 +687,7 @@
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
