@@ -43,5 +43,4 @@ class InterfaceCatalogHelper {
     }
 
 }
-
 export = InterfaceCatalogHelper;
