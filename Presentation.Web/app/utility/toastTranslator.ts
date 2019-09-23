@@ -1,20 +1,24 @@
 ﻿module Kitos.Utility {
+    import SystemDeleteMessages = Models.ItSystem.SystemDeleteMessages;
+
     export class ToastTranslatorTool {
         static translateItSystemDeletionConflictResponse(response: string): string {
             switch (response) {
                 case "InUse":{
-                        return "Systemet kan ikke slettes! \nDa Systemet er i brug";
+                        return SystemDeleteMessages.errorMessagesSystemDelete509Status[0];
                     }
                 case "HasChildren":{
-                        return "Systemet kan ikke slettes! \nDa andre systemer afhænger af dette system";
+                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[1];
                     }
                 case "HasInterfaceExhibits":{
-                        return "Systemet kan ikke slettes! \nDa en snitflade afhænger af dette system";
+                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[2];
                     }
                 default:{
-                        return "Systemet kan ikke slettes!";
-                    }
+                    return SystemDeleteMessages.errorMessagesSystemDelete509Status[3];
+                }
             }
         }
     }
+
+
 }

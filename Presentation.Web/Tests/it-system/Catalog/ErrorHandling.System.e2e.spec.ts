@@ -133,10 +133,6 @@ describe("Getting correct error message when a conflict occur on deleting IT-Sys
         return element(cssHelper.byDataElementType("notification-message-block"));
     }
 
-    function getToastText() {
-        return getToastElement().getText();
-    }
-
     function expectToastMessageToBeShown(msg: string) {
         return browser.wait(EC.textToBePresentInElement(getToastElement(), msg), waitTimer.twentySeconds);
     }

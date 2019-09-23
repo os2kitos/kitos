@@ -351,6 +351,7 @@
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
+    <TypeScriptCompile Include="app\models\it-system\systemDeleteMessages.ts" />
     <TypeScriptCompile Include="app\utility\toastTranslator.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
