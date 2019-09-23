@@ -1,8 +1,7 @@
 ﻿module Kitos.Utility {
-    import SystemDeleteMessages = Models.ItSystem.SystemDeleteMessages;
     export class ToastTranslatorTool {
         static translateItSystemDeletionConflictResponse(response: string): string {
-            var errorMsg = new SystemDeleteMessages();
+            var errorMsg = new Models.ItSystem.SystemDeleteMessages();
             switch (response) {
                 case "InUse":
                 {
