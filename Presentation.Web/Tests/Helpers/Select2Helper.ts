@@ -1,5 +1,4 @@
-﻿import SystemCatalogHelper = require("./SystemCatalogHelper");
-import WaitTimers = require("../Utility/WaitTimers");
+﻿import WaitTimers = require("../Utility/WaitTimers");
 
 class Select2Helper {
     private static waitUpTo = new WaitTimers();
