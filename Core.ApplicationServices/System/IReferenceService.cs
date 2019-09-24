@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Core.ApplicationServices.Model.Result;
 
 namespace Core.ApplicationServices.System
 {
     public interface IReferenceService
     {
-        void Delete(IEnumerable<int> referenceIds);
+        OperationResult Delete(int systemId);
     }
 }

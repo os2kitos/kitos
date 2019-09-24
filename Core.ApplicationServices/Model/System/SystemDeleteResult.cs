@@ -1,4 +1,4 @@
-﻿namespace Core.ApplicationServices.Model.Result
+﻿namespace Core.ApplicationServices.Model.System
 {
     public enum SystemDeleteResult
     {
@@ -7,6 +7,7 @@
         InUse,
         HasChildren,
         HasInterfaceExhibits,
+        NotFound,
         UnknownError
     }
 }

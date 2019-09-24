@@ -19,7 +19,6 @@ namespace Core.ApplicationServices.System
     public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
-        private readonly IGenericRepository<ItSystemRight> _rightsRepository;
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
@@ -28,7 +27,6 @@ namespace Core.ApplicationServices.System
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository, 
-            IGenericRepository<ItSystemRight> rightsRepository, 
             IItSystemRepository itSystemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
@@ -37,7 +35,6 @@ namespace Core.ApplicationServices.System
             )
         {
             _repository = repository;
-            _rightsRepository = rightsRepository;
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
@@ -130,6 +127,11 @@ namespace Core.ApplicationServices.System
         {
             var system = _itSystemRepository.GetSystem(id);
 
+            if (system == null)
+            {
+                return SystemDeleteResult.NotFound;
+            }
+
             if (! _authorizationContext.AllowDelete(system))
             {
                 return SystemDeleteResult.Forbidden;
@@ -154,15 +156,25 @@ namespace Core.ApplicationServices.System
             {
                 try
                 {
-                    if (system.ExternalReferences.Any())
+                    var deleteReferenceResult = _referenceService.Delete(system.Id);
+                    switch (deleteReferenceResult)
                     {
-                        var ids = system.ExternalReferences.ToList().Select(t => t.Id);
-                        _referenceService.Delete(ids);
+                        case OperationResult.Forbidden:
+                            transaction.Rollback();
+                            return SystemDeleteResult.Forbidden;
+                        
+                        case OperationResult.NotFound: // This case should not be possible!
+                            transaction.Rollback();
+                            return SystemDeleteResult.NotFound;
+                        case OperationResult.Ok:
+                            _itSystemRepository.DeleteSystem(system);
+                            transaction.Commit();
+                            return SystemDeleteResult.Ok;
+                        default:
+                            transaction.Rollback();
+                            return SystemDeleteResult.UnknownError;
                     }
-
-                    _itSystemRepository.DeleteSystem(system);
-                    transaction.Commit();
-                    return SystemDeleteResult.Ok;
+                    
                 }
                 catch (Exception e)
                 {
@@ -171,13 +183,6 @@ namespace Core.ApplicationServices.System
                     return SystemDeleteResult.UnknownError;
                 }
             }
-        }
-
-        public IEnumerable<ItSystem> ReportItSystemRights()
-        {
-            var rights = _rightsRepository.Get();
-
-            return null;
         }
 
         public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)

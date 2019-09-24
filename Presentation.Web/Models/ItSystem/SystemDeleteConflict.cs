@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Models.Result
+﻿namespace Presentation.Web.Models.ItSystem
 {
     public enum SystemDeleteConflict
     {

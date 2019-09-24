@@ -19,7 +19,6 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.ItSystem;
-using Presentation.Web.Models.Result;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
@@ -50,28 +49,24 @@ namespace Presentation.Web.Controllers.API
             {
                 case SystemDeleteResult.Forbidden:
                     return Forbidden();
+                case SystemDeleteResult.NotFound:
+                    return NotFound();
                 case SystemDeleteResult.InUse:
                 case SystemDeleteResult.HasChildren:
                 case SystemDeleteResult.HasInterfaceExhibits:
-                    return DeleteConflict(MapSystemDeleteResult(deleteResult));
-                case SystemDeleteResult.UnknownError:
-                    return Error("");
+                    return DeleteConflict(deleteResult.MapToConflict());
                 case SystemDeleteResult.Ok:
                     return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
                                   // This means the request fails with 500 since the system is already delete in the first pass
                 default:
-                    return Error("");
+                    return Error($"Something went wrong trying to delete system with id: {id}");
             }
         }
 
-        private HttpResponseMessage DeleteConflict(string response)
+        private HttpResponseMessage DeleteConflict(SystemDeleteConflict response)
         {
-            return CreateResponse(HttpStatusCode.Conflict, response, "");
-        }
-
-        protected override void DeleteQuery(ItSystem entity)
-        {
-            _systemService.Delete(entity.Id);
+            var responseAsString = response.ToString("G");
+            return CreateResponse(HttpStatusCode.Conflict, responseAsString, responseAsString);
         }
 
         /// <summary>
@@ -510,21 +505,6 @@ namespace Presentation.Web.Controllers.API
                     Organization = usingOrganization.Organization.MapToNamedEntityDTO()
                 })
                 .ToList();
-        }
-
-        private static string MapSystemDeleteResult(SystemDeleteResult input)
-        {
-            switch (input)
-            {
-                case SystemDeleteResult.InUse:
-                    return SystemDeleteConflict.InUse.ToString("G");
-                case SystemDeleteResult.HasChildren:
-                    return SystemDeleteConflict.HasChildren.ToString("G");
-                case SystemDeleteResult.HasInterfaceExhibits:
-                    return SystemDeleteConflict.HasInterfaceExhibits.ToString("G");
-                default:
-                    throw new InvalidEnumArgumentException($"{input} cannot be mapped to {typeof(SystemDeleteConflict)}");
-            }
         }
     }
 }

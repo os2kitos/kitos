@@ -41,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var mainSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var childSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SetParentSystemAsync(childSystem.Id, mainSystem.Id, organizationId, login);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login);
 
             var token = await HttpApi.GetTokenAsync(role);
             var url = TestEnvironment.CreateUrl($"api/itsystem/{childSystem.Id}?hierarchy=true");
