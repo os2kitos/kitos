@@ -13,6 +13,6 @@ namespace Core.ApplicationServices.System
         IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
         Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId);
-        DeleteResult Delete(int id);
+        SystemDeleteResult Delete(int id);
     }
 }

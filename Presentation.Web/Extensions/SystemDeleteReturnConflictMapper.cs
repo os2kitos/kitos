@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.ApplicationServices.Model.System;
 using Presentation.Web.Models.ItSystem;
 
@@ -6,16 +7,20 @@ namespace Presentation.Web.Extensions
 {
     public static class SystemDeleteReturnConflictMapper
     {
-        private static readonly Dictionary<DeleteResult, SystemDeleteConflict> MapToConflictDictionary = new Dictionary<DeleteResult, SystemDeleteConflict>()
+        private static readonly IReadOnlyDictionary<SystemDeleteResult, SystemDeleteConflict> MapToConflictDictionary = new Dictionary<SystemDeleteResult, SystemDeleteConflict>()
         {
-            { DeleteResult.InUse, SystemDeleteConflict.InUse},
-            { DeleteResult.HasChildren, SystemDeleteConflict.HasChildren },
-            { DeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits }
+            { SystemDeleteResult.InUse, SystemDeleteConflict.InUse},
+            { SystemDeleteResult.HasChildren, SystemDeleteConflict.HasChildren },
+            { SystemDeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits }
         };
 
-        public static SystemDeleteConflict MapToConflict(this DeleteResult input)
+        public static SystemDeleteConflict MapToConflict(this SystemDeleteResult input)
         {
-            return MapToConflictDictionary[input];
+            if (MapToConflictDictionary.TryGetValue(input, out var mappedValue))
+            {
+                return mappedValue;
+            }
+            throw new NotSupportedException($"No mapping exists for: {nameof(input)}");
         }
     }
 }

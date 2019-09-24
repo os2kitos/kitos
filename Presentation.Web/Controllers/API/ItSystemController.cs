@@ -47,15 +47,15 @@ namespace Presentation.Web.Controllers.API
             var deleteResult = _systemService.Delete(id);
             switch (deleteResult)
             {
-                case DeleteResult.Forbidden:
+                case SystemDeleteResult.Forbidden:
                     return Forbidden();
-                case DeleteResult.NotFound:
+                case SystemDeleteResult.NotFound:
                     return NotFound();
-                case DeleteResult.InUse:
-                case DeleteResult.HasChildren:
-                case DeleteResult.HasInterfaceExhibits:
+                case SystemDeleteResult.InUse:
+                case SystemDeleteResult.HasChildren:
+                case SystemDeleteResult.HasInterfaceExhibits:
                     return DeleteConflict(deleteResult.MapToConflict().ToString("G"));
-                case DeleteResult.Ok:
+                case SystemDeleteResult.Ok:
                     return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
                                   // This means the request fails with 500 since the system is already delete in the first pass
                 default:

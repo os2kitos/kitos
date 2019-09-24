@@ -1,6 +1,6 @@
 ﻿namespace Core.ApplicationServices.Model.System
 {
-    public enum DeleteResult
+    public enum SystemDeleteResult
     {
         Ok,
         Forbidden,

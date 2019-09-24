@@ -76,6 +76,8 @@
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
+    <Compile Include="Repositories\Reference\IReferenceRepository.cs" />
+    <Compile Include="Repositories\Reference\ReferenceRepository.cs" />
     <Compile Include="Repositories\SystemUsage\IItSystemUsageRepository.cs" />
     <Compile Include="Repositories\SystemUsage\ItSystemUsageRepository.cs" />
     <Compile Include="Repositories\System\IItSystemRepository.cs" />

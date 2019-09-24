@@ -220,6 +220,7 @@
     <Compile Include="OData\AuthenticationServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
+    <Compile Include="Services\ReferenceServiceTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

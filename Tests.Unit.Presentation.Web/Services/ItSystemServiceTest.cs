@@ -34,7 +34,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService = new Mock<IReferenceService>();
             _sut = new ItSystemService(
                 null, 
-                null, 
                 _systemRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
@@ -119,17 +118,32 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_Forbidden()
+        public void Delete_Returns_NotFound()
         {
             //Arrange
             var system = CreateSystem();
-            ExpectAllowDeleteReturns(system, false);
+            ExpectGetSystemReturns(system.Id, null);
 
             //Act
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.Forbidden, result);
+            Assert.Equal(SystemDeleteResult.NotFound, result);
+        }
+
+        [Fact]
+        public void Delete_Returns_Forbidden()
+        {
+            //Arrange
+            var system = CreateSystem();
+            ExpectAllowDeleteReturns(system, false);
+            ExpectGetSystemReturns(system.Id, system);
+
+            //Act
+            var result = _sut.Delete(system.Id);
+
+            //Assert
+            Assert.Equal(SystemDeleteResult.Forbidden, result);
         }
 
         [Fact]
@@ -147,7 +161,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.InUse, result);
+            Assert.Equal(SystemDeleteResult.InUse, result);
         }
 
         [Fact]
@@ -163,7 +177,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.HasChildren, result);
+            Assert.Equal(SystemDeleteResult.HasChildren, result);
         }
 
         [Fact]
@@ -179,7 +193,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.HasInterfaceExhibits, result);
+            Assert.Equal(SystemDeleteResult.HasInterfaceExhibits, result);
         }
 
         [Fact]
@@ -194,7 +208,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.NotFound, result);
+            Assert.Equal(SystemDeleteResult.NotFound, result);
         }
 
         [Fact]
@@ -210,7 +224,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.Ok, result);
+            Assert.Equal(SystemDeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
 
@@ -230,9 +244,9 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(DeleteResult.Ok, result);
+            Assert.Equal(SystemDeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
-            _referenceService.Verify(x => x.Delete(referenceIds), Times.Once);
+            _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
         }
 
         private Organization CreateOrganization()
