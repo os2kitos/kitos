@@ -3,23 +3,17 @@ import KendoToolbarHelper = require("../../../Helpers/KendoToolbarHelper");
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper")
 import CssLocatorHelper = require("../../../object-wrappers/CSSLocatorHelper");
 import Constants = require("../../../Utility/Constants");
+import NavigationHelper = require("../../../Utility/NavigationHelper");
 
 class ItSystemCatalog implements IPageObject {
     private consts = new Constants();
     private ec = protractor.ExpectedConditions;
     private byDataElementType = new CssLocatorHelper().byDataElementType;
+    private navigationHelper = new NavigationHelper();
+
 
     public getPage(): webdriver.promise.Promise<void> {
-        return browser.getCurrentUrl()
-            .then(url => {
-                const navigateToUrl = browser.baseUrl + "/#/system/catalog";
-                if (navigateToUrl !== url) {
-                    console.log("Not at " + navigateToUrl + " but at:" + url + ". Navigating to:" + navigateToUrl);
-                    return browser.get(browser.baseUrl + "/#/system/catalog");
-                } else {
-                    console.log("Already at " + navigateToUrl + ". Ignoring command");
-                }
-            });
+        return this.navigationHelper.getPage("/#/system/catalog");
     }
 
     public kendoToolbarHelper = new KendoToolbarHelper();

@@ -34,13 +34,12 @@ class InterfaceCatalogHelper {
     private gotoSpecificInterface(name : string) {
         console.log(`Navigating to interface with name ${name}`);
         return this.interfacePage.getPage()
-            .then(() => this.findSpecificInterfaceInKendo(name).click());
+            .then(() => this.findSpecificInterfaceInNameColumn(name).click());
     }
 
-    private findSpecificInterfaceInKendo(name: string) {
+    private findSpecificInterfaceInNameColumn(name: string) {
         console.log(`Finding interface with name : ${name}`);
-        return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//a'));
+        return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '" and @data-element-type="InterfaceName"]'));
     }
-
 }
 export = InterfaceCatalogHelper;

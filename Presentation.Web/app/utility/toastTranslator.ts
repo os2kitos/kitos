@@ -1,19 +1,19 @@
 ﻿module Kitos.Utility {
     export class ToastTranslatorTool {
         static translateItSystemDeletionConflictResponse(response: string): string {
-            var errorMsg = Models.ItSystem.SystemDeleteMessages;
-            switch (response) {
-                case "InUse":{
-                    return errorMsg.errorMessageSystemInUse;
+            var errorMsg = Models.ItSystem.SystemDeleteErrorMessages;
+            switch (response.toLowerCase()) {
+                case "inuse":{
+                    return errorMsg.systemInUse;
                 }
-                case "HasChildren":{
-                    return errorMsg.errorMessageSystemDependsOnThis;
+                case "haschildren":{
+                    return errorMsg.systemDependsOnThis;
                     }
-                case "HasInterfaceExhibits":{
-                    return errorMsg.errorMessageInterfaceDependsOnThis;
+                case "hasinterfaceexhibits":{
+                    return errorMsg.interfaceDependsOnThis;
                     }
                 default:{
-                    return errorMsg.errorMessageDeleteDefault;
+                    return errorMsg.deleteDefault;
                 }
             }
         }

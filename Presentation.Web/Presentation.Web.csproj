@@ -351,7 +351,8 @@
     <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
-    <TypeScriptCompile Include="app\models\it-system\systemDeleteMessages.ts" />
+    <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
+    <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\utility\toastTranslator.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
@@ -696,7 +697,6 @@
     <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\Models\systemDeleteMessages.ts" />
     <TypeScriptCompile Include="Tests\Organization\CreateUser.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
@@ -723,6 +723,7 @@
     <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
     <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
   </ItemGroup>
@@ -1320,6 +1321,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Tests\Models\" />
     <Folder Include="Views\ArchiveLocations\" />
     <Folder Include="Views\ArchivePeriod\" />
     <Folder Include="Views\AttachedOptionsRegularPersonalData\" />

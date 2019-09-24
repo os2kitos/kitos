@@ -6,7 +6,7 @@
             controller: 'system.EditCtrl',
             resolve: {
                 itSystem: ['$http', '$stateParams', function ($http, $stateParams) {
-                    return $http.get("api/itsystem/" + $stateParams.id)
+                    return $http.get("api/itsystem/" + $stateParams.id) 
                         .then(function (result) {
                             return result.data.response;
                         });
@@ -34,11 +34,11 @@
 
     app.controller('system.EditCtrl',
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights',
-            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights) {
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','toastTranslatorService',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, toastTranslatorService) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
-                var errormsg = Kitos.Models.ItSystem.SystemDeleteMessages;
+                var errormsg = Kitos.Models.ItSystem.SystemDeleteErrorMessages;
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
@@ -118,13 +118,13 @@
                         })
                         .error(function (data, status) {
                             if (status === 401) {
-                                msg.toErrorMessage(errormsg.errorMessageNoPermission);
+                                msg.toErrorMessage(errormsg.noPermission);
                             }
                             else if (status === 409) {
-                                msg.toErrorMessage(Kitos.Utility.ToastTranslatorTool.translateItSystemDeletionConflictResponse(data.response));
+                                msg.toErrorMessage(toastTranslatorService.translateResponse(data.response));
                             }
                             else {
-                                msg.toErrorMessage(errormsg.errorMessageDeleteDefault);
+                                msg.toErrorMessage(errormsg.deleteDefault);
                             }
 
                         });

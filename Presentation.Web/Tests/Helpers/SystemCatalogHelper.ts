@@ -11,7 +11,7 @@ class SystemCatalogHelper {
     private static cssHelper = new CSSLocator();
     private static pageObject = new CatalogPage();
     private static systemPage = new SystemPage();
-    private static waitUpTo = new WaitTimers();
+    private static waitUpTo = new WaitTimers(); 
     private static testFixture = new TestFixture();
     
 
@@ -35,16 +35,13 @@ class SystemCatalogHelper {
             .then(() => browser.switchTo().alert().accept());
     }
 
-
-    public static deleteSystemWithoutBrowserWait(name: string) {
-        console.log(`Deleting system: ${name}`);
+    public static getDeleteButtonForSystem(name: string) {
+        console.log(`Getting button for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
             .then(() => browser.wait(SystemCatalogHelper.systemPage.isDeleteButtonLoaded(),SystemCatalogHelper.waitUpTo.twentySeconds))
-            .then(() => SystemCatalogHelper.systemPage.getDeleteButton().click())
-            .then(() => this.testFixture.disableAutoBrowserWaits())
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => SystemCatalogHelper.systemPage.getDeleteButton());
     }
 
     public static setMainSystem(mainSystemName: string, childSystemName: string) {
@@ -64,6 +61,5 @@ class SystemCatalogHelper {
         console.log("Waiting for kendo grid to be ready");
         return browser.wait(SystemCatalogHelper.pageObject.waitForKendoGrid(), SystemCatalogHelper.waitUpTo.twentySeconds);
     }
-
 }
 export = SystemCatalogHelper;
