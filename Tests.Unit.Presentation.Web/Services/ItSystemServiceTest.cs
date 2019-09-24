@@ -278,6 +278,27 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
         }
 
+        [Fact]
+        public void Delete_Returns_Ok_With_Task_Refs_Added()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var taskRef = createTaskRef();
+            AddTaskRef(system, taskRef);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.Delete(system.Id);
+
+            //Assert
+            Assert.Equal(SystemDeleteResult.Ok, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
+        }
+
         private Organization CreateOrganization()
         {
             return new Organization { Id = A<int>(), Name = A<string>()};
@@ -286,6 +307,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private ItSystem CreateSystem()
         {
             return new ItSystem { Id = A<int>() };
+        }
+
+        private TaskRef createTaskRef()
+        {
+            return new TaskRef { Id = A<int>()};
         }
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
@@ -346,6 +372,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private static void AddExternalReference(ItSystem system, ExternalReference externalReference)
         {
             system.ExternalReferences.Add(externalReference);
+        }
+
+        private static void AddTaskRef(ItSystem system, TaskRef taskRef)
+        {
+            system.TaskRefs.Add(taskRef);
         }
     }
 }

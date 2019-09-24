@@ -10,5 +10,6 @@
         public const string CreateItSystem = "CreateItSystem";
         public const string CreateItSystemWithParent = "CreateItSystemWithParent";
         public const string CreateItContract = "CreateItContract";
+        public const string CreateTaskRef = "CreateTaskRef";
     }
 }

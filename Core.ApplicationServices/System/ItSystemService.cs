@@ -166,10 +166,12 @@ namespace Core.ApplicationServices.System
                         case OperationResult.NotFound: // This case should not be possible!
                             transaction.Rollback();
                             return SystemDeleteResult.NotFound;
+
                         case OperationResult.Ok:
                             _itSystemRepository.DeleteSystem(system);
                             transaction.Commit();
                             return SystemDeleteResult.Ok;
+
                         default:
                             transaction.Rollback();
                             return SystemDeleteResult.UnknownError;
