@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -192,11 +193,10 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var systemId = A<int>();
-            _systemService.Setup(x => x.Delete(systemId))
-                .Returns(deleteResult);
+            ExpectDeleteSystemReturn(systemId, deleteResult);
 
             //Act
-            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+            var responseMessage = DeleteSystem(systemId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, responseMessage.StatusCode);
@@ -215,11 +215,10 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var systemId = A<int>();
-            _systemService.Setup(x => x.Delete(systemId))
-                .Returns(result);
+            ExpectDeleteSystemReturn(systemId, result);
 
             //Act
-            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+            var responseMessage = DeleteSystem(systemId);
 
             //Assert
             Assert.Equal(code, responseMessage.StatusCode);
@@ -230,14 +229,18 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var systemId = A<int>();
-            _systemService.Setup(x => x.Delete(systemId))
-                .Returns(SystemDeleteResult.Forbidden);
+            ExpectDeleteSystemReturn(systemId, SystemDeleteResult.Ok);
 
             //Act
-            var responseMessage = _sut.Delete(systemId, 0); // OrgId is not used in this function.
+            var responseMessage = DeleteSystem(systemId);
 
             //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, responseMessage.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+        }
+
+        private HttpResponseMessage DeleteSystem(int systemId)
+        {
+            return _sut.Delete(systemId, 0); // OrgId is only a route qualifier and is therefore not used.
         }
 
         private void ExpectGetUsingOrganizationsReturn(
@@ -246,6 +249,12 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);
+        }
+
+        private void ExpectDeleteSystemReturn(int systemId, SystemDeleteResult deleteResult)
+        {
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(deleteResult);
         }
 
         private void ExpectAllowDeleteReturns(bool allowDelete, ItSystem itSystem)

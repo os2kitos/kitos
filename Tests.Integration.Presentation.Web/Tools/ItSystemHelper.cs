@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Newtonsoft.Json;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -195,7 +193,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
 
-        public static async Task<HttpResponseMessage> SetParentSystemAsync(
+        public static async Task<HttpResponseMessage> SendSetParentSystemRequestAsync(
             int systemId, 
             int parentSystemId,
             int organizationId, 
@@ -212,7 +210,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<HttpResponseMessage> GetSystemAsync(int systemId, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendGetSystemRequestAsync(int systemId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 

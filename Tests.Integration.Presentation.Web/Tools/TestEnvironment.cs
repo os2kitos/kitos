@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 

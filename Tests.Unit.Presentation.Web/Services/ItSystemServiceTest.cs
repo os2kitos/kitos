@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using System.Runtime.InteropServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -129,6 +130,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.NotFound, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -144,6 +146,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.Forbidden, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -162,6 +165,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.InUse, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -178,6 +182,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.HasChildren, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -194,6 +199,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.HasInterfaceExhibits, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -209,6 +215,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.Equal(SystemDeleteResult.NotFound, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -234,10 +241,10 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var system = CreateSystem();
             var externalReference = CreateExternalReference();
-            var referenceIds = new List<int> { externalReference.Id };
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
+            ExpectDeleteReferenceReturns(system.Id, OperationResult.Ok);
             ExpectTransactionToBeSet();
 
             //Act
@@ -246,6 +253,28 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.Equal(SystemDeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
+        }
+
+        [Fact]
+        public void Delete_Returns_Forbidden_And_Does_Not_Delete_ExternalReferences()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var externalReference = CreateExternalReference();
+            AddExternalReference(system, externalReference);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectDeleteReferenceReturns(system.Id, OperationResult.Forbidden);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.Delete(system.Id);
+
+            //Assert
+            Assert.Equal(SystemDeleteResult.Forbidden, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Once);
             _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
         }
 
@@ -287,6 +316,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetSystemReturns(int id, ItSystem system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
+        }
+
+        private void ExpectDeleteReferenceReturns(int id, OperationResult result)
+        {
+            _referenceService.Setup(x => x.Delete(id)).Returns(result);
         }
 
         private void ExpectTransactionToBeSet()

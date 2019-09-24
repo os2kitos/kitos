@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -159,7 +160,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-                AssertSystemDeletedAsync(system.Id);
+                await AssertSystemDeletedAsync(system.Id);
             }
         }
 
@@ -198,10 +199,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
-                Assert.Equal(SystemDeleteConflict.InUse.ToString("G"), resultValue);
-                await AssertSystemNotDeletedAsync(system.Id);
+                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.InUse, result, system.Id);
             }
         }
 
@@ -217,16 +215,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var mainSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var childSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SetParentSystemAsync(childSystem.Id, mainSystem.Id, organizationId, login);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login);
 
             //Act
             using (var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
-                Assert.Equal(SystemDeleteConflict.HasChildren.ToString("G"), resultValue);
-                await AssertSystemNotDeletedAsync(mainSystem.Id);
+                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasChildren, result, mainSystem.Id);
             }
         }
 
@@ -253,22 +248,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
-                var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
-                Assert.Equal(SystemDeleteConflict.HasInterfaceExhibits.ToString("G"), resultValue);
-                await AssertSystemNotDeletedAsync(system.Id);
+                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasInterfaceExhibits, result, system.Id);
             }
+        }
+
+        private static async Task AssertCorrectConflictResponseAsync(SystemDeleteConflict conflict, HttpResponseMessage result, int systemId)
+        {
+            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
+            var resultValue = await result.ReadResponseBodyAsKitosApiResponseAsync<string>();
+            Assert.Equal(conflict.ToString("G"), resultValue);
+            await AssertSystemNotDeletedAsync(systemId);
         }
 
         private static async Task AssertSystemNotDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.GetSystemAsync(systemId);
+            var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
         private static async Task AssertSystemDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.GetSystemAsync(systemId);
+            var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         }
     }

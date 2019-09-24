@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.InUse:
                 case SystemDeleteResult.HasChildren:
                 case SystemDeleteResult.HasInterfaceExhibits:
-                    return DeleteConflict(deleteResult.MapToConflict().ToString("G"));
+                    return DeleteConflict(deleteResult.MapToConflict());
                 case SystemDeleteResult.Ok:
                     return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
                                   // This means the request fails with 500 since the system is already delete in the first pass
@@ -63,14 +63,10 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        private HttpResponseMessage DeleteConflict(string response)
+        private HttpResponseMessage DeleteConflict(SystemDeleteConflict response)
         {
-            return CreateResponse(HttpStatusCode.Conflict, response, response);
-        }
-
-        protected override void DeleteQuery(ItSystem entity)
-        {
-            _systemService.Delete(entity.Id);
+            var responseAsString = response.ToString("G");
+            return CreateResponse(HttpStatusCode.Conflict, responseAsString, responseAsString);
         }
 
         /// <summary>
