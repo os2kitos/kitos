@@ -4,6 +4,6 @@ namespace Core.ApplicationServices.System
 {
     public interface IReferenceService
     {
-        OperationResult Delete(int systemId);
+        OperationResult DeleteBySystemId(int systemId);
     }
 }

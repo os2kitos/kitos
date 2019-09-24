@@ -28,7 +28,7 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
         }
 
-        public OperationResult Delete(int systemId)
+        public OperationResult DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
             if (system == null)
@@ -52,11 +52,6 @@ namespace Core.ApplicationServices.System
             {
                 foreach (var reference in referenceIds)
                 {
-                    if (!_authorizationContext.AllowDelete(reference))
-                    {
-                        transaction.Rollback();
-                        return OperationResult.Forbidden;
-                    }
                     _referenceRepository.Delete(reference);
                 }
                 transaction.Commit();

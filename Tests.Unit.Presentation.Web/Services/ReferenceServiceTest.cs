@@ -46,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(system.Id, null);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.NotFound, result);
@@ -63,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(system, false);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Forbidden, result);
@@ -80,7 +80,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(system, true);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result);
@@ -101,7 +101,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet();
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Forbidden, result);
@@ -122,7 +122,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet();
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result);
