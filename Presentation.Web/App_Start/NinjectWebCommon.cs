@@ -11,6 +11,7 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.DataAccess;
@@ -117,6 +118,7 @@ namespace Presentation.Web
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
             kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
+            kernel.Bind<IReferenceService>().To<ReferenceService>().InRequestScope();
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -140,6 +142,7 @@ namespace Presentation.Web
             kernel.Bind<ITransactionManager>().To<TransactionManager>().InRequestScope();
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
             kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
+            kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Newtonsoft.Json;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -184,6 +182,57 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
             }
+        }
+
+        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendSetParentSystemRequestAsync(
+            int systemId, 
+            int parentSystemId,
+            int organizationId, 
+            Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?organizationId={organizationId}");
+            var body = new
+            {
+                parentId = parentSystemId
+            };
+
+            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendSetTaskRefOnSystemRequestAsync(
+            int systemId,
+            int taskRefId,
+            int organizationId,
+            Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?taskId={taskRefId}&organizationId={organizationId}");
+            var body = new
+            {
+
+            };
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> SendGetSystemRequestAsync(int systemId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}");
+
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
     }
 }

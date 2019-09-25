@@ -103,6 +103,7 @@
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+    <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="ItProjectService.cs" />
     <Compile Include="ItInterfaceService.cs" />
     <Compile Include="System\IItSystemService.cs" />
+    <Compile Include="System\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />
     <Compile Include="ItSystemUsageService.cs" />
     <Compile Include="LinqTreeExtensions.cs" />
@@ -131,7 +133,7 @@
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailClient.cs" />
-    <Compile Include="ReferenceService.cs" />
+    <Compile Include="System\ReferenceService.cs" />
     <Compile Include="UserService.cs" />
   </ItemGroup>
   <ItemGroup>

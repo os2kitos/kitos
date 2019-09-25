@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -28,50 +28,44 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
-        private readonly ReferenceService _referenceService;
 
         public ItSystemController(
             IGenericRepository<ItSystem> repository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemService systemService,
-            ReferenceService referenceService,
             IAuthorizationContext authorizationContext)
             : base(repository, authorizationContext)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
-            _referenceService = referenceService;
         }
 
+        
         // DELETE api/T
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
-            try
+            var deleteResult = _systemService.Delete(id);
+            switch (deleteResult)
             {
-                var item = Repository.GetByKey(id);
-
-                // check if system has any usages, if it does it's may not be deleted
-                if (item.Usages.Any())
-                    return Conflict("Cannot delete a system in use!");
-
-                // OS2KITOS-796: Handles cascading delete of references when deleting an IT System
-                if (item.ExternalReferences.Any())
-                {
-                    var ids = item.ExternalReferences.ToList().Select(t => t.Id);
-                    _referenceService.Delete(ids);
-                }
-
-                return base.Delete(id, organizationId);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
+                case SystemDeleteResult.Forbidden:
+                    return Forbidden();
+                case SystemDeleteResult.NotFound:
+                    return NotFound();
+                case SystemDeleteResult.InUse:
+                case SystemDeleteResult.HasChildren:
+                case SystemDeleteResult.HasInterfaceExhibits:
+                    return DeleteConflict(deleteResult.MapToConflict());
+                case SystemDeleteResult.Ok:
+                    return Ok(); 
+                default:
+                    return Error($"Something went wrong trying to delete system with id: {id}");
             }
         }
 
-        protected override void DeleteQuery(ItSystem entity)
+        private HttpResponseMessage DeleteConflict(SystemDeleteConflict response)
         {
-            _systemService.Delete(entity.Id);
+            var responseAsString = response.ToString("G");
+            return CreateResponse(HttpStatusCode.Conflict, responseAsString, responseAsString);
         }
 
         /// <summary>

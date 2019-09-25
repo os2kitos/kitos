@@ -46,6 +46,12 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().ById(systemId);
         }
 
+        public void DeleteSystem(ItSystem itSystem)
+        {
+            _systemRepository.DeleteWithReferencePreload(itSystem);
+            _systemRepository.Save();
+        }
+
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)
         {
             var idsOfSystemsInUse = _systemUsageRepository

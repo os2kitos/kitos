@@ -8,7 +8,7 @@
     <div class="modal-body">
         <div class="form-group has-feedback" data-show-errors>
             <label class="control-label" for="name">Navn</label>
-            <input type="text" class="form-control" name="name" id="name" data-ng-change="validateItInterfaceId()" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
+            <input type="text" class="form-control" name="name" id="name" data-element-type="interfaceNameInput" data-ng-change="validateItInterfaceId()" placeholder="navn" required data-ng-model="formData.name" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
             <label class="control-label" for="itInterfaceId">Snitflade Id</label>
             <input type="text" class="form-control" name="itInterfaceId" data-ng-change="validateName()" id="itInterfaceId" placeholder="Snitflade ID" data-ng-model="formData.itInterfaceId" data-unique-it-interface-id-name="{{checkAvailbleUrl}}">
 
@@ -17,7 +17,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" data-ng-disabled="createForm.$invalid">OK</button>
+        <button type="submit" class="btn btn-primary" data-element-type="interfaceSaveButton" data-ng-disabled="createForm.$invalid">OK</button>
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
     </div>
 </form>

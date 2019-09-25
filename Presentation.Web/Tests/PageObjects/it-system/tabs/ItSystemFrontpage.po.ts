@@ -1,12 +1,14 @@
 ﻿import IPageObject = require("../../IPageObject.po");
 import KendoToolbarWrapper = require("../../../object-wrappers/KendoToolbarWrapper");
-
+import NavigationHelper = require("../../../Utility/NavigationHelper");
 var ec = protractor.ExpectedConditions;
 
 class ItSystemReference implements IPageObject {
 
+    private navigationHelper = new NavigationHelper();
+
     public getPage(): webdriver.promise.Promise<void> {
-        return browser.get(browser.baseUrl + "/#/system/edit/1/reference");
+        return this.navigationHelper.getPage("/#/system/edit/1/reference");
     }
     public kendoToolbarWrapper = new KendoToolbarWrapper();
 

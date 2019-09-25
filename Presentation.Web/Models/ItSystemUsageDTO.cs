@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Models
 {
     using Core.DomainModel.ItSystem;
     using Core.DomainModel.ItSystem.DataTypes;
-    using System;
 
     public class ItSystemUsageDTO
     {

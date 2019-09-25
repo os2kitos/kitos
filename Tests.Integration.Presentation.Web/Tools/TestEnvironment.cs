@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -19,6 +18,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public const int SecondOrganizationId = 2;
         public const int DefaultContractId = 1;
         public const int DefaultUserId = 1;
+        public const int DefaultTaskRefId = 1;
         public const string EmptyListApiJson = "{\"msg\":\"\",\"response\":[]}";
 
         static TestEnvironment()

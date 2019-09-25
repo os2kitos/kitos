@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
@@ -9,26 +11,35 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.System;
+using Infrastructure.Services.DataAccess;
+using Serilog;
 
 namespace Core.ApplicationServices.System
 {
     public class ItSystemService : IItSystemService
     {
         private readonly IGenericRepository<ItSystem> _repository;
-        private readonly IGenericRepository<ItSystemRight> _rightsRepository;
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IReferenceService _referenceService;
+        private readonly ILogger _logger;
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository, 
-            IGenericRepository<ItSystemRight> rightsRepository, 
             IItSystemRepository itSystemRepository,
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext,
+            ITransactionManager transactionManager,
+            IReferenceService referenceService,
+            ILogger logger
+            )
         {
             _repository = repository;
-            _rightsRepository = rightsRepository;
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
+            _transactionManager = transactionManager;
+            _referenceService = referenceService;
+            _logger = logger;
         }
 
 
@@ -112,22 +123,58 @@ namespace Core.ApplicationServices.System
             return parents;
         }
 
-        public void Delete(int id)
+        public SystemDeleteResult Delete(int id)
         {
-            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
-            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var system = _repository.Get(x => x.Id == id, null, $"{nameof(ItSystem.TaskRefs)}").FirstOrDefault();
+            var system = _itSystemRepository.GetSystem(id);
 
-            // delete it project
-            _repository.Delete(system);
-            _repository.Save();
-        }
+            if (system == null)
+            {
+                return SystemDeleteResult.NotFound;
+            }
 
-        public IEnumerable<ItSystem> ReportItSystemRights()
-        {
-            var rights = _rightsRepository.Get();
+            if (! _authorizationContext.AllowDelete(system))
+            {
+                return SystemDeleteResult.Forbidden;
+            }
 
-            return null;
+            if (system.Usages.Any())
+            {
+                return SystemDeleteResult.InUse;
+            }
+
+            if (system.Children.Any())
+            {
+                return SystemDeleteResult.HasChildren;
+            }
+
+            if (system.ItInterfaceExhibits.Any())
+            {
+                return SystemDeleteResult.HasInterfaceExhibits;
+            }
+
+            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            {
+                try
+                {
+                    var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
+                    if (deleteReferenceResult != OperationResult.Ok)
+                    {
+                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult}");
+                        transaction.Rollback();
+                        return SystemDeleteResult.UnknownError;
+                    }
+                    _itSystemRepository.DeleteSystem(system);
+                    transaction.Commit();
+                    return SystemDeleteResult.Ok;
+
+                }
+                catch (Exception e)
+                {
+                    _logger.Error(e, $"Failed to delete it system with id: {system.Id}");
+                    transaction.Rollback();
+                    return SystemDeleteResult.UnknownError;
+                }
+            }
         }
 
         public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)

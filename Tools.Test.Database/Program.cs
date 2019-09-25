@@ -133,6 +133,18 @@ namespace Tools.Test.Database
 
                     FailOnConnectionToProd(createContractArgs.ConnectionString);
                     return new CreateItContractTask(createContractArgs.ConnectionString, createContractArgs.ItSystemName);
+
+                case CliTargets.CreateTaskRef:
+                    Console.WriteLine("Expecting the following arguments: <connectionString> <organizationName>");
+                    var createTaskRefArgs = new
+                    {
+                        ConnectionString = GetArgument(additionalArgs, 0),
+                        OrganizationName = GetArgument(additionalArgs, 1)
+                    };
+
+                    FailOnConnectionToProd(createTaskRefArgs.ConnectionString);
+                    return new CreateTaskRefTask(createTaskRefArgs.ConnectionString, createTaskRefArgs.OrganizationName);
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");
             }

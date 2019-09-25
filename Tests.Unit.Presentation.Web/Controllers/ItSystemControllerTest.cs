@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using Core.ApplicationServices;
+using System.Net.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
@@ -35,7 +36,6 @@ namespace Tests.Unit.Presentation.Web.Controllers
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
                 _systemService.Object,
-                new ReferenceService(),
                 _authorizationContext.Object
                 );
 
@@ -185,12 +185,76 @@ namespace Tests.Unit.Presentation.Web.Controllers
                         })));
         }
 
+        [Theory]
+        [InlineData(SystemDeleteResult.InUse, SystemDeleteConflict.InUse)]
+        [InlineData(SystemDeleteResult.HasChildren, SystemDeleteConflict.HasChildren)]
+        [InlineData(SystemDeleteResult.HasInterfaceExhibits, SystemDeleteConflict.HasInterfaceExhibits)]
+        public void Delete_Returns_Conflict_With_SystemDeleteResults(SystemDeleteResult deleteResult, SystemDeleteConflict deleteConflict)
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, deleteResult);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, responseMessage.StatusCode);
+            var responseValue = ExpectResponseOf<string>(responseMessage);
+            Assert.Equal(deleteConflict, Enum.Parse(typeof(SystemDeleteConflict), responseValue));
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.Forbidden, SystemDeleteResult.Forbidden)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.InUse)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasChildren)]
+        [InlineData(HttpStatusCode.Conflict, SystemDeleteResult.HasInterfaceExhibits)]
+        [InlineData(HttpStatusCode.NotFound, SystemDeleteResult.NotFound)]
+        [InlineData(HttpStatusCode.InternalServerError, SystemDeleteResult.UnknownError)]
+        public void Delete_Returns_Failed(HttpStatusCode code, SystemDeleteResult result)
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, result);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(code, responseMessage.StatusCode);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectDeleteSystemReturn(systemId, SystemDeleteResult.Ok);
+
+            //Act
+            var responseMessage = DeleteSystem(systemId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+        }
+
+        private HttpResponseMessage DeleteSystem(int systemId)
+        {
+            return _sut.Delete(systemId, 0); // OrgId is only a route qualifier and is therefore not used.
+        }
+
         private void ExpectGetUsingOrganizationsReturn(
             int itSystemId,
             Result<OperationResult, IReadOnlyList<UsingOrganization>> result)
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);
+        }
+
+        private void ExpectDeleteSystemReturn(int systemId, SystemDeleteResult deleteResult)
+        {
+            _systemService.Setup(x => x.Delete(systemId))
+                .Returns(deleteResult);
         }
 
         private void ExpectAllowDeleteReturns(bool allowDelete, ItSystem itSystem)

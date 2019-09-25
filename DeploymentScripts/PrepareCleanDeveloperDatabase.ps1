@@ -89,3 +89,9 @@ Write-Host "Create IT Contract"
 #-------------------------------------------------------------
 & $testToolsExePath "CreateItContract" "$kitosDbConnectionString" "DefaultTestItContract"
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE IT CONTRACT" }
+
+#-------------------------------------------------------------
+Write-Host "Create TaskRef"
+#-------------------------------------------------------------
+& $testToolsExePath "CreateTaskRef" "$kitosDbConnectionString" "$defaultOrganization"
+if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE TASK REF" }
