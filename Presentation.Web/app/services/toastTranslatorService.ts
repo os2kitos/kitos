@@ -1,11 +1,8 @@
 ﻿module Kitos.Services.System {
     "use strict";
-    export class SystemDeletedErrorResponseTranslationService { //TODO: Rename to SystemDeletedErrorResponseTranslationService
-        //TODO: Take httpErrorCode + actionErrorCode and pick the right error message based on that
+    export class SystemDeletedErrorResponseTranslationService { 
         private errorMsg = Models.ItSystem.SystemDeleteErrorMessages;
-
-        translateResponse = (httpErrorCode: number, actionErrorCode: string) => { //TODO: Rename to translateErrorResponse
-            //TODO: base on httpErrorCode first before name
+        translateResponse = (httpErrorCode: number, actionErrorCode: string) => { 
             switch (httpErrorCode) {
                 case 401:
                     return this.errorMsg.notAuthorized;
