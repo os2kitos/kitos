@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -25,6 +26,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
         private readonly Mock<IReferenceService> _referenceService;
+        private readonly Mock<ILogger> _logger;
 
         public ItSystemServiceTest()
         {
@@ -33,13 +35,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _dbTransaction = new Mock<IDatabaseTransaction>();
             _referenceService = new Mock<IReferenceService>();
+            _logger = new Mock<ILogger>();
             _sut = new ItSystemService(
                 null, 
                 _systemRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
-                null
+                _logger.Object
                 );
         }
 

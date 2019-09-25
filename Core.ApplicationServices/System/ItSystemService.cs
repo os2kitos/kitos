@@ -159,6 +159,7 @@ namespace Core.ApplicationServices.System
                     var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
                     if (deleteReferenceResult != OperationResult.Ok)
                     {
+                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult}");
                         transaction.Rollback();
                         return SystemDeleteResult.UnknownError;
                     }
