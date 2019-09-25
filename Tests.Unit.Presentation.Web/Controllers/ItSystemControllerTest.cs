@@ -225,7 +225,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Fact]
-        public void Delete_Returns_Ok()
+        public void Delete_Returns_NoContent()
         {
             //Arrange
             var systemId = A<int>();
@@ -235,7 +235,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             var responseMessage = DeleteSystem(systemId);
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, responseMessage.StatusCode);
         }
 
         private HttpResponseMessage DeleteSystem(int systemId)

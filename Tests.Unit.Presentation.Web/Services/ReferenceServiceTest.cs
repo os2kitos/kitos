@@ -46,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(system.Id, null);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.NotFound, result);
@@ -63,7 +63,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(system, false);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Forbidden, result);
@@ -80,7 +80,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(system, true);
 
             //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result);
@@ -89,7 +89,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Delete_Returns_Forbidden_If_Not_Allowed_To_Delete_Reference()
+        public void Delete_Returns_Ok_If_References()
         {
             //Arrange
             var system = CreateSystem();
@@ -97,43 +97,15 @@ namespace Tests.Unit.Presentation.Web.Services
             system = AddExternalReference(system, reference);
             ExpectGetSystemReturns(system.Id, system);
             ExpectAllowModifyReturns(system, true);
-            ExpectAllowDeleteReturns(reference, false);
             ExpectTransactionToBeSet();
 
             //Act
-            var result = _sut.Delete(system.Id);
-
-            //Assert
-            Assert.Equal(OperationResult.Forbidden, result);
-            _dbTransaction.Verify(x => x.Rollback(), Times.Once);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Delete_Returns_Ok_If_Allowed_To_Delete_Reference()
-        {
-            //Arrange
-            var system = CreateSystem();
-            var reference = CreateReference();
-            system = AddExternalReference(system, reference);
-            ExpectGetSystemReturns(system.Id, system);
-            ExpectAllowModifyReturns(system, true);
-            ExpectAllowDeleteReturns(reference, true);
-            ExpectTransactionToBeSet();
-
-            //Act
-            var result = _sut.Delete(system.Id);
+            var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
             Assert.Equal(OperationResult.Ok, result);
             _dbTransaction.Verify(x => x.Rollback(), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
-        }
-
-
-        private void ExpectAllowDeleteReturns(ExternalReference reference, bool value)
-        {
-            _authorizationContext.Setup(x => x.AllowDelete(reference)).Returns(value);
         }
 
         private void ExpectAllowModifyReturns(ItSystem system, bool value)

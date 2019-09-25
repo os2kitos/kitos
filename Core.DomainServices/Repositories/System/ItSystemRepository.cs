@@ -48,7 +48,7 @@ namespace Core.DomainServices.Repositories.System
 
         public void DeleteSystem(ItSystem itSystem)
         {
-            _systemRepository.Delete(itSystem);
+            _systemRepository.DeleteWithReferencePreload(itSystem);
             _systemRepository.Save();
         }
 

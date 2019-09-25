@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
@@ -25,6 +26,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
         private readonly Mock<IReferenceService> _referenceService;
+        private readonly Mock<ILogger> _logger;
 
         public ItSystemServiceTest()
         {
@@ -33,13 +35,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _dbTransaction = new Mock<IDatabaseTransaction>();
             _referenceService = new Mock<IReferenceService>();
+            _logger = new Mock<ILogger>();
             _sut = new ItSystemService(
                 null, 
                 _systemRepository.Object, 
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
-                null
+                _logger.Object
                 );
         }
 
@@ -253,11 +256,14 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.Equal(SystemDeleteResult.Ok, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
-            _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
+            _referenceService.Verify(x => x.DeleteBySystemId(system.Id), Times.Once);
         }
 
-        [Fact]
-        public void Delete_Returns_Forbidden_And_Does_Not_Delete_ExternalReferences()
+        [Theory]
+        [InlineData(OperationResult.Forbidden)]
+        [InlineData(OperationResult.UnknownError)]
+        [InlineData(OperationResult.NotFound)]
+        public void Delete_Returns_UnknownError_And_Does_Not_Delete_ExternalReferences(OperationResult referenceDeleteResult)
         {
             //Arrange
             var system = CreateSystem();
@@ -265,17 +271,38 @@ namespace Tests.Unit.Presentation.Web.Services
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
-            ExpectDeleteReferenceReturns(system.Id, OperationResult.Forbidden);
+            ExpectDeleteReferenceReturns(system.Id, referenceDeleteResult);
             ExpectTransactionToBeSet();
 
             //Act
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.Forbidden, result);
+            Assert.Equal(SystemDeleteResult.UnknownError, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
             _dbTransaction.Verify(x => x.Rollback(), Times.Once);
-            _referenceService.Verify(x => x.Delete(system.Id), Times.Once);
+            _referenceService.Verify(x => x.DeleteBySystemId(system.Id), Times.Once);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_With_Task_Refs_Added()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var taskRef = createTaskRef();
+            AddTaskRef(system, taskRef);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.Delete(system.Id);
+
+            //Assert
+            Assert.Equal(SystemDeleteResult.Ok, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _referenceService.Verify(x => x.DeleteBySystemId(system.Id), Times.Once);
         }
 
         private Organization CreateOrganization()
@@ -286,6 +313,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private ItSystem CreateSystem()
         {
             return new ItSystem { Id = A<int>() };
+        }
+
+        private TaskRef createTaskRef()
+        {
+            return new TaskRef { Id = A<int>()};
         }
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
@@ -320,7 +352,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectDeleteReferenceReturns(int id, OperationResult result)
         {
-            _referenceService.Setup(x => x.Delete(id)).Returns(result);
+            _referenceService.Setup(x => x.DeleteBySystemId(id)).Returns(result);
         }
 
         private void ExpectTransactionToBeSet()
@@ -346,6 +378,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private static void AddExternalReference(ItSystem system, ExternalReference externalReference)
         {
             system.ExternalReferences.Add(externalReference);
+        }
+
+        private static void AddTaskRef(ItSystem system, TaskRef taskRef)
+        {
+            system.TaskRefs.Add(taskRef);
         }
     }
 }

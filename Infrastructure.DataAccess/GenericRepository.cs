@@ -5,6 +5,7 @@ using System.Data.Entity.Validation;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using Core.DomainServices;
 
 namespace Infrastructure.DataAccess
@@ -15,6 +16,18 @@ namespace Infrastructure.DataAccess
         private readonly KitosContext _context;
         private readonly DbSet<T> _dbSet;
         private bool _disposed;
+
+        private readonly Lazy<IReadOnlyList<MethodInfo>> _entityTypeVirtualGetters =
+            new Lazy<IReadOnlyList<MethodInfo>>(
+                () =>
+                    typeof(T)
+                        .GetProperties()
+                        .Where(property => property.CanRead)
+                        .Select(property => property.GetMethod)
+                        .Where(getMethod => getMethod.IsVirtual && getMethod.IsPublic)
+                        .ToList()
+                        .AsReadOnly()
+            );
 
         public GenericRepository(KitosContext context)
         {
@@ -49,7 +62,7 @@ namespace Infrastructure.DataAccess
         public IQueryable<T> AsQueryable()
         {
             var dbAsQueryable = _dbSet.AsQueryable();
-            
+
             return dbAsQueryable;
         }
 
@@ -62,7 +75,7 @@ namespace Infrastructure.DataAccess
         {
             return _dbSet.Find(key);
         }
-       
+
 
         public T Insert(T entity)
         {
@@ -74,10 +87,38 @@ namespace Infrastructure.DataAccess
             _dbSet.Remove(entity);
         }
 
+        public void DeleteWithReferencePreload(T entity)
+        {
+            LoadReferencedEntities(entity);
+            Delete(entity);
+        }
+
         public void DeleteByKey(params object[] key)
         {
             var entityToDelete = _dbSet.Find(key);
             _dbSet.Remove(entityToDelete);
+        }
+
+        public void DeleteByKeyWithReferencePreload(params object[] key)
+        {
+            var entityToDelete = _dbSet.Find(key);
+            if (entityToDelete == null)
+            {
+                throw new ArgumentException(
+                    $"Unable to locate entity of type {typeof(T).Namespace} from the provided key {string.Join(";", key.Select(k => k.ToString()))}");
+            }
+            LoadReferencedEntities(entityToDelete);
+
+            Delete(entityToDelete);
+        }
+
+        private void LoadReferencedEntities(T entity)
+        {
+            //Invoke getters of all reference properties. This solves the issue of EF not cascading on optional foreign keys in reference objects which may reference either one or many of the different root elements. Example: TaskRef
+            _entityTypeVirtualGetters
+                .Value
+                .Select(methodInfo => methodInfo.Invoke(entity, new object[0]))
+                .ToList();
         }
 
         public void Update(T entity)

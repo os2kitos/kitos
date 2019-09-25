@@ -252,6 +252,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        public async Task Can_Delete_System_With_Task_Ref(OrganizationRole role)
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(role);
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            const int taskRefId = TestEnvironment.DefaultTaskRefId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
+            await ItSystemHelper.SendSetTaskRefOnSystemRequestAsync(system.Id, taskRefId, organizationId, login);
+
+            //Act
+            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
+            {
+                //Assert
+                Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+                await AssertSystemDeletedAsync(system.Id);
+            }
+        }
+
         private static async Task AssertCorrectConflictResponseAsync(SystemDeleteConflict conflict, HttpResponseMessage result, int systemId)
         {
             Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);

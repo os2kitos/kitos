@@ -210,6 +210,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> SendSetTaskRefOnSystemRequestAsync(
+            int systemId,
+            int taskRefId,
+            int organizationId,
+            Cookie login)
+        {
+            var cookie = login;
+
+            var url = TestEnvironment.CreateUrl($"api/itsystem/{systemId}?taskId={taskRefId}&organizationId={organizationId}");
+            var body = new
+            {
+
+            };
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
         public static async Task<HttpResponseMessage> SendGetSystemRequestAsync(int systemId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

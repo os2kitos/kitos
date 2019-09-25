@@ -156,25 +156,17 @@ namespace Core.ApplicationServices.System
             {
                 try
                 {
-                    var deleteReferenceResult = _referenceService.Delete(system.Id);
-                    switch (deleteReferenceResult)
+                    var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
+                    if (deleteReferenceResult != OperationResult.Ok)
                     {
-                        case OperationResult.Forbidden:
-                            transaction.Rollback();
-                            return SystemDeleteResult.Forbidden;
-                        
-                        case OperationResult.NotFound: // This case should not be possible!
-                            transaction.Rollback();
-                            return SystemDeleteResult.NotFound;
-                        case OperationResult.Ok:
-                            _itSystemRepository.DeleteSystem(system);
-                            transaction.Commit();
-                            return SystemDeleteResult.Ok;
-                        default:
-                            transaction.Rollback();
-                            return SystemDeleteResult.UnknownError;
+                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult}");
+                        transaction.Rollback();
+                        return SystemDeleteResult.UnknownError;
                     }
-                    
+                    _itSystemRepository.DeleteSystem(system);
+                    transaction.Commit();
+                    return SystemDeleteResult.Ok;
+
                 }
                 catch (Exception e)
                 {

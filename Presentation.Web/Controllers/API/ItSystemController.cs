@@ -56,8 +56,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.HasInterfaceExhibits:
                     return DeleteConflict(deleteResult.MapToConflict());
                 case SystemDeleteResult.Ok:
-                    return Ok();  // Correct response would be NoContent, but somewhere in the frontend this breaks causing a double delete on one request.
-                                  // This means the request fails with 500 since the system is already delete in the first pass
+                    return NoContent(); 
                 default:
                     return Error($"Something went wrong trying to delete system with id: {id}");
             }
