@@ -34,11 +34,11 @@
 
     app.controller('system.EditCtrl',
         [
-            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','toastTranslatorService',
-            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, toastTranslatorService) {
+            '$rootScope', '$scope', 'itSystem', 'user', 'hasWriteAccess', '$state', 'notify', '$http', '_', 'userAccessRights','toastTransSystemDeletedErrorResponseTranslationServicelatorService',
+            function ($rootScope, $scope, itSystem, user, hasWriteAccess, $state, notify, $http, _, userAccessRights, systemDeletedErrorResponseTranslationService) {
 
                 $scope.hasWriteAccess = hasWriteAccess;
-                var errormsg = Kitos.Models.ItSystem.SystemDeleteErrorMessages;
+               
 
                 if (userAccessRights.canDelete) {
                     if (!$rootScope.page.subnav.buttons.some(x => x.text === "Slet IT System")) {
@@ -117,16 +117,7 @@
                             $state.go('it-system.catalog');
                         })
                         .error(function (data, status) {
-                            if (status === 401) {
-                                msg.toErrorMessage(errormsg.noPermission);
-                            }
-                            else if (status === 409) {
-                                msg.toErrorMessage(toastTranslatorService.translateResponse(data.response));
-                            }
-                            else {
-                                msg.toErrorMessage(errormsg.deleteDefault);
-                            }
-
+                            msg.toErrorMessage(systemDeletedErrorResponseTranslationService.translateResponse(status , data.response));
                         });
                 }
             }

@@ -354,7 +354,6 @@
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
-    <TypeScriptCompile Include="app\utility\toastTranslator.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
