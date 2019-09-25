@@ -48,14 +48,7 @@ namespace Core.DomainServices.Repositories.System
 
         public void DeleteSystem(ItSystem itSystem)
         {
-            if (itSystem.TaskRefs.Count > 0)
-            {
-                //TODO: 
-                // Since cascading delete doesn't work atm as the task refs are nullable, so we load the child Foreign Key into memory.
-                // This makes EF correctly delete the children.
-                var taskrefs = itSystem.TaskRefs;
-            }
-            _systemRepository.Delete(itSystem);
+            _systemRepository.DeleteWithReferencePreload(itSystem);
             _systemRepository.Save();
         }
 
