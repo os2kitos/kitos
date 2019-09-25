@@ -64,7 +64,7 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => itSystemFrontPage.getDeleteButton().click())
                     .then(() => testFixture.disableAutoBrowserWaits())
                     .then(() => browser.switchTo().alert().accept())
-                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da Systemet er i brug"));
+                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da Systemet er i anvendelse i en eller flere organisationer"));
             });
 
         it("When a interface depends on the system",
@@ -83,7 +83,7 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => itSystemFrontPage.getDeleteButton().click())
                     .then(() => testFixture.disableAutoBrowserWaits())
                     .then(() => browser.switchTo().alert().accept())
-                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da en snitflade afhænger af dette system"));
+                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da en det er markeret som udstillersystem for en eller flere snitflader"));
             });
 
         it("When another system depends on it",
@@ -107,7 +107,7 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => testFixture.disableAutoBrowserWaits())
                     .then(() => browser.switchTo().alert().accept())
                     .then(() => console.log("Waiting for toast message"))
-                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da andre systemer afhænger af dette system"));
+                    .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da det er markeret som overordnet system for en eller flere systemer"));
             });
 
 
