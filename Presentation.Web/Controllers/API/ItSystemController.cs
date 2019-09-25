@@ -56,7 +56,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.HasInterfaceExhibits:
                     return DeleteConflict(deleteResult.MapToConflict());
                 case SystemDeleteResult.Ok:
-                    return NoContent(); 
+                    return Ok(); 
                 default:
                     return Error($"Something went wrong trying to delete system with id: {id}");
             }
