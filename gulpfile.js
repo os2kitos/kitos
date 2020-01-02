@@ -1,19 +1,18 @@
-/// <binding BeforeBuild='deploy-prod' />
-var gulp = require('gulp'),
-    paths = require('./paths.config.js');
+"use strict";
+
+const { watch, parallel } = require("gulp");
+const paths = require("./paths.config.js");
+const del = require("del");
 
 // require gulp tasks from all gulp files
-require('require-dir')('./gulp');
+require("require-dir")("./gulp");
 
 // watch for file changes and run linters.
-gulp.task('watch', function () {
-    gulp.watch(paths.allTypeScript, ['ts-lint']);
-    gulp.watch(paths.allJavaScript, ['es-lint']);
-});
+exports.watch =  function() {
+    watch(paths.allTypeScript, ["ts-lint"]);
+    watch(paths.allJavaScript, ["es-lint"]);
+};
 
 // clean solution
-gulp.task('clean', ["clean-styles", "clean-scripts"], function() {
-    var del = require('del');
+exports.clean = parallel(del(paths.tempFiles));
 
-    return del(paths.tempFiles);
-});

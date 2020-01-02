@@ -1,32 +1,36 @@
-var gulp = require('gulp'),
-    paths = require('../paths.config.js');
+"use strict";
 
-gulp.task('lint', ['es-lint', 'ts-lint']);
+const { src, parallel } = require("gulp");
+const paths = require("../paths.config.js");
+
 
 // run tslint on all typescript files.
-gulp.task('ts-lint', function () {
-    var tslint = require('gulp-tslint');
+const tsLint = function() {
+    var tslint = require("gulp-tslint");
 
     var args = process.argv;
     var path = paths.allTypeScript;
-    if (args && args.length > 3 && args[3] === '--path') {
+    if (args && args.length > 3 && args[3] === "--path") {
         path = args[4];
     }
 
-    return gulp.src(path)
+    return src(path)
 		.pipe(tslint())
-		.pipe(tslint.report('prose', {
+		.pipe(tslint.report("prose", {
 		    emitError: false // Set to true to fail build on errors
 		}));
-});
+};
 
 // run eslint on all javascript files
-gulp.task('es-lint', function () {
-    var eslint = require('gulp-eslint');
+const esLint = function() {
+    var eslint = require("gulp-eslint");
 
-    return gulp.src(paths.allJavaScript)
+    return src(paths.allJavaScript)
 		.pipe(eslint())
 		.pipe(eslint.format());
     // Use this to fail build on errors
     //.pipe(eslint.failAfterError());
-});
+};
+
+
+exports.lint = parallel(tsLint, esLint);

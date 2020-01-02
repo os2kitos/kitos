@@ -1,13 +1,12 @@
-var gulp = require("gulp");
+"use strict";
+
+const { src, dest, series, parallel} = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var del = require("del");
 var minifyCSS = require("gulp-minify-css");
 var sourcemaps = require("gulp-sourcemaps");
-var runSequence = require('run-sequence');
 var ts = require('gulp-typescript');
-var htmlreplace = require('gulp-html-replace');
-var debug = require('gulp-debug');
 var rename = require('gulp-rename');
 var file = file = require('gulp-file');
 var less = require('gulp-less');
@@ -16,130 +15,136 @@ var config = require("../bundle.config.js");
 var tsProject = ts.createProject('tsconfig.json');
 
 //Synchronously delete the output script file(s)
-gulp.task("clean-js-and-maps", function () {
+const cleanJsAndMaps = function() {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
-});
+};
+
 
 // create css bundled file
-gulp.task("css", ["clean-styles"], function () {
-    return gulp.src(config.libraryStylesSrc.concat(config.customCssSrc))
+const css = function() {
+    return src(config.libraryStylesSrc.concat(config.customCssSrc))
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(concat(config.cssBundle))
-        .pipe(gulp.dest(config.cssDest))
+        .pipe(dest(config.cssDest))
         .pipe(minifyCSS())
         .pipe(concat(config.cssBundleMin))
         .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(config.cssDest));
-});
+        .pipe(dest(config.cssDest));
+};
 
-gulp.task('typescript', function () {
+const typescript = function() {
     tsResult = tsProject.src()
         .pipe(tsProject());
 
-    return tsResult.js.pipe(gulp.dest(paths.source));
-});
+    return tsResult.js.pipe(dest(paths.source));
+};
 
-gulp.task("clean-script-bundles", function () {
+
+const cleanScriptBundles = function() {
     return del([
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
         config.script(config.appBundle),
         config.script(config.appReportBundle),
     ]);
-});
+};
 
-gulp.task("clean-scripts", ["clean-script-bundles", "clean-js-and-maps"]);
+const cleanScripts = parallel(cleanScriptBundles, cleanJsAndMaps);
 
 // create external library bundled file
-gulp.task("library-bundle", function () {
-    return gulp.src(config.librarySrc)
+const libraryBundle = function() {
+    return src(config.librarySrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.libraryBundle))
         .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(paths.sourceScript));
-});
+        .pipe(dest(paths.sourceScript));
+};
 
 // create angular library bundled file
-gulp.task("angular-bundle", function () {
-    return gulp.src(config.angularSrc)
+const angularBundle = function() {
+    return src(config.angularSrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.angularBundle))
         .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(paths.sourceScript));
-});
+        .pipe(dest(paths.sourceScript));
+};
 
 // create app bundled file
-gulp.task("app-bundle", function () {
-    return gulp.src(config.appSrc)
+const appBundle = function() {
+    return src(config.appSrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.appBundle))
         .pipe(uglify())
         .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(paths.sourceScript));
-});
+        .pipe(dest(paths.sourceScript));
+};
 
 // create app report bundled file
-gulp.task("appReport-bundle", function () {
-    return gulp.src(config.appReportSrc)
+const appReportBundle = function() {
+    return src(config.appReportSrc)
         .pipe(sourcemaps.init())
         .pipe(concat(config.appReportBundle))
         .pipe(uglify())
         .pipe(sourcemaps.write(config.maps))
-        .pipe(gulp.dest(paths.sourceScript))
-});
+        .pipe(dest(paths.sourceScript));
+};
 
 // delete style output folders
-gulp.task("clean-styles", function () {
+const cleanStyles = function() {
     return del([
         config.fontDest,
         config.cssDest,
         config.cssDest + "/" + config.maps
     ]);
-});
+};
 
 // copy assets
-gulp.task("assets", ["clean-styles"], function () {
-    return gulp.src(config.assetsSrc)
-        .pipe(gulp.dest(config.cssDest));
-});
+const assets = function() {
+    return src(config.assetsSrc)
+        .pipe(dest(config.cssDest));
+};
 
 // copy fonts
-gulp.task("fonts", ["clean-styles"], function () {
-    return gulp.src(config.fontSrc)
-        .pipe(gulp.dest(config.fontDest));
-});
+const fonts = function() {
+    return src(config.fontSrc)
+        .pipe(dest(config.fontDest));
+};
 
 // copy tinyMCE fonts
-gulp.task("tinyMCEFonts", ["clean-styles"], function () {
-    return gulp.src(config.tinyMCEFontSrc)
-        .pipe(gulp.dest(config.tinyMCEFontDest));
-});
+const tinyMCEFonts = function() {
+    return src(config.tinyMCEFontSrc)
+        .pipe(dest(config.tinyMCEFontDest));
+};
 
-gulp.task("tinyMCEFixCss", ["clean-styles"], function () {
+const tinyMCEFixCss = function() {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
-    .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"))
+    .pipe(dest(paths.sourceScript + "/skins/lightgray"))
     .pipe(rename("skin.min.css"))
-    .pipe(gulp.dest(paths.sourceScript + "/skins/lightgray"));
-});
+    .pipe(dest(paths.sourceScript + "/skins/lightgray"));
+};
 
-gulp.task("tinyMCEFixLang", ["clean-styles"], function () {
+const tinyMCEFixLang = function() {
     return file("da.js", "//Dummy file from gulp", { src: true })
-    .pipe(gulp.dest(paths.sourceScript + "/langs"));
-});
+    .pipe(dest(paths.sourceScript + "/langs"));
+};
 
 // bundle, minify and copy styles, fonts and assets
-gulp.task("styles", ["css", "assets", "fonts", "tinyMCEFonts", "tinyMCEFixCss", "tinyMCEFixLang"]);
+const styles = series(cleanStyles, css, assets, fonts, tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang);
+//gulp.task("styles", ["css", "assets", "fonts", "", "", ""]);
 
 // run bundle tasks
-gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
+const scripts = series(cleanScripts, appBundle, libraryBundle, angularBundle);
+//gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
 
-// bundle and deploy scripts and styles
-gulp.task("deploy", function (callback) {
-    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback);
-});
+//// bundle and deploy scripts and styles
+exports.deploy = series(parallel(scripts, styles), cleanJsAndMaps);
+//gulp.task("deploy", function (callback) {
+//    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback);
+//});
 
-// bundle and deploy scripts and styles
-gulp.task("deploy-prod", function (callback) {
-    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback);
-});
+//// bundle and deploy scripts and styles
+exports.deployProd = series(typescript, parallel(scripts, styles, appReportBundle), cleanJsAndMaps);
+//gulp.task("deploy-prod", function (callback) {
+//    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback);
+//});
