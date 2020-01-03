@@ -43,7 +43,7 @@ module.exports = {
         bower("/angular-messages/angular-messages.min.js"),
         bower("/angular-ui-tree/dist/angular-ui-tree.min.js"),
         bower("/angular-ui-tinymce/src/tinymce.js"),
-        bower("/ZingChart-AngularJS/src/zingchart-angularjs.js"),
+        //bower("/ZingChart-AngularJS/src/zingchart-angularjs.js"),
         bower("/angular-route/angular-route.js"),
         bower("/ngstorage/ngstorage.js"),
         bower("/angular-base64/angular-base64.js"),
