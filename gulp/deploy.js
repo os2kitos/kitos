@@ -19,7 +19,6 @@ const cleanJsAndMaps = function(cb) {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
 };
 
-
 // create css bundled file
 const css = function(cb) {
     return src(config.libraryStylesSrc.concat(config.customCssSrc))
@@ -130,11 +129,11 @@ const tinyMCEFixLang = function(cb) {
 };
 
 // bundle, minify and copy styles, fonts and assets
-const styles = series(cleanStyles, css, assets, fonts, tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang);
+const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang));
 //gulp.task("styles", ["css", "assets", "fonts", "", "", ""]);
 
 // run bundle tasks
-const scripts = series(cleanScripts, appBundle, libraryBundle, angularBundle);
+const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
 //gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
 
 //// bundle and deploy scripts and styles
