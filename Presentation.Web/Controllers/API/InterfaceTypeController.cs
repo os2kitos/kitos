@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class InterfaceTypeController : GenericOptionApiController<ItInterfaceType, ItInterface, OptionDTO>
     {
         public InterfaceTypeController(IGenericRepository<ItInterfaceType> repository) 

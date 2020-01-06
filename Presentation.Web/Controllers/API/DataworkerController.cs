@@ -9,6 +9,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class DataworkerController : GenericApiController<ItSystemDataWorkerRelation, ItSystemDataWorkerRelationDTO>
     {
         private readonly IItSystemRepository _systemRepository;

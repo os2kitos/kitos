@@ -5,6 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItContractRightController : GenericRightsController<ItContract, ItContractRight, ItContractRole>
     {
         public ItContractRightController(IGenericRepository<ItContractRight> rightRepository, IGenericRepository<ItContract> objectRepository) 

@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class HandoverTrialTypeController : GenericOptionApiController<HandoverTrialType, HandoverTrial, OptionDTO>
     {
         public HandoverTrialTypeController(IGenericRepository<HandoverTrialType> repository) 

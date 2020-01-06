@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class ContractTypeController : GenericOptionApiController<ItContractType, ItContract, OptionDTO>
     {
         public ContractTypeController(IGenericRepository<ItContractType> repository) 

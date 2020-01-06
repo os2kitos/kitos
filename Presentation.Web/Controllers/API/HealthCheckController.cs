@@ -6,6 +6,7 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class HealthCheckController : ApiController
     {
         private static readonly string DeploymentVersion = Settings.Default.DeploymentVersion;

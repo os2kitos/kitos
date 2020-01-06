@@ -7,6 +7,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class FrequencyController : GenericOptionApiController<FrequencyType, DataRowUsage, OptionDTO>
     {
         public FrequencyController(IGenericRepository<FrequencyType> repository) : base(repository)

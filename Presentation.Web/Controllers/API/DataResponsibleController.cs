@@ -11,6 +11,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class DataResponsibleController : GenericApiController<DataResponsible, DataResponsibleDTO>
     {
         IGenericRepository<DataResponsible> _repository;

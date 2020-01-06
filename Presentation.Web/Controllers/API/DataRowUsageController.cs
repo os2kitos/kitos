@@ -8,6 +8,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class DataRowUsageController : BaseApiController
     {
         private readonly IGenericRepository<DataRowUsage> _repository;

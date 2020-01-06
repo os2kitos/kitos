@@ -8,6 +8,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class GlobalAdminController : BaseApiController
     {
         public HttpResponseMessage Get()

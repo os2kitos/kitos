@@ -9,6 +9,7 @@ namespace Presentation.Web.Controllers.API
     using Presentation.Web.Models;
 
     [PublicApi]
+    [DeprecatedApi]
     public class ArchiveTestLocationController : GenericOptionApiController<ArchiveTestLocation, ItSystemUsage, OptionDTO>
     {
         /// <summary>

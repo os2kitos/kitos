@@ -15,6 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
         private readonly IGenericRepository<ContactPerson> _repository;
@@ -54,6 +55,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     try
                     {
+                        //TODO: Check what happens if we remove this odd stuff
                         _repository.Insert(new ContactPerson
                         {
                             OrganizationId = organization.Id,

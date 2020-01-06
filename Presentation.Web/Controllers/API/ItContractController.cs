@@ -40,12 +40,13 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
-            paging.Where(x => x.Name.Contains(q) && x.OrganizationId == orgId);
+            paging.Where(x => x.OrganizationId == orgId && x.Name.Contains(q));
             return base.GetAll(paging);
         }
 
@@ -140,6 +141,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public virtual HttpResponseMessage GetExhibitedInterfaces(int id, bool? exhibit)
@@ -271,6 +273,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractOverviewDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
@@ -302,6 +305,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractPlanDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)

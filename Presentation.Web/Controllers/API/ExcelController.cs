@@ -13,6 +13,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;

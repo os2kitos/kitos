@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class ConfigController : GenericContextAwareApiController<Config, ConfigDTO>
     {
         public ConfigController(IGenericRepository<Config> repository) 

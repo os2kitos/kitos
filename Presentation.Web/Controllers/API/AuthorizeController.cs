@@ -17,6 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;

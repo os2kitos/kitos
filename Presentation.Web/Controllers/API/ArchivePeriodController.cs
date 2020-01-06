@@ -11,6 +11,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class ArchivePeriodController : GenericApiController<ArchivePeriod, ArchivePeriodDTO>
     {
         // GET: ArchivePeriod
