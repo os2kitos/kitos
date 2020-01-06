@@ -23,9 +23,6 @@ namespace Presentation.Web.Infrastructure.Attributes
 
             }
             base.OnActionExecuting(actionContext);
-
-
         }
-
     }
 }
