@@ -1,4 +1,3 @@
-/// <binding BeforeBuild='deployProd' />
 
 const { watch } = require("gulp");
 const paths = require("./paths.config.js");
@@ -19,3 +18,5 @@ exports.watch =  function(cb) {
 exports.deployProd = deploy.deployProd;
 
 exports.deploy = deploy.deploy;
+
+exports.clean = deploy.clean;

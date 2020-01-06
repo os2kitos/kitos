@@ -148,3 +148,6 @@ exports.deployProd = series(typescript, parallel(scripts, styles, appReportBundl
 //gulp.task("deploy-prod", function (callback) {
 //    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback);
 //});
+
+
+exports.clean = parallel(cleanStyles, cleanScripts);
