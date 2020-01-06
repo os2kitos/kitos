@@ -4,7 +4,7 @@ param(
     [Parameter(Mandatory=$true)][string]$pwd,
     [Parameter(Mandatory=$true)][string]$url,
 	[Parameter(Mandatory=$true)][string]$testType,
-	[string]$testToRun
+	[Parameter(Mandatory=$false)][string]$testToRun
     )
     
     Try 
@@ -49,7 +49,7 @@ param(
 				gulp "e2eLocal" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
 			}
 			"single" {
-				gulp "e2e:single" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url" --testToRun="$testToRun"
+				gulp "e2eSingle" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url" --testToRun="$testToRun"
 			}
 		}
 		

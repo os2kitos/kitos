@@ -34,7 +34,7 @@ const css = function(cb) {
 };
 
 const typescript = function(cb) {
-    var tsResult = tsProject.src()
+    const tsResult = tsProject.src()
         .pipe(tsProject());
 
     return tsResult.js.pipe(dest(paths.source));
@@ -136,12 +136,6 @@ const styles = series(cleanStyles, css, assets, fonts, tinyMCEFonts, tinyMCEFixC
 // run bundle tasks
 const scripts = series(cleanScripts, appBundle, libraryBundle, angularBundle);
 //gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
-
-//// bundle and deploy scripts and styles
-exports.deploy = series(parallel(scripts, styles), cleanJsAndMaps);
-//gulp.task("deploy", function (callback) {
-//    runSequence("clean-script-bundles", "scripts", "styles", "clean-js-and-maps", callback);
-//});
 
 //// bundle and deploy scripts and styles
 exports.deployProd = series(typescript, parallel(scripts, styles, appReportBundle), cleanJsAndMaps);

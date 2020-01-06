@@ -6,9 +6,9 @@ const paths = require("../paths.config.js");
 
 // run tslint on all typescript files.
 const tsLint = function() {
-    var tslint = require("gulp-tslint");
+    const tslint = require("gulp-tslint");
 
-    var args = process.argv;
+    const args = process.argv;
     var path = paths.allTypeScript;
     if (args && args.length > 3 && args[3] === "--path") {
         path = args[4];
@@ -23,7 +23,7 @@ const tsLint = function() {
 
 // run eslint on all javascript files
 const esLint = function() {
-    var eslint = require("gulp-eslint");
+    const eslint = require("gulp-eslint");
 
     return src(paths.allJavaScript)
 		.pipe(eslint())
