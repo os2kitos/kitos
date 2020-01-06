@@ -1,10 +1,11 @@
+"use strict";
 
 const { watch } = require("gulp");
 const paths = require("./paths.config.js");
 
 // require gulp tasks from all gulp files
-require("require-dir")("./gulp");
-
+const linting = require("./gulp/linting.js");
+const test = require("./gulp/test.js");
 const deploy = require("./gulp/deploy.js");
 
 
@@ -20,3 +21,8 @@ exports.deployProd = deploy.deployProd;
 exports.deploy = deploy.deploy;
 
 exports.clean = deploy.clean;
+
+exports.lint = linting.lint;
+
+exports.e2eHeadless = test.runProtractorHeadless;
+exports.e2eLocal = test.runProtractorLocal;

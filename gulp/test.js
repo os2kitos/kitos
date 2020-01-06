@@ -1,6 +1,6 @@
 "use strict";
 
-var {src, dest} = require("gulp");
+var {src, series} = require("gulp");
 var paths = require("../paths.config.js");
 var log = require("fancy-log");
 var protractor = require("gulp-protractor");
@@ -33,12 +33,12 @@ exports.unit = function(done) {
     }, done).start();
 };
 
-exports.cleanProtractor = function() {
+const cleanProtractor = function(cb) {
     return del("tmp");
 }
 
 
-exports.runProtractorHeadless = function (done) {
+const protractorHeadless = function (done) {
     var params = process.argv;
     var args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
@@ -63,11 +63,11 @@ exports.runProtractorHeadless = function (done) {
 }
 
 
-exports.runProtractorLocal = function(done) {
+const protractorLocal = function(done) {
     var params = process.argv;
     var args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
-    log.info("e2e arguments: " + args);
+    log.info(`e2e arguments: ${args}`);
 
     var singleSpec = "Presentation.Web/Tests/**/*.e2e.spec.js";
     src(singleSpec) 
@@ -88,6 +88,11 @@ exports.runProtractorLocal = function(done) {
             done();
         });
 }
+
+
+exports.runProtractorHeadless = series(cleanProtractor, protractorHeadless);
+exports.runProtractorLocal = series(cleanProtractor, protractorLocal);
+
 
 //gulp.task("e2e:single", ["CleanProtractor"], runSingleTest);
 

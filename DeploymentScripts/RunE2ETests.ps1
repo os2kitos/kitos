@@ -43,10 +43,10 @@ param(
         Write-Host "Starting E2E test. This might take a while..."
 		switch($testType){
 			"headless" {
-				gulp "e2e:headless" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+				gulp "e2eHeadless" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
 			}
 			"local" {
-				gulp "e2e:local" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+				gulp "e2eLocal" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
 			}
 			"single" {
 				gulp "e2e:single" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url" --testToRun="$testToRun"
