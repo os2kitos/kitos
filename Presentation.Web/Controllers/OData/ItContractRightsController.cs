@@ -41,7 +41,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Users({userId})/ItContractRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
-        [DeprecatedApi]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth
