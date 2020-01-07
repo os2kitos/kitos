@@ -12,6 +12,7 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;

@@ -9,6 +9,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
         public readonly IFeatureChecker _featureChecker;

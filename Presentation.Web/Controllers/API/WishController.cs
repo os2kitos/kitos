@@ -14,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class WishController : GenericContextAwareApiController<Wish, WishDTO>
     {
         private readonly IItSystemUsageRepository _usageRepository;

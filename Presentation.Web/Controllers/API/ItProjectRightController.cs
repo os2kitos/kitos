@@ -11,6 +11,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItProjectRightController : GenericRightsController<ItProject, ItProjectRight, ItProjectRole>
     {
         public ItProjectRightController(IGenericRepository<ItProjectRight> rightRepository, IGenericRepository<ItProject> objectRepository) : base(rightRepository, objectRepository)
@@ -23,6 +24,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="userId">Id of the user</param>
         /// <returns>List of rights</returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ICollection<RightOutputDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetRightsForUser(int userId)
         {
             try

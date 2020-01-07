@@ -16,6 +16,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
@@ -53,6 +54,7 @@ namespace Presentation.Web.Controllers.API
             _itInterfaceService.Delete(entity.Id);
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
         public HttpResponseMessage GetSearch(string q, int orgId)
         {
@@ -84,6 +86,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
         public HttpResponseMessage GetCatalog(string q, int organizationId, [FromUri] PagingModel<ItInterface> pagingModel)
         {

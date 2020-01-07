@@ -11,6 +11,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
@@ -22,6 +23,7 @@ namespace Presentation.Web.Controllers.API
             _objectRepository = objectRepository;
         }
 
+        [DeprecatedApi]
         public virtual HttpResponseMessage GetAllRights()
         {
             try
@@ -49,6 +51,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId"></param>
         /// <param name="orgRightsForUserWithRole"></param>
         /// <returns></returns>
+        [DeprecatedApi]
         public virtual HttpResponseMessage GetExistsOrgRightsForUserWithRole(string roleName, int userId, int organizationId, bool? orgRightsForUserWithRole)
         {
             try
@@ -88,6 +91,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId">OrganizationId</param>
         /// <param name="uId">UserId</param>
         /// <returns></returns>
+        [DeprecatedApi]
         public HttpResponseMessage DeleteByOrganizationRole(int orgId, int uId)
         {
             try
@@ -111,6 +115,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="userId"></param>
         /// <param name="byOrganization"></param>
         /// <returns></returns>
+        [DeprecatedApi]
         public HttpResponseMessage DeleteByOrganization(int orgId, int userId, bool? byOrganization)
         {
             try
@@ -132,6 +137,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage PostRightByOrganizationRight(bool? rightByOrganizationRight, int organizationId, OrganizationRightDTO dto)
         {
             try
@@ -189,6 +195,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="id">The id of the object</param>
         /// <returns>List of rights</returns>
+        [DeprecatedApi]
         public virtual HttpResponseMessage GetRights(int id)
         {
             try

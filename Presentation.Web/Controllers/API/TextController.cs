@@ -13,9 +13,10 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class TextController : GenericApiController<Text, TextDTO>
     {
-        protected readonly IGenericRepository<Text> _repository;
+        private readonly IGenericRepository<Text> _repository;
 
         public TextController(IGenericRepository<Text> repository) 
             : base(repository)

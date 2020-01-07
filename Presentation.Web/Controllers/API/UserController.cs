@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using AutoMapper;
@@ -14,6 +15,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class UserController : GenericApiController<User, UserDTO>
     {
         private readonly IUserService _userService;
@@ -26,85 +28,87 @@ namespace Presentation.Web.Controllers.API
             _organizationService = organizationService;
         }
 
+        [DeprecatedApi]
         public override HttpResponseMessage Post(UserDTO dto)
         {
-            try
-            {
-                // do some string magic to determine parameters, and actions
-                List<string> parameters = null;
-                var sendMailOnCreation = false;
-                var sendReminder = false;
-                var sendAdvis = false;
-                int? orgId = null;
+            return NotAllowed();
+            //try
+            //{
+            //    // do some string magic to determine parameters, and actions
+            //    List<string> parameters = null;
+            //    var sendMailOnCreation = false;
+            //    var sendReminder = false;
+            //    var sendAdvis = false;
+            //    int? orgId = null;
 
-                if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
-                    parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
-                if (parameters != null)
-                {
-                    foreach (var parameter in parameters)
-                    {
-                        if (parameter.StartsWith("sendMailOnCreation"))
-                        {
-                            sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
-                        }
-                        if (parameter.StartsWith("sendReminder"))
-                        {
-                            sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
-                        }
-                        if (parameter.StartsWith("sendAdvis"))
-                        {
-                            sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
-                        }
-                        if (parameter.StartsWith("organizationId="))
-                        {
-                            orgId = int.Parse(parameter.Replace("organizationId=", string.Empty));
-                        }
-                    }
-                }
+            //    if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
+            //        parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
+            //    if (parameters != null)
+            //    {
+            //        foreach (var parameter in parameters)
+            //        {
+            //            if (parameter.StartsWith("sendMailOnCreation"))
+            //            {
+            //                sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
+            //            }
+            //            if (parameter.StartsWith("sendReminder"))
+            //            {
+            //                sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
+            //            }
+            //            if (parameter.StartsWith("sendAdvis"))
+            //            {
+            //                sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
+            //            }
+            //            if (parameter.StartsWith("organizationId="))
+            //            {
+            //                orgId = int.Parse(parameter.Replace("organizationId=", string.Empty));
+            //            }
+            //        }
+            //    }
 
-                // check if orgId is set, if not return error as we cannot continue without it
-                if (!orgId.HasValue)
-                {
-                    return Error("Organization id is missing!");
-                }
+            //    // check if orgId is set, if not return error as we cannot continue without it
+            //    if (!orgId.HasValue)
+            //    {
+            //        return Error("Organization id is missing!");
+            //    }
 
-                // only global admin is allowed to set others to global admin
-                if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
+            //    // only global admin is allowed to set others to global admin
+            //    if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+            //    {
+            //        return Forbidden();
+            //    }
 
-                // check if user already exists and we are not sending a reminder or advis. If so, just return him
-                var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
-                if (existingUser != null && !sendReminder && !sendAdvis)
-                    return Ok(Map(existingUser));
-                // if we are sending a reminder:
-                if (existingUser != null && sendReminder)
-                {
-                    _userService.IssueAdvisMail(existingUser, true, orgId.Value);
-                    return Ok(Map(existingUser));
-                }
-                // if we are sending an advis:
-                if (existingUser != null && sendAdvis)
-                {
-                    _userService.IssueAdvisMail(existingUser, false, orgId.Value);
-                    return Ok(Map(existingUser));
-                }
+            //    // check if user already exists and we are not sending a reminder or advis. If so, just return him
+            //    var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
+            //    if (existingUser != null && !sendReminder && !sendAdvis)
+            //        return Ok(Map(existingUser));
+            //    // if we are sending a reminder:
+            //    if (existingUser != null && sendReminder)
+            //    {
+            //        _userService.IssueAdvisMail(existingUser, true, orgId.Value);
+            //        return Ok(Map(existingUser));
+            //    }
+            //    // if we are sending an advis:
+            //    if (existingUser != null && sendAdvis)
+            //    {
+            //        _userService.IssueAdvisMail(existingUser, false, orgId.Value);
+            //        return Ok(Map(existingUser));
+            //    }
 
-                // otherwise we are creating a new user
-                var item = Map(dto);
+            //    // otherwise we are creating a new user
+            //    var item = Map(dto);
 
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
+            //    item.ObjectOwner = KitosUser;
+            //    item.LastChangedByUser = KitosUser;
 
-                item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
+            //    item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
 
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+            //    return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            //}
+            //catch (Exception e)
+            //{
+            //    return LogError(e);
+            //}
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
@@ -130,6 +134,7 @@ namespace Presentation.Web.Controllers.API
             return base.Patch(id, organizationId, obj);
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage GetBySearch(string q)
         {
             try
@@ -143,6 +148,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage GetByOrganization(int orgId, bool? usePaging, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
         {
             try
@@ -165,6 +171,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage GetOverview(bool? overview, int orgId, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
         {
             try
@@ -196,6 +203,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
         {
             try
@@ -215,6 +223,7 @@ namespace Presentation.Web.Controllers.API
             return !users.Any();
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
         {
             var users = Repository.Get(u => u.Email == email && u.OrganizationRights.Count(r => r.Role == OrganizationRole.User && r.OrganizationId == orgId) > 0);

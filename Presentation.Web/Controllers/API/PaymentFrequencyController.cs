@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class PaymentFrequencyController : GenericOptionApiController<PaymentFreqencyType, ItContract, OptionDTO>
     {
         public PaymentFrequencyController(IGenericRepository<PaymentFreqencyType> repository)

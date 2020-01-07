@@ -9,6 +9,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [DeprecatedApi]
     public class LocalAdminController : BaseApiController
     {
         private readonly IOrganizationRoleService _organizationRoleService;

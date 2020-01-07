@@ -24,6 +24,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -76,6 +77,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
@@ -146,6 +148,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
         {
             try
@@ -163,6 +166,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetNonInterfacesSearch(string q, int orgId, bool? nonInterfaces)
         {
@@ -181,6 +185,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
         {
@@ -245,6 +250,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)
         {
             try

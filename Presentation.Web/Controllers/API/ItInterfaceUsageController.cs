@@ -12,6 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItInterfaceUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceUsage> _repository;
@@ -21,6 +22,7 @@ namespace Presentation.Web.Controllers.API
             _repository = repository;
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
         public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
         {
@@ -37,6 +39,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
         public HttpResponseMessage GetByUsage(int usageId)
         {

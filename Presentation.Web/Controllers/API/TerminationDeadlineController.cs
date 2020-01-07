@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class TerminationDeadlineController : GenericOptionApiController<TerminationDeadlineType, ItContract, OptionDTO>
     {
         public TerminationDeadlineController(IGenericRepository<TerminationDeadlineType> repository)

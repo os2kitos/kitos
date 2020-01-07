@@ -15,6 +15,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
@@ -27,6 +28,7 @@ namespace Presentation.Web.Controllers.API
             _useRepository = useRepository;
         }
 
+        [DeprecatedApi]
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
         {
             if (!string.IsNullOrWhiteSpace(q))
@@ -93,6 +95,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="id">Organization id</param>
         /// <param name="users">Route identifier</param>
         /// <returns>All users from organization <see cref="id"/> which matched the search criteria <see cref="q"/></returns>
+        [DeprecatedApi]
         public HttpResponseMessage GetUsers(int id, string q, bool? users)
         {
             try

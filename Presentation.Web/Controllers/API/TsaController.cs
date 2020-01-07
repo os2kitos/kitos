@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class TsaController : GenericOptionApiController<TsaType, ItInterface, OptionDTO>
     {
         public TsaController(IGenericRepository<TsaType> repository) : base(repository)

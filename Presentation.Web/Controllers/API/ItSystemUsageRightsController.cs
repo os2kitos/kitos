@@ -13,6 +13,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemUsageRightsController : GenericRightsController<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public ItSystemUsageRightsController(
@@ -27,6 +28,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         /// <param name="userId">Id of the user</param>
         /// <returns>List of rights</returns>
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ICollection<RightOutputDTO>>))]
         public HttpResponseMessage GetRightsForUser(int userId)
         {

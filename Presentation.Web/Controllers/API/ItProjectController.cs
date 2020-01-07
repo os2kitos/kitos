@@ -18,6 +18,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
@@ -47,6 +48,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="pagingModel"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -83,6 +85,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [DeprecatedApi]
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
             try
@@ -112,6 +115,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -136,6 +140,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -176,6 +181,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="pagingModel"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -212,6 +218,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrgUnitDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
         {
             try
@@ -277,6 +284,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId"></param>
         /// <param name="organizationUnit"></param>
         /// <returns></returns>
+        [DeprecatedApi]
         public HttpResponseMessage DeleteOrganizationUnitsUsingThisProject(int id, int organizationId, [FromUri] int organizationUnit)
         {
             try
@@ -563,6 +571,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] bool itProjects)
         {
             try
@@ -584,6 +593,7 @@ namespace Presentation.Web.Controllers.API
         /// <param name="usageId"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
+        [DeprecatedApi]
         public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] int usageId)
         {
             try
@@ -604,8 +614,7 @@ namespace Presentation.Web.Controllers.API
         protected override ItProject PostQuery(ItProject item)
         {
             //Makes sure to create the necessary properties, like phases
-            //force set access modifier to 0
-            item.AccessModifier = 0;
+            item.AccessModifier = AccessModifier.Local;
             return _itProjectService.AddProject(item);
         }
 
@@ -622,7 +631,7 @@ namespace Presentation.Web.Controllers.API
                 return Forbidden();
             }
             //force set access modifier to 0
-            dto.AccessModifier = 0;
+            dto.AccessModifier = AccessModifier.Local;
             return base.Post(dto);
         }
 
@@ -672,7 +681,7 @@ namespace Presentation.Web.Controllers.API
             project.LastChangedByUser = KitosUser;
 
             //force set access modifier to 0
-            project.AccessModifier = 0;
+            project.AccessModifier = AccessModifier.Local;
 
             PatchQuery(project, null);
 

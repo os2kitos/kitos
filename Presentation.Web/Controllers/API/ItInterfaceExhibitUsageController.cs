@@ -12,6 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItInterfaceExhibitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;
@@ -57,6 +58,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage Post(int usageId, int exhibitId, ItInterfaceExhibitUsageDTO dto)
         {
             try
@@ -79,6 +81,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [DeprecatedApi]
         public HttpResponseMessage Delete(int usageId, int exhibitId)
         {
             try

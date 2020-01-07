@@ -8,6 +8,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class SSOConfigController : BaseApiController
     {
         [AllowAnonymous]

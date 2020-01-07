@@ -7,6 +7,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [DeprecatedApi]
     public class SensitiveDataTypeController : GenericOptionApiController<SensitiveDataType, ItSystemUsage, OptionDTO>
     {
         public SensitiveDataTypeController(IGenericRepository<SensitiveDataType> repository)
