@@ -17,6 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -51,6 +52,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<OrganizationUnit>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetResponsibleOrganizationUnit(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
@@ -73,6 +75,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<Organization>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetOrganization(int contractKey)
         {
             var entity = Repository.GetByKey(contractKey).Organization;
@@ -121,6 +124,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({key})/Supplier")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetSupplier(int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -139,6 +143,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItContract>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetItContracts(int orgKey, int contractKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == contractKey);

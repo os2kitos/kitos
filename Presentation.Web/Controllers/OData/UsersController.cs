@@ -86,17 +86,16 @@ namespace Presentation.Web.Controllers.OData
         [HttpGet]
         public IHttpActionResult IsEmailAvailable(string email)
         {
-            if (EmailExists(email))
-                return Ok(false);
-            else
-                return Ok(true);
+            var available = EmailExists(email) == false;
+
+            return Ok(available);
         }
 
         [ODataRoute("GetUserByEmail(email={email})")]
         public IHttpActionResult GetUserByEmail(string email)
         {
             var userToReturn = this._repository.AsQueryable().FirstOrDefault(u => u.Email.ToLower() == email.ToLower());
-            if(userToReturn != null)
+            if (userToReturn != null)
             {
                 return Ok(userToReturn);
             }
@@ -116,6 +115,7 @@ namespace Presentation.Web.Controllers.OData
         //GET /Organizations(1)/DefaultOrganizationForUsers
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
+        [DeprecatedApi]
         public IHttpActionResult GetDefaultOrganizationForUsers(int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

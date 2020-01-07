@@ -4,7 +4,8 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
+    [InternalApi]
+    [ControllerEvaluationCompleted]
     public class ConfigsController : BaseEntityController<Core.DomainModel.Config>
     {
         public ConfigsController(IGenericRepository<Core.DomainModel.Config> repository, IAuthenticationService authService)

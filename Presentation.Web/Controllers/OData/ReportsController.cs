@@ -16,6 +16,7 @@ namespace Presentation.Web.Controllers.OData
 
         // GET /Organizations(1)/Reports
         [ODataRoute("Organizations({key})/Reports")]
+        [DeprecatedApi]
         public IHttpActionResult GetReportsByOrganization(int key)
         {
             return GetByOrganizationKey(key);

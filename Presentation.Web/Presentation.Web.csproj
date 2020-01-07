@@ -1323,17 +1323,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Tests\Models\" />
-    <Folder Include="Views\ArchiveLocations\" />
-    <Folder Include="Views\ArchivePeriod\" />
-    <Folder Include="Views\AttachedOptionsRegularPersonalData\" />
-    <Folder Include="Views\AttachedOptionsSensitivePersonalDataController\" />
-    <Folder Include="Views\BaseAttachedOptions\" />
-    <Folder Include="Views\BaseAttachedOption\" />
-    <Folder Include="Views\BaseOdataAuthorization\" />
-    <Folder Include="Views\Contactperson\" />
-    <Folder Include="Views\Dataworker\" />
-    <Folder Include="Views\RegisterType\" />
-    <Folder Include="Views\Test\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

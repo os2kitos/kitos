@@ -21,6 +21,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;

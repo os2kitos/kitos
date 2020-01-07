@@ -17,8 +17,8 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
-// doesn't derive from BaseEntityController because we need absolute control over what is exposed here
     {
         private readonly IGenericRepository<EconomyStream> _repository;
         private readonly IGenericRepository<User> _userRepository;
@@ -27,6 +27,31 @@ namespace Presentation.Web.Controllers.OData
         {
             _repository = repository;
             _userRepository = userRepository;
+        }
+
+        public override IHttpActionResult Get()
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override IHttpActionResult Get(int key)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override IHttpActionResult Post(EconomyStream entity)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override IHttpActionResult Patch(int key, Delta<EconomyStream> delta)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override IHttpActionResult Delete(int key)
+        {
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         // GET /Organizations(1)/ItContracts
@@ -67,6 +92,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetAllExtern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -88,6 +114,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetAllIntern(int orgKey, int contractKey)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -109,6 +136,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams({key})")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetSingleExtern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
@@ -131,6 +159,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams({key})")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetSingleIntern(int orgKey, int contractKey, int key)
         {
             if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))

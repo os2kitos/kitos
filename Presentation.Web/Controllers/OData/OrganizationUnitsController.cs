@@ -30,6 +30,7 @@ namespace Presentation.Web.Controllers.OData
         //GET /OrganizationUnits(1)
         [EnableQuery]
         [ODataRoute("OrganizationUnits({unitKey})")]
+        [DeprecatedApi]
         public IHttpActionResult GetOrganizationUnit(int unitKey)
         {
             return base.Get(unitKey);
@@ -53,6 +54,7 @@ namespace Presentation.Web.Controllers.OData
         // GET /Organizations(1)/OrganizationUnits(1)
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})")]
+        [DeprecatedApi]
         public IHttpActionResult GetOrganizationUnit(int orgKey, int unitKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == unitKey);

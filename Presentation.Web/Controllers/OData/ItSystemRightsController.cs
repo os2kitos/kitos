@@ -17,6 +17,7 @@ namespace Presentation.Web.Controllers.OData
     using System.Net;
 
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
         public ItSystemRightsController(
@@ -31,6 +32,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
+        [DeprecatedApi]
         public IHttpActionResult GetByItSystem(int orgId, int usageId)
         {
             var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();

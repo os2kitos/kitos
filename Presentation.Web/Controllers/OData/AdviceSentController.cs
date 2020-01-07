@@ -5,7 +5,8 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [PublicApi]
+    [InternalApi]
+    [ControllerEvaluationCompleted]
     public class AdviceSentController : BaseEntityController<AdviceSent>
     {
         public AdviceSentController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService): 

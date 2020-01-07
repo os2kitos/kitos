@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
@@ -17,6 +16,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
         public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
@@ -55,6 +55,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItSystem>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetItSystems(int orgKey, int sysKey)
         {
             var system = Repository.GetByKey(sysKey);

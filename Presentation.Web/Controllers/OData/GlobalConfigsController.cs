@@ -5,6 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class GlobalConfigsController : BaseEntityController<Core.DomainModel.GlobalConfig>
     {
         public GlobalConfigsController(IGenericRepository<Core.DomainModel.GlobalConfig> repository, IAuthenticationService authService)

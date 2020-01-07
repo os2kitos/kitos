@@ -64,6 +64,7 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/LastChangedByUser")]
+        [DeprecatedApi]
         public virtual IHttpActionResult GetLastChangedByUser(int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -78,6 +79,7 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/ObjectOwner")]
+        [DeprecatedApi]
         public virtual IHttpActionResult GetObjectOwner(int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -92,6 +94,7 @@ namespace Presentation.Web.Controllers.OData
 
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/Type")]
+        [DeprecatedApi]
         public virtual IHttpActionResult GetType(int orgKey)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
@@ -164,6 +167,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [DeprecatedApi]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

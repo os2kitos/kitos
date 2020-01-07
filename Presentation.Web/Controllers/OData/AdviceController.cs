@@ -4,13 +4,11 @@ using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Hangfire;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Results;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 
@@ -19,7 +17,8 @@ namespace Presentation.Web.Controllers.OData
     using Core.DomainModel.AdviceSent;
     using System.Net;
 
-    [PublicApi]
+    [InternalApi]
+    [ControllerEvaluationCompleted]
     public class AdviceController : BaseEntityController<Advice>
     {
         readonly IAdviceService _adviceService;
@@ -189,6 +188,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
+        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
         public IHttpActionResult GetAdvicesByObjectID(int id, ObjectType type)
         {
@@ -204,6 +204,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<Advice>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [DeprecatedApi]
         public IHttpActionResult GetByOrganization([FromODataUri]int orgKey)
         {
             var currentOrgId = AuthService.GetCurrentOrganizationId(UserId);

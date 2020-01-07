@@ -6,9 +6,11 @@ using System.Web.OData;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [ControllerEvaluationCompleted]
     public abstract class BaseOptionController<TType, TDomainModelType> : BaseEntityController<TType>
         where TType : OptionEntity<TDomainModelType>
     {

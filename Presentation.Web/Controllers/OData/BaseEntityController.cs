@@ -9,11 +9,13 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [ControllerEvaluationCompleted]
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated

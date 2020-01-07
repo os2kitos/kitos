@@ -12,10 +12,12 @@ using Microsoft.OData.UriParser;
 using Ninject;
 using Ninject.Extensions.Logging;
 using System.Web.Http.Routing;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [ControllerEvaluationCompleted]
     public abstract class BaseController<T> : ODataController where T : class
     {
         protected readonly IGenericRepository<T> Repository;

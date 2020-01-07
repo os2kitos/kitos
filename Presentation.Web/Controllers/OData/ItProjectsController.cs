@@ -5,7 +5,6 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
@@ -19,6 +18,7 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -74,6 +74,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetItProjects(int orgKey, int projKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);

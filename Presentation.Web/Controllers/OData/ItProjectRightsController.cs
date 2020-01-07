@@ -8,26 +8,27 @@ using Core.ApplicationServices;
  using Presentation.Web.Infrastructure.Attributes;
  using Swashbuckle.OData;
  using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Net;
 
  namespace Presentation.Web.Controllers.OData
 {
-    using System;
-    using System.Net;
-
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
-        private IAuthenticationService _authService;
+        private readonly IAuthenticationService _authService;
         public ItProjectRightsController(IGenericRepository<ItProjectRight> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
-            this._authService = authService;
+            _authService = authService;
         }
 
         // GET /Organizations(1)/ItProjects(1)/Rights
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
+        [DeprecatedApi]
         public IHttpActionResult GetByItProject(int orgId, int projId)
         {
             // TODO figure out how to check auth

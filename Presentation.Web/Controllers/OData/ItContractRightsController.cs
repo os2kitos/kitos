@@ -15,9 +15,10 @@ namespace Presentation.Web.Controllers.OData
     using System.Net;
 
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItContractRightsController : BaseEntityController<ItContractRight>
     {
-        private IAuthenticationService _authService;
+        private readonly IAuthenticationService _authService;
         public ItContractRightsController(IGenericRepository<ItContractRight> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
@@ -28,6 +29,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Organizations({orgId})/ItContracts({contractId})/Rights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
+        [DeprecatedApi]
         public IHttpActionResult GetByItContract(int orgId, int contractId)
         {
             // TODO figure out how to check auth
@@ -39,6 +41,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         [ODataRoute("Users({userId})/ItContractRights")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContractRight>>))]
+        [DeprecatedApi]
         public IHttpActionResult GetByUser(int userId)
         {
             // TODO figure out how to check auth

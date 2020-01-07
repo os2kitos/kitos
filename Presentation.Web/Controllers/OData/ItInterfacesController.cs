@@ -14,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [ControllerEvaluationCompleted]
     public class ItInterfacesController : BaseEntityController<ItInterface>
     {
         private readonly IAuthenticationService _authService;
@@ -52,6 +53,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [DeprecatedApi]
         public IHttpActionResult GetItInterfaces(int orgKey, int interfaceKey)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == interfaceKey);
