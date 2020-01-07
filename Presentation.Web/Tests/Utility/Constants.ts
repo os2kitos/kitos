@@ -75,6 +75,10 @@ class Constants {
 
     readonly kendoSystemDeleteButton = "deleteSystemButton";
 
+    readonly kleStatusLabel = "KLEStatusLabel";
+    readonly kleChangesButton = "KLEChangesButton";
+    readonly kleUpdateButton = "UpdateKLEButton";
+
 }
 
 export = Constants;

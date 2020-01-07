@@ -18,16 +18,15 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     });
 
     it("Is able to see if there is an update for KLE", () => {
-        expect(element(by.id("KLEStatusLabel")).isDisplayed());
+        expect(element(by.id(consts.kleStatusLabel)).isDisplayed());
     });
 
-    it("Is able to download xml file with changes to the newest version", () => {
-       //TODO
+    it("Is able to see the button for KLE changes", () => {
+        expect(element(by.id(consts.kleChangesButton)).isDisplayed());
     });
 
-    it("Is able to import newest KLE changes", () => {
-        //TODO
+    it("Is able to see the button for importing KLE changes", () => {
+        expect(element(by.id(consts.kleUpdateButton)).isDisplayed());
     });
-
 });
 

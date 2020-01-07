@@ -15,6 +15,7 @@
 
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify) => {
         $rootScope.page.title = "Andet";
+        //TODO Call backend for status
         $scope.KLEupdateReady = false;
 
         if ($scope.KLEupdateReady) {
@@ -45,13 +46,14 @@
             });
         };
 
-        $scope.GetKLEChanges = function() {
+        $scope.GetKLEChanges = function () {
+            //TODO Query for database changes in xml format
             notify.addSuccessMessage("Henter ændringer");
         }
 
         $scope.UpdateKLE = function () {
             if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
-
+                //TODO Query database to update
                 notify.addSuccessMessage("KLE er nu opdateret!");
                 
             } else {
