@@ -10,6 +10,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class AttachedOptionsRegularPersonalDataController : AttachedOptionsFunctionController<ItSystem, RegularPersonalDataType, LocalRegularPersonalDataType>
     {
         public AttachedOptionsRegularPersonalDataController(

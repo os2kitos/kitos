@@ -12,6 +12,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class AttachedOptionsRegisterTypesController : AttachedOptionsFunctionController<ItSystemUsage, RegisterType, LocalRegisterType>
     {
         public AttachedOptionsRegisterTypesController(

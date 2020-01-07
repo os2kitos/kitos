@@ -1,13 +1,13 @@
 ﻿using Presentation.Web.Infrastructure.Attributes;
+using Core.ApplicationServices;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
-    using Core.ApplicationServices;
-    using Core.DomainModel.ItSystem;
-    using Core.DomainModel.ItSystemUsage;
-    using Core.DomainServices;
-
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class ItSystemCategoriesController : BaseOptionController<ItSystemCategories, ItSystemUsage>
     {
         public ItSystemCategoriesController(
@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.OData.OptionControllers
             IAuthenticationService authService)
             : base(repository, authService)
         {
-            
+
         }
     }
 }

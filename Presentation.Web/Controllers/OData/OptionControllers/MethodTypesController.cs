@@ -6,6 +6,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class MethodTypesController : BaseOptionController<MethodType, ItInterface>
     {
         public MethodTypesController(IGenericRepository<MethodType> repository, IAuthenticationService authService)

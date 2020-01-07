@@ -13,6 +13,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class AttachedOptionsFunctionController<TEntity, TOption, TLocalOption> : AttachedOptionsController
     where TEntity : Entity
     where TOption : OptionHasChecked<TEntity>

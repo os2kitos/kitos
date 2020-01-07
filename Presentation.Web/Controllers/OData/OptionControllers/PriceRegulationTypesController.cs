@@ -6,6 +6,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
+    [ControllerEvaluationCompleted]
     public class PriceRegulationTypesController : BaseOptionController<PriceRegulationType, ItContract>
     {
         public PriceRegulationTypesController(IGenericRepository<PriceRegulationType> repository, IAuthenticationService authService)
