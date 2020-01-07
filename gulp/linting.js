@@ -5,7 +5,7 @@ const paths = require("../paths.config.js");
 
 
 // run tslint on all typescript files.
-const tsLint = function() {
+const tsLint = function (callBack) {
     const tslint = require("gulp-tslint");
 
     return src("Presentation.Web/app**/*.ts")
@@ -14,14 +14,12 @@ const tsLint = function() {
 };
 
 // run eslint on all javascript files
-const esLint = function() {
+const esLint = function (callBack) {
     const eslint = require("gulp-eslint");
 
     return src(paths.allJavaScript)
 		.pipe(eslint())
 		.pipe(eslint.format());
-    // Use this to fail build on errors
-    //.pipe(eslint.failAfterError());
 };
 
 

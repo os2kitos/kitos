@@ -10,10 +10,10 @@ const deploy = require("./gulp/deploy.js");
 
 
 // watch for file changes and run linters.
-exports.watch =  function(cb) {
+exports.watch = function (callBack) {
     watch(paths.allTypeScript, ["ts-lint"]);
     watch(paths.allJavaScript, ["es-lint"]);
-    cb();
+    callBack();
 };
 
 exports.deployProd = deploy.deployProd;

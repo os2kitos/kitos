@@ -7,7 +7,7 @@ var del = require("del");
 var paths = require("../paths.config.js");
 
 
-const cleanProtractor = function(cb) {
+const cleanProtractor = function(callBack) {
     return del("tmp");
 }
 

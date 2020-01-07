@@ -4,7 +4,7 @@ const { src, dest, series, parallel} = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var del = require("del");
-var cleanCss = require("gulp-clean-css");
+var minifyCss = require("gulp-clean-css");
 var sourceMaps = require("gulp-sourcemaps");
 var ts = require("gulp-typescript");
 var rename = require("gulp-rename");
@@ -15,32 +15,31 @@ var config = require("../bundle.config.js");
 var tsProject = ts.createProject("tsconfig.json");
 
 //Synchronously delete the output script file(s)
-const cleanJsAndMaps = function(cb) {
+const cleanJsAndMaps = function (callBack) {
     return del(paths.typescriptOutput, paths.allJavaScriptNoTests, paths.appMaps);
 };
 
 // create css bundled file
-const css = function(cb) {
+const css = function (callBack) {
     return src(config.libraryStylesSrc.concat(config.customCssSrc))
         .pipe(sourceMaps.init())
         .pipe(less())
         .pipe(concat(config.cssBundle))
         .pipe(dest(config.cssDest))
-        .pipe(cleanCss())
+        .pipe(minifyCss())
         .pipe(concat(config.cssBundleMin))
         .pipe(sourceMaps.write(config.maps))
         .pipe(dest(config.cssDest));
 };
 
-const typescript = function(cb) {
+const typescript = function (callBack) {
     const tsResult = tsProject.src()
         .pipe(tsProject());
 
     return tsResult.js.pipe(dest(paths.source));
 };
 
-
-const cleanScriptBundles = function(cb) {
+const cleanScriptBundles = function (callBack) {
     return del([
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
@@ -52,7 +51,7 @@ const cleanScriptBundles = function(cb) {
 const cleanScripts = parallel(cleanScriptBundles, cleanJsAndMaps);
 
 // create external library bundled file
-const libraryBundle = function(cb) {
+const libraryBundle = function (callBack) {
     return src(config.librarySrc)
         .pipe(sourceMaps.init())
         .pipe(concat(config.libraryBundle))
@@ -61,7 +60,7 @@ const libraryBundle = function(cb) {
 };
 
 // create angular library bundled file
-const angularBundle = function(cb) {
+const angularBundle = function (callBack) {
     return src(config.angularSrc)
         .pipe(sourceMaps.init())
         .pipe(concat(config.angularBundle))
@@ -70,7 +69,7 @@ const angularBundle = function(cb) {
 };
 
 // create app bundled file
-const appBundle = function(cb) {
+const appBundle = function (callBack) {
     return src(config.appSrc)
         .pipe(sourceMaps.init())
         .pipe(concat(config.appBundle))
@@ -80,7 +79,7 @@ const appBundle = function(cb) {
 };
 
 // create app report bundled file
-const appReportBundle = function(cb) {
+const appReportBundle = function (callBack) {
     return src(config.appReportSrc)
         .pipe(sourceMaps.init())
         .pipe(concat(config.appReportBundle))
@@ -90,7 +89,7 @@ const appReportBundle = function(cb) {
 };
 
 // delete style output folders
-const cleanStyles = function(cb) {
+const cleanStyles = function (callBack) {
     return del([
         config.fontDest,
         config.cssDest,
@@ -99,31 +98,31 @@ const cleanStyles = function(cb) {
 };
 
 // copy assets
-const assets = function(cb) {
+const assets = function (callBack) {
     return src(config.assetsSrc)
         .pipe(dest(config.cssDest));
 };
 
 // copy fonts
-const fonts = function(cb) {
+const fonts = function (callBack) {
     return src(config.fontSrc)
         .pipe(dest(config.fontDest));
 };
 
 // copy tinyMCE fonts
-const tinyMCEFonts = function(cb) {
+const tinyMCEFonts = function (callBack) {
     return src(config.tinyMCEFontSrc)
         .pipe(dest(config.tinyMCEFontDest));
 };
 
-const tinyMCEFixCss = function(cb) {
+const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
     .pipe(dest(paths.sourceScript + "/skins/lightgray"))
     .pipe(rename("skin.min.css"))
     .pipe(dest(paths.sourceScript + "/skins/lightgray"));
 };
 
-const tinyMCEFixLang = function(cb) {
+const tinyMCEFixLang = function (callBack) {
     return file("da.js", "//Dummy file from gulp", { src: true })
     .pipe(dest(paths.sourceScript + "/langs"));
 };
@@ -131,14 +130,10 @@ const tinyMCEFixLang = function(cb) {
 // bundle, minify and copy styles, fonts and assets
 const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang));
 
-
 // run bundle tasks
 const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle, appReportBundle));
 
-
 // bundle and deploy scripts and styles
 exports.deployProd = series(typescript, parallel(scripts, styles), cleanJsAndMaps);
-
-
 
 exports.clean = parallel(cleanStyles, cleanScripts);
