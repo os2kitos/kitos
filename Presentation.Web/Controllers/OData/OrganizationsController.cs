@@ -167,7 +167,6 @@ namespace Presentation.Web.Controllers.OData
         }
 
         [EnableQuery]
-        [DeprecatedApi]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
             var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);

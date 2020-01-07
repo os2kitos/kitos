@@ -28,7 +28,6 @@ namespace Presentation.Web.Controllers.API
             _useRepository = useRepository;
         }
 
-        [DeprecatedApi]
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
         {
             if (!string.IsNullOrWhiteSpace(q))
