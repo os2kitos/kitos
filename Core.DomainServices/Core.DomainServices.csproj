@@ -74,6 +74,8 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEStatus.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />
@@ -87,6 +89,10 @@
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
