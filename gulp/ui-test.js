@@ -4,6 +4,7 @@ var {src, series} = require("gulp");
 var log = require("fancy-log");
 var protractor = require("gulp-protractor");
 var del = require("del");
+var paths = require("../paths.config.js");
 
 
 const cleanProtractor = function(cb) {
@@ -15,8 +16,7 @@ const protractorHeadless = function (done) {
     const params = process.argv;
     const args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
-    const singleSpec = "Presentation.Web/Tests/**/*.e2e.spec.js";
-    src(singleSpec) 
+    src(paths.e2eFiles) 
         .pipe(protractor.protractor({
             configFile: "protractor.headless.conf.js",
             args: [
@@ -41,9 +41,8 @@ const protractorLocal = function(done) {
     const args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
     log.info(`e2e arguments: ${args}`);
-
-    const singleSpec = "Presentation.Web/Tests/**/*.e2e.spec.js";
-    src(singleSpec) 
+    
+    src(paths.e2eFiles) 
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",
             args: [
@@ -69,7 +68,7 @@ const protractorSingle = function (done) {
     log.info(`e2e arguments: ${args}`);
 
     const singleSpec = args[3].split("=")[1];
-    const singleSpecPath = `Presentation.Web/Tests/${singleSpec}`;
+    const singleSpecPath = `${paths.source}/Tests/${singleSpec}`;
     log.info(singleSpecPath);
     src(singleSpecPath) 
         .pipe(protractor.protractor({
