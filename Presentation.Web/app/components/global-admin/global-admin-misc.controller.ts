@@ -16,9 +16,9 @@
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify) => {
         $rootScope.page.title = "Andet";
         //TODO Call backend for status
-        $scope.KLEupdateReady = false;
+        $scope.KLEupdateReadyStep1 = true;
 
-        if ($scope.KLEupdateReady) {
+        if ($scope.KLEupdateReadyStep1) {
             $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar!";
         } 
         else 
@@ -47,7 +47,8 @@
         };
 
         $scope.GetKLEChanges = function () {
-            //TODO Query for database changes in xml format
+            //TODO Query for database changes in xml format.
+            $scope.KLEupdateReadyStep2 = true;
             notify.addSuccessMessage("Henter ændringer");
         }
 
