@@ -4,15 +4,15 @@ const { src, dest, series, parallel} = require("gulp");
 var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var del = require("del");
-var minifyCSS = require("gulp-minify-css");
-var sourcemaps = require("gulp-sourcemaps");
-var ts = require('gulp-typescript');
-var rename = require('gulp-rename');
-var file = file = require('gulp-file');
-var less = require('gulp-less');
+var cleanCss = require("gulp-clean-css");
+var sourceMaps = require("gulp-sourcemaps");
+var ts = require("gulp-typescript");
+var rename = require("gulp-rename");
+var file = file = require("gulp-file");
+var less = require("gulp-less");
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
-var tsProject = ts.createProject('tsconfig.json');
+var tsProject = ts.createProject("tsconfig.json");
 
 //Synchronously delete the output script file(s)
 const cleanJsAndMaps = function(cb) {
@@ -22,13 +22,13 @@ const cleanJsAndMaps = function(cb) {
 // create css bundled file
 const css = function(cb) {
     return src(config.libraryStylesSrc.concat(config.customCssSrc))
-        .pipe(sourcemaps.init())
+        .pipe(sourceMaps.init())
         .pipe(less())
         .pipe(concat(config.cssBundle))
         .pipe(dest(config.cssDest))
-        .pipe(minifyCSS())
+        .pipe(cleanCss())
         .pipe(concat(config.cssBundleMin))
-        .pipe(sourcemaps.write(config.maps))
+        .pipe(sourceMaps.write(config.maps))
         .pipe(dest(config.cssDest));
 };
 
@@ -54,38 +54,38 @@ const cleanScripts = parallel(cleanScriptBundles, cleanJsAndMaps);
 // create external library bundled file
 const libraryBundle = function(cb) {
     return src(config.librarySrc)
-        .pipe(sourcemaps.init())
+        .pipe(sourceMaps.init())
         .pipe(concat(config.libraryBundle))
-        .pipe(sourcemaps.write(config.maps))
+        .pipe(sourceMaps.write(config.maps))
         .pipe(dest(paths.sourceScript));
 };
 
 // create angular library bundled file
 const angularBundle = function(cb) {
     return src(config.angularSrc)
-        .pipe(sourcemaps.init())
+        .pipe(sourceMaps.init())
         .pipe(concat(config.angularBundle))
-        .pipe(sourcemaps.write(config.maps))
+        .pipe(sourceMaps.write(config.maps))
         .pipe(dest(paths.sourceScript));
 };
 
 // create app bundled file
 const appBundle = function(cb) {
     return src(config.appSrc)
-        .pipe(sourcemaps.init())
+        .pipe(sourceMaps.init())
         .pipe(concat(config.appBundle))
         .pipe(uglify())
-        .pipe(sourcemaps.write(config.maps))
+        .pipe(sourceMaps.write(config.maps))
         .pipe(dest(paths.sourceScript));
 };
 
 // create app report bundled file
 const appReportBundle = function(cb) {
     return src(config.appReportSrc)
-        .pipe(sourcemaps.init())
+        .pipe(sourceMaps.init())
         .pipe(concat(config.appReportBundle))
         .pipe(uglify())
-        .pipe(sourcemaps.write(config.maps))
+        .pipe(sourceMaps.write(config.maps))
         .pipe(dest(paths.sourceScript));
 };
 
