@@ -20,6 +20,7 @@ using Core.DomainModel.AdviceSent;
 using Presentation.Web.Models;
 using System.Linq;
 using System.Web.Http.Description;
+using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Odata;
 
