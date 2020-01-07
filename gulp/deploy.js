@@ -3,7 +3,6 @@ var concat = require("gulp-concat");
 var uglify = require("gulp-uglify");
 var del = require("del");
 var minifyCSS = require("gulp-minify-css");
-var bower = require("gulp-bower");
 var sourcemaps = require("gulp-sourcemaps");
 var runSequence = require('run-sequence');
 var ts = require('gulp-typescript');
@@ -127,11 +126,6 @@ gulp.task("tinyMCEFixCss", ["clean-styles"], function () {
 gulp.task("tinyMCEFixLang", ["clean-styles"], function () {
     return file("da.js", "//Dummy file from gulp", { src: true })
     .pipe(gulp.dest(paths.sourceScript + "/langs"));
-});
-
-// restore all bower packages
-gulp.task("bower-restore", function () {
-    return bower(paths.bowerComponents);
 });
 
 // bundle, minify and copy styles, fonts and assets
