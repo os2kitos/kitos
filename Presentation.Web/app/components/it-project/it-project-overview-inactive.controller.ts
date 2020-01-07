@@ -93,6 +93,12 @@
             this.gridState.saveGridOptions(this.mainGrid);
         }
 
+        // Resets the scrollbar position
+        private onPaging = () => {
+            this.mainGrid.content.scrollTop(0);
+            this.mainGrid.content.scrollLeft(0);
+        }
+
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             //Add only excel option if user is not readonly
@@ -294,6 +300,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,

@@ -104,6 +104,7 @@
                     $(".k-grid-excel").click(() => {
                         kendo.ui.progress(this.mainGrid.element, true);
                     });
+
                 }
 
             });
@@ -208,17 +209,32 @@
                         },
                         parse: response => {
                             // iterrate each usage
-                            this._.forEach(response.value, system => {
-                                if (!system.Reference) { system.Reference = { Title: "", ExternalReferenceId: "" }; }
-                                if (!system.Parent) { system.Parent = { Name: "" }; }
-                                if (!system.BusinessType) { system.BusinessType = { Name: "" }; }
-                                if (!system.AppTypeOption) { system.AppTypeOption = { Name: "" }; }
-                                if (!system.BelongsTo) { system.BelongsTo = { Name: "" }; }
-                                if (!system.Usages) { system.Usages = []; }
-                                if (!system.Organization) { system.Organization = { Name: "" }; }
+                            this._.forEach(response.value,
+                                system => {
+                                    if (!system.Reference) {
+                                        system.Reference = { Title: "", ExternalReferenceId: "" };
+                                    }
+                                    if (!system.Parent) {
+                                        system.Parent = { Name: "" };
+                                    }
+                                    if (!system.BusinessType) {
+                                        system.BusinessType = { Name: "" };
+                                    }
+                                    if (!system.AppTypeOption) {
+                                        system.AppTypeOption = { Name: "" };
+                                    }
+                                    if (!system.BelongsTo) {
+                                        system.BelongsTo = { Name: "" };
+                                    }
+                                    if (!system.Usages) {
+                                        system.Usages = [];
+                                    }
+                                    if (!system.Organization) {
+                                        system.Organization = { Name: "" };
+                                    }
 
 
-                            });
+                                });
                             return response;
                         }
                     },
@@ -280,12 +296,13 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                dataBound: this.saveGridOptions,
+                dataBound: this.saveGridOptions, 
                 columnResize: this.saveGridOptions,
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "Usages", title: "Anvendes", width: 40,
@@ -642,6 +659,8 @@
                     noDataTemplate: ""
                 });
             }
+            
+            
         }
 
         public createITSystem() {
@@ -709,6 +728,12 @@
         // saves grid state to localStorage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // Resets the scrollbar position
+        private onPaging = () => {
+            this.mainGrid.content.scrollTop(0);
+            this.mainGrid.content.scrollLeft(0);
         }
 
         // loads kendo grid options from localstorage
@@ -1072,8 +1097,8 @@
                 dataSource.filter(newFilter);
             }
 
-
-
+    
+           
             // http://dojo.telerik.com/ODuDe/5
             args.element.removeAttr("data-bind");
             args.element.kendoDropDownList({

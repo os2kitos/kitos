@@ -5,7 +5,6 @@
         mainGrid: Kitos.IKendoGrid<IItProjectOverview>;
         mainGridOptions: kendo.ui.GridOptions;
         roleSelectorOptions: any;
-
         saveGridProfile(): void;
         loadGridProfile(): void;
         clearGridProfile(): void;
@@ -165,6 +164,12 @@
         // saves grid state to localStorage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // Resets the scrollbar position
+        private onPaging = () => {
+            this.mainGrid.content.scrollTop(0);
+            this.mainGrid.content.scrollLeft(0);
         }
 
         // loads kendo grid options from localstorage
@@ -393,6 +398,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "ItProjectId", title: "ProjektID", width: 115,
