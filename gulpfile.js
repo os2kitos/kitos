@@ -1,4 +1,3 @@
-/// <binding BeforeBuild='deployProd' />
 "use strict";
 
 const { watch } = require("gulp");
