@@ -15,6 +15,15 @@
 
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify) => {
         $rootScope.page.title = "Andet";
+        $scope.KLEupdateReady = false;
+
+        if ($scope.KLEupdateReady) {
+            $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar!";
+        } 
+        else 
+        {
+            $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! (1.2.3)";
+        }
 
         $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
             return g.key === "CanGlobalAdminOnlyEditReports";
@@ -35,5 +44,19 @@
                 notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
             });
         };
+
+        $scope.GetKLEChanges = function() {
+            notify.addSuccessMessage("Henter ændringer");
+        }
+
+        $scope.UpdateKLE = function () {
+            if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
+
+                notify.addSuccessMessage("KLE er nu opdateret!");
+                
+            } else {
+                notify.addInfoMessage("KLE opdatering stoppet!");
+            }
+        }
     }]);
 })(angular, app);

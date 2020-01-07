@@ -20,11 +20,17 @@
         </label>
         <label class="radio-inline">
             <input type="radio" data-ng-model="canGlobalAdminOnlyEditReports.value" name="inlineRadioOptions"
-                id="inlineRadioYes" value="true" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Ja
+                   id="inlineRadioYes" value="true" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Ja
         </label>
         <label class="radio-inline">
             <input type="radio" data-ng-model="canGlobalAdminOnlyEditReports.value" name="inlineRadioOptions"
-                id="inlineRadioNo" value="false" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Nej
+                   id="inlineRadioNo" value="false" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Nej
         </label>
     </div>
-</div>
+    <h3>KLE</h3>
+    <div class="well">
+        <label class="col-xs-12" style="padding-left: 5px" id="KLEStatusLabel">{{KLEUpdateAvailableLabel}}</label>
+        <button class="btn btn-default" id="KLEChangesButton" ng-disabled="!KLEupdateReady" ng-click="GetKLEChanges()">Vis ændringer i KLE</button>
+        <button class="btn btn-default" id="UpdateKLEButton" ng-disabled="!KLEupdateReady" ng-click="UpdateKLE()">Opdater KLE</button>
+    </div>
+ </div>
