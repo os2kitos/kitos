@@ -1,32 +1,26 @@
-var gulp = require('gulp'),
-    paths = require('../paths.config.js');
+"use strict";
 
-gulp.task('lint', ['es-lint', 'ts-lint']);
+const { src, series } = require("gulp");
+const paths = require("../paths.config.js");
+
 
 // run tslint on all typescript files.
-gulp.task('ts-lint', function () {
-    var tslint = require('gulp-tslint');
+const tsLint = function (callBack) {
+    const tslint = require("gulp-tslint");
 
-    var args = process.argv;
-    var path = paths.allTypeScript;
-    if (args && args.length > 3 && args[3] === '--path') {
-        path = args[4];
-    }
-
-    return gulp.src(path)
+    return src("Presentation.Web/app**/*.ts")
 		.pipe(tslint())
-		.pipe(tslint.report('prose', {
-		    emitError: false // Set to true to fail build on errors
-		}));
-});
+		.pipe(tslint.report());
+};
 
 // run eslint on all javascript files
-gulp.task('es-lint', function () {
-    var eslint = require('gulp-eslint');
+const esLint = function (callBack) {
+    const eslint = require("gulp-eslint");
 
-    return gulp.src(paths.allJavaScript)
+    return src(paths.allJavaScript)
 		.pipe(eslint())
 		.pipe(eslint.format());
-    // Use this to fail build on errors
-    //.pipe(eslint.failAfterError());
-});
+};
+
+
+exports.lint = series(tsLint, esLint);
