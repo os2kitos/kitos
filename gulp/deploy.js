@@ -133,11 +133,11 @@ const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMC
 //gulp.task("styles", ["css", "assets", "fonts", "", "", ""]);
 
 // run bundle tasks
-const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
+const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle, appReportBundle));
 //gulp.task("scripts", ["app-bundle", "library-bundle", "angular-bundle"]);
 
 //// bundle and deploy scripts and styles
-exports.deployProd = series(typescript, parallel(scripts, styles, appReportBundle), cleanJsAndMaps);
+exports.deployProd = series(typescript, parallel(scripts, styles), cleanJsAndMaps);
 //gulp.task("deploy-prod", function (callback) {
 //    runSequence("clean-scripts", "typescript", "library-bundle", "angular-bundle", "app-bundle", "appReport-bundle", "styles", "clean-js-and-maps", callback);
 //});

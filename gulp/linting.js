@@ -1,6 +1,6 @@
 "use strict";
 
-const { src, parallel } = require("gulp");
+const { src, series } = require("gulp");
 const paths = require("../paths.config.js");
 
 
@@ -8,17 +8,9 @@ const paths = require("../paths.config.js");
 const tsLint = function() {
     const tslint = require("gulp-tslint");
 
-    const args = process.argv;
-    var path = paths.allTypeScript;
-    if (args && args.length > 3 && args[3] === "--path") {
-        path = args[4];
-    }
-
-    return src(path)
+    return src("Presentation.Web/app**/*.ts")
 		.pipe(tslint())
-		.pipe(tslint.report("prose", {
-		    emitError: false // Set to true to fail build on errors
-		}));
+		.pipe(tslint.report());
 };
 
 // run eslint on all javascript files
@@ -33,4 +25,4 @@ const esLint = function() {
 };
 
 
-exports.lint = parallel(tsLint, esLint);
+exports.lint = series(tsLint, esLint);
