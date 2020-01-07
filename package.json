@@ -17,8 +17,6 @@
   },
   "homepage": "https://github.com/os2kitos/kitos#readme",
   "devDependencies": {
-    "browser-sync": "^2.13.0",
-    "browserstacktunnel-wrapper": "^1.4.2",
     "del": "^2.2.0",
     "eslint": "^6.8.0",
     "fancy-log": "^1.3.3",
