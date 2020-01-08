@@ -47,7 +47,6 @@ namespace Presentation.Web.Controllers.API
         /// <param name="pagingModel"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        //[DeprecatedApi]
         public HttpResponseMessage GetByOrg([FromUri] int orgId, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
@@ -113,7 +112,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        //[DeprecatedApi]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool? hierarchy)
         {
             try
@@ -138,7 +136,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectOverviewDTO>>))]
-        //[DeprecatedApi]
         public HttpResponseMessage GetOverview(bool? overview, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
         {
             try
