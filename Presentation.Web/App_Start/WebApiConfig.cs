@@ -1,5 +1,4 @@
 ﻿using System.Web.Http;
-using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -19,8 +18,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Presentation.Web.Models;
 using System.Linq;
-using System.Web.Http.Description;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Odata;
 
 namespace Presentation.Web
@@ -39,7 +36,6 @@ namespace Presentation.Web
 
         public static void Register(HttpConfiguration config)
         {
-            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
             config.MapHttpAttributeRoutes();
             var apiCfg = config.Routes.MapHttpRoute(
                 name: "DefaultApi",
