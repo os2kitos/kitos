@@ -41,7 +41,6 @@ namespace Presentation.Web.Controllers.API
             _itContractService = itContractService;
         }
 
-        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractDTO>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]

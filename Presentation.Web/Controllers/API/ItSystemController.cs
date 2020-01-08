@@ -77,7 +77,6 @@ namespace Presentation.Web.Controllers.API
         /// <param name="q">Mulighed for søgning på navneindhold</param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        [DeprecatedApi]
         public HttpResponseMessage GetPublic([FromUri] int organizationId, [FromUri] PagingModel<ItSystem> paging, [FromUri] string q)
         {
             try
@@ -185,7 +184,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [DeprecatedApi]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
         {
