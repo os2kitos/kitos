@@ -13,7 +13,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
-    [DeprecatedApi]
     public class ReportsMunicipalitiesController : BaseOdataAuthorizationController<Organization>
     {
         private readonly IAuthenticationService _authService;

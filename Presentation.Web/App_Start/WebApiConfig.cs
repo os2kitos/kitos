@@ -17,12 +17,10 @@ using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
-using Presentation.Web.Models;
 using System.Linq;
-using System.Web.Http.Description;
 using Presentation.Web.Controllers.OData.ReportsControllers;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Odata;
+using Presentation.Web.Models;
 
 namespace Presentation.Web
 {

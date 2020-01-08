@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [DeprecatedApi]
     public class LocalReportCategoryTypesController : LocalOptionBaseController<LocalReportCategoryType, Report, ReportCategoryType>
     {
         public LocalReportCategoryTypesController(IGenericRepository<LocalReportCategoryType> repository, IAuthenticationService authService, IGenericRepository<ReportCategoryType> optionsRepository)
