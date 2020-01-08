@@ -10,6 +10,7 @@ using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
@@ -27,6 +28,7 @@ using Hangfire;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
@@ -130,6 +132,14 @@ namespace Presentation.Web
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
+            RegisterKLE(kernel);
+        }
+
+        private static void RegisterKLE(IKernel kernel)
+        {
+            kernel.Bind<IKLEApplicationService>().To<KLEApplicationService>();
+            kernel.Bind<IKLEStandardRepository>().To<KLEStandardRepository>();
+            kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>();
         }
 
         private static void RegisterDataAccess(IKernel kernel)
