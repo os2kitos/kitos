@@ -54,7 +54,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     try
                     {
-                        //TODO: Check what happens if we remove this odd stuff
                         _repository.Insert(new ContactPerson
                         {
                             OrganizationId = organization.Id,
