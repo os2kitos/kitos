@@ -17,7 +17,11 @@ using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
+using Presentation.Web.Models;
 using System.Linq;
+using System.Web.Http.Description;
+using Presentation.Web.Controllers.OData.ReportsControllers;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Odata;
 
 namespace Presentation.Web
@@ -165,6 +169,24 @@ namespace Presentation.Web
             taskRefs.HasManyBinding(t => t.ItSystems, entitySetItSystems);
             taskRefs.EntityType.HasKey(x => x.Id);
 
+            var reportsMunicipalities = BindEntitySet<Organization, ReportsMunicipalitiesController>(builder); 
+            reportsMunicipalities.HasManyBinding(o => o.ItSystems, entitySetItSystems);
+            reportsMunicipalities.HasManyBinding(o => o.BelongingSystems, entitySetItSystems);
+
+            var reportsItSystems = BindEntitySet<ItSystem, ReportsItSystemsController>(builder); 
+            reportsItSystems.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
+            reportsItSystems.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
+            reportsItSystems.HasManyBinding(i => i.Children, entitySetItSystems);
+            reportsItSystems.HasRequiredBinding(i => i.Parent, entitySetItSystems);
+
+            //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
+            BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
+
+            //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
+            var ReportsITSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder); 
+            ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
+
+
             var orgNameSpace = entitySetOrganizations;
 
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder); 
@@ -263,6 +285,8 @@ namespace Presentation.Web
             BindEntitySet<TsaType, TsaTypesController>(builder);
 
             BindEntitySet<MethodType, MethodTypesController>(builder);
+
+            BindEntitySet<SensitiveDataType, SensitiveDataTypesController>(builder);
 
             BindEntitySet<RegisterType, RegisterTypesController>(builder);
 
@@ -374,6 +398,9 @@ namespace Presentation.Web
 
             var localPurchaseFormType = BindEntitySet <LocalPurchaseFormType, LocalPurchaseFormTypesController> (builder);
             localPurchaseFormType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+
+            var localReportCategoryType = BindEntitySet <LocalReportCategoryType, LocalReportCategoryTypesController> (builder);
+            localReportCategoryType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var removeOption = builder.Function("RemoveOption");
             removeOption.Parameter<int>("id");
