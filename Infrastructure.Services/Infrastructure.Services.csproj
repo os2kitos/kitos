@@ -46,6 +46,8 @@
     <Compile Include="Cryptography\ICryptoService.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
+    <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
+    <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
