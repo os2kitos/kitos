@@ -85,7 +85,6 @@ namespace Presentation.Web.Controllers.API
         /// <param name="orgId"></param>
         /// <returns></returns>
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        [DeprecatedApi]
         public virtual HttpResponseMessage Get(string q, int orgId)
         {
             try
