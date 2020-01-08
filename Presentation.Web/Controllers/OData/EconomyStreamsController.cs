@@ -28,31 +28,6 @@ namespace Presentation.Web.Controllers.OData
             _userRepository = userRepository;
         }
 
-        public override IHttpActionResult Get()
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
-
-        public override IHttpActionResult Get(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
-
-        public override IHttpActionResult Post(EconomyStream entity)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
-
-        public override IHttpActionResult Patch(int key, Delta<EconomyStream> delta)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
-
-        public override IHttpActionResult Delete(int key)
-        {
-            return StatusCode(HttpStatusCode.MethodNotAllowed);
-        }
-
         // GET /Organizations(1)/ItContracts
         [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
         [ODataRoute("ExternEconomyStreams(Organization={orgKey})")]
