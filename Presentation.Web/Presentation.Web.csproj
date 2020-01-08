@@ -319,6 +319,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\KLEController.cs" />
     <Compile Include="Extensions\DTOMappingExtensions.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
@@ -333,6 +334,7 @@
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
+    <Compile Include="Models\KLEStatusDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
