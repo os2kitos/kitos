@@ -8,22 +8,25 @@
             resolve: {
                 globalConfigs: [
                     "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
-                ]
+                ],
+                KLEUpdateStatus: [
+                    "$http", $http => $http.get("/api/KLEupdateStatus").then(result => result.data.value)
+                    ]
             }
         });
     }]);
 
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEUpdateStatus) => {
         $rootScope.page.title = "Andet";
         //TODO Call backend for status
-        $scope.KLEupdateReadyStep1 = true;
+        $scope.KLEupdateReadyStep1 = KLEUpdateStatus.UpdateReady;
 
         if ($scope.KLEupdateReadyStep1) {
-            $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar!";
+            $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar! " + KLEUpdateStatus.VersionNumber;
         } 
         else 
         {
-            $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! (1.2.3)";
+            $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! " + KLEUpdateStatus.VersionNumber;
         }
 
         $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
