@@ -99,10 +99,12 @@
     <Compile Include="FeatureChecker.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IFeatureChecker.cs" />
+    <Compile Include="IKLEApplicationService.cs" />
     <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+    <Compile Include="KLEApplicationService.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />

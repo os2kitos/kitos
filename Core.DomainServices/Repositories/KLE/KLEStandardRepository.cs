@@ -5,7 +5,7 @@ using Infrastructure.Services.KLEDataBridge;
 
 namespace Core.DomainServices.Repositories.KLE
 {
-    public class KLEStandardRepository
+    public class KLEStandardRepository : IKLEStandardRepository
     {
         private readonly IKLEDataBridge _kleDataBridge;
 

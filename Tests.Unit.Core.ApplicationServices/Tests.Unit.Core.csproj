@@ -128,6 +128,7 @@
       <Link>UserMock.cs</Link>
     </Compile>
     <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
+    <Compile Include="ApplicationServices\KLEApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
