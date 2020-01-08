@@ -28,7 +28,6 @@ namespace Presentation.Web.Controllers.API
             _organizationService = organizationService;
         }
 
-        [DeprecatedApi]
         public override HttpResponseMessage Post(UserDTO dto)
         {
             return NotAllowed();

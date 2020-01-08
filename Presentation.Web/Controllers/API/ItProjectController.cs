@@ -284,7 +284,6 @@ namespace Presentation.Web.Controllers.API
         /// <param name="organizationId"></param>
         /// <param name="organizationUnit"></param>
         /// <returns></returns>
-        [DeprecatedApi]
         public HttpResponseMessage DeleteOrganizationUnitsUsingThisProject(int id, int organizationId, [FromUri] int organizationUnit)
         {
             try
