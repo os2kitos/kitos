@@ -36,6 +36,22 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
+        public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
+        {
+            try
+            {
+                var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
+                var item = _repository.GetByKey(key);
+                var dto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
+                return Ok(dto);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
         /// <summary>
         /// Patches IsWishedFor, ItContractId and InfrastructureId only.
         /// If the entry doesn't exist it's created.
