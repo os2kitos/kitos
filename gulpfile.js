@@ -1,19 +1,27 @@
-/// <binding BeforeBuild='deploy-prod' />
-var gulp = require('gulp'),
-    paths = require('./paths.config.js');
+"use strict";
+
+const { watch } = require("gulp");
+const paths = require("./paths.config.js");
 
 // require gulp tasks from all gulp files
-require('require-dir')('./gulp');
+const linting = require("./gulp/linting.js");
+const test = require("./gulp/ui-test.js");
+const deploy = require("./gulp/deploy.js");
+
 
 // watch for file changes and run linters.
-gulp.task('watch', function () {
-    gulp.watch(paths.allTypeScript, ['ts-lint']);
-    gulp.watch(paths.allJavaScript, ['es-lint']);
-});
+exports.watch = function (callBack) {
+    watch(paths.allTypeScript, ["ts-lint"]);
+    watch(paths.allJavaScript, ["es-lint"]);
+    callBack();
+};
 
-// clean solution
-gulp.task('clean', ["clean-styles", "clean-scripts"], function() {
-    var del = require('del');
+exports.deployProd = deploy.deployProd;
 
-    return del(paths.tempFiles);
-});
+exports.clean = deploy.clean;
+
+exports.lint = linting.lint;
+
+exports.e2eHeadless = test.runProtractorHeadless;
+exports.e2eLocal = test.runProtractorLocal;
+exports.e2eSingle = test.runProtractorSingle;
