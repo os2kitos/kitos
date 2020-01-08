@@ -31,15 +31,17 @@
         }
         
         GetStatus = () => {
-            return this.$http.get<IKLEStatus>(`api/KLEstatus`);
+            return this.$http.get<IKLEStatus>(`api/kle`);
         }
 
         GetChanges = () => {
-            return this.$http.get<IKLEChanges>(`api/KLEchanges`);
+            //return this.$http.get<IKLEChanges>(`api/KLEchanges`);
+            return null;
         }
 
         UpdateKLE = () => {
-            return this.$http.get<IKLEUpdateStatus>(`api/KleUpdate`);
+            //return this.$http.get<IKLEUpdateStatus>(`api/KleUpdate`);
+            return null;
         }
 
     }
