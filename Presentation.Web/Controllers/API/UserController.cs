@@ -30,84 +30,84 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Post(UserDTO dto)
         {
-            return NotAllowed();
-            //try
-            //{
-            //    // do some string magic to determine parameters, and actions
-            //    List<string> parameters = null;
-            //    var sendMailOnCreation = false;
-            //    var sendReminder = false;
-            //    var sendAdvis = false;
-            //    int? orgId = null;
+            //TODO: Hit when sending advis from organisation/brugere.
+            try
+            {
+                // do some string magic to determine parameters, and actions
+                List<string> parameters = null;
+                var sendMailOnCreation = false;
+                var sendReminder = false;
+                var sendAdvis = false;
+                int? orgId = null;
 
-            //    if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
-            //        parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
-            //    if (parameters != null)
-            //    {
-            //        foreach (var parameter in parameters)
-            //        {
-            //            if (parameter.StartsWith("sendMailOnCreation"))
-            //            {
-            //                sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
-            //            }
-            //            if (parameter.StartsWith("sendReminder"))
-            //            {
-            //                sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
-            //            }
-            //            if (parameter.StartsWith("sendAdvis"))
-            //            {
-            //                sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
-            //            }
-            //            if (parameter.StartsWith("organizationId="))
-            //            {
-            //                orgId = int.Parse(parameter.Replace("organizationId=", string.Empty));
-            //            }
-            //        }
-            //    }
+                if (!string.IsNullOrWhiteSpace(Request.RequestUri.Query))
+                    parameters = new List<string>(Request.RequestUri.Query.Replace("?", string.Empty).Split('&'));
+                if (parameters != null)
+                {
+                    foreach (var parameter in parameters)
+                    {
+                        if (parameter.StartsWith("sendMailOnCreation"))
+                        {
+                            sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
+                        }
+                        if (parameter.StartsWith("sendReminder"))
+                        {
+                            sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
+                        }
+                        if (parameter.StartsWith("sendAdvis"))
+                        {
+                            sendAdvis = bool.Parse(parameter.Replace("sendAdvis=", string.Empty));
+                        }
+                        if (parameter.StartsWith("organizationId="))
+                        {
+                            orgId = int.Parse(parameter.Replace("organizationId=", string.Empty));
+                        }
+                    }
+                }
 
-            //    // check if orgId is set, if not return error as we cannot continue without it
-            //    if (!orgId.HasValue)
-            //    {
-            //        return Error("Organization id is missing!");
-            //    }
+                // check if orgId is set, if not return error as we cannot continue without it
+                if (!orgId.HasValue)
+                {
+                    return Error("Organization id is missing!");
+                }
 
-            //    // only global admin is allowed to set others to global admin
-            //    if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
-            //    {
-            //        return Forbidden();
-            //    }
+                // only global admin is allowed to set others to global admin
+                if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
+                {
+                    return Forbidden();
+                }
 
-            //    // check if user already exists and we are not sending a reminder or advis. If so, just return him
-            //    var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
-            //    if (existingUser != null && !sendReminder && !sendAdvis)
-            //        return Ok(Map(existingUser));
-            //    // if we are sending a reminder:
-            //    if (existingUser != null && sendReminder)
-            //    {
-            //        _userService.IssueAdvisMail(existingUser, true, orgId.Value);
-            //        return Ok(Map(existingUser));
-            //    }
-            //    // if we are sending an advis:
-            //    if (existingUser != null && sendAdvis)
-            //    {
-            //        _userService.IssueAdvisMail(existingUser, false, orgId.Value);
-            //        return Ok(Map(existingUser));
-            //    }
+                // check if user already exists and we are not sending a reminder or advis. If so, just return him
+                var existingUser = Repository.Get(u => u.Email == dto.Email).FirstOrDefault();
+                if (existingUser != null && !sendReminder && !sendAdvis)
+                    return Ok(Map(existingUser));
+                // if we are sending a reminder:
+                if (existingUser != null && sendReminder)
+                {
+                    _userService.IssueAdvisMail(existingUser, true, orgId.Value);
+                    return Ok(Map(existingUser));
+                }
+                // if we are sending an advis:
+                if (existingUser != null && sendAdvis)
+                {
+                    _userService.IssueAdvisMail(existingUser, false, orgId.Value);
+                    return Ok(Map(existingUser));
+                }
 
-            //    // otherwise we are creating a new user
-            //    var item = Map(dto);
+                // otherwise we are creating a new user
+                var item = Map(dto);
 
-            //    item.ObjectOwner = KitosUser;
-            //    item.LastChangedByUser = KitosUser;
+                item.ObjectOwner = KitosUser;
+                item.LastChangedByUser = KitosUser;
 
-            //    item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
+                item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
 
-            //    return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
-            //}
-            //catch (Exception e)
-            //{
-            //    return LogError(e);
-            //}
+                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
