@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class CommunicationController : GenericContextAwareApiController<Communication, CommunicationDTO>
     {
         private readonly IItProjectRepository _projectRepository;

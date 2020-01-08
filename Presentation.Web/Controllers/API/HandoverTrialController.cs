@@ -13,7 +13,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class HandoverTrialController : GenericContextAwareApiController<HandoverTrial, HandoverTrialDTO>
     {
         private readonly IItContractRepository _contractRepository;

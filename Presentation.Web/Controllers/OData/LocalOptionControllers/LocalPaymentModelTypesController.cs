@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class LocalPaymentModelTypesController : LocalOptionBaseController<LocalPaymentModelType, ItContract, PaymentModelType>
     {
         public LocalPaymentModelTypesController(IGenericRepository<LocalPaymentModelType> repository, IAuthenticationService authService, IGenericRepository<PaymentModelType> optionsRepository)

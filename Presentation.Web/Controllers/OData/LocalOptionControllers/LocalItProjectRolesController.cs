@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class LocalItProjectRolesController : LocalOptionBaseController<LocalItProjectRole, ItProjectRight, ItProjectRole>
     {
         public LocalItProjectRolesController(IGenericRepository<LocalItProjectRole> repository, IAuthenticationService authService, IGenericRepository<ItProjectRole> optionsRepository)

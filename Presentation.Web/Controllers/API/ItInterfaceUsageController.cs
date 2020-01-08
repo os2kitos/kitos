@@ -12,7 +12,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItInterfaceUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceUsage> _repository;
@@ -20,39 +19,6 @@ namespace Presentation.Web.Controllers.API
         public ItInterfaceUsageController(IGenericRepository<ItInterfaceUsage> repository)
         {
             _repository = repository;
-        }
-
-        [DeprecatedApi]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
-        {
-            try
-            {
-                var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
-                var item = _repository.GetByKey(key);
-                var dto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
-                return Ok(dto);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        public HttpResponseMessage GetByUsage(int usageId)
-        {
-            try
-            {
-                var items = _repository.Get(x => x.ItSystemUsageId == usageId);
-                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]

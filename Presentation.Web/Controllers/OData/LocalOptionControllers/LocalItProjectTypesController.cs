@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class LocalItProjectTypesController : LocalOptionBaseController<LocalItProjectType, ItProject, ItProjectType>
     {
         public LocalItProjectTypesController(IGenericRepository<LocalItProjectType> repository, IAuthenticationService authService, IGenericRepository<ItProjectType> optionsRepository)

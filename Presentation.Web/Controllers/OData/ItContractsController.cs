@@ -17,7 +17,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -46,52 +45,6 @@ namespace Presentation.Web.Controllers.OData
             return Ok(Repository.AsQueryable().Where(x => isGlobalAdmin || x.OrganizationId == orgId));
         }
 
-        // GET /ItContracts(1)/ResponsibleOrganizationUnit
-        [EnableQuery]
-        [ODataRoute("ItContracts({contractKey})/ResponsibleOrganizationUnit")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<OrganizationUnit>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [DeprecatedApi]
-        public IHttpActionResult GetResponsibleOrganizationUnit(int contractKey)
-        {
-            var entity = Repository.GetByKey(contractKey).ResponsibleOrganizationUnit;
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (_authService.HasReadAccess(UserId, entity))
-            {
-                return Ok(entity);
-            }
-
-            return Forbidden();
-        }
-
-        // GET /ItContracts(1)/ResponsibleOrganizationUnit
-        [EnableQuery]
-        [ODataRoute("ItContracts({contractKey})/Organization")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<Organization>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [DeprecatedApi]
-        public IHttpActionResult GetOrganization(int contractKey)
-        {
-            var entity = Repository.GetByKey(contractKey).Organization;
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (_authService.HasReadAccess(UserId, entity))
-            {
-                return Ok(entity);
-            }
-
-            return Forbidden();
-        }
-
         /// <summary>
         /// Henter alle organisationens IT Kontrakter
         /// </summary>
@@ -113,51 +66,6 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.AsQueryable().ByOrganizationId(key);
             
             return Ok(result);
-        }
-
-        /// <summary>
-        /// Henter alle kontrakter for den pågældende leverandør
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        [EnableQuery(MaxExpansionDepth = 3)]
-        [ODataRoute("Organizations({key})/Supplier")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DeprecatedApi]
-        public IHttpActionResult GetSupplier(int key)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.AsQueryable().ByOrganizationId(key);
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItContracts(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItContract>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [DeprecatedApi]
-        public IHttpActionResult GetItContracts(int orgKey, int contractKey)
-        {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == contractKey);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (_authService.HasReadAccess(UserId, entity))
-            {
-                return Ok(entity);
-            }
-
-            return Forbidden();
         }
 
         // TODO refactor this now that we are using MS Sql Server that has support for MARS

@@ -18,7 +18,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     [RoutePrefix("api/v1/ItSystemUsageMigration")]
     public class ItSystemUsageMigrationController : BaseApiController
     {

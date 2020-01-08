@@ -12,7 +12,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;

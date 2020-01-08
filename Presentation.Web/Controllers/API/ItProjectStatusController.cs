@@ -13,7 +13,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItProjectStatusController : GenericContextAwareApiController<ItProjectStatus, ItProjectStatusDTO>
     {
         public ItProjectStatusController(IGenericRepository<ItProjectStatus> repository) 

@@ -7,7 +7,6 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class ItSystemCategoriesController : BaseOptionController<ItSystemCategories, ItSystemUsage>
     {
         public ItSystemCategoriesController(

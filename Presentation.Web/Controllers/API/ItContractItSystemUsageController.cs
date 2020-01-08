@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItContractItSystemUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItContractItSystemUsage> _repository;

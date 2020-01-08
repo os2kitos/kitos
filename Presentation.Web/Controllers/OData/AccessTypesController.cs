@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class AccessTypesController : BaseEntityController<AccessType>
     {
 

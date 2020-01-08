@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class ItContractRolesController : BaseOptionController<ItContractRole, ItContractRight>
     {
         public ItContractRolesController(IGenericRepository<ItContractRole> repository, IAuthenticationService authService)

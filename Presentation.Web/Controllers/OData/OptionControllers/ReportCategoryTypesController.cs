@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class ReportCategoryTypesController : BaseEntityController<ReportCategoryType>
     {
         public ReportCategoryTypesController(IGenericRepository<ReportCategoryType> repository, IAuthenticationService authService)

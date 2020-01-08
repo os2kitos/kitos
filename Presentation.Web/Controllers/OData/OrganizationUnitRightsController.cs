@@ -12,7 +12,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class OrganizationUnitRightsController : BaseEntityController<OrganizationUnitRight>
     {
         private readonly IAuthenticationService _authService;
@@ -20,17 +19,6 @@ namespace Presentation.Web.Controllers.OData
             : base(repository, authService)
         {
             _authService = authService;
-        }
-
-        // GET /Organizations(1)/ItContracts(1)/Rights
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/OrganizationUnits({orgUnitId})/Rights")]
-        [DeprecatedApi]
-        public IHttpActionResult GetByOrganizationUnit(int orgId, int orgUnitId)
-        {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == orgUnitId);
-            return Ok(result);
         }
 
         // GET /Users(1)/ItContractRights

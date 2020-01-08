@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class PaymentFrequencyTypesController : BaseOptionController<PaymentFreqencyType, ItContract>
     {
         public PaymentFrequencyTypesController(IGenericRepository<PaymentFreqencyType> repository, IAuthenticationService authService)

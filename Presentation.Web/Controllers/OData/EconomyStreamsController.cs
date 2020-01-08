@@ -17,7 +17,6 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
         private readonly IGenericRepository<EconomyStream> _repository;
@@ -84,95 +83,6 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItContracts(1)/ExternEconomyStreams
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DeprecatedApi]
-        public IHttpActionResult GetAllExtern(int orgKey, int contractKey)
-        {
-            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-            {
-                return Forbidden();
-            }
-
-            var result =
-                _repository.AsQueryable()
-                    .Where(
-                        m =>
-                            m.ExternPaymentFor.OrganizationId == orgKey && m.ExternPaymentForId == contractKey &&
-                            m.InternPaymentFor == null);
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItContracts(1)/InternEconomyStreams
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DeprecatedApi]
-        public IHttpActionResult GetAllIntern(int orgKey, int contractKey)
-        {
-            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-            {
-                return Forbidden();
-            }
-
-            var result =
-                _repository.AsQueryable()
-                    .Where(
-                        m =>
-                            m.ExternPaymentForId == null && m.InternPaymentForId == contractKey &&
-                            m.InternPaymentFor.OrganizationId == orgKey);
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItContracts(1)/ExternEconomyStreams(1)
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/ExternEconomyStreams({key})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DeprecatedApi]
-        public IHttpActionResult GetSingleExtern(int orgKey, int contractKey, int key)
-        {
-            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-            {
-                return Forbidden();
-            }
-
-            var result =
-                _repository.AsQueryable()
-                    .Where(
-                        m =>
-                            m.Id == key &&
-                            m.ExternPaymentFor.OrganizationId == orgKey && m.ExternPaymentForId == contractKey &&
-                            m.InternPaymentFor == null);
-            return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItContracts(1)/InternEconomyStreams(1)
-        [EnableQuery(AllowedQueryOptions = AllowedQueryOptions.All & ~AllowedQueryOptions.Expand)]
-        [ODataRoute("Organizations({orgKey})/ItContracts({contractKey})/InternEconomyStreams({key})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<EconomyStream>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DeprecatedApi]
-        public IHttpActionResult GetSingleIntern(int orgKey, int contractKey, int key)
-        {
-            if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractKey))
-            {
-                return Forbidden();
-            }
-
-            var result =
-                _repository.AsQueryable()
-                    .Where(
-                        m =>
-                            m.Id == key && m.ExternPaymentForId == null && m.InternPaymentForId == contractKey &&
-                            m.InternPaymentFor.OrganizationId == orgKey);
             return Ok(result);
         }
 

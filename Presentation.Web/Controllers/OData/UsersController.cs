@@ -112,22 +112,6 @@ namespace Presentation.Web.Controllers.OData
             return Unauthorized();
         }
 
-        //GET /Organizations(1)/DefaultOrganizationForUsers
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/DefaultOrganizationForUsers")]
-        [DeprecatedApi]
-        public IHttpActionResult GetDefaultOrganizationForUsers(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.AsQueryable().Where(m => m.DefaultOrganizationId == orgKey);
-            return Ok(result);
-        }
-
         private bool EmailExists(string email)
         {
             var matchingEmails = Repository.Get(x => x.Email == email);

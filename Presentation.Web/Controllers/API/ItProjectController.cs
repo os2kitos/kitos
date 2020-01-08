@@ -18,7 +18,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
@@ -171,36 +170,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
-        /// </summary>
-        /// <param name="catalog"></param>
-        /// <param name="orgId"></param>
-        /// <param name="q"></param>
-        /// <param name="pagingModel"></param>
-        /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectCatalogDTO>>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetCatalog(bool? catalog, [FromUri] int orgId, [FromUri] string q, [FromUri] PagingModel<ItProject> pagingModel)
-        {
-            try
-            {
-                //Get all projects inside the organizaton OR public
-                pagingModel.Where(p => p.OrganizationId == orgId || p.AccessModifier == AccessModifier.Public);
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-
-                var projects = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectCatalogDTO>>(projects);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
         public HttpResponseMessage GetProjectsByType([FromUri] int orgId, [FromUri] int typeId)
         {
@@ -209,30 +178,6 @@ namespace Presentation.Web.Controllers.API
                 var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectTypeId == typeId);
 
                 return Ok(Map(projects));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrgUnitDTO>>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetOrganizationUnitsUsingThisProject(int id, [FromUri] int organizationUnit)
-        {
-            try
-            {
-                var project = Repository.GetByKey(id);
-                if (project == null)
-                {
-                    return NotFound();
-                }
-
-                var dtos =
-                    Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitDTO>>(
-                        project.UsedByOrgUnits.Select(x => x.OrganizationUnit));
-
-                return Ok(dtos);
             }
             catch (Exception e)
             {
@@ -561,51 +506,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Used to list all available projects
-        /// </summary>
-        /// <param name="orgId"></param>
-        /// <param name="itProjects"></param>
-        /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [DeprecatedApi]
-        public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] bool itProjects)
-        {
-            try
-            {
-                var projects = _itProjectService.GetAll(orgId, includePublic: false);
-                // TODO: if list is empty, return empty list, not NotFound()
-                return projects == null ? NotFound() : Ok(Map(projects));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
-        /// Used to set checked state in available project list in ItSystemUsage
-        /// </summary>
-        /// <param name="orgId"></param>
-        /// <param name="usageId"></param>
-        /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItProjectDTO>>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetItProjectsUsedByOrg([FromUri] int orgId, [FromUri] int usageId)
-        {
-            try
-            {
-                var projects = _itProjectService.GetAll(orgId, includePublic: false)
-                    .Where(project => project.ItSystemUsages.Any(usage => usage.Id == usageId)).ToList();
-
-                return Ok(Map(projects));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
         /// <summary>  
         ///  Accessmodifier is and should always be 0 since it is not allowed to be accessed outside the organisation.
         /// </summary>

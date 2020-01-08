@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using AutoMapper;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -15,7 +13,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class UserController : GenericApiController<User, UserDTO>
     {
         private readonly IUserService _userService;
@@ -30,12 +27,10 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Post(UserDTO dto)
         {
-            //TODO: Hit when sending advis from organisation/brugere.
             try
             {
                 // do some string magic to determine parameters, and actions
                 List<string> parameters = null;
-                var sendMailOnCreation = false;
                 var sendReminder = false;
                 var sendAdvis = false;
                 int? orgId = null;
@@ -46,10 +41,6 @@ namespace Presentation.Web.Controllers.API
                 {
                     foreach (var parameter in parameters)
                     {
-                        if (parameter.StartsWith("sendMailOnCreation"))
-                        {
-                            sendMailOnCreation = bool.Parse(parameter.Replace("sendMailOnCreation=", string.Empty));
-                        }
                         if (parameter.StartsWith("sendReminder"))
                         {
                             sendReminder = bool.Parse(parameter.Replace("sendReminder=", string.Empty));
@@ -68,7 +59,7 @@ namespace Presentation.Web.Controllers.API
                 // check if orgId is set, if not return error as we cannot continue without it
                 if (!orgId.HasValue)
                 {
-                    return Error("Organization id is missing!");
+                    return BadRequest("Organization id is missing!");
                 }
 
                 // only global admin is allowed to set others to global admin
@@ -94,15 +85,7 @@ namespace Presentation.Web.Controllers.API
                     return Ok(Map(existingUser));
                 }
 
-                // otherwise we are creating a new user
-                var item = Map(dto);
-
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
-
-                item = _userService.AddUser(item, sendMailOnCreation, orgId.Value);
-
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+                return BadRequest("Unkown command");
             }
             catch (Exception e)
             {
@@ -131,105 +114,6 @@ namespace Presentation.Web.Controllers.API
             }
 
             return base.Patch(id, organizationId, obj);
-        }
-
-        [DeprecatedApi]
-        public HttpResponseMessage GetBySearch(string q)
-        {
-            try
-            {
-                var users = Repository.Get(u => u.Name.Contains(q) || u.Email.Contains(q));
-                return Ok(Mapper.Map<IEnumerable<User>, IEnumerable<UserDTO>>(users));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        public HttpResponseMessage GetByOrganization(int orgId, bool? usePaging, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(q))
-                    pagingModel.Where(u =>
-                        u.Name.Contains(q)
-                        || u.Email.Contains(q));
-
-                // Get all users inside the organization
-                pagingModel.Where(u => u.OrganizationRights.Count(r => r.Role == OrganizationRole.User && r.OrganizationId == orgId) > 0);
-
-                var users = Page(Repository.AsQueryable(), pagingModel).ToList();
-
-                return Ok(Map(users));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        public HttpResponseMessage GetOverview(bool? overview, int orgId, [FromUri] PagingModel<User> pagingModel, [FromUri] string q)
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(q))
-                    pagingModel.Where(u =>
-                        u.Name.Contains(q)
-                        || u.Email.Contains(q));
-
-                // Get all users inside the organization
-                pagingModel.Where(u => u.OrganizationRights.Count(r => r.OrganizationId == orgId) > 0);
-
-                var users = Page(Repository.AsQueryable(), pagingModel).ToList();
-                var dtos = new List<UserOverviewDTO>();
-
-                foreach (var user in users)
-                {
-                    var newDTO = Map<User, UserOverviewDTO>(user);
-
-                    newDTO.CanBeEdited = HasWriteAccess(user, KitosUser, orgId);
-                    dtos.Add(newDTO);
-                }
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        public HttpResponseMessage GetNameIsAvailable(string checkname, int orgId)
-        {
-            try
-            {
-                return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        private bool IsAvailable(string email, int orgId)
-        {
-            var users = Repository.Get(u => u.Email == email);
-
-            return !users.Any();
-        }
-
-        [DeprecatedApi]
-        public HttpResponseMessage GetUserExistsWithRole(string email, int orgId, bool? userExistsWithRole)
-        {
-            var users = Repository.Get(u => u.Email == email && u.OrganizationRights.Count(r => r.Role == OrganizationRole.User && r.OrganizationId == orgId) > 0);
-
-            if (users.Any()) return Ok();
-
-            return NotFound();
         }
 
         public HttpResponseMessage PostDefaultOrgUnit(bool? updateDefaultOrgUnit, UpdateDefaultOrgUnitDto dto)

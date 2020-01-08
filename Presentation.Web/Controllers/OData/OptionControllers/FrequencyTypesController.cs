@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class FrequencyTypesController : BaseOptionController<FrequencyType, DataRowUsage>
     {
         public FrequencyTypesController(IGenericRepository<FrequencyType> repository, IAuthenticationService authService)

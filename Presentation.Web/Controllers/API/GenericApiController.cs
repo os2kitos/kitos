@@ -12,11 +12,9 @@ using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [ControllerEvaluationCompleted]
     public abstract class GenericApiController<TModel, TDto> : BaseApiController
         where TModel : class, IEntity
     {

@@ -14,7 +14,6 @@ using System.Net;
  namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
         private readonly IAuthenticationService _authService;
@@ -22,18 +21,6 @@ using System.Net;
             : base(repository, authService)
         {
             _authService = authService;
-        }
-
-        // GET /Organizations(1)/ItProjects(1)/Rights
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
-        [DeprecatedApi]
-        public IHttpActionResult GetByItProject(int orgId, int projId)
-        {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == projId);
-            return Ok(result);
         }
 
         // GET /Users(1)/ItProjectRights

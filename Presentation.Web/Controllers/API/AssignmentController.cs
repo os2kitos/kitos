@@ -9,7 +9,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class AssignmentController : GenericContextAwareApiController<Assignment, AssignmentDTO>
     {
         private readonly IItProjectRepository _projectRepository;

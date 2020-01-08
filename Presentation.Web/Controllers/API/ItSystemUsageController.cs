@@ -18,7 +18,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -57,35 +56,6 @@ namespace Presentation.Web.Controllers.API
                         u.ItSystem.Name.Contains(q) &&
                         // system usage is only within the context
                         u.OrganizationId == organizationId);
-
-                return Ok(Map(usages));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? overview)
-        {
-            try
-            {
-                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
-                {
-                    return Forbidden();
-                }
-
-                pagingModel.Where(
-                    u =>
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    );
-
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-
-                var usages = Page(Repository.AsQueryable(), pagingModel);
 
                 return Ok(Map(usages));
             }

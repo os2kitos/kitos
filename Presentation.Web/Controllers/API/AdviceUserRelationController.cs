@@ -9,7 +9,6 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [ControllerEvaluationCompleted]
     [InternalApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {

@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -19,7 +18,6 @@ namespace Presentation.Web.Controllers.API
     using Core.DomainModel.Organization;
 
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
 
     {
@@ -141,28 +139,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [DeprecatedApi]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public virtual HttpResponseMessage GetExhibitedInterfaces(int id, bool? exhibit)
-        {
-            try
-            {
-                var contract = Repository.GetByKey(id);
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, contract))
-                {
-                    return Forbidden();
-                }
-                var exhibits = contract.AssociatedInterfaceExposures.Select(x => x.ItInterfaceExhibit);
-                var dtos = Map<IEnumerable<ItInterfaceExhibit>, IEnumerable<ItInterfaceExhibitDTO>>(exhibits);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         /// <summary>
         /// Adds an ItSystemUsage to the list of associated ItSystemUsages for that contract
         /// </summary>
@@ -266,70 +242,6 @@ namespace Presentation.Web.Controllers.API
                 // put it all in one result
                 var contracts = children.Union(parents);
                 return Ok(Map(contracts));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractOverviewDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public HttpResponseMessage GetOverview(bool? overview, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
-        {
-            if (KitosUser.DefaultOrganizationId != organizationId)
-            {
-                return Forbidden();
-            }
-
-            try
-            {
-                //Get contracts within organization
-                pagingModel.Where(contract => contract.OrganizationId == organizationId);
-
-                //Get contracts without parents (roots)
-                pagingModel.Where(contract => contract.ParentId == null);
-
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-
-                var contracts = Page(Repository.AsQueryable(), pagingModel);
-
-                var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractOverviewDTO>>(contracts);
-
-                return Ok(overviewDtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [DeprecatedApi]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItContractPlanDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public HttpResponseMessage GetPlan(bool? plan, int organizationId, [FromUri] PagingModel<ItContract> pagingModel, [FromUri] string q)
-        {
-            if (KitosUser.DefaultOrganizationId != organizationId)
-            {
-                return Forbidden();
-            }
-
-            try
-            {
-                //Get contracts within organization
-                pagingModel.Where(contract => contract.OrganizationId == organizationId);
-
-                //Get contracts without parents (roots)
-                pagingModel.Where(contract => contract.ParentId == null);
-
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(contract => contract.Name.Contains(q));
-
-                var contracts = Page(Repository.AsQueryable(), pagingModel);
-
-                var overviewDtos = AutoMapper.Mapper.Map<IEnumerable<ItContractPlanDTO>>(contracts);
-
-                return Ok(overviewDtos);
             }
             catch (Exception e)
             {

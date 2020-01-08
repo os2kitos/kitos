@@ -11,30 +11,11 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [ControllerEvaluationCompleted]
     public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
         public TaskRefController(IGenericRepository<TaskRef> repository)
             : base(repository)
         {
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<TaskRefDTO>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetRootsByOrgUnit(int orgUnitId, bool? roots, [FromUri] PagingModel<TaskRef> paging)
-        {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.AccessModifier == AccessModifier.Public);
-
-            return base.GetRoots(true, paging);
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<TaskRefDTO>))]
-        [DeprecatedApi]
-        public HttpResponseMessage GetChildrenByOrgUnit(int id, int orgUnitId, bool? children, [FromUri] PagingModel<TaskRef> paging)
-        {
-            paging.Where(taskRef => taskRef.OwnedByOrganizationUnitId == orgUnitId || taskRef.AccessModifier == AccessModifier.Public);
-
-            return base.GetChildren(id, true, paging);
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<TaskRefDTO>))]

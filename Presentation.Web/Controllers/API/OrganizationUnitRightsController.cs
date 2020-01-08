@@ -10,7 +10,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class OrganizationUnitRightController : GenericRightsController<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
     {
         private readonly IOrgUnitService _orgUnitService;
@@ -47,29 +46,6 @@ namespace Presentation.Web.Controllers.API
                 var pagedRights = theRights.Skip(skip).Take(take).ToList();
 
                 var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationUnitRight>, ICollection<RightOutputDTO>>(pagedRights);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
-        /// Returns all colllecteds rights for an organization unit and all sub units for a specific user
-        /// </summary>
-        /// <param name="orgId">Id of the unit</param>
-        /// <param name="userId">Id of the user</param>
-        /// <returns>List of rights</returns>
-        [DeprecatedApi]
-        public HttpResponseMessage GetRightsForUser(int orgId, int userId)
-        {
-            try
-            {
-                var theRights = GetOrganizationRights(orgId).Where(r => r.UserId == userId).ToList();
-
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationUnitRight>, ICollection<RightOutputDTO>>(theRights);
 
                 return Ok(dtos);
             }

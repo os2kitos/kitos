@@ -14,7 +14,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [ControllerEvaluationCompleted]
     public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
