@@ -15,8 +15,9 @@ describe("Regular user has access to features in the contract overview", () => {
     });
 
     beforeEach(() => {
-        pageObject.getPage();
-        browser.waitForAngular();
+        pageObject.getPage()
+            .then(() => browser.waitForAngular())
+            .then(() => pageObject.waitForKendoGrid());
     });
 
     it("Create IT contract is clickable", () => {
@@ -42,9 +43,4 @@ describe("Regular user has access to features in the contract overview", () => {
     it("User can see contract ", () => {
         expect(columnObject.contractName.getText()).toContain(consts.defaultItContractName);
     });
-
-
-
-
-
 });
