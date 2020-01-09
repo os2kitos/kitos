@@ -3,7 +3,6 @@ using System.Web.OData;
 using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {

@@ -5,13 +5,13 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.ApplicationServices;
- using Presentation.Web.Infrastructure.Attributes;
- using Swashbuckle.OData;
- using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
 
- namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
@@ -37,7 +37,7 @@ using System.Net;
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            
+
             if (entity == null)
                 return NotFound();
 

@@ -12,7 +12,6 @@ using Microsoft.OData.UriParser;
 using Ninject;
 using Ninject.Extensions.Logging;
 using System.Web.Http.Routing;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
