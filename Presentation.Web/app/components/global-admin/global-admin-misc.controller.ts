@@ -8,26 +8,27 @@
             resolve: {
                 globalConfigs: [
                     "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
-                ],
-                KLEUpdateStatus: [
-                    "$http", $http => $http.get("/api/KLEupdateStatus").then(result => result.data.value)
-                    ]
+                ]
             }
         });
     }]);
 
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEUpdateStatus) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice) => {
         $rootScope.page.title = "Andet";
-        //TODO Call backend for status
-        $scope.KLEupdateReadyStep1 = KLEUpdateStatus.UpdateReady;
+        $scope.KLEupdateReadyStep1 = false;
+        $scope.KLEupdateReadyStep2 = false;
 
-        if ($scope.KLEupdateReadyStep1) {
-            $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar! " + KLEUpdateStatus.VersionNumber;
-        } 
-        else 
-        {
-            $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! " + KLEUpdateStatus.VersionNumber;
-        }
+        KLEservice.getStatus().success(dto => {
+
+            if (!dto.response.uptodate) {
+                $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar! " + dto.response.version;
+                $scope.KLEupdateReadyStep1 = true;
+                $scope.KLEupdateReadyStep2 = false;
+            }
+            else {
+                $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! " + dto.response.version;
+            }
+        });
 
         $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
             return g.key === "CanGlobalAdminOnlyEditReports";

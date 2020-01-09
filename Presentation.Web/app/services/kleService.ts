@@ -1,47 +1,16 @@
 ﻿module Kitos.Services {
     "use strict";
 
-    interface IKLEStatus
-    {
-        UpdateReady: boolean;
-        VersionNumber: string;
-    }
-
-    interface IKLEChange
-    {
-        KLENumber: string;
-        Change: string;
-    }
-        
-    interface IKLEChanges
-    {
-        Changes: Array<IKLEChange>;
-    }
-
-    interface IKLEUpdateStatus
-    {
-        Success: boolean;
-    }
-
     export class KLEservice
     {
         public static $inject: string[] = ["$http"];
 
-        constructor(private $http: IHttpServiceWithCustomConfig) {
+        constructor(private $http: ng.IHttpService) {
         }
         
-        GetStatus = () => {
-            return this.$http.get<IKLEStatus>(`api/kle`);
-        }
-
-        GetChanges = () => {
-            //return this.$http.get<IKLEChanges>(`api/KLEchanges`);
-            return null;
-        }
-
-        UpdateKLE = () => {
-            //return this.$http.get<IKLEUpdateStatus>(`api/KleUpdate`);
-            return null;
+        getStatus() {
+            const url = `api/kle`;
+            return this.$http({ method: "GET", url: url, });
         }
 
     }
