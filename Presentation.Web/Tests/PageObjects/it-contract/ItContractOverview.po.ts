@@ -13,7 +13,7 @@ class ItContractOverview implements PageObject {
     }
 
     waitForKendoGrid(): webdriver.until.Condition<boolean> {
-        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().catalogName.first());
+        return this.ec.visibilityOf(this.kendoToolbarWrapper.columnObjects().contractName.first());
     }
 
     kendoToolbarWrapper = new KendoToolbarWrapper();
