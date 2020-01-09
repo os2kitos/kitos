@@ -68,7 +68,7 @@ namespace Core.DomainServices.Repositories.KLE
                     Type = mostRecentTaskRef.Type,
                     ChangeType = KLEChangeType.Added,
                     TaskKey = mostRecentTaskRef.TaskKey,
-                    UpdatedDescription = mostRecentTaskRef.TaskKey
+                    UpdatedDescription = mostRecentTaskRef.Description
                 }));
 
             return result;
