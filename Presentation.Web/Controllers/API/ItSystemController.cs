@@ -13,6 +13,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -23,6 +24,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -39,7 +41,7 @@ namespace Presentation.Web.Controllers.API
             _systemService = systemService;
         }
 
-        
+
         // DELETE api/T
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
@@ -55,7 +57,7 @@ namespace Presentation.Web.Controllers.API
                 case SystemDeleteResult.HasInterfaceExhibits:
                     return DeleteConflict(deleteResult.MapToConflict());
                 case SystemDeleteResult.Ok:
-                    return Ok(); 
+                    return Ok();
                 default:
                     return Error($"Something went wrong trying to delete system with id: {id}");
             }
@@ -79,27 +81,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //Get all systems which the user has access to
-                paging.Where(
-                    s =>
-                        // it's public everyone can see it
-                        s.AccessModifier == AccessModifier.Public ||
-                        // It's in the right context
-                        s.OrganizationId == organizationId &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects within the given context
-                        s.ObjectOwnerId == KitosUser.Id ||
-                        // everyone in the same organization can see normal objects
-                        s.AccessModifier == AccessModifier.Local)
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                    );
-                paging.WithPostProcessingFilter(AllowRead);
+                var systemQuery = _systemService.GetAvailableSystems(organizationId, q);
 
-                if (!string.IsNullOrEmpty(q)) paging.Where(sys => sys.Name.Contains(q));
-
-                var query = Page(Repository.AsQueryable(), paging);
+                var query = Page(systemQuery, paging);
 
                 return Ok(Map(query));
             }
@@ -114,26 +98,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var systems = Repository.Get(
-                    s =>
-                        // filter by name
-                        s.Name.Contains(q) &&
-                        // exclude system with id
-                        s.Id != excludeId &&
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                         // object owner sees his own objects
-                         s.ObjectOwnerId == KitosUser.Id ||
-                         // it's public everyone can see it
-                         s.AccessModifier == AccessModifier.Public ||
-                         // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Local &&
-                         s.OrganizationId == orgId)
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                    );
-
-                systems = systems.Where(AllowRead);
+                var systems = _systemService
+                    .GetAvailableSystems(orgId, q)
+                    .ExceptEntitiesWithIds(excludeId);
 
                 var dtos = Map(systems);
                 return Ok(dtos);
@@ -149,6 +116,17 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var itSystem = Repository.GetByKey(id);
+                if (itSystem == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowRead(itSystem))
+                {
+                    return Forbidden();
+                }
+
                 var systems = _systemService.GetHierarchy(id);
 
                 systems = systems.Where(AllowRead);
@@ -207,6 +185,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var system = Repository.GetByKey(id);
                 if (system == null) return NotFound();
+
                 if (!AllowModify(system))
                 {
                     return Forbidden();
@@ -326,14 +305,10 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                IQueryable<TaskRef> taskQuery;
+                IQueryable<TaskRef> taskQuery = _taskRepository.AsQueryable();
                 if (onlySelected)
                 {
                     taskQuery = Repository.AsQueryable().Where(p => p.Id == id).SelectMany(p => p.TaskRefs);
-                }
-                else
-                {
-                    taskQuery = _taskRepository.AsQueryable();
                 }
 
                 // if a task group is given, only find the tasks in that group
@@ -369,6 +344,12 @@ namespace Presentation.Web.Controllers.API
             obj.TryGetValue("accessModifier", out accessModToken);
 
             var itSystem = Repository.GetByKey(id);
+
+            if (itSystem == null)
+            {
+                return NotFound();
+            }
+
             if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && !AllowEntityVisibilityControl(itSystem))
             {
                 return Forbidden();
@@ -431,7 +412,12 @@ namespace Presentation.Web.Controllers.API
 
         private bool IsAvailable(string name, int orgId)
         {
-            var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
+            var system =
+                Repository
+                    .AsQueryable()
+                    .ByOrganizationId(orgId)
+                    .ByPartOfName(name);
+
             return !system.Any();
         }
 

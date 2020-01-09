@@ -14,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemUsageOrgUnitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _responsibleOrgUnitRepository;
@@ -34,6 +35,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var itSystemUsage = _systemUsageRepository.GetByKey(id);
+
+                if (!AllowRead(itSystemUsage))
+                {
+                    return Forbidden();
+                }
+
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
                 orgUnits = orgUnits.Where(AllowRead);
@@ -83,6 +91,16 @@ namespace Presentation.Web.Controllers.API
                 var entity = _responsibleOrgUnitRepository.GetByKey(new object[] { usageId, orgUnitId });
                 var systemUsage = _systemUsageRepository.GetByKey(usageId);
 
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(systemUsage))
+                {
+                    return Forbidden();
+                }
+
                 systemUsage.ResponsibleUsage = entity;
 
                 _responsibleOrgUnitRepository.Save();
@@ -100,6 +118,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systemUsage = _systemUsageRepository.GetByKey(usageId);
+
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(systemUsage))
+                {
+                    return Forbidden();
+                }
+
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = systemUsage.ResponsibleUsage;
                 systemUsage.ResponsibleUsage = null;

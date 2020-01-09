@@ -1,18 +1,30 @@
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
+using Core.DomainServices.Model;
+using Core.DomainServices.Repositories.Project;
 
 namespace Core.ApplicationServices
 {
     public class ItProjectService : IItProjectService
     {
         private readonly IGenericRepository<ItProject> _projectRepository;
+        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IItProjectRepository _itProjectRepository;
 
-        public ItProjectService(IGenericRepository<ItProject> projectRepository)
+        public ItProjectService(
+            IGenericRepository<ItProject> projectRepository, 
+            IAuthorizationContext authorizationContext,
+            IItProjectRepository itProjectRepository)
         {
             _projectRepository = projectRepository;
+            _authorizationContext = authorizationContext;
+            _itProjectRepository = itProjectRepository;
         }
 
         public ItProject AddProject(ItProject project)
@@ -49,6 +61,24 @@ namespace Core.ApplicationServices
             // delete it project
             _projectRepository.Delete(project);
             _projectRepository.Save();
+        }
+
+        public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
+        {
+            var projects = _itProjectRepository.GetProjects(
+                new OrganizationDataQueryParameters(
+                    organizationId,
+                    OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations,
+                    _authorizationContext.GetDataAccessLevel(organizationId)
+                )
+            );
+
+            if (!string.IsNullOrWhiteSpace(optionalNameSearch))
+            {
+                projects = projects.ByPartOfName(optionalNameSearch);
+            }
+
+            return projects;
         }
 
         /// <summary>

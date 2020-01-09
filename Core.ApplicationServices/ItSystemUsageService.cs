@@ -2,6 +2,7 @@
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using System.Linq;
+using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices
 {
@@ -40,6 +41,14 @@ namespace Core.ApplicationServices
             // delete it system usage
             _usageRepository.Delete(itSystemUsage);
             _usageRepository.Save();
+        }
+
+        public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)
+        {
+            return _usageRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .FirstOrDefault(u => u.ItSystemId == systemId);
         }
     }
 }

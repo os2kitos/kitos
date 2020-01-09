@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var projectsQuery = CreateScopedQuery(orgId);
+                var projectsQuery = _itProjectService.GetAvailableProjects(orgId);
 
                 var projects = Page(projectsQuery, pagingModel);
 
@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var projectsQuery = CreateScopedQuery(orgId).ByPartOfName(q);
+                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
 
                 return Ok(Map(projectsQuery));
             }
@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var projectsQuery = CreateScopedQuery(orgId).ByPartOfName(q);
+                var projectsQuery = _itProjectService.GetAvailableProjects(orgId, q);
 
                 var projects = Page(projectsQuery, pagingModel);
 
@@ -590,21 +590,6 @@ namespace Presentation.Web.Controllers.API
             }
 
             return base.Patch(id, organizationId, obj);
-        }
-
-        private IQueryable<ItProject> CreateScopedQuery(int orgId)
-        {
-            var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccessLevel();
-            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgId);
-            var projectsQuery =
-                GetAllQuery()
-                    .ByOrganizationDataAndPublicDataFromOtherOrganizations
-                    (
-                        organizationId: orgId,
-                        organizationAccessLevel: organizationDataReadAccessLevel,
-                        crossOrganizationDataReadAccessLevel: crossOrganizationDataReadAccessLevel
-                    );
-            return projectsQuery;
         }
     }
 }

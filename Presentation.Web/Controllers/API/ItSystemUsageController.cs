@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -18,6 +19,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -50,12 +52,15 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Forbidden();
                 }
-                var usages = Repository.Get(
-                    u =>
-                        // filter by system usage name
-                        u.ItSystem.Name.Contains(q) &&
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId);
+
+                var usages = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId);
+
+                if (!string.IsNullOrWhiteSpace(q))
+                {
+                    usages = usages.Where(usage => usage.ItSystem.Name.Contains(q));
+                }
 
                 return Ok(Map(usages));
             }
@@ -73,14 +78,14 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AllowRead(item))
-                {
-                    return Forbidden();
-                }
-
                 if (item == null)
                 {
                     return NotFound();
+                }
+
+                if (!AllowRead(item))
+                {
+                    return Forbidden();
                 }
 
                 var dto = Map(item);
@@ -105,7 +110,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = _itSystemUsageService.GetByOrganizationAndSystemId(organizationId, itSystemId);
 
                 if (usage == null)
                 {
@@ -129,9 +134,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var usage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!AllowCreate<ItSystemUsage>(itsystemUsage))
+                if (!AllowCreate<ItSystemUsage>(usage))
                 {
                     return Forbidden();
                 }
@@ -142,7 +147,7 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Usage already exist");
                 }
 
-                var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
+                var sysUsage = _itSystemUsageService.Add(usage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
 
                 //copy attached options from system to systemusage
@@ -169,7 +174,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = _itSystemUsageService.GetByOrganizationAndSystemId(organizationId, itSystemId);
+
                 if (usage == null)
                 {
                     return NotFound();
@@ -398,6 +404,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var usage = Repository.GetByKey(id);
+
+                if (!AllowRead(usage))
+                {
+                    return Forbidden();
+                }
 
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)

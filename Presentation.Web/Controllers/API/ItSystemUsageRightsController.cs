@@ -7,6 +7,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemUsageRightsController : GenericRightsController<ItSystemUsage, ItSystemRight, ItSystemRole>
     {
         public ItSystemUsageRightsController(

@@ -79,14 +79,14 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AllowRead(item))
-                {
-                    return Forbidden();
-                }
-
                 if (item == null)
                 {
                     return NotFound();
+                }
+
+                if (!AllowRead(item))
+                {
+                    return Forbidden();
                 }
 
                 var dto = Map(item);
@@ -252,6 +252,11 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var item = Repository.GetByKey(id);
+
+                if (item == null)
+                {
+                    return NotFound();
+                }
 
                 if (!AllowDelete(item))
                 {

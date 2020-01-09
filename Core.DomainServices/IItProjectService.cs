@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.ItProject;
+﻿using System.Linq;
+using Core.DomainModel.ItProject;
 
 namespace Core.DomainServices
 {
@@ -12,5 +13,7 @@ namespace Core.DomainServices
         ItProject AddProject(ItProject project);
 
         void DeleteProject(int id);
+
+        IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null);
     }
 }

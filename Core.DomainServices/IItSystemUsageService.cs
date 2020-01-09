@@ -7,5 +7,6 @@ namespace Core.DomainServices
     {
         ItSystemUsage Add(ItSystemUsage ItSystemUsage, User objectOwner);
         void Delete(int id);
+        ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId);
     }
 }

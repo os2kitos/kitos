@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -18,8 +19,11 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IOrganizationService _organizationService;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService)
-            : base(repository)
+        public OrganizationController(
+            IGenericRepository<Organization> repository, 
+            IOrganizationService organizationService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _organizationService = organizationService;
         }

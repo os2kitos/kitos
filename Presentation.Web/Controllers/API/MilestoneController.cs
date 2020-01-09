@@ -9,6 +9,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class MilestoneController : GenericContextAwareApiController<Milestone, MilestoneDTO>
     {
         private readonly IItProjectRepository _projectRepository;
