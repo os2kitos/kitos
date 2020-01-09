@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 
 namespace Core.DomainServices
 {
     public interface IItProjectService
     {
-        IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true);
-
         /// <summary>
         /// Adds an IT project. It creates default phases and saves the project.
         /// </summary>

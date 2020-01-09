@@ -5,13 +5,17 @@ using System.Security;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
+    [MigratedToNewAuthorizationContext]
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : OptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
+        protected GenericOptionApiController(
+            IGenericRepository<TModel> repository, 
+            IAuthorizationContext authorizationContext = null) //TODO: Do not allow null once completed
             : base(repository, authorizationContext)
         {
         }
@@ -25,9 +29,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable().Where(t => t.IsSuggestion);
+                var items = Repository
+                    .AsQueryable()
+                    .Where(t => t.IsSuggestion)
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .Select(Map);
 
-                return Ok(Map(items));
+                return Ok(items);
             }
             catch (Exception e)
             {
@@ -39,9 +48,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable().Where(t => !t.IsSuggestion);
+                var items = Repository
+                    .AsQueryable()
+                    .Where(t => !t.IsSuggestion)
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .Select(Map);
 
-                return Ok(Map(items));
+                return Ok(items);
             }
             catch (Exception e)
             {
@@ -51,7 +65,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override TModel PutQuery(TModel item)
         {
-            if (!item.IsSuggestion && !AllowModify(item)) 
+            if (!item.IsSuggestion && !AllowModify(item))
                 throw new SecurityException();
 
             return base.PutQuery(item);

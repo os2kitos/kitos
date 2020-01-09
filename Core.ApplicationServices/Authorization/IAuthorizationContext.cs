@@ -58,5 +58,10 @@ namespace Core.ApplicationServices.Authorization
         /// </summary>
         /// <returns></returns>
         bool AllowSystemUsageMigration();
+        /// <summary>
+        /// Determines if the current context allows batch import of local entities (contracts, users, org units etc)
+        /// </summary>
+        /// <returns></returns>
+        bool AllowBatchLocalImport();
     }
 }

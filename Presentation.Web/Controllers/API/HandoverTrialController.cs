@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Core.ApplicationServices.Authorization;
@@ -13,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class HandoverTrialController : GenericContextAwareApiController<HandoverTrial, HandoverTrialDTO>
     {
         private readonly IItContractRepository _contractRepository;
@@ -29,7 +31,10 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<HandoverTrialDTO>>))]
         public HttpResponseMessage GetByContractid(int id, bool? byContract)
         {
-            var query = Repository.Get(x => x.ItContractId == id);
+            var query = Repository
+                .Get(x => x.ItContractId == id)
+                .AsEnumerable()
+                .Where(AllowRead);
             var dtos = Map(query);
             return Ok(dtos);
         }

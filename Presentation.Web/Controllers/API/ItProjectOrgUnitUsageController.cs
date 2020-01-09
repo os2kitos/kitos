@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -13,12 +14,17 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItProjectOrgUnitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<ItProject> _projectRepository;
 
-        public ItProjectOrgUnitUsageController(IGenericRepository<ItProjectOrgUnitUsage> responsibleOrgUnitRepository, IGenericRepository<ItProject> projectRepository)
+        public ItProjectOrgUnitUsageController(
+            IGenericRepository<ItProjectOrgUnitUsage> responsibleOrgUnitRepository,
+            IGenericRepository<ItProject> projectRepository,
+            IAuthorizationContext authorizationContext)
+        : base(authorizationContext)
         {
             _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _projectRepository = projectRepository;
@@ -31,7 +37,8 @@ namespace Presentation.Web.Controllers.API
             {
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItProjectId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
-                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
+
+                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits.Where(AllowRead));
 
                 return Ok(dtos);
             }
@@ -51,6 +58,12 @@ namespace Presentation.Web.Controllers.API
                 if (project.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
 
                 var organizationUnit = project.ResponsibleUsage.OrganizationUnit;
+
+                if (!AllowRead(organizationUnit))
+                {
+                    return Forbidden();
+                }
+
                 var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
                 return Ok(dtos);
             }
@@ -64,8 +77,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] {projectId, orgUnitId});
+                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] { projectId, orgUnitId });
                 var project = _projectRepository.GetByKey(projectId);
+
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(project))
+                {
+                    return Forbidden();
+                }
 
                 project.ResponsibleUsage = entity;
 
@@ -84,6 +107,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = _projectRepository.GetByKey(projectId);
+
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(project))
+                {
+                    return Forbidden();
+                }
+
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = project.ResponsibleUsage;
                 project.ResponsibleUsage = null;

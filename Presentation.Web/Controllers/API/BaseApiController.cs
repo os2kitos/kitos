@@ -14,22 +14,24 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
 namespace Presentation.Web.Controllers.API
 {
     [Authorize]
+    [MigratedToNewAuthorizationContext]
     public abstract class BaseApiController : ApiController
     {
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        public IAuthenticationService AuthenticationService { get; set; }
+        public IAuthenticationService AuthenticationService { get; set; } //TODO: Remove it
 
         [Inject]
-        public IFeatureChecker FeatureChecker { get; set; }
+        public IFeatureChecker FeatureChecker { get; set; } // TODO: Remove it
 
         [Inject]
         public ILogger Logger { get; set; }
@@ -41,7 +43,7 @@ namespace Presentation.Web.Controllers.API
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected BaseApiController(IAuthorizationContext authorizationContext = null)
+        protected BaseApiController(IAuthorizationContext authorizationContext = null)//TODO: Do not allow null once migrated
         {
             _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
 
@@ -170,7 +172,7 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected User KitosUser
+        protected User KitosUser //TODO: Migrate to auth context by injection! -> not user repository
         {
             get
             {

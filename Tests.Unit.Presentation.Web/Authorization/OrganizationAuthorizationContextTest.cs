@@ -1,5 +1,6 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
+using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -103,6 +104,19 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, result);
+        }
+
+        [Fact]
+        public void AllowReads_For_GlobalReadableType_AdviceUserRelation_Returns_True()
+        {
+            //Arrange
+            var inputEntity = new AdviceUserRelation();
+
+            //Act
+            var result = _sut.AllowReads(inputEntity);
+
+            //Assert
+            Assert.True(result);
         }
 
         [Theory]
@@ -379,6 +393,26 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Act
             var result = _sut.AllowSystemUsageMigration();
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(false, true, true, false)]
+        [InlineData(false, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, false, false, false)]
+        public void AllowBatchImport_Returns(bool globalAdmin, bool localAdmin, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
+
+            //Act
+            var result = _sut.AllowBatchLocalImport();
 
             //Assert
             Assert.Equal(expectedResult, result);

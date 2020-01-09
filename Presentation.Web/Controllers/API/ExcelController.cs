@@ -7,26 +7,34 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;
+        private readonly IAuthorizationContext _authorizationContext;
         private readonly string _mapPath = HttpContext.Current.Server.MapPath("~/Content/excel/");
 
-        public ExcelController(IExcelService excelService)
+        public ExcelController(IExcelService excelService, IAuthorizationContext authorizationContext)
         {
             _excelService = excelService;
+            _authorizationContext = authorizationContext;
         }
 
         #region Excel Users
 
         public HttpResponseMessage GetUsers(int organizationId, bool? exportUsers)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             const string filename = "OS2KITOS Brugere.xlsx";
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
@@ -39,6 +47,10 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostUsers(int organizationId, bool? importUsers)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             // check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent())
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -63,6 +75,10 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetOrgUnits(int organizationId, bool? exportOrgUnits)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             const string filename = "OS2KITOS Organisationsenheder.xlsx";
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
@@ -75,6 +91,10 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostOrgUnits(int organizationId, bool? importOrgUnits)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             // check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent())
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -99,6 +119,10 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage GetContracts(int organizationId, bool? exportContracts)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             const string filename = "OS2KITOS IT Kontrakter.xlsx";
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
@@ -110,6 +134,10 @@ namespace Presentation.Web.Controllers.API
 
         public async Task<HttpResponseMessage> PostContracts(int organizationId, bool? importContracts)
         {
+            if (!AllowAccess())
+            {
+                return Forbidden();
+            }
             // check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent())
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -135,7 +163,7 @@ namespace Presentation.Web.Controllers.API
         private static HttpResponseMessage GetResponseMessage(Stream stream, string filename)
         {
             stream.Seek(0, SeekOrigin.Begin);
-            var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream)};
+            var result = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
             var mimeType = MimeMapping.GetMimeMapping(filename);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue(mimeType);
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
@@ -161,6 +189,11 @@ namespace Presentation.Web.Controllers.API
             var stream = new MemoryStream(buffer);
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        private bool AllowAccess()
+        {
+            return _authorizationContext.AllowBatchLocalImport();
         }
 
         #endregion

@@ -17,6 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ExhibitController : GenericContextAwareApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
@@ -36,7 +37,7 @@ namespace Presentation.Web.Controllers.API
             {
                 var exhibits = _repository.Get(x => x.ItSystemId == sysId && (x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public));
                 var intfs = exhibits.Select(x => x.ItInterface);
-                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs);
+                var dtos = Mapper.Map<IEnumerable<ItInterfaceDTO>>(intfs.Where(AllowRead));
                 return Ok(dtos);
             }
             catch (Exception e)
@@ -51,7 +52,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var exhibit = _repository.Get(x => x.ItSystemId == sysId && (x.ItInterface.OrganizationId == orgId || x.ItInterface.AccessModifier == AccessModifier.Public) && x.ItInterface.Name.Contains(q));
-                var dtos = Map(exhibit);
+                var dtos = Map(exhibit.Where(AllowRead));
                 return Ok(dtos);
             }
             catch (Exception e)

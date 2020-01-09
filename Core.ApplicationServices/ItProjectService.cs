@@ -15,27 +15,6 @@ namespace Core.ApplicationServices
             _projectRepository = projectRepository;
         }
 
-        public IEnumerable<ItProject> GetAll(int? orgId = null, string nameSearch = null, bool includePublic = true)
-        {
-            var result = _projectRepository.Get();
-
-            if (orgId != null)
-            {
-                //filter by organisation or optionally by access modifier
-                result = result.Where(p => p.OrganizationId == orgId.Value || (includePublic && p.AccessModifier == AccessModifier.Public));
-            }
-            else
-            {
-                //if no organisation is selected, only get public
-                result = result.Where(p => p.AccessModifier == AccessModifier.Public && includePublic);
-            }
-
-            //optionally filter by name
-            if (nameSearch != null) result = result.Where(p => p.Name.Contains(nameSearch));
-
-            return result;
-        }
-
         public ItProject AddProject(ItProject project)
         {
             CreateDefaultPhases(project);

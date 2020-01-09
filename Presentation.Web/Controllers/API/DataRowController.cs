@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Core.ApplicationServices.Authorization;
@@ -14,6 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
@@ -35,7 +37,8 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.Get(x => x.ItInterfaceId == interfaceId);
                 if (item == null) return NotFound();
 
-                var dto = Map(item);
+
+                var dto = Map(item.Where(AllowRead));
                 return Ok(dto);
             }
             catch (Exception e)

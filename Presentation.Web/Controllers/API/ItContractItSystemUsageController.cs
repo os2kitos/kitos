@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -7,12 +8,17 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItContractItSystemUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItContractItSystemUsage> _repository;
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
 
-        public ItContractItSystemUsageController(IGenericRepository<ItContractItSystemUsage> repository, IGenericRepository<ItSystemUsage> usageRepository)
+        public ItContractItSystemUsageController(
+            IGenericRepository<ItContractItSystemUsage> repository,
+            IGenericRepository<ItSystemUsage> usageRepository,
+            IAuthorizationContext authorizationContext)
+        : base(authorizationContext)
         {
             _repository = repository;
             _usageRepository = usageRepository;
@@ -20,9 +26,15 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage PostMainContract(int contractId, int usageId)
         {
-            var item = _repository.GetByKey(new object[] {contractId, usageId});
+            var item = _repository.GetByKey(new object[] { contractId, usageId });
+
             if (item == null)
                 return NotFound();
+
+            if (!AllowModify(item.ItSystemUsage))
+            {
+                return Forbidden();
+            }
 
             item.ItSystemUsage.MainContract = item;
             _repository.Save();
@@ -32,9 +44,15 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage DeleteMainContract(int usageId)
         {
             var usage = _usageRepository.GetByKey(usageId);
+
             if (usage == null)
                 return NotFound();
-            
+
+            if (!AllowModify(usage))
+            {
+                return Forbidden();
+            }
+
             // WARNING: force loading so setting it to null will be tracked
             var forceLoad = usage.MainContract;
             usage.MainContract = null;

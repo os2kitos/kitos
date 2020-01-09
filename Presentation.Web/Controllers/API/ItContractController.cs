@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -14,10 +15,8 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
-    using Core.DomainModel;
-    using Core.DomainModel.Organization;
-
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
 
     {
@@ -30,8 +29,9 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<ItSystemUsage> usageRepository,
             IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
-            IItContractService itContractService)
-            : base(repository)
+            IItContractService itContractService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;
@@ -57,14 +57,14 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
-                {
-                    return Forbidden();
-                }
-
                 if (item == null)
                 {
                     return NotFound();
+                }
+
+                if (!AllowRead(item))
+                {
+                    return Forbidden();
                 }
 
                 var dto = Map(item);
@@ -87,7 +87,13 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId))
+
+                if (contract == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(contract))
                 {
                     return Forbidden();
                 }
@@ -116,7 +122,13 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId))
+
+                if (contract == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(contract))
                 {
                     return Forbidden();
                 }
@@ -156,15 +168,16 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(contract, organizationId))
+                if (!AllowModify(contract))
                 {
                     return Forbidden();
                 }
 
                 var usage = _usageRepository.GetByKey(systemUsageId);
+
                 if (usage == null)
                 {
-                    return NotFound();
+                    return BadRequest($"System usage with id {systemUsageId} not found");
                 }
 
                 if (_itContractItSystemUsageRepository.GetByKey(new object[] { id, systemUsageId }) != null)
@@ -196,7 +209,13 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var contract = Repository.GetByKey(id);
-                if (!HasWriteAccess(contract, organizationId))
+
+                if (contract == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(contract))
                 {
                     return Forbidden();
                 }
@@ -231,7 +250,7 @@ namespace Presentation.Web.Controllers.API
                 if (itContract == null)
                     return NotFound();
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, itContract))
+                if (!AllowRead(itContract))
                 {
                     return Forbidden();
                 }
@@ -257,16 +276,6 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItContract entity)
         {
             _itContractService.Delete(entity.Id);
-        }
-
-        protected override bool HasWriteAccess(ItContract obj, User user, int organizationId)
-        {
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ContractModuleAdmin)))
-                return true;
-
-            return base.HasWriteAccess(obj, user, organizationId);
         }
     }
 }

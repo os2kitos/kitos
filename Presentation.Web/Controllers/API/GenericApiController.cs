@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
 
         protected GenericApiController(
             IGenericRepository<TModel> repository,
-            IAuthorizationContext authorizationContext = null)
+            IAuthorizationContext authorizationContext = null) //TODO: Do not allow null once migrated
         : base(authorizationContext)
         {
             Repository = repository;

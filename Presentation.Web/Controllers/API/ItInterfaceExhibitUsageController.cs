@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.SystemUsage;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -12,13 +15,20 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItInterfaceExhibitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;
+        private readonly IItSystemUsageRepository _usageRepository;
 
-        public ItInterfaceExhibitUsageController(IGenericRepository<ItInterfaceExhibitUsage> repository)
+        public ItInterfaceExhibitUsageController(
+            IGenericRepository<ItInterfaceExhibitUsage> repository,
+            IAuthorizationContext authorizationContext,
+            IItSystemUsageRepository usageRepository)
+        : base(authorizationContext)
         {
             _repository = repository;
+            _usageRepository = usageRepository;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
@@ -27,7 +37,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var items = _repository.Get(x => x.ItContractId == contractId);
-                var dto = Map<IEnumerable<ItInterfaceExhibitUsage>, IEnumerable<ItInterfaceExhibitUsageDTO>>(items);
+                var dto = Map<IEnumerable<ItInterfaceExhibitUsage>, IEnumerable<ItInterfaceExhibitUsageDTO>>(items.Where(x => AllowRead(x.ItSystemUsage)));
 
                 return Ok(dto);
             }
@@ -44,8 +54,14 @@ namespace Presentation.Web.Controllers.API
             {
                 var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
                 var item = _repository.GetByKey(key);
+
                 if (item == null)
                     return NotFound();
+
+                if (!AllowRead(item.ItSystemUsage))
+                {
+                    return Forbidden();
+                }
 
                 var dto = Map<ItInterfaceExhibitUsage, ItInterfaceExhibitUsageDTO>(item);
 
@@ -70,6 +86,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
+                var itSystemUsage = _usageRepository.GetSystemUsage(usageId);
+                if (itSystemUsage == null)
+                {
+                    return BadRequest("System usage not found");
+                }
+
+                if (!AllowModify(itSystemUsage))
+                {
+                    return Forbidden();
+                }
+
                 var item = _repository.GetByKey(key);
                 // create if doesn't exists
                 if (item == null)

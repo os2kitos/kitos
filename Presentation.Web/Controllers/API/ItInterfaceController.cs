@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -14,17 +15,20 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
 
-        public ItInterfaceController(IGenericRepository<ItInterface> repository, IItInterfaceService itInterfaceService)
-            : base(repository)
+        public ItInterfaceController(
+            IGenericRepository<ItInterface> repository,
+            IItInterfaceService itInterfaceService,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _itInterfaceService = itInterfaceService;
         }
 
-        // Udkommenteret ifm. OS2KITOS-663
         //DELETE api/ItInterface
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
@@ -32,9 +36,6 @@ namespace Presentation.Web.Controllers.API
             {
                 var item = Repository.GetByKey(id);
 
-                // Udkommenteret ifm. OS2KITOS-663
-                // check if the itinterface has any usages, if it does it's may not be deleted
-                //if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
                 if (item.ExhibitedBy != null)
                     return Conflict("Cannot delete an itinterface in use!");
 
@@ -69,6 +70,11 @@ namespace Presentation.Web.Controllers.API
                 {
                     dataRow.ObjectOwner = KitosUser;
                     dataRow.LastChangedByUser = KitosUser;
+                }
+
+                if (!AllowCreate<ItInterface>(item))
+                {
+                    return Forbidden();
                 }
 
                 PostQuery(item);

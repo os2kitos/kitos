@@ -2,19 +2,37 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class GlobalAdminController : BaseApiController
     {
+        private readonly IOrganizationalUserContext _organizationalUserContext;
+
+        public GlobalAdminController(
+            IAuthorizationContext authorizationContext, 
+            IOrganizationalUserContext organizationalUserContext)
+            : base(authorizationContext)
+        {
+            _organizationalUserContext = organizationalUserContext;
+        }
+
+        private bool HasAccess()
+        {
+            return _organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin);
+        }
+
         public HttpResponseMessage Get()
         {
             try
             {
-                if (!IsGlobalAdmin())
+                if (!HasAccess())
                 {
                     return Forbidden();
                 }
@@ -36,7 +54,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsGlobalAdmin())
+                if (!HasAccess())
                 {
                     return Forbidden();
                 }
@@ -69,8 +87,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (IsGlobalAdmin())
+                if (HasAccess())
                 {
+                    if (_organizationalUserContext.UserId == userId)
+                    {
+                        return BadRequest("Cannot remove own global admin rights");
+                    }
+
                     var user = UserRepository.GetByKey(userId);
 
                     user.IsGlobalAdmin = false;

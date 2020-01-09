@@ -15,6 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ContactpersonController : GenericApiController<ContactPerson, ContactPersonDTO>
     {
         private readonly IGenericRepository<ContactPerson> _repository;
@@ -70,7 +71,7 @@ namespace Presentation.Web.Controllers.API
                     }
                 };
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }

@@ -7,6 +7,7 @@ using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.General
 {
+    //TODO: Remove it
     public class LegacyAuthorizationStrategy : IControllerAuthorizationStrategy
     {
         private readonly IAuthenticationService _authenticationService;

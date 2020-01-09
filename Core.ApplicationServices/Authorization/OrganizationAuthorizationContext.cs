@@ -1,4 +1,7 @@
-﻿using Core.DomainModel;
+﻿using System;
+using System.Collections.Generic;
+using Core.DomainModel;
+using Core.DomainModel.Advice;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -8,6 +11,12 @@ namespace Core.ApplicationServices.Authorization
     public class OrganizationAuthorizationContext : IAuthorizationContext
     {
         private readonly IOrganizationalUserContext _activeUserContext;
+
+        //NOTE: For types which cannot be bound to a scoped context (lack of knowledge) and has shared read access
+        private static readonly IReadOnlyDictionary<Type, bool> TypesWithGlobalReadAccess = new Dictionary<Type, bool>
+        {
+            {typeof(AdviceUserRelation),true}
+        };
 
         public OrganizationAuthorizationContext(IOrganizationalUserContext activeUserContext)
         {
@@ -66,6 +75,10 @@ namespace Core.ApplicationServices.Authorization
                 {
                     result = true;
                 }
+            }
+            else if (TypesWithGlobalReadAccess.ContainsKey(entity.GetType()))
+            {
+                result = true;
             }
 
             return result;
@@ -157,6 +170,11 @@ namespace Core.ApplicationServices.Authorization
         public bool AllowSystemUsageMigration()
         {
             return IsGlobalAdmin() && IsReadOnly() == false;
+        }
+
+        public bool AllowBatchLocalImport()
+        {
+            return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
         }
 
         private bool AllowWritesToEntity(IEntity entity)

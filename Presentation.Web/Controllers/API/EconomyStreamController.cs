@@ -7,40 +7,42 @@ using Core.DomainModel;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;
 
-        public EconomyStreamController(IGenericRepository<EconomyStream> repository, IGenericRepository<ItContract> contracts) : base(repository)
+        public EconomyStreamController(
+            IGenericRepository<EconomyStream> repository,
+            IGenericRepository<ItContract> contracts,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
-            this._contracts = contracts;
+            _contracts = contracts;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<EconomyStreamDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
             var currentOrgId = KitosUser.DefaultOrganizationId;
 
-            if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id))
+            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
+
+            if (crossOrganizationReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public)
             {
-                if (!AuthenticationService.IsGlobalAdmin(KitosUser.Id) && result.Any())
+                if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && result.Any())
                 {
                     // all users may view economy streams marked Public or if they are part of the organization
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.ExternPaymentFor.OrganizationId == currentOrgId);
-                    if (!result.Any())
-                    {
-                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not allowed to view the data
-                        return Forbidden();
-
-                    }
                 }
             }
             else
@@ -52,23 +54,19 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
             var currentOrgId = KitosUser.DefaultOrganizationId;
 
-            if (AuthenticationService.HasReadAccessOutsideContext(KitosUser.Id))
+            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
+
+            if (crossOrganizationReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public)
             {
-                if (!AuthenticationService.IsGlobalAdmin(KitosUser.Id) && result.Any())
+                if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && result.Any())
                 {
                     // all users may view economy streams marked Public or if they are part of the organization
                     result = result.Where(x => x.AccessModifier == AccessModifier.Public || x.InternPaymentFor.OrganizationId == currentOrgId);
-                    if (!result.Any())
-                        //at this point the economy streams are marked Local but the user is not part of the organization which means they are not authorized to view the data
-                    {
-                        return Forbidden();
-                    }
                 }
             }
             else
@@ -99,7 +97,7 @@ namespace Presentation.Web.Controllers.API
                 stream.InternPaymentFor = contract;
             }
 
-            if (!AuthenticationService.HasWriteAccess(KitosUser.Id, stream))
+            if (!AllowCreate<EconomyStream>(stream))
             {
                 return Forbidden();
             }

@@ -49,5 +49,10 @@ namespace Core.ApplicationServices.Authorization
         {
             return false;
         }
+
+        public bool AllowBatchLocalImport()
+        {
+            return false;
+        }
     }
 }

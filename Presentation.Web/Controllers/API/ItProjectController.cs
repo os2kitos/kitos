@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -18,6 +20,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItProjectController : GenericHierarchyApiController<ItProject, ItProjectDTO>
     {
         private readonly IItProjectService _itProjectService;
@@ -25,14 +28,14 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemUsage> _itSystemUsageRepository;
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
 
-        //TODO: Man, this constructor smells ...
         public ItProjectController(
             IGenericRepository<ItProject> repository,
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
-            : base(repository)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
@@ -51,22 +54,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //Get all projects inside the organizaton
-                pagingModel.Where(
-                    p =>
-                        // it's public everyone can see it
-                        p.AccessModifier == AccessModifier.Public ||
-                        // or limit all to within the context
-                        p.OrganizationId == orgId &&
-                        // global admin sees all
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        p.ObjectOwnerId == KitosUser.Id ||
-                        // everyone in the same organization can see local objects
-                        p.AccessModifier == AccessModifier.Local)
-                    );
+                var projectsQuery = CreateScopedQuery(orgId);
 
-                var projects = Page(Repository.AsQueryable(), pagingModel);
+                var projects = Page(projectsQuery, pagingModel);
 
                 return Ok(Map(projects));
             }
@@ -75,7 +65,7 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-        
+
         /// <summary>
         /// Henter alle IT-Projekter i organisationen samt offentlige IT-projekter fra andre organisationer
         /// </summary>
@@ -87,23 +77,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.Get(
-                    p =>
-                        // filter by project name
-                        p.Name.Contains(q) &&
-                        // it's public everyone can see it
-                        (p.AccessModifier == AccessModifier.Public ||
-                        // or limit all to within the context
-                        p.OrganizationId == orgId) &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin ||
-                        // object owner sees his own objects
-                        p.ObjectOwnerId == KitosUser.Id ||
-                        // everyone in the same organization can see local objects
-                        p.AccessModifier == AccessModifier.Local)
-                    );
+                var projectsQuery = CreateScopedQuery(orgId).ByPartOfName(q);
 
-                return Ok(Map(items));
+                return Ok(Map(projectsQuery));
             }
             catch (Exception e)
             {
@@ -116,10 +92,15 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var itProject = Repository.AsQueryable().Single(x => x.Id == id);
+                var itProject = Repository.AsQueryable().ById(id);
 
                 if (itProject == null)
                     return NotFound();
+
+                if (!AllowRead(itProject))
+                {
+                    return Forbidden();
+                }
 
                 // this trick will put the first object in the result as well as the children
                 var children = new[] { itProject }.SelectNestedChildren(x => x.Children);
@@ -140,22 +121,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                //Get all projects which the user has access to
-                pagingModel.Where(
-                    p =>
-                        // global admin sees all within the context
-                        KitosUser.IsGlobalAdmin && p.OrganizationId == orgId ||
-                        // object owner sees his own objects within the context
-                        p.ObjectOwnerId == KitosUser.Id && p.OrganizationId == orgId ||
-                        // it's public everyone can see it
-                        p.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see local objects
-                        p.AccessModifier == AccessModifier.Local && p.OrganizationId == orgId
-                    );
+                var projectsQuery = CreateScopedQuery(orgId).ByPartOfName(q);
 
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(proj => proj.Name.Contains(q));
-
-                var projects = Page(Repository.AsQueryable(), pagingModel);
+                var projects = Page(projectsQuery, pagingModel);
 
                 var dtos = Map<IEnumerable<ItProject>, IEnumerable<ItProjectOverviewDTO>>(projects);
 
@@ -172,7 +140,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var projects = _itProjectService.GetAll(orgId, includePublic:false).Where(p => p.ItProjectTypeId == typeId);
+                var projects = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(orgId)
+                    .Where(p => p.ItProjectTypeId == typeId)
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .ToList();
 
                 return Ok(Map(projects));
             }
@@ -192,18 +166,19 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(project, organizationId))
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
 
                 var orgUnit = _orgUnitRepository.GetByKey(organizationUnit);
+
                 if (orgUnit == null)
                 {
-                    return NotFound();
+                    return BadRequest("Invalid org unit id");
                 }
 
-                project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage {ItProjectId = id, OrganizationUnitId = organizationUnit});
+                project.UsedByOrgUnits.Add(new ItProjectOrgUnitUsage { ItProjectId = id, OrganizationUnitId = organizationUnit });
 
                 project.LastChanged = DateTime.UtcNow;
                 project.LastChangedByUser = KitosUser;
@@ -235,7 +210,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(project, organizationId))
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
@@ -243,7 +218,7 @@ namespace Presentation.Web.Controllers.API
                 var entity = project.UsedByOrgUnits.SingleOrDefault(x => x.ItProjectId == id && x.OrganizationUnitId == organizationUnit);
                 if (entity == null)
                 {
-                    return NotFound();
+                    return BadRequest("Org unit not found");
                 }
                 project.UsedByOrgUnits.Remove(entity);
 
@@ -269,7 +244,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     return NotFound();
                 }
-                if (!HasWriteAccess(project, organizationId))
+
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
@@ -296,7 +272,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!tasks.Any())
                 {
-                    return NotFound();
+                    return BadRequest("No tasks found for the provided ids");
                 }
 
                 foreach (var task in tasks)
@@ -324,7 +300,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(project, organizationId))
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
@@ -347,7 +323,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (!tasks.Any())
                 {
-                    return NotFound();
+                    return BadRequest("No tasks found for the provided ids");
                 }
 
                 foreach (var task in tasks)
@@ -381,6 +357,16 @@ namespace Presentation.Web.Controllers.API
             {
                 var project = Repository.GetByKey(id);
 
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowRead(project))
+                {
+                    return Forbidden();
+                }
+
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
@@ -403,10 +389,10 @@ namespace Presentation.Web.Controllers.API
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 var dtos = theTasks.Select(task => new TaskRefSelectedDTO()
-                    {
-                        TaskRef = Map<TaskRef, TaskRefDTO>(task),
-                        IsSelected = onlySelected || project.TaskRefs.Any(t => t.Id == task.Id)
-                    }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
+                {
+                    TaskRef = Map<TaskRef, TaskRefDTO>(task),
+                    IsSelected = onlySelected || project.TaskRefs.Any(t => t.Id == task.Id)
+                }).ToList(); // must call .ToList here else the output will be wrapped in $type,$values
 
                 return Ok(dtos);
             }
@@ -424,6 +410,11 @@ namespace Presentation.Web.Controllers.API
                 var project = Repository.GetByKey(id);
                 if (project == null) return NotFound();
 
+                if (!AllowRead(project))
+                {
+                    return Forbidden();
+                }
+
                 return Ok(Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageDTO>>(project.ItSystemUsages));
             }
             catch (Exception e)
@@ -437,21 +428,21 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
+
                 if (project == null)
                 {
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(project, organizationId))
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
 
-                //TODO: should also we check for write access to the system usage?
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
                 if (systemUsage == null)
                 {
-                    return NotFound();
+                    return BadRequest("System usage not found");
                 }
 
                 project.ItSystemUsages.Add(systemUsage);
@@ -474,12 +465,13 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = Repository.GetByKey(id);
+
                 if (project == null)
                 {
                     return NotFound();
                 }
 
-                if (!HasWriteAccess(project, organizationId))
+                if (!AllowModify(project))
                 {
                     return Forbidden();
                 }
@@ -487,7 +479,7 @@ namespace Presentation.Web.Controllers.API
                 var systemUsage = _itSystemUsageRepository.GetByKey(usageId);
                 if (systemUsage == null)
                 {
-                    return NotFound();
+                    return BadRequest("Usage not found");
                 }
 
                 project.ItSystemUsages.Remove(systemUsage);
@@ -538,7 +530,7 @@ namespace Presentation.Web.Controllers.API
             {
                 return NotFound();
             }
-            if (!HasWriteAccess(project, organizationId))
+            if (!AllowModify(project))
             {
                 return Forbidden();
             }
@@ -585,27 +577,34 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
-            // try get AccessModifier value
-            JToken accessModToken;
-            obj.TryGetValue("accessModifier", out accessModToken);
-            // only global admin can set access mod to public
+            obj.TryGetValue("accessModifier", out var accessModToken);
+            var itProject = Repository.GetByKey(id);
+            if (itProject == null)
+            {
+                return NotFound();
+            }
 
-            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public &&
-                !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
+            if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && AllowEntityVisibilityControl(itProject) == false)
             {
                 return Forbidden();
             }
+
             return base.Patch(id, organizationId, obj);
         }
 
-        protected override bool HasWriteAccess(ItProject obj, User user, int organizationId)
+        private IQueryable<ItProject> CreateScopedQuery(int orgId)
         {
-            // local admin have write access if the obj is in context
-            if (obj.IsInContext(organizationId) &&
-                user.OrganizationRights.Any(x => x.OrganizationId == organizationId && (x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.ProjectModuleAdmin)))
-                return true;
-
-            return base.HasWriteAccess(obj, user, organizationId);
+            var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccessLevel();
+            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgId);
+            var projectsQuery =
+                GetAllQuery()
+                    .ByOrganizationDataAndPublicDataFromOtherOrganizations
+                    (
+                        organizationId: orgId,
+                        organizationAccessLevel: organizationDataReadAccessLevel,
+                        crossOrganizationDataReadAccessLevel: crossOrganizationDataReadAccessLevel
+                    );
+            return projectsQuery;
         }
     }
 }

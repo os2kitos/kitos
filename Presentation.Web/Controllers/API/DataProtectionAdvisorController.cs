@@ -5,20 +5,34 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class DataProtectionAdvisorController : GenericApiController<DataProtectionAdvisor, DataProtectionAdvisorDTO>
     {
-        IGenericRepository<DataProtectionAdvisor> _repository;
-        IGenericRepository<Organization> _orgRepository;
-        public DataProtectionAdvisorController(IGenericRepository<DataProtectionAdvisor> repository, IGenericRepository<Organization> orgRepository) : base(repository)
+        private readonly IGenericRepository<DataProtectionAdvisor> _repository;
+        private readonly IGenericRepository<Organization> _orgRepository;
+
+        public DataProtectionAdvisorController(
+            IGenericRepository<DataProtectionAdvisor> repository, 
+            IGenericRepository<Organization> orgRepository,
+            IAuthorizationContext authorizationContext) 
+            : base(repository, authorizationContext)
         {
             _repository = repository;
             _orgRepository = orgRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<DataProtectionAdvisor>(x => _orgRepository.AsQueryable().ById(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId
@@ -53,7 +67,7 @@ namespace Presentation.Web.Controllers.API
                     }
                 };
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }
