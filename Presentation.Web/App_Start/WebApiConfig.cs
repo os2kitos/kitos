@@ -19,20 +19,19 @@ using Core.DomainModel.AdviceSent;
 using Presentation.Web.Models;
 using System.Linq;
 using Presentation.Web.Infrastructure.Odata;
+using Presentation.Web.Controllers.OData.AttachedOptions;
+using Microsoft.OData;
+using Microsoft.OData.UriParser;
+using System.Collections.Generic;
+using System.Web.OData.Routing.Conventions;
+using DataType = Core.DomainModel.ItSystem.DataType;
+using HelpText = Core.DomainModel.HelpText;
 
 namespace Presentation.Web
 {
-    using Controllers.OData.AttachedOptions;
-    using Microsoft.OData;
-    using Microsoft.OData.UriParser;
-    using System.Collections.Generic;
-    using System.Web.OData.Routing.Conventions;
-    using DataType = Core.DomainModel.ItSystem.DataType;
-    using HelpText = Core.DomainModel.HelpText;
-
     public static class WebApiConfig
     {
-        const string ControllerSuffix = "Controller";
+        private const string ControllerSuffix = "Controller";
 
         public static void Register(HttpConfiguration config)
         {
@@ -178,11 +177,11 @@ namespace Presentation.Web
             BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
-            var ReportsITSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder); 
-            ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
+            var reportsItSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder); 
+            reportsItSystemContacts.EntityType.HasKey(x => x.roleId);
 
 
-            var orgNameSpace = entitySetOrganizations;
+            const string orgNameSpace = entitySetOrganizations;
 
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder); 
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
