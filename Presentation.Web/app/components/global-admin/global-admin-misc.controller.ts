@@ -53,15 +53,10 @@
         $scope.GetKLEChanges = function () {
             //TODO Query for database changes in xml format.
 
-         //   KLEservice.getChanges().success(csv => {
-           //     $scope.KLEupdateReadyStep2 = true;
-             //   notify.addSuccessMessage("Henter ændringer");
-            //});
-
             KLEservice.getChanges().success((data) => {
                     var anchor = angular.element('<a/>');
                     anchor.attr({
-                        href: 'data:attachment/csv;charset=utf-8,' + encodeURI(data),
+                        href: 'data:attachment/csv' + encodeURI(data),
                         target: '_blank',
                         download: 'filename.csv'
                     })[0].click();
@@ -70,7 +65,6 @@
                 error(function (data, status, headers, config) {
                     // handle error
                 });
-
 
         }
 

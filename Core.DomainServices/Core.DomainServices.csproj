@@ -75,8 +75,11 @@
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="Repositories\KLE\IKLEStandardRepository.cs" />
+    <Compile Include="Repositories\KLE\KLEChange.cs" />
+    <Compile Include="Repositories\KLE\KLEChangeType.cs" />
     <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
+    <Compile Include="Repositories\KLE\MostRecentKLE.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />

@@ -128,8 +128,9 @@
       <Link>UserMock.cs</Link>
     </Compile>
     <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
-    <Compile Include="ApplicationServices\KLEApplicationServiceTest.cs" />
-    <Compile Include="ApplicationServices\KLEStandardRepositoryTest.cs" />
+    <Compile Include="ApplicationServices\KLE\KLEApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
+    <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -161,7 +162,11 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ApplicationServices\20200106-kle-emneplan-response.xml">
+    <Content Include="ApplicationServices\KLE\20200106-kle-only-published-date.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ApplicationServices\KLE\20200106-kle-sample-changes.xml">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
