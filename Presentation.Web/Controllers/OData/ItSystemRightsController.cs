@@ -10,12 +10,11 @@ using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Net;
 
 namespace Presentation.Web.Controllers.OData
 {
-    using System;
-    using System.Net;
-
     [PublicApi]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
@@ -25,19 +24,6 @@ namespace Presentation.Web.Controllers.OData
             IAuthorizationContext authorizationContext)
             : base(repository, authService, authorizationContext)
         {
-        }
-
-        // GET /Organizations(1)/ItSystemUsages(1)/Rights
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/ItSystemUsages({usageId})/Rights")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
-        public IHttpActionResult GetByItSystem(int orgId, int usageId)
-        {
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == usageId).ToList();
-
-            result = FilterByAccessControl(result);
-
-            return Ok(result.AsQueryable());
         }
 
         // GET /Users(1)/ItProjectRights

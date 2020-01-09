@@ -5,7 +5,6 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
@@ -66,28 +65,6 @@ namespace Presentation.Web.Controllers.OData
                 var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
                 return Ok(result);
             }
-        }
-
-        // GET /Organizations(1)/ItProjects(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItProjects({projKey})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItProject>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItProjects(int orgKey, int projKey)
-        {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == projKey);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (_authService.HasReadAccess(UserId, entity))
-            {
-                return Ok(entity);
-            }
-
-            return Forbidden();
         }
 
         // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!

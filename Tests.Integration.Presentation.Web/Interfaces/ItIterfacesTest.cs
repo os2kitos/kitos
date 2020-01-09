@@ -65,34 +65,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        public async Task User_Is_Able_To_See_Specific_Interface_From_Own_Org_Or_public(OrganizationRole role)
-        {
-            //Arrange
-            var interFacePrefixName = CreateInterFacePrefixName();
-            var token = await HttpApi.GetTokenAsync(role);
-            await GenerateTestInterfaces(interFacePrefixName);
-            var interfaceResultByName = await GetInterfacesByName(interFacePrefixName);
-
-            foreach (var item in interfaceResultByName.Result)
-            {
-                var orgFromItem = item.OrganizationId;
-                var key = item.Id;
-
-                var url = TestEnvironment.CreateUrl($"odata/Organizations({orgFromItem})/ItInterfaces({key})");
-
-                //Act
-                using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-                {
-                    //Assert
-                    var response = await httpResponse.ReadResponseBodyAsAsync<ItInterface>();
-                    Assert.NotNull(interfaceResultByName);
-                    Assert.Equal(key, response.Id);
-                }
-            }
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
         public async Task Can_Add_Data_Row(OrganizationRole role)
         {

@@ -21,16 +21,6 @@ namespace Presentation.Web.Controllers.OData
             _authService = authService;
         }
 
-        // GET /Organizations(1)/ItContracts(1)/Rights
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/OrganizationUnits({orgUnitId})/Rights")]
-        public IHttpActionResult GetByOrganizationUnit(int orgId, int orgUnitId)
-        {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == orgUnitId);
-            return Ok(result);
-        }
-
         // GET /Users(1)/ItContractRights
         [EnableQuery]
         [ODataRoute("Users({userId})/OrganizationUnitRights")]

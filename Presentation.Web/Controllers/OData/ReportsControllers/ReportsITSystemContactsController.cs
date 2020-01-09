@@ -1,19 +1,18 @@
 ﻿using System;
-using Core.ApplicationServices;
-using Core.DomainServices;
+using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Presentation.Web.Controllers.OData.ReportsControllers;
+using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
-using System.Collections.Generic;
+using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
     public class ReportsITSystemContactsController : BaseOdataAuthorizationController<ItSystemRight>

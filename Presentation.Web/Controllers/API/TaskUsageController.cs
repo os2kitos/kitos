@@ -37,14 +37,6 @@ namespace Presentation.Web.Controllers.API
         [HttpGet]
         [Route("api/taskUsage/")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
-        public HttpResponseMessage Get(int orgUnitId, int organizationId, [FromUri] PagingModel<TaskUsage> pagingModel)
-        {
-            return Get(orgUnitId, organizationId, false, pagingModel);
-        }
-
-        [HttpGet]
-        [Route("api/taskUsage/")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
         public HttpResponseMessage Get(int orgUnitId, int organizationId, bool onlyStarred, [FromUri] PagingModel<TaskUsage> pagingModel)
         {
             try

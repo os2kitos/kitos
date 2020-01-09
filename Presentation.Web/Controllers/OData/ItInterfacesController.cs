@@ -45,23 +45,5 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository.AsQueryable().Where(m => m.OrganizationId == key || m.AccessModifier == AccessModifier.Public);
             return Ok(result);
         }
-
-        // GET /Organizations(1)/ItInterfaces(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItInterfaces({interfaceKey})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItInterface>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaces(int orgKey, int interfaceKey)
-        {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == interfaceKey);
-            if (entity == null)
-                return NotFound();
-
-            if (_authService.HasReadAccess(UserId, entity))
-                return Ok(entity);
-
-            return Forbidden();
-        }
     }
 }

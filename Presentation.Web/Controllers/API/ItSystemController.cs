@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -146,42 +145,6 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        public HttpResponseMessage GetInterfacesSearch(string q, int orgId, bool? interfaces)
-        {
-            try
-            {
-                var systems = _systemService.GetInterfaces(orgId, q, KitosUser);
-
-                systems = systems.Where(AllowRead);
-
-                var dtos = Map(systems);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        public HttpResponseMessage GetNonInterfacesSearch(string q, int orgId, bool? nonInterfaces)
-        {
-            try
-            {
-                var systems = _systemService.GetNonInterfaces(orgId, q, KitosUser);
-
-                systems = systems.Where(AllowRead);
-
-                var dtos = Map(systems);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
         public HttpResponseMessage GetHierarchy(int id, [FromUri] bool hierarchy)
         {
             try
@@ -231,29 +194,6 @@ namespace Presentation.Web.Controllers.API
                 var savedItem = PostQuery(item);
 
                 return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
-        /// Henter alle IT Systemer ejet af organisationen samt alle IT systemer fra nadre organisationer som er taget i anvendelse.
-        /// </summary>
-        /// <param name="orgId"></param>
-        /// <returns></returns>
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemDTO>>))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetItSystemsUsedByOrg([FromUri] int orgId)
-        {
-            try
-            {
-                var systems = Repository.Get(x => x.OrganizationId == orgId || x.Usages.Any(y => y.OrganizationId == orgId));
-
-                systems = systems?.Where(AllowRead);
-
-                return systems == null ? NotFound() : Ok(Map(systems));
             }
             catch (Exception e)
             {

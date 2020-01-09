@@ -22,6 +22,21 @@ namespace Presentation.Web.Controllers.API
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
+        public HttpResponseMessage GetByContract(int contractId)
+        {
+            try
+            {
+                var items = _repository.Get(x => x.ItContractId == contractId);
+                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
+                return Ok(dtos);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
         public HttpResponseMessage Get(int usageId, int sysId, int interfaceId)
         {
             try
@@ -30,36 +45,6 @@ namespace Presentation.Web.Controllers.API
                 var item = _repository.GetByKey(key);
                 var dto = Map<ItInterfaceUsage, ItInterfaceUsageDTO>(item);
                 return Ok(dto);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        public HttpResponseMessage GetByUsage(int usageId)
-        {
-            try
-            {
-                var items = _repository.Get(x => x.ItSystemUsageId == usageId);
-                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceUsageDTO>>))]
-        public HttpResponseMessage GetByContract(int contractId)
-        {
-            try
-            {
-                var items = _repository.Get(x => x.ItContractId == contractId);
-                var dtos = Map<IEnumerable<ItInterfaceUsage>, IEnumerable<ItInterfaceUsageDTO>>(items);
-                return Ok(dtos);
             }
             catch (Exception e)
             {

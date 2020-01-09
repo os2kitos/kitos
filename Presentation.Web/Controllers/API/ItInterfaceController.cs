@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -51,70 +49,6 @@ namespace Presentation.Web.Controllers.API
         protected override void DeleteQuery(ItInterface entity)
         {
             _itInterfaceService.Delete(entity.Id);
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
-        public HttpResponseMessage GetSearch(string q, int orgId)
-        {
-            try
-            {
-                var interfaces = Repository.Get(
-                    s =>
-                        // filter by name
-                        s.Name.Contains(q) &&
-                        // global admin sees all within the context
-                        (KitosUser.IsGlobalAdmin &&
-                         s.OrganizationId == orgId ||
-                         // object owner sees his own objects
-                         s.ObjectOwnerId == KitosUser.Id ||
-                         // it's public everyone can see it
-                         s.AccessModifier == AccessModifier.Public ||
-                         // everyone in the same organization can see normal objects
-                         s.AccessModifier == AccessModifier.Local &&
-                         s.OrganizationId == orgId)
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                    );
-                var dtos = Map(interfaces);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceDTO>>))]
-        public HttpResponseMessage GetCatalog(string q, int organizationId, [FromUri] PagingModel<ItInterface> pagingModel)
-        {
-            try
-            {
-                pagingModel.Where(s =>
-                    // global admin sees all within the context
-                    KitosUser.IsGlobalAdmin &&
-                    s.OrganizationId == organizationId ||
-                    // object owner sees his own objects
-                    s.ObjectOwnerId == KitosUser.Id ||
-                    // it's public everyone can see it
-                    s.AccessModifier == AccessModifier.Public ||
-                    // everyone in the same organization can see normal objects
-                    s.AccessModifier == AccessModifier.Local &&
-                    s.OrganizationId == organizationId
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                    );
-
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(s => s.Name.Contains(q));
-
-                var interfaces = Page(Repository.AsQueryable(), pagingModel);
-
-                var dtos = Map(interfaces);
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
         }
 
         public override HttpResponseMessage Post(ItInterfaceDTO dto)

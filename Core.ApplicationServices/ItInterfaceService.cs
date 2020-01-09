@@ -25,7 +25,7 @@ namespace Core.ApplicationServices
             var itInterface = _repository.Get(x => x.Id == id).FirstOrDefault();
 
             // delete it interface
-            _repository.Delete(itInterface);
+            _repository.DeleteWithReferencePreload(itInterface);
             _repository.Save();
         }
     }

@@ -65,34 +65,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItSystemUsageDTO>>))]
-        public HttpResponseMessage GetByOrganization(int organizationId, [FromUri] PagingModel<ItSystemUsage> pagingModel, [FromUri] string q, bool? overview)
-        {
-            try
-            {
-                if (GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
-                {
-                    return Forbidden();
-                }
-
-                pagingModel.Where(
-                    u =>
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId
-                    );
-
-                if (!string.IsNullOrEmpty(q)) pagingModel.Where(usage => usage.ItSystem.Name.Contains(q));
-
-                var usages = Page(Repository.AsQueryable(), pagingModel);
-
-                return Ok(Map(usages));
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageDTO>))]
         public override HttpResponseMessage GetSingle(int id)
         {

@@ -7,7 +7,6 @@ using System.Security;
 using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
-using System.Web.OData.Routing;
 using Core.DomainModel;
 using System.Linq;
 using Presentation.Web.Infrastructure.Attributes;
@@ -60,48 +59,6 @@ namespace Presentation.Web.Controllers.OData
             _organizationService.RemoveUser(orgKey, userId);
 
             return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/LastChangedByUser")]
-        public virtual IHttpActionResult GetLastChangedByUser(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.GetByKey(orgKey).LastChangedByUser;
-            return Ok(result);
-        }
-
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ObjectOwner")]
-        public virtual IHttpActionResult GetObjectOwner(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.GetByKey(orgKey).ObjectOwner;
-            return Ok(result);
-        }
-
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Type")]
-        public virtual IHttpActionResult GetType(int orgKey)
-        {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var result = Repository.GetByKey(orgKey).Type;
-            return Ok(result);
         }
 
         [EnableQuery]
