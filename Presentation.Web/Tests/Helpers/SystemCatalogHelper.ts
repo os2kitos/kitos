@@ -3,7 +3,6 @@ import SystemPage = require("../PageObjects/It-system/Tabs/ItSystemFrontpage.po"
 import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
-import TestFixture = require("../Utility/TestFixtureWrapper");
 import Select2 = require("./Select2Helper");
 
 class SystemCatalogHelper {
@@ -11,9 +10,7 @@ class SystemCatalogHelper {
     private static cssHelper = new CSSLocator();
     private static pageObject = new CatalogPage();
     private static systemPage = new SystemPage();
-    private static waitUpTo = new WaitTimers(); 
-    private static testFixture = new TestFixture();
-    
+    private static waitUpTo = new WaitTimers();
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
