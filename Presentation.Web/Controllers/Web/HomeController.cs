@@ -7,13 +7,11 @@ namespace Presentation.Web.Controllers.Web
     {
         //
         // GET: /Angular/
-
         public ActionResult Index()
         {
             ViewBag.Environment = Settings.Default.Environment;
 
             return View();
         }
-
     }
 }

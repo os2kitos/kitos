@@ -9,7 +9,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [PublicApi]
+    [InternalApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
         IGenericRepository<AdviceUserRelation> _repository;
@@ -38,7 +38,5 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
-
-
     }
 }

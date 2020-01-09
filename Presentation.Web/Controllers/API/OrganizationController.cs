@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security;
@@ -18,13 +17,11 @@ namespace Presentation.Web.Controllers.API
     public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
-        private readonly IGenericRepository<User> _useRepository;
 
-        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IGenericRepository<User> useRepository)
+        public OrganizationController(IGenericRepository<Organization> repository, IOrganizationService organizationService)
             : base(repository)
         {
             _organizationService = organizationService;
-            _useRepository = useRepository;
         }
 
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
@@ -79,30 +76,6 @@ namespace Presentation.Web.Controllers.API
 
                 var dtos = Map(orgs2);
                 return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        /// <summary>
-        /// Gets all users from an organization matching the search criteria.
-        /// </summary>
-        /// <param name="q">Text search string</param>
-        /// <param name="id">Organization id</param>
-        /// <param name="users">Route identifier</param>
-        /// <returns>All users from organization <see cref="id"/> which matched the search criteria <see cref="q"/></returns>
-        public HttpResponseMessage GetUsers(int id, string q, bool? users)
-        {
-            try
-            {
-                var qry =
-                    _useRepository.Get(
-                        u =>
-                            u.OrganizationRights.Count(r => r.OrganizationId == id) != 0 && (u.Name.Contains(q) || u.Email.Contains(q)));
-
-                return Ok(Map<IEnumerable<User>, IEnumerable<UserDTO>>(qry));
             }
             catch (Exception e)
             {

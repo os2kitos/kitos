@@ -3,7 +3,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
-namespace Presentation.Web.Controllers.OData.OptionControllers
+namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
     public class LocalRegularPersonalDataTypesController : LocalOptionBaseController<LocalRegularPersonalDataType, ItSystem, RegularPersonalDataType>

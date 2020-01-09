@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
@@ -47,27 +46,6 @@ namespace Presentation.Web.Controllers.OData
                     .ByOrganizationDataAndPublicDataFromOtherOrganizations(orgKey, readAccessLevel, GetCrossOrganizationReadAccessLevel());
 
             return Ok(result);
-        }
-
-        // GET /Organizations(1)/ItSystems(1)
-        [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItSystems({sysKey})")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<ItSystem>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystems(int orgKey, int sysKey)
-        {
-            var system = Repository.GetByKey(sysKey);
-            if (!AllowRead(system))
-            {
-                return Forbidden();
-            }
-            if (system == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(system);
         }
 
         [ODataRoute("ItSystems")]

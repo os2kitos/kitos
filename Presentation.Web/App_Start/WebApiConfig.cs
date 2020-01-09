@@ -1,4 +1,5 @@
 ﻿using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
 using Core.DomainModel;
@@ -16,9 +17,10 @@ using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
-using Presentation.Web.Models;
 using System.Linq;
+using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Infrastructure.Odata;
+using Presentation.Web.Models;
 using Presentation.Web.Controllers.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
@@ -31,10 +33,11 @@ namespace Presentation.Web
 {
     public static class WebApiConfig
     {
-        private const string ControllerSuffix = "Controller";
+        const string ControllerSuffix = "Controller";
 
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
             config.MapHttpAttributeRoutes();
             var apiCfg = config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -177,11 +180,11 @@ namespace Presentation.Web
             BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
 
             //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
-            var reportsItSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder); 
-            reportsItSystemContacts.EntityType.HasKey(x => x.roleId);
+            var ReportsITSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder); 
+            ReportsITSystemContacts.EntityType.HasKey(x => x.roleId);
 
 
-            const string orgNameSpace = entitySetOrganizations;
+            var orgNameSpace = entitySetOrganizations;
 
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder); 
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";

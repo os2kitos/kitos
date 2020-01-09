@@ -57,48 +57,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        public HttpResponseMessage Post(int usageId, int exhibitId, ItInterfaceExhibitUsageDTO dto)
-        {
-            try
-            {
-                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
-                var item = _repository.GetByKey(key);
-                if (item != null)
-                    return Conflict("Already exists");
-
-                var entity = Map<ItInterfaceExhibitUsageDTO, ItInterfaceExhibitUsage>(dto);
-
-                _repository.Insert(entity);
-                _repository.Save();
-
-                return Ok(entity);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
-        public HttpResponseMessage Delete(int usageId, int exhibitId)
-        {
-            try
-            {
-                var key = ItInterfaceExhibitUsage.GetKey(usageId, exhibitId);
-                var item = _repository.GetByKey(key);
-                if (item == null)
-                    return NotFound();
-
-                _repository.DeleteByKey(key);
-                _repository.Save();
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         /// <summary>
         /// Patches IsWishedFor or ItContractId only.
         /// If the entry doesn't exist it's created.

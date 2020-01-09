@@ -5,34 +5,22 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.ApplicationServices;
- using Presentation.Web.Infrastructure.Attributes;
- using Swashbuckle.OData;
- using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.OData;
+using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Net;
 
- namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData
 {
-    using System;
-    using System.Net;
-
     [PublicApi]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
-        private IAuthenticationService _authService;
+        private readonly IAuthenticationService _authService;
         public ItProjectRightsController(IGenericRepository<ItProjectRight> repository, IAuthenticationService authService)
             : base(repository, authService)
         {
-            this._authService = authService;
-        }
-
-        // GET /Organizations(1)/ItProjects(1)/Rights
-        [EnableQuery]
-        [ODataRoute("Organizations({orgId})/ItProjects({projId})/Rights")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItProjectRight>>))]
-        public IHttpActionResult GetByItProject(int orgId, int projId)
-        {
-            // TODO figure out how to check auth
-            var result = Repository.AsQueryable().Where(x => x.Object.OrganizationId == orgId && x.ObjectId == projId);
-            return Ok(result);
+            _authService = authService;
         }
 
         // GET /Users(1)/ItProjectRights
@@ -49,7 +37,7 @@ using Core.ApplicationServices;
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            
+
             if (entity == null)
                 return NotFound();
 
