@@ -10,6 +10,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -41,7 +42,7 @@ namespace Presentation.Web.Controllers.API
                         new KLEStatusDTO
                         {
                             UpToDate = result.Value.UpToDate,
-                            Version = result.Value.Published.ToLongDateString()
+                            Version = result.Value.Published.ToString("dd-MM-yyyy")
                         });
                 default:
                     return Error($"Something went wrong getting KLE status");
@@ -52,21 +53,54 @@ namespace Presentation.Web.Controllers.API
         [Route("changes")]
         public HttpResponseMessage GetKLEChanges()
         {
-            // TODO: Replace dummy data
-            var list = new List<dynamic>();
-            var header = new ExpandoObject() as IDictionary<string, Object>;
-            header.Add("Uuid", "Identifier");
+            var result = _kleApplicationService.GetKLEChangeSummary();
+            switch (result.Status)
+            {
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.Ok:
+                {
+                    var list = new List<dynamic>();
+                    CreateCsvHeader(list);
+                    CreateCsvChangeDescriptions(list, result.Value);
+                    return CreateCsvFormattedHttpResponse(list);
+                }
+                default:
+                    return Error($"Something went wrong getting KLE status");
+            }
+        }
+
+        private static void CreateCsvHeader(ICollection<dynamic> list)
+        {
+            var header = new ExpandoObject() as IDictionary<string, object>;
+            //header.Add("Uuid", "Identifier");
             header.Add("Type", "KLE Type");
             header.Add("TaskKey", "KLE nummer");
             header.Add("Description", "Beskrivelse");
             header.Add("Change", "Ændring");
             list.Add(header);
+        }
+
+        private void CreateCsvChangeDescriptions(ICollection<object> list, IEnumerable<KLEChange> kleChanges)
+        {
+            foreach (var elem in kleChanges)
+            {
+                var obj = new ExpandoObject() as IDictionary<string, object>;
+                obj.Add("Type", elem.Type);
+                obj.Add("TaskKey", elem.TaskKey);
+                obj.Add("Description", elem.UpdatedDescription);
+                obj.Add("Change", ChangeTypeToString(elem.ChangeType));
+                list.Add(obj);
+            };
+        }
+
+        private static HttpResponseMessage CreateCsvFormattedHttpResponse(IEnumerable<dynamic> list)
+        {
             var s = list.ToCsv();
             var bytes = Encoding.Unicode.GetBytes(s);
             var stream = new MemoryStream();
             stream.Write(bytes, 0, bytes.Length);
             stream.Seek(0, SeekOrigin.Begin);
-
             var result = new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = new StreamContent(stream)
@@ -78,6 +112,18 @@ namespace Presentation.Web.Controllers.API
                 DispositionType = "ISO-8859-1"
             };
             return result;
+        }
+
+        private string ChangeTypeToString(KLEChangeType changeType)
+        {
+            switch (changeType)
+            {
+                case KLEChangeType.Removed: return "Fjernet";
+                case KLEChangeType.Added: return "Tilføjet";
+                case KLEChangeType.Renamed: return "Ændret";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
+            }
         }
 
         [HttpPut]
