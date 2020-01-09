@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
+using Core.DomainModel.Organization;
 using Infrastructure.Services.KLEDataBridge;
 
 namespace Core.DomainServices.Repositories.KLE
@@ -8,10 +11,12 @@ namespace Core.DomainServices.Repositories.KLE
     public class KLEStandardRepository : IKLEStandardRepository
     {
         private readonly IKLEDataBridge _kleDataBridge;
+        private readonly IGenericRepository<TaskRef> _existingTaskRefRepository;
 
-        public KLEStandardRepository(IKLEDataBridge kleDataBridge)
+        public KLEStandardRepository(IKLEDataBridge kleDataBridge, IGenericRepository<TaskRef> existingTaskRefRepository)
         {
             _kleDataBridge = kleDataBridge;
+            _existingTaskRefRepository = existingTaskRefRepository;
         }
 
         public KLEStatus GetKLEStatus()
@@ -24,6 +29,76 @@ namespace Core.DomainServices.Repositories.KLE
                 UpToDate = DateTime.Now.Date>=publishedDate.Date,
                 Published = publishedDate
             };
+        }
+
+        public IReadOnlyList<KLEChange> GetKLEChangeSummary()
+        {
+            var result = new List<KLEChange>();
+            var mostRecentTaskRefs = ConvertToTaskRefs(_kleDataBridge.GetKLEXMLData());
+            foreach (var existingTaskRef in _existingTaskRefRepository.Get())
+            {
+                if (mostRecentTaskRefs.TryGet(existingTaskRef.TaskKey, out var mostRecentTaskRef))
+                {
+                    if (!mostRecentTaskRef.Description.Equals(existingTaskRef.Description))
+                    {
+                        result.Add(new KLEChange
+                        {
+                            Type = mostRecentTaskRef.Type,
+                            ChangeType = KLEChangeType.Renamed,
+                            TaskKey = existingTaskRef.TaskKey,
+                            UpdatedDescription = mostRecentTaskRef.Description
+                        });
+                    }
+                    mostRecentTaskRefs.Remove(mostRecentTaskRef.TaskKey);
+                }
+                else
+                {
+                    result.Add(new KLEChange
+                    {
+                        Type = existingTaskRef.Type,
+                        ChangeType = KLEChangeType.Removed,
+                        TaskKey = existingTaskRef.TaskKey,
+                        UpdatedDescription = existingTaskRef.Description
+                    });
+                }
+            }
+            result.AddRange(mostRecentTaskRefs.GetAll().Select(mostRecentTaskRef => 
+                new KLEChange
+                {
+                    Type = mostRecentTaskRef.Type,
+                    ChangeType = KLEChangeType.Added,
+                    TaskKey = mostRecentTaskRef.TaskKey,
+                    UpdatedDescription = mostRecentTaskRef.TaskKey
+                }));
+
+            return result;
+        }
+
+        private static MostRecentKLE ConvertToTaskRefs(XDocument document)
+        {
+            var result = new MostRecentKLE();
+            result.AddRange(document.Descendants("Hovedgruppe").Select(mainGroup => 
+                new TaskRef
+                {
+                    TaskKey = mainGroup.Descendants("HovedgruppeNr").First().Value,
+                    Description = mainGroup.Descendants("HovedgruppeTitel").First().Value,
+                    Type = "KLE-Hovedgruppe"
+                }));
+            result.AddRange(document.Descendants("Gruppe").Select(mainGroup =>
+                new TaskRef
+                {
+                    TaskKey = mainGroup.Descendants("GruppeNr").First().Value,
+                    Description = mainGroup.Descendants("GruppeTitel").First().Value,
+                    Type = "KLE-Gruppe"
+                }));
+            result.AddRange(document.Descendants("Emne").Select(mainGroup =>
+                new TaskRef
+                {
+                    TaskKey = mainGroup.Descendants("EmneNr").First().Value,
+                    Description = mainGroup.Descendants("EmneTitel").First().Value,
+                    Type = "KLE-Emne"
+                }));
+            return result;
         }
     }
 }
