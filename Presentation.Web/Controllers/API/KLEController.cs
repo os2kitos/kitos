@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.API
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileNameStar = "kle-updates.csv",
-                DispositionType = "ISO-8859-1"
+                DispositionType = "UTF-8"
             };
             return result;
         }
