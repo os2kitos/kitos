@@ -232,8 +232,6 @@
                                     if (!system.Organization) {
                                         system.Organization = { Name: "" };
                                     }
-
-
                                 });
                             return response;
                         }
@@ -659,8 +657,6 @@
                     noDataTemplate: ""
                 });
             }
-            
-            
         }
 
         public createITSystem() {
