@@ -198,7 +198,12 @@
 
         authorizeUser = (userLoginInfo) => {
             //returns the organizational context for the user whos credentials have been authorized
-            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo);
+            var csrfHeader = {
+                headers: {
+                    "X-XSRF-Token": angular.element("input[name='__RequestVerificationToken']").val()
+                }
+            }
+            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo, csrfHeader); 
         }
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
