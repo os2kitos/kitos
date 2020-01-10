@@ -31,7 +31,7 @@
                 $scope.KleApplyUpdateButtonInteraction = false;
             }
         }).
-            error(function () {
+            error(() => {
                 $scope.KleUpdateAvailableButtonInteraction = false;
                 $scope.KleApplyUpdateButtonInteraction = false;
                 notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
@@ -78,7 +78,7 @@
                 $scope.KleUpdateAvailableButtonInteraction = true;
                 $scope.KleApplyUpdateButtonInteraction = true;
                 }).
-                error(function () {
+                error(() => {
                     $scope.KleUpdateAvailableButtonInteraction = true;
                     $scope.KleApplyUpdateButtonInteraction = false;
                     notify.addErrorMessage("There was an issue downloading the excel file, please contact support.");
@@ -87,7 +87,21 @@
 
         $scope.UpdateKLE = function () {
             if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
-                //TODO Query database to update
+                KLEservice.applyUpdateKLE().
+                    success(() => {
+                        $scope.KleUpdateAvailableButtonInteraction = true;
+                        $scope.KleApplyUpdateButtonInteraction = false;
+                        notify.addSuccessMessage("KLE er opdateret");
+                    }).
+                    error(() => {
+                        $scope.KleUpdateAvailableButtonInteraction = true;
+                        $scope.KleApplyUpdateButtonInteraction = false;
+                        notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
+                    });
+
+
+
+
                 notify.addSuccessMessage("KLE er nu opdateret!");
                 
             } else {

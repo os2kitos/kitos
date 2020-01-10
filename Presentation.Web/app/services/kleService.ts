@@ -18,9 +18,9 @@
             return this.$http({ method: "GET", url: url,});
         }
 
-        updateKLE() {
-            const url = `api/kle`;
-            return this.$http({ method: "GET", url: url, });
+        applyUpdateKLE() {
+            const url = `api/v1/kle`;
+            return this.$http({ method: "PUT", url: url, });
         }
 
     }
