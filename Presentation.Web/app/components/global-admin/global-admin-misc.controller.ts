@@ -15,20 +15,28 @@
 
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice) => {
         $rootScope.page.title = "Andet";
-        $scope.KLEupdateReadyStep1 = false;
-        $scope.KLEupdateReadyStep2 = false;
+        $scope.KleUpdateAvailableButtonInteraction = false;
+        $scope.KleApplyUpdateButtonInteraction = false;
 
         KLEservice.getStatus().success(dto => {
 
             if (!dto.response.uptodate) {
                 $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar! " + dto.response.version;
-                $scope.KLEupdateReadyStep1 = true;
-                $scope.KLEupdateReadyStep2 = false;
+                $scope.KleUpdateAvailableButtonInteraction = true;
+                $scope.KleApplyUpdateButtonInteraction = false;
             }
             else {
                 $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! " + dto.response.version;
+                $scope.KleUpdateAvailableButtonInteraction = false;
+                $scope.KleApplyUpdateButtonInteraction = false;
             }
-        });
+        }).
+            error(function () {
+                $scope.KleUpdateAvailableButtonInteraction = false;
+                $scope.KleApplyUpdateButtonInteraction = false;
+                notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
+            });
+    
 
         $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
             return g.key === "CanGlobalAdminOnlyEditReports";
@@ -51,8 +59,8 @@
         };
 
         $scope.GetKLEChanges = function () {
-            $scope.KLEupdateReadyStep1 = false;
-            $scope.KLEupdateReadyStep2 = false;
+            $scope.KleUpdateAvailableButtonInteraction = false;
+            $scope.KleApplyUpdateButtonInteraction = false;
 
             
             KLEservice.getChanges().success((data) => {
@@ -67,12 +75,12 @@
                         download: 'KLE-Changes.csv'
                     })[0].click();
                 notify.addSuccessMessage("Download complete");
-                $scope.KLEupdateReadyStep1 = true;
-                $scope.KLEupdateReadyStep2 = true;
+                $scope.KleUpdateAvailableButtonInteraction = true;
+                $scope.KleApplyUpdateButtonInteraction = true;
                 }).
-                error(function (data, status, headers, config) {
-                    $scope.KLEupdateReadyStep1 = true;
-                    $scope.KLEupdateReadyStep2 = false;
+                error(function () {
+                    $scope.KleUpdateAvailableButtonInteraction = true;
+                    $scope.KleApplyUpdateButtonInteraction = false;
                     notify.addErrorMessage("There was an issue downloading the excel file, please contact support.");
                 });
         }
