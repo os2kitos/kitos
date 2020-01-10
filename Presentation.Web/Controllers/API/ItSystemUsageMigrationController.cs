@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -24,8 +23,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IItSystemUsageMigrationService _itSystemUsageMigrationService;
 
-        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext)
-            : base(authContext)
+        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService)
         {
             _itSystemUsageMigrationService = itSystemUsageMigrationService;
         }

@@ -3,8 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -16,15 +14,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
+    public class ItInterfaceController : GenericApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
 
         public ItInterfaceController(
             IGenericRepository<ItInterface> repository,
-            IItInterfaceService itInterfaceService,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItInterfaceService itInterfaceService)
+            : base(repository)
         {
             _itInterfaceService = itInterfaceService;
         }
@@ -141,16 +138,6 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
-        }
-
-        protected override bool HasWriteAccess(ItInterface obj, User user, int organizationId)
-        {
-            return HasWriteAccess();
-        }
-
-        protected bool HasWriteAccess()
-        {
-            return KitosUser.IsGlobalAdmin;
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -16,15 +15,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
+    public class RiskController : GenericApiController<Risk, RiskDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
-        public RiskController(
-            IGenericRepository<Risk> repository,
-            IAuthorizationContext authorizationContext,
-            IItProjectRepository projectRepository)
-            : base(repository, authorizationContext)
+        public RiskController(IGenericRepository<Risk> repository, IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

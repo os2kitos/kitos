@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItContract;
+﻿using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -11,9 +10,8 @@ namespace Presentation.Web.Controllers.API
     {
         public ItContractRightController(
             IGenericRepository<ItContractRight> rightRepository, 
-            IGenericRepository<ItContract> objectRepository,
-            IAuthorizationContext authorizationContext) 
-            : base(rightRepository, objectRepository, authorizationContext)
+            IGenericRepository<ItContract> objectRepository) 
+            : base(rightRepository, objectRepository)
         {
         }
     }

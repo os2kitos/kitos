@@ -25,9 +25,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<User> repository, 
             IUserService userService, 
             IOrganizationService organizationService,
-            IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext)
-            : base(repository, authorizationContext)
+            : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;

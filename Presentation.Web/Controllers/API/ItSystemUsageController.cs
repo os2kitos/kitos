@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Castle.Core.Internal;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -20,7 +19,7 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
+    public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -32,9 +31,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<AttachedOption> attachedOptionsRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<AttachedOption> attachedOptionsRepository)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;

@@ -385,7 +385,6 @@
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
-    <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -17,15 +16,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class ItProjectStatusController : GenericContextAwareApiController<ItProjectStatus, ItProjectStatusDTO>
+    public class ItProjectStatusController : GenericApiController<ItProjectStatus, ItProjectStatusDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
-        public ItProjectStatusController(
-            IGenericRepository<ItProjectStatus> repository,
-            IAuthorizationContext authorizationContext,
-            IItProjectRepository projectRepository)
-            : base(repository, authorizationContext)
+        public ItProjectStatusController(IGenericRepository<ItProjectStatus> repository, IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

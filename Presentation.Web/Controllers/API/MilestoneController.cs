@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,15 +9,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class MilestoneController : GenericContextAwareApiController<Milestone, MilestoneDTO>
+    public class MilestoneController : GenericApiController<Milestone, MilestoneDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
-        public MilestoneController(
-            IGenericRepository<Milestone> repository,
-            IAuthorizationContext authorization,
-            IItProjectRepository projectRepository)
-            : base(repository, authorization)
+        public MilestoneController(IGenericRepository<Milestone> repository, IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

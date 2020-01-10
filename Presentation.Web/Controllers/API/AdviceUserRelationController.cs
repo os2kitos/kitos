@@ -5,21 +5,17 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Mvc;
-using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
         private readonly IGenericRepository<AdviceUserRelation> _repository;
 
-        public AdviceUserRelationController(
-            IGenericRepository<AdviceUserRelation> repository, 
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+        public AdviceUserRelationController(IGenericRepository<AdviceUserRelation> repository)
+            : base(repository)
         {
             _repository = repository;
         }

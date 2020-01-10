@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -14,13 +16,12 @@ namespace Presentation.Web.Controllers.API
     public class GlobalAdminController : BaseApiController
     {
         private readonly IOrganizationalUserContext _organizationalUserContext;
+        private readonly IGenericRepository<User> _userRepository;
 
-        public GlobalAdminController(
-            IAuthorizationContext authorizationContext, 
-            IOrganizationalUserContext organizationalUserContext)
-            : base(authorizationContext)
+        public GlobalAdminController(IOrganizationalUserContext organizationalUserContext, IGenericRepository<User> userRepository)
         {
             _organizationalUserContext = organizationalUserContext;
+            _userRepository = userRepository;
         }
 
         private bool HasAccess()
@@ -37,7 +38,7 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                var users = UserRepository.Get(u => u.IsGlobalAdmin);
+                var users = _userRepository.Get(u => u.IsGlobalAdmin);
 
                 var dtos = AutoMapper.Mapper.Map<IEnumerable<UserDTO>>(users);
 
@@ -59,7 +60,7 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                var user = UserRepository.GetByKey(dto.UserId);
+                var user = _userRepository.GetByKey(dto.UserId);
 
                 //if already global admin, return conflict
                 if (user.IsGlobalAdmin)
@@ -70,7 +71,7 @@ namespace Presentation.Web.Controllers.API
                 user.IsGlobalAdmin = true;
                 user.LastChanged = DateTime.UtcNow;
                 user.LastChangedByUser = KitosUser;
-                UserRepository.Save();
+                _userRepository.Save();
 
                 var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
 
@@ -94,10 +95,10 @@ namespace Presentation.Web.Controllers.API
                         return BadRequest("Cannot remove own global admin rights");
                     }
 
-                    var user = UserRepository.GetByKey(userId);
+                    var user = _userRepository.GetByKey(userId);
 
                     user.IsGlobalAdmin = false;
-                    UserRepository.Save();
+                    _userRepository.Save();
 
                     var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
 

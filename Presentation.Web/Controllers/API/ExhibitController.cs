@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
@@ -18,13 +17,13 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class ExhibitController : GenericContextAwareApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
+    public class ExhibitController : GenericApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
 
-        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository, IAuthorizationContext authorizationContext, IGenericRepository<ItInterface> interfaceRepository)
-            : base(repository, authorizationContext)
+        public ExhibitController(IGenericRepository<ItInterfaceExhibit> repository, IGenericRepository<ItInterface> interfaceRepository)
+            : base(repository)
         {
             _repository = repository;
             _interfaceRepository = interfaceRepository;

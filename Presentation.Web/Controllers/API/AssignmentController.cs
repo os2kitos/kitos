@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,15 +9,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class AssignmentController : GenericContextAwareApiController<Assignment, AssignmentDTO>
+    public class AssignmentController : GenericApiController<Assignment, AssignmentDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
         public AssignmentController(
             IGenericRepository<Assignment> repository,
-            IItProjectRepository projectRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

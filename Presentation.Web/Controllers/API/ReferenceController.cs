@@ -3,7 +3,6 @@ using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
-using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -12,8 +11,8 @@ namespace Presentation.Web.Controllers.API
     [MigratedToNewAuthorizationContext]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
-        public ReferenceController(IGenericRepository<ExternalReference> repository, IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+        public ReferenceController(IGenericRepository<ExternalReference> repository)
+            : base(repository)
         {
         }
 

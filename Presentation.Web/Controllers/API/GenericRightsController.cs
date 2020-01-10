@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
+using Ninject;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
@@ -21,11 +21,13 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
         protected GenericRightsController(
             IGenericRepository<TRight> rightRepository,
-            IGenericRepository<TObject> objectRepository,
-            IAuthorizationContext authorizationContext = null) //TODO: Do not allow null once completed
-        : base(authorizationContext)
+            IGenericRepository<TObject> objectRepository)
+        : base()
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;

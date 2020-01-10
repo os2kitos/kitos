@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IAuthorizationContext _authorizationContext;
         private readonly string _mapPath = HttpContext.Current.Server.MapPath("~/Content/excel/");
 
-        public ExcelController(IExcelService excelService, IAuthorizationContext authorizationContext)
+        public ExcelController(IExcelService excelService, IAuthorizationContext authorizationContext) 
         {
             _excelService = excelService;
             _authorizationContext = authorizationContext;

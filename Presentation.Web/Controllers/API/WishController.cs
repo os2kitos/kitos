@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -16,15 +15,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class WishController : GenericContextAwareApiController<Wish, WishDTO>
+    public class WishController : GenericApiController<Wish, WishDTO>
     {
         private readonly IItSystemUsageRepository _usageRepository;
 
-        public WishController(
-            IGenericRepository<Wish> repository,
-            IAuthorizationContext authorization,
-            IItSystemUsageRepository usageRepository)
-            : base(repository, authorization)
+        public WishController(IGenericRepository<Wish> repository, IItSystemUsageRepository usageRepository)
+            : base(repository)
         {
             _usageRepository = usageRepository;
         }
@@ -32,7 +28,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<WishDTO>>))]
         public HttpResponseMessage GetWishes([FromUri] int userId, [FromUri] int usageId)
         {
-            var wishes = 
+            var wishes =
                 Repository
                     .Get(x => x.ItSystemUsageId == usageId && (x.IsPublic || x.UserId == userId))
                     .Where(AllowRead);

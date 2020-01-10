@@ -4,7 +4,6 @@ using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
@@ -22,9 +21,8 @@ namespace Presentation.Web.Controllers.API
 
         public OrganizationRightController(
             IGenericRepository<OrganizationRight> rightRepository,
-            IAuthorizationContext authorizationContext,
             IOrganizationRightsService organizationRightsService)
-            : base(rightRepository, authorizationContext)
+            : base(rightRepository)
         {
             _rightRepository = rightRepository;
             _organizationRightsService = organizationRightsService;

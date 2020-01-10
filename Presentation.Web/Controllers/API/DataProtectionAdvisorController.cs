@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -22,9 +21,8 @@ namespace Presentation.Web.Controllers.API
 
         public DataProtectionAdvisorController(
             IGenericRepository<DataProtectionAdvisor> repository, 
-            IGenericRepository<Organization> orgRepository,
-            IAuthorizationContext authorizationContext) 
-            : base(repository, authorizationContext)
+            IGenericRepository<Organization> orgRepository) 
+            : base(repository)
         {
             _repository = repository;
             _orgRepository = orgRepository;

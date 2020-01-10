@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -9,11 +8,8 @@ namespace Presentation.Web.Controllers.API
     [MigratedToNewAuthorizationContext]
     public class ItProjectRightController : GenericRightsController<ItProject, ItProjectRight, ItProjectRole>
     {
-        public ItProjectRightController(
-            IGenericRepository<ItProjectRight> rightRepository,
-            IGenericRepository<ItProject> objectRepository,
-            IAuthorizationContext authorizationContext)
-            : base(rightRepository, objectRepository, authorizationContext)
+        public ItProjectRightController(IGenericRepository<ItProjectRight> rightRepository, IGenericRepository<ItProject> objectRepository)
+            : base(rightRepository, objectRepository)
         {
         }
     }

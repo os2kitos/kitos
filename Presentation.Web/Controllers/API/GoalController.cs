@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -17,10 +16,9 @@ namespace Presentation.Web.Controllers.API
 
         public GoalController(
             IGenericRepository<Goal> repository,
-            IAuthorizationContext authorization,
             IItProjectRepository projectRepository,
             IGenericRepository<GoalStatus> goalStatusRepository)
-            : base(repository, authorization)
+            : base(repository)
         {
             _projectRepository = projectRepository;
             _goalStatusRepository = goalStatusRepository;

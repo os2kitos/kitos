@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -29,9 +28,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<ItSystemUsage> usageRepository,
             IGenericRepository<AgreementElementType> agreementElementRepository,
             IGenericRepository<ItContractItSystemUsage> itContractItSystemUsageRepository,
-            IItContractService itContractService,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItContractService itContractService)
+            : base(repository)
         {
             _usageRepository = usageRepository;
             _agreementElementRepository = agreementElementRepository;

@@ -7,7 +7,6 @@ using Core.DomainModel;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
@@ -16,15 +15,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class EconomyStreamController : GenericContextAwareApiController<EconomyStream, EconomyStreamDTO>
+    public class EconomyStreamController : GenericApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;
 
         public EconomyStreamController(
             IGenericRepository<EconomyStream> repository,
-            IGenericRepository<ItContract> contracts,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<ItContract> contracts)
+            : base(repository)
         {
             _contracts = contracts;
         }

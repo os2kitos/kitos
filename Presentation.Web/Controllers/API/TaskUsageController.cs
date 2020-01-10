@@ -9,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
@@ -34,9 +33,8 @@ namespace Presentation.Web.Controllers.API
         public TaskUsageController(
             IGenericRepository<TaskUsage> repository, 
             IGenericRepository<OrganizationUnit> orgUnitRepository, 
-            IGenericRepository<TaskRef> taskRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<TaskRef> taskRepository)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
@@ -70,7 +68,7 @@ namespace Presentation.Web.Controllers.API
                 foreach (var taskUsage in usages)
                 {
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
-                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser, organizationId);
+                    dto.HasWriteAccess = AllowModify(taskUsage);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
                     dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
@@ -33,9 +32,8 @@ namespace Presentation.Web.Controllers.API
         public ItSystemController(
             IGenericRepository<ItSystem> repository,
             IGenericRepository<TaskRef> taskRepository,
-            IItSystemService systemService,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItSystemService systemService)
+            : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;

@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -15,15 +14,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class CommunicationController : GenericContextAwareApiController<Communication, CommunicationDTO>
+    public class CommunicationController : GenericApiController<Communication, CommunicationDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
         public CommunicationController(
             IGenericRepository<Communication> repository,
-            IAuthorizationContext authorization,
             IItProjectRepository projectRepository)
-            : base(repository, authorization)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

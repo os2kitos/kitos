@@ -352,7 +352,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [Theory]
         [InlineData(false, true, false, false, true)]
         [InlineData(false, false, true, true, true)]
-        [InlineData(true, true, false, false, false)]
+        [InlineData(true, true, false, false, true)]
         [InlineData(true, false, true, true, false)]
         [InlineData(false, false, false, true, false)]
         [InlineData(false, false, true, false, false)]

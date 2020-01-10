@@ -15,7 +15,6 @@ namespace Core.ApplicationServices.Authorization
     {
         private readonly ISet<Feature> _supportedFeatures;
         private readonly ISet<OrganizationRole> _roles;
-        private readonly User _user;
 
         public OrganizationalUserContext(
             IEnumerable<Feature> supportedFeatures,
@@ -23,7 +22,7 @@ namespace Core.ApplicationServices.Authorization
             User user,
             int activeOrganizationId)
         {
-            _user = user;
+            UserEntity = user;
             ActiveOrganizationId = activeOrganizationId;
             _supportedFeatures = new HashSet<Feature>(supportedFeatures);
             _roles = new HashSet<OrganizationRole>(roles);
@@ -31,11 +30,13 @@ namespace Core.ApplicationServices.Authorization
 
         public int ActiveOrganizationId { get; }
 
-        public int UserId => _user.Id;
+        public int UserId => UserEntity.Id;
+
+        public User UserEntity { get; }
 
         public bool IsActiveInOrganizationOfType(OrganizationCategory category)
         {
-            return _user.DefaultOrganization?.Type?.Category == category;
+            return UserEntity.DefaultOrganization?.Type?.Category == category;
         }
 
         public bool HasRole(OrganizationRole role)
@@ -92,7 +93,7 @@ namespace Core.ApplicationServices.Authorization
 
         public bool HasAssignedWriteAccess(IEntity entity)
         {
-            return entity.HasUserWriteAccess(_user);
+            return entity.HasUserWriteAccess(UserEntity);
         }
 
         public bool HasOwnership(IEntity entity)

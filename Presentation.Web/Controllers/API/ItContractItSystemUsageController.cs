@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -16,9 +15,7 @@ namespace Presentation.Web.Controllers.API
 
         public ItContractItSystemUsageController(
             IGenericRepository<ItContractItSystemUsage> repository,
-            IGenericRepository<ItSystemUsage> usageRepository,
-            IAuthorizationContext authorizationContext)
-        : base(authorizationContext)
+            IGenericRepository<ItSystemUsage> usageRepository)
         {
             _repository = repository;
             _usageRepository = usageRepository;

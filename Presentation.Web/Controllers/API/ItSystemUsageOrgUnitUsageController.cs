@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -20,11 +19,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
 
-        public ItSystemUsageOrgUnitUsageController(
-            IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository,
-            IGenericRepository<ItSystemUsage> systemUsageRepository,
-            IAuthorizationContext authorizationContext)
-        :base(authorizationContext)
+        public ItSystemUsageOrgUnitUsageController(IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository, IGenericRepository<ItSystemUsage> systemUsageRepository)
         {
             _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _systemUsageRepository = systemUsageRepository;

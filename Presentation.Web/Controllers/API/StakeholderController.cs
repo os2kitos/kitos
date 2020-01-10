@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,15 +9,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class StakeholderController : GenericContextAwareApiController<Stakeholder, StakeholderDTO>
+    public class StakeholderController : GenericApiController<Stakeholder, StakeholderDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
-        public StakeholderController(
-            IGenericRepository<Stakeholder> repository,
-            IAuthorizationContext authorization,
-            IItProjectRepository projectRepository)
-            : base(repository, authorization)
+        public StakeholderController(IGenericRepository<Stakeholder> repository, IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

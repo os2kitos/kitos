@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -19,8 +18,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
 
-        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository, IAuthorizationContext authorizationContext)
-            : base(authorizationContext)
+        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository)
         {
             _userService = userService;
             _userRepository = userRepository;

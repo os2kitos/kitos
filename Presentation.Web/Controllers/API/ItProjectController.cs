@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
@@ -33,9 +32,8 @@ namespace Presentation.Web.Controllers.API
             IItProjectService itProjectService,
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
-            IGenericRepository<ItSystemUsage> itSystemUsageRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<ItSystemUsage> itSystemUsageRepository)
+            : base(repository)
         {
             _itProjectService = itProjectService;
             _taskRepository = taskRepository;
@@ -512,11 +510,6 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Post(ItProjectDTO dto)
         {
-            // only global admin can set access mod to public
-            if (dto.AccessModifier == AccessModifier.Public && !FeatureChecker.CanExecute(KitosUser, Feature.CanSetAccessModifierToPublic))
-            {
-                return Forbidden();
-            }
             //force set access modifier to 0
             dto.AccessModifier = AccessModifier.Local;
             return base.Post(dto);

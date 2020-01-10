@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -27,9 +26,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> repository,
             IOrgUnitService orgUnitService, 
             IGenericRepository<TaskRef> taskRepository, 
-            IGenericRepository<TaskUsage> taskUsageRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<TaskUsage> taskUsageRepository)
+            : base(repository)
         {
             _orgUnitService = orgUnitService;
             _taskRepository = taskRepository;

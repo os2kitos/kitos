@@ -8,7 +8,6 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -25,16 +24,13 @@ namespace Presentation.Web.Controllers.API
     public abstract class BaseApiController : ApiController
     {
         [Inject]
-        public IGenericRepository<User> UserRepository { get; set; }
-
-        [Inject]
-        public IAuthenticationService AuthenticationService { get; set; } //TODO: Remove it
-
-        [Inject]
-        public IFeatureChecker FeatureChecker { get; set; } // TODO: Remove it
-
-        [Inject]
         public ILogger Logger { get; set; }
+
+        [Inject]
+        public IOrganizationalUserContext UserContext { get; set; }
+
+        [Inject]
+        public IAuthorizationContext AuthorizationContext { get; set; }
 
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
@@ -43,14 +39,9 @@ namespace Presentation.Web.Controllers.API
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected BaseApiController(IAuthorizationContext authorizationContext = null)//TODO: Do not allow null once migrated
+        protected BaseApiController()
         {
-            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
-
-                authorizationContext == null
-                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
-                    : new ContextBasedAuthorizationStrategy(authorizationContext)
-            );
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
             _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
@@ -156,46 +147,9 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.Forbidden, msg);
         }
 
+        protected User KitosUser => UserContext.UserEntity;
 
-        protected bool IsGlobalAdmin()
-        {
-            try
-            {
-                int userId;
-                int.TryParse(User.Identity.Name, out userId);
-
-                return AuthenticationService.IsGlobalAdmin(userId);
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        protected User KitosUser //TODO: Migrate to auth context by injection! -> not user repository
-        {
-            get
-            {
-                try
-                {
-                    var user = UserRepository.GetByKey(UserId);
-
-                    if (user == null)
-                        throw new SecurityException();
-
-                    return user;
-                }
-                catch (Exception exp)
-                {
-                    Logger?.Error("Error in property KitosUser", exp);
-                    throw new SecurityException();
-                }
-            }
-        }
-
-        protected int UserId => Convert.ToInt32(User.Identity.Name);
-
-        protected bool IsAuthenticated => User.Identity.IsAuthenticated;
+        protected int UserId => UserContext.UserId;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {

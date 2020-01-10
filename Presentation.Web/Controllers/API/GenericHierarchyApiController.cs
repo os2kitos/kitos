@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -11,11 +10,11 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [MigratedToNewAuthorizationContext]
-    public abstract class GenericHierarchyApiController<TModel, TDto> : GenericContextAwareApiController<TModel, TDto>
+    public abstract class GenericHierarchyApiController<TModel, TDto> : GenericApiController<TModel, TDto>
         where TModel : Entity, IHierarchy<TModel>, IContextAware
     {
-        protected GenericHierarchyApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null) // TODO: Do not allow nulle once migrated
-            : base(repository, authorizationContext)
+        protected GenericHierarchyApiController(IGenericRepository<TModel> repository)
+            : base(repository)
         {
         }
 

@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItProject;
+﻿using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,15 +9,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class EconomyYearController : GenericContextAwareApiController<EconomyYear, EconomyYearDTO>
+    public class EconomyYearController : GenericApiController<EconomyYear, EconomyYearDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
         public EconomyYearController(
             IGenericRepository<EconomyYear> repository,
-            IAuthorizationContext authorizationContext,
             IItProjectRepository projectRepository) 
-            : base(repository, authorizationContext)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }

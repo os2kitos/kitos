@@ -3,6 +3,7 @@ using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.General
 {
+    //TODO: Remove strategy layer once migrated
     public interface IControllerAuthorizationStrategy
     {
         CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess();

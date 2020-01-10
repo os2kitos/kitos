@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -23,9 +22,8 @@ namespace Presentation.Web.Controllers.API
 
         public ContactpersonController(
             IGenericRepository<ContactPerson> repository,
-            IGenericRepository<Organization> orgRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+            IGenericRepository<Organization> orgRepository)
+            : base(repository)
         {
             _repository = repository;
             _orgRepository = orgRepository;

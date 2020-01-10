@@ -149,6 +149,7 @@ namespace Core.ApplicationServices.Authorization
 
             if (IsGlobalAdmin())
             {
+                ignoreReadOnlyRole = true; //Global admin cannot be locally read-ony
                 result = true;
             }
             else if (EntityEqualsActiveUser(entity))
@@ -171,8 +172,24 @@ namespace Core.ApplicationServices.Authorization
                 result = AllowWritesToEntity(entity);
             }
 
+            //Specific type policy may revoke existing result so AND it
+            result = result && CheckSpecificTypePolicies(entity);
+
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
+        }
+
+        private bool CheckSpecificTypePolicies(IEntity entity)
+        {
+            var result = true;
+
+            if (entity is ItInterface)
+            {
+                //Only global admin can modify interfaces
+                result = IsGlobalAdmin();
+            }
+
+            return result;
         }
 
         public bool AllowDelete(IEntity entity)

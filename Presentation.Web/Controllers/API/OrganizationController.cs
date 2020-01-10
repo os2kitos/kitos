@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [MigratedToNewAuthorizationContext]
-    public class OrganizationController : GenericContextAwareApiController<Organization, OrganizationDTO>
+    public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationalUserContext _userContext;
@@ -23,9 +23,8 @@ namespace Presentation.Web.Controllers.API
         public OrganizationController(
             IGenericRepository<Organization> repository, 
             IOrganizationService organizationService,
-            IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext)
-            : base(repository, authorizationContext)
+            : base(repository)
         {
             _organizationService = organizationService;
             _userContext = userContext;

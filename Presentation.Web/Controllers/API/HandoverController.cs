@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
@@ -14,7 +13,7 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class HandoverController : GenericContextAwareApiController<Handover, HandoverDTO>
+    public class HandoverController : GenericApiController<Handover, HandoverDTO>
     {
         private readonly IGenericRepository<User> _userRepository;
         private readonly IItProjectRepository _projectRepository;
@@ -22,9 +21,8 @@ namespace Presentation.Web.Controllers.API
         public HandoverController(
             IGenericRepository<Handover> repository, 
             IGenericRepository<User> userRepository,
-            IItProjectRepository projectRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItProjectRepository projectRepository)
+            : base(repository)
         {
             _userRepository = userRepository;
             _projectRepository = projectRepository;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
@@ -20,10 +19,7 @@ namespace Presentation.Web.Controllers.API
     {
         protected readonly IGenericRepository<TModel> Repository;
 
-        protected GenericApiController(
-            IGenericRepository<TModel> repository,
-            IAuthorizationContext authorizationContext = null) //TODO: Do not allow null once migrated
-        : base(authorizationContext)
+        protected GenericApiController(IGenericRepository<TModel> repository)
         {
             Repository = repository;
         }
@@ -42,7 +38,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var organizationId = AuthenticationService.GetCurrentOrganizationId(UserId);
+                var organizationId = UserContext.ActiveOrganizationId;
 
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -128,7 +124,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
         {
-            if (GetOrganizationReadAccessLevel(AuthenticationService.GetCurrentOrganizationId(UserId)) == OrganizationDataReadAccessLevel.None)
+            if (GetOrganizationReadAccessLevel(UserContext.ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }
@@ -410,34 +406,6 @@ namespace Presentation.Web.Controllers.API
             Repository.Dispose();
             base.Dispose(disposing);
         }
-
-        #region Write Access Checks functions
-
-        /// <summary>
-        /// Checks if a given user has write access to a given object.
-        /// Override this method as needed.
-        /// </summary>
-        /// <param name="obj">The object</param>
-        /// <param name="user">The user</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True if user has write access to obj</returns>
-        protected virtual bool HasWriteAccess(TModel obj, User user, int organizationId)
-        {
-            return AuthenticationService.HasWriteAccess(user.Id, obj);
-        }
-
-        /// <summary>
-        /// Checks if the current authenticated user has write access to a given object.
-        /// </summary>
-        /// <param name="obj">The object</param>
-        /// <param name="organizationId"></param>
-        /// <returns>True iff user has write access to obj</returns>
-        protected bool HasWriteAccess(TModel obj, int organizationId)
-        {
-            return HasWriteAccess(obj, KitosUser, organizationId);
-        }
-
-        #endregion
 
         #region Mapping functions
 

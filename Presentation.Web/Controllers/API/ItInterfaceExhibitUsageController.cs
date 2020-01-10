@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -21,11 +20,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;
         private readonly IItSystemUsageRepository _usageRepository;
 
-        public ItInterfaceExhibitUsageController(
-            IGenericRepository<ItInterfaceExhibitUsage> repository,
-            IAuthorizationContext authorizationContext,
-            IItSystemUsageRepository usageRepository)
-        : base(authorizationContext)
+        public ItInterfaceExhibitUsageController(IGenericRepository<ItInterfaceExhibitUsage> repository, IItSystemUsageRepository usageRepository)
         {
             _repository = repository;
             _usageRepository = usageRepository;

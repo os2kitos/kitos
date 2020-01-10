@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -16,15 +15,12 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class PaymentMilestoneController : GenericContextAwareApiController<PaymentMilestone, PaymentMilestoneDTO>
+    public class PaymentMilestoneController : GenericApiController<PaymentMilestone, PaymentMilestoneDTO>
     {
         private readonly IItContractRepository _contractRepository;
 
-        public PaymentMilestoneController(
-            IGenericRepository<PaymentMilestone> repository,
-            IItContractRepository contractRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+        public PaymentMilestoneController(IGenericRepository<PaymentMilestone> repository, IItContractRepository contractRepository)
+            : base(repository)
         {
             _contractRepository = contractRepository;
         }

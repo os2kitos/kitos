@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
@@ -16,15 +15,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class DataRowController : GenericContextAwareApiController<DataRow, DataRowDTO>
+    public class DataRowController : GenericApiController<DataRow, DataRowDTO>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
 
         public DataRowController(
             IGenericRepository<DataRow> repository,
-            IGenericRepository<ItInterface> interfaceRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+            IGenericRepository<ItInterface> interfaceRepository)
+            : base(repository)
         {
             _interfaceRepository = interfaceRepository;
         }

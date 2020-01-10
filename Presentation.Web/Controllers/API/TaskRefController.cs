@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -15,8 +14,8 @@ namespace Presentation.Web.Controllers.API
     [MigratedToNewAuthorizationContext]
     public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
-        public TaskRefController(IGenericRepository<TaskRef> repository, IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+        public TaskRefController(IGenericRepository<TaskRef> repository)
+            : base(repository)
         {
         }
 

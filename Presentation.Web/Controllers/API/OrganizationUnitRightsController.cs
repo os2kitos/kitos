@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -19,9 +18,8 @@ namespace Presentation.Web.Controllers.API
         public OrganizationUnitRightController(
             IGenericRepository<OrganizationUnitRight> rightRepository,
             IGenericRepository<OrganizationUnit> objectRepository, 
-            IOrgUnitService orgUnitService,
-            IAuthorizationContext authorizationContext)
-            : base(rightRepository, objectRepository, authorizationContext)
+            IOrgUnitService orgUnitService)
+            : base(rightRepository, objectRepository)
         {
             _orgUnitService = orgUnitService;
         }

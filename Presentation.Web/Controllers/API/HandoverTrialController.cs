@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -15,15 +14,14 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [MigratedToNewAuthorizationContext]
-    public class HandoverTrialController : GenericContextAwareApiController<HandoverTrial, HandoverTrialDTO>
+    public class HandoverTrialController : GenericApiController<HandoverTrial, HandoverTrialDTO>
     {
         private readonly IItContractRepository _contractRepository;
 
         public HandoverTrialController(
             IGenericRepository<HandoverTrial> repository,
-            IItContractRepository contractRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+            IItContractRepository contractRepository)
+            : base(repository)
         {
             _contractRepository = contractRepository;
         }

@@ -35,11 +35,11 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _sut = new ItSystemController(
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
-                _systemService.Object,
-                _authorizationContext.Object
+                _systemService.Object
                 );
 
             SetupControllerFrorTest(_sut);
+            _sut.AuthorizationContext = _authorizationContext.Object;
         }
 
         [Fact]
