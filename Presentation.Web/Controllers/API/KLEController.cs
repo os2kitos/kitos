@@ -98,19 +98,20 @@ namespace Presentation.Web.Controllers.API
         private static HttpResponseMessage CreateCsvFormattedHttpResponse(IEnumerable<dynamic> list)
         {
             var s = list.ToCsv();
-            var bytes = Encoding.Unicode.GetBytes(s);
-        var stream = new MemoryStream();
+            //var bytes = Encoding.Unicode.GetBytes(s);
+            var bytes = Encoding.UTF8.GetBytes(s);
+            var stream = new MemoryStream();
             stream.Write(bytes, 0, bytes.Length);
             stream.Seek(0, SeekOrigin.Begin);
             var result = new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StreamContent(stream)
+                Content = new StreamContent(stream),
             };
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
             {
                 FileNameStar = "kle-updates.csv",
-                DispositionType = "utf-8"
+                DispositionType = "attachment"
 
             };
             return result;

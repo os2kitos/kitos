@@ -15,7 +15,7 @@
 
         getChanges() {
             const url = `api/v1/kle/changes`;
-            return this.$http({ method: "GET", url: url, });
+            return this.$http({ method: "GET", url: url,});
         }
 
         updateKLE() {

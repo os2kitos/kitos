@@ -35,7 +35,7 @@
         });
 
         $scope.uploadFile = function () {
-            var fileToBeUploaded = $scope.myFile;
+            var fileToBeUploaded = $scope.myFile;   
             uploadFile.uploadFile(fileToBeUploaded);
         };
 
@@ -51,21 +51,30 @@
         };
 
         $scope.GetKLEChanges = function () {
-            //TODO Query for database changes in xml format.
+            $scope.KLEupdateReadyStep1 = false;
+            $scope.KLEupdateReadyStep2 = false;
 
+            
             KLEservice.getChanges().success((data) => {
+                var uri = encodeURI(data);
+                var universalBOM = "\uFEFF";
+                console.log(data);
+                    console.log("URL :" + uri);
                     var anchor = angular.element('<a/>');
-                    anchor.attr({
-                        href: 'data:attachment/csv' + encodeURI(data),
+                    anchor.attr({   
+                        href: 'data:text/csv; charset=utf-8,' + encodeURI(universalBOM+data),
                         target: '_blank',
-                        download: 'filename.csv'
+                        download: 'KLE-Changes.csv'
                     })[0].click();
-
+                notify.addSuccessMessage("Download complete");
+                $scope.KLEupdateReadyStep1 = true;
+                $scope.KLEupdateReadyStep2 = true;
                 }).
                 error(function (data, status, headers, config) {
-                    // handle error
+                    $scope.KLEupdateReadyStep1 = true;
+                    $scope.KLEupdateReadyStep2 = false;
+                    notify.addErrorMessage("There was an issue downloading the excel file, please contact support.");
                 });
-
         }
 
         $scope.UpdateKLE = function () {
