@@ -153,7 +153,8 @@
                 this.$http<Kitos.API.Models.IApiWrapper<any>>({
                     method: "PATCH",
                     url: `api/user/${this._user.id}?organizationId=${this._user.currentOrganizationId}`,
-                    data: payload
+                    data: payload,
+                    headers: Utility.csrfToken.addHeader()
                 }).success(result => {
                     var newUser = result.response;
 
@@ -198,12 +199,8 @@
 
         authorizeUser = (userLoginInfo) => {
             //returns the organizational context for the user whos credentials have been authorized
-            var csrfHeader = {
-                headers: {
-                    "X-XSRF-Token": angular.element("input[name='__RequestVerificationToken']").val()
-                }
-            }
-            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo, csrfHeader); 
+            
+            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo, Utility.csrfToken.addHeader()); 
         }
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
@@ -240,7 +237,7 @@
         }
 
         setDefaultOrganizationInBackend = (organizationId) => {
-            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
+            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined, Utility.csrfToken.addHeader());
         }
 
         login = (email: string, password: string, rememberMe: boolean) => {
@@ -282,7 +279,7 @@
             this._user = null;
             this.$rootScope.user = null;
 
-            return this.$http.post("api/authorize?logout", undefined);
+            return this.$http.post("api/authorize?logout", undefined, Utility.csrfToken.addHeader());
         }
 
         loadUser = (userLoginInfo) => {
@@ -480,7 +477,7 @@
                 orgUnitId: newDefaultOrgUnitId
             };
 
-            return this.$http.post("api/user?updateDefaultOrgUnit", payload);
+            return this.$http.post("api/user?updateDefaultOrgUnit", payload, Utility.csrfToken.addHeader());
         }
     }
     app.service("userService", UserService);
