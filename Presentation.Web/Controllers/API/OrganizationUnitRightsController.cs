@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,13 +11,17 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class OrganizationUnitRightController : GenericRightsController<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationUnitRightController(IGenericRepository<OrganizationUnitRight> rightRepository,
-            IGenericRepository<OrganizationUnit> objectRepository, IOrgUnitService orgUnitService)
-            : base(rightRepository, objectRepository)
+        public OrganizationUnitRightController(
+            IGenericRepository<OrganizationUnitRight> rightRepository,
+            IGenericRepository<OrganizationUnit> objectRepository, 
+            IOrgUnitService orgUnitService,
+            IAuthorizationContext authorizationContext)
+            : base(rightRepository, objectRepository, authorizationContext)
         {
             _orgUnitService = orgUnitService;
         }
@@ -64,7 +69,7 @@ namespace Presentation.Web.Controllers.API
             {
                 theRights.AddRange(GetRightsQuery(orgUnit.Id));
             }
-            return theRights;
+            return theRights.Where(AllowRead).ToList();
         }
     }
 }

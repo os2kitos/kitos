@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -14,15 +16,20 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class OrganizationUnitController : GenericHierarchyApiController<OrganizationUnit, OrgUnitDTO>
     {
         private readonly IOrgUnitService _orgUnitService;
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, IGenericRepository<TaskRef> taskRepository, IGenericRepository<TaskUsage> taskUsageRepository)
-            : base(repository)
+        public OrganizationUnitController(
+            IGenericRepository<OrganizationUnit> repository,
+            IOrgUnitService orgUnitService, 
+            IGenericRepository<TaskRef> taskRepository, 
+            IGenericRepository<TaskUsage> taskUsageRepository,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _orgUnitService = orgUnitService;
             _taskRepository = taskRepository;
@@ -40,7 +47,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
 
-                orgUnits = orgUnits.Distinct().ToList();
+                orgUnits = orgUnits
+                    .Distinct()
+                    .Where(AllowRead)
+                    .ToList();
 
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));
             }
@@ -58,6 +68,11 @@ namespace Presentation.Web.Controllers.API
 
                 if (orgUnit == null) return NotFound();
 
+                if (!AllowRead(orgUnit))
+                {
+                    return Forbidden();
+                }
+
                 var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
 
                 return Ok(item);
@@ -72,7 +87,12 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organizationId);
+                var orgUnit = 
+                    Repository
+                        .AsQueryable()
+                        .ByOrganizationId(organizationId)
+                        .AsEnumerable()
+                        .Where(AllowRead);
 
                 return Ok(Map(orgUnit));
             }
@@ -160,6 +180,8 @@ namespace Presentation.Web.Controllers.API
                     // else get all task leaves
                     pagingModel.Where(taskRef => !taskRef.Children.Any());
                 }
+
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
@@ -202,6 +224,7 @@ namespace Presentation.Web.Controllers.API
                                                    taskUsage.TaskRef.Parent.ParentId.Value == taskGroup.Value);
                 }
 
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theUsages = Page(usageQuery, pagingModel).ToList();
 
                 var dtos = (from usage in theUsages

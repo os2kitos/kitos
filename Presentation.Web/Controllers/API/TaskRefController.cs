@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -11,10 +12,11 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class TaskRefController : GenericHierarchyApiController<TaskRef, TaskRefDTO>
     {
-        public TaskRefController(IGenericRepository<TaskRef> repository)
-            : base(repository)
+        public TaskRefController(IGenericRepository<TaskRef> repository, IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
         }
 

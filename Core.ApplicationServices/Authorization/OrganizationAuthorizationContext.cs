@@ -15,8 +15,9 @@ namespace Core.ApplicationServices.Authorization
         //NOTE: For types which cannot be bound to a scoped context (lack of knowledge) and has shared read access
         private static readonly IReadOnlyDictionary<Type, bool> TypesWithGlobalReadAccess = new Dictionary<Type, bool>
         {
-            {typeof(AdviceUserRelation),true}
-        };
+            {typeof(AdviceUserRelation),true},
+            {typeof(Text),true}
+    };
 
         public OrganizationAuthorizationContext(IOrganizationalUserContext activeUserContext)
         {

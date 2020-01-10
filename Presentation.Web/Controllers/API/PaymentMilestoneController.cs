@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -14,6 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class PaymentMilestoneController : GenericContextAwareApiController<PaymentMilestone, PaymentMilestoneDTO>
     {
         private readonly IItContractRepository _contractRepository;
@@ -30,7 +32,9 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<PaymentMilestoneDTO>>))]
         public HttpResponseMessage GetByContractId(int id, [FromUri] bool? contract)
         {
-            var items = Repository.Get(x => x.ItContractId == id);
+            var items =
+                Repository.Get(x => x.ItContractId == id)
+                    .Where(AllowRead);
 
             return Ok(Map(items));
         }

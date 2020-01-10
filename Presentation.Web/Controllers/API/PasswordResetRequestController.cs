@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -12,12 +13,14 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
 
-        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository)
+        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository, IAuthorizationContext authorizationContext)
+            : base(authorizationContext)
         {
             _userService = userService;
             _userRepository = userRepository;
@@ -29,7 +32,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var user = _userRepository.GetByEmail(input.Email);
-                var request = _userService.IssuePasswordReset(user, null, null);
+                _userService.IssuePasswordReset(user, null, null);
 
                 return Ok();
             }

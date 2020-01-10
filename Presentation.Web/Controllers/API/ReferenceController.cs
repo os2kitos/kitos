@@ -3,32 +3,33 @@ using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
-using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
-        public readonly IFeatureChecker _featureChecker;
-        public ReferenceController(IGenericRepository<ExternalReference> repository, IFeatureChecker featureChecker) : base(repository)
+        public ReferenceController(IGenericRepository<ExternalReference> repository, IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
-            _featureChecker = featureChecker;
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
             var reference = Repository.GetByKey(id);
+
             if (!CanModifyReference(reference))
             {
                 return Forbidden();
             }
 
             var result = base.PatchQuery(reference, obj);
-            
+
             return Ok(Map(result));
-            
+
         }
 
         private bool CanModifyReference(ExternalReference entity)
@@ -38,22 +39,22 @@ namespace Presentation.Web.Controllers.API
                 return true;
             }
 
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyContracts) && entity.ItContract != null)
+            if (entity.ItContract != null && AllowModify(entity.ItContract))
             {
                 return true;
             }
 
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyProjects) && entity.ItProject != null)
+            if (entity.ItProject != null && AllowModify(entity.ItProject))
             {
                 return true;
             }
 
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystem != null)
+            if (entity.ItSystem != null && AllowModify(entity.ItSystem))
             {
                 return true;
             }
 
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystemUsage != null)
+            if (entity.ItSystemUsage != null && AllowModify(entity.ItSystemUsage))
             {
                 return true;
             }

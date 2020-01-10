@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using Core.ApplicationServices.Authorization;
@@ -14,6 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
     {
         private readonly IItProjectRepository _projectRepository;
@@ -32,7 +34,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var risks = Repository.Get(r => r.ItProjectId == projectId);
+                var risks = Repository
+                    .Get(r => r.ItProjectId == projectId)
+                    .Where(AllowRead);
 
                 return Ok(Map(risks));
             }

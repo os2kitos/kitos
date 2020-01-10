@@ -9,6 +9,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class StakeholderController : GenericContextAwareApiController<Stakeholder, StakeholderDTO>
     {
         private readonly IItProjectRepository _projectRepository;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web;
+using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -8,8 +9,20 @@ namespace Presentation.Web.Controllers.API
     [InternalApi]
     public class UploadFileController : BaseApiController
     {
+        private readonly IAuthorizationContext _authorizationContext;
+
+        public UploadFileController(IAuthorizationContext authorizationContext) 
+            : base(authorizationContext)
+        {
+            _authorizationContext = authorizationContext;
+        }
+
         public HttpResponseMessage Post()
         {
+            if (_authorizationContext.AllowBatchLocalImport() == false)
+            {
+                return Forbidden();
+            }
 
             var context = HttpContext.Current.Request;
 

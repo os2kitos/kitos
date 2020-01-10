@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -13,12 +14,13 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class TextController : GenericApiController<Text, TextDTO>
     {
         private readonly IGenericRepository<Text> _repository;
 
-        public TextController(IGenericRepository<Text> repository) 
-            : base(repository)
+        public TextController(IGenericRepository<Text> repository, IAuthorizationContext authorizationContext)
+            : base(repository, authorizationContext)
         {
             _repository = repository;
         }
