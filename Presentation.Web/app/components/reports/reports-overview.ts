@@ -412,7 +412,7 @@
 
         // Resets the scrollbar position
         private onPaging = () => {
-            Utility.ScrollBarHelper.resetScrollbarPosition(this.mainGrid);
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // loads kendo grid options from localstorage

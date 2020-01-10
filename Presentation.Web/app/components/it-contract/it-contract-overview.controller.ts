@@ -156,7 +156,7 @@
 
         // Resets the scrollbar position
         private onPaging = () => {
-            Utility.ScrollBarHelper.resetScrollbarPosition(this.mainGrid);
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"

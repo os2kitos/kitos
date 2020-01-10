@@ -728,7 +728,7 @@
 
         // Resets the scrollbar position
         private onPaging = () => {
-            Utility.ScrollBarHelper.resetScrollbarPosition(this.mainGrid);
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // loads kendo grid options from localstorage
@@ -1088,7 +1088,6 @@
                 if (selectedValue) {
                     newFilter = self._.addFilter(newFilter, field, "eq", selectedValue, "and");
                 }
-
                 dataSource.filter(newFilter);
             }
 
