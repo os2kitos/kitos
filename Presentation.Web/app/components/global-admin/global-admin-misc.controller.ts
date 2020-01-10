@@ -98,10 +98,6 @@
                         $scope.KleApplyUpdateButtonInteraction = false;
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                     });
-
-
-
-
                 notify.addSuccessMessage("KLE er nu opdateret!");
                 
             } else {
