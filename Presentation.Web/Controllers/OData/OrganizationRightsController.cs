@@ -5,6 +5,8 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -16,12 +18,18 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IUserService _userService;
         private readonly IAuthenticationService _authService;
+        private readonly IOrganizationRightsService _organizationRightsService;
 
-        public OrganizationRightsController(IGenericRepository<OrganizationRight> repository, IUserService userService, IAuthenticationService authService)
+        public OrganizationRightsController(
+            IGenericRepository<OrganizationRight> repository,
+            IUserService userService,
+            IAuthenticationService authService,
+            IOrganizationRightsService organizationRightsService)
             : base(repository, authService)
         {
             _userService = userService;
             _authService = authService;
+            _organizationRightsService = organizationRightsService;
         }
 
         // GET /Organizations(1)/Rights
@@ -37,6 +45,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
+            //TODO: Migrate to the service
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -44,17 +53,17 @@ namespace Presentation.Web.Controllers.OData
 
             var user = _userService.GetUserById(UserId);
 
-            if(entity.Role == OrganizationRole.GlobalAdmin)
+            if (entity.Role == OrganizationRole.GlobalAdmin)
             {
-                if(!user.IsGlobalAdmin)
+                if (!user.IsGlobalAdmin)
                 {
                     return Forbidden();
                 }
             }
 
-            if(entity.Role == OrganizationRole.LocalAdmin)
+            if (entity.Role == OrganizationRole.LocalAdmin)
             {
-                if(!user.IsGlobalAdmin && !user.IsLocalAdmin)
+                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
                 {
                     return Forbidden();
                 }
@@ -69,7 +78,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             entity.LastChangedByUserId = UserId;
-            
+
             try
             {
                 entity = Repository.Insert(entity);
@@ -97,94 +106,53 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights({key})")]
         public IHttpActionResult DeleteRights(int orgKey, int key)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.OrganizationId == orgKey && m.Id == key);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            var user = _userService.GetUserById(UserId);
-
-            if (entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
-
-            try
-            {
-                Repository.DeleteByKey(key);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            return StatusCode(HttpStatusCode.NoContent);
+            return PerformDelete(key);
         }
 
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            if (entity == null)
-                return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
-            {
-                return Forbidden();
-            }
+            return entity == null ?
+                NotFound() :
+                PerformDelete(entity.Id);
+        }
 
-            var user = _userService.GetUserById(UserId);
-
-            if (entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
+        private IHttpActionResult PerformDelete(int key)
+        {
             try
             {
-                Repository.DeleteByKey(key);
-                Repository.Save();
+                var result = _organizationRightsService.RemoveRole(key);
+
+                if (result.Ok)
+                {
+                    return StatusCode(HttpStatusCode.NoContent);
+                }
+
+                switch (result.Error)
+                {
+                    case GenericOperationFailure.BadInput:
+                        return BadRequest();
+                    case GenericOperationFailure.NotFound:
+                        return NotFound();
+                    case GenericOperationFailure.Forbidden:
+                        return Forbidden();
+                    case GenericOperationFailure.Conflict:
+                        return StatusCode(HttpStatusCode.Conflict);
+                    default:
+                        return StatusCode(HttpStatusCode.InternalServerError);
+                }
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
 
         public override IHttpActionResult Patch(int key, Delta<OrganizationRight> delta)
         {
             var entity = Repository.GetByKey(key);
-            
+
             // does the entity exist?
             if (entity == null)
             {

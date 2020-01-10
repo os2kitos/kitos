@@ -1,5 +1,4 @@
-﻿using System;
-using Core.ApplicationServices;
+﻿using Core.ApplicationServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
@@ -64,6 +63,9 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Organization organization)
         {
+            //TODO: Override post as in odata version an make the same assertions - moved to the appservice
+
+            //TODO: Used only by local admin
             if (organization == null)
             {
                 return BadRequest();
@@ -74,22 +76,12 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest("Invalid CVR format");
             }
 
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
+            if (!AllowCreate<Organization>(organization))
             {
                 return Forbidden();
             }
 
             var user = _userRepository.GetByKey(UserId);
-
-            try
-            {
-                CheckOrgTypeRights(organization);
-            }
-            catch (SecurityException e)
-            {
-                return Forbidden();
-            }
 
             _organizationService.SetupDefaultOrganization(organization, user);
 
@@ -139,42 +131,20 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 var organization = delta.GetInstance();
-                CheckOrgTypeRights(organization);
+                if (organization.TypeId > 0)
+                {
+                    var typeKey = (OrganizationTypeKeys)organization.TypeId;
+                    if (!_organizationService.CanCreateOrganizationOfType(organization, typeKey))
+                    {
+                        return Forbidden();
+                    }
+                }
             }
             catch (SecurityException e)
             {
                 return Forbidden();
             }
             return base.Patch(key, delta);
-        }
-
-        private void CheckOrgTypeRights(Organization organization)
-        {
-            if (organization.TypeId > 0)
-            {
-                var typeKey = (OrganizationTypeKeys)organization.TypeId;
-                switch (typeKey)
-                {
-                    case OrganizationTypeKeys.Kommune:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeKommune))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.Interessefællesskab:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeInteressefællesskab))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.Virksomhed:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeVirksomhed))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.AndenOffentligMyndighed:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeAndenOffentligMyndighed))
-                            throw new SecurityException();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
         }
     }
 }

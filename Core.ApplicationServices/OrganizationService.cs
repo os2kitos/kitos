@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -10,11 +12,16 @@ namespace Core.ApplicationServices
     {
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public OrganizationService(IGenericRepository<Organization> orgRepository, IGenericRepository<OrganizationRight> orgRightRepository)
+        public OrganizationService(
+            IGenericRepository<Organization> orgRepository,
+            IGenericRepository<OrganizationRight> orgRightRepository,
+            IAuthorizationContext authorizationContext)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
+            _authorizationContext = authorizationContext;
         }
 
         /// <summary>
@@ -49,11 +56,11 @@ namespace Core.ApplicationServices
         {
             org.Config = Config.Default(objectOwner);
             org.OrgUnits.Add(new OrganizationUnit()
-                {
-                    Name = org.Name,
-                    ObjectOwnerId = objectOwner.Id,
-                    LastChangedByUserId = objectOwner.Id
-                });
+            {
+                Name = org.Name,
+                ObjectOwnerId = objectOwner.Id,
+                LastChangedByUserId = objectOwner.Id
+            });
         }
 
         /// <summary>
@@ -71,12 +78,15 @@ namespace Core.ApplicationServices
             _orgRightRepository.Save();
         }
 
-        public void addContactPerson(int organizationId, int contactId)
+        public bool CanCreateOrganizationOfType(Organization organization, OrganizationTypeKeys organizationType)
         {
-            var org = _orgRepository.Get(o => o.Id == organizationId).First();
-            org.ContactPersonId = contactId;
-            _orgRepository.Update(org);
-            _orgRepository.Save();
+            if (organization == null)
+            {
+                throw new ArgumentNullException(nameof(organization));
+            }
+            return
+                _authorizationContext.AllowModify(organization) &&
+                _authorizationContext.AllowChangeOrganizationType(organizationType);
         }
     }
 }

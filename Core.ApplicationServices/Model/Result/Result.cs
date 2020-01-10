@@ -1,7 +1,13 @@
 ﻿using System;
+using Core.DomainServices.Model.Result;
 
 namespace Core.ApplicationServices.Model.Result
 {
+    /// <summary>
+    /// NOTE: Migrate to <see cref="TwoTrackResult{TSuccess,TFailure}"/>
+    /// </summary>
+    /// <typeparam name="TStatus"></typeparam>
+    /// <typeparam name="TResult"></typeparam>
     public class Result<TStatus, TResult>
     {
         public TStatus Status { get; }

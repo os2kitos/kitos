@@ -1,30 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
+        private readonly IOrganizationRightsService _organizationRightsService;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository) : base (rightRepository)
+        public OrganizationRightController(
+            IGenericRepository<OrganizationRight> rightRepository,
+            IAuthorizationContext authorizationContext,
+            IOrganizationRightsService organizationRightsService)
+            : base(rightRepository, authorizationContext)
         {
             _rightRepository = rightRepository;
+            _organizationRightsService = organizationRightsService;
         }
 
         public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool? roleWithName)
         {
             try
             {
-                if (!IsGlobalAdmin())
+                if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -61,37 +71,26 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var right = _rightRepository.Get(r => r.OrganizationId == id && r.Role == (OrganizationRole)rId && r.UserId == uId).FirstOrDefault();
+                var result = _organizationRightsService.RemoveRole(organizationId, uId, (OrganizationRole)rId);
 
-                if (right == null)
+                if (result.Ok)
                 {
-                    return NotFound();
+                    return Ok();
                 }
 
-                // Only global admin can set other users as global admins
-                if (right.Role == OrganizationRole.GlobalAdmin)
+                switch (result.Error)
                 {
-                    if (!KitosUser.IsGlobalAdmin)
+                    case GenericOperationFailure.BadInput:
+                        return BadRequest();
+                    case GenericOperationFailure.NotFound:
+                        return NotFound();
+                    case GenericOperationFailure.Forbidden:
                         return Forbidden();
+                    case GenericOperationFailure.Conflict:
+                        return Conflict(string.Empty);
+                    default:
+                        return Error(result);
                 }
-
-                // Only local and global admins can make users local admins
-                if (right.Role == OrganizationRole.LocalAdmin)
-                {
-                    if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
-                        return Forbidden();
-                }
-
-                if(!base.HasWriteAccess(right, KitosUser, organizationId))
-                {
-                    return Forbidden();
-                }
-
-
-                _rightRepository.DeleteByKey(right.Id);
-                _rightRepository.Save();
-
-                return Ok();
             }
             catch (Exception e)
             {

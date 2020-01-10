@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
@@ -103,6 +104,7 @@ namespace Presentation.Web
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
             kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
+            kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InRequestScope();
             kernel.Bind<IAdviceService>().To<AdviceService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();

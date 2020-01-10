@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
@@ -51,6 +52,11 @@ namespace Core.ApplicationServices.Authorization
         }
 
         public bool AllowBatchLocalImport()
+        {
+            return false;
+        }
+
+        public bool AllowChangeOrganizationType(OrganizationTypeKeys organizationType)
         {
             return false;
         }

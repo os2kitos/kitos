@@ -104,7 +104,40 @@ namespace Core.ApplicationServices.Authorization
         {
             return
                 AllowCreate<T>() &&
+                CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
+        }
+
+        private bool CheckSpecificCreationPolicy(IEntity entity)
+        {
+            switch (entity)
+            {
+                case Organization newOrganization:
+                    return CheckNewOrganizationCreationPolicy(newOrganization);
+                default:
+                    return true;
+            }
+        }
+
+        private bool CheckNewOrganizationCreationPolicy(Organization newOrganization)
+        {
+            var result = true;
+
+            if (newOrganization.TypeId > 0)
+            {
+                var organizationType = (OrganizationTypeKeys) newOrganization.TypeId;
+                if (!AllowChangeOrganizationType(organizationType))
+                {
+                    result = false;
+                }
+            }
+
+            if (newOrganization.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(newOrganization))
+            {
+                result = false;
+            }
+
+            return result;
         }
 
         public bool AllowModify(IEntity entity)
@@ -153,6 +186,25 @@ namespace Core.ApplicationServices.Authorization
                             IsGlobalAdmin() ||
                             (IsLocalAdmin() && ActiveContextIsEntityContext(entity));
                         break;
+                    case OrganizationRight right:
+                        // Only global admin can set other users as global admins
+                        if (right.Role == OrganizationRole.GlobalAdmin)
+                        {
+                            if (IsGlobalAdmin())
+                            {
+                                result = true;
+                            }
+                        }
+
+                        // Only local and global admins can make users local admins
+                        if (right.Role == OrganizationRole.LocalAdmin)
+                        {
+                            if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
+                            {
+                                result = true;
+                            }
+                        }
+                        break;
                     default:
                         result = true;
                         break;
@@ -175,6 +227,21 @@ namespace Core.ApplicationServices.Authorization
         public bool AllowBatchLocalImport()
         {
             return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+        }
+
+        public bool AllowChangeOrganizationType(OrganizationTypeKeys organizationType)
+        {
+            switch (organizationType)
+            {
+                case OrganizationTypeKeys.Kommune:
+                case OrganizationTypeKeys.AndenOffentligMyndighed:
+                    return IsGlobalAdmin();
+                case OrganizationTypeKeys.Interessefællesskab:
+                case OrganizationTypeKeys.Virksomhed:
+                    return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(organizationType), organizationType, "Unmapped organization type");
+            }
         }
 
         private bool AllowWritesToEntity(IEntity entity)

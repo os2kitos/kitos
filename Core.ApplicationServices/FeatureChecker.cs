@@ -10,20 +10,16 @@ namespace Core.ApplicationServices
     public enum Feature
     {
         MakeGlobalAdmin = 1,
-        MakeLocalAdmin,
-        CanSetAccessModifierToPublic,
-        CanSetOrganizationTypeKommune,
-        CanSetOrganizationTypeInteressefællesskab,
-        CanSetOrganizationTypeVirksomhed,
-        CanSetOrganizationTypeAndenOffentligMyndighed,
-        CanSetOrganizationAccessModifierToPublic,
-        CanModifyUsers,
-        CanModifyContracts,
-        CanModifyOrganizations,
-        CanModifySystems,
-        CanModifyProjects,
-        CanModifyReports,
-        CanSetContractElementsAccessModifierToPublic
+        MakeLocalAdmin = 2,
+        CanSetAccessModifierToPublic = 3,
+        CanSetOrganizationAccessModifierToPublic = 8, //TODO: Replace bu auth check in org service - no need for this feature matrix.
+        CanModifyUsers = 9,
+        CanModifyContracts = 10,
+        CanModifyOrganizations = 11,
+        CanModifySystems = 12,
+        CanModifyProjects = 13,
+        CanModifyReports = 14,
+        CanSetContractElementsAccessModifierToPublic = 15
     }
 
     public class FeatureChecker : IFeatureChecker
@@ -37,10 +33,6 @@ namespace Core.ApplicationServices
             {
                 {Feature.MakeGlobalAdmin, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.MakeLocalAdmin, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeKommune, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin}},
-                {Feature.CanSetOrganizationTypeInteressefællesskab, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeVirksomhed, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
-                {Feature.CanSetOrganizationTypeAndenOffentligMyndighed, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetAccessModifierToPublic, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin}},
                 {Feature.CanSetOrganizationAccessModifierToPublic, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin}},
                 {Feature.CanModifyUsers, new HashSet<OrganizationRole> {OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin } },

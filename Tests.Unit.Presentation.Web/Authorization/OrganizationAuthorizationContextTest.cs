@@ -418,6 +418,67 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
+        [Theory]
+        [InlineData(OrganizationTypeKeys.Kommune, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Kommune, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Kommune, false, true, false, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, true, false, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, false, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true, false)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true, false)]
+        public void AllowCreateOrganizationOfType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            var organization = new Organization { TypeId = (int)organizationType};
+
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
+            ExpectIsActiveInSameOrganizationAsReturns(organization, localAdmin); //local admin test - always in same org in this scope
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
+
+            //Act
+            var result = _sut.AllowCreate<Organization>(organization);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(OrganizationTypeKeys.Kommune, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, false, false, false)]
+        [InlineData(OrganizationTypeKeys.Kommune, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, true, false, false, true)]
+        [InlineData(OrganizationTypeKeys.Kommune, false, true, false, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false, true, false, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, false, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, false, true, true, false)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, false, true, true, false)]
+        public void AllowChangeOrganizationType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
+            ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
+            ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
+
+            //Act
+            var result = _sut.AllowChangeOrganizationType(organizationType);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
         private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
             //Arrange

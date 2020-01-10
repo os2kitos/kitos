@@ -134,9 +134,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!AllowCreate<ItSystemUsage>(usage))
+                if (!AllowCreate<ItSystemUsage>(systemUsage))
                 {
                     return Forbidden();
                 }
@@ -147,7 +147,7 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Usage already exist");
                 }
 
-                var sysUsage = _itSystemUsageService.Add(usage, KitosUser);
+                var sysUsage = _itSystemUsageService.Add(systemUsage, KitosUser);
                 sysUsage.DataLevel = dto.DataLevel;
 
                 //copy attached options from system to systemusage

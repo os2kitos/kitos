@@ -103,9 +103,12 @@
     <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
     <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
     <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+    <Compile Include="Model\Result\GenericOperationFailure.cs" />
     <Compile Include="Model\System\SystemDeleteResult.cs" />
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
+    <Compile Include="Organizations\IOrganizationRightsService.cs" />
+    <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />

@@ -18,6 +18,7 @@ namespace Core.DomainServices
         void SetupDefaultOrganization(Organization org, User objectOwner);
 
         void RemoveUser(int organizationId, int userId);
-        void addContactPerson(int organizationId, int contactId);
+
+        bool CanCreateOrganizationOfType(Organization organization, OrganizationTypeKeys organizationType);
     }
 }
