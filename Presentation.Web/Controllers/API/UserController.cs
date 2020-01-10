@@ -153,5 +153,17 @@ namespace Presentation.Web.Controllers.API
             Repository.Save();
             return Ok();
         }
+
+        /// <summary>
+        /// Deletes user from the system
+        /// </summary>
+        /// <param name="id">The id of the user to be deleted</param>
+        /// <param name="organizationId">Not used in this case. Should remain empty</param>
+        /// <returns></returns>
+        public override HttpResponseMessage Delete(int id, int organizationId = 0)
+        {
+            // NOTE: Only exists to apply optional param for org id
+            return base.Delete(id, organizationId);
+        }
     }
 }

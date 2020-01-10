@@ -89,7 +89,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 ExternalReferenceId = A<string>(),
                 URL = "https://strongminds.dk/"
             };
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.User);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
 
             //Act
             using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/Reference"), cookie, payload))
@@ -123,7 +123,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
             };
-            await HttpApi.DeleteOdataUserAsync(createdUserId);
+            await HttpApi.DeleteUserAsync(createdUserId);
         }
 
         private static string CreateEmail()

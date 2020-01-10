@@ -21,7 +21,6 @@ namespace Presentation.Web.Controllers.API
         private readonly IItSystemUsageRepository _itSystemUsageRepository;
 
         public ItInterfaceUsageController(IGenericRepository<ItInterfaceUsage> repository, IItSystemUsageRepository itSystemUsageRepository)
-        : base()
         {
             _repository = repository;
             _itSystemUsageRepository = itSystemUsageRepository;
@@ -49,6 +48,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
                 var item = _repository.GetByKey(key);
+                if (item == null)
+                {
+                    return NotFound();
+                }
                 if (!AllowRead(item.ItSystemUsage))
                 {
                     return Forbidden();

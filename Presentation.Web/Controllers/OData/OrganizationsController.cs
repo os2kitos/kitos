@@ -8,6 +8,8 @@ using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -17,15 +19,19 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationRoleService _organizationRoleService;
-        private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<User> _userRepository;
 
-        public OrganizationsController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IOrganizationRoleService organizationRoleService, IAuthenticationService authService, IGenericRepository<User> userRepository)
-            : base(repository, authService)
+        public OrganizationsController(
+            IGenericRepository<Organization> repository,
+            IOrganizationService organizationService,
+            IOrganizationRoleService organizationRoleService,
+            IAuthenticationService authService,
+            IGenericRepository<User> userRepository,
+            IAuthorizationContext authorizationContext)
+            : base(repository, authService, authorizationContext)
         {
             _organizationService = organizationService;
             _organizationRoleService = organizationRoleService;
-            _authService = authService;
             _userRepository = userRepository;
         }
 
@@ -43,7 +49,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }
@@ -115,8 +121,8 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            var accessLevel = GetOrganizationReadAccessLevel(key);
+            if (accessLevel < OrganizationDataReadAccessLevel.Public)
             {
                 return Forbidden();
             }

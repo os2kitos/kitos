@@ -595,10 +595,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private static async Task AssertInterfaceUsageUpdatedAfterMigration(ItInterfaceUsageDTO interfaceUsage, int sysId)
         {
             // Checking the old interface usage key is removed
-            Assert.Null(await InterfaceUsageHelper.GetItInterfaceUsage(
+            using (var response = await InterfaceUsageHelper.GetItInterfaceUsageResponse(
                 interfaceUsage.ItSystemUsageId,
                 interfaceUsage.ItSystemId,
-                interfaceUsage.ItInterfaceId, true));
+                interfaceUsage.ItInterfaceId))
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
 
             await AssertInterfaceUsageSystemBinding(interfaceUsage, sysId);
         }
