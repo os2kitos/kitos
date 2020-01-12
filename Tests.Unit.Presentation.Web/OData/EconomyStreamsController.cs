@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Web.Http.Results;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -26,7 +25,6 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             _economyStreamRepository = Substitute.For<IGenericRepository<EconomyStream>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
-            var _authenticator = Substitute.For<IAuthenticationService>();
             _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _userRepository);
             var userMock = new UserMock(_economyStreamsController, "12345678");
             userMock.LogOn();

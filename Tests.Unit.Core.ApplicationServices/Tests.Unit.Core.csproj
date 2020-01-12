@@ -121,7 +121,6 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
-    <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
     <Compile Include="DomainServices\MaybeTest.cs" />
     <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
     <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />

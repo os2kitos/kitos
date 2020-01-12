@@ -103,7 +103,6 @@ namespace Presentation.Web
                 .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
-            kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InRequestScope();
             kernel.Bind<IAdviceService>().To<AdviceService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();

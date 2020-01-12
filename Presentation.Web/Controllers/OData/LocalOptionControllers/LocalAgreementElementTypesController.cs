@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.ItContract;
+﻿using Core.DomainModel.ItContract;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,7 +9,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     [MigratedToNewAuthorizationContext]
     public class LocalAgreementElementTypesController : LocalOptionBaseController<LocalAgreementElementType, ItContract, AgreementElementType>
     {
-        public LocalAgreementElementTypesController(IGenericRepository<LocalAgreementElementType> repository, IAuthenticationService authService, IGenericRepository<AgreementElementType> optionsRepository)
+        public LocalAgreementElementTypesController(IGenericRepository<LocalAgreementElementType> repository, IGenericRepository<AgreementElementType> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

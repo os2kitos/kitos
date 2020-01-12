@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,7 +9,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     [MigratedToNewAuthorizationContext]
     public class LocalItSystemTypesController : LocalOptionBaseController<LocalItSystemType, ItSystem, ItSystemType>
     {
-        public LocalItSystemTypesController(IGenericRepository<LocalItSystemType> repository, IAuthenticationService authService, IGenericRepository<ItSystemType> optionsRepository)
+        public LocalItSystemTypesController(IGenericRepository<LocalItSystemType> repository, IGenericRepository<ItSystemType> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

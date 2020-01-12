@@ -1,5 +1,4 @@
 ﻿using Presentation.Web.Infrastructure.Attributes;
-using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
@@ -11,7 +10,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     [MigratedToNewAuthorizationContext]
     public class LocalArchiveTestLocationsController : LocalOptionBaseController<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>
     {
-        public LocalArchiveTestLocationsController(IGenericRepository<LocalArchiveTestLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveTestLocation> optionsRepository)
+        public LocalArchiveTestLocationsController(IGenericRepository<LocalArchiveTestLocation> repository, IGenericRepository<ArchiveTestLocation> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

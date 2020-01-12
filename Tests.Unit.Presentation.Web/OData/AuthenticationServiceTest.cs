@@ -46,7 +46,6 @@ namespace Tests.Unit.Presentation.Web.OData
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
             _featureChecker = Substitute.For<IFeatureChecker>();
-            var _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<ItContract> contracts = new EnumerableQuery<ItContract>(new List<ItContract>
             {
                 new ItContract {OrganizationId = 1,Name = "Contract belongs to org 1"},

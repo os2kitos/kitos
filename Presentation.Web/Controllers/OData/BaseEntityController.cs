@@ -1,7 +1,6 @@
 ﻿using System.Web.Http;
 using System.Web.OData;
 using Core.DomainServices;
-using Core.ApplicationServices;
 using System.Net;
 using System;
 using Core.DomainModel;
@@ -15,7 +14,6 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;

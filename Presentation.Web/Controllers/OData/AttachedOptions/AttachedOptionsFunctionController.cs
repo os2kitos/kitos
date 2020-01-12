@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         public virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
-            var orgId = AuthService.GetCurrentOrganizationId(UserId);
+            var orgId = UserContext.ActiveOrganizationId;
 
             var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
             var localpersonalData = _localOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
@@ -134,8 +134,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 && x.ObjectType == objectType).ToList();
             }
 
+            var organizationId = UserContext.ActiveOrganizationId;
             return _attachedOptionRepository.AsQueryable()
-                .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)
+                .Where(x => ((IHasOrganization)x).OrganizationId == organizationId
                             && x.ObjectId == id
                             && x.OptionType == type
                             && x.ObjectType == objectType).ToList();

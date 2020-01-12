@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.ItContract;
+﻿using Core.DomainModel.ItContract;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,7 +9,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     [MigratedToNewAuthorizationContext]
     public class LocalProcurementStrategyTypesController : LocalOptionBaseController<LocalProcurementStrategyType, ItContract, ProcurementStrategyType>
     {
-        public LocalProcurementStrategyTypesController(IGenericRepository<LocalProcurementStrategyType> repository, IAuthenticationService authService, IGenericRepository<ProcurementStrategyType> optionsRepository)
+        public LocalProcurementStrategyTypesController(IGenericRepository<LocalProcurementStrategyType> repository, IGenericRepository<ProcurementStrategyType> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

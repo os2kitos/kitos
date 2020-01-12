@@ -116,8 +116,6 @@
     <Compile Include="Model\Result\OperationResult.cs" />
     <Compile Include="Model\Result\Result.cs" />
     <Compile Include="OrganizationRoleService.cs" />
-    <Compile Include="AuthenticationService.cs" />
-    <Compile Include="IAuthenticationService.cs" />
     <Compile Include="IExcelHandler.cs" />
     <Compile Include="IExcelService.cs" />
     <Compile Include="IItContractService.cs" />
