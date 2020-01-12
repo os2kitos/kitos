@@ -9,7 +9,7 @@ namespace Presentation.Web.Controllers.OData
     public class HelpTextsController : BaseEntityController<HelpText>
     {
         public HelpTextsController(IGenericRepository<HelpText> repository, IAuthenticationService authService)
-            : base(repository, authService)
+            : base(repository)
         {
         }
     }

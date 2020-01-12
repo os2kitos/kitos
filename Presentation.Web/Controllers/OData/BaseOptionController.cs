@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -14,13 +13,11 @@ namespace Presentation.Web.Controllers.OData
     {
 
         private readonly IGenericRepository<TType> _repository;
-        private readonly IAuthenticationService _authService;
         // GET: BaseRole
-        protected BaseOptionController(IGenericRepository<TType> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        protected BaseOptionController(IGenericRepository<TType> repository)
+            : base(repository)
         {
             _repository = repository;
-            _authService = authService;
         }
 
         public override IHttpActionResult Patch(int key, Delta<TType> delta)
@@ -81,22 +78,15 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Post(TType entity)
         {
-            try
-            {
-                var Entities = _repository.Get();
+            var Entities = _repository.Get();
 
-                if(Entities.Any())
-                {
-                    entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
-                }else
-                {
-                    entity.Priority = 1;
-                }
-            }
-            catch(Exception e)
+            if (Entities.Any())
             {
-                var message = e.Message;
-                return InternalServerError(e);
+                entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
+            }
+            else
+            {
+                entity.Priority = 1;
             }
 
             return base.Post(entity);
@@ -108,7 +98,7 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            if (!AllowDelete(entity))
             {
                 return Forbidden();
             }

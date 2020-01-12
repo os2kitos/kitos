@@ -27,7 +27,6 @@ namespace Presentation.Web.Controllers.API
         protected GenericRightsController(
             IGenericRepository<TRight> rightRepository,
             IGenericRepository<TObject> objectRepository)
-        : base()
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;

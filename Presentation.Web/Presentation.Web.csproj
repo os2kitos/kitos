@@ -336,7 +336,6 @@
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
-    <Compile Include="Infrastructure\Authorization\Controller\General\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageContractMigrationDTO.cs" />

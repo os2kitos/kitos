@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -12,14 +11,14 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class AttachedOptionsRegisterTypesController : AttachedOptionsFunctionController<ItSystemUsage, RegisterType, LocalRegisterType>
     {
         public AttachedOptionsRegisterTypesController(
                 IGenericRepository<AttachedOption> repository,
-                IAuthenticationService authService,
                 IGenericRepository<RegisterType> registerTypeRepository,
                 IGenericRepository<LocalRegisterType> localRegisterTypeRepository)
-               : base(repository, authService, registerTypeRepository, localRegisterTypeRepository)
+               : base(repository, registerTypeRepository, localRegisterTypeRepository)
         {
 
         }

@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData
     {
     public ItProjectStatusUpdatesController(IGenericRepository<ItProjectStatusUpdate>
         repository, IAuthenticationService authService)
-        : base(repository, authService)
+        : base(repository)
         {
         }
     }

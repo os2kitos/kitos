@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IAuthenticationService _authService;
 
         public ItInterfacesController(IGenericRepository<ItInterface> repository, IAuthenticationService authService)
-            : base(repository, authService)
+            : base(repository)
         {
             _authService = authService;
         }

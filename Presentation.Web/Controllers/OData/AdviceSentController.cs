@@ -9,6 +9,6 @@ namespace Presentation.Web.Controllers.OData
     public class AdviceSentController : BaseEntityController<AdviceSent>
     {
         public AdviceSentController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService): 
-        base(repository,authService){ }
+        base(repository){ }
     }
 }

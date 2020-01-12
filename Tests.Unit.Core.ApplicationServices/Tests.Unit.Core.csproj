@@ -124,6 +124,7 @@
     <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
     <Compile Include="DomainServices\MaybeTest.cs" />
     <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
+    <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +145,10 @@
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

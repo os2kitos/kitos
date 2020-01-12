@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using System;
 using System.Collections.Generic;
@@ -8,11 +7,13 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class AttachedOptionsFunctionController<TEntity, TOption, TLocalOption> : AttachedOptionsController
     where TEntity : Entity
     where TOption : OptionHasChecked<TEntity>
@@ -24,10 +25,9 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         public AttachedOptionsFunctionController(
             IGenericRepository<AttachedOption> repository, 
-            IAuthenticationService authService,
             IGenericRepository<TOption> optionRepository,
             IGenericRepository<TLocalOption> localOptionRepository)
-               : base(repository, authService)
+               : base(repository)
         {
             _attachedOptionRepository = repository;
             _optionRepository = optionRepository;
@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 return NotFound();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, option))
+            if (!AllowWrite(option))
             {
                 return Forbidden();
             }
@@ -126,7 +126,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         {
             var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
 
-            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
+            if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All || hasOrg == false)
             {
                 //tolist so we can operate with open datareaders in the following foreach loop.
                 return _attachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id

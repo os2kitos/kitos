@@ -7,6 +7,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class LocalGoalTypesController : LocalOptionBaseController<LocalGoalType, Goal, GoalType>
     {
         public LocalGoalTypesController(IGenericRepository<LocalGoalType> repository, IAuthenticationService authService, IGenericRepository<GoalType> optionsRepository)

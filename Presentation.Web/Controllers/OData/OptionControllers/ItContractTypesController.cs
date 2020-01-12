@@ -1,15 +1,15 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.ItContract;
+﻿using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class ItContractTypesController : BaseOptionController<ItContractType, ItContract>
     {
-        public ItContractTypesController(IGenericRepository<ItContractType> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItContractTypesController(IGenericRepository<ItContractType> repository)
+            : base(repository)
         {
         }
     }

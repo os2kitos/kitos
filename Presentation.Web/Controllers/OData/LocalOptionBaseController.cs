@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<TOptionType> _optionsRepository;
 
         public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IAuthenticationService authService, IGenericRepository<TOptionType> optionsRepository)
-            : base(repository, authService)
+            : base(repository)
         {
             _authService = authService;
             _optionsRepository = optionsRepository;

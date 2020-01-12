@@ -119,6 +119,32 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.True(result);
         }
 
+        [Fact]
+        public void AllowReads_For_GlobalReadableType_Text_Returns_True()
+        {
+            //Arrange
+            var inputEntity = new Text();
+
+            //Act
+            var result = _sut.AllowReads(inputEntity);
+
+            //Assert
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void AllowReads_For_GlobalReadableType_HelpText_Returns_True()
+        {
+            //Arrange
+            var inputEntity = new HelpText();
+
+            //Act
+            var result = _sut.AllowReads(inputEntity);
+
+            //Assert
+            Assert.True(result);
+        }
+
         [Theory]
         //Checks not bound to context condition
         [InlineData(true, false, false, false, false, false, false, false, true)]

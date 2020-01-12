@@ -6,12 +6,15 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Web.Http.Results;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using FluentAssertions;
+using Moq;
 using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -27,8 +30,9 @@ namespace Tests.Unit.Presentation.Web.OData
         private IGenericRepository<User> _userRepository;
         private IGenericRepository<ItContract> _itContractRepository;
         private IGenericRepository<OrganizationUnit> _organizationUnitRepository;
-        private AuthenticationService _authenticationService;
         private IFeatureChecker _featureChecker;
+        private Mock<IAuthorizationContext> _authorizationContext;
+        private Mock<IOrganizationalUserContext> _userContext;
 
         public AuthenticationServiceTest()
         {
@@ -42,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.OData
             _organizationUnitRepository = Substitute.For<IGenericRepository<OrganizationUnit>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
             _featureChecker = Substitute.For<IFeatureChecker>();
-            _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
+            var _authenticationService = new AuthenticationService(_userRepository, _featureChecker);
             IQueryable<ItContract> contracts = new EnumerableQuery<ItContract>(new List<ItContract>
             {
                 new ItContract {OrganizationId = 1,Name = "Contract belongs to org 1"},
@@ -62,7 +66,11 @@ namespace Tests.Unit.Presentation.Web.OData
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
 
             _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository, _authenticationService);
-            _reportsController = new ReportsController(_reportRepository, _authenticationService);
+            _reportsController = new ReportsController(_reportRepository);
+            _authorizationContext = new Mock<IAuthorizationContext>();
+            _reportsController.AuthorizationContext = _authorizationContext.Object;
+            _userContext = new Mock<IOrganizationalUserContext>();
+            _reportsController.UserContext = _userContext.Object;
 
 
             var usr = new UserMock(_itContractsController, "1");
@@ -73,13 +81,12 @@ namespace Tests.Unit.Presentation.Web.OData
 
 
         [Fact]
-        // test AuthenticationService.HasReadAccessOutsideContext true
         public void hasReadAccessOutsideContext_returns_three_reports()
         {
             // Arrange
             const int orgKey = 1;
-            var user = SetAccess(true, orgKey, isGlobalmin: true, organizationCategory: OrganizationCategory.Municipality);
-            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+            _userContext.Setup(x => x.ActiveOrganizationId).Returns(orgKey);
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             // Act
             var result = _reportsController.Get();
@@ -93,13 +100,12 @@ namespace Tests.Unit.Presentation.Web.OData
         }
 
         [Fact]
-        // test AuthenticationService.HasReadAccessOutsideContext true
         public void hasReadAccessOutsideContext_returns_two_reports()
         {
             // Arrange
             const int orgKey = 1;
-            var user =SetAccess(true, orgKey, isGlobalmin: false, organizationCategory: OrganizationCategory.Municipality);
-            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+            _userContext.Setup(x => x.ActiveOrganizationId).Returns(orgKey);
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.Public);
 
             // Act
             var result = _reportsController.Get();
@@ -118,8 +124,8 @@ namespace Tests.Unit.Presentation.Web.OData
         {
             // Arrange
             const int orgKey = 2;
-            var user = SetAccess(true, orgKey, isGlobalmin: false, organizationCategory: OrganizationCategory.Municipality);
-            _reportsController.User = new System.Security.Principal.GenericPrincipal(new System.Security.Principal.GenericIdentity(user.Id.ToString()), new[] { "" });
+            _userContext.Setup(x => x.ActiveOrganizationId).Returns(orgKey);
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.Public);
 
             // Act
             var result = _reportsController.Get();

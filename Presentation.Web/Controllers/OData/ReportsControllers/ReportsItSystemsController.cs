@@ -3,9 +3,9 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -13,12 +13,11 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class ReportsItSystemsController : BaseOdataAuthorizationController<ItSystem>
     {
-        private readonly IAuthenticationService _authService;
-        public ReportsItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService)
+        public ReportsItSystemsController(IGenericRepository<ItSystem> repository)
             : base(repository){
-            _authService = authService;
         }
 
         [HttpGet]
@@ -28,7 +27,7 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Get()
         {
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
             {
                 return StatusCode(HttpStatusCode.Forbidden);
             }

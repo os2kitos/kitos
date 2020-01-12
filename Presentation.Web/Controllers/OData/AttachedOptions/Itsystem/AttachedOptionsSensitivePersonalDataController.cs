@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Web.Http;
@@ -10,14 +9,14 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
         public AttachedOptionsSensitivePersonalDataController(
             IGenericRepository<AttachedOption> repository,
             IGenericRepository<LocalSensitivePersonalDataType> localSensitivePersonalDataTypeRepository,
-            IAuthenticationService authService,
             IGenericRepository<SensitivePersonalDataType> sensitiveDataTypeRepository)
-           : base(repository, authService, sensitiveDataTypeRepository, localSensitivePersonalDataTypeRepository)
+           : base(repository, sensitiveDataTypeRepository, localSensitivePersonalDataTypeRepository)
         {
         }
 

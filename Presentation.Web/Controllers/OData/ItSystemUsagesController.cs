@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
 
         public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository,
             IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAuthorizationContext authorizationContext)
-            : base(repository, authService, authorizationContext)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;

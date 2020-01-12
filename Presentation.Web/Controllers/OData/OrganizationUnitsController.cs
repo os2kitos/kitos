@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IAuthenticationService _authService;
 
         public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository, IAuthenticationService authService)
-            : base(repository, authService)
+            : base(repository)
         {
             _authService = authService;
         }

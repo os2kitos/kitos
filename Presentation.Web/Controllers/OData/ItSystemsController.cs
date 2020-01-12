@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.OData
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
         public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
-            : base(repository, authService, authorizationContext)
+            : base(repository)
         {
         }
 

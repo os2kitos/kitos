@@ -9,6 +9,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
+using Ninject;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
@@ -17,28 +18,27 @@ namespace Presentation.Web.Controllers.OData
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
         protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
-        private readonly IControllerAuthorizationStrategy _authorizationStrategy;
+        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected BaseEntityController(
-            IGenericRepository<T> repository,
-            IAuthenticationService authService,
-            IAuthorizationContext authorizationContext = null)
+        [Inject]
+        public IOrganizationalUserContext UserContext { get; set; }
+
+        [Inject]
+        public IAuthorizationContext AuthorizationContext { get; set; }
+
+        protected BaseEntityController(IGenericRepository<T> repository)
             : base(repository)
         {
-            _authorizationStrategy =
-                authorizationContext == null
-                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
-                    : new ContextBasedAuthorizationStrategy(authorizationContext);
-            AuthService = authService;
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
             _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var organizationId = AuthService.GetCurrentOrganizationId(UserId);
+            var organizationId = UserContext.ActiveOrganizationId;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.OData
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IHasOrganization organization && organization.OrganizationId == 0)
             {
-                organization.OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
+                organization.OrganizationId = UserContext.ActiveOrganizationId;
             }
 
             entity.ObjectOwnerId = UserId;
@@ -211,12 +211,12 @@ namespace Presentation.Web.Controllers.OData
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
-            return _authorizationStrategy.GetCrossOrganizationReadAccess();
+            return _authorizationStrategy.Value.GetCrossOrganizationReadAccess();
         }
 
         protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            return _authorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
+            return _authorizationStrategy.Value.GetOrganizationReadAccessLevel(organizationId);
         }
 
         protected bool AllowRead(T entity)
@@ -231,7 +231,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowCreate<T>()
         {
-            return _authorizationStrategy.AllowCreate<T>();
+            return _authorizationStrategy.Value.AllowCreate<T>();
         }
 
         protected bool AllowCreate<T>(IEntity entity)
@@ -246,12 +246,12 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return _authorizationStrategy.AllowEntityVisibilityControl(entity);
+            return _authorizationStrategy.Value.AllowEntityVisibilityControl(entity);
         }
 
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new RootEntityCrudAuthorization(_authorizationStrategy);
+            return new RootEntityCrudAuthorization(_authorizationStrategy.Value);
         }
     }
 }

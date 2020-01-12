@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
         public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
-            : base(repository, authService)
+            : base(repository)
         {
             _adviceService = adviceService;
             _repository = repository;

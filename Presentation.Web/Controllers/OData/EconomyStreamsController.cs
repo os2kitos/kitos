@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<EconomyStream> _repository;
         private readonly IGenericRepository<User> _userRepository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IAuthenticationService authService, IGenericRepository<User> userRepository) : base(repository, authService)
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IAuthenticationService authService, IGenericRepository<User> userRepository) : base(repository)
         {
             _repository = repository;
             _userRepository = userRepository;

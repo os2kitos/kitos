@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<User> _repository;
 
         public UsersController(IGenericRepository<User> repository, IAuthenticationService authService, IUserService userService)
-            : base(repository, authService)
+            : base(repository)
         {
             _authService = authService;
             _userService = userService;

@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
             IAuthenticationService authService,
             IGenericRepository<User> userRepository,
             IAuthorizationContext authorizationContext)
-            : base(repository, authService, authorizationContext)
+            : base(repository)
         {
             _organizationService = organizationService;
             _organizationRoleService = organizationRoleService;

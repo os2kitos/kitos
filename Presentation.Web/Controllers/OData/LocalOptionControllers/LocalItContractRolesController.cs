@@ -7,6 +7,7 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class LocalItContractRolesController : LocalOptionBaseController<LocalItContractRole, ItContractRight, ItContractRole>
     {
         public LocalItContractRolesController(IGenericRepository<LocalItContractRole> repository, IAuthenticationService authService, IGenericRepository<ItContractRole> optionsRepository)

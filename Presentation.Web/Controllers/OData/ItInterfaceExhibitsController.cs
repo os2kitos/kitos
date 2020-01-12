@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.OData
             IAuthenticationService authService,
             IAuthorizationContext authorizationContext,
             IGenericRepository<ItInterface> interfaceRepository)
-            : base(repository, authService, authorizationContext)
+            : base(repository)
         {
             _interfaceRepository = interfaceRepository;
         }

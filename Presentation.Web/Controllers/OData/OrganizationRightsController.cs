@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.OData
             IUserService userService,
             IAuthenticationService authService,
             IOrganizationRightsService organizationRightsService)
-            : base(repository, authService)
+            : base(repository)
         {
             _userService = userService;
             _authService = authService;

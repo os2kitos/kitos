@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData
     {
         // GET: ArchivePeriode
         public ArchivePeriodsController(IGenericRepository<ArchivePeriod> repository, IAuthenticationService authService)
-            : base(repository, authService)
+            : base(repository)
         {
         }
     }

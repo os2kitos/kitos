@@ -8,6 +8,7 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class LocalArchiveLocationsController : LocalOptionBaseController<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>
     {
         public LocalArchiveLocationsController(IGenericRepository<LocalArchiveLocation> repository, IAuthenticationService authService, IGenericRepository<ArchiveLocation> optionsRepository)

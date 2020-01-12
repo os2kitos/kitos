@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
             IGenericRepository<ItSystemRight> repository,
             IAuthenticationService authService,
             IAuthorizationContext authorizationContext)
-            : base(repository, authService, authorizationContext)
+            : base(repository)
         {
         }
 
