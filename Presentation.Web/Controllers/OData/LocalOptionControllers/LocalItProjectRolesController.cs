@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalItProjectRolesController : LocalOptionBaseController<LocalItProjectRole, ItProjectRight, ItProjectRole>
     {
         public LocalItProjectRolesController(IGenericRepository<LocalItProjectRole> repository, IAuthenticationService authService, IGenericRepository<ItProjectRole> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

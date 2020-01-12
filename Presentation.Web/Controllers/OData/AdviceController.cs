@@ -15,13 +15,17 @@ namespace Presentation.Web.Controllers.OData
     using System.Net;
 
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
         private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
-        public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
+        public AdviceController(
+            IAdviceService adviceService, 
+            IGenericRepository<Advice> repository, 
+            IGenericRepository<AdviceSent> sentRepository)
             : base(repository)
         {
             _adviceService = adviceService;
@@ -198,7 +202,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (!AllowDelete(entity))
             {
                 return Forbidden();
             }

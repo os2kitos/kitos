@@ -27,7 +27,7 @@ namespace Tests.Unit.Presentation.Web.OData
             _economyStreamRepository = Substitute.For<IGenericRepository<EconomyStream>>();
             _userRepository = Substitute.For<IGenericRepository<User>>();
             var _authenticator = Substitute.For<IAuthenticationService>();
-            _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _authenticator, _userRepository);
+            _economyStreamsController = new EconomyStreamsController(_economyStreamRepository, _userRepository);
             var userMock = new UserMock(_economyStreamsController, "12345678");
             userMock.LogOn();
         }

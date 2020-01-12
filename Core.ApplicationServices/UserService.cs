@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Mail;
+using System.Security;
 using System.Text;
 using System.Web;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Security.Cryptography;
+using Core.ApplicationServices.Authorization;
 using Infrastructure.Services.Cryptography;
 
 namespace Core.ApplicationServices
@@ -23,6 +25,7 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
         private readonly IMailClient _mailClient;
         private readonly ICryptoService _cryptoService;
+        private readonly IAuthorizationContext _authorizationContext;
         private readonly SHA256Managed _crypt;
         private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
@@ -35,7 +38,8 @@ namespace Core.ApplicationServices
             IGenericRepository<Organization> orgRepository,
             IGenericRepository<PasswordResetRequest> passwordResetRequestRepository,
             IMailClient mailClient,
-            ICryptoService cryptoService)
+            ICryptoService cryptoService,
+            IAuthorizationContext authorizationContext)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -47,6 +51,7 @@ namespace Core.ApplicationServices
             _passwordResetRequestRepository = passwordResetRequestRepository;
             _mailClient = mailClient;
             _cryptoService = cryptoService;
+            _authorizationContext = authorizationContext;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -66,6 +71,11 @@ namespace Core.ApplicationServices
 
             user.LastChanged = utcNow;
             user.DefaultOrganizationId = orgId;
+
+            if (!_authorizationContext.AllowCreate<User>(user))
+            {
+                throw new SecurityException();
+            }
 
             _userRepository.Insert(user);
             _userRepository.Save();
@@ -126,12 +136,12 @@ namespace Core.ApplicationServices
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
 
             var message = new MailMessage()
-                {
-                    Subject = (subject ?? mailSubject).Replace('\r', ' ').Replace('\n', ' '),
-                    Body = content ?? mailContent,
-                    IsBodyHtml = true,
-                    BodyEncoding = Encoding.UTF8,
-                };
+            {
+                Subject = (subject ?? mailSubject).Replace('\r', ' ').Replace('\n', ' '),
+                Body = content ?? mailContent,
+                IsBodyHtml = true,
+                BodyEncoding = Encoding.UTF8,
+            };
             message.To.Add(user.Email);
 
             _mailClient.Send(message);

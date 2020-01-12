@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
+using Core.DomainModel.AdviceSent;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -23,9 +24,13 @@ namespace Core.ApplicationServices.Authorization
             var typesWithGlobalRead =
                 new Dictionary<Type, bool>
                 {
+                    {typeof(Advice),true},
                     {typeof(AdviceUserRelation),true},
                     {typeof(Text),true},
-                    {typeof(HelpText),true}
+                    {typeof(HelpText),true},
+                    {typeof(AdviceSent),true},
+                    {typeof(Config),true},
+                    {typeof(GlobalConfig),true }
                 };
 
             //All base options are globally readable
@@ -135,6 +140,8 @@ namespace Core.ApplicationServices.Authorization
             {
                 case Organization newOrganization:
                     return CheckNewOrganizationCreationPolicy(newOrganization);
+                case OrganizationRight newOrganizationRight:
+                    return AllowOrganizationRightAssignment(newOrganizationRight);
                 default:
                     return true;
             }
@@ -226,27 +233,39 @@ namespace Core.ApplicationServices.Authorization
                         break;
                     case OrganizationRight right:
                         // Only global admin can set other users as global admins
-                        if (right.Role == OrganizationRole.GlobalAdmin)
-                        {
-                            if (IsGlobalAdmin())
-                            {
-                                result = true;
-                            }
-                        }
-
-                        // Only local and global admins can make users local admins
-                        if (right.Role == OrganizationRole.LocalAdmin)
-                        {
-                            if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
-                            {
-                                result = true;
-                            }
-                        }
+                        result = AllowOrganizationRightAssignment(right);
                         break;
                     default:
                         result = true;
                         break;
                 }
+            }
+
+            return result;
+        }
+
+        private bool AllowOrganizationRightAssignment(OrganizationRight right)
+        {
+            var result = false;
+
+            if (right.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (IsGlobalAdmin())
+                {
+                    result = true;
+                }
+            }
+            // Only local and global admins can make users local admins
+            else if (right.Role == OrganizationRole.LocalAdmin)
+            {
+                if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
+                {
+                    result = true;
+                }
+            }
+            else
+            {
+                result = true;
             }
 
             return result;

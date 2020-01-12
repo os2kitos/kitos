@@ -6,14 +6,16 @@ using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
 using System.Net;
+using System.Net.Http;
+using System.Web.Http.Routing;
+using System.Web.OData.Extensions;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
-using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Microsoft.OData.UriParser;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -21,13 +23,16 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
 
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository,
-            IAuthenticationService authService, IGenericRepository<AccessType> accessTypeRepository, IAuthorizationContext authorizationContext)
+        public ItSystemUsagesController(
+            IGenericRepository<ItSystemUsage> repository,
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
+            IGenericRepository<AccessType> accessTypeRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
@@ -47,7 +52,7 @@ namespace Presentation.Web.Controllers.OData
         {
             //Usages are local so full access is required
             var accessLevel = GetOrganizationReadAccessLevel(orgKey);
-            if (accessLevel != OrganizationDataReadAccessLevel.All)
+            if (accessLevel < OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
@@ -132,6 +137,30 @@ namespace Presentation.Web.Controllers.OData
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        private static TKey GetKeyFromUri<TKey>(HttpRequestMessage request, Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException("uri");
+            }
+
+            var urlHelper = request.GetUrlHelper() ?? new UrlHelper(request);
+            var pathHandler = (IODataPathHandler)request.GetRequestContainer().GetService(typeof(IODataPathHandler));
+
+            string serviceRoot = urlHelper.CreateODataLink(request.ODataProperties().RouteName, pathHandler, new List<ODataPathSegment>());
+
+            var odataPath = pathHandler.Parse(serviceRoot, uri.LocalPath, request.GetRequestContainer());
+
+            var keySegment = odataPath.Segments.OfType<KeySegment>().FirstOrDefault();
+            if (keySegment == null)
+            {
+                throw new InvalidOperationException("The link does not contain a key.");
+            }
+
+            var value = keySegment.Keys.FirstOrDefault().Value;
+            return (TKey)value;
         }
 
         public IHttpActionResult DeleteRef([FromODataUri] int key, [FromODataUri] string relatedKey, string navigationProperty)

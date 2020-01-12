@@ -1,14 +1,13 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Query;
 using System.Web.OData.Routing;
-using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -17,12 +16,14 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
         private readonly IGenericRepository<EconomyStream> _repository;
         private readonly IGenericRepository<User> _userRepository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IAuthenticationService authService, IGenericRepository<User> userRepository) : base(repository)
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IGenericRepository<User> userRepository) 
+            : base(repository)
         {
             _repository = repository;
             _userRepository = userRepository;
@@ -63,10 +64,7 @@ namespace Presentation.Web.Controllers.OData
 
         private bool HasAccessWithinOrganization(int orgKey)
         {
-            var id = Convert.ToUInt32(User.Identity.Name);
-            var user = _userRepository.Get(u => u.Id == id).FirstOrDefault();
-            var hasRightsOnOrganization = user != null && user.OrganizationRights.Any(x => x.OrganizationId == orgKey);
-            return hasRightsOnOrganization;
+            return GetOrganizationReadAccessLevel(orgKey) == OrganizationDataReadAccessLevel.All;
         }
 
         private bool EconomyStreamIsPublic(int contractKey)

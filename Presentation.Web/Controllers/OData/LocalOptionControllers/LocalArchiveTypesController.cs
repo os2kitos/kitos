@@ -12,7 +12,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalArchiveTypesController : LocalOptionBaseController<LocalArchiveType, ItSystemUsage, ArchiveType>
     {
         public LocalArchiveTypesController(IGenericRepository<LocalArchiveType> repository, IAuthenticationService authService, IGenericRepository<ArchiveType> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

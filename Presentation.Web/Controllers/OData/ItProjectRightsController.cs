@@ -4,23 +4,31 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
-using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
+using Core.DomainServices.Repositories.Project;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
-        private readonly IAuthenticationService _authService;
-        public ItProjectRightsController(IGenericRepository<ItProjectRight> repository, IAuthenticationService authService)
+        private readonly IItProjectRepository _itProjectRepository;
+
+        public ItProjectRightsController(IGenericRepository<ItProjectRight> repository, IItProjectRepository itProjectRepository)
             : base(repository)
         {
-            _authService = authService;
+            _itProjectRepository = itProjectRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<ItProjectRight>(r => _itProjectRepository.GetById(r.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItProjectRights
@@ -41,7 +49,7 @@ namespace Presentation.Web.Controllers.OData
             if (entity == null)
                 return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }
@@ -70,7 +78,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }

@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalTsaTypesController : LocalOptionBaseController<LocalTsaType, ItInterface, TsaType>
     {
         public LocalTsaTypesController(IGenericRepository<LocalTsaType> repository, IAuthenticationService authService, IGenericRepository<TsaType> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

@@ -6,19 +6,26 @@ using System.Web.Http;
 using System.Linq;
 using System;
 using System.Net;
-using Core.ApplicationServices;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class OrganizationUnitRightsController : BaseEntityController<OrganizationUnitRight>
     {
-        private readonly IAuthenticationService _authService;
-        public OrganizationUnitRightsController(IGenericRepository<OrganizationUnitRight> repository, IAuthenticationService authService)
+        private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
+
+        public OrganizationUnitRightsController(IGenericRepository<OrganizationUnitRight> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
             : base(repository)
         {
-            _authService = authService;
+            _orgUnitRepository = orgUnitRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<OrganizationUnitRight>(or => _orgUnitRepository.GetByKey(or.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItContractRights
@@ -40,7 +47,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowDelete(entity))
             {
                 return Unauthorized();
             }
@@ -69,7 +76,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }

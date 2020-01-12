@@ -3,6 +3,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using System.Linq;
 using Core.DomainServices.Extensions;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices
 {
@@ -49,6 +50,11 @@ namespace Core.ApplicationServices
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
                 .FirstOrDefault(u => u.ItSystemId == systemId);
+        }
+
+        public ItSystemUsage GetById(int usageId)
+        {
+            return _usageRepository.GetByKey(usageId);
         }
     }
 }

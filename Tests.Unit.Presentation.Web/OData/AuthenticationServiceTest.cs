@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.OData
             IQueryable<OrganizationUnit> organizationUnits = new EnumerableQuery<OrganizationUnit>(new List<OrganizationUnit>());
             _organizationUnitRepository.AsQueryable().Returns(organizationUnits);
 
-            _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository, _authenticationService);
+            _itContractsController = new ItContractsController(_itContractRepository, _organizationUnitRepository);
             _reportsController = new ReportsController(_reportRepository);
             _authorizationContext = new Mock<IAuthorizationContext>();
             _reportsController.AuthorizationContext = _authorizationContext.Object;

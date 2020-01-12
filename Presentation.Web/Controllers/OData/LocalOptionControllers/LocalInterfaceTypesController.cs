@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalInterfaceTypesController : LocalOptionBaseController<LocalInterfaceType, ItInterface, InterfaceType>
     {
         public LocalInterfaceTypesController(IGenericRepository<LocalInterfaceType> repository, IAuthenticationService authService, IGenericRepository<InterfaceType> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

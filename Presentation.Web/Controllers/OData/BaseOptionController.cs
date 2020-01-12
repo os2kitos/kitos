@@ -5,9 +5,11 @@ using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using Core.DomainServices;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
+    [MigratedToNewAuthorizationContext]
     public abstract class BaseOptionController<TType, TDomainModelType> : BaseEntityController<TType>
         where TType : OptionEntity<TDomainModelType>
     {
@@ -78,11 +80,9 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Post(TType entity)
         {
-            var Entities = _repository.Get();
-
-            if (Entities.Any())
+            if (_repository.AsQueryable().Any())
             {
-                entity.Priority = _repository.Get().Max(e => e.Priority) + 1;
+                entity.Priority = _repository.AsQueryable().Max(x => x.Priority) + 1;
             }
             else
             {

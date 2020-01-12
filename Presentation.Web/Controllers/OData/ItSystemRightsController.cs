@@ -5,25 +5,32 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemRightsController : BaseEntityController<ItSystemRight>
     {
+        private readonly IItSystemUsageService _systemUsageService;
+
         public ItSystemRightsController(
             IGenericRepository<ItSystemRight> repository,
-            IAuthenticationService authService,
-            IAuthorizationContext authorizationContext)
+            IItSystemUsageService systemUsageService)
             : base(repository)
         {
+            _systemUsageService = systemUsageService;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<ItSystemRight>(sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItProjectRights

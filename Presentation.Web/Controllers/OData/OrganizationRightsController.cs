@@ -4,31 +4,29 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;
-        private readonly IAuthenticationService _authService;
         private readonly IOrganizationRightsService _organizationRightsService;
 
         public OrganizationRightsController(
             IGenericRepository<OrganizationRight> repository,
             IUserService userService,
-            IAuthenticationService authService,
             IOrganizationRightsService organizationRightsService)
             : base(repository)
         {
             _userService = userService;
-            _authService = authService;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -37,6 +35,10 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult GetRights(int orgKey)
         {
+            if (GetCrossOrganizationReadAccessLevel() != CrossOrganizationDataReadAccessLevel.All)
+            {
+                return Forbidden();
+            }
             var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgKey);
             return Ok(result);
         }
@@ -72,7 +74,7 @@ namespace Presentation.Web.Controllers.OData
             entity.OrganizationId = orgKey;
             entity.ObjectOwnerId = UserId;
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowCreate<OrganizationRight>(entity))
             {
                 return Forbidden();
             }
@@ -160,7 +162,7 @@ namespace Presentation.Web.Controllers.OData
             }
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }

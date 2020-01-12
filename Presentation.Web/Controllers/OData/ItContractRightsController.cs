@@ -4,24 +4,31 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.ItContract;
-using Core.ApplicationServices;
+using Core.DomainServices.Repositories.Contract;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Net;
 
 namespace Presentation.Web.Controllers.OData
 {
-    using System;
-    using System.Net;
-
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItContractRightsController : BaseEntityController<ItContractRight>
     {
-        private readonly IAuthenticationService _authService;
-        public ItContractRightsController(IGenericRepository<ItContractRight> repository, IAuthenticationService authService)
+        private readonly IItContractRepository _itContractRepository;
+
+        public ItContractRightsController(IGenericRepository<ItContractRight> repository, IItContractRepository itContractRepository)
             : base(repository)
         {
-            this._authService = authService;
+            _itContractRepository = itContractRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<ItContractRight>(r => _itContractRepository.GetById(r.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItContractRights
@@ -38,13 +45,12 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
-            var test = !_authService.IsLocalAdmin(this.UserId);
             if (entity == null)
             {
                 return NotFound();
             }
 
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowDelete(entity))
             {
                 return Forbidden();
             }
@@ -72,7 +78,7 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
 
             // check if user is allowed to write to the entity
-            if (!_authService.HasWriteAccess(UserId, entity) && !_authService.IsLocalAdmin(this.UserId))
+            if (!AllowWrite(entity))
             {
                 return Forbidden();
             }

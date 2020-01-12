@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalOrganizationUnitRolesController : LocalOptionBaseController<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>
     {
         public LocalOrganizationUnitRolesController(IGenericRepository<LocalOrganizationUnitRole> repository, IAuthenticationService authService, IGenericRepository<OrganizationUnitRole> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

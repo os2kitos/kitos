@@ -6,10 +6,8 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Ninject;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
@@ -21,12 +19,6 @@ namespace Presentation.Web.Controllers.OData
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
-
-        [Inject]
-        public IOrganizationalUserContext UserContext { get; set; }
-
-        [Inject]
-        public IAuthorizationContext AuthorizationContext { get; set; }
 
         protected BaseEntityController(IGenericRepository<T> repository)
             : base(repository)

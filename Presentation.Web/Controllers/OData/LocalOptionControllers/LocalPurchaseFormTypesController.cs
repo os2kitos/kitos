@@ -11,7 +11,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalPurchaseFormTypesController : LocalOptionBaseController<LocalPurchaseFormType, ItContract, PurchaseFormType>
     {
         public LocalPurchaseFormTypesController(IGenericRepository<LocalPurchaseFormType> repository, IAuthenticationService authService, IGenericRepository<PurchaseFormType> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

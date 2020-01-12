@@ -9,6 +9,7 @@ namespace Presentation.Web.Controllers.OData
     /// Primarily used for reporting
     /// </summary>
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItContractAgreementElementTypesController : BaseController<ItContractAgreementElementTypes>
     {
         public ItContractAgreementElementTypesController(IGenericRepository<ItContractAgreementElementTypes> repository)

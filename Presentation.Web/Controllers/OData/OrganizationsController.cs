@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
 using System.Security;
@@ -8,7 +7,6 @@ using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using System.Linq;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -25,9 +23,7 @@ namespace Presentation.Web.Controllers.OData
             IGenericRepository<Organization> repository,
             IOrganizationService organizationService,
             IOrganizationRoleService organizationRoleService,
-            IAuthenticationService authService,
-            IGenericRepository<User> userRepository,
-            IAuthorizationContext authorizationContext)
+            IGenericRepository<User> userRepository)
             : base(repository)
         {
             _organizationService = organizationService;

@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.OData.LocalOptionControllers
     public class LocalSensistivePersonalDataTypesController : LocalOptionBaseController<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>
     {
         public LocalSensistivePersonalDataTypesController(IGenericRepository<LocalSensitivePersonalDataType> repository, IAuthenticationService authService, IGenericRepository<SensitivePersonalDataType> optionsRepository)
-            : base(repository, authService, optionsRepository)
+            : base(repository, optionsRepository)
         {
         }
     }

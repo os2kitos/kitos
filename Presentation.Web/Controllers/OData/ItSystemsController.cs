@@ -5,8 +5,6 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -16,9 +14,10 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
+    [MigratedToNewAuthorizationContext]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
+        public ItSystemsController(IGenericRepository<ItSystem> repository)
             : base(repository)
         {
         }

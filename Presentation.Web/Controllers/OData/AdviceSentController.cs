@@ -1,14 +1,14 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel.AdviceSent;
+﻿using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
+    [MigratedToNewAuthorizationContext]
     public class AdviceSentController : BaseEntityController<AdviceSent>
     {
-        public AdviceSentController(IGenericRepository<AdviceSent> repository, IAuthenticationService authService): 
+        public AdviceSentController(IGenericRepository<AdviceSent> repository): 
         base(repository){ }
     }
 }
