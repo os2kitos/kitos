@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -17,16 +16,13 @@ namespace Presentation.Web.Controllers.API
     public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
 
         public OrganizationController(
             IGenericRepository<Organization> repository,
-            IOrganizationService organizationService,
-            IOrganizationalUserContext userContext)
+            IOrganizationService organizationService)
             : base(repository)
         {
             _organizationService = organizationService;
-            _userContext = userContext;
         }
 
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)

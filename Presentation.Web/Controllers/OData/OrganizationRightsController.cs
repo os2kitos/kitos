@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
@@ -17,16 +16,13 @@ namespace Presentation.Web.Controllers.OData
     [InternalApi]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
-        private readonly IUserService _userService;
         private readonly IOrganizationRightsService _organizationRightsService;
 
         public OrganizationRightsController(
             IGenericRepository<OrganizationRight> repository,
-            IUserService userService,
             IOrganizationRightsService organizationRightsService)
             : base(repository)
         {
-            _userService = userService;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -50,51 +46,28 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
         {
-            //TODO: Migrate to the service
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = _userService.GetUserById(UserId);
-
-            if (entity.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (!user.IsGlobalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            if (entity.Role == OrganizationRole.LocalAdmin)
-            {
-                if (!user.IsGlobalAdmin && !user.IsLocalAdmin)
-                {
-                    return Forbidden();
-                }
-            }
-
-            entity.OrganizationId = orgKey;
-            entity.ObjectOwnerId = UserId;
-
-            if (!AllowCreate<OrganizationRight>(entity))
-            {
-                return Forbidden();
-            }
-
-            entity.LastChangedByUserId = UserId;
-
             try
             {
-                entity = Repository.Insert(entity);
-                Repository.Save();
+                var result = _organizationRightsService.AddRightToUser(orgKey, entity);
+                if (result.Ok)
+                {
+                    return Created(entity);
+                }
+
+                return result.Error == OperationFailure.Forbidden ?
+                    Forbidden() :
+                    InternalServerError();
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                Logger.ErrorException("Failed to add right", e);
+                return InternalServerError();
             }
-
-            return Created(entity);
         }
 
         /// <summary>

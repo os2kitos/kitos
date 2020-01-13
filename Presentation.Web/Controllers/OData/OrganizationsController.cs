@@ -65,9 +65,6 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(Organization organization)
         {
-            //TODO: Override post as in odata version an make the same assertions - moved to the appservice
-
-            //TODO: Used only by local admin
             if (organization == null)
             {
                 return BadRequest();

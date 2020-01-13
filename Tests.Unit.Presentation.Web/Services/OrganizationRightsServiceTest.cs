@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using System;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
@@ -100,6 +101,52 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             _organizationRightRepository.Verify(x => x.DeleteByKey(id), Times.Once);
+            _organizationRightRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void AddRightToUser_Throws_On_Null()
+        {
+            Assert.Throws<ArgumentNullException>(() => _sut.AddRightToUser(A<int>(), null));
+        }
+
+        [Fact]
+        public void AddRightToUser_Returns_Forbidden()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var organizationRight = new OrganizationRight();
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationRight)).Returns(false);
+
+            //Act
+            var result = _sut.AddRightToUser(organizationId, organizationRight);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void AddRightToUser_Returns_Ok()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var organizationRight = new OrganizationRight();
+            var userId = A<int>();
+            _organizationUserContext.Setup(x => x.UserId).Returns(userId);
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationRight)).Returns(true);
+            _organizationRightRepository.Setup(x => x.Insert(organizationRight)).Returns(organizationRight);
+
+            //Act
+            var result = _sut.AddRightToUser(organizationId, organizationRight);
+
+            //Assert
+            Assert.True(result.Ok);
+            var resultValue = result.Value;
+            Assert.Equal(organizationId,resultValue.OrganizationId);
+            Assert.Equal(userId,resultValue.ObjectOwnerId);
+            Assert.Equal(userId,resultValue.LastChangedByUserId);
+            _organizationRightRepository.Verify(x => x.Insert(organizationRight), Times.Once);
             _organizationRightRepository.Verify(x => x.Save(), Times.Once);
         }
     }

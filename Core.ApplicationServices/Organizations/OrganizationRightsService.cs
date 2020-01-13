@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.Organization;
@@ -14,13 +15,34 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrganizationalUserContext _userContext;
 
         public OrganizationRightsService(
-            IAuthorizationContext authorizationContext, 
+            IAuthorizationContext authorizationContext,
             IGenericRepository<OrganizationRight> organizationRightRepository,
             IOrganizationalUserContext userContext)
         {
             _authorizationContext = authorizationContext;
             _organizationRightRepository = organizationRightRepository;
             _userContext = userContext;
+        }
+
+        public Result<OrganizationRight, OperationFailure> AddRightToUser(int organizationId, OrganizationRight right)
+        {
+            if (right == null)
+            {
+                throw new ArgumentNullException(nameof(right));
+            }
+
+            right.OrganizationId = organizationId;
+            right.ObjectOwnerId = _userContext.UserId;
+            right.LastChangedByUserId = _userContext.UserId;
+
+            if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
+            {
+                return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.Forbidden);
+            }
+
+            right = _organizationRightRepository.Insert(right);
+            _organizationRightRepository.Save();
+            return Result<OrganizationRight, OperationFailure>.Success(right);
         }
 
         public Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)

@@ -210,11 +210,6 @@ namespace Core.ApplicationServices
             return password.Length >= 6;
         }
 
-        public User GetUserById(int id)
-        {
-            return _userRepository.GetByKey(id);
-        }
-
         public void Dispose()
         {
             _crypt?.Dispose();
