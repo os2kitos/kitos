@@ -103,13 +103,13 @@ namespace Presentation.Web.Controllers.OData
         }
 
         /// <summary>
-        /// Always returns 401 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
+        /// Always returns 405 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         public override IHttpActionResult Delete(int key)
         {
-            return Unauthorized();
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         private bool EmailExists(string email)

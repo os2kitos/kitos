@@ -5,12 +5,12 @@ using System.Web.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
     {
         public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository)
@@ -35,7 +35,10 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey);
+
             return Ok(result);
         }
     }

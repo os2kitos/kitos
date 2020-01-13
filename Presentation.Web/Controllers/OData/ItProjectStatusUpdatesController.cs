@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItProjectStatusUpdatesController : BaseEntityController<ItProjectStatusUpdate>
     {
         private readonly IItProjectRepository _projectRepository;
@@ -20,7 +19,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault()), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
     }
 }

@@ -5,11 +5,9 @@ using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
-    [MigratedToNewAuthorizationContext]
     public abstract class BaseOptionController<TType, TDomainModelType> : BaseEntityController<TType>
         where TType : OptionEntity<TDomainModelType>
     {

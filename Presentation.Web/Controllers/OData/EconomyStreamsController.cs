@@ -16,7 +16,6 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
         private readonly IGenericRepository<EconomyStream> _repository;

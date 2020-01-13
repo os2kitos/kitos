@@ -23,7 +23,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -57,7 +56,9 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByOrganizationId(orgKey, accessLevel);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey);
 
             return Ok(result);
         }

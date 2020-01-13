@@ -18,7 +18,6 @@ namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -50,7 +49,7 @@ namespace Presentation.Web.Controllers.OData
         {
             if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
             {
-                if (UserContext.ActiveOrganizationId != key)
+                if (GetOrganizationReadAccessLevel(key) < OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
@@ -60,12 +59,14 @@ namespace Presentation.Web.Controllers.OData
             }
             else
             {
-                var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
+                var result = Repository
+                    .AsQueryable()
+                    .ByPublicAccessOrOrganizationId(key);
+
                 return Ok(result);
             }
         }
 
-        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]

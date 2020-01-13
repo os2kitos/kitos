@@ -17,7 +17,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;

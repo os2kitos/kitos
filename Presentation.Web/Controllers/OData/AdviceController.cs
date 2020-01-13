@@ -15,7 +15,6 @@ namespace Presentation.Web.Controllers.OData
     using System.Net;
 
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
@@ -52,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
                     _repository.Save();
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to add advice",e);
                     return InternalServerError(e);
                 }
 
@@ -111,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
                         }
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to schedule advice", e);
                     return InternalServerError(e);
                 }
             }
@@ -179,7 +178,7 @@ namespace Presentation.Web.Controllers.OData
                 }
                 catch (Exception e)
                 {
-                    //todo log error
+                    Logger.ErrorException("Failed to update advice", e);
                     return InternalServerError(e);
                 }
             }
@@ -222,6 +221,7 @@ namespace Presentation.Web.Controllers.OData
             }
             catch (Exception e)
             {
+                Logger.ErrorException("Failed to delete advice", e);
                 return InternalServerError(e);
             }
 

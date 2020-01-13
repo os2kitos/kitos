@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ArchivePeriodsController : BaseEntityController<ArchivePeriod>
     {
         private readonly IItSystemUsageService _itSystemUsageService;

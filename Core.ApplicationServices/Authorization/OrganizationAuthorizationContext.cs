@@ -29,7 +29,6 @@ namespace Core.ApplicationServices.Authorization
                     {typeof(Text),true},
                     {typeof(HelpText),true},
                     {typeof(AdviceSent),true},
-                    {typeof(Config),true},
                     {typeof(GlobalConfig),true },
                     {typeof(ExternalReference),true }
             };

@@ -1,13 +1,11 @@
 ﻿using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItInterfaceExhibitsController : BaseEntityController<ItInterfaceExhibit>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
@@ -22,7 +20,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItInterfaceExhibit>(x => _interfaceRepository.AsQueryable().ById(x.Id), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItInterfaceExhibit>(x => _interfaceRepository.GetByKey(x.Id), base.GetCrudAuthorization());
         }
     }
 }

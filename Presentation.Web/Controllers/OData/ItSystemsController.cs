@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
         public ItSystemsController(IGenericRepository<ItSystem> repository)

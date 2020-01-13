@@ -218,8 +218,6 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                //Repository.DeleteByKey(localOption.Id);
-
                 localOption.IsActive = false;
                 Repository.Save();
             }

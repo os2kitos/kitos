@@ -9,12 +9,12 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class OrganizationRightsController : BaseEntityController<OrganizationRight>
     {
         private readonly IUserService _userService;
@@ -39,7 +39,10 @@ namespace Presentation.Web.Controllers.OData
             {
                 return Forbidden();
             }
-            var result = Repository.AsQueryable().Where(x => x.OrganizationId == orgKey);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey);
+
             return Ok(result);
         }
 
@@ -95,13 +98,13 @@ namespace Presentation.Web.Controllers.OData
         }
 
         /// <summary>
-        /// Always Use 403 - POST /Organizations(orgKey)/Rights instead
+        /// Always Use 405 - POST /Organizations(orgKey)/Rights instead
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         public override IHttpActionResult Post(OrganizationRight entity)
         {
-            return StatusCode(HttpStatusCode.Forbidden);
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         // DELETE /Organizations(1)/Rights(1)
@@ -149,45 +152,6 @@ namespace Presentation.Web.Controllers.OData
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
-        }
-
-        public override IHttpActionResult Patch(int key, Delta<OrganizationRight> delta)
-        {
-            var entity = Repository.GetByKey(key);
-
-            // does the entity exist?
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            // check if user is allowed to write to the entity
-            if (!AllowWrite(entity))
-            {
-                return Forbidden();
-            }
-
-            // check model state
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                // patch the entity
-                delta.Patch(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            // add the request header "Prefer: return=representation"
-            // if you want the updated entity returned,
-            // else you'll just get 204 (No Content) returned
-            return Updated(entity);
         }
     }
 }
