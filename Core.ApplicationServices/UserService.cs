@@ -27,7 +27,7 @@ namespace Core.ApplicationServices
         private readonly ICryptoService _cryptoService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly SHA256Managed _crypt;
-        private static RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
+        private static readonly RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
 
         public UserService(TimeSpan ttl,
             string baseUrl,

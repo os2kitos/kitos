@@ -50,8 +50,6 @@
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
-    <Compile Include="IItProjectService.cs" />
-    <Compile Include="IItSystemUsageService.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrganizationService.cs" />
     <Compile Include="IOrgUnitService.cs" />

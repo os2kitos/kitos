@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Project;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
@@ -497,21 +500,24 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         protected override ItProject PostQuery(ItProject item)
         {
-            //Makes sure to create the necessary properties, like phases
-            item.AccessModifier = AccessModifier.Local;
-            return _itProjectService.AddProject(item);
+            var result = _itProjectService.AddProject(item);
+            if (result.Ok)
+                return result.Value;
+
+            if (result.Error == GenericOperationFailure.Forbidden)
+                throw new SecurityException();
+            throw new InvalidOperationException(result.Error.ToString("G"));
         }
 
         protected override void DeleteQuery(ItProject entity)
         {
-            _itProjectService.DeleteProject(entity.Id);
-        }
-
-        public override HttpResponseMessage Post(ItProjectDTO dto)
-        {
-            //force set access modifier to 0
-            dto.AccessModifier = AccessModifier.Local;
-            return base.Post(dto);
+            var result = _itProjectService.DeleteProject(entity.Id);
+            if (!result.Ok)
+            {
+                if (result.Error == GenericOperationFailure.Forbidden)
+                    throw new SecurityException();
+                throw new InvalidOperationException(result.Error.ToString("G"));
+            }
         }
 
         public HttpResponseMessage PostPhaseChange(int id, int organizationId, string phaseNum, JObject phaseObj)

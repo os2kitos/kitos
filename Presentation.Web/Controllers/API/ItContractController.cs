@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
@@ -48,7 +51,8 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItContractDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public override HttpResponseMessage GetSingle(int id) {
+        public override HttpResponseMessage GetSingle(int id)
+        {
 
             try
             {
@@ -66,7 +70,8 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != KitosUser.DefaultOrganizationId) {
+                if (item.OrganizationId != KitosUser.DefaultOrganizationId)
+                {
                     dto.Note = "";
                 }
 
@@ -97,7 +102,8 @@ namespace Presentation.Web.Controllers.API
 
                 var elem = _agreementElementRepository.GetByKey(elemId);
 
-                contract.AssociatedAgreementElementTypes.Add(new ItContractAgreementElementTypes {
+                contract.AssociatedAgreementElementTypes.Add(new ItContractAgreementElementTypes
+                {
                     AgreementElementType_Id = elem.Id,
                     ItContract_Id = contract.Id
                 });
@@ -272,7 +278,17 @@ namespace Presentation.Web.Controllers.API
 
         protected override void DeleteQuery(ItContract entity)
         {
-            _itContractService.Delete(entity.Id);
+            var result = _itContractService.Delete(entity.Id);
+            if (result.Ok == false)
+            {
+                switch (result.Error)
+                {
+                    case GenericOperationFailure.Forbidden:
+                        throw new SecurityException();
+                    default:
+                        throw new InvalidOperationException(result.Error.ToString("G"));
+                }
+            }
         }
     }
 }

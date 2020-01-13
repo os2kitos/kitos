@@ -2,7 +2,10 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -46,7 +49,13 @@ namespace Presentation.Web.Controllers.API
 
         protected override void DeleteQuery(ItInterface entity)
         {
-            _itInterfaceService.Delete(entity.Id);
+            var result = _itInterfaceService.Delete(entity.Id);
+            if (!result.Ok)
+            {
+                if (result.Error == GenericOperationFailure.Forbidden)
+                    throw new SecurityException();
+                throw new InvalidOperationException(result.Error.ToString("G"));
+            }
         }
 
         public override HttpResponseMessage Post(ItInterfaceDTO dto)

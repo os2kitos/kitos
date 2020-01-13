@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.OData
 
             if (result.Result.IsSuccessStatusCode)
             {
-                if (organization.TypeId == 2)
+                if (organization.TypeId == (int)OrganizationTypeKeys.Interessefællesskab)
                 {
                     _organizationRoleService.MakeLocalAdmin(user, organization, user);
                     _organizationRoleService.MakeUser(user, organization, user);

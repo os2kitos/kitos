@@ -1,15 +1,18 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Project;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.Project
 {
     public class ItProjectService : IItProjectService
     {
@@ -18,7 +21,7 @@ namespace Core.ApplicationServices
         private readonly IItProjectRepository _itProjectRepository;
 
         public ItProjectService(
-            IGenericRepository<ItProject> projectRepository, 
+            IGenericRepository<ItProject> projectRepository,
             IAuthorizationContext authorizationContext,
             IItProjectRepository itProjectRepository)
         {
@@ -27,8 +30,19 @@ namespace Core.ApplicationServices
             _itProjectRepository = itProjectRepository;
         }
 
-        public ItProject AddProject(ItProject project)
+        public TwoTrackResult<ItProject, GenericOperationFailure> AddProject(ItProject project)
         {
+            if (project == null)
+            {
+                throw new ArgumentNullException(nameof(project));
+            }
+
+            if (!_authorizationContext.AllowCreate<ItProject>(project))
+            {
+                return TwoTrackResult<ItProject, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+            }
+
+            project.AccessModifier = AccessModifier.Local; //Force set to local
             CreateDefaultPhases(project);
             _projectRepository.Insert(project);
             _projectRepository.Save();
@@ -36,31 +50,38 @@ namespace Core.ApplicationServices
             AddEconomyYears(project);
 
             project.Handover = new Handover
-                {
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                };
+            {
+                ObjectOwner = project.ObjectOwner,
+                LastChangedByUser = project.ObjectOwner
+            };
 
             project.GoalStatus = new GoalStatus
-                {
-                    ObjectOwner = project.ObjectOwner,
-                    LastChangedByUser = project.ObjectOwner
-                };
+            {
+                ObjectOwner = project.ObjectOwner,
+                LastChangedByUser = project.ObjectOwner
+            };
 
             _projectRepository.Save();
 
-            return project;
+            return TwoTrackResult<ItProject, GenericOperationFailure>.Success(project);
         }
 
-        public void DeleteProject(int id)
+        public TwoTrackResult<ItProject, GenericOperationFailure> DeleteProject(int id)
         {
-            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
-            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var project = _projectRepository.Get(x => x.Id == id, null, $"{nameof(ItProject.Children)}, {nameof(ItProject.JointMunicipalProjects)}, {nameof(ItProject.CommonPublicProjects)}, {nameof(ItProject.TaskRefs)}, {nameof(ItProject.ItSystemUsages)}").FirstOrDefault();
+            var project = _projectRepository.GetByKey(id);
+            if (project == null)
+            {
+                return TwoTrackResult<ItProject, GenericOperationFailure>.Failure(GenericOperationFailure.NotFound);
+            }
 
-            // delete it project
-            _projectRepository.Delete(project);
+            if (!_authorizationContext.AllowDelete(project))
+            {
+                return TwoTrackResult<ItProject, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+            }
+            _projectRepository.DeleteByKeyWithReferencePreload(id);
             _projectRepository.Save();
+
+            return TwoTrackResult<ItProject, GenericOperationFailure>.Success(project);
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
@@ -89,14 +110,14 @@ namespace Core.ApplicationServices
         private static void CreateDefaultPhases(ItProject project)
         {
             project.CurrentPhase = 1;
-            project.Phase1 = new ItProjectPhase {Name = "Afventer"};
+            project.Phase1 = new ItProjectPhase { Name = "Afventer" };
             project.Phase2 = new ItProjectPhase { Name = "Foranalyse" };
             project.Phase3 = new ItProjectPhase { Name = "Gennemførsel" };
             project.Phase4 = new ItProjectPhase { Name = "Overlevering" };
             project.Phase5 = new ItProjectPhase { Name = "Drift" };
         }
 
-       private static void AddEconomyYears(ItProject project)
+        private static void AddEconomyYears(ItProject project)
         {
             project.EconomyYears = new List<EconomyYear>
             {

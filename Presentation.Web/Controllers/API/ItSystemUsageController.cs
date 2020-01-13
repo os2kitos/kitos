@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Castle.Core.Internal;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -138,27 +141,37 @@ namespace Presentation.Web.Controllers.API
                     return Forbidden();
                 }
 
-                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
-                                            && usage.OrganizationId == dto.OrganizationId).Any())
+                var sysUsageResult = _itSystemUsageService.Add(systemUsage, KitosUser);
+                if (sysUsageResult.Ok)
                 {
-                    return Conflict("Usage already exist");
+                    var sysUsage = sysUsageResult.Value;
+                    sysUsage.DataLevel = dto.DataLevel;
+
+                    //copy attached options from system to systemusage
+                    var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
+                    foreach (var option in attachedOptions)
+                    {
+                        option.ObjectId = sysUsage.Id;
+                        option.ObjectType = EntityType.ITSYSTEMUSAGE;
+                        _attachedOptionsRepository.Insert(option);
+                    }
+                    _attachedOptionsRepository.Save();
+
+
+                    return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }
 
-                var sysUsage = _itSystemUsageService.Add(systemUsage, KitosUser);
-                sysUsage.DataLevel = dto.DataLevel;
-
-                //copy attached options from system to systemusage
-                var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
-                foreach (var option in attachedOptions)
+                switch (sysUsageResult.Error)
                 {
-                    option.ObjectId = sysUsage.Id;
-                    option.ObjectType = EntityType.ITSYSTEMUSAGE;
-                    _attachedOptionsRepository.Insert(option);
+                    case GenericOperationFailure.BadInput:
+                        return BadRequest();
+                    case GenericOperationFailure.Forbidden:
+                        return Forbidden();
+                    case GenericOperationFailure.Conflict:
+                        return Conflict("existing usage already found");
+                    default:
+                        return new HttpResponseMessage(HttpStatusCode.InternalServerError);
                 }
-                _attachedOptionsRepository.Save();
-
-
-                return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
 
             }
             catch (Exception e)
@@ -452,7 +465,13 @@ namespace Presentation.Web.Controllers.API
 
         protected override void DeleteQuery(ItSystemUsage entity)
         {
-            _itSystemUsageService.Delete(entity.Id);
+            var result = _itSystemUsageService.Delete(entity.Id);
+            if (result.Ok == false)
+            {
+                if (result.Error == GenericOperationFailure.Forbidden)
+                    throw new SecurityException();
+                throw new InvalidOperationException(result.Error.ToString("G"));
+            }
         }
     }
 }
