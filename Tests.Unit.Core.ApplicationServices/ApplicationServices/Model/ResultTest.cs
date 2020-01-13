@@ -4,14 +4,14 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Model
 {
-    public class TwoTrackResultTest
+    public class ResultTest
     {
         [Fact]
         public void Success_Returns_OkResult_With_Value()
         {
             var value = Guid.NewGuid();
 
-            var result = TwoTrackResult<Guid, bool>.Success(value);
+            var result = Result<Guid, bool>.Success(value);
 
             Assert.True(result.Ok);
             Assert.Equal(value, result.Value);
@@ -23,7 +23,7 @@ namespace Tests.Unit.Core.ApplicationServices.Model
         {
             var value = Guid.NewGuid();
 
-            var result = TwoTrackResult<bool, Guid>.Failure(value);
+            var result = Result<bool, Guid>.Failure(value);
 
             Assert.False(result.Ok);
             Assert.Equal(value, result.Error);

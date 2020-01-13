@@ -2,13 +2,13 @@
 
 namespace Core.DomainServices.Model.Result
 {
-    public class TwoTrackResult<TSuccess, TFailure>
+    public class Result<TSuccess, TFailure>
     {
         private readonly Maybe<TFailure> _failure;
         private readonly Maybe<TSuccess> _value;
 
 
-        private TwoTrackResult(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
+        private Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
         {
             if (successResult.HasValue == failureResult.HasValue)
             {
@@ -25,14 +25,14 @@ namespace Core.DomainServices.Model.Result
 
         public TFailure Error => _failure.Value;
 
-        public static TwoTrackResult<TSuccess, TFailure> Success(TSuccess value)
+        public static Result<TSuccess, TFailure> Success(TSuccess value)
         {
-            return new TwoTrackResult<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
+            return new Result<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
         }
 
-        public static TwoTrackResult<TSuccess, TFailure> Failure(TFailure value)
+        public static Result<TSuccess, TFailure> Failure(TFailure value)
         {
-            return new TwoTrackResult<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
+            return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
         }
     }
 }

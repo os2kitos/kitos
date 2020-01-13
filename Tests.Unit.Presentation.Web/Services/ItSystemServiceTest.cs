@@ -232,7 +232,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
-            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.Delete(system.Id);
@@ -251,7 +251,7 @@ namespace Tests.Unit.Presentation.Web.Services
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
-            ExpectDeleteReferenceReturns(system.Id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            ExpectDeleteReferenceReturns(system.Id, Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
             ExpectTransactionToBeSet();
 
             //Act
@@ -275,7 +275,7 @@ namespace Tests.Unit.Presentation.Web.Services
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
-            ExpectDeleteReferenceReturns(system.Id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(referenceDeleteResult));
+            ExpectDeleteReferenceReturns(system.Id, Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(referenceDeleteResult));
             ExpectTransactionToBeSet();
 
             //Act
@@ -298,7 +298,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
-            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.Delete(system.Id);
@@ -355,7 +355,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
 
-        private void ExpectDeleteReferenceReturns(int id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure> result)
+        private void ExpectDeleteReferenceReturns(int id, Result<IEnumerable<ExternalReference>, OperationFailure> result)
         {
             _referenceService.Setup(x => x.DeleteBySystemId(id)).Returns(result);
         }

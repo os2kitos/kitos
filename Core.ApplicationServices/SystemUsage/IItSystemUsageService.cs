@@ -7,8 +7,8 @@ namespace Core.ApplicationServices.SystemUsage
 {
     public interface IItSystemUsageService
     {
-        TwoTrackResult<ItSystemUsage, OperationFailure> Add(ItSystemUsage usage, User objectOwner);
-        TwoTrackResult<ItSystemUsage, OperationFailure> Delete(int id);
+        Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage usage, User objectOwner);
+        Result<ItSystemUsage, OperationFailure> Delete(int id);
         ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId);
         ItSystemUsage GetById(int usageId);
     }

@@ -22,18 +22,18 @@ namespace Core.ApplicationServices
             _economyStreamRepository = economyStreamRepository;
             _authorizationContext = authorizationContext;
         }
-        public TwoTrackResult<ItContract, OperationFailure> Delete(int id)
+        public Result<ItContract, OperationFailure> Delete(int id)
         {
             var contract = _repository.GetByKey(id);
 
             if (contract == null)
             {
-                return TwoTrackResult<ItContract, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<ItContract, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(contract))
             {
-                return TwoTrackResult<ItContract, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItContract, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             // delete it interface
@@ -48,7 +48,7 @@ namespace Core.ApplicationServices
             }
             _economyStreamRepository.Save();
 
-            return TwoTrackResult<ItContract, OperationFailure>.Success(contract);
+            return Result<ItContract, OperationFailure>.Success(contract);
         }
     }
 }

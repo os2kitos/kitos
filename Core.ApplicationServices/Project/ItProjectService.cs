@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.Project
             _itProjectRepository = itProjectRepository;
         }
 
-        public TwoTrackResult<ItProject, OperationFailure> AddProject(ItProject project)
+        public Result<ItProject, OperationFailure> AddProject(ItProject project)
         {
             if (project == null)
             {
@@ -39,7 +39,7 @@ namespace Core.ApplicationServices.Project
 
             if (!_authorizationContext.AllowCreate<ItProject>(project))
             {
-                return TwoTrackResult<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             project.AccessModifier = AccessModifier.Local; //Force set to local
@@ -63,25 +63,25 @@ namespace Core.ApplicationServices.Project
 
             _projectRepository.Save();
 
-            return TwoTrackResult<ItProject, OperationFailure>.Success(project);
+            return Result<ItProject, OperationFailure>.Success(project);
         }
 
-        public TwoTrackResult<ItProject, OperationFailure> DeleteProject(int id)
+        public Result<ItProject, OperationFailure> DeleteProject(int id)
         {
             var project = _projectRepository.GetByKey(id);
             if (project == null)
             {
-                return TwoTrackResult<ItProject, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<ItProject, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(project))
             {
-                return TwoTrackResult<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
             _projectRepository.DeleteByKeyWithReferencePreload(id);
             _projectRepository.Save();
 
-            return TwoTrackResult<ItProject, OperationFailure>.Success(project);
+            return Result<ItProject, OperationFailure>.Success(project);
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)

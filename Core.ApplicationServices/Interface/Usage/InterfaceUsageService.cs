@@ -27,7 +27,7 @@ namespace Core.ApplicationServices.Interface.Usage
             _authorizationContext = authorizationContext;
             _contractRepository = contractRepository;
         }
-        public TwoTrackResult<ItInterfaceUsage, OperationFailure> Create(
+        public Result<ItInterfaceUsage, OperationFailure> Create(
             int systemUsageId,
             int systemId,
             int interfaceId,
@@ -44,19 +44,19 @@ namespace Core.ApplicationServices.Interface.Usage
                               $"ItSystemUsageId: {systemUsageId}, " +
                               $"ItSystemId: {systemId}," +
                               $"ItInterfaceId: {interfaceId} }} already exists");
-                return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Conflict);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Conflict);
             }
 
             var contract = _contractRepository.GetById(contractId);
             if (contract == null)
             {
                 _logger.Error("Contract with id: {id} not found. Cannot create interface usage", contractId);
-                return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.BadInput);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.BadInput);
             }
 
             if (!AllowCreateInterfaceUsageIn(contract))
             {
-                return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var newInterfaceUsage = _interfaceUsageRepository.Create();
@@ -69,7 +69,7 @@ namespace Core.ApplicationServices.Interface.Usage
             _interfaceUsageRepository.Insert(newInterfaceUsage);
             _interfaceUsageRepository.Save();
 
-            return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Success(newInterfaceUsage);
+            return Result<ItInterfaceUsage, OperationFailure>.Success(newInterfaceUsage);
         }
 
         private bool AllowCreateInterfaceUsageIn(ItContract contract)
@@ -78,24 +78,24 @@ namespace Core.ApplicationServices.Interface.Usage
             return _authorizationContext.AllowModify(contract);
         }
 
-        public TwoTrackResult<ItInterfaceUsage, OperationFailure> Delete(int systemUsageId, int systemId, int interfaceId)
+        public Result<ItInterfaceUsage, OperationFailure> Delete(int systemUsageId, int systemId, int interfaceId)
         {
             var key = ItInterfaceUsage.GetKey(systemUsageId, systemId, interfaceId);
             var interfaceUsageToBeDeleted = _interfaceUsageRepository.GetByKey(key);
             if (interfaceUsageToBeDeleted == null)
             {
                 _logger.Error($"Could not find interface usage with key {key}");
-                return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!AllowDelete(interfaceUsageToBeDeleted))
             {
-                return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             _interfaceUsageRepository.Delete(interfaceUsageToBeDeleted);
             _interfaceUsageRepository.Save();
-            return TwoTrackResult<ItInterfaceUsage, OperationFailure>.Success(interfaceUsageToBeDeleted);
+            return Result<ItInterfaceUsage, OperationFailure>.Success(interfaceUsageToBeDeleted);
         }
 
         private bool AllowDelete(ItInterfaceUsage interfaceExhibitUsageToBeDeleted)

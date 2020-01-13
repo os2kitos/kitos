@@ -23,24 +23,24 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             _authorizationContext = authorizationContext;
         }
 
-        public TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure> Delete(int systemUsageId, int interfaceExhibitId)
+        public Result<ItInterfaceExhibitUsage, OperationFailure> Delete(int systemUsageId, int interfaceExhibitId)
         {
             var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
             var interfaceExhibitUsageToBeDeleted = _itInterfaceExhibitUsageRepository.GetByKey(key);
             if (interfaceExhibitUsageToBeDeleted == null)
             {
                 _logger.Error($"Could not find interface exhibit usage with key {key}");
-                return TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!AllowDelete(interfaceExhibitUsageToBeDeleted))
             {
-                return TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
             _itInterfaceExhibitUsageRepository.Save();
-            return TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure>.Success(interfaceExhibitUsageToBeDeleted);
+            return Result<ItInterfaceExhibitUsage, OperationFailure>.Success(interfaceExhibitUsageToBeDeleted);
         }
 
         private bool AllowDelete(ItInterfaceExhibitUsage interfaceExhibitUsageToBeDeleted)

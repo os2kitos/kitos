@@ -7,6 +7,6 @@ namespace Core.ApplicationServices.System
 {
     public interface IReferenceService
     {
-        TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId);
+        Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId);
     }
 }

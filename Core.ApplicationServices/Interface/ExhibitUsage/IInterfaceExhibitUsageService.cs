@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
 {
     public interface IInterfaceExhibitUsageService
     {
-        TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure> Delete(int systemUsageId, int interfaceExhibitId);
+        Result<ItInterfaceExhibitUsage, OperationFailure> Delete(int systemUsageId, int interfaceExhibitId);
     }
 }

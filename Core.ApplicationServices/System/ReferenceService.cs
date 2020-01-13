@@ -31,17 +31,17 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
         }
 
-        public TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
             if (system == null)
             {
-                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (! _authorizationContext.AllowModify(system))
             {
-                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var systemExternalReferences = system.ExternalReferences.ToList();
@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.System
 
             if (referenceIds.Count == 0)
             {
-                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -60,7 +60,7 @@ namespace Core.ApplicationServices.System
                     _referenceRepository.Delete(reference);
                 }
                 transaction.Commit();
-                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
             
         }

@@ -58,7 +58,7 @@
     <Compile Include="Model\OrganizationDataQueryBreadth.cs" />
     <Compile Include="Model\OrganizationDataQueryParameters.cs" />
     <Compile Include="Model\Result\Maybe.cs" />
-    <Compile Include="Model\Result\TwoTrackResult.cs" />
+    <Compile Include="Model\Result\Result.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\QueryById.cs" />
     <Compile Include="Queries\QueryByIds.cs" />

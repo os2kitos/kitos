@@ -12,9 +12,9 @@ namespace Core.ApplicationServices.Project
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        TwoTrackResult<ItProject, OperationFailure> AddProject(ItProject project);
+        Result<ItProject, OperationFailure> AddProject(ItProject project);
 
-        TwoTrackResult<ItProject, OperationFailure> DeleteProject(int id);
+        Result<ItProject, OperationFailure> DeleteProject(int id);
 
         IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null);
     }

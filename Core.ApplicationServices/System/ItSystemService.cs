@@ -152,19 +152,19 @@ namespace Core.ApplicationServices.System
             }
         }
 
-        public TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId)
+        public Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId)
         {
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)
             {
-                return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
+                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
+            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)

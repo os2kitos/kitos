@@ -6,7 +6,7 @@ namespace Core.ApplicationServices.Interface.Usage
 {
     public interface IInterfaceUsageService
     {
-        TwoTrackResult<ItInterfaceUsage, OperationFailure> Create(
+        Result<ItInterfaceUsage, OperationFailure> Create(
             int systemUsageId,
             int systemId,
             int interfaceId,
@@ -14,6 +14,6 @@ namespace Core.ApplicationServices.Interface.Usage
             int contractId,
             int? infrastructureId = null);
 
-        TwoTrackResult<ItInterfaceUsage, OperationFailure> Delete(int systemUsageId, int systemId, int interfaceId);
+        Result<ItInterfaceUsage, OperationFailure> Delete(int systemUsageId, int systemId, int interfaceId);
     }
 }

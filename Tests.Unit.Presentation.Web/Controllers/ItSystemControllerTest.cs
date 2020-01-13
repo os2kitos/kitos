@@ -109,7 +109,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -123,7 +123,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -140,7 +140,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(operationResult));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(operationResult));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -156,7 +156,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             var itSystemId = A<int>();
             var usingOrganizations = Many<UsingOrganization>().ToList();
 
-            ExpectGetUsingOrganizationsReturn(itSystemId, TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(usingOrganizations));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(usingOrganizations));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -246,7 +246,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
 
         private void ExpectGetUsingOrganizationsReturn(
             int itSystemId,
-            TwoTrackResult<IReadOnlyList<UsingOrganization>,OperationFailure > result)
+            Result<IReadOnlyList<UsingOrganization>,OperationFailure > result)
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);

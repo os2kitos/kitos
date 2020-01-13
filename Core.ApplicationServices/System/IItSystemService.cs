@@ -11,7 +11,7 @@ namespace Core.ApplicationServices.System
     {
         IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
-        TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId);
+        Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId);
         SystemDeleteResult Delete(int id);
     }
 }

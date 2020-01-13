@@ -423,7 +423,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             foreach (var exhibit in exhibitsAffected)
             {
-                ExpectDeleteExhibitReturns(exhibit, TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure>.Success(exhibit));
+                ExpectDeleteExhibitReturns(exhibit, Result<ItInterfaceExhibitUsage, OperationFailure>.Success(exhibit));
             }
 
             //Act
@@ -457,8 +457,8 @@ namespace Tests.Unit.Presentation.Web.Services
 
             foreach (var usage in usagesAffected)
             {
-                ExpectCreateInterfaceUsageReturns(usage, newSystem, TwoTrackResult<ItInterfaceUsage, OperationFailure>.Success(usage));
-                ExpectDeleteInterfaceUsageReturns(usage, TwoTrackResult<ItInterfaceUsage, OperationFailure>.Success(usage));
+                ExpectCreateInterfaceUsageReturns(usage, newSystem, Result<ItInterfaceUsage, OperationFailure>.Success(usage));
+                ExpectDeleteInterfaceUsageReturns(usage, Result<ItInterfaceUsage, OperationFailure>.Success(usage));
             }
 
             //Act
@@ -506,7 +506,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var usageAffected = contract.AssociatedInterfaceUsages.Single();
-            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
@@ -531,8 +531,8 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var usageAffected = contract.AssociatedInterfaceUsages.Single();
-            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, TwoTrackResult<ItInterfaceUsage, OperationFailure>.Success(usageAffected));
-            ExpectDeleteInterfaceUsageReturns(usageAffected, TwoTrackResult<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<ItInterfaceUsage, OperationFailure>.Success(usageAffected));
+            ExpectDeleteInterfaceUsageReturns(usageAffected, Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
@@ -558,7 +558,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var exhibitUsage = contract.AssociatedInterfaceExposures.Single();
-            ExpectDeleteExhibitReturns(exhibitUsage, TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
+            ExpectDeleteExhibitReturns(exhibitUsage, Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
@@ -570,13 +570,13 @@ namespace Tests.Unit.Presentation.Web.Services
             VerifyTransactionRollback(transaction);
         }
 
-        private void ExpectDeleteExhibitReturns(ItInterfaceExhibitUsage exhibit, TwoTrackResult<ItInterfaceExhibitUsage, OperationFailure> operationResult)
+        private void ExpectDeleteExhibitReturns(ItInterfaceExhibitUsage exhibit, Result<ItInterfaceExhibitUsage, OperationFailure> operationResult)
         {
             _interfaceExhibitUsageService.Setup(x => x.Delete(exhibit.ItSystemUsageId, exhibit.ItInterfaceExhibitId))
                 .Returns(operationResult);
         }
 
-        private void ExpectDeleteInterfaceUsageReturns(ItInterfaceUsage usage, TwoTrackResult<ItInterfaceUsage, OperationFailure> operationResult)
+        private void ExpectDeleteInterfaceUsageReturns(ItInterfaceUsage usage, Result<ItInterfaceUsage, OperationFailure> operationResult)
         {
             _interfaceUsageService.Setup(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId))
                 .Returns(operationResult);
@@ -587,7 +587,7 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
-        private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, TwoTrackResult<ItInterfaceUsage, OperationFailure> result)
+        private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, Result<ItInterfaceUsage, OperationFailure> result)
         {
             _interfaceUsageService.Setup(
                     x => x.Create(
