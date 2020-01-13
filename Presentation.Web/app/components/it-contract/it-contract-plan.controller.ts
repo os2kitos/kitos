@@ -138,6 +138,11 @@
             this.gridState.saveGridOptions(this.mainGrid);
         }
 
+        // Resets the scrollbar position
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
+        }
+
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
             var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
@@ -396,6 +401,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "IsActive",

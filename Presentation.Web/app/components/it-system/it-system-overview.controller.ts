@@ -91,9 +91,14 @@
             return filterUrl.replace(pattern, "ItSystem/TaskRefs/any(c: $1c/Description$2)");
         }
 
-        // saves grid state to localStorage
+        // saves grid state to local storage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // Resets the position of the scrollbar
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // loads kendo grid options from localstorage
@@ -316,6 +321,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page:this.onPaging,
                 columns: [
                     {
                         field: "IsActive", title: "Gyldig/Ikke gyldig", width: 90,
