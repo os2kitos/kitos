@@ -1,14 +1,21 @@
-﻿namespace Core.DomainServices.Model.Result
+﻿using System;
+
+namespace Core.DomainServices.Model.Result
 {
+    //TODO: Unit test it
     public class TwoTrackResult<TSuccess, TFailure>
     {
         private readonly Maybe<TFailure> _failure;
         private readonly Maybe<TSuccess> _value;
 
 
-        private TwoTrackResult(bool success, Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
+        private TwoTrackResult(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
         {
-            Ok = success;
+            if (successResult.HasValue == failureResult.HasValue)
+            {
+                throw new ArgumentException($"{nameof(successResult)} cannot return the same value of {nameof(successResult.HasValue)} as {nameof(failureResult)}");
+            }
+            Ok = successResult.HasValue;
             _value = successResult;
             _failure = failureResult;
         }
@@ -21,12 +28,12 @@
 
         public static TwoTrackResult<TSuccess, TFailure> Success(TSuccess value)
         {
-            return new TwoTrackResult<TSuccess, TFailure>(true, Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
+            return new TwoTrackResult<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
         }
 
         public static TwoTrackResult<TSuccess, TFailure> Failure(TFailure value)
         {
-            return new TwoTrackResult<TSuccess, TFailure>(true, Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
+            return new TwoTrackResult<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
         }
     }
 }

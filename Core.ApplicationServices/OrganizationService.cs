@@ -44,7 +44,6 @@ namespace Core.ApplicationServices
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)
         {
-            //TODO this should probably be Single() ?
             var right = _orgRightRepository.Get(r => r.UserId == user.Id && r.OrganizationId == orgId).First();
             right.DefaultOrgUnitId = orgUnitId;
 
