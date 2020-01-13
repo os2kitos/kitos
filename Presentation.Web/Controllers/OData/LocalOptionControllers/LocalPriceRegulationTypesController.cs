@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalPriceRegulationTypesController : LocalOptionBaseController<LocalPriceRegulationType, ItContract, PriceRegulationType>
     {
         public LocalPriceRegulationTypesController(IGenericRepository<LocalPriceRegulationType> repository, IGenericRepository<PriceRegulationType> optionsRepository)

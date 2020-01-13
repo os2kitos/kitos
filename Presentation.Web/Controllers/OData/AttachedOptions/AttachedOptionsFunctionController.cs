@@ -7,13 +7,11 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class AttachedOptionsFunctionController<TEntity, TOption, TLocalOption> : AttachedOptionsController
     where TEntity : Entity
     where TOption : OptionHasChecked<TEntity>
@@ -24,7 +22,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         private readonly IGenericRepository<TLocalOption> _localOptionRepository;
 
         public AttachedOptionsFunctionController(
-            IGenericRepository<AttachedOption> repository, 
+            IGenericRepository<AttachedOption> repository,
             IGenericRepository<TOption> optionRepository,
             IGenericRepository<TLocalOption> localOptionRepository)
                : base(repository)
@@ -61,8 +59,8 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         [ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
         public IHttpActionResult RemoveOption(int id, int objectId, OptionType type, EntityType entityType)
         {
-            var option = _attachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id 
-            && o.ObjectId == objectId 
+            var option = _attachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id
+            && o.ObjectId == objectId
             && o.OptionType == type
             && o.ObjectType == entityType);
 
@@ -124,22 +122,13 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         protected List<AttachedOption> GetAttachedOptions(OptionType type, int id, EntityType objectType)
         {
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
-
-            if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All || hasOrg == false)
-            {
-                //tolist so we can operate with open datareaders in the following foreach loop.
-                return _attachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
-                && x.OptionType == type
-                && x.ObjectType == objectType).ToList();
-            }
-
-            var organizationId = UserContext.ActiveOrganizationId;
-            return _attachedOptionRepository.AsQueryable()
-                .Where(x => ((IHasOrganization)x).OrganizationId == organizationId
-                            && x.ObjectId == id
-                            && x.OptionType == type
-                            && x.ObjectType == objectType).ToList();
+            return _attachedOptionRepository
+                .AsQueryable()
+                .Where(x =>
+                    x.ObjectId == id
+                    && x.OptionType == type
+                    && x.ObjectType == objectType)
+                .ToList();
         }
     }
 }

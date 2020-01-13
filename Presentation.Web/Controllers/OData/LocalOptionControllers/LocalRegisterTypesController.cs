@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalRegisterTypesController : LocalOptionBaseController<LocalRegisterType, ItSystemUsage, RegisterType>
     {
         public LocalRegisterTypesController(IGenericRepository<LocalRegisterType> repository, IGenericRepository<RegisterType> optionsRepository)

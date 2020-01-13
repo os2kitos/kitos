@@ -15,11 +15,11 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class ReportsITSystemContactsController : BaseOdataAuthorizationController<ItSystemRight>
     {
         public ReportsITSystemContactsController(IGenericRepository<ItSystemRight> repository)
-            : base(repository){
+            : base(repository)
+        {
         }
 
         [HttpGet]
@@ -34,11 +34,12 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
                 return StatusCode(HttpStatusCode.Forbidden);
             }
             var result = Repository.Get();
-            try {
-            var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
+            try
+            {
+                var dtos = AutoMapper.Mapper.Map<IEnumerable<ItSystemRight>, IEnumerable<ReportItSystemRightOutputDTO>>(result);
                 return Ok(dtos);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return StatusCode(HttpStatusCode.InternalServerError);
             }

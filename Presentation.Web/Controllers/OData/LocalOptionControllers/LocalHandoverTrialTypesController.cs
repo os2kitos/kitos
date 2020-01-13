@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalHandoverTrialTypesController : LocalOptionBaseController<LocalHandoverTrialType, HandoverTrial, HandoverTrialType>
     {
         public LocalHandoverTrialTypesController(IGenericRepository<LocalHandoverTrialType> repository, IGenericRepository<HandoverTrialType> optionsRepository)

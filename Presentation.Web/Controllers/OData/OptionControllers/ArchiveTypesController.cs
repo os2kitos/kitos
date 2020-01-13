@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class ArchiveTypesController : BaseOptionController<ArchiveType, ItSystemUsage>
     {
         public ArchiveTypesController(IGenericRepository<ArchiveType> repository)

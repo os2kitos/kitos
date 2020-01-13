@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalOrganizationUnitRolesController : LocalOptionBaseController<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>
     {
         public LocalOrganizationUnitRolesController(IGenericRepository<LocalOrganizationUnitRole> repository, IGenericRepository<OrganizationUnitRole> optionsRepository)

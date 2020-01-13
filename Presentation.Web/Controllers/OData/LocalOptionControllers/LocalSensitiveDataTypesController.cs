@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalSensitiveDataTypesController : LocalOptionBaseController<LocalSensitiveDataType, ItSystemUsage, SensitiveDataType>
     {
         public LocalSensitiveDataTypesController(IGenericRepository<LocalSensitiveDataType> repository, IGenericRepository<SensitiveDataType> optionsRepository)

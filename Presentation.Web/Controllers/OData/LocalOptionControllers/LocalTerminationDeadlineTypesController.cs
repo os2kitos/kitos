@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalTerminationDeadlineTypesController : LocalOptionBaseController<LocalTerminationDeadlineType, ItContract, TerminationDeadlineType>
     {
         public LocalTerminationDeadlineTypesController(IGenericRepository<LocalTerminationDeadlineType> repository, IGenericRepository<TerminationDeadlineType> optionsRepository)

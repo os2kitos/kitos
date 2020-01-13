@@ -6,7 +6,6 @@ using Core.DomainServices;
 namespace Presentation.Web.Controllers.OData.OptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class ArchiveLocationsController : BaseOptionController<ArchiveLocation, ItSystemUsage>
     {
         public ArchiveLocationsController(IGenericRepository<ArchiveLocation> repository)

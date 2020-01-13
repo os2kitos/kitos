@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class LocalItInterfaceTypesController : LocalOptionBaseController<LocalItInterfaceType, ItInterface, ItInterfaceType>
     {
         public LocalItInterfaceTypesController(IGenericRepository<LocalItInterfaceType> repository, IGenericRepository<ItInterfaceType> optionsRepository)

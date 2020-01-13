@@ -13,7 +13,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class ReportsItSystemRolesController : BaseOdataAuthorizationController<ItSystemRole>
     {
         public ReportsItSystemRolesController(IGenericRepository<ItSystemRole> repository)

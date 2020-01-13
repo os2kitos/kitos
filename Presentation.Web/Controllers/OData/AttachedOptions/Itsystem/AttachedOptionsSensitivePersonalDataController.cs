@@ -9,7 +9,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.AttachedOptions
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class AttachedOptionsSensitivePersonalDataController : AttachedOptionsFunctionController<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>
     {
         public AttachedOptionsSensitivePersonalDataController(
