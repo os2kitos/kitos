@@ -216,6 +216,7 @@
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
     <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
+    <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />

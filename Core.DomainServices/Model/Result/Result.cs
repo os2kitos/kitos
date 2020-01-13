@@ -34,5 +34,10 @@ namespace Core.DomainServices.Model.Result
         {
             return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
         }
+
+        public override string ToString()
+        {
+            return Ok ? "RESULT: SUCCESS" : $"RESULT: ERROR '{Error}'";
+        }
     }
 }
