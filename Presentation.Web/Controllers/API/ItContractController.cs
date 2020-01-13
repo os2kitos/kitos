@@ -283,7 +283,7 @@ namespace Presentation.Web.Controllers.API
             {
                 switch (result.Error)
                 {
-                    case GenericOperationFailure.Forbidden:
+                    case OperationFailure.Forbidden:
                         throw new SecurityException();
                     default:
                         throw new InvalidOperationException(result.Error.ToString("G"));

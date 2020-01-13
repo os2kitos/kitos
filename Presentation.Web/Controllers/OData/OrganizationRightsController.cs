@@ -136,13 +136,13 @@ namespace Presentation.Web.Controllers.OData
 
                 switch (result.Error)
                 {
-                    case GenericOperationFailure.BadInput:
+                    case OperationFailure.BadInput:
                         return BadRequest();
-                    case GenericOperationFailure.NotFound:
+                    case OperationFailure.NotFound:
                         return NotFound();
-                    case GenericOperationFailure.Forbidden:
+                    case OperationFailure.Forbidden:
                         return Forbidden();
-                    case GenericOperationFailure.Conflict:
+                    case OperationFailure.Conflict:
                         return StatusCode(HttpStatusCode.Conflict);
                     default:
                         return StatusCode(HttpStatusCode.InternalServerError);

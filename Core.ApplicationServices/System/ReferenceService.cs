@@ -1,8 +1,11 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -28,24 +31,26 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
         }
 
-        public OperationResult DeleteBySystemId(int systemId)
+        public TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
             if (system == null)
             {
-                return OperationResult.NotFound;
+                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (! _authorizationContext.AllowModify(system))
             {
-                return OperationResult.Forbidden;
+                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            var referenceIds = system.ExternalReferences;
+            var systemExternalReferences = system.ExternalReferences.ToList();
+
+            var referenceIds = systemExternalReferences;
 
             if (referenceIds.Count == 0)
             {
-                return OperationResult.Ok;
+                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -55,7 +60,7 @@ namespace Core.ApplicationServices.System
                     _referenceRepository.Delete(reference);
                 }
                 transaction.Commit();
-                return OperationResult.Ok;
+                return TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
             
         }

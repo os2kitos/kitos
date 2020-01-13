@@ -20,18 +20,18 @@ namespace Core.ApplicationServices.Interface
             _dataRowRepository = dataRowRepository;
             _authorizationContext = authorizationContext;
         }
-        public TwoTrackResult<ItInterface, GenericOperationFailure> Delete(int id)
+        public TwoTrackResult<ItInterface, OperationFailure> Delete(int id)
         {
             var itInterface = _repository.GetByKey(id);
 
             if (itInterface == null)
             {
-                return TwoTrackResult<ItInterface, GenericOperationFailure>.Failure(GenericOperationFailure.NotFound);
+                return TwoTrackResult<ItInterface, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(itInterface))
             {
-                return TwoTrackResult<ItInterface, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+                return TwoTrackResult<ItInterface, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var dataRows = _dataRowRepository.Get(x => x.ItInterfaceId == id);
@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.Interface
             // delete it interface
             _repository.DeleteWithReferencePreload(itInterface);
             _repository.Save();
-            return TwoTrackResult<ItInterface, GenericOperationFailure>.Success(itInterface);
+            return TwoTrackResult<ItInterface, OperationFailure>.Success(itInterface);
         }
     }
 }

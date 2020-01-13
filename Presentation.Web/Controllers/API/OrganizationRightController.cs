@@ -77,13 +77,13 @@ namespace Presentation.Web.Controllers.API
 
                 switch (result.Error)
                 {
-                    case GenericOperationFailure.BadInput:
+                    case OperationFailure.BadInput:
                         return BadRequest();
-                    case GenericOperationFailure.NotFound:
+                    case OperationFailure.NotFound:
                         return NotFound();
-                    case GenericOperationFailure.Forbidden:
+                    case OperationFailure.Forbidden:
                         return Forbidden();
-                    case GenericOperationFailure.Conflict:
+                    case OperationFailure.Conflict:
                         return Conflict(string.Empty);
                     default:
                         return Error(result);

@@ -52,7 +52,7 @@ namespace Presentation.Web.Controllers.API
             var result = _itInterfaceService.Delete(entity.Id);
             if (!result.Ok)
             {
-                if (result.Error == GenericOperationFailure.Forbidden)
+                if (result.Error == OperationFailure.Forbidden)
                     throw new SecurityException();
                 throw new InvalidOperationException(result.Error.ToString("G"));
             }

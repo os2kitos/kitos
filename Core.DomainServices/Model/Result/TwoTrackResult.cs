@@ -2,7 +2,6 @@
 
 namespace Core.DomainServices.Model.Result
 {
-    //TODO: Unit test it
     public class TwoTrackResult<TSuccess, TFailure>
     {
         private readonly Maybe<TFailure> _failure;

@@ -163,11 +163,11 @@ namespace Presentation.Web.Controllers.API
 
                 switch (sysUsageResult.Error)
                 {
-                    case GenericOperationFailure.BadInput:
+                    case OperationFailure.BadInput:
                         return BadRequest();
-                    case GenericOperationFailure.Forbidden:
+                    case OperationFailure.Forbidden:
                         return Forbidden();
-                    case GenericOperationFailure.Conflict:
+                    case OperationFailure.Conflict:
                         return Conflict("existing usage already found");
                     default:
                         return new HttpResponseMessage(HttpStatusCode.InternalServerError);
@@ -468,7 +468,7 @@ namespace Presentation.Web.Controllers.API
             var result = _itSystemUsageService.Delete(entity.Id);
             if (result.Ok == false)
             {
-                if (result.Error == GenericOperationFailure.Forbidden)
+                if (result.Error == OperationFailure.Forbidden)
                     throw new SecurityException();
                 throw new InvalidOperationException(result.Error.ToString("G"));
             }

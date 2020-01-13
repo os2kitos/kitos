@@ -6,7 +6,7 @@ namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationRightsService
     {
-        TwoTrackResult<OrganizationRight, GenericOperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole rightId);
-        TwoTrackResult<OrganizationRight, GenericOperationFailure> RemoveRole(int rightId);
+        TwoTrackResult<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole rightId);
+        TwoTrackResult<OrganizationRight, OperationFailure> RemoveRole(int rightId);
     }
 }

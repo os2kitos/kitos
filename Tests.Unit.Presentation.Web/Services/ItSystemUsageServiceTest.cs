@@ -40,7 +40,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(GenericOperationFailure.Conflict, result.Error);
+            Assert.Equal(OperationFailure.Conflict, result.Error);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(GenericOperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(GenericOperationFailure.NotFound, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
         }
 
         [Fact]
@@ -125,7 +125,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(GenericOperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]

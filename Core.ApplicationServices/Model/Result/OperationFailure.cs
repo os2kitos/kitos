@@ -1,6 +1,6 @@
 ﻿namespace Core.ApplicationServices.Model.Result
 {
-    public enum GenericOperationFailure
+    public enum OperationFailure
     {
         BadInput,
         NotFound,

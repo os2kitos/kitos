@@ -13,6 +13,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -53,7 +54,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _interfaceUsageService = interfaceUsageService;
         }
 
-        public Result<OperationResult, IReadOnlyList<ItSystem>> GetUnusedItSystemsByOrganization(
+        public TwoTrackResult<IReadOnlyList<ItSystem>, OperationFailure> GetUnusedItSystemsByOrganization(
             int organizationId,
             string nameContent,
             int numberOfItSystems,
@@ -72,7 +73,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
             if (dataAccessLevel.CurrentOrganization < OrganizationDataReadAccessLevel.Public)
             {
-                return Result<OperationResult, IReadOnlyList<ItSystem>>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<IReadOnlyList<ItSystem>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
@@ -86,42 +87,42 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .ToList()
                 .AsReadOnly();
 
-            return Result<OperationResult, IReadOnlyList<ItSystem>>.Ok(result);
+            return TwoTrackResult<IReadOnlyList<ItSystem>, OperationFailure>.Success(result);
         }
 
-        public Result<OperationResult, ItSystemUsageMigration> GetSystemUsageMigration(int usageId, int toSystemId)
+        public TwoTrackResult<ItSystemUsageMigration, OperationFailure> GetSystemUsageMigration(int usageId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             // Get usage
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
             if (itSystemUsage == null)
             {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.BadInput);
+                return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
             }
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             // Get system
             var toItSystem = _systemRepository.GetSystem(toSystemId);
             if (toItSystem == null)
             {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.BadInput);
+                return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
             }
             if (!_authorizationContext.AllowReads(toItSystem))
             {
-                return Result<OperationResult, ItSystemUsageMigration>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             // Map all contract migrations
             var contractMigrations = GetContractMigrations(itSystemUsage);
 
-            return Result<OperationResult, ItSystemUsageMigration>.Ok(
+            return TwoTrackResult<ItSystemUsageMigration, OperationFailure>.Success(
                 new ItSystemUsageMigration(
                     systemUsage: itSystemUsage,
                     fromItSystem: itSystemUsage.ItSystem,
@@ -157,11 +158,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 .AsReadOnly();
         }
 
-        public Result<OperationResult, ItSystemUsage> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
+        public TwoTrackResult<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
-                return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -174,9 +175,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
                     // If migration description cannot be retrieved, bail out
                     var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
-                    if (migrationConsequences.Status != OperationResult.Ok)
+                    if (migrationConsequences.Ok == false)
                     {
-                        return Result<OperationResult, ItSystemUsage>.Fail(migrationConsequences.Status);
+                        return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(migrationConsequences.Error);
                     }
                     var migration = migrationConsequences.Value;
                     var systemUsage = migration.SystemUsage;
@@ -184,13 +185,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     //If modification of the target usage is not allowed, bail out
                     if (!_authorizationContext.AllowModify(systemUsage))
                     {
-                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.Forbidden);
+                        return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
                     }
 
                     // If target equals current system, bail out
                     if (systemUsage.ItSystemId == migration.ToItSystem.Id)
                     {
-                        return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
+                        return TwoTrackResult<ItSystemUsage, OperationFailure>.Success(systemUsage);
                     }
 
                     // *************************
@@ -202,7 +203,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     if (interfaceMigration == false)
                     {
                         transaction.Rollback();
-                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
+                        return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
                     }
 
                     // Delete interface exhibit usages
@@ -210,7 +211,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     if (deletedStatus == false)
                     {
                         transaction.Rollback();
-                        return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
+                        return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
                     }
 
                     //***********************************************
@@ -225,13 +226,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     _systemUsageRepository.Update(systemUsage);
 
                     transaction.Commit();
-                    return Result<OperationResult, ItSystemUsage>.Ok(systemUsage);
+                    return TwoTrackResult<ItSystemUsage, OperationFailure>.Success(systemUsage);
                 }
                 catch (Exception e)
                 {
                     _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                     transaction.Rollback();
-                    return Result<OperationResult, ItSystemUsage>.Fail(OperationResult.UnknownError);
+                    return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.UnknownError);
                 }
             }
         }
@@ -261,9 +262,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     itInterfaceExhibitUsage.ItSystemUsageId,
                     itInterfaceExhibitUsage.ItInterfaceExhibitId);
 
-                if (deletedStatus != OperationResult.Ok)
+                if (deletedStatus.Ok == false)
                 {
-                    _logger.Error($"Deleting interface exhibit usages failed with {deletedStatus}");
+                    _logger.Error($"Deleting interface exhibit usages failed with {deletedStatus.Error}");
                     return false;
                 }
             }
@@ -285,9 +286,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     interfaceUsage.ItContractId.GetValueOrDefault(),
                     interfaceUsage.InfrastructureId);
 
-                if (interfaceCreationResult.Status != OperationResult.Ok)
+                if (interfaceCreationResult.Ok == false)
                 {
-                    _logger.Error($"Creating new interface usages failed with {interfaceCreationResult.Status}");
+                    _logger.Error($"Creating new interface usages failed with {interfaceCreationResult.Error}");
                     return false;
                 }
 
@@ -296,9 +297,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     interfaceUsage.ItSystemId,
                     interfaceUsage.ItInterfaceId);
 
-                if (deletedStatus != OperationResult.Ok)
+                if (deletedStatus.Ok == false)
                 {
-                    _logger.Error($"Deleting old interface usages failed with {deletedStatus}");
+                    _logger.Error($"Deleting old interface usages failed with {deletedStatus.Error}");
                     return false;
                 }
 

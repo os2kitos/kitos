@@ -20,18 +20,18 @@ namespace Core.ApplicationServices.SystemUsage
             _authorizationContext = authorizationContext;
         }
 
-        public TwoTrackResult<ItSystemUsage, GenericOperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
+        public TwoTrackResult<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
         {
             // create the system usage
             var existing = GetByOrganizationAndSystemId(newSystemUsage.OrganizationId, newSystemUsage.ItSystemId);
             if (existing != null)
             {
-                return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Failure(GenericOperationFailure.Conflict);
+                return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Conflict);
             }
 
             if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage))
             {
-                return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+                return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var usage = _usageRepository.Create();
@@ -46,25 +46,25 @@ namespace Core.ApplicationServices.SystemUsage
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 
-            return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Success(usage);
+            return TwoTrackResult<ItSystemUsage, OperationFailure>.Success(usage);
         }
 
-        public TwoTrackResult<ItSystemUsage, GenericOperationFailure> Delete(int id)
+        public TwoTrackResult<ItSystemUsage, OperationFailure> Delete(int id)
         {
             var itSystemUsage = GetById(id);
             if (itSystemUsage == null)
             {
-                return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Failure(GenericOperationFailure.NotFound);
+                return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.NotFound);
             }
             if (!_authorizationContext.AllowDelete(itSystemUsage))
             {
-                return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+                return TwoTrackResult<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             // delete it system usage
             _usageRepository.DeleteByKeyWithReferencePreload(id);
             _usageRepository.Save();
-            return TwoTrackResult<ItSystemUsage, GenericOperationFailure>.Success(itSystemUsage);
+            return TwoTrackResult<ItSystemUsage, OperationFailure>.Success(itSystemUsage);
         }
 
         public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)

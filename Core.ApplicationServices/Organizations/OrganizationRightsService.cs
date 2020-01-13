@@ -23,41 +23,41 @@ namespace Core.ApplicationServices.Organizations
             _userContext = userContext;
         }
 
-        public TwoTrackResult<OrganizationRight, GenericOperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)
+        public TwoTrackResult<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)
         {
             var right = _organizationRightRepository.Get(r => r.OrganizationId == organizationId && r.Role == roleId && r.UserId == userId).FirstOrDefault();
 
             return RemoveRight(right);
         }
 
-        public TwoTrackResult<OrganizationRight, GenericOperationFailure> RemoveRole(int rightId)
+        public TwoTrackResult<OrganizationRight, OperationFailure> RemoveRole(int rightId)
         {
             var right = _organizationRightRepository.GetByKey(rightId);
 
             return RemoveRight(right);
         }
 
-        private TwoTrackResult<OrganizationRight, GenericOperationFailure> RemoveRight(OrganizationRight right)
+        private TwoTrackResult<OrganizationRight, OperationFailure> RemoveRight(OrganizationRight right)
         {
             if (right == null)
             {
-                return TwoTrackResult<OrganizationRight, GenericOperationFailure>.Failure(GenericOperationFailure.NotFound);
+                return TwoTrackResult<OrganizationRight, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!_authorizationContext.AllowDelete(right))
             {
-                return TwoTrackResult<OrganizationRight, GenericOperationFailure>.Failure(GenericOperationFailure.Forbidden);
+                return TwoTrackResult<OrganizationRight, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             if (right.Role == OrganizationRole.GlobalAdmin && right.UserId == _userContext.UserId)
             {
-                return TwoTrackResult<OrganizationRight, GenericOperationFailure>.Failure(GenericOperationFailure.Conflict);
+                return TwoTrackResult<OrganizationRight, OperationFailure>.Failure(OperationFailure.Conflict);
             }
 
             _organizationRightRepository.DeleteByKey(right.Id);
             _organizationRightRepository.Save();
 
-            return TwoTrackResult<OrganizationRight, GenericOperationFailure>.Success(right);
+            return TwoTrackResult<OrganizationRight, OperationFailure>.Success(right);
         }
     }
 }

@@ -391,15 +391,17 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetUsingOrganizations([FromUri] int id)
         {
             var itSystemUsages = _systemService.GetUsingOrganizations(id);
-            switch (itSystemUsages.Status)
+            if (itSystemUsages.Ok)
             {
-                case OperationResult.Forbidden:
+                var dto = Map(itSystemUsages.Value);
+                return Ok(dto);
+            }
+            switch (itSystemUsages.Error)
+            {
+                case OperationFailure.Forbidden:
                     return Forbidden();
-                case OperationResult.NotFound:
+                case OperationFailure.NotFound:
                     return NotFound();
-                case OperationResult.Ok:
-                    var dto = Map(itSystemUsages.Value);
-                    return Ok(dto);
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,
                         "An error occured when trying to get using organizations");

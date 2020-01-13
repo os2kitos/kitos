@@ -504,7 +504,7 @@ namespace Presentation.Web.Controllers.API
             if (result.Ok)
                 return result.Value;
 
-            if (result.Error == GenericOperationFailure.Forbidden)
+            if (result.Error == OperationFailure.Forbidden)
                 throw new SecurityException();
             throw new InvalidOperationException(result.Error.ToString("G"));
         }
@@ -514,7 +514,7 @@ namespace Presentation.Web.Controllers.API
             var result = _itProjectService.DeleteProject(entity.Id);
             if (!result.Ok)
             {
-                if (result.Error == GenericOperationFailure.Forbidden)
+                if (result.Error == OperationFailure.Forbidden)
                     throw new SecurityException();
                 throw new InvalidOperationException(result.Error.ToString("G"));
             }

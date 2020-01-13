@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Contract
 {
     public interface IItContractService
     {
-        TwoTrackResult<ItContract,GenericOperationFailure> Delete(int id);
+        TwoTrackResult<ItContract,OperationFailure> Delete(int id);
     }
 }

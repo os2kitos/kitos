@@ -12,6 +12,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -131,9 +132,9 @@ namespace Core.ApplicationServices.System
                 try
                 {
                     var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
-                    if (deleteReferenceResult != OperationResult.Ok)
+                    if (deleteReferenceResult.Ok == false)
                     {
-                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult}");
+                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult.Error}");
                         transaction.Rollback();
                         return SystemDeleteResult.UnknownError;
                     }
@@ -151,19 +152,19 @@ namespace Core.ApplicationServices.System
             }
         }
 
-        public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)
+        public TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId)
         {
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)
             {
-                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound);
+                return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden);
+                return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(MapToUsingOrganization(itSystem.Usages));
+            return TwoTrackResult<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)

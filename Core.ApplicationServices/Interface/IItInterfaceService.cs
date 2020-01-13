@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Interface
 {
     public interface IItInterfaceService
     {
-        TwoTrackResult<ItInterface,GenericOperationFailure> Delete(int id);
+        TwoTrackResult<ItInterface,OperationFailure> Delete(int id);
     }
 }

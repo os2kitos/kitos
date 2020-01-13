@@ -33,15 +33,17 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
-            switch (res.Status)
+            if (res.Ok)
             {
-                case OperationResult.Ok:
-                    return Ok(Map(res.Value));
-                case OperationResult.Forbidden:
+                return Ok(Map(res.Value));
+            }
+            switch (res.Error)
+            {
+                case OperationFailure.Forbidden:
                     return Forbidden();
-                case OperationResult.BadInput:
+                case OperationFailure.BadInput:
                     return BadRequest();
-                case OperationResult.NotFound:
+                case OperationFailure.NotFound:
                     return NotFound();
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,
@@ -58,15 +60,17 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
-            switch (result.Status)
+            if (result.Ok)
             {
-                case OperationResult.Ok:
-                    return NoContent();
-                case OperationResult.BadInput:
+                return NoContent();
+            }
+            switch (result.Error)
+            {
+                case OperationFailure.BadInput:
                     return BadRequest();
-                case OperationResult.Forbidden:
+                case OperationFailure.Forbidden:
                     return Forbidden();
-                case OperationResult.NotFound:
+                case OperationFailure.NotFound:
                     return NotFound();
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,
@@ -109,14 +113,16 @@ namespace Presentation.Web.Controllers.API
 
             var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
 
-            switch (result.Status)
+            if (result.Ok)
             {
-                case OperationResult.Ok:
-                    var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
-                    return Ok(unusedItSystems);
-                case OperationResult.Forbidden:
+                var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
+                return Ok(unusedItSystems);
+            }
+            switch (result.Error)
+            {
+                case OperationFailure.Forbidden:
                     return Forbidden();
-                case OperationResult.NotFound:
+                case OperationFailure.NotFound:
                     return NotFound();
                 default:
                     return CreateResponse(HttpStatusCode.InternalServerError,

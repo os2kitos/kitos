@@ -9,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -37,8 +38,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
             _sut = new ItSystemService(
-                null, 
-                _systemRepository.Object, 
+                null,
+                _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
@@ -58,7 +59,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUsingOrganizations(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -71,7 +73,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUsingOrganizations(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.NotFound, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
         }
 
         [Fact]
@@ -89,7 +92,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUsingOrganizations(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var usage = Assert.Single(result.Value);
             Assert.Equal(systemUsage.Id, usage.ItSystemUsageId);
             Assert.Equal(organization.Id, usage.Organization.Id);
@@ -114,8 +117,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUsingOrganizations(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
-            Assert.Collection(result.Value, 
+            Assert.True(result.Ok);
+            Assert.Collection(result.Value,
                 item => Assert.Equal(firstSystemUsage.Id, item.ItSystemUsageId),
                 item => Assert.Equal(secondSystemUsage.Id, item.ItSystemUsageId)
                 );
@@ -229,6 +232,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
+            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.Delete(system.Id);
@@ -247,7 +251,7 @@ namespace Tests.Unit.Presentation.Web.Services
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
-            ExpectDeleteReferenceReturns(system.Id, OperationResult.Ok);
+            ExpectDeleteReferenceReturns(system.Id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
             ExpectTransactionToBeSet();
 
             //Act
@@ -260,10 +264,10 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData(OperationResult.Forbidden)]
-        [InlineData(OperationResult.UnknownError)]
-        [InlineData(OperationResult.NotFound)]
-        public void Delete_Returns_UnknownError_And_Does_Not_Delete_ExternalReferences(OperationResult referenceDeleteResult)
+        [InlineData(OperationFailure.Forbidden)]
+        [InlineData(OperationFailure.UnknownError)]
+        [InlineData(OperationFailure.NotFound)]
+        public void Delete_Returns_UnknownError_And_Does_Not_Delete_ExternalReferences(OperationFailure referenceDeleteResult)
         {
             //Arrange
             var system = CreateSystem();
@@ -271,7 +275,7 @@ namespace Tests.Unit.Presentation.Web.Services
             AddExternalReference(system, externalReference);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
-            ExpectDeleteReferenceReturns(system.Id, referenceDeleteResult);
+            ExpectDeleteReferenceReturns(system.Id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Failure(referenceDeleteResult));
             ExpectTransactionToBeSet();
 
             //Act
@@ -294,6 +298,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
+            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
             var result = _sut.Delete(system.Id);
@@ -307,7 +312,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private Organization CreateOrganization()
         {
-            return new Organization { Id = A<int>(), Name = A<string>()};
+            return new Organization { Id = A<int>(), Name = A<string>() };
         }
 
         private ItSystem CreateSystem()
@@ -317,7 +322,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private TaskRef createTaskRef()
         {
-            return new TaskRef { Id = A<int>()};
+            return new TaskRef { Id = A<int>() };
         }
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
@@ -327,12 +332,12 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
         {
-            return new ItInterfaceExhibit() { Id = A<int>()};
+            return new ItInterfaceExhibit() { Id = A<int>() };
         }
 
         private ExternalReference CreateExternalReference()
         {
-            return new ExternalReference() {Id = A<int>()};
+            return new ExternalReference() { Id = A<int>() };
         }
 
         private void ExpectAllowReadsReturns(ItSystem system, bool value)
@@ -350,7 +355,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
 
-        private void ExpectDeleteReferenceReturns(int id, OperationResult result)
+        private void ExpectDeleteReferenceReturns(int id, TwoTrackResult<IEnumerable<ExternalReference>, OperationFailure> result)
         {
             _referenceService.Setup(x => x.DeleteBySystemId(id)).Returns(result);
         }

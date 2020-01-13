@@ -1,18 +1,19 @@
 ﻿using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Model.Result;
 
 namespace Core.ApplicationServices.Interface.Usage
 {
     public interface IInterfaceUsageService
     {
-        Result<OperationResult, ItInterfaceUsage> Create(
-            int systemUsageId, 
-            int systemId, 
+        TwoTrackResult<ItInterfaceUsage, OperationFailure> Create(
+            int systemUsageId,
+            int systemId,
             int interfaceId,
             bool isWishedFor,
             int contractId,
             int? infrastructureId = null);
 
-        OperationResult Delete(int systemUsageId, int systemId, int interfaceId);
+        TwoTrackResult<ItInterfaceUsage, OperationFailure> Delete(int systemUsageId, int systemId, int interfaceId);
     }
 }
