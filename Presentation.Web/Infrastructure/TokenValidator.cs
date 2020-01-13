@@ -53,9 +53,10 @@ namespace Presentation.Web.Infrastructure
             var handler = new JwtSecurityTokenHandler();
 
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
+            var organizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
             if (user.DefaultOrganizationId.HasValue)
             {
-                identity.AddClaim(new Claim(BearerTokenConfig.DefaultOrganizationClaimName, user.DefaultOrganizationId.Value.ToString("D")));
+                identity.AddClaim(new Claim(BearerTokenConfig.DefaultOrganizationClaimName, organizationId.ToString("D")));
             }
 
             // securityKey length should be >256b
@@ -71,7 +72,7 @@ namespace Presentation.Web.Infrastructure
                     SigningCredentials = new SigningCredentials(BearerTokenConfig.SecurityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
                 });
                 var tokenString = handler.WriteToken(securityToken);
-                return new KitosApiToken(user, tokenString, expires);
+                return new KitosApiToken(user, tokenString, expires, organizationId);
             }
             catch (Exception exn)
             {

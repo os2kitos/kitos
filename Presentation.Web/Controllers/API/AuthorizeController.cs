@@ -154,7 +154,8 @@ namespace Presentation.Web.Controllers.API
                     Token = token.Value,
                     Email = loginDto.Email,
                     LoginSuccessful = true,
-                    Expires = token.Expiration
+                    Expires = token.Expiration,
+                    ActiveOrganizationId = token.ActiveOrganizationId
                 };
 
                 Logger.Info($"Created token for user with Id {user.Id}");
