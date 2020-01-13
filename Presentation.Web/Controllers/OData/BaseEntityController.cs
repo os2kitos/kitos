@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var organizationId = UserContext.ActiveOrganizationId;
+            var organizationId = ActiveOrganizationId;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.OData
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IHasOrganization organization && organization.OrganizationId == 0)
             {
-                organization.OrganizationId = UserContext.ActiveOrganizationId;
+                organization.OrganizationId = ActiveOrganizationId;
             }
 
             entity.ObjectOwnerId = UserId;

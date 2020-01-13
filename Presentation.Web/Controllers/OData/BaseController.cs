@@ -30,6 +30,8 @@ namespace Presentation.Web.Controllers.OData
 
         protected int UserId => UserContext.UserId;
 
+        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
+
         [EnableQuery]
         public virtual IHttpActionResult Get()
         {

@@ -74,7 +74,7 @@ namespace Presentation.Web.Controllers.API
 
                 var outDto = AutoMapper.Mapper.Map<UserDTO>(user);
 
-                return Created(outDto); //TODO location?
+                return Created(outDto);
 
             }
             catch (Exception e)

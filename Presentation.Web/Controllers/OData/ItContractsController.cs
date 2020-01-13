@@ -44,8 +44,7 @@ namespace Presentation.Web.Controllers.OData
                 return Ok(Repository.AsQueryable());
             }
 
-            var activeOrganizationId = UserContext.ActiveOrganizationId;
-            return Ok(Repository.AsQueryable().ByOrganizationId(activeOrganizationId));
+            return Ok(Repository.AsQueryable().ByOrganizationId(ActiveOrganizationId));
         }
 
         /// <summary>

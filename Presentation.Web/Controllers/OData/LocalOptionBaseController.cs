@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var orgId = UserContext.ActiveOrganizationId;
+            var orgId = ActiveOrganizationId;
             var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
             var returnList = new List<TOptionType>();
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get(int key)
         {
-            var orgId = UserContext.ActiveOrganizationId;
+            var orgId = ActiveOrganizationId;
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            var orgId = UserContext.ActiveOrganizationId;
+            var orgId = ActiveOrganizationId;
 
             entity.OrganizationId = orgId;
 
@@ -141,7 +141,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
         {
-            var orgId = UserContext.ActiveOrganizationId;
+            var orgId = ActiveOrganizationId;
             var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOptionSearch.Any())
@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Delete(int key)
         {
-            var orgId = UserContext.ActiveOrganizationId;
+            var orgId = ActiveOrganizationId;
             LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOption == null)
