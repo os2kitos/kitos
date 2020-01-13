@@ -332,7 +332,6 @@
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
-    <Compile Include="Infrastructure\Attributes\MigratedToNewAuthorizationContextAttribute.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />

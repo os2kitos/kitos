@@ -7,7 +7,6 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
-using System;
 using System.Net;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -15,7 +14,6 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 namespace Presentation.Web.Controllers.OData
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItProjectRightsController : BaseEntityController<ItProjectRight>
     {
         private readonly IItProjectRepository _itProjectRepository;
