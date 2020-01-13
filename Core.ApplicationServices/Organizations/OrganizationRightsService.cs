@@ -51,6 +51,7 @@ namespace Core.ApplicationServices.Organizations
 
             if (right.Role == OrganizationRole.GlobalAdmin && right.UserId == _userContext.UserId)
             {
+                //Only other global admins should do this. Otherwise the system could end up without a global admin
                 return Result<OrganizationRight, OperationFailure>.Failure(OperationFailure.Conflict);
             }
 
