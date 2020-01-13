@@ -4,11 +4,9 @@ using System.Net.Http;
 using System.Security;
 using Core.DomainModel;
 using Core.DomainServices;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
 {
-    [MigratedToNewAuthorizationContext]
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : OptionEntity<TReference>
     {

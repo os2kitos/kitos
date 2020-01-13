@@ -12,7 +12,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class HandoverController : GenericApiController<Handover, HandoverDTO>
     {
         private readonly IGenericRepository<User> _userRepository;
@@ -30,7 +29,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Handover>(goalStatus => _projectRepository.GetById(goalStatus.ItProject.Id), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Handover>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
         }
 
         public virtual HttpResponseMessage PostParticipant(int id, [FromUri] int participantId)

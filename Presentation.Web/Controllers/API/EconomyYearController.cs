@@ -8,7 +8,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class EconomyYearController : GenericApiController<EconomyYear, EconomyYearDTO>
     {
         private readonly IItProjectRepository _projectRepository;

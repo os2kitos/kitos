@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class RiskController : GenericApiController<Risk, RiskDTO>
     {
         private readonly IItProjectRepository _projectRepository;

@@ -8,7 +8,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class GoalStatusController : GenericApiController<GoalStatus, GoalStatusDTO>
     {
         private readonly IItProjectRepository _projectRepository;
@@ -24,7 +23,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<GoalStatus>(goalStatus=> _projectRepository.GetById(goalStatus.ItProject.Id), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<GoalStatus>(goalStatus=> _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
         }
     }
 }

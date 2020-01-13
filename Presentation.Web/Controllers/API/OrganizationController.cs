@@ -14,14 +14,13 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationalUserContext _userContext;
 
         public OrganizationController(
-            IGenericRepository<Organization> repository, 
+            IGenericRepository<Organization> repository,
             IOrganizationService organizationService,
             IOrganizationalUserContext userContext)
             : base(repository)
@@ -77,8 +76,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        //TODO: Override post as in odata version an make the same assertions - moved to the appservice
-
         protected override Organization PostQuery(Organization item)
         {
             _organizationService.SetupDefaultOrganization(item, KitosUser);
@@ -94,22 +91,20 @@ namespace Presentation.Web.Controllers.API
                 return NotFound();
             }
 
-            if (!_userContext.HasRole(OrganizationRole.GlobalAdmin))
-            {
-                var token = obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase);
-                if (token != null)
+            var token = obj.GetValue("typeId", StringComparison.InvariantCultureIgnoreCase);
+            if (token != null)
 
+            {
+                var typeId = token.Value<int>();
+                if (typeId > 0)
                 {
-                    var typeId = token.Value<int>();
-                    if (typeId > 0)
+                    if (!_organizationService.CanCreateOrganizationOfType(organization, (OrganizationTypeKeys)typeId))
                     {
-                        if (!_organizationService.CanCreateOrganizationOfType(organization, (OrganizationTypeKeys)typeId))
-                        {
-                            return Forbidden();
-                        }
+                        return Forbidden();
                     }
                 }
             }
+
             return base.Patch(id, organizationId, obj);
         }
     }

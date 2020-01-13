@@ -10,7 +10,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
         private readonly IGenericRepository<AdviceUserRelation> _repository;

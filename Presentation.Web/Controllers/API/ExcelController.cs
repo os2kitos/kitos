@@ -14,7 +14,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;

@@ -6,7 +6,6 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class HealthCheckController : ApiController
     {
         private static readonly string DeploymentVersion = Settings.Default.DeploymentVersion;

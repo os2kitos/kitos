@@ -5,6 +5,7 @@ using System.Net.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -13,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItInterfaceController : GenericApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
@@ -105,6 +105,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var accessLevel = GetOrganizationReadAccessLevel(orgId);
+                if (accessLevel < OrganizationDataReadAccessLevel.Public)
+                {
+                    return Forbidden();
+                }
                 return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
             }
             catch (Exception e)
@@ -119,6 +124,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var accessLevel = GetOrganizationReadAccessLevel(orgId);
+                if (accessLevel < OrganizationDataReadAccessLevel.Public)
+                {
+                    return Forbidden();
+                }
                 return IsItInterfaceIdAndNameUnique(checkitinterfaceid, checkname, orgId) ? Ok() : Conflict("Name and ItInterfaceId is already taken by a single interface!");
             }
             catch (Exception e)

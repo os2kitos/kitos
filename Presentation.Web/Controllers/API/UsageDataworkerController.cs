@@ -7,7 +7,6 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class UsageDataworkerController : GenericApiController<ItSystemUsageDataWorkerRelation, ItSystemUsageDataWorkerRelationDTO>
     {
         private readonly IItSystemUsageRepository _systemUsageRepository;

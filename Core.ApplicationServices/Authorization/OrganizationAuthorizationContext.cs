@@ -30,8 +30,9 @@ namespace Core.ApplicationServices.Authorization
                     {typeof(HelpText),true},
                     {typeof(AdviceSent),true},
                     {typeof(Config),true},
-                    {typeof(GlobalConfig),true }
-                };
+                    {typeof(GlobalConfig),true },
+                    {typeof(ExternalReference),true }
+            };
 
             //All base options are globally readable
             typeof(Entity)

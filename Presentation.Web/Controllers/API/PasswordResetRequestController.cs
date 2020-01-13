@@ -12,7 +12,6 @@ namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;

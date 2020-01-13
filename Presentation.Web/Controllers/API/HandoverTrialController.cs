@@ -13,7 +13,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class HandoverTrialController : GenericApiController<HandoverTrial, HandoverTrialDTO>
     {
         private readonly IItContractRepository _contractRepository;

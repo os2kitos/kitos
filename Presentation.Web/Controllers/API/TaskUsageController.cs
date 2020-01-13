@@ -24,7 +24,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class TaskUsageController : GenericHierarchyApiController<TaskUsage, TaskUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -42,7 +41,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<TaskUsage>(x => _orgUnitRepository.GetByKey(x.OrgUnitId)?.Organization, base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<TaskUsage>(x => _orgUnitRepository.GetByKey(x.OrgUnitId), base.GetCrudAuthorization());
         }
 
         [HttpGet]

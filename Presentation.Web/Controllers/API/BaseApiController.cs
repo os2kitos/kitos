@@ -13,14 +13,12 @@ using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Models;
 using Presentation.Web.Helpers;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 
 namespace Presentation.Web.Controllers.API
 {
     [Authorize]
-    [MigratedToNewAuthorizationContext]
     public abstract class BaseApiController : ApiController
     {
         [Inject]

@@ -10,7 +10,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [MigratedToNewAuthorizationContext]
     public class OrganizationUnitRightController : GenericRightsController<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
     {
         private readonly IOrgUnitService _orgUnitService;

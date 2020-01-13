@@ -18,7 +18,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
@@ -74,7 +73,7 @@ namespace Presentation.Web.Controllers.API
 
             try
             {
-                var item = Repository.GetByKey(id);
+                var item = _itSystemUsageService.GetById(id);
 
                 if (item == null)
                 {

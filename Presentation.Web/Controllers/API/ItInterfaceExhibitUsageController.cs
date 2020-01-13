@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItInterfaceExhibitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;

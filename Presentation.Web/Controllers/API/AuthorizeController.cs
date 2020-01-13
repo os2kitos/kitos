@@ -17,7 +17,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class AuthorizeController : BaseApiController
     {
         private readonly IUserRepository _userRepository;
@@ -68,7 +67,7 @@ namespace Presentation.Web.Controllers.API
             var user = KitosUser;
             var org = _organizationService.GetOrganizations(user).Single(o => o.Id == orgId);
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
-            var dto = new OrganizationAndDefaultUnitDTO()
+            var dto = new OrganizationAndDefaultUnitDTO
             {
                 Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)

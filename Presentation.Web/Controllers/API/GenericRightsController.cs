@@ -6,13 +6,11 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Ninject;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [MigratedToNewAuthorizationContext]
     public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
         where TObject : HasRightsEntity<TObject, TRight, TRole>, IContextAware
         where TRight : Entity, IRight<TObject, TRight, TRole>

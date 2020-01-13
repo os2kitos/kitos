@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class DataRowController : GenericApiController<DataRow, DataRowDTO>
     {
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
@@ -47,7 +46,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<DataRow>(x => _interfaceRepository.AsQueryable().ById(x.ItInterfaceId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<DataRow>(x => _interfaceRepository.GetByKey(x.ItInterfaceId), base.GetCrudAuthorization());
         }
     }
 }

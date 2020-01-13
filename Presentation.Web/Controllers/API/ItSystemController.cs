@@ -23,7 +23,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItSystemController : GenericHierarchyApiController<ItSystem, ItSystemDTO>
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -156,15 +155,15 @@ namespace Presentation.Web.Controllers.API
                 item.LastChangedByUser = KitosUser;
                 item.Uuid = Guid.NewGuid();
 
-                if (!AllowCreate<ItSystem>(item))
-                {
-                    return Forbidden();
-                }
-
                 foreach (var id in dto.TaskRefIds)
                 {
                     var task = _taskRepository.GetByKey(id);
                     item.TaskRefs.Add(task);
+                }
+
+                if (!AllowCreate<ItSystem>(item))
+                {
+                    return Forbidden();
                 }
 
                 var savedItem = PostQuery(item);

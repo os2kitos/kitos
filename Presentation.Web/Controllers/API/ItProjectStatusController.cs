@@ -15,7 +15,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ItProjectStatusController : GenericApiController<ItProjectStatus, ItProjectStatusDTO>
     {
         private readonly IItProjectRepository _projectRepository;

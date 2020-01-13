@@ -8,7 +8,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
         public ReferenceController(IGenericRepository<ExternalReference> repository)

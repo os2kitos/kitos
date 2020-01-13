@@ -8,7 +8,6 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [MigratedToNewAuthorizationContext]
     public class AssignmentController : GenericApiController<Assignment, AssignmentDTO>
     {
         private readonly IItProjectRepository _projectRepository;

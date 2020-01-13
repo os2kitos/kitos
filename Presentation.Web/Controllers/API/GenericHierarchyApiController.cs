@@ -4,12 +4,10 @@ using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [MigratedToNewAuthorizationContext]
     public abstract class GenericHierarchyApiController<TModel, TDto> : GenericApiController<TModel, TDto>
         where TModel : Entity, IHierarchy<TModel>, IContextAware
     {
