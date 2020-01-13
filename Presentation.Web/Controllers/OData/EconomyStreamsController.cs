@@ -20,13 +20,11 @@ namespace Presentation.Web.Controllers.OData
     public class EconomyStreamsController : BaseEntityController<EconomyStream>
     {
         private readonly IGenericRepository<EconomyStream> _repository;
-        private readonly IGenericRepository<User> _userRepository;
 
-        public EconomyStreamsController(IGenericRepository<EconomyStream> repository, IGenericRepository<User> userRepository) 
+        public EconomyStreamsController(IGenericRepository<EconomyStream> repository) 
             : base(repository)
         {
             _repository = repository;
-            _userRepository = userRepository;
         }
 
         // GET /Organizations(1)/ItContracts
@@ -45,26 +43,32 @@ namespace Presentation.Web.Controllers.OData
 
             var economyStream = result.FirstOrDefault();
 
+            var accessLevel = GetOrganizationReadAccessLevel(orgKey);
+
             if (economyStream != null)
             {
                 var contractId = economyStream.ExternPaymentFor.Id;
 
-                if (!HasAccessWithinOrganization(orgKey) && !EconomyStreamIsPublic(contractId))
+                var economyStreamIsPublic = EconomyStreamIsPublic(contractId);
+
+                if (accessLevel < OrganizationDataReadAccessLevel.All && economyStreamIsPublic == false)
                 {
                     return Forbidden();
                 }
+
+                if (economyStreamIsPublic && accessLevel < OrganizationDataReadAccessLevel.Public)
+                {
+                    return Forbidden();
+                }
+                
             }
-            else if (!HasAccessWithinOrganization(orgKey))
+            //No access to organization -> forbidden, not empty response
+            else if (accessLevel < OrganizationDataReadAccessLevel.Public)
             {
                 return Forbidden();
             }
 
             return Ok(result);
-        }
-
-        private bool HasAccessWithinOrganization(int orgKey)
-        {
-            return GetOrganizationReadAccessLevel(orgKey) == OrganizationDataReadAccessLevel.All;
         }
 
         private bool EconomyStreamIsPublic(int contractKey)

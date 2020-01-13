@@ -45,7 +45,8 @@ namespace Presentation.Web.Controllers.OData
                 return Ok(Repository.AsQueryable());
             }
 
-            return Ok(Repository.AsQueryable().ByOrganizationId(UserContext.ActiveOrganizationId));
+            var activeOrganizationId = UserContext.ActiveOrganizationId;
+            return Ok(Repository.AsQueryable().ByOrganizationId(activeOrganizationId));
         }
 
         /// <summary>
@@ -59,9 +60,8 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(int key)
         {
-            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(key);
-            if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && organizationDataReadAccessLevel != OrganizationDataReadAccessLevel.All)
+            if (organizationDataReadAccessLevel != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
@@ -78,9 +78,8 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
-            var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
             var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgKey);
-            if (crossOrganizationReadAccessLevel < CrossOrganizationDataReadAccessLevel.All && organizationDataReadAccessLevel != OrganizationDataReadAccessLevel.All)
+            if (organizationDataReadAccessLevel < OrganizationDataReadAccessLevel.Public)
             {
                 return Forbidden();
             }
@@ -110,7 +109,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
             }
-            return Ok(contracts);
+            return Ok(contracts.Where(AllowRead));
         }
     }
 }

@@ -7,6 +7,7 @@ using Core.DomainServices;
 
 namespace Core.ApplicationServices
 {
+    //TODO: Migrate to Permissions and this file is to be PermissionRepository
     public enum Feature
     {
         MakeGlobalAdmin = 1,
