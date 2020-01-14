@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using System.Net.Http;
+using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using Core.DomainServices.Repositories.Contract;
@@ -36,6 +37,18 @@ namespace Presentation.Web.Controllers.API
         {
             //NOTE: In this case we make sure dependencies are loaded on POST so we CAN use GetOwner
             return new ChildEntityCrudAuthorization<ExternalReference>(reference => reference.GetOwner(), base.GetCrudAuthorization());
+        }
+
+        public override HttpResponseMessage Post(ExternalReferenceDTO dto)
+        {
+            if (dto.ItContract_Id.HasValue ||
+                dto.ItSystem_Id.HasValue ||
+                dto.ItSystemUsage_Id.HasValue ||
+                dto.ItProject_Id.HasValue)
+            {
+                return base.Post(dto);
+            }
+            return BadRequest("Target object must be specified");
         }
 
         protected override void PrepareNewObject(ExternalReference item)
