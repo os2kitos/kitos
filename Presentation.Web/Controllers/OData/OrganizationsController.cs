@@ -1,12 +1,14 @@
-﻿using Core.DomainModel.Organization;
+﻿using System;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
 using System.Security;
-using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -39,27 +41,18 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            var entity = Repository.GetByKey(orgKey);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (!AllowWrite(entity))
-            {
-                return Forbidden();
-            }
-
-            var userId = 0;
             if (parameters.ContainsKey("userId"))
             {
-                userId = (int)parameters["userId"];
-                // TODO check if user is allowed to remove users from this organization
+                var userId = (int)parameters["userId"];
+
+                var result = _organizationService.RemoveUser(orgKey, userId);
+                return
+                    result.Ok ?
+                        StatusCode(HttpStatusCode.NoContent) :
+                        FromOperationFailure(result.Error);
             }
 
-            _organizationService.RemoveUser(orgKey, userId);
-
-            return StatusCode(HttpStatusCode.NoContent);
+            return BadRequest("No user ID specified");
         }
 
         [EnableQuery]
@@ -70,45 +63,11 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest();
             }
 
-            if (IsCvrInvalid(organization))
-            {
-                return BadRequest("Invalid CVR format");
-            }
+            var result = _organizationService.CreateNewOrganization(organization);
 
-            if (!AllowCreate<Organization>(organization))
-            {
-                return Forbidden();
-            }
-
-            var user = _userRepository.GetByKey(UserId);
-
-            _organizationService.SetupDefaultOrganization(organization, user);
-
-            var result = base.Post(organization).ExecuteAsync(new CancellationToken());
-
-            if (result.Result.IsSuccessStatusCode)
-            {
-                if (organization.TypeId == (int)OrganizationTypeKeys.Interessefællesskab)
-                {
-                    _organizationRoleService.MakeLocalAdmin(user, organization, user);
-                    _organizationRoleService.MakeUser(user, organization, user);
-                }
-            }
-            else
-            {
-                return StatusCode(result.Result.StatusCode);
-            }
-
-            return Created(organization);
-        }
-
-        private static bool IsCvrInvalid(Organization organization)
-        {
-            //Cvr is optional
-            var isCvrProvided = string.IsNullOrWhiteSpace(organization.Cvr) == false;
-
-            //If cvr is defined, it must be valid
-            return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
+            return result.Ok ? 
+                Created(result.Value) : 
+                FromOperationFailure(result.Error);
         }
 
         [EnableQuery]
@@ -133,7 +92,7 @@ namespace Presentation.Web.Controllers.OData
                 if (organization.TypeId > 0)
                 {
                     var typeKey = (OrganizationTypeKeys)organization.TypeId;
-                    if (!_organizationService.CanCreateOrganizationOfType(organization, typeKey))
+                    if (!_organizationService.CanChangeOrganizationType(organization, typeKey))
                     {
                         return Forbidden();
                     }

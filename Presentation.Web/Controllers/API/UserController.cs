@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using AutoMapper;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;

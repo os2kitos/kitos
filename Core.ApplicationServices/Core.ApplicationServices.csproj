@@ -108,6 +108,7 @@
     <Compile Include="Model\Shared\NamedEntity.cs" />
     <Compile Include="Model\System\UsingOrganization.cs" />
     <Compile Include="Organizations\IOrganizationRightsService.cs" />
+    <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
@@ -130,7 +131,7 @@
     <Compile Include="LinqTreeExtensions.cs" />
     <Compile Include="ExcelImportError.cs" />
     <Compile Include="ExcelService.cs" />
-    <Compile Include="OrganizationService.cs" />
+    <Compile Include="Organizations\OrganizationService.cs" />
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MailClient.cs" />

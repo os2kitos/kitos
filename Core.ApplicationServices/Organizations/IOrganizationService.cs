@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Model.Result;
 
-namespace Core.DomainServices
+namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationService
     {
@@ -15,10 +17,10 @@ namespace Core.DomainServices
 
         void SetDefaultOrgUnit(User user, int orgId, int orgUnitId);
 
-        void SetupDefaultOrganization(Organization org, User objectOwner);
+        Result<Organization, OperationFailure> RemoveUser(int organizationId, int userId);
 
-        void RemoveUser(int organizationId, int userId);
+        bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType);
 
-        bool CanCreateOrganizationOfType(Organization organization, OrganizationTypeKeys organizationType);
+        Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
     }
 }

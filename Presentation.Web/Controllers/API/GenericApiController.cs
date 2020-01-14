@@ -10,6 +10,7 @@ using Presentation.Web.Models;
 using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Queries;
 
 namespace Presentation.Web.Controllers.API
@@ -192,20 +193,12 @@ namespace Presentation.Web.Controllers.API
             }
             catch (SecurityException e)
             {
-                return Unauthorized(e.Message);
+                return Forbidden(e.Message);
             }
             catch (Exception e)
             {
-                // check if inner message is a duplicate, if so return conflict
-                if (e.InnerException?.InnerException != null)
-                {
-                    if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
-                    {
-                        return Conflict(e.InnerException.InnerException.Message);
-                    }
-                }
-
-                return LogError(e);
+                var duplicate = CheckForDuplicateEntryException(e);
+                return duplicate.HasValue ? duplicate.Value : LogError(e);
             }
         }
 
@@ -262,6 +255,10 @@ namespace Presentation.Web.Controllers.API
                 DeleteQuery(item);
 
                 return Ok();
+            }
+            catch (SecurityException e)
+            {
+                return Forbidden();
             }
             catch (Exception e)
             {
@@ -383,22 +380,34 @@ namespace Presentation.Web.Controllers.API
                 var result = PatchQuery(item, obj);
                 return Ok(Map(result));
             }
+            catch (SecurityException e)
+            {
+                return Forbidden();
+            }
             catch (Exception e)
             {
-                // check if inner message is a duplicate, if so return conflict
-                if (e.InnerException != null)
+                var duplicate = CheckForDuplicateEntryException(e);
+                return duplicate.HasValue ? duplicate.Value : LogError(e);
+            }
+        }
+
+        private Maybe<HttpResponseMessage> CheckForDuplicateEntryException(Exception e)
+        {
+            var innerException = e.InnerException;
+            while (innerException != null)
+            {
+                if (innerException.Message?.Contains("Duplicate entry") == true)
                 {
-                    if (e.InnerException.InnerException != null)
                     {
-                        if (e.InnerException.InnerException.Message.Contains("Duplicate entry"))
-                        {
-                            return Conflict(e.InnerException.InnerException.Message);
-                        }
+                        var conflict = Conflict(innerException.Message);
+                        return Maybe<HttpResponseMessage>.Some(conflict);
                     }
                 }
 
-                return LogError(e);
+                innerException = innerException.InnerException;
             }
+
+            return Maybe<HttpResponseMessage>.None;
         }
 
         protected override void Dispose(bool disposing)

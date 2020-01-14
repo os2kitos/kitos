@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -74,9 +77,18 @@ namespace Presentation.Web.Controllers.API
 
         protected override Organization PostQuery(Organization item)
         {
-            _organizationService.SetupDefaultOrganization(item, KitosUser);
+            var result = _organizationService.CreateNewOrganization(item);
+            if (result.Ok)
+            {
+                return base.PostQuery(item);
+            }
 
-            return base.PostQuery(item);
+            if (result.Error == OperationFailure.Forbidden)
+            {
+                throw new SecurityException();
+            }
+
+            throw new InvalidOperationException(result.Error.ToString("G"));
         }
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
@@ -94,7 +106,7 @@ namespace Presentation.Web.Controllers.API
                 var typeId = token.Value<int>();
                 if (typeId > 0)
                 {
-                    if (!_organizationService.CanCreateOrganizationOfType(organization, (OrganizationTypeKeys)typeId))
+                    if (!_organizationService.CanChangeOrganizationType(organization, (OrganizationTypeKeys)typeId))
                     {
                         return Forbidden();
                     }

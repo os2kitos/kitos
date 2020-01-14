@@ -7,6 +7,7 @@ using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
 using Ninject;
@@ -143,6 +144,23 @@ namespace Presentation.Web.Controllers.API
         protected HttpResponseMessage Forbidden(string msg)
         {
             return CreateResponse(HttpStatusCode.Forbidden, msg);
+        }
+
+        protected new HttpResponseMessage FromOperationFailure(OperationFailure failure)
+        {
+            switch (failure)
+            {
+                case OperationFailure.BadInput:
+                    return BadRequest();
+                case OperationFailure.NotFound:
+                    return NotFound();
+                case OperationFailure.Forbidden:
+                    return Forbidden();
+                case OperationFailure.Conflict:
+                    return Conflict("");
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError);
+            }
         }
 
         protected User KitosUser => UserContext.UserEntity;

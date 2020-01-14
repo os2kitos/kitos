@@ -70,24 +70,9 @@ namespace Presentation.Web.Controllers.API
             {
                 var result = _organizationRightsService.RemoveRole(organizationId, uId, (OrganizationRole)rId);
 
-                if (result.Ok)
-                {
-                    return Ok();
-                }
-
-                switch (result.Error)
-                {
-                    case OperationFailure.BadInput:
-                        return BadRequest();
-                    case OperationFailure.NotFound:
-                        return NotFound();
-                    case OperationFailure.Forbidden:
-                        return Forbidden();
-                    case OperationFailure.Conflict:
-                        return Conflict(string.Empty);
-                    default:
-                        return Error(result);
-                }
+                return result.Ok ?
+                    Ok() :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {

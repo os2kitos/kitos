@@ -161,18 +161,7 @@ namespace Presentation.Web.Controllers.API
                     return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }
 
-                switch (sysUsageResult.Error)
-                {
-                    case OperationFailure.BadInput:
-                        return BadRequest();
-                    case OperationFailure.Forbidden:
-                        return Forbidden();
-                    case OperationFailure.Conflict:
-                        return Conflict("existing usage already found");
-                    default:
-                        return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-                }
-
+                return FromOperationFailure(sysUsageResult.Error);
             }
             catch (Exception e)
             {

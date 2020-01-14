@@ -5,6 +5,7 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -101,11 +102,6 @@ namespace Presentation.Web.Controllers.OData
             entity.LastChangedByUserId = UserId;
 
             if (AllowCreate<T>(entity) == false)
-            {
-                return Forbidden();
-            }
-
-            if ((entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public && AllowEntityVisibilityControl(entity) == false)
             {
                 return Forbidden();
             }
@@ -242,6 +238,23 @@ namespace Presentation.Web.Controllers.OData
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new RootEntityCrudAuthorization(_authorizationStrategy.Value);
+        }
+
+        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        {
+            switch (failure)
+            {
+                case OperationFailure.BadInput:
+                    return BadRequest();
+                case OperationFailure.NotFound:
+                    return NotFound();
+                case OperationFailure.Forbidden:
+                    return Forbidden();
+                case OperationFailure.Conflict:
+                    return Conflict();
+                default:
+                    return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

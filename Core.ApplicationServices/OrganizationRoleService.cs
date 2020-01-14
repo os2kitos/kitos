@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -9,14 +10,17 @@ namespace Core.ApplicationServices
     public class OrganizationRoleService : IOrganizationRoleService
     {
         private readonly IGenericRepository<OrganizationRight> _organizationRights;
+        private readonly IOrganizationalUserContext _userContext;
 
-        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights)
+        public OrganizationRoleService(IGenericRepository<OrganizationRight> organizationRights, IOrganizationalUserContext userContext)
         {
             _organizationRights = organizationRights;
+            _userContext = userContext;
         }
 
-        private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, User kitosUser, OrganizationRole organizationRole)
+        private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, OrganizationRole organizationRole)
         {
+            var kitosUser = _userContext.UserEntity;
             var result = _organizationRights.Insert(new OrganizationRight
             {
                 Organization = organization,
@@ -30,14 +34,14 @@ namespace Core.ApplicationServices
             return result;
         }
 
-        public OrganizationRight MakeUser(User user, Organization organization, User kitosUser)
+        public OrganizationRight MakeUser(User user, Organization organization)
         {
-            return AddOrganizationRoleToUser(user, organization, kitosUser, OrganizationRole.User);
+            return AddOrganizationRoleToUser(user, organization, OrganizationRole.User);
         }
 
-        public OrganizationRight MakeLocalAdmin(User user, Organization organization, User kitosUser)
+        public OrganizationRight MakeLocalAdmin(User user, Organization organization)
         {
-            return AddOrganizationRoleToUser(user, organization, kitosUser, OrganizationRole.LocalAdmin);
+            return AddOrganizationRoleToUser(user, organization, OrganizationRole.LocalAdmin);
         }
 
         public IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId)

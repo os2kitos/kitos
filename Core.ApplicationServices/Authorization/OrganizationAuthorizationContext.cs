@@ -130,8 +130,22 @@ namespace Core.ApplicationServices.Authorization
         {
             return
                 AllowCreate<T>() &&
+                CheckAccessModifierPolicy(entity) &&
                 CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
+        }
+
+        private bool CheckAccessModifierPolicy(IEntity entity)
+        {
+            if (entity is IHasAccessModifier accessModifier)
+            {
+                if (accessModifier.AccessModifier == AccessModifier.Public && !_activeUserContext.CanChangeVisibilityOf(entity))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private bool CheckSpecificCreationPolicy(IEntity entity)
@@ -158,11 +172,6 @@ namespace Core.ApplicationServices.Authorization
                 {
                     result = false;
                 }
-            }
-
-            if (newOrganization.AccessModifier == AccessModifier.Public && !AllowEntityVisibilityControl(newOrganization))
-            {
-                result = false;
             }
 
             return result;
@@ -200,13 +209,13 @@ namespace Core.ApplicationServices.Authorization
             }
 
             //Specific type policy may revoke existing result so AND it
-            result = result && CheckSpecificTypePolicies(entity);
+            result = result && CheckSpecificTypeModificationPolicies(entity);
 
             //If result is TRUE, this can be negated if read-only is not ignored AND user is marked as read-only
             return result && (ignoreReadOnlyRole || IsReadOnly() == false);
         }
 
-        private bool CheckSpecificTypePolicies(IEntity entity)
+        private bool CheckSpecificTypeModificationPolicies(IEntity entity)
         {
             var result = true;
 

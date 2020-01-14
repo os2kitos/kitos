@@ -48,10 +48,10 @@
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
+    <Compile Include="Extensions\OrganizationExtensions.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
-    <Compile Include="IOrganizationService.cs" />
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />

@@ -133,10 +133,10 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(OperationFailure.Conflict)]
-        [InlineData(OperationFailure.BadInput)]
-        [InlineData(OperationFailure.UnknownError)]
-        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationFailure operationResult)
+        [InlineData(OperationFailure.Conflict, HttpStatusCode.Conflict)]
+        [InlineData(OperationFailure.BadInput, HttpStatusCode.BadRequest)]
+        [InlineData(OperationFailure.UnknownError, HttpStatusCode.InternalServerError)]
+        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationFailure operationResult, HttpStatusCode expectedStatusCode)
         {
             //Arrange
             var itSystemId = A<int>();
@@ -146,7 +146,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
 
             //Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, responseMessage.StatusCode);
+            Assert.Equal(expectedStatusCode, responseMessage.StatusCode);
         }
 
         [Fact]

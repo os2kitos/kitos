@@ -396,17 +396,8 @@ namespace Presentation.Web.Controllers.API
                 var dto = Map(itSystemUsages.Value);
                 return Ok(dto);
             }
-            switch (itSystemUsages.Error)
-            {
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get using organizations");
-            }
 
+            return FromOperationFailure(itSystemUsages.Error);
         }
 
         private bool IsAvailable(string name, int orgId)

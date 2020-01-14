@@ -59,9 +59,7 @@ namespace Presentation.Web.Controllers.OData
                     return Created(entity);
                 }
 
-                return result.Error == OperationFailure.Forbidden ?
-                    Forbidden() :
-                    InternalServerError();
+                return FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
@@ -107,19 +105,7 @@ namespace Presentation.Web.Controllers.OData
                     return StatusCode(HttpStatusCode.NoContent);
                 }
 
-                switch (result.Error)
-                {
-                    case OperationFailure.BadInput:
-                        return BadRequest();
-                    case OperationFailure.NotFound:
-                        return NotFound();
-                    case OperationFailure.Forbidden:
-                        return Forbidden();
-                    case OperationFailure.Conflict:
-                        return StatusCode(HttpStatusCode.Conflict);
-                    default:
-                        return StatusCode(HttpStatusCode.InternalServerError);
-                }
+                return FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {

@@ -37,18 +37,8 @@ namespace Presentation.Web.Controllers.API
             {
                 return Ok(Map(res.Value));
             }
-            switch (res.Error)
-            {
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.BadInput:
-                    return BadRequest();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get migration consequences");
-            }
+
+            return FromOperationFailure(res.Error);
         }
 
         [HttpPost]
@@ -64,18 +54,8 @@ namespace Presentation.Web.Controllers.API
             {
                 return NoContent();
             }
-            switch (result.Error)
-            {
-                case OperationFailure.BadInput:
-                    return BadRequest();
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to migrate It System Usage");
-            }
+
+            return FromOperationFailure(result.Error);
         }
 
         [HttpGet]
@@ -118,16 +98,8 @@ namespace Presentation.Web.Controllers.API
                 var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
                 return Ok(unusedItSystems);
             }
-            switch (result.Error)
-            {
-                case OperationFailure.Forbidden:
-                    return Forbidden();
-                case OperationFailure.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get Unused It Systems");
-            }
+
+            return FromOperationFailure(result.Error);
         }
 
         private static ItSystemUsageMigrationDTO Map(ItSystemUsageMigration input)
