@@ -74,7 +74,6 @@
                     notify.addErrorMessage("Der skete en fejle under henting af ændringer");
                     return;
                 }
-                var uri = encodeURI(data);
                 var universalBOM = "\uFEFF";
                 var anchor = angular.element(document.getElementById("KLEDownloadAnchor"));
                 anchor.attr("data-element-type", "KLEDownloadAnchor");
