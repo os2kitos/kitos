@@ -113,13 +113,11 @@ namespace Presentation.Web
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
-            // Udkommenteret ifm. OS2KITOS-663
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InRequestScope();
             kernel.Bind<IItContractService>().To<ItContractService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
-            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
             kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();

@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using System;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
@@ -234,7 +235,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
             ExpectGetUserIdReturns(userId);
-            ExpectCanChangeVisibilityOfReturns(isAllowedToChangeVisibility, inputEntity);
+            //ExpectCanChangeVisibilityOfReturns(isAllowedToChangeVisibility, inputEntity); //TOOD
 
             //Act
             var allowUpdates = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
@@ -506,6 +507,76 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
+        //TODO: Migrate stuff from this one
+        //[Theory]
+        //[MemberData(nameof(GetModuleAccessTestInputs))]
+        //public void HasModuleLevelAccessTo_Returns_Correct_Result(IEntity entity, IReadOnlyList<Feature> supportedFeatures, bool expectedResult)
+        //{
+        //    //Arrange
+        //    var sut = new OrganizationalUserContext(supportedFeatures, Many<OrganizationRole>(), new User(), A<int>());
+
+        //    //Act
+        //    var result = sut.HasModuleLevelAccessTo(entity);
+
+        //    //Assert
+        //    Assert.Equal(expectedResult, result);
+        //}
+
+        //[Theory]
+        //[InlineData(true)]
+        //[InlineData(false)]
+        //public void CanChangeVisibilityOf_ContractModuleEntity_Returns(bool hasAccess)
+        //{
+        //    //Arrange
+        //    var features = hasAccess
+        //        ? GetFeatureOptions()
+        //        : GetFeatureOptions(Feature.CanSetContractElementsAccessModifierToPublic);
+
+        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+        //    //Act
+        //    var result = sut.CanChangeVisibilityOf(new EconomyStream());
+
+        //    //Assert
+        //    Assert.Equal(hasAccess, result);
+        //}
+
+        //[Theory]
+        //[InlineData(true)]
+        //[InlineData(false)]
+        //public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(bool hasAccess)
+        //{
+        //    //Arrange
+        //    var features = hasAccess
+        //        ? GetFeatureOptions()
+        //        : GetFeatureOptions(Feature.CanSetOrganizationAccessModifierToPublic);
+
+        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+        //    //Act
+        //    var result = sut.CanChangeVisibilityOf(new Organization());
+
+        //    //Assert
+        //    Assert.Equal(hasAccess, result);
+        //}
+
+        //[Theory, MemberData(nameof(GetNonSpecificVisibilityChangeTypeTestInputs))]
+        //public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(IEntity inputType, bool hasAccess)
+        //{
+        //    //Arrange
+        //    var features = hasAccess
+        //        ? GetFeatureOptions()
+        //        : GetFeatureOptions(Feature.CanSetAccessModifierToPublic);
+
+        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
+
+        //    //Act
+        //    var result = sut.CanChangeVisibilityOf(inputType);
+
+        //    //Assert
+        //    Assert.Equal(hasAccess, result);
+        //}
+
         private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
             //Arrange
@@ -519,11 +590,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
-        private void ExpectCanChangeVisibilityOfReturns(bool isAllowedToChangeVisibility, IEntity inputEntity)
-        {
-            _userContextMock.Setup(x => x.CanChangeVisibilityOf(inputEntity)).Returns(isAllowedToChangeVisibility);
-        }
-
         private void ExpectHasOwnershipReturns(IEntity inputEntity, bool value)
         {
             _userContextMock.Setup(x => x.HasOwnership(inputEntity)).Returns(value);
@@ -531,7 +597,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private void ExpectHasModuleLevelAccessReturns(IEntity inputEntity, bool hasModuleLevelAccess)
         {
-            _userContextMock.Setup(x => x.HasModuleLevelAccessTo(inputEntity)).Returns(hasModuleLevelAccess);
+            throw new NotImplementedException("TODO: Re-write tests to embrace visibility control checks");
         }
 
         private void ExpectHasAssignedWriteAccessReturns(IEntity inputEntity, bool value)

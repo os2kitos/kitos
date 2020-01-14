@@ -6,8 +6,11 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Reports;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.Types;
 
@@ -283,7 +286,52 @@ namespace Core.ApplicationServices.Authorization
 
         private bool HasModuleLevelWriteAccess(IEntity entity)
         {
-            return _activeUserContext.HasModuleLevelAccessTo(entity);
+            var result = IsGlobalAdmin() || IsLocalAdmin();
+            switch (entity)
+            {
+                case IContractModule _:
+                    result |= IsContractModuleAdmin();
+                    break;
+                case User _:
+                case IOrganizationModule _:
+                    result |= IsOrganizationModuleAdmin();
+                    break;
+                case IProjectModule _:
+                    result |= IsProjectModuleAdmin();
+                    break;
+                case ISystemModule _:
+                    result |= IsSystemModuleAdmin();
+                    break;
+                case IReportModule _:
+                    result |= IsReportModuleAdmin();
+                    break;
+                default:
+                    //Unknown module type - no module level access can be granted
+                    result = false;
+                    break;
+            }
+
+            return result;
+        }
+
+        private bool IsReportModuleAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.ReportModuleAdmin);
+        }
+
+        private bool IsSystemModuleAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.SystemModuleAdmin);
+        }
+
+        private bool IsProjectModuleAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.ProjectModuleAdmin);
+        }
+
+        private bool IsOrganizationModuleAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.OrganizationModuleAdmin);
         }
 
         private static bool IsUserEntity(IEntity entity)
@@ -352,6 +400,11 @@ namespace Core.ApplicationServices.Authorization
             return typeof(TLeft) == typeof(TRight);
         }
 
+        private bool IsContractModuleAdmin()
+        {
+            return _activeUserContext.HasRole(OrganizationRole.ContractModuleAdmin);
+        }
+
         #region PERMISSIONS
         bool IPermissionVisitor.Visit(BatchImportPermission permission)
         {
@@ -365,7 +418,22 @@ namespace Core.ApplicationServices.Authorization
 
         bool IPermissionVisitor.Visit(VisibilityControlPermission permission)
         {
-            return AllowModify(permission.Target) && _activeUserContext.CanChangeVisibilityOf(permission.Target);
+            var target = permission.Target;
+            if (target is IHasAccessModifier)
+            {
+                switch (target)
+                {
+                    case IContractModule _:
+                        return IsGlobalAdmin() || IsLocalAdmin() || IsContractModuleAdmin();
+                    case IOrganizationModule _:
+                        return IsGlobalAdmin() || IsLocalAdmin();
+                }
+
+                return IsGlobalAdmin();
+            }
+
+            //No-one can control access modifiers that are not there
+            return false;
         }
 
         bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)
