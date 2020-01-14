@@ -38,6 +38,8 @@ namespace Presentation.Web.Controllers.API
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
+        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
+
         protected BaseApiController()
         {
             _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));

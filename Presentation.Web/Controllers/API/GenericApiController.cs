@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var organizationId = UserContext.ActiveOrganizationId;
+                var organizationId = ActiveOrganizationId;
 
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
@@ -125,7 +125,7 @@ namespace Presentation.Web.Controllers.API
         /// </summary>
         public HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights)
         {
-            if (GetOrganizationReadAccessLevel(UserContext.ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
+            if (GetOrganizationReadAccessLevel(ActiveOrganizationId) == OrganizationDataReadAccessLevel.None)
             {
                 return Forbidden();
             }

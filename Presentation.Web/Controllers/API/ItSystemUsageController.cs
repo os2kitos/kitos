@@ -90,7 +90,7 @@ namespace Presentation.Web.Controllers.API
 
                 var dto = Map(item);
 
-                if (item.OrganizationId != KitosUser.DefaultOrganizationId)
+                if (item.OrganizationId != ActiveOrganizationId)
                 {
                     dto.Note = "";
                 }

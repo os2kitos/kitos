@@ -2,10 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security;
-using Core.ApplicationServices;
 using Core.ApplicationServices.Interface;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -34,12 +31,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var item = Repository.GetByKey(id);
-
-                if (item.ExhibitedBy != null)
-                    return Conflict("Cannot delete an itinterface in use!");
-
-                return base.Delete(id, organizationId);
+                var result = _itInterfaceService.Delete(id);
+                return result.Ok ?
+                    Ok() :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
@@ -47,45 +42,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected override void DeleteQuery(ItInterface entity)
-        {
-            var result = _itInterfaceService.Delete(entity.Id);
-            if (!result.Ok)
-            {
-                if (result.Error == OperationFailure.Forbidden)
-                    throw new SecurityException();
-                throw new InvalidOperationException(result.Error.ToString("G"));
-            }
-        }
-
         public override HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try
             {
-                if (!IsItInterfaceIdAndNameUnique(dto.ItInterfaceId, dto.Name, dto.OrganizationId))
-                    return Conflict("ItInterface with same InterfaceId and Name is taken!");
-
-                var item = Map(dto);
-
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
-                item.ItInterfaceId = item.ItInterfaceId ?? "";
-                item.Uuid = Guid.NewGuid();
-
-                foreach (var dataRow in item.DataRows)
-                {
-                    dataRow.ObjectOwner = KitosUser;
-                    dataRow.LastChangedByUser = KitosUser;
-                }
-
-                if (!AllowCreate<ItInterface>(item))
-                {
-                    return Forbidden();
-                }
-
-                PostQuery(item);
-
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+                var result = _itInterfaceService.Create(Map(dto));
+                return result.Ok ?
+                    Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {

@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetExternEconomyStreamForContract(int externPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.ExternPaymentForId == externPaymentForContractWithId);
-            var currentOrgId = KitosUser.DefaultOrganizationId;
+            var currentOrgId = ActiveOrganizationId;
 
             var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
 
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetInternEconomyStreamForContract(int internPaymentForContractWithId)
         {
             var result = Repository.AsQueryable().Where(e => e.InternPaymentForId == internPaymentForContractWithId);
-            var currentOrgId = KitosUser.DefaultOrganizationId;
+            var currentOrgId = ActiveOrganizationId;
 
             var crossOrganizationReadAccessLevel = GetCrossOrganizationReadAccessLevel();
 
