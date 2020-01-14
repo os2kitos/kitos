@@ -76,8 +76,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Fact]
         private void UpdateKLE_Given_Summary_Updates_Renamed_TaskRef()
         {
-            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var renamedTaskRef,
-                out var removedTaskRef);
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
             var mockTransactionManager = Substitute.For<ITransactionManager>();
             var mockItProjectRepository = Substitute.For<IGenericRepository<ItProject>>();
             var mockItSystemRepository = Substitute.For<IGenericRepository<ItSystem>>();
@@ -89,7 +88,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Fact]
         private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItProject()
         {
-            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var renamedTaskRef, out var removedTaskRef);
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
             var mockItProjectRepository = Substitute.For<IGenericRepository<ItProject>>();
             const int itProjectKey = 1;
             var itProject = new ItProject
@@ -110,8 +109,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Fact]
         private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystem()
         {
-            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var renamedTaskRef,
-                out var removedTaskRef);
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
             var mockItSystemRepository = Substitute.For<IGenericRepository<ItSystem>>();
             const int itSystemKey = 1;
             var itSystem = new ItSystem
@@ -130,19 +128,19 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
 
         #region Helpers
 
-        private static IKLEDataBridge SetupUpdateObjects(out IGenericRepository<TaskRef> mockTaskRefRepository,
-            out TaskRef renamedTaskRef, out TaskRef removedTaskRef)
+        private static IKLEDataBridge SetupUpdateObjects(out IGenericRepository<TaskRef> mockTaskRefRepository, out TaskRef removedTaskRef, out TaskRef renamedTaskRef)
         {
             var mockKLEDataBridge = Substitute.For<IKLEDataBridge>();
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-sample-changes.xml");
             mockKLEDataBridge.GetKLEXMLData().Returns(document);
             mockTaskRefRepository = Substitute.For<IGenericRepository<TaskRef>>();
-            renamedTaskRef = SetupTaskRef("KLE-Emne", "00.03.00", "International virksomhed og EU");
             removedTaskRef = SetupTaskRef("KLE-Emne", "00.03.01", "Dummy");
-            var existingTaskRefs = new List<TaskRef> {renamedTaskRef, removedTaskRef};
+            renamedTaskRef = SetupTaskRef("KLE-Emne", "00.03.00", "International virksomhed og EU");
+            var existingTaskRefs = new List<TaskRef> {removedTaskRef, renamedTaskRef};
             mockTaskRefRepository.Get().Returns(existingTaskRefs);
-            mockTaskRefRepository.GetWithReferencePreload(SetupTaskRefFilter(renamedTaskRef)).Returns(new List<TaskRef> {renamedTaskRef});
-            mockTaskRefRepository.GetWithReferencePreload(SetupTaskRefFilter(removedTaskRef)).Returns(new List<TaskRef> {removedTaskRef});
+            mockTaskRefRepository.Get(SetupTaskRefFilter(renamedTaskRef)).Returns(new List<TaskRef> {renamedTaskRef});
+            mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<ItProject>>>>()).Returns(existingTaskRefs);
+            mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<ItSystem>>>>()).Returns(existingTaskRefs);
             return mockKLEDataBridge;
         }
 

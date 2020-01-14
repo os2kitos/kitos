@@ -97,7 +97,8 @@ namespace Core.DomainServices.Repositories.KLE
                     switch (kleChange.ChangeType)
                     {
                         case KLEChangeType.Removed:
-                            UpdateProjectTaskRefs(kleChange);
+                            UpdateRemovedProjectTaskRefs(kleChange);
+                            UpdateRemovedSystemTaskRefs(kleChange);
                             break;
 
                         case KLEChangeType.Renamed:
@@ -118,7 +119,7 @@ namespace Core.DomainServices.Repositories.KLE
             }
         }
 
-        private void UpdateProjectTaskRefs(KLEChange kleChange)
+        private void UpdateRemovedProjectTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef =
                 _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
@@ -128,6 +129,18 @@ namespace Core.DomainServices.Repositories.KLE
             }
 
             removedTaskRef.ItProjects.Clear();
+        }
+
+        private void UpdateRemovedSystemTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itSystem in removedTaskRef.ItSystems)
+            {
+                itSystem.TaskRefs.Remove(removedTaskRef);
+            }
+
+            removedTaskRef.ItSystems.Clear();
         }
 
         private static MostRecentKLE ConvertToTaskRefs(XDocument document)
