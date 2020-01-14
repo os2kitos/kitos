@@ -83,11 +83,13 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task Post_Reference_With_Valid_Input_Returns_201()
         {
             //Arrange
+            var contract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
             var payload = new
             {
                 Title = A<string>(),
                 ExternalReferenceId = A<string>(),
-                URL = "https://strongminds.dk/"
+                URL = "https://strongminds.dk/",
+                Itcontract_Id = contract.Id
             };
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
 
