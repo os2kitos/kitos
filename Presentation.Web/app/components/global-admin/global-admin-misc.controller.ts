@@ -12,7 +12,6 @@
             }
         });
     }]);
-
     app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window) => {
         $rootScope.page.title = "Andet";
         getKleStatus();
