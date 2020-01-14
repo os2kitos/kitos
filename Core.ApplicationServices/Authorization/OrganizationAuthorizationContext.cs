@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
@@ -12,7 +13,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization
 {
-    public class OrganizationAuthorizationContext : IAuthorizationContext
+    public class OrganizationAuthorizationContext : IAuthorizationContext, IPermissionVisitor
     {
         private readonly IOrganizationalUserContext _activeUserContext;
 
@@ -130,19 +131,16 @@ namespace Core.ApplicationServices.Authorization
         {
             return
                 AllowCreate<T>() &&
-                CheckAccessModifierPolicy(entity) &&
+                CheckNewObjectAccessModifierPolicy(entity) &&
                 CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
         }
 
-        private bool CheckAccessModifierPolicy(IEntity entity)
+        private bool CheckNewObjectAccessModifierPolicy(IEntity entity)
         {
             if (entity is IHasAccessModifier accessModifier)
             {
-                if (accessModifier.AccessModifier == AccessModifier.Public && !_activeUserContext.CanChangeVisibilityOf(entity))
-                {
-                    return false;
-                }
+                return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity));
             }
 
             return true;
@@ -153,22 +151,22 @@ namespace Core.ApplicationServices.Authorization
             switch (entity)
             {
                 case Organization newOrganization:
-                    return CheckNewOrganizationCreationPolicy(newOrganization);
+                    return CheckOrganizationCreationPolicy(newOrganization);
                 case OrganizationRight newOrganizationRight:
-                    return AllowOrganizationRightAssignment(newOrganizationRight);
+                    return AllowAdministerOrganizationRight(newOrganizationRight);
                 default:
                     return true;
             }
         }
 
-        private bool CheckNewOrganizationCreationPolicy(Organization newOrganization)
+        private bool CheckOrganizationCreationPolicy(Organization newOrganization)
         {
             var result = true;
 
             if (newOrganization.TypeId > 0)
             {
                 var organizationType = (OrganizationTypeKeys)newOrganization.TypeId;
-                if (!AllowChangeOrganizationType(organizationType))
+                if (!HasPermission(new DefineOrganizationTypePermission(organizationType)))
                 {
                     result = false;
                 }
@@ -237,13 +235,11 @@ namespace Core.ApplicationServices.Authorization
                 switch (entity)
                 {
                     case ItSystem _:
-                        result =
-                            IsGlobalAdmin() ||
-                            (IsLocalAdmin() && ActiveContextIsEntityContext(entity));
+                        result = IsGlobalAdmin() || IsLocalAdmin();
                         break;
                     case OrganizationRight right:
                         // Only global admin can set other users as global admins
-                        result = AllowOrganizationRightAssignment(right);
+                        result = AllowAdministerOrganizationRight(right);
                         break;
                     default:
                         result = true;
@@ -254,61 +250,19 @@ namespace Core.ApplicationServices.Authorization
             return result;
         }
 
-        private bool AllowOrganizationRightAssignment(OrganizationRight right)
+        private bool AllowAdministerOrganizationRight(OrganizationRight right)
         {
-            var result = false;
-
-            if (right.Role == OrganizationRole.GlobalAdmin)
-            {
-                if (IsGlobalAdmin())
-                {
-                    result = true;
-                }
-            }
-            // Only local and global admins can make users local admins
-            else if (right.Role == OrganizationRole.LocalAdmin)
-            {
-                if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
-                {
-                    result = true;
-                }
-            }
-            else
-            {
-                result = true;
-            }
-
-            return result;
+            return HasPermission(new AdministerOrganizationRightPermission(right));
         }
 
-        public bool AllowEntityVisibilityControl(IEntity entity)
+        public bool HasPermission(Permission permission)
         {
-            return AllowModify(entity) && _activeUserContext.CanChangeVisibilityOf(entity);
-        }
-
-        public bool AllowSystemUsageMigration()
-        {
-            return IsGlobalAdmin() && IsReadOnly() == false;
-        }
-
-        public bool AllowBatchLocalImport()
-        {
-            return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
-        }
-
-        public bool AllowChangeOrganizationType(OrganizationTypeKeys organizationType)
-        {
-            switch (organizationType)
+            if (permission == null)
             {
-                case OrganizationTypeKeys.Kommune:
-                case OrganizationTypeKeys.AndenOffentligMyndighed:
-                    return IsGlobalAdmin();
-                case OrganizationTypeKeys.Interessefællesskab:
-                case OrganizationTypeKeys.Virksomhed:
-                    return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(organizationType), organizationType, "Unmapped organization type");
+                throw new ArgumentNullException(nameof(permission));
             }
+
+            return permission.Accept(this);
         }
 
         private bool AllowWritesToEntity(IEntity entity)
@@ -397,5 +351,73 @@ namespace Core.ApplicationServices.Authorization
         {
             return typeof(TLeft) == typeof(TRight);
         }
+
+        #region PERMISSIONS
+        bool IPermissionVisitor.Visit(BatchImportPermission permission)
+        {
+            return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+        }
+
+        bool IPermissionVisitor.Visit(SystemUsageMigrationPermission permission)
+        {
+            return IsGlobalAdmin();
+        }
+
+        bool IPermissionVisitor.Visit(VisibilityControlPermission permission)
+        {
+            return AllowModify(permission.Target) && _activeUserContext.CanChangeVisibilityOf(permission.Target);
+        }
+
+        bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)
+        {
+            var right = permission.Target;
+
+            var result = false;
+
+            if (right.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (IsGlobalAdmin())
+                {
+                    result = true;
+                }
+            }
+            // Only local and global admins can make users local admins
+            else if (right.Role == OrganizationRole.LocalAdmin)
+            {
+                if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
+                {
+                    result = true;
+                }
+            }
+            else
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
+        bool IPermissionVisitor.Visit(DefineOrganizationTypePermission permission)
+        {
+            switch (permission.TargetOrganizationType)
+            {
+                case OrganizationTypeKeys.Kommune:
+                case OrganizationTypeKeys.AndenOffentligMyndighed:
+                    return IsGlobalAdmin();
+                case OrganizationTypeKeys.Interessefællesskab:
+                case OrganizationTypeKeys.Virksomhed:
+                    return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType), permission.TargetOrganizationType, "Unmapped organization type");
+            }
+        }
+
+        public bool Visit(CreateEntityWithVisibilityPermission permission)
+        {
+            return permission.Visibility == AccessModifier.Local
+                   || (HasPermission(new VisibilityControlPermission(permission.Target)));
+        }
+
+        #endregion PERMISSIONS
     }
 }

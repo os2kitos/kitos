@@ -1,5 +1,5 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Organization;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
@@ -49,25 +49,10 @@ namespace Core.ApplicationServices.Authorization
         /// <returns></returns>
         bool AllowDelete(IEntity entity);
         /// <summary>
-        /// Determines if write-access is allowed to entity's visibility control
+        /// Determines if the current context allows for the permission
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="permission"></param>
         /// <returns></returns>
-        bool AllowEntityVisibilityControl(IEntity entity);
-        /// <summary>
-        /// Determines if the current context allows system migration
-        /// </summary>
-        /// <returns></returns>
-        bool AllowSystemUsageMigration();
-        /// <summary>
-        /// Determines if the current context allows batch import of local entities (contracts, users, org units etc)
-        /// </summary>
-        /// <returns></returns>
-        bool AllowBatchLocalImport();
-        /// <summary>
-        /// Determines if the current context allows change of organization type to the suggested type
-        /// </summary>
-        /// <returns></returns>
-        bool AllowChangeOrganizationType(OrganizationTypeKeys organizationType);
+        bool HasPermission(Permission permission);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
@@ -236,7 +237,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectCanChangeVisibilityOfReturns(isAllowedToChangeVisibility, inputEntity);
 
             //Act
-            var allowUpdates = _sut.AllowEntityVisibilityControl(inputEntity);
+            var allowUpdates = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
@@ -408,7 +409,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         [InlineData(true, false, true)]
-        [InlineData(true, true, false)]
+        [InlineData(true, true, true)] //Global admin cannot be locally read-only
         [InlineData(false, true, false)]
         [InlineData(false, false, false)]
         public void AllowSystemUsageMigration_Returns(bool globalAdmin, bool readOnly, bool expectedResult)
@@ -418,7 +419,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
 
             //Act
-            var result = _sut.AllowSystemUsageMigration();
+            var result = _sut.HasPermission(new SystemUsageMigrationPermission());
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -438,7 +439,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
 
             //Act
-            var result = _sut.AllowBatchLocalImport();
+            var result = _sut.HasPermission(new BatchImportPermission());
 
             //Assert
             Assert.Equal(expectedResult, result);
@@ -462,7 +463,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void AllowCreateOrganizationOfType_Returns(OrganizationTypeKeys organizationType, bool globalAdmin, bool localAdmin, bool readOnly, bool expectedResult)
         {
             //Arrange
-            var organization = new Organization { TypeId = (int)organizationType};
+            var organization = new Organization { TypeId = (int)organizationType };
 
             ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, globalAdmin);
             ExpectHasRoleReturns(OrganizationRole.LocalAdmin, localAdmin);
@@ -499,7 +500,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             ExpectHasRoleReturns(OrganizationRole.ReadOnly, readOnly);
 
             //Act
-            var result = _sut.AllowChangeOrganizationType(organizationType);
+            var result = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType));
 
             //Assert
             Assert.Equal(expectedResult, result);

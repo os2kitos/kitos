@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
@@ -192,7 +193,7 @@ namespace Presentation.Web.Controllers.API
 
         private bool AllowAccess()
         {
-            return _authorizationContext.AllowBatchLocalImport();
+            return _authorizationContext.HasPermission(new BatchImportPermission());
         }
 
         #endregion

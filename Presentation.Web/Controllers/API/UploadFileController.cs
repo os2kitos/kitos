@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web;
+using Core.ApplicationServices.Authorization.Permissions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -10,7 +11,7 @@ namespace Presentation.Web.Controllers.API
     {
         public HttpResponseMessage Post()
         {
-            if (AuthorizationContext.AllowBatchLocalImport() == false)
+            if (AuthorizationContext.HasPermission(new BatchImportPermission()) == false)
             {
                 return Forbidden();
             }
@@ -26,8 +27,9 @@ namespace Presentation.Web.Controllers.API
             {
                 file.SaveAs(savePath + "Kontrakt_Indgåelse_Skabelon" + fileExtension);
             }
-            catch (Exception e) {
-                return CreateResponse(System.Net.HttpStatusCode.InternalServerError,e);
+            catch (Exception e)
+            {
+                return CreateResponse(System.Net.HttpStatusCode.InternalServerError, e);
             }
 
             return Ok();

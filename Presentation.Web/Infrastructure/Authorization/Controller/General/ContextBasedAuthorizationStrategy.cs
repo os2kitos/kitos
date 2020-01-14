@@ -49,9 +49,9 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
             return _authorizationContext.AllowDelete(entity);
         }
 
-        public bool AllowEntityVisibilityControl(IEntity entity)
+        public bool HasPermission(Permission permission)
         {
-            return _authorizationContext.AllowEntityVisibilityControl(entity);
+            return _authorizationContext.HasPermission(permission);
         }
     }
 }

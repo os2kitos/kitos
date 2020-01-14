@@ -1,5 +1,5 @@
 param(	
-    [string]$testToRun
+    [Parameter(Mandatory=$false)][string]$testToRun
     )
 # Stop on first error
 $ErrorActionPreference = "Stop"

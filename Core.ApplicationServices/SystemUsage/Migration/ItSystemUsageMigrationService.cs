@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
@@ -250,7 +251,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         public bool CanExecuteMigration()
         {
-            return _authorizationContext.AllowSystemUsageMigration();
+            return _authorizationContext.HasPermission(new SystemUsageMigrationPermission());
         }
 
         private bool DeleteExhibits(ItSystemUsageMigration migration)

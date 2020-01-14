@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
@@ -41,22 +40,7 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
-        public bool AllowEntityVisibilityControl(IEntity entity)
-        {
-            return false;
-        }
-
-        public bool AllowSystemUsageMigration()
-        {
-            return false;
-        }
-
-        public bool AllowBatchLocalImport()
-        {
-            return false;
-        }
-
-        public bool AllowChangeOrganizationType(OrganizationTypeKeys organizationType)
+        public bool HasPermission(Permission permission)
         {
             return false;
         }

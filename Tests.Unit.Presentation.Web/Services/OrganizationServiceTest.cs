@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -63,7 +64,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = new Organization();
             var organizationTypeKeys = A<OrganizationTypeKeys>();
             _authorizationContext.Setup(x => x.AllowModify(organization)).Returns(allowModify);
-            _authorizationContext.Setup(x => x.AllowChangeOrganizationType(organizationTypeKeys)).Returns(allowChangeOrgType);
+            _authorizationContext.Setup(x => x.HasPermission(It.IsAny<DefineOrganizationTypePermission>())).Returns(allowChangeOrgType);
 
             //Act
             var result = _sut.CanChangeOrganizationType(organization, organizationTypeKeys);

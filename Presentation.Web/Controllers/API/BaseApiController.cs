@@ -7,6 +7,7 @@ using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
@@ -243,7 +244,7 @@ namespace Presentation.Web.Controllers.API
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
+            return AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
         }
 
         #endregion

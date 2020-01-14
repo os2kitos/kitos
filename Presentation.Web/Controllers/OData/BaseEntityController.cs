@@ -5,6 +5,7 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
@@ -232,7 +233,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return _authorizationStrategy.Value.AllowEntityVisibilityControl(entity);
+            return _authorizationStrategy.Value.HasPermission(new VisibilityControlPermission(entity));
         }
 
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()

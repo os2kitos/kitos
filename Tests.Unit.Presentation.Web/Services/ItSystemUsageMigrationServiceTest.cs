@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.Result;
@@ -702,7 +703,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectAllowSystemMigrationReturns(bool value)
         {
-            _authorizationContext.Setup(x => x.AllowSystemUsageMigration()).Returns(value);
+            _authorizationContext.Setup(x => x.HasPermission(It.IsAny<SystemUsageMigrationPermission>())).Returns(value);
         }
 
         private static List<ItSystem> CreateItSystemSequenceWithNamePrefix(int amount, string prefix)

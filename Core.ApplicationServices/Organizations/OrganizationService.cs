@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -109,7 +110,7 @@ namespace Core.ApplicationServices.Organizations
             }
             return
                 _authorizationContext.AllowModify(organization) &&
-                _authorizationContext.AllowChangeOrganizationType(organizationType);
+                _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType));
         }
 
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
