@@ -72,16 +72,13 @@ class Constants {
     readonly kendoReferenceFieldTitle = "referenceDocTitle";
     readonly kendoReferenceFieldId = "referenceDocId";
     readonly kendoReferenceFieldUrl = "referenceDocUrl";
-
     readonly kendoSystemDeleteButton = "deleteSystemButton";
 
     readonly kleStatusLabel = "KLEStatusLabel";
-    readonly kleStatusLabelDefaultString = "Tjekker efter ny version af KLE";
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
 
 }
-
 export = Constants;
 

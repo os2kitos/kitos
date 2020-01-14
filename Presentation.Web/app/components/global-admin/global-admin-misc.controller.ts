@@ -71,7 +71,7 @@
             KLEservice.getChanges().success((data, status) => {
                 if (status !== 200)
                 {
-                    notify.addErrorMessage("Der skete en fejle under henting af ændringer");
+                    notify.addErrorMessage("Der skete en fejle under hentning af ændringer fejlkode: " + status);
                     return;
                 }
                 var universalBOM = "\uFEFF";
@@ -105,7 +105,6 @@
                         }
                         $scope.KleUpdateAvailableButtonInteraction = true;
                         $scope.KleApplyUpdateButtonInteraction = false;
-                      //  $window.location.reload();
                         notify.addSuccessMessage("KLE er opdateret");
                         getKleStatus();
                     }).
