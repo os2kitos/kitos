@@ -14,5 +14,10 @@ class NavigationHelper {
                 }
             });
     }
+
+
+    public refreshPage(): webdriver.promise.Promise<void> {
+        return browser.refresh();
+    }
 }
 export = NavigationHelper;

@@ -29,8 +29,9 @@
     </div>
     <h3>KLE</h3>
     <div class="well">
-        <label class="col-xs-12" style="padding-left: 5px" id="KLEStatusLabel">{{KLEUpdateAvailableLabel}}</label>
-        <button class="btn btn-default" id="KLEChangesButton" ng-disabled="!KleUpdateAvailableButtonInteraction" ng-click="GetKLEChanges()">Vis ændringer i KLE</button>
-        <button class="btn btn-default" id="UpdateKLEButton" ng-disabled="!KleApplyUpdateButtonInteraction" ng-click="UpdateKLE()">Opdater KLE</button>
+        <label class="col-xs-12" id="KLEStatusLabel" data-element-type="KLEStatusLabel">{{KLEUpdateAvailableLabel}}</label>
+        <button class="btn btn-default" style="margin-left: 15px" id="KLEChangesButton" data-element-type="KLEChangesButton" ng-disabled="!KleUpdateAvailableButtonInteraction" ng-click="GetKLEChanges()">Vis ændringer i KLE</button>
+        <button class="btn btn-default" style="margin-left: 5px" id="KLEUpdateButton" data-element-type="KLEUpdateButton" ng-disabled="!KleApplyUpdateButtonInteraction" ng-click="UpdateKLE()">Opdater KLE</button>
+        <a id="KLEDownloadAnchor" style="visibility: hidden; width: 0px"/>
     </div>
  </div>

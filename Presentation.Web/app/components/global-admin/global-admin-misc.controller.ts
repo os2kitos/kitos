@@ -13,30 +13,35 @@
         });
     }]);
 
-    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice) => {
+    app.controller("globalAdminMisc", ["$rootScope", "$scope", "$http", "uploadFile", "globalConfigs", "_", "notify", "KLEservice", "$window", ($rootScope, $scope, $http, uploadFile, globalConfigs, _, notify, KLEservice, $window) => {
         $rootScope.page.title = "Andet";
-        $scope.KleUpdateAvailableButtonInteraction = false;
-        $scope.KleApplyUpdateButtonInteraction = false;
-
-        KLEservice.getStatus().success(dto => {
-
-            if (!dto.response.uptodate) {
-                $scope.KLEUpdateAvailableLabel = "KLE Opdatering er klar! " + dto.response.version;
-                $scope.KleUpdateAvailableButtonInteraction = true;
-                $scope.KleApplyUpdateButtonInteraction = false;
-            }
-            else {
-                $scope.KLEUpdateAvailableLabel = "KLE kører med nyeste version! " + dto.response.version;
-                $scope.KleUpdateAvailableButtonInteraction = false;
-                $scope.KleApplyUpdateButtonInteraction = false;
-            }
-        }).
-            error(() => {
-                $scope.KleUpdateAvailableButtonInteraction = false;
-                $scope.KleApplyUpdateButtonInteraction = false;
-                notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
-            });
-    
+        getKleStatus();
+        function getKleStatus() {
+            $scope.KLEUpdateAvailableLabel = "Tjekker efter ny version af KLE";
+            $scope.KleUpdateAvailableButtonInteraction = false;
+            $scope.KleApplyUpdateButtonInteraction = false;
+            KLEservice.getStatus().success((dto, status) => {
+                    if (status !== 200) {
+                        notify.addErrorMessage("Der skete en fejle under tjek af version!");
+                        return;
+                    }
+                    if (!dto.response.uptodate) {
+                        $scope.KLEUpdateAvailableLabel = "Der er en ny version af KLE, udgivet " + dto.response.version;
+                        $scope.KleUpdateAvailableButtonInteraction = true;
+                        $scope.KleApplyUpdateButtonInteraction = false;
+                    }
+                    else {
+                        $scope.KLEUpdateAvailableLabel = "KITOS baserer sig på den seneste KLE version, udgivet  " + dto.response.version;
+                        $scope.KleUpdateAvailableButtonInteraction = false;
+                        $scope.KleApplyUpdateButtonInteraction = false;
+                    }
+                }).
+                error(() => {
+                    $scope.KleUpdateAvailableButtonInteraction = false;
+                    $scope.KleApplyUpdateButtonInteraction = false;
+                    notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
+                });
+        }
 
         $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, function (g) {
             return g.key === "CanGlobalAdminOnlyEditReports";
@@ -63,43 +68,53 @@
             $scope.KleApplyUpdateButtonInteraction = false;
 
             
-            KLEservice.getChanges().success((data) => {
+            KLEservice.getChanges().success((data, status) => {
+                if (status !== 200)
+                {
+                    notify.addErrorMessage("Der skete en fejle under henting af ændringer");
+                    return;
+                }
                 var uri = encodeURI(data);
                 var universalBOM = "\uFEFF";
-                console.log(data);
-                    console.log("URL :" + uri);
-                    var anchor = angular.element('<a/>');
-                    anchor.attr({   
-                        href: 'data:text/csv; charset=utf-8,' + encodeURI(universalBOM+data),
-                        target: '_blank',
-                        download: 'KLE-Changes.csv'
+                var anchor = angular.element(document.getElementById("KLEDownloadAnchor"));
+                anchor.attr("data-element-type", "KLEDownloadAnchor");
+                anchor.attr({
+                        href: 'data:text/csv; charset=utf-8,' + encodeURI(universalBOM + data),
+                        target: "_blank",
+                        download: "KLE-Changes.csv"
                     })[0].click();
-                notify.addSuccessMessage("Download complete");
+                    notify.addSuccessMessage("Download af ændringer færdig");
                 $scope.KleUpdateAvailableButtonInteraction = true;
                 $scope.KleApplyUpdateButtonInteraction = true;
                 }).
                 error(() => {
                     $scope.KleUpdateAvailableButtonInteraction = true;
                     $scope.KleApplyUpdateButtonInteraction = false;
-                    notify.addErrorMessage("There was an issue downloading the excel file, please contact support.");
+                    notify.addErrorMessage("Der skete en fejle under henting af ændringer");
                 });
         }
 
         $scope.UpdateKLE = function () {
             if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
                 KLEservice.applyUpdateKLE().
-                    success(() => {
+                    success((data, status) => {
+                        if (status !== 200) {
+                            $scope.KleUpdateAvailableButtonInteraction = true;
+                            $scope.KleApplyUpdateButtonInteraction = false;
+                            notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
+                            return;
+                        }
                         $scope.KleUpdateAvailableButtonInteraction = true;
                         $scope.KleApplyUpdateButtonInteraction = false;
+                      //  $window.location.reload();
                         notify.addSuccessMessage("KLE er opdateret");
+                        getKleStatus();
                     }).
                     error(() => {
                         $scope.KleUpdateAvailableButtonInteraction = true;
                         $scope.KleApplyUpdateButtonInteraction = false;
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                     });
-                notify.addSuccessMessage("KLE er nu opdateret!");
-                
             } else {
                 notify.addInfoMessage("KLE opdatering stoppet!");
             }

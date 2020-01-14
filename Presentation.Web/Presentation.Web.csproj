@@ -728,6 +728,7 @@
     <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\ToastHandler.ts" />
     <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
     <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />

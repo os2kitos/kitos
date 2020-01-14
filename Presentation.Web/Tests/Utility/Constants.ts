@@ -76,8 +76,10 @@ class Constants {
     readonly kendoSystemDeleteButton = "deleteSystemButton";
 
     readonly kleStatusLabel = "KLEStatusLabel";
+    readonly kleStatusLabelDefaultString = "Tjekker efter ny version af KLE";
     readonly kleChangesButton = "KLEChangesButton";
-    readonly kleUpdateButton = "UpdateKLEButton";
+    readonly kleUpdateButton = "KLEUpdateButton";
+    readonly KleDownloadAnchor = "KLEDownloadAnchor";
 
 }
 
