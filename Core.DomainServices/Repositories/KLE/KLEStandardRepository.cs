@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
 
 namespace Core.DomainServices.Repositories.KLE
@@ -11,12 +15,21 @@ namespace Core.DomainServices.Repositories.KLE
     public class KLEStandardRepository : IKLEStandardRepository
     {
         private readonly IKLEDataBridge _kleDataBridge;
+        private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<TaskRef> _existingTaskRefRepository;
+        private readonly IGenericRepository<ItProject> _itProjectRepository;
+        private readonly IGenericRepository<ItSystem> _itSystemRepository;
 
-        public KLEStandardRepository(IKLEDataBridge kleDataBridge, IGenericRepository<TaskRef> existingTaskRefRepository)
+        public KLEStandardRepository(IKLEDataBridge kleDataBridge,
+            ITransactionManager transactionManager,
+            IGenericRepository<TaskRef> existingTaskRefRepository,
+            IGenericRepository<ItProject> itProjectRepository, IGenericRepository<ItSystem> itSystemRepository)
         {
             _kleDataBridge = kleDataBridge;
+            _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
+            _itProjectRepository = itProjectRepository;
+            _itSystemRepository = itSystemRepository;
         }
 
         public KLEStatus GetKLEStatus()
@@ -72,6 +85,49 @@ namespace Core.DomainServices.Repositories.KLE
                 }));
 
             return result;
+        }
+
+        public void UpdateKLE()
+        {
+            var changes = GetKLEChangeSummary();
+            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            {
+                foreach (var kleChange in changes)
+                {
+                    switch (kleChange.ChangeType)
+                    {
+                        case KLEChangeType.Removed:
+                            UpdateProjectTaskRefs(kleChange);
+                            break;
+
+                        case KLEChangeType.Renamed:
+                            var renamedTaskRef = _existingTaskRefRepository.Get(t => t.TaskKey == kleChange.TaskKey).First();
+                            renamedTaskRef.Description = kleChange.UpdatedDescription;
+                            break;
+
+                        case KLEChangeType.Added:
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+                _itProjectRepository.Save();
+                _existingTaskRefRepository.Save();
+                transaction.Commit();
+            }
+        }
+
+        private void UpdateProjectTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itProject in removedTaskRef.ItProjects)
+            {
+                itProject.TaskRefs.Remove(removedTaskRef);
+            }
+
+            removedTaskRef.ItProjects.Clear();
         }
 
         private static MostRecentKLE ConvertToTaskRefs(XDocument document)
