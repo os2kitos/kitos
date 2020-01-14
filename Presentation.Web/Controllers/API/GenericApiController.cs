@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API
                 var item = Map<TDto, TModel>(dto);
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
-
+                PrepareNewObject(item);
                 // Check CREATE access rights  
                 if (!AllowCreate<TModel>(item))
                 {
@@ -200,6 +200,11 @@ namespace Presentation.Web.Controllers.API
                 var duplicate = CheckForDuplicateEntryException(e);
                 return duplicate.HasValue ? duplicate.Value : LogError(e);
             }
+        }
+
+        protected virtual void PrepareNewObject(TModel item)
+        {
+
         }
 
         protected virtual TModel PutQuery(TModel item)

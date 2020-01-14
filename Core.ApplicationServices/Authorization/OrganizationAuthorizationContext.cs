@@ -219,13 +219,14 @@ namespace Core.ApplicationServices.Authorization
         {
             var result = true;
 
-            if (entity is ItInterface)
+            switch (entity)
             {
-                //Only global admin can modify interfaces
-                result = IsGlobalAdmin();
+                case ItInterface _:
+                    result = IsGlobalAdmin();
+                    break;
             }
 
-            return result;
+            return result || IsGlobalAdmin();
         }
 
         public bool AllowDelete(IEntity entity)
