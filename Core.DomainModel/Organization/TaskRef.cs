@@ -14,7 +14,9 @@ namespace Core.DomainModel.Organization
             this.Children = new List<TaskRef>();
             this.ItSystems = new List<ItSystem.ItSystem>();
             this.ItSystemUsages = new List<ItSystemUsage.ItSystemUsage>();
+            this.ItSystemUsagesOptOut = new List<ItSystemUsage.ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
+            this.Usages = new List<TaskUsage>();
         }
 
         /// <summary>

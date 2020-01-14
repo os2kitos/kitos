@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Xml.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
@@ -29,7 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             mockKLEDataBridge.GetKLEXMLData().Returns(document);
             var mockTaskRefRepository = Substitute.For<IGenericRepository<TaskRef>>();
             var mockTransactionManager = Substitute.For<ITransactionManager>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository, null, null);
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
             var result = sut.GetKLEStatus();
             Assert.Equal(expectedUpToDate, result.UpToDate);
             Assert.Equal(publishedDate, result.Published);
@@ -45,17 +46,17 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var taskRefs = new List<TaskRef>
             {
                 // Removed item examples
-                SetupTaskRef("KLE-Hovedgruppe", "03"),
-                SetupTaskRef("KLE-Gruppe", "00.02" ),
-                SetupTaskRef("KLE-Emne", "00.03.01"),
+                SetupTaskRef(1, "KLE-Hovedgruppe", "03"),
+                SetupTaskRef(2, "KLE-Gruppe", "00.02" ),
+                SetupTaskRef(3, "KLE-Emne", "00.03.01"),
                 // Renamed item example
-                SetupTaskRef("KLE-Emne", "00.03.00", "International virksomhed og EU"),
+                SetupTaskRef(4, "KLE-Emne", "00.03.00", "International virksomhed og EU"),
                 // Unchanged item example
-                SetupTaskRef("KLE-Emne", "02.02.00", "Bebyggelsens højde- og afstandsforhold i almindelighed"),
+                SetupTaskRef(5, "KLE-Emne", "02.02.00", "Bebyggelsens højde- og afstandsforhold i almindelighed"),
             };
             mockTaskRefRepository.Get().Returns(taskRefs);
             var mockTransactionManager = Substitute.For<ITransactionManager>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository, null, null);
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
             var result = sut.GetKLEChangeSummary();
             var numberOfKLEMainGroups = document.Descendants("Hovedgruppe").Count();
             var numberOfKLEGroups = document.Descendants("Gruppe").Count();
@@ -78,9 +79,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
             var mockTransactionManager = Substitute.For<ITransactionManager>();
-            var mockItProjectRepository = Substitute.For<IGenericRepository<ItProject>>();
-            var mockItSystemRepository = Substitute.For<IGenericRepository<ItSystem>>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository, mockItProjectRepository, mockItSystemRepository);
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
             sut.UpdateKLE();
             Assert.Equal("HAS BEEN RENAMED", renamedTaskRef.Description);
         }
@@ -89,7 +88,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItProject()
         {
             var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
-            var mockItProjectRepository = Substitute.For<IGenericRepository<ItProject>>();
             const int itProjectKey = 1;
             var itProject = new ItProject
             {
@@ -97,10 +95,8 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 TaskRefs = new List<TaskRef> {removedTaskRef}
             };
             removedTaskRef.ItProjects = new List<ItProject> { itProject };
-            mockItProjectRepository.GetByKey(itProjectKey).Returns(itProject);
             var mockTransactionManager = Substitute.For<ITransactionManager>();
-            var mockItSystemRepository = Substitute.For<IGenericRepository<ItSystem>>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository, mockItProjectRepository, mockItSystemRepository);
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
             sut.UpdateKLE();
             Assert.False(itProject.TaskRefs.Contains(removedTaskRef));
             Assert.Null(removedTaskRef.ItProjects.FirstOrDefault(p => p.Id == itProjectKey));
@@ -110,7 +106,6 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystem()
         {
             var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
-            var mockItSystemRepository = Substitute.For<IGenericRepository<ItSystem>>();
             const int itSystemKey = 1;
             var itSystem = new ItSystem
             {
@@ -119,11 +114,64 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             };
             removedTaskRef.ItSystems = new List<ItSystem> { itSystem };
             var mockTransactionManager = Substitute.For<ITransactionManager>();
-            var mockItProjectRepository = Substitute.For<IGenericRepository<ItProject>>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository, mockItProjectRepository, mockItSystemRepository);
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
             sut.UpdateKLE();
             Assert.False(itSystem.TaskRefs.Contains(removedTaskRef));
-            Assert.Null(removedTaskRef.ItProjects.FirstOrDefault(p => p.Id == itSystemKey));
+            Assert.Null(removedTaskRef.ItSystems.FirstOrDefault(p => p.Id == itSystemKey));
+        }
+
+        [Fact]
+        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystemUsages()
+        {
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
+            const int itSystemUsageKey = 1;
+            var itSystemUsage = new ItSystemUsage
+            {
+                Id = itSystemUsageKey,
+                TaskRefs = new List<TaskRef> { removedTaskRef }
+            };
+            removedTaskRef.ItSystemUsages = new List<ItSystemUsage> { itSystemUsage };
+            var mockTransactionManager = Substitute.For<ITransactionManager>();
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
+            sut.UpdateKLE();
+            Assert.False(itSystemUsage.TaskRefs.Contains(removedTaskRef));
+            Assert.Null(removedTaskRef.ItSystemUsages.FirstOrDefault(p => p.Id == itSystemUsageKey));
+        }
+
+        [Fact]
+        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystemUsageOptOut()
+        {
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
+            const int itSystemUsagesOptOutKey = 1;
+            var itSystemUsage = new ItSystemUsage
+            {
+                Id = itSystemUsagesOptOutKey,
+                TaskRefs = new List<TaskRef> { removedTaskRef }
+            };
+            removedTaskRef.ItSystemUsagesOptOut = new List<ItSystemUsage> { itSystemUsage };
+            var mockTransactionManager = Substitute.For<ITransactionManager>();
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
+            sut.UpdateKLE();
+            Assert.False(itSystemUsage.TaskRefs.Contains(removedTaskRef));
+            Assert.Null(removedTaskRef.ItSystemUsagesOptOut.FirstOrDefault(p => p.Id == itSystemUsagesOptOutKey));
+        }
+
+        [Fact]
+        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_TaskUsage()
+        {
+            var mockKLEDataBridge = SetupUpdateObjects(out var mockTaskRefRepository, out var removedTaskRef, out var renamedTaskRef);
+            const int taskUsageKey = 1;
+            var taskUsage = new TaskUsage
+            {
+                Id = taskUsageKey,
+                TaskRef = removedTaskRef
+            };
+            removedTaskRef.Usages = new List<TaskUsage> { taskUsage };
+            var mockTransactionManager = Substitute.For<ITransactionManager>();
+            var sut = new KLEStandardRepository(mockKLEDataBridge, mockTransactionManager, mockTaskRefRepository);
+            sut.UpdateKLE();
+            Assert.Null(taskUsage.TaskRef);
+            Assert.Null(removedTaskRef.Usages.FirstOrDefault(p => p.Id == taskUsageKey));
         }
 
         #region Helpers
@@ -134,13 +182,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-sample-changes.xml");
             mockKLEDataBridge.GetKLEXMLData().Returns(document);
             mockTaskRefRepository = Substitute.For<IGenericRepository<TaskRef>>();
-            removedTaskRef = SetupTaskRef("KLE-Emne", "00.03.01", "Dummy");
-            renamedTaskRef = SetupTaskRef("KLE-Emne", "00.03.00", "International virksomhed og EU");
+            removedTaskRef = SetupTaskRef(1, "KLE-Emne", "00.03.01", "Dummy");
+            renamedTaskRef = SetupTaskRef(2, "KLE-Emne", "00.03.00", "International virksomhed og EU");
             var existingTaskRefs = new List<TaskRef> {removedTaskRef, renamedTaskRef};
             mockTaskRefRepository.Get().Returns(existingTaskRefs);
             mockTaskRefRepository.Get(SetupTaskRefFilter(renamedTaskRef)).Returns(new List<TaskRef> {renamedTaskRef});
             mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<ItProject>>>>()).Returns(existingTaskRefs);
             mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<ItSystem>>>>()).Returns(existingTaskRefs);
+            mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<ItSystemUsage>>>>()).Returns(existingTaskRefs);
+            mockTaskRefRepository.GetWithReferencePreload(Arg.Any<Expression<Func<TaskRef, ICollection<TaskUsage>>>>()).Returns(existingTaskRefs);
             return mockKLEDataBridge;
         }
 
@@ -151,9 +201,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             );
         }
 
-        private static TaskRef SetupTaskRef(string kleType, string kleTaskKey, string kleDescription = "")
+        private static TaskRef SetupTaskRef(int id, string kleType, string kleTaskKey, string kleDescription = "")
         {
-            return new TaskRef { Type = kleType, TaskKey = kleTaskKey, Description = kleDescription };
+            return new TaskRef { Id = id, Type = kleType, TaskKey = kleTaskKey, Description = kleDescription };
         }
 
         #endregion

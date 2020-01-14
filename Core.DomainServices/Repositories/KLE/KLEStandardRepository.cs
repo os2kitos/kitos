@@ -4,8 +4,6 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
-using Core.DomainModel.ItProject;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
@@ -17,19 +15,14 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IKLEDataBridge _kleDataBridge;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<TaskRef> _existingTaskRefRepository;
-        private readonly IGenericRepository<ItProject> _itProjectRepository;
-        private readonly IGenericRepository<ItSystem> _itSystemRepository;
 
         public KLEStandardRepository(IKLEDataBridge kleDataBridge,
             ITransactionManager transactionManager,
-            IGenericRepository<TaskRef> existingTaskRefRepository,
-            IGenericRepository<ItProject> itProjectRepository, IGenericRepository<ItSystem> itSystemRepository)
+            IGenericRepository<TaskRef> existingTaskRefRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
-            _itProjectRepository = itProjectRepository;
-            _itSystemRepository = itSystemRepository;
         }
 
         public KLEStatus GetKLEStatus()
@@ -97,8 +90,12 @@ namespace Core.DomainServices.Repositories.KLE
                     switch (kleChange.ChangeType)
                     {
                         case KLEChangeType.Removed:
-                            UpdateRemovedProjectTaskRefs(kleChange);
-                            UpdateRemovedSystemTaskRefs(kleChange);
+                            RemoveProjectTaskRefs(kleChange);
+                            RemoveSystemTaskRefs(kleChange);
+                            RemoveSystemUsageTaskRefs(kleChange);
+                            RemoveSystemUsageOptOutTaskRefs(kleChange);
+                            RemoveTaskUsageTaskRef(kleChange);
+                            RemoveTaskRef(kleChange);
                             break;
 
                         case KLEChangeType.Renamed:
@@ -113,13 +110,12 @@ namespace Core.DomainServices.Repositories.KLE
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                _itProjectRepository.Save();
                 _existingTaskRefRepository.Save();
                 transaction.Commit();
             }
         }
 
-        private void UpdateRemovedProjectTaskRefs(KLEChange kleChange)
+        private void RemoveProjectTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef =
                 _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
@@ -131,7 +127,7 @@ namespace Core.DomainServices.Repositories.KLE
             removedTaskRef.ItProjects.Clear();
         }
 
-        private void UpdateRemovedSystemTaskRefs(KLEChange kleChange)
+        private void RemoveSystemTaskRefs(KLEChange kleChange)
         {
             var removedTaskRef =
                 _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
@@ -141,6 +137,50 @@ namespace Core.DomainServices.Repositories.KLE
             }
 
             removedTaskRef.ItSystems.Clear();
+        }
+
+        private void RemoveSystemUsageTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsages).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itSystemUsage in removedTaskRef.ItSystemUsages)
+            {
+                itSystemUsage.TaskRefs.Remove(removedTaskRef);
+            }
+
+            removedTaskRef.ItSystemUsages.Clear();
+        }
+
+        private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut)
+            {
+                itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
+            }
+
+            removedTaskRef.ItSystemUsagesOptOut.Clear();
+        }
+
+        private void RemoveTaskUsageTaskRef(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.Usages).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var taskUsage in removedTaskRef.Usages)
+            {
+                taskUsage.TaskRef = null;
+            }
+
+            removedTaskRef.Usages.Clear();
+        }
+
+        private void RemoveTaskRef(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
+
+            _existingTaskRefRepository.Delete(removedTaskRef);
         }
 
         private static MostRecentKLE ConvertToTaskRefs(XDocument document)
