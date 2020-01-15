@@ -5,6 +5,7 @@ using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.Organization;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies
@@ -25,7 +26,8 @@ namespace Core.ApplicationServices.Authorization.Policies
                     {typeof(HelpText),true},
                     {typeof(AdviceSent),true},
                     {typeof(GlobalConfig),true },
-                    {typeof(ExternalReference),true }
+                    {typeof(ExternalReference),true },
+                    {typeof(TaskRef),true }
                 };
 
             //All base options are globally readable
@@ -33,8 +35,8 @@ namespace Core.ApplicationServices.Authorization.Policies
                 .Assembly
                 .GetTypes()
                 .Where(t => t.IsImplementationOfGenericType(typeof(OptionEntity<>)))
-                .Where(t=>t.IsAbstract == false)
-                .Where(t=>t.IsInterface == false)
+                .Where(t => t.IsAbstract == false)
+                .Where(t => t.IsInterface == false)
                 .ToList()
                 .ForEach(t => typesWithGlobalRead.Add(t, true));
 
