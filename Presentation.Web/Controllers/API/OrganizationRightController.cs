@@ -4,7 +4,6 @@ using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -54,6 +53,25 @@ namespace Presentation.Web.Controllers.API
         protected IEnumerable<OrganizationRight> GetRightsQuery(int id)
         {
             return _rightRepository.Get(right => right.OrganizationId == id);
+        }
+
+        public override HttpResponseMessage Post(OrganizationRightDTO dto)
+        {
+            var organizationRight = Map<OrganizationRightDTO, OrganizationRight>(dto);
+
+            try
+            {
+                var result = _organizationRightsService.AssignRole(dto.OrganizationId, organizationRight.UserId, organizationRight.Role);
+
+                return result.Ok ?
+                    NewObjectCreated(result.Value) :
+                    FromOperationFailure(result.Error);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorException("Failed to add right", e);
+                return LogError(e);
+            }
         }
 
         /// <summary>

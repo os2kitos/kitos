@@ -48,10 +48,11 @@
                 var data = {
                     userId: uId,
                     role: rId,
+                    organizationId: oId
                 };
 
                 var msg = notify.addInfoMessage("Arbejder ...", false);
-                $http.post("api/OrganizationRight/" + oId + "?organizationId=" + oId, data, { handleBusy: true }).success(function (result) {
+                $http.post("api/OrganizationRight/" + oId, data, { handleBusy: true }).success(function (result) {
                     msg.toSuccessMessage(user.text + " er blevet lokal administrator for " + orgName);
                     reload();
                 }).error(function() {

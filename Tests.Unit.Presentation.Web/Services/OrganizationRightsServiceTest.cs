@@ -1,5 +1,4 @@
-﻿using System;
-using Core.ApplicationServices.Authorization;
+﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
@@ -105,21 +104,14 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void AddRightToUser_Throws_On_Null()
-        {
-            Assert.Throws<ArgumentNullException>(() => _sut.AddRightToUser(A<int>(), null));
-        }
-
-        [Fact]
         public void AddRightToUser_Returns_Forbidden()
         {
             //Arrange
             var organizationId = A<int>();
-            var organizationRight = new OrganizationRight();
-            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationRight)).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(It.IsAny<OrganizationRight>())).Returns(false);
 
             //Act
-            var result = _sut.AddRightToUser(organizationId, organizationRight);
+            var result = _sut.AssignRole(organizationId, A<int>(), A<OrganizationRole>());
 
             //Assert
             Assert.False(result.Ok);
@@ -131,22 +123,24 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<int>();
-            var organizationRight = new OrganizationRight();
             var userId = A<int>();
+            var organizationRole = A<OrganizationRole>();
             _organizationUserContext.Setup(x => x.UserId).Returns(userId);
-            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationRight)).Returns(true);
-            _organizationRightRepository.Setup(x => x.Insert(organizationRight)).Returns(organizationRight);
+            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(It.IsAny<OrganizationRight>())).Returns(true);
+            _organizationRightRepository.Setup(x => x.Insert(It.IsAny<OrganizationRight>())).Returns<OrganizationRight>(right => right);
 
             //Act
-            var result = _sut.AddRightToUser(organizationId, organizationRight);
+            var result = _sut.AssignRole(organizationId, userId, organizationRole);
 
             //Assert
             Assert.True(result.Ok);
             var resultValue = result.Value;
-            Assert.Equal(organizationId,resultValue.OrganizationId);
-            Assert.Equal(userId,resultValue.ObjectOwnerId);
-            Assert.Equal(userId,resultValue.LastChangedByUserId);
-            _organizationRightRepository.Verify(x => x.Insert(organizationRight), Times.Once);
+            Assert.Equal(organizationId, resultValue.OrganizationId);
+            Assert.Equal(userId, resultValue.ObjectOwnerId);
+            Assert.Equal(userId, resultValue.LastChangedByUserId);
+            Assert.Equal(userId, resultValue.UserId);
+            Assert.Equal(organizationRole, resultValue.Role);
+            _organizationRightRepository.Verify(x => x.Insert(It.IsAny<OrganizationRight>()), Times.Once);
             _organizationRightRepository.Verify(x => x.Save(), Times.Once);
         }
     }

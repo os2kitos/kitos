@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.Organization;
@@ -24,16 +23,14 @@ namespace Core.ApplicationServices.Organizations
             _userContext = userContext;
         }
 
-        public Result<OrganizationRight, OperationFailure> AddRightToUser(int organizationId, OrganizationRight right)
+        public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
         {
-            if (right == null)
-            {
-                throw new ArgumentNullException(nameof(right));
-            }
-
+            var right = new OrganizationRight();
             right.OrganizationId = organizationId;
             right.ObjectOwnerId = _userContext.UserId;
             right.LastChangedByUserId = _userContext.UserId;
+            right.Role = roleId;
+            right.UserId = userId;
 
             if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
             {

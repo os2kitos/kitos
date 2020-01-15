@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                var result = _organizationRightsService.AddRightToUser(orgKey, entity);
+                var result = _organizationRightsService.AssignRole(orgKey, entity.UserId, entity.Role);
                 if (result.Ok)
                 {
                     return Created(entity);

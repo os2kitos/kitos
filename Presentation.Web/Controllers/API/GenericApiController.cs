@@ -185,7 +185,7 @@ namespace Presentation.Web.Controllers.API
 
                 var savedItem = PostQuery(item);
 
-                return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+                return NewObjectCreated(savedItem);
             }
             catch (ConflictException e)
             {
@@ -200,6 +200,11 @@ namespace Presentation.Web.Controllers.API
                 var duplicate = CheckForDuplicateEntryException(e);
                 return duplicate.HasValue ? duplicate.Value : LogError(e);
             }
+        }
+
+        protected HttpResponseMessage NewObjectCreated(TModel savedItem)
+        {
+            return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
         }
 
         protected virtual void PrepareNewObject(TModel item)
