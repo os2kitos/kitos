@@ -48,7 +48,7 @@ namespace Core.DomainServices.Model.Result
                 Maybe<TResult>.None;
         }
 
-        public T GetValueOrDefault(T defaultValue)
+        public T GetValueOrFallback(T defaultValue)
         {
             if (defaultValue == null)
                 throw new ArgumentNullException(nameof(defaultValue));

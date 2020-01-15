@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API
         /// <summary>
         /// Delete a right from the object
         /// </summary>
-        /// <param name="id">ID of object</param>
+        /// <param name="id">ID of organization to remove from</param>
         /// <param name="rId">ID of role</param>
         /// <param name="uId">ID of user in role</param>
         /// <param name="organizationId"></param>
@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var result = _organizationRightsService.RemoveRole(organizationId, uId, (OrganizationRole)rId);
+                var result = _organizationRightsService.RemoveRole(id, uId, (OrganizationRole)rId);
 
                 return result.Ok ?
                     Ok() :

@@ -18,8 +18,8 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<Organization> _orgRepository;
 
         public DataProtectionAdvisorController(
-            IGenericRepository<DataProtectionAdvisor> repository, 
-            IGenericRepository<Organization> orgRepository) 
+            IGenericRepository<DataProtectionAdvisor> repository,
+            IGenericRepository<Organization> orgRepository)
             : base(repository)
         {
             _repository = repository;
@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<DataProtectionAdvisor>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<DataProtectionAdvisor, Organization>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId
@@ -49,16 +49,21 @@ namespace Presentation.Web.Controllers.API
                 var item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
 
                 //create object if it doesnt exsist
-                if (item == null) {
-                    try {
-                        _repository.Insert(new DataProtectionAdvisor {
+                if (item == null)
+                {
+                    try
+                    {
+                        _repository.Insert(new DataProtectionAdvisor
+                        {
                             OrganizationId = organization.Id,
                             ObjectOwnerId = organization.ObjectOwnerId,
                             LastChangedByUserId = KitosUser.Id
                         });
                         _repository.Save();
                         item = Repository.AsQueryable().FirstOrDefault(d => d.OrganizationId == organization.Id);
-                    } catch(Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         return LogError(e);
                     }
                 };

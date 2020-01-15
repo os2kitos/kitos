@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -34,12 +35,12 @@ namespace Presentation.Web.Controllers.API
             if (item == null)
                 return NotFound();
 
-            return Ok(Map(item));
+            return Ok(Map(item.Where(AllowRead)));
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Communication>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Communication, ItProject>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
         }
     }
 }

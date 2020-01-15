@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
@@ -37,7 +38,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Wish>(x => _usageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Wish, ItSystemUsage>(x => _usageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
         }
     }
 }

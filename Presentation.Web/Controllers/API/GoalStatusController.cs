@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API
         public GoalStatusController(
             IGenericRepository<GoalStatus> repository,
             IItProjectRepository projectRepository
-            ) 
+            )
             : base(repository)
         {
             _projectRepository = projectRepository;
@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<GoalStatus>(goalStatus=> _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<GoalStatus, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<OrganizationUnitRight>(or => _orgUnitRepository.GetByKey(or.ObjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<OrganizationUnitRight, OrganizationUnit>(or => _orgUnitRepository.GetByKey(or.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItContractRights

@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemDataWorkerRelation>(x => _systemRepository.GetSystem(x.ItSystemId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItSystemDataWorkerRelation, ItSystem>(x => _systemRepository.GetSystem(x.ItSystemId), base.GetCrudAuthorization());
         }
     }
 }

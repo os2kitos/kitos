@@ -19,7 +19,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate, ItProject>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
     }
 }

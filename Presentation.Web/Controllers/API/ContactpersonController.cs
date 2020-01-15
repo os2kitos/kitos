@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ContactPerson>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ContactPerson, Organization>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId

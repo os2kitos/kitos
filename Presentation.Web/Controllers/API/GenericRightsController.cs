@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<TRight>(x => _objectRepository.GetByKey(x.ObjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<TRight, TObject>(x => _objectRepository.GetByKey(x.ObjectId), base.GetCrudAuthorization());
         }
 
         /// <summary>

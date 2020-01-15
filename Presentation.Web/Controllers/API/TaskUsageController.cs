@@ -30,8 +30,8 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
 
         public TaskUsageController(
-            IGenericRepository<TaskUsage> repository, 
-            IGenericRepository<OrganizationUnit> orgUnitRepository, 
+            IGenericRepository<TaskUsage> repository,
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository)
             : base(repository)
         {
@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<TaskUsage>(x => _orgUnitRepository.GetByKey(x.OrgUnitId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<TaskUsage, OrganizationUnit>(x => _orgUnitRepository.GetByKey(x.OrgUnitId), base.GetCrudAuthorization());
         }
 
         [HttpGet]

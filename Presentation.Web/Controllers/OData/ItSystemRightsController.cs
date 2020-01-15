@@ -10,6 +10,7 @@ using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
@@ -29,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemRight>(sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItSystemRight, ItSystemUsage>(sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItProjectRights

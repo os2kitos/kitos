@@ -44,7 +44,7 @@ namespace Tests.Unit.Core.DomainServices
         }
 
         [Fact]
-        public void GetValueOrDefault_Returns_Value_If_HasValue()
+        public void GetValueOrFallback_Returns_Value_If_HasValue()
         {
             //Arrange
             var expectedValue = Guid.NewGuid();
@@ -55,11 +55,11 @@ namespace Tests.Unit.Core.DomainServices
 
             //Assert
             Assert.True(maybe.HasValue);
-            Assert.Equal(expectedValue, maybe.GetValueOrDefault(fallback));
+            Assert.Equal(expectedValue, maybe.GetValueOrFallback(fallback));
         }
 
         [Fact]
-        public void GetValueOrDefault_Returns_Value_If_Not_HasValue()
+        public void GetValueOrFallback_Returns_Value_If_Not_HasValue()
         {
             //Arrange
             var fallback = Guid.NewGuid();
@@ -69,7 +69,7 @@ namespace Tests.Unit.Core.DomainServices
 
             //Assert
             Assert.False(maybe.HasValue);
-            Assert.Equal(fallback, maybe.GetValueOrDefault(fallback));
+            Assert.Equal(fallback, maybe.GetValueOrFallback(fallback));
         }
 
         [Fact]

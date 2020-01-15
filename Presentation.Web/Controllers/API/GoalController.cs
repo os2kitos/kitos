@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Goal>(GetItProject, base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Goal, ItProject>(GetItProject, base.GetCrudAuthorization());
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.API
 
         public EconomyYearController(
             IGenericRepository<EconomyYear> repository,
-            IItProjectRepository projectRepository) 
+            IItProjectRepository projectRepository)
             : base(repository)
         {
             _projectRepository = projectRepository;
@@ -22,7 +22,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<EconomyYear>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<EconomyYear, ItProject>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
         }
     }
 }

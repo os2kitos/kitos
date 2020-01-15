@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IItProjectRepository _projectRepository;
 
         public HandoverController(
-            IGenericRepository<Handover> repository, 
+            IGenericRepository<Handover> repository,
             IGenericRepository<User> userRepository,
             IItProjectRepository projectRepository)
             : base(repository)
@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Handover>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Handover, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
         }
 
         public virtual HttpResponseMessage PostParticipant(int id, [FromUri] int participantId)

@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<HandoverTrial>(x => _contractRepository.GetById(x.ItContractId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<HandoverTrial, ItContract>(x => _contractRepository.GetById(x.ItContractId), base.GetCrudAuthorization());
         }
     }
 }

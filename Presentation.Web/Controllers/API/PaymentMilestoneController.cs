@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<PaymentMilestone>(x => _contractRepository.GetById(x.ItContractId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<PaymentMilestone, ItContract>(x => _contractRepository.GetById(x.ItContractId), base.GetCrudAuthorization());
         }
     }
 }
