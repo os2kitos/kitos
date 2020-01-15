@@ -198,6 +198,7 @@
     <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\GlobalReadAccessPolicyTest.cs" />
+    <Compile Include="Authorization\ModuleLevelAccessPolicyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
     <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />

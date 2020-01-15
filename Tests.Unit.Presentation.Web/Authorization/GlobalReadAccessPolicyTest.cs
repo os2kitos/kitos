@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoFixture;
-using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Fasterflect;
-using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization

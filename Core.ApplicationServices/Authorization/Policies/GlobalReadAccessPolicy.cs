@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.Authorization.Policies
 {
     public class GlobalReadAccessPolicy : IEntityPolicy
     {

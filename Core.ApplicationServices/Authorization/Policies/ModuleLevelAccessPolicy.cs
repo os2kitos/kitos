@@ -7,11 +7,11 @@ using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices.Authorization
 {
-    public class ModuleLevelAccessRule : IEntityPolicy
+    public class ModuleLevelAccessPolicy : IEntityPolicy
     {
         private readonly IOrganizationalUserContext _userContext;
 
-        public ModuleLevelAccessRule(IOrganizationalUserContext userContext)
+        public ModuleLevelAccessPolicy(IOrganizationalUserContext userContext)
         {
             _userContext = userContext;
         }

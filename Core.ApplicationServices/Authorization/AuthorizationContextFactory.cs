@@ -1,4 +1,6 @@
-﻿namespace Core.ApplicationServices.Authorization
+﻿using Core.ApplicationServices.Authorization.Policies;
+
+namespace Core.ApplicationServices.Authorization
 {
     public class AuthorizationContextFactory : IAuthorizationContextFactory
     {
@@ -9,7 +11,7 @@
             //NOTE: SupplierAccess is injected here because then it is not "organizationAuthorizationContext but supplierauthorizationcontext"
             return userContext is UnauthenticatedUserContext
                 ? new UnauthenticatedAuthorizationContext()
-                : (IAuthorizationContext)new OrganizationAuthorizationContext(userContext, new ModuleLevelAccessRule(userContext), GlobalReadAccessPolicy);
+                : (IAuthorizationContext)new OrganizationAuthorizationContext(userContext, new ModuleLevelAccessPolicy(userContext), GlobalReadAccessPolicy);
         }
     }
 }
