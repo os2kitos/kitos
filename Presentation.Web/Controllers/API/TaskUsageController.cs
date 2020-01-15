@@ -97,7 +97,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             (x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
                 }
                 else
@@ -106,7 +105,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
                 }
 

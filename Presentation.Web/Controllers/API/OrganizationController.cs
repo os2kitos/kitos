@@ -80,7 +80,7 @@ namespace Presentation.Web.Controllers.API
             var result = _organizationService.CreateNewOrganization(item);
             if (result.Ok)
             {
-                return base.PostQuery(item);
+                return result.Value;
             }
 
             if (result.Error == OperationFailure.Forbidden)

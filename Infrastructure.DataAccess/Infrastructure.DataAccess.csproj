@@ -507,6 +507,10 @@
     <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.Designer.cs">
       <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.cs" />
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.Designer.cs">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -807,6 +811,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.resx">
       <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.resx">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

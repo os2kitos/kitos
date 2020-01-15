@@ -9,7 +9,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     public abstract class GenericHierarchyApiController<TModel, TDto> : GenericApiController<TModel, TDto>
-        where TModel : Entity, IHierarchy<TModel>, IContextAware
+        where TModel : Entity, IHierarchy<TModel>
     {
         protected GenericHierarchyApiController(IGenericRepository<TModel> repository)
             : base(repository)

@@ -285,7 +285,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.ItSystemUsages.All(y => y.Id != id)).ToList();
                 }
                 else
@@ -294,7 +293,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.ItSystemUsages.All(y => y.Id != id)).ToList();
                 }
 
@@ -303,7 +301,7 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var task in tasks)
                 {
-                    if (!usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id))
+                    if (usage.ItSystem.TaskRefs.All(t => t.Id != task.Id))
                     {
                         usage.TaskRefs.Add(task);
                     }
@@ -427,8 +425,7 @@ namespace Presentation.Web.Controllers.API
                 if (taskGroup.HasValue)
                     pagingModel.Where(taskRef => (taskRef.ParentId.Value == taskGroup.Value ||
                                                   taskRef.Parent.ParentId.Value == taskGroup.Value) &&
-                                                 !taskRef.Children.Any() &&
-                                                 taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                                                 !taskRef.Children.Any());
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 

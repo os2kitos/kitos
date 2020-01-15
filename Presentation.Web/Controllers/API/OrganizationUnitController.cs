@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     // this is not so good performance wise
                     var orgUnitQueryable = Repository.AsQueryable().Where(unit => unit.Id == id);
-                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef).Where(x => x.AccessModifier == AccessModifier.Public)); // TODO add support for normal
+                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef));
 
                     // it would have been better with:
                     // pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
@@ -159,7 +159,7 @@ namespace Presentation.Web.Controllers.API
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable().Where(x => x.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                    taskQuery = _taskRepository.AsQueryable();
                 }
 
                 // if a task group is given, only find the tasks in that group and sub groups
@@ -169,8 +169,7 @@ namespace Presentation.Web.Controllers.API
                         taskRef =>
                             (taskRef.ParentId.Value == taskGroup.Value ||
                              taskRef.Parent.ParentId.Value == taskGroup.Value) &&
-                             !taskRef.Children.Any() &&
-                            taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                             !taskRef.Children.Any());
                 }
                 else
                 {
