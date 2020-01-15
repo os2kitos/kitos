@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainServices.Model.Result;
 using Xunit;
 
@@ -74,7 +73,7 @@ namespace Tests.Unit.Core.DomainServices
         }
 
         [Fact]
-        public void Map_Maps_Returns_Mapped_Value()
+        public void Select_Maps_Returns_Mapped_Value()
         {
             //Arrange
             var originalValue = Guid.NewGuid();
@@ -83,7 +82,7 @@ namespace Tests.Unit.Core.DomainServices
             var maybe = Maybe<Guid>.Some(originalValue);
 
             //Act
-            var mapped = maybe.Map(org => $"{org}{anotherValue}");
+            var mapped = maybe.Select(org => $"{org}{anotherValue}");
 
             //Assert
             Assert.True(mapped.HasValue);
@@ -91,16 +90,30 @@ namespace Tests.Unit.Core.DomainServices
         }
 
         [Fact]
-        public void Map_Maps_Returns_None_If_Original_Value_Is_None()
+        public void Select_Maps_Returns_None_If_Original_Value_Is_None()
         {
             //Arrange
             var maybe = Maybe<Guid>.None;
 
             //Act
-            var mapped = maybe.Map(org => $"{org}{Guid.NewGuid()}");
+            var mapped = maybe.Select(org => $"{org}{Guid.NewGuid()}");
 
             //Assert
             Assert.False(mapped.HasValue);
+        }
+
+        [Fact]
+        public void Select_Enables_Linq()
+        {
+            //Arrange
+            var initial = Maybe<int[]>.Some(new[] { 1, 2 });
+
+            //Act
+            var mapped = from numbers in initial
+                         select string.Join(".", numbers);
+
+            //Assert
+            Assert.Equal("1.2", mapped.Value);
         }
     }
 }

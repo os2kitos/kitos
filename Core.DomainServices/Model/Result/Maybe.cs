@@ -38,7 +38,7 @@ namespace Core.DomainServices.Model.Result
             return new Maybe<T>(true, value);
         }
 
-        public Maybe<TResult> Map<TResult>(Func<T, TResult> selector)
+        public Maybe<TResult> Select<TResult>(Func<T, TResult> selector)
         {
             if (selector == null)
                 throw new ArgumentNullException(nameof(selector));
