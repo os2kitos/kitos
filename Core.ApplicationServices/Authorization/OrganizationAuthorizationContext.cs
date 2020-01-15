@@ -1,56 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
-using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Core.DomainServices.Authorization;
-using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization
 {
     public class OrganizationAuthorizationContext : IAuthorizationContext, IPermissionVisitor
     {
         private readonly IOrganizationalUserContext _activeUserContext;
+        private readonly IEntityPolicy _moduleLevelAccessPolicy;
+        private readonly IEntityPolicy _globalReadAccessPolicy;
 
-        //NOTE: For types which cannot be bound to a scoped context (lack of knowledge) and has shared read access
-        private static readonly IReadOnlyDictionary<Type, bool> TypesWithGlobalReadAccess;
-
-        static OrganizationAuthorizationContext()
-        {
-            var typesWithGlobalRead =
-                new Dictionary<Type, bool>
-                {
-                    {typeof(Advice),true},
-                    {typeof(AdviceUserRelation),true},
-                    {typeof(Text),true},
-                    {typeof(HelpText),true},
-                    {typeof(AdviceSent),true},
-                    {typeof(GlobalConfig),true },
-                    {typeof(ExternalReference),true }
-            };
-
-            //All base options are globally readable
-            typeof(Entity)
-                .Assembly
-                .GetTypes()
-                .Where(t => t.IsImplementationOfGenericType(typeof(OptionEntity<>)))
-                .ToList()
-                .ForEach(t => typesWithGlobalRead.Add(t, true));
-
-            TypesWithGlobalReadAccess = new ReadOnlyDictionary<Type, bool>(typesWithGlobalRead);
-        }
-
-        public OrganizationAuthorizationContext(IOrganizationalUserContext activeUserContext)
+        public OrganizationAuthorizationContext(
+            IOrganizationalUserContext activeUserContext,
+            IEntityPolicy moduleLevelAccessPolicy,
+            IEntityPolicy globalReadAccessPolicy)
         {
             _activeUserContext = activeUserContext;
+            _moduleLevelAccessPolicy = moduleLevelAccessPolicy;
+            _globalReadAccessPolicy = globalReadAccessPolicy;
         }
 
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
@@ -106,7 +77,7 @@ namespace Core.ApplicationServices.Authorization
                     result = true;
                 }
             }
-            else if (TypesWithGlobalReadAccess.ContainsKey(entity.GetType()))
+            else if (_globalReadAccessPolicy.Allow(entity))
             {
                 result = true;
             }
@@ -286,47 +257,7 @@ namespace Core.ApplicationServices.Authorization
 
         private bool HasModuleLevelWriteAccess(IEntity entity)
         {
-            var result = IsGlobalAdmin() || IsLocalAdmin();
-            switch (entity)
-            {
-                case IContractModule _:
-                    result |= IsContractModuleAdmin();
-                    break;
-                case User _:
-                case IOrganizationModule _:
-                    result |= IsOrganizationModuleAdmin();
-                    break;
-                case IProjectModule _:
-                    result |= IsProjectModuleAdmin();
-                    break;
-                case ISystemModule _:
-                    result |= IsSystemModuleAdmin();
-                    break;
-                case IReportModule _:
-                    result |= IsReportModuleAdmin();
-                    break;
-                default:
-                    //Unknown module type - no module level access can be granted
-                    result = false;
-                    break;
-            }
-
-            return result;
-        }
-
-        private bool IsReportModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.ReportModuleAdmin);
-        }
-
-        private bool IsSystemModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.SystemModuleAdmin);
-        }
-
-        private bool IsProjectModuleAdmin()
-        {
-            return _activeUserContext.HasRole(OrganizationRole.ProjectModuleAdmin);
+            return _moduleLevelAccessPolicy.Allow(entity);
         }
 
         private bool IsOrganizationModuleAdmin()
@@ -424,9 +355,9 @@ namespace Core.ApplicationServices.Authorization
                 switch (target)
                 {
                     case IContractModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin() || IsContractModuleAdmin();
+                        return IsGlobalAdmin() || ((IsLocalAdmin() || IsContractModuleAdmin()) && IsReadOnly() == false);
                     case IOrganizationModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin();
+                        return IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false);
                 }
 
                 return IsGlobalAdmin();
@@ -452,14 +383,14 @@ namespace Core.ApplicationServices.Authorization
             // Only local and global admins can make users local admins
             else if (right.Role == OrganizationRole.LocalAdmin)
             {
-                if (IsGlobalAdmin() && (IsLocalAdmin() && IsReadOnly() == false))
+                if (IsGlobalAdmin() || (IsLocalAdmin() && IsReadOnly() == false))
                 {
                     result = true;
                 }
             }
             else
             {
-                result = true;
+                result = IsGlobalAdmin() || ((IsLocalAdmin() || IsOrganizationModuleAdmin()) && IsReadOnly() == false);
             }
 
             return result;

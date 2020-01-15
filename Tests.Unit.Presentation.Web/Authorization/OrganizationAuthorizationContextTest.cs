@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
-using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -19,11 +19,15 @@ namespace Tests.Unit.Presentation.Web.Authorization
     {
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly OrganizationAuthorizationContext _sut;
+        private readonly Mock<IEntityPolicy> _moduleLevelAccessPolicy;
+        private readonly Mock<IEntityPolicy> _globalAccessPolicy;
 
         public OrganizationAuthorizationContextTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _sut = new OrganizationAuthorizationContext(_userContextMock.Object);
+            _moduleLevelAccessPolicy = new Mock<IEntityPolicy>();
+            _globalAccessPolicy = new Mock<IEntityPolicy>();
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object);
         }
 
         [Theory]
@@ -109,36 +113,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Fact]
-        public void AllowReads_For_GlobalReadableType_AdviceUserRelation_Returns_True()
+        public void AllowReads_For_GlobalReadableType_Returns_True()
         {
             //Arrange
-            var inputEntity = new AdviceUserRelation();
-
-            //Act
-            var result = _sut.AllowReads(inputEntity);
-
-            //Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void AllowReads_For_GlobalReadableType_Text_Returns_True()
-        {
-            //Arrange
-            var inputEntity = new Text();
-
-            //Act
-            var result = _sut.AllowReads(inputEntity);
-
-            //Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void AllowReads_For_GlobalReadableType_HelpText_Returns_True()
-        {
-            //Arrange
-            var inputEntity = new HelpText();
+            var inputEntity = Mock.Of<IEntity>();
+            _globalAccessPolicy.Setup(x => x.Allow(inputEntity)).Returns(true);
 
             //Act
             var result = _sut.AllowReads(inputEntity);
@@ -223,25 +202,206 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allowUpdates);
         }
 
+        public interface ISimpleEntityWithAccessModifier : IEntity, IHasAccessModifier { }
+        public interface IContractElement : IEntity, IHasAccessModifier, IContractModule { }
+        public interface IOrganizationElement : IEntity, IHasAccessModifier, IOrganizationModule { }
+
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(false, true, false)]
-        [InlineData(true, false, false)]
-        public void AllowEntityVisibilityControl_Returns_True_If_HasWriteAccess_And_Is_AllowedToModifyVisibility(bool isGlobalAdmin, bool isAllowedToChangeVisibility, bool expectedResult)
+        [InlineData(typeof(IEntity), OrganizationRole.GlobalAdmin, false)] //Type does not allow access modification, so false regardless of roles
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.GlobalAdmin, true)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.LocalAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.User, false)]
+        [InlineData(typeof(ISimpleEntityWithAccessModifier), OrganizationRole.ReadOnly, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.GlobalAdmin, true)]
+        [InlineData(typeof(IContractElement), OrganizationRole.LocalAdmin, true)]
+        [InlineData(typeof(IContractElement), OrganizationRole.ContractModuleAdmin, true)]
+        [InlineData(typeof(IContractElement), OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.User, false)]
+        [InlineData(typeof(IContractElement), OrganizationRole.ReadOnly, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.GlobalAdmin, true)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.LocalAdmin, true)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.ProjectModuleAdmin, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.ReportModuleAdmin, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.User, false)]
+        [InlineData(typeof(IOrganizationElement), OrganizationRole.ReadOnly, false)]
+        public void HasPermission_With_VisibilityControlPermission_Returns(Type entityType, OrganizationRole userRole, bool expectedResult)
         {
             //Arrange
-            var userId = A<int>();
-            var inputEntity = Mock.Of<IEntity>();
-
-            ExpectHasRoleReturns(OrganizationRole.GlobalAdmin, isGlobalAdmin);
-            ExpectGetUserIdReturns(userId);
-            //ExpectCanChangeVisibilityOfReturns(isAllowedToChangeVisibility, inputEntity); //TOOD
+            var inputEntity = (IEntity)MoqTools.MockOf(entityType);
+            ExpectUserHasRoles(userRole);
 
             //Act
-            var allowUpdates = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
+            var actual = _sut.HasPermission(new VisibilityControlPermission(inputEntity));
 
             //Assert
-            Assert.Equal(expectedResult, allowUpdates);
+            Assert.Equal(expectedResult, actual);
+        }
+
+        [Theory]
+        [InlineData(OrganizationTypeKeys.Kommune, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationTypeKeys.Kommune, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationTypeKeys.Kommune, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationTypeKeys.Kommune, OrganizationRole.LocalAdmin, false, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationRole.LocalAdmin, false, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationTypeKeys.Virksomhed, OrganizationRole.LocalAdmin, false, true)]
+        public void HasPermission_With_DefineOrganizationTypePermission_Returns(OrganizationTypeKeys organizationType, OrganizationRole userRole, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            if (readOnly)
+                ExpectUserHasRoles(userRole, OrganizationRole.ReadOnly);
+            else
+                ExpectUserHasRoles(userRole);
+
+            //Act
+            var actual = _sut.HasPermission(new DefineOrganizationTypePermission(organizationType));
+
+            //Assert
+            Assert.Equal(expectedResult, actual);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.User, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.User, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.User, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.User, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.LocalAdmin, false, true)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.User, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ReportModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.ProjectModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.OrganizationModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, false, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.LocalAdmin, true, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, OrganizationRole.GlobalAdmin, true, true)]
+        public void HasPermission_With_AdministerOrganizationRightPermission_Returns(OrganizationRole administeredRole, OrganizationRole userRole, bool readOnly, bool expectedResult)
+        {
+            //Arrange
+            if (readOnly)
+                ExpectUserHasRoles(userRole, OrganizationRole.ReadOnly);
+            else
+                ExpectUserHasRoles(userRole);
+
+            //Act
+            var actual = _sut.HasPermission(new AdministerOrganizationRightPermission(new OrganizationRight() { Role = administeredRole }));
+
+            //Assert
+            Assert.Equal(expectedResult, actual);
         }
 
         [Theory]
@@ -507,76 +667,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
-        //TODO: Migrate stuff from this one
-        //[Theory]
-        //[MemberData(nameof(GetModuleAccessTestInputs))]
-        //public void HasModuleLevelAccessTo_Returns_Correct_Result(IEntity entity, IReadOnlyList<Feature> supportedFeatures, bool expectedResult)
-        //{
-        //    //Arrange
-        //    var sut = new OrganizationalUserContext(supportedFeatures, Many<OrganizationRole>(), new User(), A<int>());
-
-        //    //Act
-        //    var result = sut.HasModuleLevelAccessTo(entity);
-
-        //    //Assert
-        //    Assert.Equal(expectedResult, result);
-        //}
-
-        //[Theory]
-        //[InlineData(true)]
-        //[InlineData(false)]
-        //public void CanChangeVisibilityOf_ContractModuleEntity_Returns(bool hasAccess)
-        //{
-        //    //Arrange
-        //    var features = hasAccess
-        //        ? GetFeatureOptions()
-        //        : GetFeatureOptions(Feature.CanSetContractElementsAccessModifierToPublic);
-
-        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
-
-        //    //Act
-        //    var result = sut.CanChangeVisibilityOf(new EconomyStream());
-
-        //    //Assert
-        //    Assert.Equal(hasAccess, result);
-        //}
-
-        //[Theory]
-        //[InlineData(true)]
-        //[InlineData(false)]
-        //public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(bool hasAccess)
-        //{
-        //    //Arrange
-        //    var features = hasAccess
-        //        ? GetFeatureOptions()
-        //        : GetFeatureOptions(Feature.CanSetOrganizationAccessModifierToPublic);
-
-        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
-
-        //    //Act
-        //    var result = sut.CanChangeVisibilityOf(new Organization());
-
-        //    //Assert
-        //    Assert.Equal(hasAccess, result);
-        //}
-
-        //[Theory, MemberData(nameof(GetNonSpecificVisibilityChangeTypeTestInputs))]
-        //public void CanChangeVisibilityOf_OrganizationModuleEntity_Returns(IEntity inputType, bool hasAccess)
-        //{
-        //    //Arrange
-        //    var features = hasAccess
-        //        ? GetFeatureOptions()
-        //        : GetFeatureOptions(Feature.CanSetAccessModifierToPublic);
-
-        //    var sut = new OrganizationalUserContext(features, Many<OrganizationRole>(), new User(), A<int>());
-
-        //    //Act
-        //    var result = sut.CanChangeVisibilityOf(inputType);
-
-        //    //Assert
-        //    Assert.Equal(hasAccess, result);
-        //}
-
         private void Allow_Create_Returns<T>(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
             //Arrange
@@ -597,7 +687,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private void ExpectHasModuleLevelAccessReturns(IEntity inputEntity, bool hasModuleLevelAccess)
         {
-            throw new NotImplementedException("TODO: Re-write tests to embrace visibility control checks");
+            _moduleLevelAccessPolicy.Setup(x => x.Allow(inputEntity)).Returns(hasModuleLevelAccess);
         }
 
         private void ExpectHasAssignedWriteAccessReturns(IEntity inputEntity, bool value)
@@ -638,6 +728,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void ExpectHasRoleReturns(OrganizationRole role, bool value)
         {
             _userContextMock.Setup(x => x.HasRole(role)).Returns(value);
+        }
+
+        private void ExpectUserHasRoles(params OrganizationRole[] targetRoles)
+        {
+            foreach (var organizationRole in Enum.GetValues(typeof(OrganizationRole)).Cast<OrganizationRole>())
+            {
+                ExpectHasRoleReturns(organizationRole, targetRoles.Contains(organizationRole));
+            }
         }
 
         private static IEntity CreateUserEntity(int id)

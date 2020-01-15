@@ -44,6 +44,9 @@
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
     </Reference>
+    <Reference Include="Fasterflect, Version=2.1.3.0, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\packages\fasterflect.2.1.3\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
     <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
@@ -194,6 +197,7 @@
   <ItemGroup>
     <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
+    <Compile Include="Authorization\GlobalReadAccessPolicyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
     <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />
@@ -211,6 +215,7 @@
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
+    <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Helpers\WithAutoFixture.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
