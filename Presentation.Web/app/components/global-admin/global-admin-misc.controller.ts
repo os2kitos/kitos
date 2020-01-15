@@ -20,7 +20,7 @@
             toggleKleButtonsClickAbility(false, false);
             KLEservice.getStatus().success((dto, status) => {
                     if (status !== 200) {
-                        notify.addErrorMessage("Der skete en fejle under tjek af version!");
+                        notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                         return;
                     }
                     if (!dto.response.uptodate) {
@@ -34,7 +34,7 @@
                 }).
                 error(() => {
                     toggleKleButtonsClickAbility(false, false);
-                    notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
+                    notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                 });
         }
 
@@ -63,7 +63,8 @@
             KLEservice.getChanges().success((data, status) => {
                 if (status !== 200)
                 {
-                    notify.addErrorMessage("Der skete en fejle under hentning af ændringer fejlkode: " + status);
+                    toggleKleButtonsClickAbility(true, false);
+                    notify.addErrorMessage("Der skete en fejl under hentning af ændringer");
                     return;
                 }
                 var universalBOM = "\uFEFF";
@@ -79,7 +80,7 @@
                 }).
                 error(() => {
                     toggleKleButtonsClickAbility(true, false);
-                    notify.addErrorMessage("Der skete en fejle under henting af ændringer");
+                    notify.addErrorMessage("Der skete en fejl under henting af ændringer");
                 });
         }
 
@@ -92,7 +93,6 @@
                             notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                             return;
                         }
-                        toggleKleButtonsClickAbility(true, false);
                         notify.addSuccessMessage("KLE er opdateret");
                         getKleStatus();
                     }).
@@ -104,7 +104,6 @@
                 notify.addInfoMessage("KLE opdatering stoppet!");
             }
         }
-
 
         function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
             $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;

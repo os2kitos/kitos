@@ -21,7 +21,7 @@ class NavigationBarHelper {
     public isLocalAdminDisplayed(): webdriver.promise.Promise<Boolean> {
         return this.navigationBar.dropDownMenu.localAdmin.isPresent();
     }
-    
+
 }
 
 export = NavigationBarHelper;
