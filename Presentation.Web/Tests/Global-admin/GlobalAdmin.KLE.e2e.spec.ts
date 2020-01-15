@@ -73,7 +73,5 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     function expectButtonEnableToBe(eleType: string,toBe: boolean) {
         expect(element(cssHelper.byDataElementType(eleType)).isEnabled()).toBe(toBe);
     }
-
-
 });
 
