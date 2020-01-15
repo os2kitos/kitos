@@ -48,12 +48,10 @@ describe("Global Administrator is able to see changes to KLE and update to the n
             return browser.switchTo().alert().accept();
         }).then(() => {
             console.log("Checking KLE have been updated");
-            //expect(element(cssHelper.byDataElementType(consts.kleStatusLabel)).getText())
-            //    .toStartWith("KITOS baserer sig på den seneste KLE version, udgivet");
-            //expect(element(cssHelper.byDataElementType(consts.kleChangesButton)).isEnabled()).toBe(false);
             expect(element(cssHelper.byDataElementType(consts.kleStatusLabel)).getText())
-                .toStartWith("Der er en ny version af KLE, udgivet");
-            expect(element(cssHelper.byDataElementType(consts.kleChangesButton)).isEnabled()).toBe(true);
+                .toStartWith("KITOS baserer sig på den seneste KLE version, udgivet");
+            expect(element(cssHelper.byDataElementType(consts.kleChangesButton)).isEnabled()).toBe(false);
+            expect(element(cssHelper.byDataElementType(consts.kleUpdateButton)).isEnabled()).toBe(false);
         });
     });
 

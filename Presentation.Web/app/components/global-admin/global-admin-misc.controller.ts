@@ -17,8 +17,7 @@
         getKleStatus();
         function getKleStatus() {
             $scope.KLEUpdateAvailableLabel = "Tjekker efter ny version af KLE";
-            $scope.KleUpdateAvailableButtonInteraction = false;
-            $scope.KleApplyUpdateButtonInteraction = false;
+            toggleKleButtonsClickAbility(false, false);
             KLEservice.getStatus().success((dto, status) => {
                     if (status !== 200) {
                         notify.addErrorMessage("Der skete en fejle under tjek af version!");
@@ -26,18 +25,15 @@
                     }
                     if (!dto.response.uptodate) {
                         $scope.KLEUpdateAvailableLabel = "Der er en ny version af KLE, udgivet " + dto.response.version;
-                        $scope.KleUpdateAvailableButtonInteraction = true;
-                        $scope.KleApplyUpdateButtonInteraction = false;
+                        toggleKleButtonsClickAbility(true, false);
                     }
                     else {
                         $scope.KLEUpdateAvailableLabel = "KITOS baserer sig på den seneste KLE version, udgivet  " + dto.response.version;
-                        $scope.KleUpdateAvailableButtonInteraction = false;
-                        $scope.KleApplyUpdateButtonInteraction = false;
+                        toggleKleButtonsClickAbility(false, false);
                     }
                 }).
                 error(() => {
-                    $scope.KleUpdateAvailableButtonInteraction = false;
-                    $scope.KleApplyUpdateButtonInteraction = false;
+                    toggleKleButtonsClickAbility(false, false);
                     notify.addErrorMessage("Der skete en fejl ved tjekke om der er opdatering klar.");
                 });
         }
@@ -63,10 +59,7 @@
         };
 
         $scope.GetKLEChanges = function () {
-            $scope.KleUpdateAvailableButtonInteraction = false;
-            $scope.KleApplyUpdateButtonInteraction = false;
-
-            
+            toggleKleButtonsClickAbility(false, false);
             KLEservice.getChanges().success((data, status) => {
                 if (status !== 200)
                 {
@@ -82,12 +75,10 @@
                         download: "KLE-Changes.csv"
                     })[0].click();
                     notify.addSuccessMessage("Download af ændringer færdig");
-                $scope.KleUpdateAvailableButtonInteraction = true;
-                $scope.KleApplyUpdateButtonInteraction = true;
+                    toggleKleButtonsClickAbility(true, true);
                 }).
                 error(() => {
-                    $scope.KleUpdateAvailableButtonInteraction = true;
-                    $scope.KleApplyUpdateButtonInteraction = false;
+                    toggleKleButtonsClickAbility(true, false);
                     notify.addErrorMessage("Der skete en fejle under henting af ændringer");
                 });
         }
@@ -97,24 +88,28 @@
                 KLEservice.applyUpdateKLE().
                     success((data, status) => {
                         if (status !== 200) {
-                            $scope.KleUpdateAvailableButtonInteraction = true;
-                            $scope.KleApplyUpdateButtonInteraction = false;
+                            toggleKleButtonsClickAbility(true,false);
                             notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                             return;
                         }
-                        $scope.KleUpdateAvailableButtonInteraction = true;
-                        $scope.KleApplyUpdateButtonInteraction = false;
+                        toggleKleButtonsClickAbility(true, false);
                         notify.addSuccessMessage("KLE er opdateret");
                         getKleStatus();
                     }).
                     error(() => {
-                        $scope.KleUpdateAvailableButtonInteraction = true;
-                        $scope.KleApplyUpdateButtonInteraction = false;
+                        toggleKleButtonsClickAbility(true, false);
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                     });
             } else {
                 notify.addInfoMessage("KLE opdatering stoppet!");
             }
         }
+
+
+        function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
+            $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
+            $scope.KleApplyUpdateButtonInteraction = updateButton;
+        }
+
     }]);
 })(angular, app);
