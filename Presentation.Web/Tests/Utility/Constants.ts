@@ -78,7 +78,6 @@ class Constants {
     readonly kleChangesButton = "KLEChangesButton";
     readonly kleUpdateButton = "KLEUpdateButton";
     readonly KleDownloadAnchor = "KLEDownloadAnchor";
-
 }
 export = Constants;
 
