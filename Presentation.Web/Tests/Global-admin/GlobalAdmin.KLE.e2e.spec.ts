@@ -41,7 +41,10 @@ describe("Global Administrator is able to see changes to KLE and update to the n
             clickOnButton(consts.kleChangesButton);
         }).then(() => {
             console.log("Waiting for download link to appear");
-            return browser.wait(pageObject.waitForKleDownloadLink(), waitUpTo.twentySeconds);
+            waitForUpdateButtonToBeClickAble(consts.KleDownloadAnchor);
+        }).then(() => {
+            console.log("Checking if Update KLE button is clickable");
+            waitForUpdateButtonToBeClickAble(consts.kleUpdateButton);
         }).then(() => {
             console.log("Clicking the update KLE button");
             clickOnButton(consts.kleUpdateButton);
@@ -72,6 +75,10 @@ describe("Global Administrator is able to see changes to KLE and update to the n
 
     function expectButtonEnableToBe(eleType: string,toBe: boolean) {
         expect(element(cssHelper.byDataElementType(eleType)).isEnabled()).toBe(toBe);
+    }
+
+    function waitForUpdateButtonToBeClickAble(waitingFor: string) {
+        return browser.wait(pageObject.waitForElementToBecomeClickAble(waitingFor), waitUpTo.twentySeconds);
     }
 });
 

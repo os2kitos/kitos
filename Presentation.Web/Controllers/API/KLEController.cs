@@ -98,7 +98,6 @@ namespace Presentation.Web.Controllers.API
         private static HttpResponseMessage CreateCsvFormattedHttpResponse(IEnumerable<dynamic> list)
         {
             var s = list.ToCsv();
-            //var bytes = Encoding.Unicode.GetBytes(s);
             var bytes = Encoding.UTF8.GetBytes(s);
             var stream = new MemoryStream();
             stream.Write(bytes, 0, bytes.Length);

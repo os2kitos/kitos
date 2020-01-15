@@ -28,8 +28,8 @@ class GlobalMisc implements PageObject {
         return this.ec.elementToBeClickable(element(this.byDataElementType(this.consts.kleChangesButton)));
     }
 
-    public waitForKleDownloadLink() {
-        return this.ec.presenceOf(element(this.byDataElementType(this.consts.KleDownloadAnchor)));
+    public waitForElementToBecomeClickAble(elementWaitingFor: string) {
+        return this.ec.presenceOf(element(this.byDataElementType(elementWaitingFor)));
     }
 }
 export = GlobalMisc;
