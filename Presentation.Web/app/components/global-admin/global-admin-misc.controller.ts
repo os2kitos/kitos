@@ -18,12 +18,14 @@
         function getKleStatus() {
             $scope.KLEUpdateAvailableLabel = "Tjekker efter ny version af KLE";
             toggleKleButtonsClickAbility(false, false);
-            KLEservice.getStatus().success((dto, status) => {
+            KLEservice.getStatus().success(function (dto, status) {
                     if (status !== 200) {
                         notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                         return;
                     }
-                    if (!dto.response.uptodate) {
+                    console.log(dto.response);
+                    console.log(dto.response.upToDate);
+                    if (!dto.response.upToDate) {
                         $scope.KLEUpdateAvailableLabel = "Der er en ny version af KLE, udgivet " + dto.response.version;
                         toggleKleButtonsClickAbility(true, false);
                     }

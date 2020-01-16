@@ -19,7 +19,7 @@
         }
 
         applyUpdateKLE() {
-            const url = `api/v1/kle`;
+            const url = `api/v1/kle/update`;
             return this.$http({ method: "PUT", url: url, });
         }
 
