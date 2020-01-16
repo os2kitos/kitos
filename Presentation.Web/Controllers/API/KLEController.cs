@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -107,7 +108,8 @@ namespace Presentation.Web.Controllers.API
 
         private void CreateCsvChangeDescriptions(ICollection<object> list, IEnumerable<KLEChange> kleChanges)
         {
-            foreach (var elem in kleChanges)
+            var relevantChanges = kleChanges.Where(c => c.ChangeType != KLEChangeType.UuidPatched);
+            foreach (var elem in relevantChanges)
             {
                 var obj = new ExpandoObject() as IDictionary<string, object>;
                 obj.Add("Type", elem.Type);
@@ -146,6 +148,7 @@ namespace Presentation.Web.Controllers.API
                 case KLEChangeType.Removed: return "Fjernet";
                 case KLEChangeType.Added: return "Tilføjet";
                 case KLEChangeType.Renamed: return "Ændret";
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
             }
