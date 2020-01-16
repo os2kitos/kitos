@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies
@@ -44,11 +45,10 @@ namespace Core.ApplicationServices.Authorization.Policies
         }
         public bool Allow(Type target)
         {
-            if (target == null)
-            {
-                throw new ArgumentNullException(nameof(target));
-            }
-            return TypesWithGlobalReadAccess.ContainsKey(target);
+            return target
+                .FromNullable()
+                .Select(TypesWithGlobalReadAccess.ContainsKey)
+                .GetValueOrFallback(false);
         }
     }
 }
