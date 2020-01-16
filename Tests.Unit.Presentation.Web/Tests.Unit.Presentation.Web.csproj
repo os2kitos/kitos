@@ -103,10 +103,6 @@
       <HintPath>..\packages\Ninject.Extensions.Logging.3.2.3.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NSubstitute, Version=1.10.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\NSubstitute.1.10.0.0\lib\net45\NSubstitute.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
@@ -214,13 +210,11 @@
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
-    <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Helpers\WithAutoFixture.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
-    <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageServiceTest.cs" />

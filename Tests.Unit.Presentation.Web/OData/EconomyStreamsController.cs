@@ -8,7 +8,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Moq;
-using NSubstitute;
 using Presentation.Web.Controllers.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -18,13 +17,13 @@ namespace Tests.Unit.Presentation.Web.OData
     public class ODataEconomyStreamsController
     {
         private readonly EconomyStreamsController _sut;
-        private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly Mock<IGenericRepository<EconomyStream>> _economyStreamRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
 
         public ODataEconomyStreamsController()
         {
-            _economyStreamRepository = Substitute.For<IGenericRepository<EconomyStream>>();
-            _sut = new EconomyStreamsController(_economyStreamRepository);
+            _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
+            _sut = new EconomyStreamsController(_economyStreamRepository.Object);
             _authorizationContext = new Mock<IAuthorizationContext>();
             _sut.AuthorizationContext = _authorizationContext.Object;
             var userMock = new UserMock(_sut, "12345678");
@@ -53,8 +52,7 @@ namespace Tests.Unit.Presentation.Web.OData
             const int orgKey = 1;
             ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.All);
             IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream>());
-            _economyStreamRepository.AsQueryable()
-                .Returns(list);
+            _economyStreamRepository.Setup(x=>x.AsQueryable()).Returns(list);
 
             // Act
             var result = _sut.GetByOrganization(orgKey);
@@ -76,8 +74,7 @@ namespace Tests.Unit.Presentation.Web.OData
             const int contractKey = 1;
             ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.Public);
             IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Public, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
-            _economyStreamRepository.AsQueryable()
-                .Returns(list);
+            _economyStreamRepository.Setup(x => x.AsQueryable()).Returns(list);
 
             // Act
             var result = _sut.GetByOrganization(orgKey);
@@ -99,8 +96,7 @@ namespace Tests.Unit.Presentation.Web.OData
             const int contractKey = 1;
             ExpectGetOrganizationalReadAccessReturns(orgKey, OrganizationDataReadAccessLevel.None);
             IQueryable<EconomyStream> list = new EnumerableQuery<EconomyStream>(new List<EconomyStream> { new EconomyStream { AccessModifier = AccessModifier.Local, ExternPaymentFor = new ItContract { Id = contractKey, OrganizationId = orgKey } } });
-            _economyStreamRepository.AsQueryable()
-                .Returns(list);
+            _economyStreamRepository.Setup(x => x.AsQueryable()).Returns(list);
 
             // Act
             var result = _sut.GetByOrganization(orgKey) as ResponseMessageResult;
