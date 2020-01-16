@@ -53,5 +53,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
         {
             return _authorizationContext.HasPermission(permission);
         }
+
+        public EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        {
+            return _authorizationContext.GetReadAccessLevel<T>();
+        }
     }
 }

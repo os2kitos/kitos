@@ -34,10 +34,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             foreach (var type in nonGlobalReadEntityTypes)
             {
-                var entity = (IEntity)Activator.CreateInstance(type);
-                
                 //Act
-                var allow = _sut.Allow(entity);
+                var allow = _sut.Allow(type);
                 
                 //Assert
                 Assert.False(allow);
@@ -52,10 +50,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             foreach (var type in expectedReadAccess.Keys)
             {
-                var entity = (IEntity)Activator.CreateInstance(type);
-
                 //Act
-                var allow = _sut.Allow(entity);
+                var allow = _sut.Allow(type);
 
                 //Assert
                 Assert.True(allow);

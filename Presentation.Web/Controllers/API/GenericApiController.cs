@@ -43,11 +43,24 @@ namespace Presentation.Web.Controllers.API
 
                 var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
-                var refinement = new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId);
+                var entityAccessLevel = GetEntityTypeReadAccessLevel<TModel>();
 
-                var result = refinement.Apply(Repository.AsQueryable());
+                var refinement = entityAccessLevel == EntityReadAccessLevel.All ? 
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.None : 
+                    Maybe<QueryAllByRestrictionCapabilities<TModel>>.Some(new QueryAllByRestrictionCapabilities<TModel>(crossOrganizationReadAccess, organizationId));
 
-                if (refinement.RequiresPostFiltering())
+                var mainQuery = Repository.AsQueryable();
+
+                var result = refinement
+                    .Select(x => x.Apply(mainQuery))
+                    .GetValueOrFallback(mainQuery);
+
+                var requiresPostFiltering = 
+                    refinement
+                        .Select(x=>x.RequiresPostFiltering())
+                        .GetValueOrFallback(false);
+
+                if (requiresPostFiltering)
                 {
                     paging = paging.WithPostProcessingFilter(AllowRead);
                 }

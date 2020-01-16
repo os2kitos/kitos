@@ -207,6 +207,11 @@ namespace Presentation.Web.Controllers.API
             return new RootEntityCrudAuthorization(AuthorizationStrategy);
         }
 
+        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        {
+            return AuthorizationStrategy.GetEntityTypeReadAccessLevel<T>();
+        }
+
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
             return AuthorizationStrategy.GetCrossOrganizationReadAccess();

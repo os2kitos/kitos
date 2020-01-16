@@ -14,5 +14,6 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
         bool AllowModify(IEntity entity);
         bool AllowDelete(IEntity entity);
         bool HasPermission(Permission permission);
+        EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>();
     }
 }

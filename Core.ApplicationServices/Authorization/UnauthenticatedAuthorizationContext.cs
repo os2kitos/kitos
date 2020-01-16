@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel;
 using Core.DomainServices.Authorization;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -13,6 +14,11 @@ namespace Core.ApplicationServices.Authorization
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
             return OrganizationDataReadAccessLevel.None;
+        }
+
+        public EntityReadAccessLevel GetReadAccessLevel<T>()
+        {
+            return EntityReadAccessLevel.None;
         }
 
         public bool AllowReads(IEntity entity)

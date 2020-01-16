@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -19,15 +20,17 @@ namespace Tests.Unit.Presentation.Web.Authorization
     {
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly OrganizationAuthorizationContext _sut;
-        private readonly Mock<IEntityPolicy> _moduleLevelAccessPolicy;
-        private readonly Mock<IEntityPolicy> _globalAccessPolicy;
+        private readonly Mock<IAuthorizationPolicy<IEntity>> _moduleLevelAccessPolicy;
+        private readonly Mock<IAuthorizationPolicy<Type>> _globalAccessPolicy;
 
         public OrganizationAuthorizationContextTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
-            _moduleLevelAccessPolicy = new Mock<IEntityPolicy>();
-            _globalAccessPolicy = new Mock<IEntityPolicy>();
-            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object);
+            _moduleLevelAccessPolicy = new Mock<IAuthorizationPolicy<IEntity>>();
+            _globalAccessPolicy = new Mock<IAuthorizationPolicy<Type>>();
+            var typeResolver = new Mock<IEntityTypeResolver>();
+            typeResolver.Setup(x => x.Resolve(It.IsAny<Type>())).Returns<Type>(t => t);
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object,_moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object);
         }
 
         [Theory]
@@ -117,7 +120,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             //Arrange
             var inputEntity = Mock.Of<IEntity>();
-            _globalAccessPolicy.Setup(x => x.Allow(inputEntity)).Returns(true);
+            _globalAccessPolicy.Setup(x => x.Allow(inputEntity.GetType())).Returns(true);
 
             //Act
             var result = _sut.AllowReads(inputEntity);

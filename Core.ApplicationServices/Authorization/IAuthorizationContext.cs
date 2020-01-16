@@ -19,6 +19,12 @@ namespace Core.ApplicationServices.Authorization
         /// <returns></returns>
         OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId);
         /// <summary>
+        /// Determines read access level of the entity type
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        EntityReadAccessLevel GetReadAccessLevel<T>();
+        /// <summary>
         /// Determines if read-access is allowed for the provided entity
         /// </summary>
         /// <param name="entity"></param>

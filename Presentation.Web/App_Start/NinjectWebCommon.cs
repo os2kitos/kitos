@@ -146,6 +146,7 @@ namespace Presentation.Web
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
             kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InRequestScope();
+            kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

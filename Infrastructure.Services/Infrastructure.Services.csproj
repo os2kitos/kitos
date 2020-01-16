@@ -45,6 +45,7 @@
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
+    <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\TypeHierarchyExtensions.cs" />

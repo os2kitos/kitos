@@ -7,7 +7,7 @@ using Core.DomainModel.Reports;
 
 namespace Core.ApplicationServices.Authorization
 {
-    public class ModuleLevelAccessPolicy : IEntityPolicy
+    public class ModuleLevelAccessPolicy : IAuthorizationPolicy<IEntity>
     {
         private readonly IOrganizationalUserContext _userContext;
 

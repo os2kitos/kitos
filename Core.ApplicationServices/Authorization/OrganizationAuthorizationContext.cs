@@ -5,21 +5,25 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Authorization
 {
     public class OrganizationAuthorizationContext : IAuthorizationContext, IPermissionVisitor
     {
         private readonly IOrganizationalUserContext _activeUserContext;
-        private readonly IEntityPolicy _moduleLevelAccessPolicy;
-        private readonly IEntityPolicy _globalReadAccessPolicy;
+        private readonly IEntityTypeResolver _typeResolver;
+        private readonly IAuthorizationPolicy<IEntity> _moduleLevelAccessPolicy;
+        private readonly IAuthorizationPolicy<Type> _globalReadAccessPolicy;
 
         public OrganizationAuthorizationContext(
             IOrganizationalUserContext activeUserContext,
-            IEntityPolicy moduleLevelAccessPolicy,
-            IEntityPolicy globalReadAccessPolicy)
+            IEntityTypeResolver typeResolver,
+            IAuthorizationPolicy<IEntity> moduleLevelAccessPolicy,
+            IAuthorizationPolicy<Type> globalReadAccessPolicy)
         {
             _activeUserContext = activeUserContext;
+            _typeResolver = typeResolver;
             _moduleLevelAccessPolicy = moduleLevelAccessPolicy;
             _globalReadAccessPolicy = globalReadAccessPolicy;
         }
@@ -54,35 +58,40 @@ namespace Core.ApplicationServices.Authorization
             }
         }
 
+        public EntityReadAccessLevel GetReadAccessLevel<T>()
+        {
+            var entityType = _typeResolver.Resolve(typeof(T));
+            return GetReadAccessLevel(entityType);
+        }
+
         public bool AllowReads(IEntity entity)
         {
-            var result = false;
-
-            if (IsGlobalAdmin())
+            if (entity == null)
             {
-                result = true;
-            }
-            else if (EntityEqualsActiveUser(entity))
-            {
-                result = true;
-            }
-            else if (IsContextBound(entity))
-            {
-                if (ActiveContextIsEntityContext(entity))
-                {
-                    result = true;
-                }
-                else if (GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public && EntityIsShared(entity))
-                {
-                    result = true;
-                }
-            }
-            else if (_globalReadAccessPolicy.Allow(entity))
-            {
-                result = true;
+                return false;
             }
 
-            return result;
+            if (EntityEqualsActiveUser(entity))
+            {
+                return true;
+            }
+
+            var entityType = _typeResolver.Resolve(entity.GetType());
+
+            var readAccessLevel = GetReadAccessLevel(entityType);
+            switch (readAccessLevel)
+            {
+                case EntityReadAccessLevel.None:
+                    return false;
+                case EntityReadAccessLevel.OrganizationOnly:
+                    return ActiveContextIsEntityContext(entity);
+                case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
+                    return ActiveContextIsEntityContext(entity) || EntityIsShared(entity);
+                case EntityReadAccessLevel.All:
+                    return true;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level");
+            }
         }
 
         public bool AllowCreate<T>()
@@ -108,6 +117,24 @@ namespace Core.ApplicationServices.Authorization
                 CheckNewObjectAccessModifierPolicy(entity) &&
                 CheckSpecificCreationPolicy(entity) &&
                 AllowModify(entity); //NOTE: Ensures backwards compatibility as long as some terms are yet to be fully migrated
+        }
+
+        private EntityReadAccessLevel GetReadAccessLevel(Type entityType)
+        {
+            var globalRead = _globalReadAccessPolicy.Allow(entityType) || IsGlobalAdmin();
+            if (globalRead)
+            {
+                return EntityReadAccessLevel.All;
+            }
+
+            if (IsContextBound(entityType))
+            {
+                return GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public
+                    ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
+                    : EntityReadAccessLevel.OrganizationOnly;
+            }
+
+            return EntityReadAccessLevel.None;
         }
 
         private bool CheckNewObjectAccessModifierPolicy(IEntity entity)
@@ -291,9 +318,14 @@ namespace Core.ApplicationServices.Authorization
             return _activeUserContext.HasAssignedWriteAccess(entity);
         }
 
-        private static bool IsContextBound(IEntity entity)
+        private bool IsContextBound(IEntity entity)
         {
-            return entity is IContextAware || entity is IHasOrganization;
+            return IsContextBound(_typeResolver.Resolve(entity.GetType()));
+        }
+
+        private static bool IsContextBound(Type entityType)
+        {
+            return typeof(IContextAware).IsAssignableFrom(entityType) || typeof(IHasOrganization).IsAssignableFrom(entityType);
         }
 
         private bool ActiveContextIsEntityContext(IEntity entity)

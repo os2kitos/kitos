@@ -88,7 +88,7 @@
     <Compile Include="Authorization\AuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IAuthorizationContext.cs" />
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
-    <Compile Include="Authorization\IEntityPolicy.cs" />
+    <Compile Include="Authorization\IAuthorizationPolicy.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
     <Compile Include="Authorization\Policies\ModuleLevelAccessPolicy.cs" />

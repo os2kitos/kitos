@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Authorization\CrossOrganizationDataReadAccessLevel.cs" />
     <Compile Include="Authorization\DataAccessLevel.cs" />
+    <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Extensions\EntityQueryExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />

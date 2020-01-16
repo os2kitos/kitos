@@ -8,6 +8,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Queries;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -34,13 +35,24 @@ namespace Presentation.Web.Controllers.OData
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
-            var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
+            var entityAccessLevel = GetEntityTypeReadAccessLevel<T>();
 
-            var result = refinement.Apply(Repository.AsQueryable());
+            var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
+                Maybe<QueryAllByRestrictionCapabilities<T>>.None :
+                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId));
 
-            if (refinement.RequiresPostFiltering())
+            var mainQuery = Repository.AsQueryable();
+
+            var result = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            if (refinement.Select(x => x.RequiresPostFiltering()).GetValueOrFallback(false))
             {
-                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
+                result = result
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .AsQueryable();
             }
 
             return Ok(result);
@@ -199,6 +211,11 @@ namespace Presentation.Web.Controllers.OData
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
             return _authorizationStrategy.Value.GetCrossOrganizationReadAccess();
+        }
+
+        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        {
+            return _authorizationStrategy.Value.GetEntityTypeReadAccessLevel<T>();
         }
 
         protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
