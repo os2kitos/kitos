@@ -29,7 +29,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
                     .Where(x => typeof(IEntity).IsAssignableFrom(x))
                     .Where(x=>x.IsAbstract == false)
                     .Where(x=>x.IsInterface == false)
-                    .Where(x => expectedReadAccess.ContainsKey(x) == false)
+                    .Where(x => expectedReadAccess.Contains(x) == false)
                     .ToList();
 
             foreach (var type in nonGlobalReadEntityTypes)
@@ -48,7 +48,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             //Arrange
             var expectedReadAccess = GetKnownTypes();
 
-            foreach (var type in expectedReadAccess.Keys)
+            foreach (var type in expectedReadAccess)
             {
                 //Act
                 var allow = _sut.Allow(type);
@@ -58,9 +58,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
             }
         }
 
-        private IReadOnlyDictionary<Type, bool> GetKnownTypes()
+        private ISet<Type> GetKnownTypes()
         {
-            return (IReadOnlyDictionary<Type, bool>)_sut.GetFieldValue("TypesWithGlobalReadAccess");
+            return (ISet<Type>)_sut.GetFieldValue("TypesWithGlobalReadAccess");
         }
     }
 }

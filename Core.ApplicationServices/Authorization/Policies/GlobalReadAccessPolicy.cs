@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
@@ -14,21 +13,21 @@ namespace Core.ApplicationServices.Authorization.Policies
     public class GlobalReadAccessPolicy : IAuthorizationPolicy<Type>
     {
         //NOTE: For types which cannot be bound to a scoped context (lack of knowledge) and has shared read access
-        private static readonly IReadOnlyDictionary<Type, bool> TypesWithGlobalReadAccess;
+        private static readonly ISet<Type> TypesWithGlobalReadAccess;
 
         static GlobalReadAccessPolicy()
         {
             var typesWithGlobalRead =
-                new Dictionary<Type, bool>
+                new HashSet<Type>
                 {
-                    {typeof(Advice),true},
-                    {typeof(AdviceUserRelation),true},
-                    {typeof(Text),true},
-                    {typeof(HelpText),true},
-                    {typeof(AdviceSent),true},
-                    {typeof(GlobalConfig),true },
-                    {typeof(ExternalReference),true },
-                    {typeof(TaskRef),true }
+                    typeof(Advice),
+                    typeof(AdviceUserRelation),
+                    typeof(Text),
+                    typeof(HelpText),
+                    typeof(AdviceSent),
+                    typeof(GlobalConfig),
+                    typeof(ExternalReference),
+                    typeof(TaskRef)
                 };
 
             //All base options are globally readable
@@ -39,15 +38,15 @@ namespace Core.ApplicationServices.Authorization.Policies
                 .Where(t => t.IsAbstract == false)
                 .Where(t => t.IsInterface == false)
                 .ToList()
-                .ForEach(t => typesWithGlobalRead.Add(t, true));
+                .ForEach(t => typesWithGlobalRead.Add(t));
 
-            TypesWithGlobalReadAccess = new ReadOnlyDictionary<Type, bool>(typesWithGlobalRead);
+            TypesWithGlobalReadAccess = new HashSet<Type>(typesWithGlobalRead);
         }
         public bool Allow(Type target)
         {
             return target
                 .FromNullable()
-                .Select(TypesWithGlobalReadAccess.ContainsKey)
+                .Select(TypesWithGlobalReadAccess.Contains)
                 .GetValueOrFallback(false);
         }
     }
