@@ -50,7 +50,7 @@ namespace Core.ApplicationServices
             }
 
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
-            _kleUpdateHistoryItemRepository.Insert(publishedDate.ToString("dd-MM-yyyy"), _organizationalUserContext.UserId);
+            _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);
             return Result<OperationResult, KLEUpdateStatus>.Ok(KLEUpdateStatus.Ok);
         }
     }

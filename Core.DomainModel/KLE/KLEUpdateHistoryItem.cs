@@ -1,10 +1,12 @@
-﻿namespace Core.DomainModel.KLE
+﻿using System;
+
+namespace Core.DomainModel.KLE
 {
     public class KLEUpdateHistoryItem: Entity
     {
-        public string Version { get; set; }
+        public DateTime Version { get; set; }
 
-        public KLEUpdateHistoryItem(string version, int userId)
+        public KLEUpdateHistoryItem(DateTime version, int userId)
         {
             Version = version;
             LastChangedByUserId = userId;

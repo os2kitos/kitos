@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202001161255290_KLEUpdateHistoryItem"; }
+            get { return "202001162041388_KLEUpdateHistoryItem"; }
         }
         
         string IMigrationMetadata.Source
