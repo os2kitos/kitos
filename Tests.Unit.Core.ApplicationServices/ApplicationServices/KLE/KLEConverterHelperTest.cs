@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using Core.DomainServices.Repositories.KLE;
 using Infrastructure.Services.KLEDataBridge;
-using NSubstitute;
+using Moq;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.KLE
@@ -12,9 +12,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Fact]
         private void ConvertToTaskRefs_Given_Sample_Creates_Valid_TaskRefs()
         {
-            var mockKLEDataBridge = Substitute.For<IKLEDataBridge>();
+            var mockKLEDataBridge = new Mock<IKLEDataBridge>();
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-single-item.xml");
-            mockKLEDataBridge.GetKLEXMLData().Returns(document);
+            mockKLEDataBridge.Setup(b => b.GetKLEXMLData()).Returns(document);
             var sut = new KLEConverterHelper();
             var result = sut.ConvertToTaskRefs(document);
             Assert.True(result.TryGet("00", out var mainGroup));
