@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Core.DomainModel.Organization;
 
-namespace Core.DomainServices.Repositories.KLE
+namespace Core.DomainModel.KLE
 {
-    public class MostRecentKLE
+    public class KLEMostRecent
     {
         private readonly IDictionary<string, TaskRef> _taskRefs = new Dictionary<string, TaskRef>();
 

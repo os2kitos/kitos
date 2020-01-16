@@ -64,6 +64,11 @@ namespace Infrastructure.DataAccess
             return _dbSet.Include(includeExpression);
         }
 
+        public TProperty GetMax<TProperty>(Expression<Func<T, TProperty>> propertyExpression)
+        {
+            return _dbSet.Max(propertyExpression);
+        }
+
         public IQueryable<T> AsQueryable()
         {
             var dbAsQueryable = _dbSet.AsQueryable();
@@ -80,7 +85,6 @@ namespace Infrastructure.DataAccess
         {
             return _dbSet.Find(key);
         }
-
 
         public T Insert(T entity)
         {
@@ -170,6 +174,8 @@ namespace Infrastructure.DataAccess
                 throw;
             }
         }
+
+        public int Count => _dbSet.Count();
 
         protected virtual void Dispose(bool disposing)
         {

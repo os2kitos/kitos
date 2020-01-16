@@ -11,22 +11,13 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.AdviceSent;
+using Core.DomainModel.KLE;
 
 namespace Infrastructure.DataAccess
 {
     public class KitosContext : DbContext
     {
-        static KitosContext()
-        {
-
-        }
-
-        public KitosContext()
-            : this("KitosContext")
-
-        {
-
-        }
+        public KitosContext(): this("KitosContext") {}
 
         public KitosContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
@@ -114,7 +105,6 @@ namespace Infrastructure.DataAccess
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
         public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
-
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
         public DbSet<LocalArchiveType> LocalArchiveTypes { get; set; }
         public DbSet<LocalArchiveLocation> LocalArchiveLocation { get; set; }
@@ -160,6 +150,7 @@ namespace Infrastructure.DataAccess
         public DbSet<RegisterType> RegisterTypes { get; set; }
         public DbSet<LocalRegisterType> LocalRegisterTypes { get; set; }
         public DbSet<ContactPerson> ContactPersons { get; set; }
+        public DbSet<KLEUpdateHistoryItem> KLEUpdateHistoryItems { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

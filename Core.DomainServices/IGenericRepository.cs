@@ -15,6 +15,8 @@ namespace Core.DomainServices
 
         IEnumerable<TModel> GetWithReferencePreload<TProperty>(Expression<Func<TModel, TProperty>> includeExpression);
 
+        TProperty GetMax<TProperty>(Expression<Func<TModel, TProperty>> propertyExpression);
+
         TModel GetByKey(params object[] key);
 
         TModel Insert(TModel entity);
@@ -56,5 +58,7 @@ namespace Core.DomainServices
         IEnumerable<TModel> SQL(string sql);
 
         TModel Create();
+
+        int Count { get; }
     }
 }

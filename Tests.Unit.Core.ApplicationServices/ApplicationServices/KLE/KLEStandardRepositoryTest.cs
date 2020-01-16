@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.KLE;
 using Infrastructure.Services.DataAccess;
@@ -19,22 +21,21 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
     public class KLEStandardRepositoryTest
     {
         [Theory]
-        [InlineData("2019-11-01", true)]
-        [InlineData("9999-12-31", false)]
-        private void GetKLEStatus_Returns_ValidStatus(string currentDate, bool expectedUpToDate)
+        [InlineData("31-10-2019", false)]
+        [InlineData("01-01-2020", true)]
+        private void GetKLEStatus_Returns_ValidStatus(string lastUpdatedString, bool expectedUpToDate)
         {
             var mockKLEDataBridge = new Mock<IKLEDataBridge>();
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-only-published-date.xml");
-            var publishedDate = DateTime.Parse(currentDate);
-            document.Descendants("UdgivelsesDato").First().Value = publishedDate.ToLongDateString();
+            var expectedPublishDate = DateTime.Parse(document.Descendants("UdgivelsesDato").First().Value, CultureInfo.GetCultureInfo("da-DK"));
             mockKLEDataBridge.Setup(r => r.GetKLEXMLData()).Returns(document);
             var stubTaskRefRepository = new GenericRepositoryTaskRefStub();
             var mockTransactionManager = new Mock<ITransactionManager>();
             var mockLogger = new Mock<ILogger>();
             var sut = new KLEStandardRepository(mockKLEDataBridge.Object, mockTransactionManager.Object, stubTaskRefRepository, mockLogger.Object);
-            var result = sut.GetKLEStatus();
+            var result = sut.GetKLEStatus(DateTime.Parse(lastUpdatedString, CultureInfo.GetCultureInfo("da-DK")));
             Assert.Equal(expectedUpToDate, result.UpToDate);
-            Assert.Equal(publishedDate, result.Published);
+            Assert.Equal(expectedPublishDate, result.Published);
         }
 
         [Fact]
@@ -70,6 +71,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             Assert.Equal(expectedNumberOfRemoved, result.Count(c => c.ChangeType == KLEChangeType.Removed));
             Assert.Equal(expectedNumberOfRenames, result.Count(c => c.ChangeType == KLEChangeType.Renamed));
             Assert.Equal(expectedNumberOfAdded, result.Count(c => c.ChangeType == KLEChangeType.Added));
+        }
+
+        [Fact]
+        private void UpdateKLE_Given_Summary_Updates_Returns_Published_Date()
+        {
+            var updateObjects = SetupUpdateObjects();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var result = sut.UpdateKLE(0, 0);
+            Assert.Equal(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), result);
         }
 
         [Fact]

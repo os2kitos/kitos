@@ -1,4 +1,4 @@
-﻿namespace Core.DomainServices.Repositories.KLE
+﻿namespace Core.DomainModel.KLE
 {
     public enum KLEChangeType
     {

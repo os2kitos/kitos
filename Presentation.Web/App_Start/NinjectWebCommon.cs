@@ -142,6 +142,7 @@ namespace Presentation.Web
             kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>();
             kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>();
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>();
+            kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

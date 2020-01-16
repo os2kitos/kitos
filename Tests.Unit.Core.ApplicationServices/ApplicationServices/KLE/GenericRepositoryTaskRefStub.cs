@@ -33,13 +33,13 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _taskRefs.Remove(entity.TaskKey);
         }
 
-        public TaskRef GetByKey(params object[] key) { throw new NotImplementedException(); }
-
-        public IQueryable<TaskRef> AsQueryable() { throw new NotImplementedException(); }
-
-        public IEnumerable<TaskRef> SQL(string sql) { throw new NotImplementedException(); }
+        public int Count => _taskRefs.Count;
 
         public TaskRef Create() { throw new NotImplementedException(); }
+        public TaskRef GetByKey(params object[] key) { throw new NotImplementedException(); }
+        public TProperty GetMax<TProperty>(Expression<Func<TaskRef, TProperty>> propertyExpression) { throw new NotImplementedException(); }
+        public IQueryable<TaskRef> AsQueryable() { throw new NotImplementedException(); }
+        public IEnumerable<TaskRef> SQL(string sql) { throw new NotImplementedException(); }
 
         public void Dispose() { }
         public void DeleteWithReferencePreload(TaskRef entity) { }

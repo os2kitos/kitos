@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.KLE;
 using Core.DomainServices.Repositories.KLE;
 
 namespace Core.ApplicationServices
