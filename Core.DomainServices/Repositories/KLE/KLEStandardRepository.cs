@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
+using Core.DomainModel;
+using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
@@ -37,22 +40,26 @@ namespace Core.DomainServices.Repositories.KLE
             _kleConverterHelper = kleConverterHelper;
         }
 
-        public KLEStatus GetKLEStatus()
+        public KLEStatus GetKLEStatus(DateTime lastUpdated)
         {
             var kleXmlData = _kleDataBridge.GetKLEXMLData();
-            var publishedString = kleXmlData.Descendants("UdgivelsesDato").First().Value;
-            var publishedDate = DateTime.Parse(publishedString, CultureInfo.InvariantCulture);
+            var publishedDate = GetPublishedDate(kleXmlData);
             return new KLEStatus
             {
-                UpToDate = DateTime.Now.Date>=publishedDate.Date,
+                UpToDate = lastUpdated>=publishedDate.Date,
                 Published = publishedDate
             };
         }
 
         public IReadOnlyList<KLEChange> GetKLEChangeSummary()
         {
+            return GetKLEChangeSummary(_kleDataBridge.GetKLEXMLData());
+        }
+
+        private IReadOnlyList<KLEChange> GetKLEChangeSummary(XDocument kleXmlData)
+        {
             var result = new List<KLEChange>();
-            var mostRecentTaskRefs = _kleConverterHelper.ConvertToTaskRefs(_kleDataBridge.GetKLEXMLData());
+            var mostRecentTaskRefs = _kleConverterHelper.ConvertToTaskRefs(kleXmlData);
             foreach (var existingTaskRef in _existingTaskRefRepository.Get())
             {
                 if (mostRecentTaskRefs.TryGet(existingTaskRef.TaskKey, out var mostRecentTaskRef))
@@ -103,10 +110,12 @@ namespace Core.DomainServices.Repositories.KLE
             return result;
         }
 
-        public void UpdateKLE(int ownerObjectId, int ownedByOrgnizationUnitId)
+        public DateTime UpdateKLE(int ownerObjectId, int ownedByOrgnizationUnitId)
         {
             _logger.Debug("UpdateKLE: Begin");
-            var changes = GetKLEChangeSummary();
+
+            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+            var changes = GetKLEChangeSummary(kleXmlData);
             _logger.Debug($"Changes: {changes.Count}");
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
@@ -120,9 +129,18 @@ namespace Core.DomainServices.Repositories.KLE
                 transaction.Commit();
             }
             _logger.Debug("UpdateKLE: End");
+
+            return GetPublishedDate(kleXmlData);
         }
 
         #region Helpers
+
+        private static DateTime GetPublishedDate(XContainer kleXmlData)
+        {
+            var publishedString = kleXmlData.Descendants("UdgivelsesDato").First().Value;
+            var publishedDate = DateTime.Parse(publishedString, CultureInfo.GetCultureInfo("da-DK"));
+            return publishedDate;
+        }
 
         private void UpdateRemovedTaskRefs(IEnumerable<KLEChange> changes)
         {
@@ -162,6 +180,7 @@ namespace Core.DomainServices.Repositories.KLE
                 _existingTaskRefRepository.Insert(
                     new TaskRef
                     {
+                        AccessModifier = AccessModifier.Public,
                         Uuid = kleChange.Uuid,
                         Type = kleChange.Type,
                         TaskKey = kleChange.TaskKey,

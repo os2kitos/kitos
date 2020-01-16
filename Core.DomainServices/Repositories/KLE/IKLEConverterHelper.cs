@@ -1,9 +1,10 @@
 ﻿using System.Xml.Linq;
+using Core.DomainModel.KLE;
 
 namespace Core.DomainServices.Repositories.KLE
 {
     public interface IKLEConverterHelper
     {
-        MostRecentKLE ConvertToTaskRefs(XDocument document);
+        KLEMostRecent ConvertToTaskRefs(XDocument document);
     }
 }

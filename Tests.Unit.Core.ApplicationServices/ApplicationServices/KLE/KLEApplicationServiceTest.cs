@@ -4,6 +4,7 @@ using System.Linq;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.KLE;
 using Moq;
@@ -19,18 +20,22 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void GetKLEStatus_Authorizes_And_Returns_Valid_KLEStatus(OrganizationRole role, OperationResult expectedOperationResult)
         {
             var mockKLEStandardRepository = new Mock<IKLEStandardRepository>();
-            var expectedPublishedDate = DateTime.Now.Date;
+            var expectedPublishedDate = DateTime.Parse("01-11-2019");
             var kleStatus = new KLEStatus
             {
-                UpToDate = true,
+                UpToDate = false,
                 Published = expectedPublishedDate
             };
-            mockKLEStandardRepository.Setup(r => r.GetKLEStatus()).Returns(kleStatus);
+            var lastUpdate = DateTime.Parse("01-01-1970");
+            var mockUpdateHistoryItemRepository = new Mock<IKLEUpdateHistoryItemRepository>();
+            mockUpdateHistoryItemRepository.Setup(r => r.GetLastUpdated()).Returns(lastUpdate);
+            mockKLEStandardRepository.Setup(r => r.GetKLEStatus(lastUpdate)).Returns(kleStatus);
             var mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
             mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
-            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object);
+            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object, mockUpdateHistoryItemRepository.Object);
             var result = sut.GetKLEStatus();
             Assert.Equal(expectedOperationResult, result.Status);
+            mockKLEStandardRepository.Verify();
         }
 
         [Theory]
@@ -45,7 +50,8 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             });
             var mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
             mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
-            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object);
+            var mockUpdateHistoryItemRepository = new Mock<IKLEUpdateHistoryItemRepository>();
+            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object, mockUpdateHistoryItemRepository.Object);
             var result = sut.GetKLEChangeSummary();
             Assert.Equal(expectedOperationResult, result.Status);
             Assert.Equal(expectedNumberOfChanges, result.Value?.Count() ?? 0);
@@ -56,16 +62,27 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [InlineData(OrganizationRole.User, OperationResult.Forbidden)]
         private void UpdateKLE_Authorizes_And_Updates(OrganizationRole role, OperationResult expectedOperationResult)
         {
+            var mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
+            mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
+            const int activeOrganizationId = 1;
+            mockOrganizationalUserContext.Setup(r => r.ActiveOrganizationId).Returns(activeOrganizationId);
+            const int userId = 1;
+            mockOrganizationalUserContext.Setup(r => r.UserId).Returns(userId);
             var mockKLEStandardRepository = new Mock<IKLEStandardRepository>();
+            var publishedDate = DateTime.Today;
+            mockKLEStandardRepository
+                .Setup(r => r.UpdateKLE(userId, activeOrganizationId))
+                .Returns(publishedDate);
             mockKLEStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
                 new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
             });
-            var mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
-            mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
-            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object);
+            var mockUpdateHistoryItemRepository = new Mock<IKLEUpdateHistoryItemRepository>();
+            var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object, mockUpdateHistoryItemRepository.Object);
             var result = sut.UpdateKLE();
             Assert.Equal(expectedOperationResult, result.Status);
+            mockUpdateHistoryItemRepository.Verify(r => r.Insert(publishedDate.ToString("dd-MM-yyyy"), userId), 
+                expectedOperationResult == OperationResult.Ok ? Times.Once() : Times.Never());
         }
 
     }

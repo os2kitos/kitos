@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Linq;
 using System.Xml.Linq;
+using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 
 namespace Core.DomainServices.Repositories.KLE
 {
     public class KLEConverterHelper : IKLEConverterHelper
     {
-        public MostRecentKLE ConvertToTaskRefs(XDocument document)
+        public KLEMostRecent ConvertToTaskRefs(XDocument document)
         {
-            var result = new MostRecentKLE();
+            var result = new KLEMostRecent();
             result.AddRange(document.Descendants("Hovedgruppe").Select(mainGroup => 
                 new TaskRef
                 {

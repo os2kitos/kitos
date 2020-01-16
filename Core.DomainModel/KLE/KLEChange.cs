@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainServices.Repositories.KLE
+namespace Core.DomainModel.KLE
 {
     public class KLEChange
     {

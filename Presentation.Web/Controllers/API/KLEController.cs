@@ -12,6 +12,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.KLE;
 using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
