@@ -11,6 +11,11 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Web;
+using System.Web.Helpers;
+using Newtonsoft.Json;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -246,6 +251,35 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/authorize/antiforgery")]
+        public HttpResponseMessage GetAntiForgeryToken()
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+            var cookie = HttpContext.Current.Request.Cookies["XSRF-TOKEN"];
+
+            AntiForgery.GetTokens(cookie == null ? "" : cookie.Value, out var cookieToken, out var formToken);
+
+            response.Content = new StringContent(
+                JsonConvert.SerializeObject(formToken), Encoding.UTF8, "application/json");
+
+            if (!string.IsNullOrEmpty(cookieToken))
+            {
+                response.Headers.AddCookies(new[]
+                {
+                    new CookieHeaderValue("XSRF-TOKEN", cookieToken)
+                    {
+                        Expires = DateTimeOffset.Now.AddMinutes(10),
+                        Path = "/"
+                    }
+                });
+            }
+
+            return response;
         }
     }
 }

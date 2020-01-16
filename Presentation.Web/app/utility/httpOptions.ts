@@ -1,9 +1,10 @@
 ﻿module Kitos.Utility {
     export class csrfToken {
         static addHeader() {
+            const tokenVal = angular.element("input[id='__RequestVerificationToken']").val();
             const csrfHeader = {
                 headers: {
-                    "X-XSRF-Token": angular.element("input[name='__RequestVerificationToken']").val()
+                    "HEADER-XSRF-TOKEN": tokenVal
                 }
             };
             return csrfHeader;

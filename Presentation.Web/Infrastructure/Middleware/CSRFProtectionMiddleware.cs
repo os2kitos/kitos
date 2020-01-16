@@ -13,8 +13,8 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
-        private const string XsrfHeader = "X-XSRF-TOKEN";
-        private const string XsrfCookie = "__RequestVerificationToken";
+        private const string XsrfHeader = "HEADER-XSRF-TOKEN";
+        private const string XsrfCookie = "XSRF-TOKEN";
 
         public override async Task Invoke(IOwinContext context)
         {
@@ -31,22 +31,23 @@ namespace Presentation.Web.Infrastructure.Middleware
 
                 var tokenHeaderValue = xsrfToken.First();
                 
-                var tokenCookie = context.Request.Cookies.Single(c => c.Key == XsrfCookie).Value;
+                var tokenCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == XsrfCookie);
 
-                if (tokenCookie == null)
+                if (tokenCookie.Value == null)
                 {
-                    context.Response.StatusCode = 400;
+                    context.Response.StatusCode = 401;
                     return;
                 }
 
                 try
                 {
-                    AntiForgery.Validate(tokenCookie, tokenHeaderValue);
+                    AntiForgery.Validate(tokenCookie.Value, tokenHeaderValue);
                     await Next.Invoke(context);
                 }
-                catch (HttpAntiForgeryException)
+                catch (HttpAntiForgeryException e)
                 {
-                    context.Response.StatusCode = 400;
+
+                    context.Response.StatusCode = 402;
                 }
                 
             }

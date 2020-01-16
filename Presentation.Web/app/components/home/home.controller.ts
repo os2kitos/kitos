@@ -9,9 +9,10 @@
                 resolve: {
                     texts: [
                         "$http", $http => $http.get("api/text/")
-                            .then(result => result.data.response)
+                        .then(result => result.data.response)
                     ]
-                }
+                    
+        }
             });
         }
     ]);
@@ -56,6 +57,11 @@
                 notify.addInfoMessage("Should do redirect to OS2SSO...");
                 $auth.signIn();
             };
+
+            $scope.TEST = () => {
+                $http.get("api/authorize/antiforgery")
+                    .then(result => (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value = result.data);
+            }
 
             // login
             $scope.submitLogin = () => {
