@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -74,11 +80,16 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
+    <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEStandardRepository.cs" />
     <Compile Include="Repositories\KLE\KLEChange.cs" />
     <Compile Include="Repositories\KLE\KLEChangeType.cs" />
+    <Compile Include="Repositories\KLE\KLEConverterHelper.cs" />
+    <Compile Include="Repositories\KLE\KLEParentHelper.cs" />
     <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
+    <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
     <Compile Include="Repositories\KLE\MostRecentKLE.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
@@ -101,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

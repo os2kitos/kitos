@@ -35,5 +35,15 @@ namespace Core.ApplicationServices
             }
             return Result<OperationResult, IEnumerable<KLEChange>>.Ok(_kleStandardRepository.GetKLEChangeSummary());
         }
+
+        public Result<OperationResult, KLEUpdateStatus> UpdateKLE()
+        {
+            if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
+            {
+                return Result<OperationResult, KLEUpdateStatus>.Fail(OperationResult.Forbidden);
+            }
+            _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
+            return Result<OperationResult, KLEUpdateStatus>.Ok(KLEUpdateStatus.Ok);
+        }
     }
 }

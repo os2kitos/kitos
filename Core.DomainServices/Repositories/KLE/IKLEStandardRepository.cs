@@ -6,5 +6,6 @@ namespace Core.DomainServices.Repositories.KLE
     {
         KLEStatus GetKLEStatus();
         IReadOnlyList<KLEChange> GetKLEChangeSummary();
+        void UpdateKLE(int ownerObjectId, int ownedByOrgnizationUnitId);
     }
 }
