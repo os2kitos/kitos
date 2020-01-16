@@ -12,7 +12,7 @@ namespace Infrastructure.DataAccess.Migrations
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        Version = c.String(),
+                        Version = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         ObjectOwnerId = c.Int(),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         LastChangedByUserId = c.Int(),

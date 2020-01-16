@@ -22,7 +22,7 @@ namespace Core.DomainServices.Repositories.KLE
             return _updateHistoryItems.Get();
         }
 
-        public KLEUpdateHistoryItem Insert(string version, int userId)
+        public KLEUpdateHistoryItem Insert(DateTime version, int userId)
         {
             KLEUpdateHistoryItem result;
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
@@ -39,7 +39,7 @@ namespace Core.DomainServices.Repositories.KLE
             var lastUpdated = DateTime.MinValue;
             if (_updateHistoryItems.Count > 0)
             {
-                lastUpdated = _updateHistoryItems.GetMax(item => item.LastChanged);
+                lastUpdated = _updateHistoryItems.GetMax(item => item.Version);
             }
             return lastUpdated;
         }

@@ -81,7 +81,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var sut = new KLEApplicationService(mockOrganizationalUserContext.Object, mockKLEStandardRepository.Object, mockUpdateHistoryItemRepository.Object);
             var result = sut.UpdateKLE();
             Assert.Equal(expectedOperationResult, result.Status);
-            mockUpdateHistoryItemRepository.Verify(r => r.Insert(publishedDate.ToString("dd-MM-yyyy"), userId), 
+            mockUpdateHistoryItemRepository.Verify(r => r.Insert(publishedDate, userId), 
                 expectedOperationResult == OperationResult.Ok ? Times.Once() : Times.Never());
         }
 

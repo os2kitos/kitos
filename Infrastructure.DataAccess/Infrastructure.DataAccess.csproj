@@ -507,9 +507,9 @@
     <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.Designer.cs">
       <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202001161255290_KLEUpdateHistoryItem.cs" />
-    <Compile Include="Migrations\202001161255290_KLEUpdateHistoryItem.Designer.cs">
-      <DependentUpon>202001161255290_KLEUpdateHistoryItem.cs</DependentUpon>
+    <Compile Include="Migrations\202001162041388_KLEUpdateHistoryItem.cs" />
+    <Compile Include="Migrations\202001162041388_KLEUpdateHistoryItem.Designer.cs">
+      <DependentUpon>202001162041388_KLEUpdateHistoryItem.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -812,8 +812,8 @@
     <EmbeddedResource Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.resx">
       <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202001161255290_KLEUpdateHistoryItem.resx">
-      <DependentUpon>202001161255290_KLEUpdateHistoryItem.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202001162041388_KLEUpdateHistoryItem.resx">
+      <DependentUpon>202001162041388_KLEUpdateHistoryItem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

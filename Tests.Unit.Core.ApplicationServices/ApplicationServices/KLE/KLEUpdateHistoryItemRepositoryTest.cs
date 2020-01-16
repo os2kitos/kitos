@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Core.DomainModel.KLE;
@@ -24,8 +25,8 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                     It.IsAny<Func<IQueryable<KLEUpdateHistoryItem>, IOrderedQueryable<KLEUpdateHistoryItem>>>(),
                     It.IsAny<string>())).Returns(new List<KLEUpdateHistoryItem>
             {
-                new KLEUpdateHistoryItem("01-01-2020", 1),
-                new KLEUpdateHistoryItem("01-11-2019", 1)
+                new KLEUpdateHistoryItem(DateTime.Parse("01-01-2020", CultureInfo.GetCultureInfo("da-DK")), 1),
+                new KLEUpdateHistoryItem(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1)
             });
             var mockTransactionManager = new Mock<ITransactionManager>();
             var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
@@ -58,7 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             mockTransactionManager.Setup(t => t.Begin(IsolationLevel.Serializable))
                 .Returns(mockDatabaseTransaction.Object);
             var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
-            sut.Insert("01-11-2019", 1);
+            sut.Insert(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1);
             mockGenericUpdateHistoryItemRepository.Verify();
         }
     }
