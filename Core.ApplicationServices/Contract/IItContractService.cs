@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Contract
 {
     public interface IItContractService
     {
-        Result<ItContract,OperationFailure> Delete(int id);
+        Result<ItContract, OperationFailure> Delete(int id);
     }
 }

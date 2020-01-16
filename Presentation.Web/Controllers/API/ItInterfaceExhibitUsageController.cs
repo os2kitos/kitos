@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.SystemUsage;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
@@ -18,11 +19,13 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<ItInterfaceExhibitUsage> _repository;
         private readonly IItSystemUsageRepository _usageRepository;
+        private readonly IItContractRepository _contractRepository;
 
-        public ItInterfaceExhibitUsageController(IGenericRepository<ItInterfaceExhibitUsage> repository, IItSystemUsageRepository usageRepository)
+        public ItInterfaceExhibitUsageController(IGenericRepository<ItInterfaceExhibitUsage> repository, IItSystemUsageRepository usageRepository, IItContractRepository contractRepository)
         {
             _repository = repository;
             _usageRepository = usageRepository;
+            _contractRepository = contractRepository;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<ItInterfaceExhibitUsageDTO>>))]
@@ -31,7 +34,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var items = _repository.Get(x => x.ItContractId == contractId);
-                var dto = Map<IEnumerable<ItInterfaceExhibitUsage>, IEnumerable<ItInterfaceExhibitUsageDTO>>(items.Where(x => AllowRead(x.ItSystemUsage)));
+                var dto = Map<IEnumerable<ItInterfaceExhibitUsage>, IEnumerable<ItInterfaceExhibitUsageDTO>>(items.Where(x => AllowRead(x.ItContract)));
 
                 return Ok(dto);
             }
@@ -52,7 +55,7 @@ namespace Presentation.Web.Controllers.API
                 if (item == null)
                     return NotFound();
 
-                if (!AllowRead(item.ItSystemUsage))
+                if (!AllowRead(item.ItContract))
                 {
                     return Forbidden();
                 }
@@ -86,11 +89,6 @@ namespace Presentation.Web.Controllers.API
                     return BadRequest("System usage not found");
                 }
 
-                if (!AllowModify(itSystemUsage))
-                {
-                    return Forbidden();
-                }
-
                 var item = _repository.GetByKey(key);
                 // create if doesn't exists
                 if (item == null)
@@ -109,6 +107,18 @@ namespace Presentation.Web.Controllers.API
                 var contractToken = obj.GetValue("itContractId");
                 if (contractToken != null)
                     item.ItContractId = contractToken.Value<int?>();
+
+                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(-1));
+                if (itContract == null)
+                {
+                    return NotFound();
+                }
+
+                //Is modification of contract as it is right now
+                if (!AllowModify(itContract))
+                {
+                    return Forbidden();
+                }
 
                 _repository.Save();
                 var outDto = Map<ItInterfaceExhibitUsage, ItInterfaceExhibitUsageDTO>(item);

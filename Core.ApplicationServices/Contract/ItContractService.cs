@@ -1,11 +1,10 @@
-﻿using Core.DomainModel.ItContract;
-using Core.DomainServices;
-using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Contract;
+﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
+using Core.DomainModel.ItContract;
+using Core.DomainServices;
 using Core.DomainServices.Model.Result;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.Contract
 {
     public class ItContractService : IItContractService
     {
