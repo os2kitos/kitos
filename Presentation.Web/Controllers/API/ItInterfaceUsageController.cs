@@ -139,5 +139,46 @@ namespace Presentation.Web.Controllers.API
                 return LogError(e);
             }
         }
+
+        /// <summary>
+        /// Deletes the usage
+        /// </summary>
+        /// <param name="usageId"></param>
+        /// <param name="sysId"></param>
+        /// <param name="organizationId"></param>
+        /// <param name="interfaceId"></param>
+        /// <returns></returns>
+        public HttpResponseMessage Delete(int usageId, int interfaceId, int sysId, int organizationId)
+        {
+            try
+            {
+                var key = ItInterfaceUsage.GetKey(usageId, sysId, interfaceId);
+
+                var item = _repository.GetByKey(key);
+                // create if doesn't exists
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(-1));
+                if (itContract != null)
+                {
+                    if (!AllowModify(itContract))
+                    {
+                        return Forbidden();
+                    }
+                }
+
+                _repository.DeleteWithReferencePreload(item);
+                _repository.Save();
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
     }
 }
