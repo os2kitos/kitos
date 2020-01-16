@@ -36,13 +36,13 @@ namespace Core.DomainModel
         public Display Display { get; set; }
         public DateTime Created { get; set; }
 
-        public IEntity GetOwner()
+        public IEntityWithExternalReferences GetOwner()
         {
             return
                 ItSystemUsage ??
                 ItContract ??
                 ItProject ??
-                (IEntity)ItSystem;
+                (IEntityWithExternalReferences)ItSystem;
         }
     }
 }

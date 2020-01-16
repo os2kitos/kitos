@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             //NOTE: In this case we make sure dependencies are loaded on POST so we CAN use GetOwner
-            return new ChildEntityCrudAuthorization<ExternalReference, IEntity>(reference => reference.GetOwner(), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ExternalReference, IEntityWithExternalReferences>(reference => reference.GetOwner(), base.GetCrudAuthorization());
         }
 
         public override HttpResponseMessage Post(ExternalReferenceDTO dto)
