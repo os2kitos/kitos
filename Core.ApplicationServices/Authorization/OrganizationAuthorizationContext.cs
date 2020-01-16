@@ -139,6 +139,14 @@ namespace Core.ApplicationServices.Authorization
 
         private bool CheckNewObjectAccessModifierPolicy(IEntity entity)
         {
+            if (entity is User user)
+            {
+                if (user.IsGlobalAdmin)
+                {
+                    return IsGlobalAdmin(); //Only global admin can create other global admins
+                }
+            }
+
             if (entity is IHasAccessModifier accessModifier)
             {
                 return HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.AccessModifier, entity));
