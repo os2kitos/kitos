@@ -1,4 +1,7 @@
-﻿using Core.DomainModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -18,32 +21,35 @@ namespace Core.ApplicationServices.Authorization
 
         public bool Allow(IEntity target)
         {
-            var result = IsGlobalAdmin() || IsLocalAdmin();
-            switch (target)
+            var possibleConditions = GetPossibleConditions(target).ToList();
+            if (!possibleConditions.Any())
             {
-                case IContractModule _:
-                    result |= IsContractModuleAdmin();
-                    break;
-                case User _:
-                case IOrganizationModule _:
-                    result |= IsOrganizationModuleAdmin();
-                    break;
-                case IProjectModule _:
-                    result |= IsProjectModuleAdmin();
-                    break;
-                case ISystemModule _:
-                    result |= IsSystemModuleAdmin();
-                    break;
-                case IReportModule _:
-                    result |= IsReportModuleAdmin();
-                    break;
-                default:
-                    //Unknown module type - no module level access can be granted
-                    result = false;
-                    break;
+                //Unknown module
+                return false;
             }
 
-            return result;
+            if (IsGlobalAdmin() || IsLocalAdmin())
+            {
+                return true;
+            }
+
+            return possibleConditions.Any(condition => condition.Invoke());
+        }
+
+        private IEnumerable<Func<bool>> GetPossibleConditions(IEntity target)
+        {
+            //An entity may be marked for several different modules (e.g. Advice), so we must check each
+            //Must not be converted to switch since that will only match on the first option. We must check all
+            if (target is IContractModule _)
+                yield return IsContractModuleAdmin;
+            if (target is User _ || target is IOrganizationModule _)
+                yield return IsOrganizationModuleAdmin;
+            if (target is IProjectModule _)
+                yield return IsProjectModuleAdmin;
+            if (target is ISystemModule _)
+                yield return IsSystemModuleAdmin;
+            if (target is IReportModule _)
+                yield return IsReportModuleAdmin;
         }
 
         private bool IsReportModuleAdmin()

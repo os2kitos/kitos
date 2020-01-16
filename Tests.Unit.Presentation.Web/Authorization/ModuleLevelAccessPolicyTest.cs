@@ -28,6 +28,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public interface IProjectElement : IEntity, IProjectModule { }
         public interface IReportElement : IEntity, IReportModule { }
         public interface ISystemElement : IEntity, ISystemModule { }
+        public interface ICrossCuttingElement : IEntity, ISystemModule, IProjectModule, IContractModule, IReportModule, IOrganizationModule { }
 
         [Theory]
         [InlineData(typeof(IEntity), true, true, null, false)]//Unknown entity type always returns false from this policy
@@ -76,6 +77,15 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ReadOnly, false)]
+        [InlineData(typeof(ICrossCuttingElement), true, false, null, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, true, null, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ContractModuleAdmin, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.User, false)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ReportModuleAdmin, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
+        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ReadOnly, false)]
         public void Allow_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
