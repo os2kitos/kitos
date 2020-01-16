@@ -39,12 +39,16 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         public override IHttpActionResult Get()
         {
+            var all = Repository.AsQueryable();
+
             if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All)
             {
-                return Ok(Repository.AsQueryable());
+                return Ok(all);
             }
 
-            return Ok(Repository.AsQueryable().ByOrganizationId(ActiveOrganizationId));
+            var byOrganizationId = all.ByOrganizationId(ActiveOrganizationId);
+
+            return Ok(byOrganizationId);
         }
 
         /// <summary>

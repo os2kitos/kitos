@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
@@ -30,12 +31,12 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
-                {
-                    return Forbidden();
-                }
                 var role = (OrganizationRole)Enum.Parse(typeof(OrganizationRole), roleName, true);
-                var theRights = _rightRepository.Get(x => x.Role == role);
+                var theRights = 
+                    _rightRepository
+                        .Get(x => x.Role == role)
+                        .Where(AllowRead);
+
                 var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<OrganizationRightDTO>>(theRights);
                 return Ok(dtos);
             }

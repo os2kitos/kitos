@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/Rights")]
         public IHttpActionResult GetRights(int orgKey)
         {
-            if (GetCrossOrganizationReadAccessLevel() != CrossOrganizationDataReadAccessLevel.All)
+            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }

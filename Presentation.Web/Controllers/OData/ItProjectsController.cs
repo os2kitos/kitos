@@ -47,6 +47,8 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjects(int key)
         {
+            var all = Repository.AsQueryable();
+
             if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
             {
                 if (GetOrganizationReadAccessLevel(key) < OrganizationDataReadAccessLevel.All)
@@ -54,13 +56,12 @@ namespace Presentation.Web.Controllers.OData
                     return Forbidden();
                 }
 
-                var result = Repository.AsQueryable().ByOrganizationId(key);
+                var result = all.ByOrganizationId(key);
                 return Ok(result);
             }
             else
             {
-                var result = Repository
-                    .AsQueryable()
+                var result = all
                     .ByPublicAccessOrOrganizationId(key);
 
                 return Ok(result);
