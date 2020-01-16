@@ -15,6 +15,7 @@ namespace Core.DomainServices.Repositories.KLE
             {
                 _taskRefs.Add(toBeAddedTaskRef.TaskKey, new TaskRef
                 {
+                    Uuid = toBeAddedTaskRef.Uuid,
                     Type = toBeAddedTaskRef.Type,
                     TaskKey = toBeAddedTaskRef.TaskKey,
                     Description = toBeAddedTaskRef.Description

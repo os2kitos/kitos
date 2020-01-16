@@ -71,6 +71,29 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
+        [HttpPut]
+        [Route("update")]
+        public HttpResponseMessage PutKLEChanges()
+        {
+            var result = _kleApplicationService.UpdateKLE();
+            switch (result.Status)
+            {
+                case OperationResult.Forbidden:
+                    return Forbidden();
+                case OperationResult.Ok:
+                {
+                    return Ok(new KLEUpdateDTO
+                    {
+                        Status = result.Value
+                    });
+                }
+                default:
+                    return Error($"Something went wrong updating KLE values");
+            }
+        }
+
+        #region Helpers
+
         private static void CreateCsvHeader(ICollection<dynamic> list)
         {
             var header = new ExpandoObject() as IDictionary<string, object>;
@@ -128,12 +151,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        [HttpPut]
-        [Route("")]
-        public HttpResponseMessage PutKLEChanges()
-        {
-            // TODO
-            return Ok();
-        }
+        #endregion
     }
 }

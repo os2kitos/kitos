@@ -140,6 +140,8 @@ namespace Presentation.Web
             kernel.Bind<IKLEApplicationService>().To<KLEApplicationService>();
             kernel.Bind<IKLEStandardRepository>().To<KLEStandardRepository>();
             kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>();
+            kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>();
+            kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

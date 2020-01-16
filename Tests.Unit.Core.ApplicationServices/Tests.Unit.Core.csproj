@@ -40,9 +40,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.4.4.0\lib\net45\Castle.Core.dll</HintPath>
-    </Reference>
     <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
@@ -68,12 +65,21 @@
     <Reference Include="Microsoft.Spatial, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Spatial.7.0.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
     </Reference>
+    <Reference Include="Neleus.LambdaCompare, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Neleus.LambdaCompare.1.0.3\lib\net461\Neleus.LambdaCompare.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NSubstitute, Version=4.2.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
       <HintPath>..\packages\NSubstitute.4.2.1\lib\net46\NSubstitute.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -128,7 +134,11 @@
       <Link>UserMock.cs</Link>
     </Compile>
     <Compile Include="ApplicationServices\AuthenticationServiceTest.cs" />
+    <Compile Include="ApplicationServices\KLE\GenericCollectionExtensions.cs" />
+    <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
     <Compile Include="ApplicationServices\KLE\KLEApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\KLE\KLEConverterHelperTest.cs" />
+    <Compile Include="ApplicationServices\KLE\KLEParentHelperTest.cs" />
     <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
@@ -153,6 +163,10 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
+      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
+      <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
       <Name>Infrastructure.Services</Name>
@@ -167,6 +181,9 @@
     </Content>
     <Content Include="ApplicationServices\KLE\20200106-kle-sample-changes.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ApplicationServices\KLE\20200106-kle-single-item.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

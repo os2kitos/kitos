@@ -8,5 +8,6 @@ namespace Core.ApplicationServices
     {
         Result<OperationResult, KLEStatus> GetKLEStatus();
         Result<OperationResult, IEnumerable<KLEChange>> GetKLEChangeSummary();
+        Result<OperationResult, KLEUpdateStatus> UpdateKLE();
     }
 }

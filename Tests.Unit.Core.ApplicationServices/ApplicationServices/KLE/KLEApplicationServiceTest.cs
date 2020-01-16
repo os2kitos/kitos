@@ -50,5 +50,23 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             Assert.Equal(expectedOperationResult, result.Status);
             Assert.Equal(expectedNumberOfChanges, result.Value?.Count() ?? 0);
         }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, OperationResult.Ok)]
+        [InlineData(OrganizationRole.User, OperationResult.Forbidden)]
+        private void UpdateKLE_Authorizes_And_Updates(OrganizationRole role, OperationResult expectedOperationResult)
+        {
+            var mockKLEStandardRepository = Substitute.For<IKLEStandardRepository>();
+            mockKLEStandardRepository.GetKLEChangeSummary().Returns(new List<KLEChange>
+            {
+                new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
+            });
+            var mockOrganizationalUserContext = Substitute.For<IOrganizationalUserContext>();
+            mockOrganizationalUserContext.HasRole(role).Returns(true);
+            var sut = new KLEApplicationService(mockOrganizationalUserContext, mockKLEStandardRepository);
+            var result = sut.UpdateKLE();
+            Assert.Equal(expectedOperationResult, result.Status);
+        }
+
     }
 }
