@@ -51,14 +51,18 @@ namespace Core.ApplicationServices.Organizations
         public IEnumerable<Organization> GetOrganizations(User user)
         {
             if (user.IsGlobalAdmin) return _orgRepository.Get();
-            return _orgRepository.Get(o => o.Rights.Any(r => r.OrganizationId == o.Id && r.UserId == user.Id));
+            return _orgRepository
+                .Get(o => o.Rights.Any(r => r.OrganizationId == o.Id && r.UserId == user.Id));
         }
 
         //returns the default org unit for that user inside that organization
         //or null if none has been chosen
         public OrganizationUnit GetDefaultUnit(Organization organization, User user)
         {
-            return _orgRightRepository.Get(r => r.OrganizationId == organization.Id && r.UserId == user.Id).Select(r => r.DefaultOrgUnit).FirstOrDefault();
+            return _orgRightRepository
+                .Get(r => r.OrganizationId == organization.Id && r.UserId == user.Id)
+                .Select(r => r.DefaultOrgUnit)
+                .FirstOrDefault();
         }
 
         public void SetDefaultOrgUnit(User user, int orgId, int orgUnitId)

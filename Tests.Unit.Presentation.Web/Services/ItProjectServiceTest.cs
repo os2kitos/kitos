@@ -76,7 +76,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.NotNull(resultValue.GoalStatus);
             Assert.Equal(objectOwner, resultValue.GoalStatus.ObjectOwner);
             Assert.Equal(objectOwner, resultValue.GoalStatus.LastChangedByUser);
-            Assert.True(new[] { "Afventer", "Foranalyse", "Gennemførsel", "Overlevering", "Drift" }.SequenceEqual(new[] { itProject.Phase1, itProject.Phase2, itProject.Phase3, itProject.Phase4, itProject.Phase5 }.Select(x => x.Name)));
+            Assert.True(new[] { PhaseNames.Phase1, PhaseNames.Phase2, PhaseNames.Phase3, PhaseNames.Phase4, PhaseNames.Phase5 }.SequenceEqual(new[] { itProject.Phase1, itProject.Phase2, itProject.Phase3, itProject.Phase4, itProject.Phase5 }.Select(x => x.Name)));
             Assert.Equal(1, itProject.CurrentPhase);
             Assert.Equal(6, itProject.EconomyYears.Count);
             for (var i = 0; i < itProject.EconomyYears.Count; i++)

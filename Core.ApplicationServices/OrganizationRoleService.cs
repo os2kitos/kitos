@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 
@@ -26,7 +27,7 @@ namespace Core.ApplicationServices
 
         private OrganizationRight AddOrganizationRoleToUser(User user, Organization organization, OrganizationRole organizationRole)
         {
-            var kitosUser = _userRepository.GetById(_authenticationContext.UserId.GetValueOrDefault(-1));
+            var kitosUser = _userRepository.GetById(_authenticationContext.UserId.GetValueOrDefault(EntityConstants.InvalidId));
             if (kitosUser == null)
             {
                 throw new InvalidOperationException($"Cannot determine who is adding the role to the user with id:{user.Id}");

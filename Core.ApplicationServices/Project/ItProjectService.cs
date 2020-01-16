@@ -110,11 +110,11 @@ namespace Core.ApplicationServices.Project
         private static void CreateDefaultPhases(ItProject project)
         {
             project.CurrentPhase = 1;
-            project.Phase1 = new ItProjectPhase { Name = "Afventer" };
-            project.Phase2 = new ItProjectPhase { Name = "Foranalyse" };
-            project.Phase3 = new ItProjectPhase { Name = "Gennemførsel" };
-            project.Phase4 = new ItProjectPhase { Name = "Overlevering" };
-            project.Phase5 = new ItProjectPhase { Name = "Drift" };
+            project.Phase1 = new ItProjectPhase { Name = PhaseNames.Phase1 };
+            project.Phase2 = new ItProjectPhase { Name = PhaseNames.Phase2 };
+            project.Phase3 = new ItProjectPhase { Name = PhaseNames.Phase3 };
+            project.Phase4 = new ItProjectPhase { Name = PhaseNames.Phase4 };
+            project.Phase5 = new ItProjectPhase { Name = PhaseNames.Phase5 };
         }
 
         private static void AddEconomyYears(ItProject project)

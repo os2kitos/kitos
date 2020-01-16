@@ -9,6 +9,8 @@ using Newtonsoft.Json.Linq;
 using Serilog;
 using System.IdentityModel.Tokens;
 using System.Security.Principal;
+using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Presentation.Web.Infrastructure.Model.Authentication;
 
 namespace Presentation.Web.Infrastructure
@@ -53,7 +55,7 @@ namespace Presentation.Web.Infrastructure
             var handler = new JwtSecurityTokenHandler();
 
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
-            var organizationId = user.DefaultOrganizationId.GetValueOrDefault(-1);
+            var organizationId = user.DefaultOrganizationId.GetValueOrDefault(EntityConstants.InvalidId);
             if (user.DefaultOrganizationId.HasValue)
             {
                 identity.AddClaim(new Claim(BearerTokenConfig.DefaultOrganizationClaimName, organizationId.ToString("D")));

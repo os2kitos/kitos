@@ -95,8 +95,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
         [Theory]
         [InlineData("23123123")]
-        [InlineData("231231231")]
-        [InlineData("2312312312")]
         public void CreateNewOrganization_Returns_Forbidden(string cvr)
         {
             //Arrange

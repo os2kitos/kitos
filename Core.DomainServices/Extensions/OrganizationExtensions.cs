@@ -9,7 +9,7 @@ namespace Core.DomainServices.Extensions
             //Cvr is optional
             var isCvrProvided = string.IsNullOrWhiteSpace(organization.Cvr) == false;
 
-            //If cvr is defined, it must be valid
+            //Checking if the provided cvr is valid
             return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
         }
     }

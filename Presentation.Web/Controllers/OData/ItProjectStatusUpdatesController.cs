@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.ItProject;
+﻿using Core.DomainModel;
+using Core.DomainModel.Constants;
+using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
@@ -19,7 +21,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate, ItProject>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItProjectStatusUpdate, ItProject>(ps => _projectRepository.GetById(ps.AssociatedItProjectId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
         }
     }
 }

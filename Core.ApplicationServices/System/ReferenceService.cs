@@ -45,16 +45,14 @@ namespace Core.ApplicationServices.System
 
             var systemExternalReferences = system.ExternalReferences.ToList();
 
-            var referenceIds = systemExternalReferences;
-
-            if (referenceIds.Count == 0)
+            if (systemExternalReferences.Count == 0)
             {
                 return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                foreach (var reference in referenceIds)
+                foreach (var reference in systemExternalReferences)
                 {
                     _referenceRepository.Delete(reference);
                 }

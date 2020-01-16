@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -29,7 +30,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Handover, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? -1), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Handover, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? EntityConstants.InvalidId), base.GetCrudAuthorization());
         }
 
         public virtual HttpResponseMessage PostParticipant(int id, [FromUri] int participantId)

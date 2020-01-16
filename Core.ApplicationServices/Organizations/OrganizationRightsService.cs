@@ -25,12 +25,14 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
         {
-            var right = new OrganizationRight();
-            right.OrganizationId = organizationId;
-            right.ObjectOwnerId = _userContext.UserId;
-            right.LastChangedByUserId = _userContext.UserId;
-            right.Role = roleId;
-            right.UserId = userId;
+            var right = new OrganizationRight
+            {
+                OrganizationId = organizationId,
+                ObjectOwnerId = _userContext.UserId,
+                LastChangedByUserId = _userContext.UserId,
+                Role = roleId,
+                UserId = userId
+            };
 
             if (!_authorizationContext.AllowCreate<OrganizationRight>(right))
             {

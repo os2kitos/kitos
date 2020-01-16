@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -108,7 +110,7 @@ namespace Presentation.Web.Controllers.API
                 if (contractToken != null)
                     item.ItContractId = contractToken.Value<int?>();
 
-                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(-1));
+                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(EntityConstants.InvalidId));
                 if (itContract == null)
                 {
                     return NotFound();
@@ -150,7 +152,7 @@ namespace Presentation.Web.Controllers.API
                     return NotFound();
                 }
 
-                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(-1));
+                var itContract = _contractRepository.GetById(item.ItContractId.GetValueOrDefault(EntityConstants.InvalidId));
                 if (itContract != null)
                 {
                     //Is modification of contract as it is right now
