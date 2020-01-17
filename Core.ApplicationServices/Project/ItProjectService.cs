@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -11,6 +12,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Project;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Project
 {
@@ -19,15 +21,18 @@ namespace Core.ApplicationServices.Project
         private readonly IGenericRepository<ItProject> _projectRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItProjectRepository _itProjectRepository;
+        private readonly ITransactionManager _transactionManager;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
             IAuthorizationContext authorizationContext,
-            IItProjectRepository itProjectRepository)
+            IItProjectRepository itProjectRepository,
+            ITransactionManager transactionManager)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
             _itProjectRepository = itProjectRepository;
+            _transactionManager = transactionManager;
         }
 
         public Result<ItProject, OperationFailure> AddProject(ItProject project)
@@ -42,28 +47,45 @@ namespace Core.ApplicationServices.Project
                 return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            project.AccessModifier = AccessModifier.Local; //Force set to local
-            CreateDefaultPhases(project);
-            _projectRepository.Insert(project);
-            _projectRepository.Save();
+            PrepareNewObject(project);
 
-            AddEconomyYears(project);
-
-            project.Handover = new Handover
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                ObjectOwner = project.ObjectOwner,
-                LastChangedByUser = project.ObjectOwner
-            };
+                _projectRepository.Insert(project);
+                _projectRepository.Save();
 
-            project.GoalStatus = new GoalStatus
-            {
-                ObjectOwner = project.ObjectOwner,
-                LastChangedByUser = project.ObjectOwner
-            };
+                AddEconomyYears(project);
 
-            _projectRepository.Save();
+                project.Handover = new Handover
+                {
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
+                };
+
+                project.GoalStatus = new GoalStatus
+                {
+                    ObjectOwner = project.ObjectOwner,
+                    LastChangedByUser = project.ObjectOwner
+                };
+
+                _projectRepository.Save();
+                transaction.Commit();
+            }
 
             return Result<ItProject, OperationFailure>.Success(project);
+        }
+
+        private static void PrepareNewObject(ItProject project)
+        {
+            project.AccessModifier = AccessModifier.Local; //Force set to local
+
+            //Setup all project phases and select initial "current".
+            project.CurrentPhase = 1;
+            project.Phase1 = new ItProjectPhase {Name = PhaseNames.Phase1};
+            project.Phase2 = new ItProjectPhase {Name = PhaseNames.Phase2};
+            project.Phase3 = new ItProjectPhase {Name = PhaseNames.Phase3};
+            project.Phase4 = new ItProjectPhase {Name = PhaseNames.Phase4};
+            project.Phase5 = new ItProjectPhase {Name = PhaseNames.Phase5};
         }
 
         public Result<ItProject, OperationFailure> DeleteProject(int id)
@@ -100,21 +122,6 @@ namespace Core.ApplicationServices.Project
             }
 
             return projects;
-        }
-
-        /// <summary>
-        /// Adds default phases 1-5 and select the first phase as current phase
-        /// </summary>
-        /// <param name="project"></param>
-        /// <returns></returns>
-        private static void CreateDefaultPhases(ItProject project)
-        {
-            project.CurrentPhase = 1;
-            project.Phase1 = new ItProjectPhase { Name = PhaseNames.Phase1 };
-            project.Phase2 = new ItProjectPhase { Name = PhaseNames.Phase2 };
-            project.Phase3 = new ItProjectPhase { Name = PhaseNames.Phase3 };
-            project.Phase4 = new ItProjectPhase { Name = PhaseNames.Phase4 };
-            project.Phase5 = new ItProjectPhase { Name = PhaseNames.Phase5 };
         }
 
         private static void AddEconomyYears(ItProject project)

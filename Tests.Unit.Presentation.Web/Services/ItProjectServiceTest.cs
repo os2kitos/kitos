@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
@@ -7,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -19,13 +21,15 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItProjectRepository> _specificProjectRepo;
         private readonly ItProjectService _sut;
+        private readonly Mock<ITransactionManager> _transactionManager;
 
         public ItProjectServiceTest()
         {
             _itProjectRepo = new Mock<IGenericRepository<ItProject>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _specificProjectRepo = new Mock<IItProjectRepository>();
-            _sut = new ItProjectService(_itProjectRepo.Object, _authorizationContext.Object, _specificProjectRepo.Object);
+            _transactionManager = new Mock<ITransactionManager>();
+            _sut = new ItProjectService(_itProjectRepo.Object, _authorizationContext.Object, _specificProjectRepo.Object, _transactionManager.Object);
         }
 
         [Fact]
@@ -58,7 +62,9 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 ObjectOwner = objectOwner
             };
+            var transaction = new Mock<IDatabaseTransaction>();
             _authorizationContext.Setup(x => x.AllowCreate<ItProject>(itProject)).Returns(true);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
 
             //Act
             var result = _sut.AddProject(itProject);
@@ -67,6 +73,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             _itProjectRepo.Verify(x => x.Insert(itProject), Times.Once);
             _itProjectRepo.Verify(x => x.Save(), Times.Exactly(2));
+            transaction.Verify(x => x.Commit(), Times.Once);
             var resultValue = result.Value;
             Assert.Same(itProject, resultValue);
             Assert.Equal(AccessModifier.Local, resultValue.AccessModifier); //access modifier must be forced to local
