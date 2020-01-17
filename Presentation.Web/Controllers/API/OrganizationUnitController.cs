@@ -7,6 +7,7 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -20,8 +21,11 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
 
-        public OrganizationUnitController(IGenericRepository<OrganizationUnit> repository,
-            IOrgUnitService orgUnitService, IGenericRepository<TaskRef> taskRepository, IGenericRepository<TaskUsage> taskUsageRepository)
+        public OrganizationUnitController(
+            IGenericRepository<OrganizationUnit> repository,
+            IOrgUnitService orgUnitService, 
+            IGenericRepository<TaskRef> taskRepository, 
+            IGenericRepository<TaskUsage> taskUsageRepository)
             : base(repository)
         {
             _orgUnitService = orgUnitService;
@@ -40,7 +44,10 @@ namespace Presentation.Web.Controllers.API
             {
                 var orgUnits = Repository.Get(x => x.Rights.Any(y => y.UserId == KitosUser.Id) && x.OrganizationId == organizationId).SelectNestedChildren(x => x.Children).ToList();
 
-                orgUnits = orgUnits.Distinct().ToList();
+                orgUnits = orgUnits
+                    .Distinct()
+                    .Where(AllowRead)
+                    .ToList();
 
                 return Ok(Map<IEnumerable<OrganizationUnit>, IEnumerable<OrgUnitSimpleDTO>>(orgUnits));
             }
@@ -58,6 +65,11 @@ namespace Presentation.Web.Controllers.API
 
                 if (orgUnit == null) return NotFound();
 
+                if (!AllowRead(orgUnit))
+                {
+                    return Forbidden();
+                }
+
                 var item = Map<OrganizationUnit, OrgUnitDTO>(orgUnit);
 
                 return Ok(item);
@@ -72,7 +84,12 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var orgUnit = Repository.Get(o => o.OrganizationId == organizationId);
+                var orgUnit = 
+                    Repository
+                        .AsQueryable()
+                        .ByOrganizationId(organizationId)
+                        .AsEnumerable()
+                        .Where(AllowRead);
 
                 return Ok(Map(orgUnit));
             }
@@ -134,7 +151,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     // this is not so good performance wise
                     var orgUnitQueryable = Repository.AsQueryable().Where(unit => unit.Id == id);
-                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef).Where(x => x.AccessModifier == AccessModifier.Public)); // TODO add support for normal
+                    taskQuery = orgUnitQueryable.SelectMany(u => u.Parent.TaskUsages.Select(usage => usage.TaskRef));
 
                     // it would have been better with:
                     // pagingModel.Where(taskRef => taskRef.Usages.Any(usage => usage.OrgUnitId == orgUnit.ParentId));
@@ -142,7 +159,7 @@ namespace Presentation.Web.Controllers.API
                 }
                 else
                 {
-                    taskQuery = _taskRepository.AsQueryable().Where(x => x.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                    taskQuery = _taskRepository.AsQueryable();
                 }
 
                 // if a task group is given, only find the tasks in that group and sub groups
@@ -152,14 +169,15 @@ namespace Presentation.Web.Controllers.API
                         taskRef =>
                             (taskRef.ParentId.Value == taskGroup.Value ||
                              taskRef.Parent.ParentId.Value == taskGroup.Value) &&
-                             !taskRef.Children.Any() &&
-                            taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                             !taskRef.Children.Any());
                 }
                 else
                 {
                     // else get all task leaves
                     pagingModel.Where(taskRef => !taskRef.Children.Any());
                 }
+
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theTasks = Page(taskQuery, pagingModel).ToList();
 
                 // convert tasks to DTO containing both the task and possibly also a taskUsage, if that exists
@@ -202,6 +220,7 @@ namespace Presentation.Web.Controllers.API
                                                    taskUsage.TaskRef.Parent.ParentId.Value == taskGroup.Value);
                 }
 
+                pagingModel.WithPostProcessingFilter(AllowRead);
                 var theUsages = Page(usageQuery, pagingModel).ToList();
 
                 var dtos = (from usage in theUsages

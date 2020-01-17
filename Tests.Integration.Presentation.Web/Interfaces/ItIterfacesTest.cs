@@ -48,7 +48,10 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interFacePrefixName = CreateInterFacePrefixName();
             var token = await HttpApi.GetTokenAsync(role);
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
-            var expectedResults = interfacesCreated.Where(x => x.OrganizationId == orgId || x.AccessModifier == AccessModifier.Public).ToList();
+            var expectedResults = interfacesCreated.Where(x =>
+                (x.OrganizationId == orgId &&
+                 (orgId == token.ActiveOrganizationId || role == OrganizationRole.GlobalAdmin)) ||
+                x.AccessModifier == AccessModifier.Public).ToList();
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
@@ -65,7 +68,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.LocalAdmin)]
         public async Task Can_Add_Data_Row(OrganizationRole role)
         {
             //Arrange
@@ -99,7 +101,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.LocalAdmin)]
         public async Task Can_Set_Exposing_System(OrganizationRole role)
         {
             //Arrange

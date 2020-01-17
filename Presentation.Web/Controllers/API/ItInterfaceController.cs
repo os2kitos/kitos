@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices;
-using Core.DomainModel;
+using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -14,31 +14,27 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class ItInterfaceController : GenericContextAwareApiController<ItInterface, ItInterfaceDTO>
+    public class ItInterfaceController : GenericApiController<ItInterface, ItInterfaceDTO>
     {
         private readonly IItInterfaceService _itInterfaceService;
 
-        public ItInterfaceController(IGenericRepository<ItInterface> repository, IItInterfaceService itInterfaceService)
+        public ItInterfaceController(
+            IGenericRepository<ItInterface> repository,
+            IItInterfaceService itInterfaceService)
             : base(repository)
         {
             _itInterfaceService = itInterfaceService;
         }
 
-        // Udkommenteret ifm. OS2KITOS-663
         //DELETE api/ItInterface
         public override HttpResponseMessage Delete(int id, int organizationId)
         {
             try
             {
-                var item = Repository.GetByKey(id);
-
-                // Udkommenteret ifm. OS2KITOS-663
-                // check if the itinterface has any usages, if it does it's may not be deleted
-                //if (item.ExhibitedBy != null || item.CanBeUsedBy.Any())
-                if (item.ExhibitedBy != null)
-                    return Conflict("Cannot delete an itinterface in use!");
-
-                return base.Delete(id, organizationId);
+                var result = _itInterfaceService.Delete(id);
+                return result.Ok ?
+                    Ok() :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
@@ -46,34 +42,14 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        protected override void DeleteQuery(ItInterface entity)
-        {
-            _itInterfaceService.Delete(entity.Id);
-        }
-
         public override HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try
             {
-                if (!IsItInterfaceIdAndNameUnique(dto.ItInterfaceId, dto.Name, dto.OrganizationId))
-                    return Conflict("ItInterface with same InterfaceId and Name is taken!");
-
-                var item = Map(dto);
-
-                item.ObjectOwner = KitosUser;
-                item.LastChangedByUser = KitosUser;
-                item.ItInterfaceId = item.ItInterfaceId ?? "";
-                item.Uuid = Guid.NewGuid();
-
-                foreach (var dataRow in item.DataRows)
-                {
-                    dataRow.ObjectOwner = KitosUser;
-                    dataRow.LastChangedByUser = KitosUser;
-                }
-
-                PostQuery(item);
-
-                return Created(Map(item), new Uri(Request.RequestUri + "/" + item.Id));
+                var result = _itInterfaceService.Create(Map(dto));
+                return result.Ok ?
+                    Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
@@ -102,6 +78,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var accessLevel = GetOrganizationReadAccessLevel(orgId);
+                if (accessLevel < OrganizationDataReadAccessLevel.Public)
+                {
+                    return Forbidden();
+                }
                 return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
             }
             catch (Exception e)
@@ -116,6 +97,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var accessLevel = GetOrganizationReadAccessLevel(orgId);
+                if (accessLevel < OrganizationDataReadAccessLevel.Public)
+                {
+                    return Forbidden();
+                }
                 return IsItInterfaceIdAndNameUnique(checkitinterfaceid, checkname, orgId) ? Ok() : Conflict("Name and ItInterfaceId is already taken by a single interface!");
             }
             catch (Exception e)
@@ -135,16 +121,6 @@ namespace Presentation.Web.Controllers.API
         {
             var system = Repository.Get(x => x.Name == name && x.OrganizationId == orgId);
             return !system.Any();
-        }
-
-        protected override bool HasWriteAccess(ItInterface obj, User user, int organizationId)
-        {
-            return HasWriteAccess();
-        }
-
-        protected bool HasWriteAccess()
-        {
-            return KitosUser.IsGlobalAdmin;
         }
     }
 }

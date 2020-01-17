@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
 using Core.ApplicationServices.Model.Result;
@@ -14,6 +15,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -91,7 +93,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUnusedItSystemsByOrganization(organizationId, A<string>(), 1337, A<bool>());
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Theory]
@@ -116,7 +119,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUnusedItSystemsByOrganization(organizationId, prefix, amount, getPublic);
 
             //Assert + requested amount returned and in the right order
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var itSystems = result.Value.ToList();
             Assert.Equal(amount, itSystems.Count);
             Assert.True(resultSet.OrderBy(x => x.Name).Take(amount).SequenceEqual(itSystems));
@@ -146,7 +149,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetUnusedItSystemsByOrganization(organizationId, prefix, 2, getPublic);
 
             //Assert Only the one that matches the naming criterion is returned
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var itSystem = Assert.Single(result.Value);
             Assert.Equal(resultSet.First().Id, itSystem.Id);
         }
@@ -161,7 +164,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(A<int>(), A<int>());
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -177,7 +181,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, A<int>());
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -196,7 +201,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -212,7 +218,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert OK and correct marking of contract WITH and WITHOUT associations
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Empty(migration.AffectedContracts);
             Assert.Empty(migration.AffectedProjects);
@@ -245,7 +251,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert OK and correct marking of contract WITH and WITHOUT associations
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(2, migration.AffectedContracts.Count);
 
@@ -280,7 +286,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(2, migration.AffectedContracts.Count);
 
@@ -316,7 +322,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(2, migration.AffectedContracts.Count);
 
@@ -342,7 +348,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             var migration = result.Value;
             Assert.Equal(2, migration.AffectedProjects.Count);
             Assert.True(systemUsage.ItProjects.SequenceEqual(migration.AffectedProjects));
@@ -358,7 +364,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.ExecuteSystemUsageMigration(A<int>(), A<int>());
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -375,7 +382,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
         [Fact]
@@ -391,7 +399,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, systemUsage.ItSystem.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
@@ -416,14 +424,14 @@ namespace Tests.Unit.Presentation.Web.Services
 
             foreach (var exhibit in exhibitsAffected)
             {
-                ExpectDeleteExhibitReturns(exhibit, OperationResult.Ok);
+                ExpectDeleteExhibitReturns(exhibit, Result<ItInterfaceExhibitUsage, OperationFailure>.Success(exhibit));
             }
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             _interfaceExhibitUsageService.VerifyAll();
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
@@ -450,15 +458,15 @@ namespace Tests.Unit.Presentation.Web.Services
 
             foreach (var usage in usagesAffected)
             {
-                ExpectCreateInterfaceUsageReturns(usage, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(new ItInterfaceUsage()));
-                ExpectDeleteInterfaceUsageReturns(usage, OperationResult.Ok);
+                ExpectCreateInterfaceUsageReturns(usage, newSystem, Result<ItInterfaceUsage, OperationFailure>.Success(usage));
+                ExpectDeleteInterfaceUsageReturns(usage, Result<ItInterfaceUsage, OperationFailure>.Success(usage));
             }
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             _interfaceUsageService.VerifyAll();
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
@@ -480,7 +488,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - Check that access types have been removed from the system usage
-            Assert.Equal(OperationResult.Ok, result.Status);
+            Assert.True(result.Ok);
             Assert.Empty(systemUsage.AccessTypes);
             VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
@@ -499,13 +507,14 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var usageAffected = contract.AssociatedInterfaceUsages.Single();
-            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<OperationResult, ItInterfaceUsage>.Fail(OperationResult.UnknownError));
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.UnknownError, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.UnknownError, result.Error);
             VerifyTransactionRollback(transaction);
         }
 
@@ -523,14 +532,15 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var usageAffected = contract.AssociatedInterfaceUsages.Single();
-            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<OperationResult, ItInterfaceUsage>.Ok(usageAffected));
-            ExpectDeleteInterfaceUsageReturns(usageAffected, OperationResult.UnknownError);
+            ExpectCreateInterfaceUsageReturns(usageAffected, newSystem, Result<ItInterfaceUsage, OperationFailure>.Success(usageAffected));
+            ExpectDeleteInterfaceUsageReturns(usageAffected, Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.UnknownError, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.UnknownError, result.Error);
             _interfaceUsageService.VerifyAll();
             VerifyTransactionRollback(transaction);
         }
@@ -549,24 +559,25 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetContractsBySystemUsageReturns(systemUsage.Id, new[] { contract });
 
             var exhibitUsage = contract.AssociatedInterfaceExposures.Single();
-            ExpectDeleteExhibitReturns(exhibitUsage, OperationResult.UnknownError);
+            ExpectDeleteExhibitReturns(exhibitUsage, Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.UnknownError));
 
             //Act
             var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
 
             //Assert - check that all affected exhibits are deleted
-            Assert.Equal(OperationResult.UnknownError, result.Status);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.UnknownError, result.Error);
             _interfaceExhibitUsageService.VerifyAll();
             VerifyTransactionRollback(transaction);
         }
 
-        private void ExpectDeleteExhibitReturns(ItInterfaceExhibitUsage exhibit, OperationResult operationResult)
+        private void ExpectDeleteExhibitReturns(ItInterfaceExhibitUsage exhibit, Result<ItInterfaceExhibitUsage, OperationFailure> operationResult)
         {
             _interfaceExhibitUsageService.Setup(x => x.Delete(exhibit.ItSystemUsageId, exhibit.ItInterfaceExhibitId))
                 .Returns(operationResult);
         }
 
-        private void ExpectDeleteInterfaceUsageReturns(ItInterfaceUsage usage, OperationResult operationResult)
+        private void ExpectDeleteInterfaceUsageReturns(ItInterfaceUsage usage, Result<ItInterfaceUsage, OperationFailure> operationResult)
         {
             _interfaceUsageService.Setup(x => x.Delete(usage.ItSystemUsageId, usage.ItSystemId, usage.ItInterfaceId))
                 .Returns(operationResult);
@@ -577,7 +588,7 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
-        private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, Result<OperationResult, ItInterfaceUsage> result)
+        private void ExpectCreateInterfaceUsageReturns(ItInterfaceUsage itInterfaceUsage, ItSystem newSystem, Result<ItInterfaceUsage, OperationFailure> result)
         {
             _interfaceUsageService.Setup(
                     x => x.Create(
@@ -692,7 +703,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectAllowSystemMigrationReturns(bool value)
         {
-            _authorizationContext.Setup(x => x.AllowSystemUsageMigration()).Returns(value);
+            _authorizationContext.Setup(x => x.HasPermission(It.IsAny<SystemUsageMigrationPermission>())).Returns(value);
         }
 
         private static List<ItSystem> CreateItSystemSequenceWithNamePrefix(int amount, string prefix)

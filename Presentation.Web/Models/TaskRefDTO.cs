@@ -1,12 +1,10 @@
 ﻿using System;
-using Core.DomainModel;
 
 namespace Presentation.Web.Models
 {
     public class TaskRefDTO
     {
         public int Id { get; set; }
-        public AccessModifier AccessModifier { get; set; }
         public int? ParentId { get; set; }
         public Guid Uuid { get; set; }
         public string Type { get; set; }

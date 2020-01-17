@@ -1,8 +1,10 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
-using Core.DomainServices;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -28,34 +30,34 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
         }
 
-        public OperationResult DeleteBySystemId(int systemId)
+        public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
             if (system == null)
             {
-                return OperationResult.NotFound;
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (! _authorizationContext.AllowModify(system))
             {
-                return OperationResult.Forbidden;
-            }
-
-            var referenceIds = system.ExternalReferences;
-
-            if (referenceIds.Count == 0)
-            {
-                return OperationResult.Ok;
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                foreach (var reference in referenceIds)
+                var systemExternalReferences = system.ExternalReferences.ToList();
+
+                if (systemExternalReferences.Count == 0)
+                {
+                    return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                }
+
+                foreach (var reference in systemExternalReferences)
                 {
                     _referenceRepository.Delete(reference);
                 }
                 transaction.Commit();
-                return OperationResult.Ok;
+                return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
             }
             
         }

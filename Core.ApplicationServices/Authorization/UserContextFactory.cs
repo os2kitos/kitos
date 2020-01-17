@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Core.DomainServices;
 
 namespace Core.ApplicationServices.Authorization
@@ -7,16 +6,13 @@ namespace Core.ApplicationServices.Authorization
     public class UserContextFactory : IUserContextFactory
     {
         private readonly IUserRepository _userRepository;
-        private readonly IFeatureChecker _featureChecker;
         private readonly IOrganizationRoleService _roleService;
 
         public UserContextFactory(
             IUserRepository userRepository,
-            IFeatureChecker featureChecker,
             IOrganizationRoleService roleService)
         {
             _userRepository = userRepository;
-            _featureChecker = featureChecker;
             _roleService = roleService;
         }
 
@@ -31,13 +27,7 @@ namespace Core.ApplicationServices.Authorization
             //Get roles for the organization
             var organizationRoles = _roleService.GetRolesInOrganization(user, organizationId);
 
-            var supportedFeatures =
-                Enum.GetValues(typeof(Feature))
-                    .Cast<Feature>()
-                    .Where(x => _featureChecker.CanExecute(user, x))
-                    .ToList();
-
-            return new OrganizationalUserContext(supportedFeatures, organizationRoles, user, organizationId);
+            return new OrganizationalUserContext(organizationRoles, user, organizationId);
         }
     }
 }

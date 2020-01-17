@@ -186,7 +186,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var itSystem1 = await CreateSystemAsync(name: itSystemName1);
 
             //These two - one local and one shared in other org - should not be returned since they are in use in own organization
-            var itSystem2 = await CreateSystemAsync(name: itSystemName2);
+            var itSystem2 = await CreateSystemAsync(name: itSystemName2, organizationId: TestEnvironment.SecondOrganizationId, accessModifier: AccessModifier.Public);
             var itSystem3 = await CreateSystemAsync(name: itSystemName3, organizationId: TestEnvironment.SecondOrganizationId, accessModifier: AccessModifier.Public);
             await TakeSystemIntoUseAsync(itSystem2, organizationId: TestEnvironment.SecondOrganizationId);
             await TakeSystemIntoUseAsync(itSystem3, organizationId: TestEnvironment.SecondOrganizationId);
@@ -595,10 +595,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         private static async Task AssertInterfaceUsageUpdatedAfterMigration(ItInterfaceUsageDTO interfaceUsage, int sysId)
         {
             // Checking the old interface usage key is removed
-            Assert.Null(await InterfaceUsageHelper.GetItInterfaceUsage(
+            using (var response = await InterfaceUsageHelper.GetItInterfaceUsageResponse(
                 interfaceUsage.ItSystemUsageId,
                 interfaceUsage.ItSystemId,
-                interfaceUsage.ItInterfaceId, true));
+                interfaceUsage.ItInterfaceId))
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
 
             await AssertInterfaceUsageSystemBinding(interfaceUsage, sysId);
         }

@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using System;
 using System.Collections.Generic;
@@ -14,20 +13,18 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class LocalOptionBaseController<TLocalModelType, TDomainModelType, TOptionType> : BaseEntityController<TLocalModelType> where TLocalModelType : LocalOptionEntity<TOptionType>, new() where TOptionType : OptionEntity<TDomainModelType>
     {
-        private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<TOptionType> _optionsRepository;
 
-        public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IAuthenticationService authService, IGenericRepository<TOptionType> optionsRepository)
-            : base(repository, authService)
+        public LocalOptionBaseController(IGenericRepository<TLocalModelType> repository, IGenericRepository<TOptionType> optionsRepository)
+            : base(repository)
         {
-            _authService = authService;
             _optionsRepository = optionsRepository;
         }
 
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = ActiveOrganizationId;
             var localOptionsResult = Repository.AsQueryable().Where(x => x.OrganizationId == orgId).ToList();
             var globalOptionsResult = _optionsRepository.AsQueryable().ToList();
             var returnList = new List<TOptionType>();
@@ -58,7 +55,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get(int key)
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = ActiveOrganizationId;
             var globalOptionResult = _optionsRepository.AsQueryable().Where(x => x.Id == key);
 
             if (!globalOptionResult.Any())
@@ -92,17 +89,18 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            entity.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = ActiveOrganizationId;
 
-            if (!_authService.HasWriteAccess(UserId, entity))
+            entity.OrganizationId = orgId;
+
+            if (!AllowCreate<TLocalModelType>(entity))
             {
                 return Forbidden();
             }
 
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
             var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == entity.OptionId);
 
-            if(localOptionSearch.Any())
+            if (localOptionSearch.Any())
             {
                 try
                 {
@@ -115,18 +113,20 @@ namespace Presentation.Web.Controllers.OData
                 {
                     return InternalServerError(e);
                 }
-            } else
+            }
+            else
             {
                 try
                 {
                     entity.ObjectOwnerId = UserId;
                     entity.LastChangedByUserId = UserId;
                     entity.IsActive = true;
-                    var entityWithOrganization = entity as IHasOrganization;
-                    if (entityWithOrganization != null)
+
+                    if (entity is IHasOrganization entityWithOrganization)
                     {
-                        entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                        entityWithOrganization.OrganizationId = orgId;
                     }
+
                     entity = Repository.Insert(entity);
                     Repository.Save();
                 }
@@ -141,7 +141,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Patch(int key, Delta<TLocalModelType> delta)
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = ActiveOrganizationId;
             var localOptionSearch = Repository.AsQueryable().Where(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOptionSearch.Any())
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 // check if user is allowed to write to the entity
-                if (!_authService.HasWriteAccess(UserId, localOption))
+                if (!AllowWrite(localOption))
                 {
                     return Forbidden();
                 }
@@ -176,20 +176,22 @@ namespace Presentation.Web.Controllers.OData
                     return InternalServerError(e);
                 }
             }
-            else {
+            else
+            {
                 try
                 {
                     TLocalModelType entity = new TLocalModelType();
                     entity.ObjectOwnerId = UserId;
                     entity.LastChangedByUserId = UserId;
                     entity.OptionId = key;
-                    var entityWithOrganization = entity as IHasOrganization;
-                    if (entityWithOrganization != null)
+
+                    if (entity is IHasOrganization entityWithOrganization)
                     {
-                        entityWithOrganization.OrganizationId = _authService.GetCurrentOrganizationId(UserId);
+                        entityWithOrganization.OrganizationId = orgId;
                     }
+
                     delta.Patch(entity);
-                    entity = Repository.Insert(entity);
+                    Repository.Insert(entity);
                     Repository.Save();
                 }
                 catch (Exception e)
@@ -203,21 +205,19 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Delete(int key)
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
+            var orgId = ActiveOrganizationId;
             LocalOptionEntity<TOptionType> localOption = Repository.AsQueryable().First(x => x.OrganizationId == orgId && x.OptionId == key);
 
             if (localOption == null)
                 return NotFound();
 
-            if (!_authService.HasWriteAccess(UserId, localOption))
+            if (!AllowDelete(localOption))
             {
                 return Forbidden();
             }
 
             try
             {
-                //Repository.DeleteByKey(localOption.Id);
-
                 localOption.IsActive = false;
                 Repository.Save();
             }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
@@ -9,21 +8,17 @@ using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    public abstract class GenericHierarchyApiController<TModel, TDto> : GenericContextAwareApiController<TModel, TDto>
-        where TModel : Entity, IHierarchy<TModel>, IContextAware
+    public abstract class GenericHierarchyApiController<TModel, TDto> : GenericApiController<TModel, TDto>
+        where TModel : Entity, IHierarchy<TModel>
     {
-        protected GenericHierarchyApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
-            : base(repository, authorizationContext)
+        protected GenericHierarchyApiController(IGenericRepository<TModel> repository)
+            : base(repository)
         {
         }
 
         protected override void DeleteQuery(TModel entity)
         {
-            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
-            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            //var todo = Repository.Get(x => x.Id == entity.Id, null, "Children").FirstOrDefault();
-            var dummy = entity.Children;
-            Repository.DeleteByKey(entity.Id);
+            Repository.DeleteByKeyWithReferencePreload(entity.Id);
             Repository.Save();
         }
 

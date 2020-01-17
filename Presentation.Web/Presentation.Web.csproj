@@ -335,7 +335,6 @@
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
-    <Compile Include="Infrastructure\Authorization\Controller\General\LegacyAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Middleware\CSRFProtectionMiddleware.cs" />
@@ -386,7 +385,6 @@
     <Compile Include="Controllers\API\UsageDataworkerController.cs" />
     <Compile Include="Controllers\API\DataworkerController.cs" />
     <Compile Include="Controllers\API\ExcelController.cs" />
-    <Compile Include="Controllers\API\GenericContextAwareApiController.cs" />
     <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
     <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
     <Compile Include="Controllers\API\ExhibitController.cs" />
@@ -653,6 +651,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />

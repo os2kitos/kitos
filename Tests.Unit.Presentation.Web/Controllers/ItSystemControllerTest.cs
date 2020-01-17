@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
@@ -35,11 +36,11 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _sut = new ItSystemController(
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
-                _systemService.Object,
-                _authorizationContext.Object
+                _systemService.Object
                 );
 
             SetupControllerFrorTest(_sut);
+            _sut.AuthorizationContext = _authorizationContext.Object;
         }
 
         [Fact]
@@ -108,7 +109,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -122,7 +123,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -132,20 +133,20 @@ namespace Tests.Unit.Presentation.Web.Controllers
         }
 
         [Theory]
-        [InlineData(OperationResult.Conflict)]
-        [InlineData(OperationResult.BadInput)]
-        [InlineData(OperationResult.UnknownError)]
-        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationResult operationResult)
+        [InlineData(OperationFailure.Conflict, HttpStatusCode.Conflict)]
+        [InlineData(OperationFailure.BadInput, HttpStatusCode.BadRequest)]
+        [InlineData(OperationFailure.UnknownError, HttpStatusCode.InternalServerError)]
+        public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationFailure operationResult, HttpStatusCode expectedStatusCode)
         {
             //Arrange
             var itSystemId = A<int>();
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(operationResult));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(operationResult));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
 
             //Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, responseMessage.StatusCode);
+            Assert.Equal(expectedStatusCode, responseMessage.StatusCode);
         }
 
         [Fact]
@@ -155,7 +156,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             var itSystemId = A<int>();
             var usingOrganizations = Many<UsingOrganization>().ToList();
 
-            ExpectGetUsingOrganizationsReturn(itSystemId, Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(usingOrganizations));
+            ExpectGetUsingOrganizationsReturn(itSystemId, Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(usingOrganizations));
 
             //Act
             var responseMessage = _sut.GetUsingOrganizations(itSystemId);
@@ -245,7 +246,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
 
         private void ExpectGetUsingOrganizationsReturn(
             int itSystemId,
-            Result<OperationResult, IReadOnlyList<UsingOrganization>> result)
+            Result<IReadOnlyList<UsingOrganization>,OperationFailure > result)
         {
             _systemService.Setup(x => x.GetUsingOrganizations(itSystemId))
                 .Returns(result);

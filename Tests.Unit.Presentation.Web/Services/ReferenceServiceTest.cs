@@ -49,7 +49,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.NotFound, result);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
             _dbTransaction.Verify(x => x.Rollback(), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
@@ -66,7 +67,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Forbidden, result);
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
             _dbTransaction.Verify(x => x.Rollback(), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
@@ -83,7 +85,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result);
+            Assert.True(result.Ok);
             _dbTransaction.Verify(x => x.Rollback(), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
@@ -103,7 +105,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.DeleteBySystemId(system.Id);
 
             //Assert
-            Assert.Equal(OperationResult.Ok, result);
+            Assert.True(result.Ok);
             _dbTransaction.Verify(x => x.Rollback(), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
@@ -131,7 +133,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new ExternalReference { Id = A<int>() };
         }
 
-        private ItSystem AddExternalReference(ItSystem system, ExternalReference reference)
+        private static ItSystem AddExternalReference(ItSystem system, ExternalReference reference)
         {
             system.ExternalReferences.Add(reference);
             return system;

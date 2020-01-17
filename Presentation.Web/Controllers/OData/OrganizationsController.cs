@@ -1,14 +1,15 @@
 ﻿using System;
-using Core.ApplicationServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
 using System.Security;
-using System.Threading;
 using System.Web.Http;
 using System.Web.OData;
 using Core.DomainModel;
 using System.Linq;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.Organizations;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -18,15 +19,17 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationRoleService _organizationRoleService;
-        private readonly IAuthenticationService _authService;
         private readonly IGenericRepository<User> _userRepository;
 
-        public OrganizationsController(IGenericRepository<Organization> repository, IOrganizationService organizationService, IOrganizationRoleService organizationRoleService, IAuthenticationService authService, IGenericRepository<User> userRepository)
-            : base(repository, authService)
+        public OrganizationsController(
+            IGenericRepository<Organization> repository,
+            IOrganizationService organizationService,
+            IOrganizationRoleService organizationRoleService,
+            IGenericRepository<User> userRepository)
+            : base(repository)
         {
             _organizationService = organizationService;
             _organizationRoleService = organizationRoleService;
-            _authService = authService;
             _userRepository = userRepository;
         }
 
@@ -38,27 +41,18 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
             }
 
-            var entity = Repository.GetByKey(orgKey);
-            if (entity == null)
-            {
-                return NotFound();
-            }
-
-            if (!_authService.HasWriteAccess(UserId, entity))
-            {
-                return Forbidden();
-            }
-
-            var userId = 0;
             if (parameters.ContainsKey("userId"))
             {
-                userId = (int)parameters["userId"];
-                // TODO check if user is allowed to remove users from this organization
+                var userId = (int)parameters["userId"];
+
+                var result = _organizationService.RemoveUser(orgKey, userId);
+                return
+                    result.Ok ?
+                        StatusCode(HttpStatusCode.NoContent) :
+                        FromOperationFailure(result.Error);
             }
 
-            _organizationService.RemoveUser(orgKey, userId);
-
-            return StatusCode(HttpStatusCode.NoContent);
+            return BadRequest("No user ID specified");
         }
 
         [EnableQuery]
@@ -69,62 +63,18 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest();
             }
 
-            if (IsCvrInvalid(organization))
-            {
-                return BadRequest("Invalid CVR format");
-            }
+            var result = _organizationService.CreateNewOrganization(organization);
 
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != organization.Id && !_authService.HasReadAccessOutsideContext(UserId))
-            {
-                return Forbidden();
-            }
-
-            var user = _userRepository.GetByKey(UserId);
-
-            try
-            {
-                CheckOrgTypeRights(organization);
-            }
-            catch (SecurityException e)
-            {
-                return Forbidden();
-            }
-
-            _organizationService.SetupDefaultOrganization(organization, user);
-
-            var result = base.Post(organization).ExecuteAsync(new CancellationToken());
-
-            if (result.Result.IsSuccessStatusCode)
-            {
-                if (organization.TypeId == 2)
-                {
-                    _organizationRoleService.MakeLocalAdmin(user, organization, user);
-                    _organizationRoleService.MakeUser(user, organization, user);
-                }
-            }
-            else
-            {
-                return StatusCode(result.Result.StatusCode);
-            }
-
-            return Created(organization);
-        }
-
-        private static bool IsCvrInvalid(Organization organization)
-        {
-            //Cvr is optional
-            var isCvrProvided = string.IsNullOrWhiteSpace(organization.Cvr) == false;
-
-            //If cvr is defined, it must be valid
-            return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
+            return result.Ok ? 
+                Created(result.Value) : 
+                FromOperationFailure(result.Error);
         }
 
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            var accessLevel = GetOrganizationReadAccessLevel(key);
+            if (accessLevel < OrganizationDataReadAccessLevel.Public)
             {
                 return Forbidden();
             }
@@ -139,42 +89,20 @@ namespace Presentation.Web.Controllers.OData
             try
             {
                 var organization = delta.GetInstance();
-                CheckOrgTypeRights(organization);
+                if (organization.TypeId > 0)
+                {
+                    var typeKey = (OrganizationTypeKeys)organization.TypeId;
+                    if (!_organizationService.CanChangeOrganizationType(organization, typeKey))
+                    {
+                        return Forbidden();
+                    }
+                }
             }
             catch (SecurityException e)
             {
                 return Forbidden();
             }
             return base.Patch(key, delta);
-        }
-
-        private void CheckOrgTypeRights(Organization organization)
-        {
-            if (organization.TypeId > 0)
-            {
-                var typeKey = (OrganizationTypeKeys)organization.TypeId;
-                switch (typeKey)
-                {
-                    case OrganizationTypeKeys.Kommune:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeKommune))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.Interessefællesskab:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeInteressefællesskab))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.Virksomhed:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeVirksomhed))
-                            throw new SecurityException();
-                        break;
-                    case OrganizationTypeKeys.AndenOffentligMyndighed:
-                        if (!_authService.CanExecute(UserId, Feature.CanSetOrganizationTypeAndenOffentligMyndighed))
-                            throw new SecurityException();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
         }
     }
 }

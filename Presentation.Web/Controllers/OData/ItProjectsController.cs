@@ -8,7 +8,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
-using Core.ApplicationServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -21,13 +21,11 @@ namespace Presentation.Web.Controllers.OData
     public class ItProjectsController : BaseEntityController<ItProject>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IAuthenticationService _authService;
 
-        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItProjectsController(IGenericRepository<ItProject> repository, IGenericRepository<OrganizationUnit> orgUnitRepository)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
-            _authService = authService;
         }
 
         [EnableQuery]
@@ -49,25 +47,27 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjects(int key)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            var all = Repository.AsQueryable();
+
+            if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
             {
-                if (loggedIntoOrgId != key)
+                if (GetOrganizationReadAccessLevel(key) < OrganizationDataReadAccessLevel.All)
                 {
                     return Forbidden();
                 }
 
-                var result = Repository.AsQueryable().ByOrganizationId(key);
+                var result = all.ByOrganizationId(key);
                 return Ok(result);
             }
             else
             {
-                var result = Repository.AsQueryable().ByPublicAccessOrOrganizationId(key);
+                var result = all
+                    .ByPublicAccessOrOrganizationId(key);
+
                 return Ok(result);
             }
         }
 
-        // TODO for now only read actions are allowed, in future write will be enabled - but keep security in mind!
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects
         [EnableQuery]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItProjects")]
@@ -75,8 +75,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjectsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            if (GetOrganizationReadAccessLevel(orgKey) < OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }

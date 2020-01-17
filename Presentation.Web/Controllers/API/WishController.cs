@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
@@ -14,15 +15,12 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class WishController : GenericContextAwareApiController<Wish, WishDTO>
+    public class WishController : GenericApiController<Wish, WishDTO>
     {
         private readonly IItSystemUsageRepository _usageRepository;
 
-        public WishController(
-            IGenericRepository<Wish> repository,
-            IAuthorizationContext authorization,
-            IItSystemUsageRepository usageRepository)
-            : base(repository, authorization)
+        public WishController(IGenericRepository<Wish> repository, IItSystemUsageRepository usageRepository)
+            : base(repository)
         {
             _usageRepository = usageRepository;
         }
@@ -30,13 +28,17 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<WishDTO>>))]
         public HttpResponseMessage GetWishes([FromUri] int userId, [FromUri] int usageId)
         {
-            var wishes = Repository.Get(x => x.ItSystemUsageId == usageId && (x.IsPublic || x.UserId == userId));
+            var wishes =
+                Repository
+                    .Get(x => x.ItSystemUsageId == usageId && (x.IsPublic || x.UserId == userId))
+                    .Where(AllowRead);
+
             return Ok(Map(wishes));
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Wish>(x => _usageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Wish, ItSystemUsage>(x => _usageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
         }
     }
 }

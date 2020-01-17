@@ -3,8 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel.ItSystemUsage;
@@ -23,8 +21,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IItSystemUsageMigrationService _itSystemUsageMigrationService;
 
-        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService, IAuthorizationContext authContext)
-            : base(authContext)
+        public ItSystemUsageMigrationController(IItSystemUsageMigrationService itSystemUsageMigrationService)
         {
             _itSystemUsageMigrationService = itSystemUsageMigrationService;
         }
@@ -35,20 +32,12 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
-            switch (res.Status)
+            if (res.Ok)
             {
-                case OperationResult.Ok:
-                    return Ok(Map(res.Value));
-                case OperationResult.Forbidden:
-                    return Forbidden();
-                case OperationResult.BadInput:
-                    return BadRequest();
-                case OperationResult.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get migration consequences");
+                return Ok(Map(res.Value));
             }
+
+            return FromOperationFailure(res.Error);
         }
 
         [HttpPost]
@@ -60,20 +49,12 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
         {
             var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
-            switch (result.Status)
+            if (result.Ok)
             {
-                case OperationResult.Ok:
-                    return NoContent();
-                case OperationResult.BadInput:
-                    return BadRequest();
-                case OperationResult.Forbidden:
-                    return Forbidden();
-                case OperationResult.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to migrate It System Usage");
+                return NoContent();
             }
+
+            return FromOperationFailure(result.Error);
         }
 
         [HttpGet]
@@ -111,19 +92,13 @@ namespace Presentation.Web.Controllers.API
 
             var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
 
-            switch (result.Status)
+            if (result.Ok)
             {
-                case OperationResult.Ok:
-                    var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
-                    return Ok(unusedItSystems);
-                case OperationResult.Forbidden:
-                    return Forbidden();
-                case OperationResult.NotFound:
-                    return NotFound();
-                default:
-                    return CreateResponse(HttpStatusCode.InternalServerError,
-                        "An error occured when trying to get Unused It Systems");
+                var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityDTO).ToList();
+                return Ok(unusedItSystems);
             }
+
+            return FromOperationFailure(result.Error);
         }
 
         private static ItSystemUsageMigrationDTO Map(ItSystemUsageMigration input)

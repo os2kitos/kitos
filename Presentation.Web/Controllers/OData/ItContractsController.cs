@@ -8,7 +8,7 @@ using System.Web.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
-using Core.ApplicationServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
@@ -20,13 +20,13 @@ namespace Presentation.Web.Controllers.OData
     public class ItContractsController : BaseEntityController<ItContract>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
-        private readonly IAuthenticationService _authService;
 
-        public ItContractsController(IGenericRepository<ItContract> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IAuthenticationService authService)
-            : base(repository, authService)
+        public ItContractsController(
+            IGenericRepository<ItContract> repository,
+            IGenericRepository<OrganizationUnit> orgUnitRepository)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
-            _authService = authService;
         }
 
         /// <summary>
@@ -39,10 +39,16 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItContract>>))]
         public override IHttpActionResult Get()
         {
-            var orgId = _authService.GetCurrentOrganizationId(UserId);
-            var isGlobalAdmin = _authService.IsGlobalAdmin(UserId);
+            var all = Repository.AsQueryable();
 
-            return Ok(Repository.AsQueryable().Where(x => isGlobalAdmin || x.OrganizationId == orgId));
+            if (GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return Ok(all);
+            }
+
+            var byOrganizationId = all.ByOrganizationId(ActiveOrganizationId);
+
+            return Ok(byOrganizationId);
         }
 
         /// <summary>
@@ -56,27 +62,26 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(int key)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != key && !_authService.HasReadAccessOutsideContext(UserId))
+            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(key);
+            if (organizationDataReadAccessLevel != OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
 
             //tolist requried to handle filtering on computed fields
             var result = Repository.AsQueryable().ByOrganizationId(key);
-            
+
             return Ok(result);
         }
 
-        // TODO refactor this now that we are using MS Sql Server that has support for MARS
         [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItContracts")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<List<ItContract>>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContractsByOrgUnit(int orgKey, int unitKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(orgKey);
+            if (organizationDataReadAccessLevel < OrganizationDataReadAccessLevel.Public)
             {
                 return Forbidden();
             }
@@ -106,7 +111,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
             }
-            return Ok(contracts);
+            return Ok(contracts.Where(AllowRead));
         }
     }
 }

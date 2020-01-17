@@ -14,8 +14,10 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationUnitRightController(IGenericRepository<OrganizationUnitRight> rightRepository,
-            IGenericRepository<OrganizationUnit> objectRepository, IOrgUnitService orgUnitService)
+        public OrganizationUnitRightController(
+            IGenericRepository<OrganizationUnitRight> rightRepository,
+            IGenericRepository<OrganizationUnit> objectRepository, 
+            IOrgUnitService orgUnitService)
             : base(rightRepository, objectRepository)
         {
             _orgUnitService = orgUnitService;
@@ -64,7 +66,7 @@ namespace Presentation.Web.Controllers.API
             {
                 theRights.AddRange(GetRightsQuery(orgUnit.Id));
             }
-            return theRights;
+            return theRights.Where(AllowRead).ToList();
         }
     }
 }

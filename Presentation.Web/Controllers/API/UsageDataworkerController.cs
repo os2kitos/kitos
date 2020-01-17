@@ -1,5 +1,5 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
@@ -12,18 +12,15 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IItSystemUsageRepository _systemUsageRepository;
 
-        public UsageDataworkerController(
-            IGenericRepository<ItSystemUsageDataWorkerRelation> repository,
-            IItSystemUsageRepository systemUsageRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+        public UsageDataworkerController(IGenericRepository<ItSystemUsageDataWorkerRelation> repository, IItSystemUsageRepository systemUsageRepository)
+            : base(repository)
         {
             _systemUsageRepository = systemUsageRepository;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemUsageDataWorkerRelation>(x => _systemUsageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItSystemUsageDataWorkerRelation, ItSystemUsage>(x => _systemUsageRepository.GetSystemUsage(x.ItSystemUsageId), base.GetCrudAuthorization());
         }
     }
 }
