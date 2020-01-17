@@ -256,7 +256,8 @@
                     deferred.resolve(resp);
                 }, (resp) => {
                     deferred.reject(resp);
-                });
+                    });
+                //TODO CSRF: Should make a new call to api/authorize/antiforgery after logging in to update csrf tokens.
             }
 
             return deferred.promise;
@@ -279,6 +280,7 @@
             this.$rootScope.user = null;
 
             return this.$http.post("api/authorize?logout", undefined);
+            //TODO CSRF: should delete cookies and empty the hidden field.
         };
 
         loadUser = (userLoginInfo) => {

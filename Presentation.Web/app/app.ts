@@ -54,14 +54,7 @@ app.config([
         // $window isn't ready yet, so fetch it ourself
         var $window = $windowProvider.$get();
 
-        $httpProvider.interceptors.push(
-            () => ({
-                request(config) {
-                    const tokenVal = angular.element("input[id='__RequestVerificationToken']").val();
-                    config.headers["X-XSRF-TOKEN"] = tokenVal;
-                    return config;
-                }
-            }));
+        $httpProvider.interceptors.push("csrfRequestInterceptor");
 
         // encode all url requests - fixes IE not correctly encoding special chars
         $httpProvider.interceptors.push(() => ({

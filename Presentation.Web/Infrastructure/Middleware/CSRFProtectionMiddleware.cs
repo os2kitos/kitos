@@ -25,7 +25,7 @@ namespace Presentation.Web.Infrastructure.Middleware
                 if (!headers.TryGetValue(XsrfHeader, out var xsrfToken))
                 {
                     context.Response.StatusCode = 400;
-                    context.Response.Write("Manglende xsrf token");
+                    context.Response.Write("Manglende xsrf header");
                     return;
                 }
 
@@ -35,7 +35,8 @@ namespace Presentation.Web.Infrastructure.Middleware
 
                 if (tokenCookie.Value == null)
                 {
-                    context.Response.StatusCode = 401;
+                    context.Response.StatusCode = 400;
+                    context.Response.Write("Manglende xsrf cookie");
                     return;
                 }
 
@@ -46,8 +47,8 @@ namespace Presentation.Web.Infrastructure.Middleware
                 }
                 catch (HttpAntiForgeryException e)
                 {
-
-                    context.Response.StatusCode = 402;
+                    context.Response.StatusCode = 400;
+                    context.Response.Write(e.Message);
                 }
                 
             }

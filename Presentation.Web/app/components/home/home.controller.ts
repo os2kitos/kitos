@@ -9,15 +9,21 @@
                 resolve: {
                     texts: [
                         "$http", $http => $http.get("api/text/")
-                        .then(result => result.data.response)
+                            .then(result => result.data.response)
+                    ],
+                    //TODO: Maybe place this somewhere else?
+                    csrf: [
+                        "$http", $http => $http.get("api/authorize/antiforgery")
+                            .then()
+
                     ]
-                    
-        }
+
+                }
             });
         }
     ]);
 
-    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth","$location",
+    app.controller("home.IndexCtrl", ["$rootScope", "$scope", "$http", "$state", "$stateParams", "notify", "userService", "texts", "navigationService", "$sce", "$auth", "$location",
         ($rootScope, $scope, $http, $state, $stateParams, notify, userService, texts, navigationService, $sce, $auth, $location) => {
             $rootScope.page.title = "Index";
             $rootScope.page.subnav = [];
@@ -57,11 +63,6 @@
                 notify.addInfoMessage("Should do redirect to OS2SSO...");
                 $auth.signIn();
             };
-
-            $scope.TEST = () => {
-                $http.get("api/authorize/antiforgery")
-                    .then(result => (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value = result.data);
-            }
 
             // login
             $scope.submitLogin = () => {
