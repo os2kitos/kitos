@@ -21,11 +21,19 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             return _taskRefs.Values;
         }
 
-        public TaskRef Insert(TaskRef entity)
+        public TaskRef Insert(TaskRef taskref)
         {
             // Copy by reference: Test has lifetime responsibility for TaskRefs
-            _taskRefs.Add(entity.TaskKey, entity); 
-            return entity;
+            _taskRefs.Add(taskref.TaskKey, taskref); 
+            return taskref;
+        }
+
+        public void BulkInsert(IEnumerable<TaskRef> entities)
+        {
+            foreach (var taskRef in entities)
+            {
+                _taskRefs.Add(taskRef.TaskKey, taskRef);
+            }
         }
 
         public void Delete(TaskRef entity)

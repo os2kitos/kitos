@@ -6,20 +6,18 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Principal;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.KLE;
-using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
 {
-    [PublicApi]//TODO: Internalapi
+    [InternalApi]
     [RoutePrefix("api/v1/kle")]
     public class KLEController : BaseApiController
     {
@@ -99,7 +97,6 @@ namespace Presentation.Web.Controllers.API
         private static void CreateCsvHeader(ICollection<dynamic> list)
         {
             var header = new ExpandoObject() as IDictionary<string, object>;
-            //header.Add("Uuid", "Identifier");
             header.Add("Type", "KLE Type");
             header.Add("TaskKey", "KLE nummer");
             header.Add("Description", "Beskrivelse");
