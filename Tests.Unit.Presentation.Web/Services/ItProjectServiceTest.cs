@@ -64,7 +64,7 @@ namespace Tests.Unit.Presentation.Web.Services
             };
             var transaction = new Mock<IDatabaseTransaction>();
             _authorizationContext.Setup(x => x.AllowCreate<ItProject>(itProject)).Returns(true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
 
             //Act
             var result = _sut.AddProject(itProject);

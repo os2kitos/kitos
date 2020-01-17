@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.System
                 return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
                 var systemExternalReferences = system.ExternalReferences.ToList();
 

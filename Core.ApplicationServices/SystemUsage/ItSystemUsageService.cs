@@ -2,10 +2,12 @@
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.Result;
+using Core.DomainServices.Repositories.System;
 
 namespace Core.ApplicationServices.SystemUsage
 {
@@ -13,11 +15,16 @@ namespace Core.ApplicationServices.SystemUsage
     {
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IItSystemRepository _systemRepository;
 
-        public ItSystemUsageService(IGenericRepository<ItSystemUsage> usageRepository, IAuthorizationContext authorizationContext)
+        public ItSystemUsageService(
+            IGenericRepository<ItSystemUsage> usageRepository,
+            IAuthorizationContext authorizationContext,
+            IItSystemRepository systemRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
+            _systemRepository = systemRepository;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
@@ -30,6 +37,23 @@ namespace Core.ApplicationServices.SystemUsage
             }
 
             if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage))
+            {
+                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+            }
+
+            var itSystem = _systemRepository.GetSystem(newSystemUsage.ItSystemId);
+            if (itSystem == null)
+            {
+                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.BadInput);
+            }
+
+            if (!_authorizationContext.AllowReads(itSystem))
+            {
+                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+            }
+
+            //Cannot create system usage in an org where the logical it system is unavailable to the users.
+            if (!AllowUsageInTargetOrganization(newSystemUsage, itSystem))
             {
                 return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
@@ -47,6 +71,13 @@ namespace Core.ApplicationServices.SystemUsage
             _usageRepository.Save(); // abuse this as UoW
 
             return Result<ItSystemUsage, OperationFailure>.Success(usage);
+        }
+
+        private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
+        {
+            return 
+                    newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
+                    itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
         public Result<ItSystemUsage, OperationFailure> Delete(int id)

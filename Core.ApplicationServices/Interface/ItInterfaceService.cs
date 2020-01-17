@@ -34,7 +34,7 @@ namespace Core.ApplicationServices.Interface
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
                 var itInterface = _repository.GetByKey(id);
 

@@ -49,7 +49,7 @@ namespace Core.ApplicationServices.Project
 
             PrepareNewObject(project);
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
                 _projectRepository.Insert(project);
                 _projectRepository.Save();

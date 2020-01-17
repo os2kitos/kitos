@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.System;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
@@ -19,12 +20,14 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly ItSystemUsageService _sut;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _usageRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
+        private readonly Mock<IItSystemRepository> _systemRepository;
 
         public ItSystemUsageServiceTest()
         {
             _usageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
-            _sut = new ItSystemUsageService(_usageRepository.Object, _authorizationContext.Object);
+            _systemRepository = new Mock<IItSystemRepository>();
+            _sut = new ItSystemUsageService(_usageRepository.Object, _authorizationContext.Object, _systemRepository.Object);
         }
 
         [Fact]
@@ -60,7 +63,64 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Add_Returns_Ok()
+        public void Add_Returns_BadInput_If_ItSystemNotFound()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage {ItSystemId = A<int>()};
+            SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(true);
+            _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(default(ItSystem));
+
+            //Act
+            var result = _sut.Add(itSystemUsage, new User());
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error);
+        }
+
+        [Fact]
+        public void Add_Returns_Forbidden_If_ReadAccess_To_ItSystem_Is_Declined()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage { ItSystemId = A<int>(), OrganizationId = A<int>() };
+            var itSystem = new ItSystem();
+            SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(true);
+            _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(itSystem);
+            _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(false);
+
+            //Act
+            var result = _sut.Add(itSystemUsage, new User());
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void Add_Returns_Forbidden_If_Usage_Of_Local_System_In_Other_Org_Is_Attempted()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage { ItSystemId = A<int>(), OrganizationId = A<int>() };
+            var itSystem = new ItSystem() { OrganizationId = itSystemUsage.OrganizationId + 1, AccessModifier = AccessModifier.Local };
+            SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(true);
+            _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(itSystem);
+            _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(true);
+
+            //Act
+            var result = _sut.Add(itSystemUsage, new User());
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Add_Returns_Ok(bool sameOrg)
         {
             //Arrange
             var objectOwner = new User();
@@ -73,9 +133,16 @@ namespace Tests.Unit.Presentation.Web.Services
                 AssociatedDataWorkers = new List<ItSystemUsageDataWorkerRelation> { new ItSystemUsageDataWorkerRelation(), new ItSystemUsageDataWorkerRelation() }
 
             };
+            var associatedItSystem = new ItSystem
+            {
+                OrganizationId = sameOrg ? input.OrganizationId : input.OrganizationId + 1,
+                AccessModifier = AccessModifier.Public
+            };
             var usageCreatedByRepo = new ItSystemUsage();
             SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
             _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(input)).Returns(true);
+            _systemRepository.Setup(x => x.GetSystem(input.ItSystemId)).Returns(associatedItSystem);
+            _authorizationContext.Setup(x => x.AllowReads(associatedItSystem)).Returns(true);
             _usageRepository.Setup(x => x.Create()).Returns(usageCreatedByRepo);
 
             //Act
