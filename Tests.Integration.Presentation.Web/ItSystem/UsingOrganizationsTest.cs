@@ -43,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetUsingOrganizations_Can_Get_All_Organizations_In_Use(OrganizationRole role)
         {
             //Arrange
-            var newSystem = await CreateSystemAsync();
+            var newSystem = await CreateSystemAsync(accessModifier: AccessModifier.Public);
             var firstUsage = await TakeSystemIntoUseAsync(newSystem, TestEnvironment.DefaultOrganizationId);
             var secondUsage = await TakeSystemIntoUseAsync(newSystem, TestEnvironment.SecondOrganizationId);
 
@@ -68,7 +68,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             //Arrange
             var newSystem = await CreateSystemAsync(organizationId: TestEnvironment.SecondOrganizationId);
             await TakeSystemIntoUseAsync(newSystem, TestEnvironment.SecondOrganizationId);
-            await TakeSystemIntoUseAsync(newSystem, TestEnvironment.DefaultOrganizationId);
 
             //Act
             using (var httpResponse = await GetUsingOrganizations(role, newSystem.Id))

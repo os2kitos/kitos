@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using System.Web.Http;
@@ -13,15 +12,15 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
     public class AttachedOptionsRegularPersonalDataController : AttachedOptionsFunctionController<ItSystem, RegularPersonalDataType, LocalRegularPersonalDataType>
     {
         public AttachedOptionsRegularPersonalDataController(
-            IGenericRepository<AttachedOption> repository, 
-            IAuthenticationService authService,
+            IGenericRepository<AttachedOption> repository,
             IGenericRepository<RegularPersonalDataType> regularPersonalDataTypeRepository,
             IGenericRepository<LocalRegularPersonalDataType> localregularPersonalDataTypeRepository)
-           : base(repository, authService, regularPersonalDataTypeRepository,localregularPersonalDataTypeRepository){
+           : base(repository, regularPersonalDataTypeRepository, localregularPersonalDataTypeRepository)
+        {
 
         }
 
-        [System.Web.Http.HttpGet]
+        [HttpGet]
         [EnableQuery]
         [ODataRoute("GetRegularPersonalDataBySystemId(id={id})")]
         public IHttpActionResult GetRegularPersonalDataBySystemId(int id)
@@ -29,7 +28,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
             return GetOptionsByObjectIDAndType(id, EntityType.ITSYSTEM, OptionType.REGULARPERSONALDATA);
         }
 
-        [System.Web.Http.HttpGet]
+        [HttpGet]
         [EnableQuery]
         [ODataRoute("GetRegularPersonalDataByUsageId(id={id})")]
         public IHttpActionResult GetRegularPersonalDataByUsageId(int id)

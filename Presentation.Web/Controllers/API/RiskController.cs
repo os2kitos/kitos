@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -14,15 +14,12 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class RiskController : GenericContextAwareApiController<Risk, RiskDTO>
+    public class RiskController : GenericApiController<Risk, RiskDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
-        public RiskController(
-            IGenericRepository<Risk> repository,
-            IAuthorizationContext authorizationContext,
-            IItProjectRepository projectRepository)
-            : base(repository, authorizationContext)
+        public RiskController(IGenericRepository<Risk> repository, IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }
@@ -32,7 +29,9 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var risks = Repository.Get(r => r.ItProjectId == projectId);
+                var risks = Repository
+                    .Get(r => r.ItProjectId == projectId)
+                    .Where(AllowRead);
 
                 return Ok(Map(risks));
             }
@@ -44,7 +43,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Risk>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Risk, ItProject>(x => _projectRepository.GetById(x.ItProjectId), base.GetCrudAuthorization());
         }
     }
 }

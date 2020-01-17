@@ -12,11 +12,14 @@ namespace Presentation.Web.Controllers.API
     [InternalApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
-        IGenericRepository<AdviceUserRelation> _repository;
-        public AdviceUserRelationController(IGenericRepository<AdviceUserRelation> repository) : base(repository)
+        private readonly IGenericRepository<AdviceUserRelation> _repository;
+
+        public AdviceUserRelationController(IGenericRepository<AdviceUserRelation> repository)
+            : base(repository)
         {
             _repository = repository;
         }
+
         /// <summary>
         /// Sletter adviser med det specificerede id fra en genereisk advis
         /// </summary>
@@ -27,10 +30,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId)) {
-                    _repository.Delete(d);
+                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId))
+                {
+                    if (AllowDelete(d))
+                    {
+                        _repository.Delete(d);
+                        _repository.Save();
+                    }
+                    else
+                    {
+                        return Forbidden();
+                    }
                 }
-                _repository.Save();
                 return Ok();
             }
             catch (Exception e)

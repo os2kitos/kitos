@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
@@ -7,20 +6,21 @@ using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
     public class UsersController : BaseEntityController<User>
     {
-        private readonly IAuthenticationService _authService;
         private readonly IUserService _userService;
         private readonly IGenericRepository<User> _repository;
 
-        public UsersController(IGenericRepository<User> repository, IAuthenticationService authService, IUserService userService)
-            : base(repository, authService)
+        public UsersController(
+            IGenericRepository<User> repository, 
+            IUserService userService)
+            : base(repository)
         {
-            _authService = authService;
             _userService = userService;
             _repository = repository;
         }
@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.OData
             if (user?.IsGlobalAdmin == true)
             {
                 // only other global admins can create global admin users
-                if (!_authService.IsGlobalAdmin(UserId))
+                if (!UserContext.HasRole(OrganizationRole.GlobalAdmin))
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
                 }
@@ -103,13 +103,13 @@ namespace Presentation.Web.Controllers.OData
         }
 
         /// <summary>
-        /// Always returns 401 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
+        /// Always returns 405 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         public override IHttpActionResult Delete(int key)
         {
-            return Unauthorized();
+            return StatusCode(HttpStatusCode.MethodNotAllowed);
         }
 
         private bool EmailExists(string email)

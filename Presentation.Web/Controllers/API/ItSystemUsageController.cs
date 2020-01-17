@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security;
 using System.Web.Http;
 using Castle.Core.Internal;
-using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Result;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
@@ -18,7 +21,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class ItSystemUsageController : GenericContextAwareApiController<ItSystemUsage, ItSystemUsageDTO>
+    public class ItSystemUsageController : GenericApiController<ItSystemUsage, ItSystemUsageDTO>
     {
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
@@ -30,9 +33,8 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<TaskRef> taskRepository,
             IItSystemUsageService itSystemUsageService,
-            IGenericRepository<AttachedOption> attachedOptionsRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IGenericRepository<AttachedOption> attachedOptionsRepository)
+            : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
@@ -50,12 +52,15 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Forbidden();
                 }
-                var usages = Repository.Get(
-                    u =>
-                        // filter by system usage name
-                        u.ItSystem.Name.Contains(q) &&
-                        // system usage is only within the context
-                        u.OrganizationId == organizationId);
+
+                var usages = Repository
+                    .AsQueryable()
+                    .ByOrganizationId(organizationId);
+
+                if (!string.IsNullOrWhiteSpace(q))
+                {
+                    usages = usages.Where(usage => usage.ItSystem.Name.Contains(q));
+                }
 
                 return Ok(Map(usages));
             }
@@ -71,21 +76,21 @@ namespace Presentation.Web.Controllers.API
 
             try
             {
-                var item = Repository.GetByKey(id);
-
-                if (!AllowRead(item))
-                {
-                    return Forbidden();
-                }
+                var item = _itSystemUsageService.GetById(id);
 
                 if (item == null)
                 {
                     return NotFound();
                 }
 
+                if (!AllowRead(item))
+                {
+                    return Forbidden();
+                }
+
                 var dto = Map(item);
 
-                if (item.OrganizationId != KitosUser.DefaultOrganizationId)
+                if (item.OrganizationId != ActiveOrganizationId)
                 {
                     dto.Note = "";
                 }
@@ -105,7 +110,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = _itSystemUsageService.GetByOrganizationAndSystemId(organizationId, itSystemId);
 
                 if (usage == null)
                 {
@@ -129,35 +134,34 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var itsystemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
+                var systemUsage = AutoMapper.Mapper.Map<ItSystemUsageDTO, ItSystemUsage>(dto);
 
-                if (!AllowCreate<ItSystemUsage>(itsystemUsage))
+                if (!AllowCreate<ItSystemUsage>(systemUsage))
                 {
                     return Forbidden();
                 }
 
-                if (Repository.Get(usage => usage.ItSystemId == dto.ItSystemId
-                                            && usage.OrganizationId == dto.OrganizationId).Any())
+                var sysUsageResult = _itSystemUsageService.Add(systemUsage, KitosUser);
+                if (sysUsageResult.Ok)
                 {
-                    return Conflict("Usage already exist");
+                    var sysUsage = sysUsageResult.Value;
+                    sysUsage.DataLevel = dto.DataLevel;
+
+                    //copy attached options from system to systemusage
+                    var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
+                    foreach (var option in attachedOptions)
+                    {
+                        option.ObjectId = sysUsage.Id;
+                        option.ObjectType = EntityType.ITSYSTEMUSAGE;
+                        _attachedOptionsRepository.Insert(option);
+                    }
+                    _attachedOptionsRepository.Save();
+
+
+                    return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }
 
-                var sysUsage = _itSystemUsageService.Add(itsystemUsage, KitosUser);
-                sysUsage.DataLevel = dto.DataLevel;
-
-                //copy attached options from system to systemusage
-                var attachedOptions = _attachedOptionsRepository.AsQueryable().Where(a => a.ObjectId == sysUsage.ItSystemId && a.ObjectType == EntityType.ITSYSTEM);
-                foreach (var option in attachedOptions)
-                {
-                    option.ObjectId = sysUsage.Id;
-                    option.ObjectType = EntityType.ITSYSTEMUSAGE;
-                    _attachedOptionsRepository.Insert(option);
-                }
-                _attachedOptionsRepository.Save();
-
-
-                return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
-
+                return FromOperationFailure(sysUsageResult.Error);
             }
             catch (Exception e)
             {
@@ -169,7 +173,8 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usage = Repository.Get(u => u.ItSystemId == itSystemId && u.OrganizationId == organizationId).FirstOrDefault();
+                var usage = _itSystemUsageService.GetByOrganizationAndSystemId(organizationId, itSystemId);
+
                 if (usage == null)
                 {
                     return NotFound();
@@ -280,7 +285,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.ItSystemUsages.All(y => y.Id != id)).ToList();
                 }
                 else
@@ -289,7 +293,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.ItSystemUsages.All(y => y.Id != id)).ToList();
                 }
 
@@ -298,7 +301,7 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var task in tasks)
                 {
-                    if (!usage.ItSystem.TaskRefs.Any(t => t.Id == task.Id))
+                    if (usage.ItSystem.TaskRefs.All(t => t.Id != task.Id))
                     {
                         usage.TaskRefs.Add(task);
                     }
@@ -399,6 +402,11 @@ namespace Presentation.Web.Controllers.API
             {
                 var usage = Repository.GetByKey(id);
 
+                if (!AllowRead(usage))
+                {
+                    return Forbidden();
+                }
+
                 IQueryable<TaskRef> taskQuery;
                 if (onlySelected)
                 {
@@ -417,8 +425,7 @@ namespace Presentation.Web.Controllers.API
                 if (taskGroup.HasValue)
                     pagingModel.Where(taskRef => (taskRef.ParentId.Value == taskGroup.Value ||
                                                   taskRef.Parent.ParentId.Value == taskGroup.Value) &&
-                                                 !taskRef.Children.Any() &&
-                                                 taskRef.AccessModifier == AccessModifier.Public); // TODO add support for normal
+                                                 !taskRef.Children.Any());
                 else
                     pagingModel.Where(taskRef => taskRef.Children.Count == 0);
 
@@ -444,7 +451,13 @@ namespace Presentation.Web.Controllers.API
 
         protected override void DeleteQuery(ItSystemUsage entity)
         {
-            _itSystemUsageService.Delete(entity.Id);
+            var result = _itSystemUsageService.Delete(entity.Id);
+            if (result.Ok == false)
+            {
+                if (result.Error == OperationFailure.Forbidden)
+                    throw new SecurityException();
+                throw new InvalidOperationException(result.Error.ToString("G"));
+            }
         }
     }
 }

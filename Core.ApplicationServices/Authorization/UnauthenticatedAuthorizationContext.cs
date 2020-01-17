@@ -15,6 +15,11 @@ namespace Core.ApplicationServices.Authorization
             return OrganizationDataReadAccessLevel.None;
         }
 
+        public EntityReadAccessLevel GetReadAccessLevel<T>()
+        {
+            return EntityReadAccessLevel.None;
+        }
+
         public bool AllowReads(IEntity entity)
         {
             return false;
@@ -40,12 +45,7 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
-        public bool AllowEntityVisibilityControl(IEntity entity)
-        {
-            return false;
-        }
-
-        public bool AllowSystemUsageMigration()
+        public bool HasPermission(Permission permission)
         {
             return false;
         }

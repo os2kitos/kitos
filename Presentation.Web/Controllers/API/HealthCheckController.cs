@@ -5,7 +5,7 @@ using Presentation.Web.Properties;
 namespace Presentation.Web.Controllers.API
 {
     [AllowAnonymous]
-    [PublicApi]
+    [InternalApi]
     public class HealthCheckController : ApiController
     {
         private static readonly string DeploymentVersion = Settings.Default.DeploymentVersion;

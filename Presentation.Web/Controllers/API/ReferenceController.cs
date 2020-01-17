@@ -1,64 +1,75 @@
-﻿using Core.DomainModel;
+﻿using System.Net.Http;
+using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Models;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
-using Core.ApplicationServices;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.SystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     public class ReferenceController : GenericApiController<ExternalReference, ExternalReferenceDTO>
     {
-        public readonly IFeatureChecker _featureChecker;
-        public ReferenceController(IGenericRepository<ExternalReference> repository, IFeatureChecker featureChecker) : base(repository)
+        private readonly IItProjectRepository _projectRepository;
+        private readonly IItContractRepository _contractRepository;
+        private readonly IItSystemRepository _systemRepository;
+        private readonly IItSystemUsageRepository _systemUsageRepository;
+
+        public ReferenceController(
+            IGenericRepository<ExternalReference> repository,
+            IItProjectRepository projectRepository,
+            IItContractRepository contractRepository,
+            IItSystemRepository systemRepository,
+            IItSystemUsageRepository systemUsageRepository)
+            : base(repository)
         {
-            _featureChecker = featureChecker;
+            _projectRepository = projectRepository;
+            _contractRepository = contractRepository;
+            _systemRepository = systemRepository;
+            _systemUsageRepository = systemUsageRepository;
         }
 
-        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            var reference = Repository.GetByKey(id);
-            if (!CanModifyReference(reference))
-            {
-                return Forbidden();
-            }
-
-            var result = base.PatchQuery(reference, obj);
-            
-            return Ok(Map(result));
-            
+            //NOTE: In this case we make sure dependencies are loaded on POST so we CAN use GetOwner
+            return new ChildEntityCrudAuthorization<ExternalReference, IEntityWithExternalReferences>(reference => reference.GetOwner(), base.GetCrudAuthorization());
         }
 
-        private bool CanModifyReference(ExternalReference entity)
+        public override HttpResponseMessage Post(ExternalReferenceDTO dto)
         {
-            if (entity.ObjectOwnerId == KitosUser.Id)
+            if (dto.ItContract_Id.HasValue ||
+                dto.ItSystem_Id.HasValue ||
+                dto.ItSystemUsage_Id.HasValue ||
+                dto.ItProject_Id.HasValue)
             {
-                return true;
+                return base.Post(dto);
             }
+            return BadRequest("Target object must be specified");
+        }
 
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyContracts) && entity.ItContract != null)
+        protected override void PrepareNewObject(ExternalReference item)
+        {
+            if (item.ItProject_Id.HasValue)
             {
-                return true;
+                item.ItProject = _projectRepository.GetById(item.ItProject_Id.Value);
             }
-
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifyProjects) && entity.ItProject != null)
+            if (item.Itcontract_Id.HasValue)
             {
-                return true;
+                item.ItContract = _contractRepository.GetById(item.Itcontract_Id.Value);
             }
-
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystem != null)
+            if (item.ItSystem_Id.HasValue)
             {
-                return true;
+                item.ItSystem = _systemRepository.GetSystem(item.ItSystem_Id.Value);
             }
-
-            if (_featureChecker.CanExecute(KitosUser, Feature.CanModifySystems) && entity.ItSystemUsage != null)
+            if (item.ItSystemUsage_Id.HasValue)
             {
-                return true;
+                item.ItSystemUsage = _systemUsageRepository.GetSystemUsage(item.ItSystemUsage_Id.Value);
             }
-
-            return false;
+            base.PrepareNewObject(item);
         }
     }
 }

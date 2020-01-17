@@ -11,6 +11,7 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
 using System.Net;
+using Core.ApplicationServices.Organizations;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -22,7 +23,11 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        public AuthorizeController(IUserRepository userRepository, IUserService userService, IOrganizationService organizationService)
+
+        public AuthorizeController(
+            IUserRepository userRepository,
+            IUserService userService,
+            IOrganizationService organizationService)
         {
             _userRepository = userRepository;
             _userService = userService;
@@ -63,7 +68,7 @@ namespace Presentation.Web.Controllers.API
             var user = KitosUser;
             var org = _organizationService.GetOrganizations(user).Single(o => o.Id == orgId);
             var defaultUnit = _organizationService.GetDefaultUnit(org, user);
-            var dto = new OrganizationAndDefaultUnitDTO()
+            var dto = new OrganizationAndDefaultUnitDTO
             {
                 Organization = AutoMapper.Mapper.Map<Organization, OrganizationDTO>(org),
                 DefaultOrgUnit = AutoMapper.Mapper.Map<OrganizationUnit, OrgUnitSimpleDTO>(defaultUnit)
@@ -149,7 +154,8 @@ namespace Presentation.Web.Controllers.API
                     Token = token.Value,
                     Email = loginDto.Email,
                     LoginSuccessful = true,
-                    Expires = token.Expiration
+                    Expires = token.Expiration,
+                    ActiveOrganizationId = token.ActiveOrganizationId
                 };
 
                 Logger.Info($"Created token for user with Id {user.Id}");

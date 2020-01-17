@@ -5,9 +5,8 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.ApplicationServices.Authorization;
+using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
@@ -22,9 +21,8 @@ namespace Presentation.Web.Controllers.API
 
         public ContactpersonController(
             IGenericRepository<ContactPerson> repository,
-            IGenericRepository<Organization> orgRepository,
-            IAuthorizationContext authorization)
-            : base(repository, authorization)
+            IGenericRepository<Organization> orgRepository)
+            : base(repository)
         {
             _repository = repository;
             _orgRepository = orgRepository;
@@ -32,7 +30,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ContactPerson>(x => _orgRepository.AsQueryable().ById(x.OrganizationId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ContactPerson, Organization>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
         }
 
         // GET DataProtectionAdvisor by OrganizationId
@@ -70,7 +68,7 @@ namespace Presentation.Web.Controllers.API
                     }
                 };
 
-                if (!AuthenticationService.HasReadAccess(KitosUser.Id, item))
+                if (!AllowRead(item))
                 {
                     return Forbidden();
                 }

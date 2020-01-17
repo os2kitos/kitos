@@ -21,8 +21,11 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
-        public AdviceController(IAdviceService adviceService, IGenericRepository<Advice> repository, IAuthenticationService authService, IGenericRepository<AdviceSent> sentRepository)
-            : base(repository, authService)
+        public AdviceController(
+            IAdviceService adviceService, 
+            IGenericRepository<Advice> repository, 
+            IGenericRepository<AdviceSent> sentRepository)
+            : base(repository)
         {
             _adviceService = adviceService;
             _repository = repository;
@@ -48,7 +51,7 @@ namespace Presentation.Web.Controllers.OData
                     _repository.Save();
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to add advice",e);
                     return InternalServerError(e);
                 }
 
@@ -107,7 +110,7 @@ namespace Presentation.Web.Controllers.OData
                         }
                 }
                 catch (Exception e) {
-                    //todo log error
+                    Logger.ErrorException("Failed to schedule advice", e);
                     return InternalServerError(e);
                 }
             }
@@ -175,7 +178,7 @@ namespace Presentation.Web.Controllers.OData
                 }
                 catch (Exception e)
                 {
-                    //todo log error
+                    Logger.ErrorException("Failed to update advice", e);
                     return InternalServerError(e);
                 }
             }
@@ -198,7 +201,7 @@ namespace Presentation.Web.Controllers.OData
                 return Forbidden();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, entity))
+            if (!AllowDelete(entity))
             {
                 return Forbidden();
             }
@@ -218,6 +221,7 @@ namespace Presentation.Web.Controllers.OData
             }
             catch (Exception e)
             {
+                Logger.ErrorException("Failed to delete advice", e);
                 return InternalServerError(e);
             }
 

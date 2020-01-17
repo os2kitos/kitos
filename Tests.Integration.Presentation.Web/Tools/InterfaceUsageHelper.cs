@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
@@ -32,19 +33,25 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItInterfaceUsageDTO> GetItInterfaceUsage(int usageId, int systemId, int interfaceId, bool allowErrorResponse = false)
         {
+            using (var response = await GetItInterfaceUsageResponse(usageId, systemId, interfaceId))
+            {
+                if (!allowErrorResponse)
+                {
+                    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                }
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> GetItInterfaceUsageResponse(int usageId, int systemId, int interfaceId)
+        {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var oldInterfaceUrl = TestEnvironment.CreateUrl($"api/ItInterfaceUsage?" +
                                                             $"usageId={usageId}&" +
                                                             $"sysId={systemId}&" +
                                                             $"interfaceId={interfaceId}");
-            using (var response = await HttpApi.GetWithCookieAsync(oldInterfaceUrl, cookie))
-            {
-                if (!allowErrorResponse)
-                {
-                    Assert.Equal(HttpStatusCode.OK,response.StatusCode);
-                }
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceUsageDTO>();
-            }
+
+            return await HttpApi.GetWithCookieAsync(oldInterfaceUrl, cookie);
         }
     }
 }

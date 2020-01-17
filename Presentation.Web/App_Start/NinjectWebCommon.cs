@@ -4,9 +4,14 @@ using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
@@ -102,19 +107,17 @@ namespace Presentation.Web
                 .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InRequestScope();
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InRequestScope();
-            kernel.Bind<IAuthenticationService>().To<AuthenticationService>().InRequestScope();
+            kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InRequestScope();
             kernel.Bind<IAdviceService>().To<AdviceService>().InRequestScope();
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InRequestScope();
             kernel.Bind<IItSystemService>().To<ItSystemService>().InRequestScope();
             kernel.Bind<IItProjectService>().To<ItProjectService>().InRequestScope();
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InRequestScope();
-            // Udkommenteret ifm. OS2KITOS-663
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InRequestScope();
             kernel.Bind<IItContractService>().To<ItContractService>().InRequestScope();
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InRequestScope();
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InRequestScope().Intercept().With(new LogInterceptor());
-            kernel.Bind<IFeatureChecker>().To<FeatureChecker>().InRequestScope();
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InRequestScope();
             kernel.Bind<IInterfaceExhibitUsageService>().To<InterfaceExhibitUsageService>().InRequestScope();
             kernel.Bind<IInterfaceUsageService>().To<InterfaceUsageService>().InRequestScope();
@@ -143,6 +146,7 @@ namespace Presentation.Web
             kernel.Bind<IItSystemUsageRepository>().To<ItSystemUsageRepository>().InRequestScope();
             kernel.Bind<IItProjectRepository>().To<ItProjectRepository>().InRequestScope();
             kernel.Bind<IReferenceRepository>().To<ReferenceRepository>().InRequestScope();
+            kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InRequestScope();
         }
 
         private static void RegisterAuthenticationContext(IKernel kernel)

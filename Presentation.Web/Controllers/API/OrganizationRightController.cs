@@ -5,7 +5,9 @@ using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API
@@ -14,22 +16,27 @@ namespace Presentation.Web.Controllers.API
     public class OrganizationRightController : GenericApiController<OrganizationRight, OrganizationRightDTO>
     {
         private readonly IGenericRepository<OrganizationRight> _rightRepository;
+        private readonly IOrganizationRightsService _organizationRightsService;
 
-        public OrganizationRightController(IGenericRepository<OrganizationRight> rightRepository) : base (rightRepository)
+        public OrganizationRightController(
+            IGenericRepository<OrganizationRight> rightRepository,
+            IOrganizationRightsService organizationRightsService)
+            : base(rightRepository)
         {
             _rightRepository = rightRepository;
+            _organizationRightsService = organizationRightsService;
         }
 
         public virtual HttpResponseMessage GetRightsWithRoleName(string roleName, bool? roleWithName)
         {
             try
             {
-                if (!IsGlobalAdmin())
-                {
-                    return Forbidden();
-                }
                 var role = (OrganizationRole)Enum.Parse(typeof(OrganizationRole), roleName, true);
-                var theRights = _rightRepository.Get(x => x.Role == role);
+                var theRights = 
+                    _rightRepository
+                        .Get(x => x.Role == role)
+                        .Where(AllowRead);
+
                 var dtos = Map<IEnumerable<OrganizationRight>, IEnumerable<OrganizationRightDTO>>(theRights);
                 return Ok(dtos);
             }
@@ -49,10 +56,29 @@ namespace Presentation.Web.Controllers.API
             return _rightRepository.Get(right => right.OrganizationId == id);
         }
 
+        public override HttpResponseMessage Post(OrganizationRightDTO dto)
+        {
+            var organizationRight = Map<OrganizationRightDTO, OrganizationRight>(dto);
+
+            try
+            {
+                var result = _organizationRightsService.AssignRole(dto.OrganizationId, organizationRight.UserId, organizationRight.Role);
+
+                return result.Ok ?
+                    NewObjectCreated(result.Value) :
+                    FromOperationFailure(result.Error);
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorException("Failed to add right", e);
+                return LogError(e);
+            }
+        }
+
         /// <summary>
         /// Delete a right from the object
         /// </summary>
-        /// <param name="id">ID of object</param>
+        /// <param name="id">ID of organization to remove from</param>
         /// <param name="rId">ID of role</param>
         /// <param name="uId">ID of user in role</param>
         /// <param name="organizationId"></param>
@@ -61,37 +87,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var right = _rightRepository.Get(r => r.OrganizationId == id && r.Role == (OrganizationRole)rId && r.UserId == uId).FirstOrDefault();
+                var result = _organizationRightsService.RemoveRole(id, uId, (OrganizationRole)rId);
 
-                if (right == null)
-                {
-                    return NotFound();
-                }
-
-                // Only global admin can set other users as global admins
-                if (right.Role == OrganizationRole.GlobalAdmin)
-                {
-                    if (!KitosUser.IsGlobalAdmin)
-                        return Forbidden();
-                }
-
-                // Only local and global admins can make users local admins
-                if (right.Role == OrganizationRole.LocalAdmin)
-                {
-                    if (!KitosUser.IsGlobalAdmin && !KitosUser.IsLocalAdmin)
-                        return Forbidden();
-                }
-
-                if(!base.HasWriteAccess(right, KitosUser, organizationId))
-                {
-                    return Forbidden();
-                }
-
-
-                _rightRepository.DeleteByKey(right.Id);
-                _rightRepository.Save();
-
-                return Ok();
+                return result.Ok ?
+                    Ok() :
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {

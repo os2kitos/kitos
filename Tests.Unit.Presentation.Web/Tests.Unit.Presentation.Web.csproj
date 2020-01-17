@@ -44,6 +44,9 @@
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
     </Reference>
+    <Reference Include="Fasterflect, Version=2.1.3.0, Culture=neutral, PublicKeyToken=38d18473284c1ca7, processorArchitecture=MSIL">
+      <HintPath>..\packages\fasterflect.2.1.3\lib\net40\Fasterflect.dll</HintPath>
+    </Reference>
     <Reference Include="FluentAssertions, Version=4.17.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.4.17.0\lib\net45\FluentAssertions.dll</HintPath>
       <Private>True</Private>
@@ -98,10 +101,6 @@
     </Reference>
     <Reference Include="Ninject.Extensions.Logging, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
       <HintPath>..\packages\Ninject.Extensions.Logging.3.2.3.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NSubstitute, Version=1.10.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\NSubstitute.1.10.0.0\lib\net45\NSubstitute.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -194,7 +193,8 @@
   <ItemGroup>
     <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
-    <Compile Include="Authorization\LegacyAuthorizationStrategyTest.cs" />
+    <Compile Include="Authorization\GlobalReadAccessPolicyTest.cs" />
+    <Compile Include="Authorization\ModuleLevelAccessPolicyTest.cs" />
     <Compile Include="Authorization\OrganizationAuthorizationContextTest.cs" />
     <Compile Include="Authorization\OrganizationalUserContextTest.cs" />
     <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />
@@ -205,21 +205,24 @@
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
     <Compile Include="DomainServices\QueryByIdTest.cs" />
     <Compile Include="DomainServices\QueryByOrganizationIdTest.cs" />
+    <Compile Include="DomainServices\QueryByNameTest.cs" />
     <Compile Include="DomainServices\QueryByPartOfNameTest.cs" />
     <Compile Include="DomainServices\QueryByPublicAccessOrOrganizationIdTest.cs" />
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
-    <Compile Include="Hangfire\Hangfire_TestingWorkingcondition_ExpectedTestPass.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
+    <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Helpers\WithAutoFixture.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
-    <Compile Include="Login\CustomMembershipProviderTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
-    <Compile Include="OData\AuthenticationServiceTest.cs" />
+    <Compile Include="Services\ItProjectServiceTest.cs" />
+    <Compile Include="Services\ItSystemUsageServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
+    <Compile Include="Services\OrganizationRightsServiceTest.cs" />
+    <Compile Include="Services\OrganizationServiceTest.cs" />
     <Compile Include="Services\ReferenceServiceTest.cs" />
     <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

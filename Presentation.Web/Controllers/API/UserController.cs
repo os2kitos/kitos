@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using AutoMapper;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -17,12 +19,18 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
+        private readonly IOrganizationalUserContext _userContext;
 
-        public UserController(IGenericRepository<User> repository, IUserService userService, IOrganizationService organizationService)
+        public UserController(
+            IGenericRepository<User> repository, 
+            IUserService userService, 
+            IOrganizationService organizationService,
+            IOrganizationalUserContext userContext)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
+            _userContext = userContext;
         }
 
         public override HttpResponseMessage Post(UserDTO dto)
@@ -60,12 +68,6 @@ namespace Presentation.Web.Controllers.API
                 if (!orgId.HasValue)
                 {
                     return BadRequest("Organization id is missing!");
-                }
-
-                // only global admin is allowed to set others to global admin
-                if (dto.IsGlobalAdmin && !KitosUser.IsGlobalAdmin)
-                {
-                    return Forbidden();
                 }
 
                 // check if user already exists and we are not sending a reminder or advis. If so, just return him
@@ -109,7 +111,7 @@ namespace Presentation.Web.Controllers.API
 
                 if (destName == "IsGlobalAdmin")
                     if (valuePair.Value.Value<bool>()) // check if value is being set to true
-                        if (!KitosUser.IsGlobalAdmin)
+                        if (!_userContext.HasRole(OrganizationRole.GlobalAdmin))
                             return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
             }
 
@@ -120,6 +122,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var user = Repository.GetByKey(UserId);
+                if (user == null)
+                    return NotFound();
+
+                if (!AllowModify(user))
+                    return Forbidden();
+
                 _organizationService.SetDefaultOrgUnit(KitosUser, dto.OrgId, dto.OrgUnitId);
 
                 return Ok();
@@ -132,20 +141,17 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage PostDefaultOrganization(bool? updateDefaultOrganization, int organizationId)
         {
-            var userId = int.Parse(User.Identity.Name);
-            var user = Repository.Get(x => x.Id == userId).First();
+            var user = Repository.GetByKey(UserId);
+
+            if (user == null)
+                return NotFound();
+
+            if (!AllowModify(user))
+                return Forbidden();
+
             user.DefaultOrganizationId = organizationId;
             Repository.Save();
             return Ok();
-        }
-
-        protected override bool HasWriteAccess(User obj, User user, int organizationId)
-        {
-            //if user is readonly
-            if (user.IsReadOnly && !user.IsGlobalAdmin)
-                return false;
-
-            return base.HasWriteAccess(obj, user, organizationId);
         }
 
         /// <summary>
@@ -156,11 +162,7 @@ namespace Presentation.Web.Controllers.API
         /// <returns></returns>
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
         {
-            if (!KitosUser.OrganizationRights.Any(x => x.Role == OrganizationRole.GlobalAdmin || x.Role == OrganizationRole.LocalAdmin || x.Role == OrganizationRole.OrganizationModuleAdmin))
-            {
-                return Forbidden();
-            }
-
+            // NOTE: Only exists to apply optional param for org id
             return base.Delete(id, organizationId);
         }
     }

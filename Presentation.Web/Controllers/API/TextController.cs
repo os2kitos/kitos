@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<Text> _repository;
 
-        public TextController(IGenericRepository<Text> repository) 
+        public TextController(IGenericRepository<Text> repository)
             : base(repository)
         {
             _repository = repository;

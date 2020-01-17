@@ -4,7 +4,8 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
-using Core.ApplicationServices;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -12,12 +13,9 @@ namespace Presentation.Web.Controllers.OData
     [InternalApi]
     public class OrganizationUnitsController : BaseEntityController<OrganizationUnit>
     {
-        private readonly IAuthenticationService _authService;
-
-        public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository, IAuthenticationService authService)
-            : base(repository, authService)
+        public OrganizationUnitsController(IGenericRepository<OrganizationUnit> repository)
+            : base(repository)
         {
-            _authService = authService;
         }
 
         [EnableQuery]
@@ -32,13 +30,15 @@ namespace Presentation.Web.Controllers.OData
         [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
         public IHttpActionResult GetOrganizationUnits(int orgKey)
         {
-            var loggedIntoOrgId = _authService.GetCurrentOrganizationId(UserId);
-            if (loggedIntoOrgId != orgKey && !_authService.HasReadAccessOutsideContext(UserId))
+            if (GetOrganizationReadAccessLevel(orgKey) < OrganizationDataReadAccessLevel.All)
             {
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().Where(m => m.OrganizationId == orgKey);
+            var result = Repository
+                .AsQueryable()
+                .ByOrganizationId(orgKey);
+
             return Ok(result);
         }
     }

@@ -9,7 +9,10 @@ namespace Core.ApplicationServices.Authorization
         private const int INVALID_ID = -1;
 
         public int ActiveOrganizationId { get; } = INVALID_ID;
+
         public int UserId { get; } = INVALID_ID;
+
+        public User UserEntity { get; } = null;
 
         public bool IsActiveInOrganizationOfType(OrganizationCategory category)
         {

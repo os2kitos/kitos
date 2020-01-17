@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Result;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
+using Core.DomainServices.Model;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -26,7 +29,7 @@ namespace Core.ApplicationServices.System
         private readonly ILogger _logger;
 
         public ItSystemService(
-            IGenericRepository<ItSystem> repository, 
+            IGenericRepository<ItSystem> repository,
             IItSystemRepository itSystemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
@@ -43,50 +46,22 @@ namespace Core.ApplicationServices.System
         }
 
 
-        public IEnumerable<ItSystem> GetSystems(int organizationId, string nameSearch, User user)
+        public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
         {
-            if (string.IsNullOrWhiteSpace(nameSearch))
-                return _repository.Get(
-                    s =>
-                        // global admin sees all within the context
-                        user.IsGlobalAdmin && s.OrganizationId == organizationId ||
-                        // object owner sees his own objects
-                        s.ObjectOwnerId == user.Id ||
-                        // it's public everyone can see it
-                        s.AccessModifier == AccessModifier.Public ||
-                        // everyone in the same organization can see normal objects
-                        s.AccessModifier == AccessModifier.Local &&
-                        s.OrganizationId == organizationId
-                        // it systems doesn't have roles so private doesn't make sense
-                        // only object owners will be albe to see private objects
-                    );
+            var itSystems = _itSystemRepository.GetSystems(
+                new OrganizationDataQueryParameters(
+                    activeOrganizationId: organizationId,
+                    breadth: OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations,
+                    dataAccessLevel: _authorizationContext.GetDataAccessLevel(organizationId)
+                )
+            );
 
-            return _repository.Get(
-                s =>
-                    // filter by name
-                    s.Name.Contains(nameSearch) &&
-                    // global admin sees all within the context
-                    (user.IsGlobalAdmin && s.OrganizationId == organizationId ||
-                    // object owner sees his own objects
-                    s.ObjectOwnerId == user.Id ||
-                    // it's public everyone can see it
-                    s.AccessModifier == AccessModifier.Public ||
-                    // everyone in the same organization can see normal objects
-                    s.AccessModifier == AccessModifier.Local &&
-                    s.OrganizationId == organizationId)
-                    // it systems doesn't have roles so private doesn't make sense
-                    // only object owners will be albe to see private objects
-                );
-        }
+            if (!string.IsNullOrWhiteSpace(optionalNameSearch))
+            {
+                itSystems = itSystems.ByPartOfName(optionalNameSearch);
+            }
 
-        public IEnumerable<ItSystem> GetNonInterfaces(int organizationId, string nameSearch, User user)
-        {
-            return GetSystems(organizationId, nameSearch, user);
-        }
-
-        public IEnumerable<ItSystem> GetInterfaces(int organizationId, string nameSearch, User user)
-        {
-            return GetSystems(organizationId, nameSearch, user);
+            return itSystems;
         }
 
         public IEnumerable<ItSystem> GetHierarchy(int systemId)
@@ -100,7 +75,7 @@ namespace Core.ApplicationServices.System
             return result;
         }
 
-        private IEnumerable<ItSystem> GetHierarchyChildren(ItSystem itSystem)
+        private static IEnumerable<ItSystem> GetHierarchyChildren(ItSystem itSystem)
         {
             var systems = new List<ItSystem>();
             systems.AddRange(itSystem.Children);
@@ -112,7 +87,7 @@ namespace Core.ApplicationServices.System
             return systems;
         }
 
-        private IEnumerable<ItSystem> GetHierarchyParents(ItSystem itSystem)
+        private static IEnumerable<ItSystem> GetHierarchyParents(ItSystem itSystem)
         {
             var parents = new List<ItSystem>();
             if (itSystem.Parent != null)
@@ -132,7 +107,7 @@ namespace Core.ApplicationServices.System
                 return SystemDeleteResult.NotFound;
             }
 
-            if (! _authorizationContext.AllowDelete(system))
+            if (_authorizationContext.AllowDelete(system) == false)
             {
                 return SystemDeleteResult.Forbidden;
             }
@@ -157,9 +132,9 @@ namespace Core.ApplicationServices.System
                 try
                 {
                     var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
-                    if (deleteReferenceResult != OperationResult.Ok)
+                    if (deleteReferenceResult.Ok == false)
                     {
-                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult}");
+                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult.Error}");
                         transaction.Rollback();
                         return SystemDeleteResult.UnknownError;
                     }
@@ -177,28 +152,28 @@ namespace Core.ApplicationServices.System
             }
         }
 
-        public Result<OperationResult, IReadOnlyList<UsingOrganization>> GetUsingOrganizations(int systemId)
+        public Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId)
         {
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)
             {
-                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.NotFound);
+                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.NotFound);
             }
-            if (! _authorizationContext.AllowReads(itSystem))
+            if (!_authorizationContext.AllowReads(itSystem))
             {
-                return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Fail(OperationResult.Forbidden);
+                return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            return Result<OperationResult, IReadOnlyList<UsingOrganization>>.Ok(MapToUsingOrganization(itSystem.Usages));
+            return Result<IReadOnlyList<UsingOrganization>, OperationFailure>.Success(MapToUsingOrganization(itSystem.Usages));
         }
 
         private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
         {
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
-                    itSystemUsage.Id, 
+                    itSystemUsage.Id,
                     new NamedEntity(
-                        itSystemUsage.Organization.Id, 
+                        itSystemUsage.Organization.Id,
                         itSystemUsage.Organization.Name)))
                 .ToList()
                 .AsReadOnly();

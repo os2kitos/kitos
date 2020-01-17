@@ -5,8 +5,6 @@ using System.Web.OData;
 using System.Web.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -18,8 +16,8 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        public ItSystemsController(IGenericRepository<ItSystem> repository, IAuthenticationService authService, IAuthorizationContext authorizationContext)
-            : base(repository, authService, authorizationContext)
+        public ItSystemsController(IGenericRepository<ItSystem> repository)
+            : base(repository)
         {
         }
 
