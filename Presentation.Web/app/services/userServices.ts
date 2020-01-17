@@ -153,8 +153,7 @@
                 this.$http<Kitos.API.Models.IApiWrapper<any>>({
                     method: "PATCH",
                     url: `api/user/${this._user.id}?organizationId=${this._user.currentOrganizationId}`,
-                    data: payload,
-                    headers: Utility.csrfToken.addHeader()
+                    data: payload
                 }).success(result => {
                     var newUser = result.response;
 
@@ -200,7 +199,7 @@
         authorizeUser = (userLoginInfo) => {
             //returns the organizational context for the user whos credentials have been authorized
             
-            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo, Utility.csrfToken.addHeader()); 
+            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo); 
         };
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
@@ -237,7 +236,7 @@
         };
 
         setDefaultOrganizationInBackend = (organizationId) => {
-            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined, Utility.csrfToken.addHeader());
+            this.$http.post(`api/user?updateDefaultOrganization=true&organizationId=${organizationId}`, undefined);
         };
 
         login = (email: string, password: string, rememberMe: boolean) => {
@@ -279,7 +278,7 @@
             this._user = null;
             this.$rootScope.user = null;
 
-            return this.$http.post("api/authorize?logout", undefined, Utility.csrfToken.addHeader());
+            return this.$http.post("api/authorize?logout", undefined);
         };
 
         loadUser = (userLoginInfo) => {
@@ -290,12 +289,6 @@
                 // login or re-auth? If userLoginInfo is null then re-auth otherwise login
                 var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getCurrentUserIfAuthorized();
 
-                this.$http.get("api/authorize/antiforgery")
-                    .then(result => {
-                        var test = (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value;
-
-                        test = "hej";
-                    });
 
                 httpDeferred.then(result => {
 
@@ -484,7 +477,7 @@
                 orgUnitId: newDefaultOrgUnitId
             };
 
-            return this.$http.post("api/user?updateDefaultOrgUnit", payload, Utility.csrfToken.addHeader());
+            return this.$http.post("api/user?updateDefaultOrgUnit", payload);
         };
     }
     app.service("userService", UserService);

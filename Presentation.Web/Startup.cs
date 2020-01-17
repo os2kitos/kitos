@@ -38,7 +38,7 @@ namespace Presentation.Web
             app.Use<ApiRequestsLoggingMiddleware>();
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
             app.Use<DenyModificationsThroughApiMiddleware>();
-            //app.Use<CSRFProtectionMiddleware>();
+            app.Use<CSRFProtectionMiddleware>();
         }
     }
 }

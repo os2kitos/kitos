@@ -136,7 +136,7 @@
 
                         var msg = self.notify.addInfoMessage('Opretter projekt...', false);
 
-                        self.$http.post("api/itproject", payload, Utility.csrfToken.addHeader())
+                        self.$http.post("api/itproject", payload)
                             .success((result: any) => {
                                 msg.toSuccessMessage("Et nyt projekt er oprettet!");
                                 let projectId = result.response.id;

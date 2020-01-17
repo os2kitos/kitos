@@ -46,11 +46,22 @@ app.config([
         $httpProvider.defaults.headers.get = {
             "Cache-Control": "no-cache"
         };
+        $httpProvider.defaults.xsrfCookieName = "XSRF-TOKEN";
+        $httpProvider.defaults.xsrfHeaderName = "XX-XSRF-TOKEN";
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
 
         // $window isn't ready yet, so fetch it ourself
         var $window = $windowProvider.$get();
+
+        $httpProvider.interceptors.push(
+            () => ({
+                request(config) {
+                    const tokenVal = angular.element("input[id='__RequestVerificationToken']").val();
+                    config.headers["X-XSRF-TOKEN"] = tokenVal;
+                    return config;
+                }
+            }));
 
         // encode all url requests - fixes IE not correctly encoding special chars
         $httpProvider.interceptors.push(() => ({
@@ -72,6 +83,7 @@ app.config([
 app.run([
     "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
     ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
+
         // init info
         $rootScope.page = {
             title: "Index",

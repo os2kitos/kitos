@@ -13,7 +13,7 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
-        private const string XsrfHeader = "HEADER-XSRF-TOKEN";
+        private const string XsrfHeader = "X-XSRF-TOKEN";
         private const string XsrfCookie = "XSRF-TOKEN";
 
         public override async Task Invoke(IOwinContext context)
