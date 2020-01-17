@@ -60,7 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 .Returns(mockDatabaseTransaction.Object);
             var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
             sut.Insert(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1);
-            mockGenericUpdateHistoryItemRepository.Verify();
+            mockGenericUpdateHistoryItemRepository.VerifyAll();
         }
     }
 }

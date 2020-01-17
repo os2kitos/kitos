@@ -175,22 +175,20 @@ namespace Core.DomainServices.Repositories.KLE
         {
             var additions = changes.Where(c => c.ChangeType == KLEChangeType.Added).ToList();
             _logger.Debug($"Additions: {additions.Count}");
-            foreach (var kleChange in additions)
-            {
-                _existingTaskRefRepository.Insert(
-                    new TaskRef
-                    {
-                        AccessModifier = AccessModifier.Public,
-                        Uuid = kleChange.Uuid,
-                        Type = kleChange.Type,
-                        TaskKey = kleChange.TaskKey,
-                        Description = kleChange.UpdatedDescription,
-                        ObjectOwnerId = ownerObjectId,
-                        LastChangedByUserId = ownerObjectId,
-                        OwnedByOrganizationUnitId = ownedByOrgnizationUnitId
-                    }
-                );
-            }
+            var addedTaskRefs = additions.Select(kleChange =>
+                new TaskRef
+                {
+                    AccessModifier = AccessModifier.Public,
+                    Uuid = kleChange.Uuid,
+                    Type = kleChange.Type,
+                    TaskKey = kleChange.TaskKey,
+                    Description = kleChange.UpdatedDescription,
+                    ObjectOwnerId = ownerObjectId,
+                    LastChangedByUserId = ownerObjectId,
+                    OwnedByOrganizationUnitId = ownedByOrgnizationUnitId
+                }
+            );
+            _existingTaskRefRepository.BulkInsert(addedTaskRefs);
         }
 
         private void PatchTaskRefUuid(IReadOnlyList<KLEChange> changes)

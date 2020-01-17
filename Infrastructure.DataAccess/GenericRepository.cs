@@ -91,6 +91,11 @@ namespace Infrastructure.DataAccess
             return _dbSet.Add(entity);
         }
 
+        public void BulkInsert(IEnumerable<T> entities)
+        {
+            _dbSet.AddRange(entities);
+        }
+
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
