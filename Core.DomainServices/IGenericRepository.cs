@@ -21,6 +21,8 @@ namespace Core.DomainServices
 
         TModel Insert(TModel entity);
 
+        void BulkInsert(IEnumerable<TModel> entities);
+
         /// <summary>
         /// Consider using <see cref="DeleteWithReferencePreload"/> and remove any pre-delete manual loading of child refs.
         /// </summary>
