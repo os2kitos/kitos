@@ -3,6 +3,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.Result;
 
 namespace Core.ApplicationServices.Organizations
@@ -46,7 +47,11 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)
         {
-            var right = _organizationRightRepository.Get(r => r.OrganizationId == organizationId && r.Role == roleId && r.UserId == userId).FirstOrDefault();
+            var right = _organizationRightRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .Where(r => r.Role == roleId && r.UserId == userId)
+                .FirstOrDefault();
 
             return RemoveRight(right);
         }

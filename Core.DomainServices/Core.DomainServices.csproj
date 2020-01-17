@@ -62,6 +62,7 @@
     <Compile Include="Model\Result\Maybe.cs" />
     <Compile Include="Model\Result\Result.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\QueryByName.cs" />
     <Compile Include="Queries\QueryById.cs" />
     <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />

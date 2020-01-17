@@ -205,6 +205,7 @@
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
     <Compile Include="DomainServices\QueryByIdTest.cs" />
     <Compile Include="DomainServices\QueryByOrganizationIdTest.cs" />
+    <Compile Include="DomainServices\QueryByNameTest.cs" />
     <Compile Include="DomainServices\QueryByPartOfNameTest.cs" />
     <Compile Include="DomainServices\QueryByPublicAccessOrOrganizationIdTest.cs" />
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />

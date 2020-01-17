@@ -43,15 +43,15 @@ namespace Core.ApplicationServices.System
                 return Result<IEnumerable<ExternalReference>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
-            var systemExternalReferences = system.ExternalReferences.ToList();
-
-            if (systemExternalReferences.Count == 0)
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
-            }
+                var systemExternalReferences = system.ExternalReferences.ToList();
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
-            {
+                if (systemExternalReferences.Count == 0)
+                {
+                    return Result<IEnumerable<ExternalReference>, OperationFailure>.Success(systemExternalReferences);
+                }
+
                 foreach (var reference in systemExternalReferences)
                 {
                     _referenceRepository.Delete(reference);

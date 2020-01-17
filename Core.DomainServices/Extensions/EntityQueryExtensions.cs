@@ -115,6 +115,13 @@ namespace Core.DomainServices.Extensions
             return new QueryByPartOfName<T>(nameContent).Apply(result);
         }
 
+        public static IQueryable<T> ByNameExact<T>(this IQueryable<T> result, string nameContent) where T :
+            class,
+            IHasName
+        {
+            return new QueryByName<T>(nameContent).Apply(result);
+        }
+
         public static IQueryable<T> ByIds<T>(this IQueryable<T> result, IReadOnlyList<int> ids) where T :
             Entity
         {

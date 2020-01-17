@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.Result;
+using Infrastructure.Services.DataAccess;
+using DataRow = Core.DomainModel.ItSystem.DataRow;
 
 namespace Core.ApplicationServices.Interface
 {
@@ -13,48 +17,56 @@ namespace Core.ApplicationServices.Interface
         private readonly IGenericRepository<DataRow> _dataRowRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<ItInterface> _repository;
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
             IGenericRepository<DataRow> dataRowRepository,
             IAuthorizationContext authorizationContext,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            ITransactionManager transactionManager)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
+            _transactionManager = transactionManager;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
-            var itInterface = _repository.GetByKey(id);
-
-            if (itInterface == null)
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
-                return Result<ItInterface, OperationFailure>.Failure(OperationFailure.NotFound);
-            }
+                var itInterface = _repository.GetByKey(id);
 
-            if (!_authorizationContext.AllowDelete(itInterface))
-            {
-                return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Forbidden);
-            }
+                if (itInterface == null)
+                {
+                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.NotFound);
+                }
 
-            if (itInterface.ExhibitedBy != null)
-            {
-                return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Conflict);
-            }
+                if (!_authorizationContext.AllowDelete(itInterface))
+                {
+                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Forbidden);
+                }
 
-            var dataRows = _dataRowRepository.Get(x => x.ItInterfaceId == id);
-            foreach (var dataRow in dataRows)
-            {
-                _dataRowRepository.DeleteByKey(dataRow.Id);
-            }
-            _dataRowRepository.Save();
+                if (itInterface.ExhibitedBy != null)
+                {
+                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Conflict);
+                }
 
-            // delete it interface
-            _repository.DeleteWithReferencePreload(itInterface);
-            _repository.Save();
-            return Result<ItInterface, OperationFailure>.Success(itInterface);
+                var dataRows = _dataRowRepository.Get(x => x.ItInterfaceId == id);
+                foreach (var dataRow in dataRows)
+                {
+                    _dataRowRepository.DeleteByKey(dataRow.Id);
+                }
+                _dataRowRepository.Save();
+
+                // delete it interface
+                _repository.DeleteWithReferencePreload(itInterface);
+                _repository.Save();
+
+                transaction.Commit();
+                return Result<ItInterface, OperationFailure>.Success(itInterface);
+            }
         }
 
         public Result<ItInterface, OperationFailure> Create(ItInterface newInterface)
@@ -96,8 +108,15 @@ namespace Core.ApplicationServices.Interface
 
         private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)
         {
-            if (itInterfaceId == "undefined") itInterfaceId = null;
-            var system = _repository.AsQueryable().Where(x => x.ItInterfaceId == (itInterfaceId ?? string.Empty) && x.Name == name && x.OrganizationId == orgId);
+            var interfaceId = itInterfaceId ?? string.Empty;
+
+            var system =
+                _repository
+                    .AsQueryable()
+                    .ByOrganizationId(orgId)
+                    .ByNameExact(name)
+                    .Where(x => x.ItInterfaceId == interfaceId);
+
             return !system.Any();
         }
     }
