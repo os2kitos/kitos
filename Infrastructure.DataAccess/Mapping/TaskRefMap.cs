@@ -37,7 +37,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(x => x.TaskKey).HasMaxLength(50);
 
             this.Property(x => x.TaskKey).HasUniqueIndexAnnotation("UX_TaskKey", 0);
-            this.Property(x => x.Uuid).HasUniqueIndexAnnotation("UX_Uuid", 0);
 
             TypeMapping.AddIndexOnAccessModifier<TaskRefMap, TaskRef>(this);
         }

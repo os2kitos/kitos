@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202001171203234_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid"; }
+            get { return "202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid"; }
         }
         
         string IMigrationMetadata.Source
