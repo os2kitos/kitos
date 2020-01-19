@@ -28,7 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             return taskref;
         }
 
-        public void BulkInsert(IEnumerable<TaskRef> entities)
+        public void AddRange(IEnumerable<TaskRef> entities)
         {
             foreach (var taskRef in entities)
             {
@@ -39,6 +39,14 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         public void Delete(TaskRef entity)
         {
             _taskRefs.Remove(entity.TaskKey);
+        }
+
+        public void RemoveRange(IEnumerable<TaskRef> entities)
+        {
+            foreach (var taskRef in entities)
+            {
+                _taskRefs.Remove(taskRef.TaskKey);
+            }
         }
 
         public int Count => _taskRefs.Count;

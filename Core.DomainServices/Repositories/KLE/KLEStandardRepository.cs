@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Core.DomainModel;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.DataAccess;
@@ -18,6 +19,8 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IKLEDataBridge _kleDataBridge;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<TaskRef> _existingTaskRefRepository;
+        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
+        private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
         private readonly ILogger _logger;
@@ -26,18 +29,22 @@ namespace Core.DomainServices.Repositories.KLE
             IKLEDataBridge kleDataBridge,
             ITransactionManager transactionManager,
             IGenericRepository<TaskRef> existingTaskRefRepository,
-            ILogger logger): this(new KLEParentHelper(), new KLEConverterHelper())
+            IGenericRepository<ItSystemUsage> systemUsageRepository,
+            IGenericRepository<TaskUsage> taskUsageRepository,
+            ILogger logger): this(new KLEParentHelper(), new KLEConverterHelper(), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
+            _systemUsageRepository = systemUsageRepository;
             _logger = logger;
         }
 
-        private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper)
+        private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper, IGenericRepository<TaskUsage> taskUsageRepository)
         {
             _kleParentHelper = kleParentHelper;
             _kleConverterHelper = kleConverterHelper;
+            _taskUsageRepository = taskUsageRepository;
         }
 
         public KLEStatus GetKLEStatus(DateTime lastUpdated)
@@ -49,6 +56,13 @@ namespace Core.DomainServices.Repositories.KLE
                 UpToDate = lastUpdated>=publishedDate.Date,
                 Published = publishedDate
             };
+        }
+
+        private static DateTime GetPublishedDate(XContainer kleXmlData)
+        {
+            var publishedString = kleXmlData.Descendants("UdgivelsesDato").First().Value;
+            var publishedDate = DateTime.Parse(publishedString, CultureInfo.GetCultureInfo("da-DK"));
+            return publishedDate;
         }
 
         public IReadOnlyList<KLEChange> GetKLEChangeSummary()
@@ -133,14 +147,7 @@ namespace Core.DomainServices.Repositories.KLE
             return GetPublishedDate(kleXmlData);
         }
 
-        #region Helpers
-
-        private static DateTime GetPublishedDate(XContainer kleXmlData)
-        {
-            var publishedString = kleXmlData.Descendants("UdgivelsesDato").First().Value;
-            var publishedDate = DateTime.Parse(publishedString, CultureInfo.GetCultureInfo("da-DK"));
-            return publishedDate;
-        }
+        #region Removals
 
         private void UpdateRemovedTaskRefs(IEnumerable<KLEChange> changes)
         {
@@ -150,12 +157,71 @@ namespace Core.DomainServices.Repositories.KLE
             {
                 RemoveProjectTaskRefs(kleChange);
                 RemoveSystemTaskRefs(kleChange);
-                RemoveSystemUsageTaskRefs(kleChange);
                 RemoveSystemUsageOptOutTaskRefs(kleChange);
-                RemoveTaskUsageTaskRef(kleChange);
-                RemoveTaskRef(kleChange);
+            }
+            RemoveSystemUsageTaskRefs(removals);
+            RemoveTaskUsageTaskRef(removals);
+            RemoveTaskRef(removals);
+        }
+
+        private void RemoveProjectTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itProject in removedTaskRef.ItProjects)
+            {
+                itProject.TaskRefs.Remove(removedTaskRef);
             }
         }
+
+        private void RemoveSystemTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itSystem in removedTaskRef.ItSystems)
+            {
+                itSystem.TaskRefs.Remove(removedTaskRef);
+            }
+        }
+
+        // TODO: Hvad er betydningen af SystemUsageOptOut?
+        private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
+        {
+            var removedTaskRef =
+                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
+            foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut)
+            {
+                itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
+            }
+        }
+
+        private void RemoveSystemUsageTaskRefs(List<KLEChange> kleChanges)
+        {
+            var systemUsages = _systemUsageRepository.GetWithReferencePreload(s => s.TaskRefs);
+            foreach (var systemUsage in systemUsages)
+            {
+                systemUsage.TaskRefs.ToList().RemoveAll(t => kleChanges.Exists(c => c.TaskKey == t.TaskKey));
+            }
+        }
+
+        private void RemoveTaskUsageTaskRef(List<KLEChange> kleChanges)
+        {
+            var taskUsages = _taskUsageRepository
+                .GetWithReferencePreload(t => t.TaskRef)
+                .Where(t => kleChanges.Exists(c => c.TaskKey == t.TaskRef.TaskKey));
+            _taskUsageRepository.RemoveRange(taskUsages);
+        }
+
+        private void RemoveTaskRef(IEnumerable<KLEChange> kleChanges)
+        {
+            var removedTaskRefs = kleChanges.Select(c => _existingTaskRefRepository.Get(t => t.TaskKey == c.TaskKey).First());
+
+            _existingTaskRefRepository.RemoveRange(removedTaskRefs);
+        }
+
+        #endregion
+
+        #region Renames
 
         private void UpdateRenamedTaskRefs(IEnumerable<KLEChange> changes)
         {
@@ -169,6 +235,10 @@ namespace Core.DomainServices.Repositories.KLE
                 renamedTaskRef.Uuid = kleChange.Uuid;
             }
         }
+
+        #endregion
+
+        #region Additions
 
         private void UpdateAddedTaskRefs(IEnumerable<KLEChange> changes, int ownerObjectId,
             int ownedByOrgnizationUnitId)
@@ -188,8 +258,12 @@ namespace Core.DomainServices.Repositories.KLE
                     OwnedByOrganizationUnitId = ownedByOrgnizationUnitId
                 }
             );
-            _existingTaskRefRepository.BulkInsert(addedTaskRefs);
+            _existingTaskRefRepository.AddRange(addedTaskRefs);
         }
+
+        #endregion
+
+        #region Patches
 
         private void PatchTaskRefUuid(IReadOnlyList<KLEChange> changes)
         {
@@ -214,74 +288,6 @@ namespace Core.DomainServices.Repositories.KLE
                     _logger.Debug($"Patched ParentId='{existingTaskRef.ParentId}' on '{existingTaskRef.Uuid}' as parent '{parentTaskKey}'");
                 }
             }
-        }
-
-        private void RemoveProjectTaskRefs(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itProject in removedTaskRef.ItProjects)
-            {
-                itProject.TaskRefs.Remove(removedTaskRef);
-            }
-
-            removedTaskRef.ItProjects.Clear();
-        }
-
-        private void RemoveSystemTaskRefs(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itSystem in removedTaskRef.ItSystems)
-            {
-                itSystem.TaskRefs.Remove(removedTaskRef);
-            }
-
-            removedTaskRef.ItSystems.Clear();
-        }
-
-        private void RemoveSystemUsageTaskRefs(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsages).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itSystemUsage in removedTaskRef.ItSystemUsages)
-            {
-                itSystemUsage.TaskRefs.Remove(removedTaskRef);
-            }
-
-            removedTaskRef.ItSystemUsages.Clear();
-        }
-
-        private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut)
-            {
-                itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
-            }
-
-            removedTaskRef.ItSystemUsagesOptOut.Clear();
-        }
-
-        private void RemoveTaskUsageTaskRef(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.Usages).First(t => t.TaskKey == kleChange.TaskKey);
-            foreach (var taskUsage in removedTaskRef.Usages)
-            {
-                taskUsage.TaskRef = null;
-            }
-
-            removedTaskRef.Usages.Clear();
-        }
-
-        private void RemoveTaskRef(KLEChange kleChange)
-        {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
-
-            _existingTaskRefRepository.Delete(removedTaskRef);
         }
 
         #endregion
