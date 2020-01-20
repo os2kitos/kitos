@@ -31,7 +31,7 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<TaskRef> existingTaskRefRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<TaskUsage> taskUsageRepository,
-            ILogger logger): this(new KLEParentHelper(), new KLEConverterHelper(), taskUsageRepository)
+            ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
@@ -53,7 +53,7 @@ namespace Core.DomainServices.Repositories.KLE
             var publishedDate = GetPublishedDate(kleXmlData);
             return new KLEStatus
             {
-                UpToDate = lastUpdated>=publishedDate.Date,
+                UpToDate = lastUpdated >= publishedDate.Date,
                 Published = publishedDate
             };
         }
@@ -88,7 +88,7 @@ namespace Core.DomainServices.Repositories.KLE
                             TaskKey = existingTaskRef.TaskKey,
                             UpdatedDescription = mostRecentTaskRef.Description
                         });
-                    } 
+                    }
                     else if (existingTaskRef.Uuid == Guid.Empty)
                     {
                         result.Add(new KLEChange
@@ -111,7 +111,7 @@ namespace Core.DomainServices.Repositories.KLE
                     });
                 }
             }
-            result.AddRange(mostRecentTaskRefs.GetAll().Select(mostRecentTaskRef => 
+            result.AddRange(mostRecentTaskRefs.GetAll().Select(mostRecentTaskRef =>
                 new KLEChange
                 {
                     Uuid = mostRecentTaskRef.Uuid,
@@ -166,8 +166,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveProjectTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
             foreach (var itProject in removedTaskRef.ItProjects)
             {
                 itProject.TaskRefs.Remove(removedTaskRef);
@@ -176,19 +175,16 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveSystemTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
             foreach (var itSystem in removedTaskRef.ItSystems)
             {
                 itSystem.TaskRefs.Remove(removedTaskRef);
             }
         }
 
-        // TODO: Hvad er betydningen af SystemUsageOptOut?
         private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef =
-                _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
             foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut)
             {
                 itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
@@ -200,15 +196,21 @@ namespace Core.DomainServices.Repositories.KLE
             var systemUsages = _systemUsageRepository.GetWithReferencePreload(s => s.TaskRefs);
             foreach (var systemUsage in systemUsages)
             {
-                systemUsage.TaskRefs.ToList().RemoveAll(t => kleChanges.Exists(c => c.TaskKey == t.TaskKey));
+                foreach (var taskRef in systemUsage.TaskRefs.ToList().Where(t => kleChanges.Exists(c => c.TaskKey == t.TaskKey)))
+                {
+                    systemUsage.TaskRefs.Remove(taskRef);
+                }
             }
         }
 
-        private void RemoveTaskUsageTaskRef(List<KLEChange> kleChanges)
+        private void RemoveTaskUsageTaskRef(IEnumerable<KLEChange> kleChanges)
         {
+            var keys = kleChanges.Select(x=>x.TaskKey).ToList();
             var taskUsages = _taskUsageRepository
                 .GetWithReferencePreload(t => t.TaskRef)
-                .Where(t => kleChanges.Exists(c => c.TaskKey == t.TaskRef.TaskKey));
+                .Where(t => keys.Contains(t.TaskRef.TaskKey))
+                .ToList();
+
             _taskUsageRepository.RemoveRange(taskUsages);
         }
 
@@ -225,14 +227,12 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void UpdateRenamedTaskRefs(IEnumerable<KLEChange> changes)
         {
-            var renames = changes.Where(c => c.ChangeType == KLEChangeType.Renamed).ToList();
-            _logger.Debug($"Renames: {renames.Count}");
-            foreach (var kleChange in renames)
+            var updates = BuildChangeSet(changes, KLEChangeType.Renamed);
+
+            foreach (var update in updates)
             {
-                var renamedTaskRef =
-                    _existingTaskRefRepository.Get(t => t.TaskKey == kleChange.TaskKey).First();
-                renamedTaskRef.Description = kleChange.UpdatedDescription;
-                renamedTaskRef.Uuid = kleChange.Uuid;
+                update.Item1.Description = update.Item2.UpdatedDescription;
+                update.Item1.Uuid = update.Item2.Uuid;
             }
         }
 
@@ -265,29 +265,45 @@ namespace Core.DomainServices.Repositories.KLE
 
         #region Patches
 
-        private void PatchTaskRefUuid(IReadOnlyList<KLEChange> changes)
+        private void PatchTaskRefUuid(IEnumerable<KLEChange> changes)
         {
-            var patches = changes.Where(c => c.ChangeType == KLEChangeType.UuidPatched).ToList();
-            foreach (var patch in patches)
+            var updates = BuildChangeSet(changes, KLEChangeType.UuidPatched);
+
+            foreach (var update in updates)
             {
-                var existingTaskRef = _existingTaskRefRepository.Get(t => t.TaskKey == patch.TaskKey).First();
-                existingTaskRef.Uuid = patch.Uuid;
+                update.Item1.Uuid = update.Item2.Uuid;
             }
         }
 
         private void PatchTaskRefParentId(IEnumerable<KLEChange> changes)
         {
-            var additions = changes.Where(c => c.ChangeType == KLEChangeType.Added).ToList();
-            foreach (var kleChange in additions)
+            var updates = BuildChangeSet(changes, KLEChangeType.Added);
+
+            foreach (var update in updates)
             {
-                var existingTaskRef = _existingTaskRefRepository.Get(t => t.TaskKey == kleChange.TaskKey).First();
-                if (_kleParentHelper.TryDeduceParentTaskKey(kleChange.TaskKey, out var parentTaskKey))
+                var existingTaskRef = update.Item1;
+                if (_kleParentHelper.TryDeduceParentTaskKey(update.Item2.TaskKey, out var parentTaskKey))
                 {
                     var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).First();
                     existingTaskRef.ParentId = parent.Id;
                     _logger.Debug($"Patched ParentId='{existingTaskRef.ParentId}' on '{existingTaskRef.Uuid}' as parent '{parentTaskKey}'");
                 }
             }
+        }
+
+        private IEnumerable<Tuple<TaskRef, KLEChange>> BuildChangeSet(IEnumerable<KLEChange> changes, KLEChangeType kleChangeType)
+        {
+            var changesByType = changes.Where(c => c.ChangeType == kleChangeType).ToList();
+
+            var kleChanges = changesByType.ToDictionary(change => change.TaskKey);
+            var taskKeys = changesByType.Select(x => x.TaskKey).ToList();
+
+            var updates = _existingTaskRefRepository
+                .AsQueryable()
+                .Where(taskRef => taskKeys.Contains(taskRef.TaskKey))
+                .AsEnumerable()
+                .Select(taskRef => new Tuple<TaskRef, KLEChange>(taskRef, kleChanges[taskRef.TaskKey]));
+            return updates;
         }
 
         #endregion

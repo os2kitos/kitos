@@ -16,9 +16,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             return filter != null ? _taskRefs.Values.Where(filter.Compile()) : _taskRefs.Values;
         }
 
-        public IEnumerable<TaskRef> GetWithReferencePreload<TProperty>(Expression<Func<TaskRef, TProperty>> includeExpression)
+        public IQueryable<TaskRef> GetWithReferencePreload<TProperty>(Expression<Func<TaskRef, TProperty>> includeExpression)
         {
-            return _taskRefs.Values;
+            return _taskRefs.Values.AsQueryable();
         }
 
         public TaskRef Insert(TaskRef taskref)

@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess
             return query.ToList();
         }
 
-        public IEnumerable<T> GetWithReferencePreload<TProperty>(Expression<Func<T, TProperty>> includeExpression)
+        public IQueryable<T> GetWithReferencePreload<TProperty>(Expression<Func<T, TProperty>> includeExpression)
         {
             return _dbSet.Include(includeExpression);
         }
