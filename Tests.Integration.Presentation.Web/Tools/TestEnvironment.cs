@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.Organization;
+using Infrastructure.DataAccess;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -20,6 +21,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public const int DefaultUserId = 1;
         public const int DefaultTaskRefId = 1;
         public const string EmptyListApiJson = "{\"msg\":\"\",\"response\":[]}";
+        private static readonly string ConnectionString;
 
         static TestEnvironment()
         {
@@ -39,6 +41,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
                 const string localDevUserPassword = "localNoSecret";
                 DefaultUserPassword = "arne123";
+                ConnectionString = @"Server=.\SQLEXPRESS;Integrated Security=true;Initial Catalog=Kitos;MultipleActiveResultSets=True";
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
@@ -87,6 +90,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 //Loading users from environment
                 Console.Out.WriteLine("Tests running towards remote target. Loading configuration from environment.");
                 DefaultUserPassword = GetEnvironmentVariable("DefaultUserPassword");
+                ConnectionString = GetEnvironmentVariable("HangfireDbConnectionStringForIIsApp");
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
@@ -129,6 +133,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             var username = GetEnvironmentVariable($"TestUser{suffix}");
             var password = GetEnvironmentVariable($"TestUser{suffix}Pw");
             return new KitosCredentials(username, password, role);
+        }
+
+        public static KitosContext GetDatabase()
+        {
+            return new KitosContext(ConnectionString);
         }
 
         private static string GetEnvironmentVariable(string name, bool mandatory = true, string defaultValue = null)
