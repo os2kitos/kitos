@@ -13,7 +13,8 @@ var app = angular.module("app", [
     "ngMessages",
     "ui.tree",
     "ui.tinymce",
-    "oidc-angular"]);
+    "oidc-angular",
+    "ngCookies"]);
 
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
@@ -46,8 +47,10 @@ app.config([
         $httpProvider.defaults.headers.get = {
             "Cache-Control": "no-cache"
         };
-        $httpProvider.defaults.xsrfCookieName = "XSRF-TOKEN";
-        $httpProvider.defaults.xsrfHeaderName = "XX-XSRF-TOKEN";
+
+        //Disable built-in xsrf in angular - it overrides our interceptor
+        $httpProvider.defaults.xsrfCookieName = "IGNORED-XSRF-TOKEN";
+        $httpProvider.defaults.xsrfHeaderName = "IGNORED-XSRF-TOKEN";
         notifyProvider.globalTimeToLive(5000);
         notifyProvider.onlyUniqueMessages(false);
 
@@ -74,8 +77,8 @@ app.config([
 ]);
 
 app.run([
-    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService",
-    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService) => {
+    "$rootScope", "$http", "$state", "$uibModal", "notify", "userService", "uiSelect2Config", "navigationService", "$timeout", "$", "needsWidthFixService", "$cookies",
+    ($rootScope, $http, $state, $modal, notify, userService, uiSelect2Config, navigationService, $timeout, $, needsWidthFixService, $cookies) => {
 
         // init info
         $rootScope.page = {
@@ -128,6 +131,7 @@ app.run([
             userService.logout().then(() => {
                 $rootScope.changingOrganization = false;
                 $state.go("index");
+                $cookies.remove("XSRF-TOKEN");
             });
         };
 

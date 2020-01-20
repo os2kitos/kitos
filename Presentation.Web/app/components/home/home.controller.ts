@@ -10,14 +10,7 @@
                     texts: [
                         "$http", $http => $http.get("api/text/")
                             .then(result => result.data.response)
-                    ],
-                    //TODO: Maybe place this somewhere else?
-                    csrf: [
-                        "$http", $http => $http.get("api/authorize/antiforgery")
-                            .then()
-
                     ]
-
                 }
             });
         }

@@ -270,10 +270,9 @@ namespace Presentation.Web.Controllers.API
 
             AntiForgery.GetTokens(cookie == null ? "" : cookie.Value, out var cookieToken, out var formToken);
 
-            response.Content = new StringContent(
-                JsonConvert.SerializeObject(formToken), Encoding.UTF8, "application/json");
+            response.Content = new StringContent(JsonConvert.SerializeObject(formToken), Encoding.UTF8, "application/json");
 
-            if (!string.IsNullOrEmpty(cookieToken))
+            if (CookieAlreadySet(cookieToken))
             {
                 response.Headers.AddCookies(new[]
                 {
@@ -286,6 +285,11 @@ namespace Presentation.Web.Controllers.API
             }
 
             return response;
+        }
+
+        private static bool CookieAlreadySet(string cookieToken)
+        {
+            return !string.IsNullOrEmpty(cookieToken);
         }
     }
 }

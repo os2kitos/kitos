@@ -83,7 +83,7 @@
             var isReadOnly = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
                 return userRight.role == Kitos.API.Models.OrganizationRole.ReadOnly && userRight.organizationId == currOrg.id;
             });
-            
+
 
             // the current org unit is the default org unit for this organization if the user has selected one
             // otherwise it's the root of this organization
@@ -123,7 +123,7 @@
                 isContractAdmin: isContractAdmin,
                 isReportAdmin: isReportAdmin,
                 isReadOnly: isReadOnly,
-                
+
 
                 orgAndDefaultUnit: orgAndDefaultUnit,
 
@@ -198,8 +198,7 @@
 
         authorizeUser = (userLoginInfo) => {
             //returns the organizational context for the user whos credentials have been authorized
-            
-            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo); 
+            return this.$http.post<Kitos.API.Models.IApiWrapper<any>>("api/authorize", userLoginInfo);
         };
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
@@ -256,8 +255,7 @@
                     deferred.resolve(resp);
                 }, (resp) => {
                     deferred.reject(resp);
-                    });
-                //TODO CSRF: Should make a new call to api/authorize/antiforgery after logging in to update csrf tokens.
+                });
             }
 
             return deferred.promise;
@@ -280,7 +278,6 @@
             this.$rootScope.user = null;
 
             return this.$http.post("api/authorize?logout", undefined);
-            //TODO CSRF: should delete cookies and empty the hidden field.
         };
 
         loadUser = (userLoginInfo) => {
@@ -289,37 +286,47 @@
 
                 this._loadUserDeferred = this.$q.defer();
                 // login or re-auth? If userLoginInfo is null then re-auth otherwise login
-                var httpDeferred = userLoginInfo ? this.authorizeUser(userLoginInfo) : this.getCurrentUserIfAuthorized();
 
+                if (userLoginInfo) {
+                    this.authorizeUser(userLoginInfo).then(
+                        result => {
+                            this.$http.get("api/authorize/antiforgery")
+                                .then(res =>
+                                    (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value = res.data.toString());
+                            this.successfulUserAuth(result.data.response);
+                        },
+                        result => this.failedUserAuth(result));
 
-                httpDeferred.then(result => {
-
-                    var user = result.data.response;
-                    this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, 'organizationId').length > 1;
-
-                    this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
-                        this.saveUserInfo(user, orgAndDefaultUnit);
-                        this._loadUserDeferred.resolve(this._user);
-                        this._loadUserDeferred = null;
-
-                    }, () => {
-
-                        this._loadUserDeferred.reject("No organization selected");
-                        this._loadUserDeferred = null;
-
-                    });
-
-                }, result => {
-
-                    this._loadUserDeferred.reject(result.data);
-                    this._loadUserDeferred = null;
-                    this.clearSavedOrgId();
-
-                });
+                } else {
+                    this.getCurrentUserIfAuthorized()
+                        .then(
+                            result => this.successfulUserAuth(result.data.response),
+                            result => this.failedUserAuth(result));
+                }
             }
 
             return this._loadUserDeferred.promise;
         };
+
+        successfulUserAuth = (user) => {
+            this.$rootScope.userHasOrgChoices = this._.uniqBy(user.organizationRights, "organizationId").length > 1;
+
+            this.determineLoginProcedure().then((orgAndDefaultUnit: any) => {
+                this.saveUserInfo(user, orgAndDefaultUnit);
+                this._loadUserDeferred.resolve(this._user);
+                this._loadUserDeferred = null;
+
+            }, () => {
+                this._loadUserDeferred.reject("No organization selected");
+                this._loadUserDeferred = null;
+            });
+        }
+
+        failedUserAuth = (result) => {
+            this._loadUserDeferred.reject(result.data);
+            this._loadUserDeferred = null;
+            this.clearSavedOrgId();
+        }
 
         determineLoginProcedure = () => {
 
