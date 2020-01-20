@@ -266,8 +266,8 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void PatchTaskRefUuid(IEnumerable<KLEChange> changes)
         {
-            var updates = BuildChangeSet(changes, KLEChangeType.UuidPatched);
-
+            var updates = BuildChangeSet(changes, KLEChangeType.UuidPatched).ToList();
+            _logger.Debug($"Patch-uuids: {updates.Count}");
             foreach (var update in updates)
             {
                 update.Item1.Uuid = update.Item2.Uuid;
@@ -285,7 +285,6 @@ namespace Core.DomainServices.Repositories.KLE
                 {
                     var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).First();
                     existingTaskRef.ParentId = parent.Id;
-                    _logger.Debug($"Patched ParentId='{existingTaskRef.ParentId}' on '{existingTaskRef.Uuid}' as parent '{parentTaskKey}'");
                 }
             }
         }
