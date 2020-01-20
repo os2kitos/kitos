@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class TaskRefCharLimitAndIndexOnTaskKeyIndexOnUuid : IMigrationMetadata
+    public sealed partial class AddedKLEHistoryTable : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(TaskRefCharLimitAndIndexOnTaskKeyIndexOnUuid));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedKLEHistoryTable));
         
         string IMigrationMetadata.Id
         {
-            get { return "202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid"; }
+            get { return "202001201357301_Added-KLEHistoryTable"; }
         }
         
         string IMigrationMetadata.Source

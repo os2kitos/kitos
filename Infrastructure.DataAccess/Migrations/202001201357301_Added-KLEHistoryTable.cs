@@ -3,7 +3,7 @@ namespace Infrastructure.DataAccess.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class KLEUpdateHistoryItem : DbMigration
+    public partial class AddedKLEHistoryTable : DbMigration
     {
         public override void Up()
         {
@@ -23,6 +23,8 @@ namespace Infrastructure.DataAccess.Migrations
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
+            AlterColumn("dbo.TaskRef", "TaskKey", c => c.String(maxLength: 50));
+            CreateIndex("dbo.TaskRef", "TaskKey", unique: true, name: "UX_TaskKey");
         }
         
         public override void Down()
@@ -31,6 +33,8 @@ namespace Infrastructure.DataAccess.Migrations
             DropForeignKey("dbo.KLEUpdateHistoryItems", "LastChangedByUserId", "dbo.User");
             DropIndex("dbo.KLEUpdateHistoryItems", new[] { "LastChangedByUserId" });
             DropIndex("dbo.KLEUpdateHistoryItems", new[] { "ObjectOwnerId" });
+            DropIndex("dbo.TaskRef", "UX_TaskKey");
+            AlterColumn("dbo.TaskRef", "TaskKey", c => c.String());
             DropTable("dbo.KLEUpdateHistoryItems");
         }
     }
