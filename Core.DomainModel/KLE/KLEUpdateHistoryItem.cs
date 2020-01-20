@@ -6,7 +6,7 @@ namespace Core.DomainModel.KLE
     {
         public DateTime Version { get; set; }
 
-        public KLEUpdateHistoryItem()
+        private KLEUpdateHistoryItem()
         {
             //NOTE: For EF
         }
