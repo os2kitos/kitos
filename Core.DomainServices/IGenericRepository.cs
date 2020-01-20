@@ -13,7 +13,7 @@ namespace Core.DomainServices
             Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
             string includeProperties = "");
 
-        IEnumerable<TModel> GetWithReferencePreload<TProperty>(Expression<Func<TModel, TProperty>> includeExpression);
+        IQueryable<TModel> GetWithReferencePreload<TProperty>(Expression<Func<TModel, TProperty>> includeExpression);
 
         TProperty GetMax<TProperty>(Expression<Func<TModel, TProperty>> propertyExpression);
 
@@ -21,7 +21,9 @@ namespace Core.DomainServices
 
         TModel Insert(TModel entity);
 
-        void BulkInsert(IEnumerable<TModel> entities);
+        void AddRange(IEnumerable<TModel> entities);
+
+        void RemoveRange(IEnumerable<TModel> entities);
 
         /// <summary>
         /// Consider using <see cref="DeleteWithReferencePreload"/> and remove any pre-delete manual loading of child refs.

@@ -59,7 +59,7 @@ namespace Infrastructure.DataAccess
             return query.ToList();
         }
 
-        public IEnumerable<T> GetWithReferencePreload<TProperty>(Expression<Func<T, TProperty>> includeExpression)
+        public IQueryable<T> GetWithReferencePreload<TProperty>(Expression<Func<T, TProperty>> includeExpression)
         {
             return _dbSet.Include(includeExpression);
         }
@@ -91,7 +91,7 @@ namespace Infrastructure.DataAccess
             return _dbSet.Add(entity);
         }
 
-        public void BulkInsert(IEnumerable<T> entities)
+        public void AddRange(IEnumerable<T> entities)
         {
             _dbSet.AddRange(entities);
         }
@@ -99,6 +99,11 @@ namespace Infrastructure.DataAccess
         public void Delete(T entity)
         {
             _dbSet.Remove(entity);
+        }
+
+        public void RemoveRange(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
         }
 
         public void DeleteWithReferencePreload(T entity)

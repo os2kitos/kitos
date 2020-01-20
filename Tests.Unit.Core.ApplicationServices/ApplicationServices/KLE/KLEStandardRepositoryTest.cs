@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Repositories.KLE;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.KLEDataBridge;
@@ -32,7 +35,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var stubTaskRefRepository = new GenericRepositoryTaskRefStub();
             var mockTransactionManager = new Mock<ITransactionManager>();
             var mockLogger = new Mock<ILogger>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge.Object, mockTransactionManager.Object, stubTaskRefRepository, mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(mockKLEDataBridge.Object, mockTransactionManager.Object, stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, mockLogger.Object);
             var result = sut.GetKLEStatus(DateTime.Parse(lastUpdatedString, CultureInfo.GetCultureInfo("da-DK")));
             Assert.Equal(expectedUpToDate, result.UpToDate);
             Assert.Equal(expectedPublishDate, result.Published);
@@ -55,7 +60,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             stubTaskRefRepository.Insert(SetupTaskRef(5, "KLE-Emne", "02.02.00", "Bebyggelsens højde- og afstandsforhold i almindelighed"));
             var mockTransactionManager = new Mock<ITransactionManager>();
             var mockLogger = new Mock<ILogger>();
-            var sut = new KLEStandardRepository(mockKLEDataBridge.Object, mockTransactionManager.Object, stubTaskRefRepository, mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(mockKLEDataBridge.Object, mockTransactionManager.Object, stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, mockLogger.Object);
             var result = sut.GetKLEChangeSummary();
             var numberOfKLEMainGroups = document.Descendants("Hovedgruppe").Count();
             var numberOfKLEGroups = document.Descendants("Gruppe").Count();
@@ -77,7 +84,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void UpdateKLE_Given_Summary_Updates_Returns_Published_Date()
         {
             var updateObjects = SetupUpdateObjects();
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             var result = sut.UpdateKLE(0, 0);
             Assert.Equal(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), result);
         }
@@ -86,7 +95,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void UpdateKLE_Given_Summary_Updates_Renamed_TaskRefs()
         {
             var updateObjects = SetupUpdateObjects();
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0, 0);
             Assert.Equal("HAS BEEN RENAMED", updateObjects.renamedTaskRef.Description);
             Assert.Equal(Guid.Parse("f8d6e719-e050-48d8-89e2-977d0eaba6bb"), updateObjects.renamedTaskRef.Uuid);
@@ -96,7 +107,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void UpdateKLE_Given_Summary_Updates_On_Empty_Repos_Adds_All_TaskRefs()
         {
             var updateObjects = SetupUpdateObjects();
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0, 0);
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
         }
@@ -108,7 +121,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             // Existing item with no Uuid
             const string existingItemTaskKey = "02.02.00";
             updateObjects.stubTaskRefRepository.Insert(SetupTaskRef(1, "KLE-Emne", existingItemTaskKey, "Bebyggelsens højde- og afstandsforhold i almindelighed"));
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0, 0);
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
             var sampleTaskRef = updateObjects.stubTaskRefRepository.Get(t => t.TaskKey == existingItemTaskKey).First();
@@ -116,7 +131,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
         
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItProject()
+        private void UpdateKLE_Given_Summary_Updates_ItProject()
         {
             var updateObjects = SetupUpdateObjects();
             const int itProjectKey = 1;
@@ -126,14 +141,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 TaskRefs = new List<TaskRef> {updateObjects.removedTaskRef}
             };
             updateObjects.removedTaskRef.ItProjects = new List<ItProject> { itProject };
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0, 0);
             Assert.False(itProject.TaskRefs.Contains(updateObjects.removedTaskRef));
-            Assert.Null(updateObjects.removedTaskRef.ItProjects.FirstOrDefault(p => p.Id == itProjectKey));
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystem()
+        private void UpdateKLE_Given_Summary_Updates_ItSystem()
         {
             var updateObjects = SetupUpdateObjects();
             const int itSystemKey = 1;
@@ -143,14 +159,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 TaskRefs = new List<TaskRef> { updateObjects.removedTaskRef }
             };
             updateObjects.removedTaskRef.ItSystems = new List<ItSystem> { itSystem };
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0,0);
             Assert.False(itSystem.TaskRefs.Contains(updateObjects.removedTaskRef));
-            Assert.Null(updateObjects.removedTaskRef.ItSystems.FirstOrDefault(p => p.Id == itSystemKey));
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystemUsages()
+        private void UpdateKLE_Given_Summary_Updates_ItSystemUsages()
         {
             var updateObjects = SetupUpdateObjects();
             const int itSystemUsageKey = 1;
@@ -159,15 +176,19 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 Id = itSystemUsageKey,
                 TaskRefs = new List<TaskRef> { updateObjects.removedTaskRef }
             };
-            updateObjects.removedTaskRef.ItSystemUsages = new List<ItSystemUsage> { itSystemUsage };
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var itSystemUsages = new List<ItSystemUsage> { itSystemUsage };
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            mockSystemUsageRepository
+                .Setup(s => s.GetWithReferencePreload(t => t.TaskRefs))
+                .Returns(itSystemUsages.AsQueryable);
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0,0);
             Assert.False(itSystemUsage.TaskRefs.Contains(updateObjects.removedTaskRef));
-            Assert.Null(updateObjects.removedTaskRef.ItSystemUsages.FirstOrDefault(p => p.Id == itSystemUsageKey));
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_ItSystemUsageOptOut()
+        private void UpdateKLE_Given_Summary_Updates_ItSystemUsageOptOut()
         {
             var updateObjects = SetupUpdateObjects();
             const int itSystemUsagesOptOutKey = 1;
@@ -177,14 +198,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 TaskRefs = new List<TaskRef> { updateObjects.removedTaskRef }
             };
             updateObjects.removedTaskRef.ItSystemUsagesOptOut = new List<ItSystemUsage> { itSystemUsage };
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0,0);
             Assert.False(itSystemUsage.TaskRefs.Contains(updateObjects.removedTaskRef));
-            Assert.Null(updateObjects.removedTaskRef.ItSystemUsagesOptOut.FirstOrDefault(p => p.Id == itSystemUsagesOptOutKey));
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Both_TaskRef_And_TaskUsage()
+        private void UpdateKLE_Given_Summary_Updates_TaskUsage()
         {
             var updateObjects = SetupUpdateObjects();
             const int taskUsageKey = 1;
@@ -193,11 +215,16 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 Id = taskUsageKey,
                 TaskRef = updateObjects.removedTaskRef
             };
-            updateObjects.removedTaskRef.Usages = new List<TaskUsage> { taskUsage };
-            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, updateObjects.mockLogger.Object);
+            var taskUsages = new List<TaskUsage> { taskUsage };
+            var mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            var mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
+            mockTaskUsageRepository
+                .Setup(s => s.GetWithReferencePreload(t => t.TaskRef))
+                .Returns(taskUsages.AsQueryable);
+            mockTaskUsageRepository.Setup(s => s.RemoveRange(taskUsages));
+            var sut = new KLEStandardRepository(updateObjects.mockKLEDataBridge.Object, updateObjects.mockTransactionManager.Object, updateObjects.stubTaskRefRepository, mockSystemUsageRepository.Object, mockTaskUsageRepository.Object, updateObjects.mockLogger.Object);
             sut.UpdateKLE(0,0);
-            Assert.Null(taskUsage.TaskRef);
-            Assert.Null(updateObjects.removedTaskRef.Usages.FirstOrDefault(p => p.Id == taskUsageKey));
+            mockTaskUsageRepository.VerifyAll();
         }
 
         #region Helpers
