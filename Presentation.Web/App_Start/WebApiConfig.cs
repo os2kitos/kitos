@@ -17,22 +17,20 @@ using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
-using Presentation.Web.Models;
 using System.Linq;
-using System.Web.Http.Description;
-using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Infrastructure.Odata;
+using Presentation.Web.Models;
+using Presentation.Web.Controllers.OData.AttachedOptions;
+using Microsoft.OData;
+using Microsoft.OData.UriParser;
+using System.Collections.Generic;
+using System.Web.OData.Routing.Conventions;
+using DataType = Core.DomainModel.ItSystem.DataType;
+using HelpText = Core.DomainModel.HelpText;
 
 namespace Presentation.Web
 {
-    using Controllers.OData.AttachedOptions;
-    using Microsoft.OData;
-    using Microsoft.OData.UriParser;
-    using System.Collections.Generic;
-    using System.Web.OData.Routing.Conventions;
-    using DataType = Core.DomainModel.ItSystem.DataType;
-    using HelpText = Core.DomainModel.HelpText;
-
     public static class WebApiConfig
     {
         const string ControllerSuffix = "Controller";

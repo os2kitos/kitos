@@ -14,6 +14,7 @@ namespace Presentation.Web.Controllers.OData
         public ItContractAgreementElementTypesController(IGenericRepository<ItContractAgreementElementTypes> repository)
             : base(repository)
         {
+
         }
     }
 }

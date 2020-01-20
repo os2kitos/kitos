@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
+using Ninject;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 
 namespace Presentation.Web.Controllers.API
@@ -18,14 +19,20 @@ namespace Presentation.Web.Controllers.API
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;
 
+        [Inject]
+        public IGenericRepository<User> UserRepository { get; set; }
+
         protected GenericRightsController(
             IGenericRepository<TRight> rightRepository,
-            IGenericRepository<TObject> objectRepository,
-            IAuthorizationContext authorizationContext = null)
-        : base(authorizationContext)
+            IGenericRepository<TObject> objectRepository)
         {
             RightRepository = rightRepository;
             _objectRepository = objectRepository;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<TRight, TObject>(x => _objectRepository.GetByKey(x.ObjectId), base.GetCrudAuthorization());
         }
 
         /// <summary>
@@ -70,16 +77,16 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id))
-                {
-                    return Forbidden();
-                }
-
                 var right = AutoMapper.Mapper.Map<RightInputDTO, TRight>(dto);
                 right.ObjectId = id;
                 right.ObjectOwner = KitosUser;
                 right.LastChangedByUser = KitosUser;
                 right.LastChanged = DateTime.UtcNow;
+
+                if (!AllowCreate<TRight>(right))
+                {
+                    return Forbidden();
+                }
 
                 right = RightRepository.Insert(right);
                 RightRepository.Save();
@@ -109,15 +116,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!HasWriteAccess(id))
-                {
-                    return Forbidden();
-                }
-
-
                 var right = RightRepository.Get(r => r.ObjectId == id && r.RoleId == rId && r.UserId == uId).FirstOrDefault();
 
                 if (right == null) return NotFound();
+
+                if (!AllowDelete(right))
+                {
+                    return Forbidden();
+                }
 
                 RightRepository.DeleteByKey(right.Id);
                 RightRepository.Save();
@@ -128,13 +134,6 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
-        }
-
-        private bool HasWriteAccess(int objectId)
-        {
-            var obj = _objectRepository.GetByKey(objectId);
-
-            return AllowModify(obj);
         }
     }
 }

@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.KLE;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.KLE;
 
 namespace Core.ApplicationServices
 {
     public interface IKLEApplicationService
     {
-        Result<OperationResult, KLEStatus> GetKLEStatus();
-        Result<OperationResult, IEnumerable<KLEChange>> GetKLEChangeSummary();
-        Result<OperationResult, KLEUpdateStatus> UpdateKLE();
+        Result<KLEStatus, OperationFailure> GetKLEStatus();
+        Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary();
+        Result<KLEUpdateStatus, OperationFailure> UpdateKLE();
     }
 }

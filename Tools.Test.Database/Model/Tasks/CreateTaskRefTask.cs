@@ -23,7 +23,6 @@ namespace Tools.Test.Database.Model.Tasks
 
                 var taskRef = new TaskRef()
                 {
-                    AccessModifier = AccessModifier.Public,
                     Uuid = new Guid(),
                     Type = "TestKLEType",
                     TaskKey = "TestKLEKey",

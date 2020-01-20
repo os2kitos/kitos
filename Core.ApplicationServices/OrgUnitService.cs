@@ -129,10 +129,7 @@ namespace Core.ApplicationServices
             }
             _itProjectOrgUnitUsageRepository.Save();
 
-
-            // http://stackoverflow.com/questions/15226312/entityframewok-how-to-configure-cascade-delete-to-nullify-foreign-keys
-            // when children are loaded into memory the foreign key is correctly set to null on children when deleted
-            var orgUnit = _orgUnitRepository.Get(x => x.Id == id, null, $"{nameof(OrganizationUnit.DefaultUsers)}").FirstOrDefault();
+            var orgUnit = _orgUnitRepository.GetByKey(id);
 
             // attach children to parent of this instance to avoid orphans
             // parent id will never be null because users aren't allowed to delete the root node
@@ -141,7 +138,7 @@ namespace Core.ApplicationServices
                 child.ParentId = orgUnit.ParentId;
             }
 
-            _orgUnitRepository.Delete(orgUnit);
+            _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
             _orgUnitRepository.Save();
         }
     }

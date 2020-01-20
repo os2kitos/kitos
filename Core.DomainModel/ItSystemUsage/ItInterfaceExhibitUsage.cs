@@ -1,3 +1,4 @@
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 
 namespace Core.DomainModel.ItSystemUsage
@@ -9,7 +10,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// of the interface.
     /// It is also used for binding an <see cref="ItContract"/> with the usage.
     /// </summary>
-    public class ItInterfaceExhibitUsage : ISystemModule
+    public class ItInterfaceExhibitUsage : ISystemModule, IContractModule
     {
         public static object[] GetKey(int systemUsageId, int interfaceExhibitId)
         {

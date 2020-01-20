@@ -1,22 +1,25 @@
 ﻿import Login = require("../Helpers/LoginHelper");
-import ItSystemEditPo = require("../PageObjects/it-contract/ItContractOverview.po");
+import ItContractOverview = require("../PageObjects/it-contract/ItContractOverview.po");
 import Constants = require("../Utility/Constants");
+import WaitTimers = require("../Utility/WaitTimers");
 
 describe("Regular user has access to features in the contract overview", () => {
 
     var loginHelper = new Login();
     var consts = new Constants();
-    var pageObject = new ItSystemEditPo();
+    var pageObject = new ItContractOverview();
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var columnObject = pageObject.kendoToolbarWrapper.columnObjects();
+    var waitUpTo = new WaitTimers();
 
     beforeAll(() => {
         loginHelper.loginAsRegularUser();
     });
 
     beforeEach(() => {
-        pageObject.getPage();
-        browser.waitForAngular();
+        pageObject.getPage()
+            .then(() => browser.waitForAngular())
+            .then(() => browser.wait(pageObject.waitForKendoGrid(), waitUpTo.twentySeconds));
     });
 
     it("Create IT contract is clickable", () => {
@@ -42,9 +45,4 @@ describe("Regular user has access to features in the contract overview", () => {
     it("User can see contract ", () => {
         expect(columnObject.contractName.getText()).toContain(consts.defaultItContractName);
     });
-
-
-
-
-
 });

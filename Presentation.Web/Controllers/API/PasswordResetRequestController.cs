@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var user = _userRepository.GetByEmail(input.Email);
-                var request = _userService.IssuePasswordReset(user, null, null);
+                _userService.IssuePasswordReset(user, null, null);
 
                 return Ok();
             }

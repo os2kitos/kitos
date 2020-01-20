@@ -38,7 +38,6 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.Property(x => x.TaskKey).HasUniqueIndexAnnotation("UX_TaskKey", 0);
 
-            TypeMapping.AddIndexOnAccessModifier<TaskRefMap, TaskRef>(this);
-        }
+       }
     }
 }

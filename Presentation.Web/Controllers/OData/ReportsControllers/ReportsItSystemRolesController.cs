@@ -1,26 +1,22 @@
-﻿using Core.ApplicationServices;
-using Core.DomainServices;
+﻿using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using System.Linq;
-using Presentation.Web.Controllers.OData.ReportsControllers;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.OData
+namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [InternalApi]
     public class ReportsItSystemRolesController : BaseOdataAuthorizationController<ItSystemRole>
     {
-        private readonly IAuthenticationService _authService;
-        public ReportsItSystemRolesController(IGenericRepository<ItSystemRole> repository, IAuthenticationService authService)
-            : base(repository){
-            _authService = authService;
-        }
+        public ReportsItSystemRolesController(IGenericRepository<ItSystemRole> repository)
+            : base(repository) { }
 
         [HttpGet]
         [EnableQuery]
@@ -29,7 +25,7 @@ namespace Presentation.Web.Controllers.OData
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Get()
         {
-            if (!_authService.HasReadAccessOutsideContext(UserId))
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All) 
             {
                 return StatusCode(HttpStatusCode.Forbidden);
             }

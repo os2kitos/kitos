@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Model;
 
 namespace Core.DomainServices.Repositories.Project
 {
@@ -16,6 +18,16 @@ namespace Core.DomainServices.Repositories.Project
         public ItProject GetById(int id)
         {
             return _repository.AsQueryable().ById(id);
+        }
+
+        public IQueryable<ItProject> GetProjects(OrganizationDataQueryParameters parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            return _repository.AsQueryable().ByOrganizationDataQueryParameters(parameters);
         }
     }
 }

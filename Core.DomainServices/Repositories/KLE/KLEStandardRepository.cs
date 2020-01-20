@@ -248,7 +248,6 @@ namespace Core.DomainServices.Repositories.KLE
             var addedTaskRefs = additions.Select(kleChange =>
                 new TaskRef
                 {
-                    AccessModifier = AccessModifier.Public,
                     Uuid = kleChange.Uuid,
                     Type = kleChange.Type,
                     TaskKey = kleChange.TaskKey,

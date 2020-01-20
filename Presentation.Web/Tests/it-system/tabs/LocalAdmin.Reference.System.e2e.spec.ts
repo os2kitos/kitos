@@ -4,15 +4,14 @@ import ReferenceHelper = require("../../Helpers/ReferenceHelper");
 import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 
-var loginHelper = new login();
-var itSystemReference = new ItSystemReferenceHelper();
-var refHelper = new ReferenceHelper();
-var testFixture = new TestFixtureWrapper();
-var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
-var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
-
 describe("Local Admin can",
     () => {
+        var loginHelper = new login();
+        var itSystemReference = new ItSystemReferenceHelper();
+        var refHelper = new ReferenceHelper();
+        var testFixture = new TestFixtureWrapper();
+        var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
+        var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
         var itSystemName = createItSystemName();
 
         beforeAll(() => {

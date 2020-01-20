@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using AutoMapper;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -19,11 +18,7 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<ItSystemUsageOrgUnitUsage> _responsibleOrgUnitRepository;
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
 
-        public ItSystemUsageOrgUnitUsageController(
-            IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository,
-            IGenericRepository<ItSystemUsage> systemUsageRepository,
-            IAuthorizationContext authorizationContext)
-        :base(authorizationContext)
+        public ItSystemUsageOrgUnitUsageController(IGenericRepository<ItSystemUsageOrgUnitUsage> responsibleOrgUnitRepository, IGenericRepository<ItSystemUsage> systemUsageRepository)
         {
             _responsibleOrgUnitRepository = responsibleOrgUnitRepository;
             _systemUsageRepository = systemUsageRepository;
@@ -34,6 +29,13 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                var itSystemUsage = _systemUsageRepository.GetByKey(id);
+
+                if (!AllowRead(itSystemUsage))
+                {
+                    return Forbidden();
+                }
+
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItSystemUsageId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
                 orgUnits = orgUnits.Where(AllowRead);
@@ -83,6 +85,16 @@ namespace Presentation.Web.Controllers.API
                 var entity = _responsibleOrgUnitRepository.GetByKey(new object[] { usageId, orgUnitId });
                 var systemUsage = _systemUsageRepository.GetByKey(usageId);
 
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(systemUsage))
+                {
+                    return Forbidden();
+                }
+
                 systemUsage.ResponsibleUsage = entity;
 
                 _responsibleOrgUnitRepository.Save();
@@ -100,6 +112,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var systemUsage = _systemUsageRepository.GetByKey(usageId);
+
+                if (systemUsage == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(systemUsage))
+                {
+                    return Forbidden();
+                }
+
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = systemUsage.ResponsibleUsage;
                 systemUsage.ResponsibleUsage = null;

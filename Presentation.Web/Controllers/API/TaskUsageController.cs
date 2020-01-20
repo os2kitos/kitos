@@ -14,8 +14,10 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
 using Swashbuckle.Swagger.Annotations;
 
@@ -27,19 +29,19 @@ namespace Presentation.Web.Controllers.API
         private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<TaskRef> _taskRepository;
 
-        public TaskUsageController(IGenericRepository<TaskUsage> repository, IGenericRepository<OrganizationUnit> orgUnitRepository, IGenericRepository<TaskRef> taskRepository)
+        public TaskUsageController(
+            IGenericRepository<TaskUsage> repository,
+            IGenericRepository<OrganizationUnit> orgUnitRepository,
+            IGenericRepository<TaskRef> taskRepository)
             : base(repository)
         {
             _orgUnitRepository = orgUnitRepository;
             _taskRepository = taskRepository;
         }
 
-        [HttpGet]
-        [Route("api/taskUsage/")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<List<TaskUsageNestedDTO>>))]
-        public HttpResponseMessage Get(int orgUnitId, int organizationId, [FromUri] PagingModel<TaskUsage> pagingModel)
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return Get(orgUnitId, organizationId, false, pagingModel);
+            return new ChildEntityCrudAuthorization<TaskUsage, OrganizationUnit>(x => _orgUnitRepository.GetByKey(x.OrgUnitId), base.GetCrudAuthorization());
         }
 
         [HttpGet]
@@ -49,6 +51,11 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
+                if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                {
+                    return Forbidden();
+                }
+
                 pagingModel.Where(usage => usage.OrgUnitId == orgUnitId);
 
                 if (onlyStarred) pagingModel.Where(usage => usage.Starred);
@@ -60,7 +67,7 @@ namespace Presentation.Web.Controllers.API
                 foreach (var taskUsage in usages)
                 {
                     var dto = Map<TaskUsage, TaskUsageNestedDTO>(taskUsage);
-                    dto.HasWriteAccess = HasWriteAccess(taskUsage, KitosUser, organizationId);
+                    dto.HasWriteAccess = AllowModify(taskUsage);
                     dto.SystemUsages = AssociatedSystemUsages(taskUsage);
                     dto.Projects = AssociatedProjects(taskUsage);
                     dtos.Add(dto);
@@ -83,7 +90,6 @@ namespace Presentation.Web.Controllers.API
                 var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
                 if (orgUnit == null)
                     return NotFound();
-
                 List<TaskRef> tasks;
                 if (taskId.HasValue)
                 {
@@ -91,7 +97,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             (x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
                 }
                 else
@@ -100,7 +105,6 @@ namespace Presentation.Web.Controllers.API
                     tasks = _taskRepository.Get(
                         x =>
                             !x.Children.Any() &&
-                            x.AccessModifier == AccessModifier.Public &&
                             x.Usages.All(y => y.OrgUnitId != orgUnitId)).ToList();
                 }
 
@@ -109,14 +113,19 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var task in tasks)
                 {
-                    Repository.Insert(new TaskUsage()
+                    var taskUsage = new TaskUsage()
                     {
                         OrgUnitId = orgUnitId,
                         TaskRefId = task.Id,
                         ObjectOwner = KitosUser,
                         LastChanged = DateTime.UtcNow,
                         LastChangedByUser = KitosUser
-                    });
+                    };
+                    if (!AllowCreate<TaskUsage>(taskUsage))
+                    {
+                        return Forbidden();
+                    }
+                    Repository.Insert(taskUsage);
                 }
                 Repository.Save();
                 return Ok();
@@ -136,7 +145,10 @@ namespace Presentation.Web.Controllers.API
                 var item = Map<TaskUsageDTO, TaskUsage>(taskUsageDto);
                 item.ObjectOwner = KitosUser;
                 item.LastChangedByUser = KitosUser;
-
+                if (!AllowCreate<TaskUsage>(item))
+                {
+                    return Forbidden();
+                }
                 var savedItem = PostQuery(item);
 
                 return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
@@ -182,6 +194,10 @@ namespace Presentation.Web.Controllers.API
 
                 foreach (var taskUsage in taskUsages)
                 {
+                    if (!AllowDelete(taskUsage))
+                    {
+                        return Forbidden();
+                    }
                     Repository.DeleteByKey(taskUsage.Id);
                 }
                 Repository.Save();
@@ -199,7 +215,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var usages = Repository.Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred);
+                var usages = Repository
+                    .Get(usage => usage.OrgUnitId == orgUnitId && usage.Starred == onlyStarred)
+                    .Where(AllowRead);
+
                 var dtos = new List<TaskUsageNestedDTO>();
 
                 foreach (var taskUsage in usages)

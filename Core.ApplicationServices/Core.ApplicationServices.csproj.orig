@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Core.ApplicationServices</RootNamespace>
+    <AssemblyName>Core.ApplicationServices</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Hangfire.Core, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.6.6\lib\net45\Hangfire.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Logging.3.2.3.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AdviceService.cs" />
+    <Compile Include="ApplicationServiceModule.cs" />
+    <Compile Include="Authentication\AuthenticationContext.cs" />
+    <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\IAuthenticationContext.cs" />
+    <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
+    <Compile Include="Authorization\AuthorizationContextFactory.cs" />
+    <Compile Include="Authorization\IAuthorizationContext.cs" />
+    <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
+    <Compile Include="Authorization\IAuthorizationPolicy.cs" />
+    <Compile Include="Authorization\IOrganizationalUserContext.cs" />
+    <Compile Include="Authorization\IUserContextFactory.cs" />
+    <Compile Include="Authorization\Policies\ModuleLevelAccessPolicy.cs" />
+    <Compile Include="Authorization\OrganizationalUserContext.cs" />
+    <Compile Include="Authorization\OrganizationAuthorizationContext.cs" />
+    <Compile Include="Authorization\IPermissionVisitor.cs" />
+    <Compile Include="Authorization\Permission.cs" />
+    <Compile Include="Authorization\Permissions\AdministerOrganizationRightPermission.cs" />
+    <Compile Include="Authorization\Permissions\BatchImportPermission.cs" />
+    <Compile Include="Authorization\Permissions\CreateEntityWithVisibilityPermission.cs" />
+    <Compile Include="Authorization\Permissions\DefineOrganizationTypePermission.cs" />
+    <Compile Include="Authorization\Permissions\SystemUsageMigrationPermission.cs" />
+    <Compile Include="Authorization\Permissions\VisibilityControlPermission.cs" />
+    <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
+    <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
+    <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
+    <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
+    <Compile Include="IAdviceService.cs" />
+<<<<<<< HEAD
+    <Compile Include="IFeatureChecker.cs" />
+    <Compile Include="IKLEApplicationService.cs" />
+=======
+>>>>>>> 4862ce8cc9ee179865ed1830c4a0dab3d4239b3d
+    <Compile Include="Interface\ExhibitUsage\IInterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\ExhibitUsage\InterfaceExhibitUsageService.cs" />
+    <Compile Include="Interface\Usage\IInterfaceUsageService.cs" />
+    <Compile Include="Interface\Usage\InterfaceUsageService.cs" />
+<<<<<<< HEAD
+    <Compile Include="KLEApplicationService.cs" />
+=======
+    <Compile Include="Model\Result\OperationFailure.cs" />
+>>>>>>> 4862ce8cc9ee179865ed1830c4a0dab3d4239b3d
+    <Compile Include="Model\System\SystemDeleteResult.cs" />
+    <Compile Include="Model\Shared\NamedEntity.cs" />
+    <Compile Include="Model\System\UsingOrganization.cs" />
+    <Compile Include="Organizations\IOrganizationRightsService.cs" />
+    <Compile Include="Organizations\IOrganizationService.cs" />
+    <Compile Include="Organizations\OrganizationRightsService.cs" />
+    <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="SystemUsage\IItSystemUsageService.cs" />
+    <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
+    <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
+    <Compile Include="Model\SystemUsage\Migration\ItContractMigration.cs" />
+    <Compile Include="OrganizationRoleService.cs" />
+    <Compile Include="IExcelHandler.cs" />
+    <Compile Include="IExcelService.cs" />
+    <Compile Include="Contract\IItContractService.cs" />
+    <Compile Include="Interface\IItInterfaceService.cs" />
+    <Compile Include="Contract\ItContractService.cs" />
+    <Compile Include="Project\ItProjectService.cs" />
+    <Compile Include="Interface\ItInterfaceService.cs" />
+    <Compile Include="System\IItSystemService.cs" />
+    <Compile Include="System\IReferenceService.cs" />
+    <Compile Include="System\ItSystemService.cs" />
+    <Compile Include="SystemUsage\ItSystemUsageService.cs" />
+    <Compile Include="LinqTreeExtensions.cs" />
+    <Compile Include="ExcelImportError.cs" />
+    <Compile Include="ExcelService.cs" />
+    <Compile Include="Organizations\OrganizationService.cs" />
+    <Compile Include="OrgUnitService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MailClient.cs" />
+    <Compile Include="System\ReferenceService.cs" />
+    <Compile Include="UserService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
+      <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

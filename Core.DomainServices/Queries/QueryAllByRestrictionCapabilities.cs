@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 
 namespace Core.DomainServices.Queries
 {
@@ -26,35 +27,27 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            if (_crossOrganizationAccess == CrossOrganizationDataReadAccessLevel.All)
-            {
-                return source;
-            }
+            var refine = Maybe<IDomainQuery<T>>.None;
 
-            if (_hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationDataReadAccessLevel.Public)
+            if (_crossOrganizationAccess < CrossOrganizationDataReadAccessLevel.All)
             {
-                if (_hasOrganization)
+                if (_hasAccessModifier && _crossOrganizationAccess >= CrossOrganizationDataReadAccessLevel.Public)
                 {
-                    var refinement = QueryFactory.ByPublicAccessOrOrganizationId<T>(_activeOrganizationId);
-
-                    return refinement.Apply(source);
+                    refine = Maybe<IDomainQuery<T>>
+                        .Some(_hasOrganization
+                            ? QueryFactory.ByPublicAccessOrOrganizationId<T>(_activeOrganizationId)
+                            : QueryFactory.ByPublicAccessModifier<T>()
+                        );
                 }
-                else
+                else if (_hasOrganization)
                 {
-                    var refinement = QueryFactory.ByPublicAccessModifier<T>();
-
-                    return refinement.Apply(source);
+                    refine = Maybe<IDomainQuery<T>>.Some(QueryFactory.ByOrganizationId<T>(_activeOrganizationId));
                 }
             }
 
-            if (_hasOrganization)
-            {
-                var refinement = QueryFactory.ByOrganizationId<T>(_activeOrganizationId);
-
-                return refinement.Apply(source);
-            }
-
-            return source;
+            return refine
+                .Select(r => r.Apply(source))
+                .GetValueOrFallback(source);
         }
 
         public bool RequiresPostFiltering()

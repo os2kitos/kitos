@@ -1,0 +1,860 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6CD15363-5401-43C5-9479-02FDDFA881DC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Infrastructure.DataAccess</RootNamespace>
+    <AssemblyName>Infrastructure.DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Output\DataAccess\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Output\DataAccess\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="migrate, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.3\tools\migrate.exe</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GenericRepository.cs" />
+    <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\DataResponsibleMap.cs" />
+    <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
+    <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
+    <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
+    <Compile Include="Mapping\RegularPersonalDataTypeMap.cs" />
+    <Compile Include="Mapping\AdviceSentMap.cs" />
+    <Compile Include="Mapping\AgreementElementTypeMap.cs" />
+    <Compile Include="Mapping\ArchiveLocationMap.cs" />
+    <Compile Include="Mapping\ArchiveTypeMap.cs" />
+    <Compile Include="Mapping\CommunicationMap.cs" />
+    <Compile Include="Mapping\ConfigMap.cs" />
+    <Compile Include="Mapping\ExternalReferenceMap.cs" />
+    <Compile Include="Mapping\ItContractAgreementElementTypeMap.cs" />
+    <Compile Include="Mapping\ItContractTemplateMap.cs" />
+    <Compile Include="Mapping\ItContractTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemCategoriesMap.cs" />
+    <Compile Include="Mapping\OptionExtendTypeMap.cs" />
+    <Compile Include="Mapping\OrganizationTypeMap.cs" />
+    <Compile Include="Mapping\OrganizationRightMap.cs" />
+    <Compile Include="Mapping\BusinessTypeMap.cs" />
+    <Compile Include="Mapping\ItSystemTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceExhibitMap.cs" />
+    <Compile Include="Mapping\ItContractItSystemUsageMap.cs" />
+    <Compile Include="Mapping\ItInterfaceMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOrgUnitUsageMap.cs" />
+    <Compile Include="Mapping\ItProjectOrgUnitUsageMap.cs" />
+    <Compile Include="Mapping\ItProjectStatusMap.cs" />
+    <Compile Include="Mapping\HandoverTrialMap.cs" />
+    <Compile Include="Mapping\HandoverTrialTypeMap.cs" />
+    <Compile Include="Mapping\EntityMap.cs" />
+    <Compile Include="Mapping\EconomyStreamMap.cs" />
+    <Compile Include="Mapping\OptionEntityMap.cs" />
+    <Compile Include="Mapping\PaymentFreqencyTypeMap.cs" />
+    <Compile Include="Mapping\PaymentModelTypeMap.cs" />
+    <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
+    <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceExhibitUsageMap.cs" />
+    <Compile Include="Mapping\GoalTypeMap.cs" />
+    <Compile Include="Mapping\ReportMap.cs" />
+    <Compile Include="Mapping\RightMap.cs" />
+    <Compile Include="Mapping\EconomyYearMap.cs" />
+    <Compile Include="Mapping\DataTypeMap.cs" />
+    <Compile Include="Mapping\DataRowUsageMap.cs" />
+    <Compile Include="Mapping\DataRowMap.cs" />
+    <Compile Include="Mapping\FrequencyTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageMap.cs" />
+    <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
+    <Compile Include="Mapping\TsaTypeMap.cs" />
+    <Compile Include="Mapping\TaskUsageMap.cs" />
+    <Compile Include="Mapping\OrganizationUnitMap.cs" />
+    <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
+    <Compile Include="Mapping\OrganizationUnitRoleMap.cs" />
+    <Compile Include="Mapping\GoalMap.cs" />
+    <Compile Include="Mapping\GoalStatusMap.cs" />
+    <Compile Include="Mapping\HandoverMap.cs" />
+    <Compile Include="Mapping\InterfaceTypeMap.cs" />
+    <Compile Include="Mapping\ItInterfaceTypeMap.cs" />
+    <Compile Include="Mapping\ItContractMap.cs" />
+    <Compile Include="Mapping\ItContractRightMap.cs" />
+    <Compile Include="Mapping\ItContractRoleMap.cs" />
+    <Compile Include="Mapping\ItProjectMap.cs" />
+    <Compile Include="Mapping\ItProjectRightMap.cs" />
+    <Compile Include="Mapping\ItProjectRoleMap.cs" />
+    <Compile Include="Mapping\ItSystemMap.cs" />
+    <Compile Include="Mapping\ItSystemRightMap.cs" />
+    <Compile Include="Mapping\ItSystemRoleMap.cs" />
+    <Compile Include="Mapping\TaskRefMap.cs" />
+    <Compile Include="Mapping\MethodTypeMap.cs" />
+    <Compile Include="Mapping\OrganizationMap.cs" />
+    <Compile Include="Mapping\PasswordResetRequestMap.cs" />
+    <Compile Include="Mapping\ItProjectTypeMap.cs" />
+    <Compile Include="Mapping\PurchaseFormTypeMap.cs" />
+    <Compile Include="Mapping\RiskMap.cs" />
+    <Compile Include="Mapping\AdviceMap.cs" />
+    <Compile Include="Mapping\StakeholderMap.cs" />
+    <Compile Include="Mapping\TextMap.cs" />
+    <Compile Include="Mapping\UserMap.cs" />
+    <Compile Include="Mapping\ArchivePeriodMap.cs" />
+    <Compile Include="Mapping\WishMap.cs" />
+    <Compile Include="Migrations\201607110712126_Initial.cs" />
+    <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
+      <DependentUpon>201607110712126_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607110724592_FixIndexes.cs" />
+    <Compile Include="Migrations\201607110724592_FixIndexes.Designer.cs">
+      <DependentUpon>201607110724592_FixIndexes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607141106381_AlteredOrgType.cs" />
+    <Compile Include="Migrations\201607141106381_AlteredOrgType.Designer.cs">
+      <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607220834424_AlterOrganizationRole.cs" />
+    <Compile Include="Migrations\201607220834424_AlterOrganizationRole.Designer.cs">
+      <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201607271054106_AddedDefaultOrgToUser.cs" />
+    <Compile Include="Migrations\201607271054106_AddedDefaultOrgToUser.Designer.cs">
+      <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608111143069_AddedReports.cs" />
+    <Compile Include="Migrations\201608111143069_AddedReports.Designer.cs">
+      <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.cs" />
+    <Compile Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.Designer.cs">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201609301133049_Option Entity to base class.cs" />
+    <Compile Include="Migrations\201609301133049_Option Entity to base class.Designer.cs">
+      <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610100846446_Added the IT prefix to config.cs" />
+    <Compile Include="Migrations\201610100846446_Added the IT prefix to config.Designer.cs">
+      <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121636117_Added OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121636117_Added OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121636117_Added OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121639127_Updated OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121639127_Updated OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121639127_Updated OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.cs" />
+    <Compile Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.Designer.cs">
+      <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610121914148_LocalOptions2.cs" />
+    <Compile Include="Migrations\201610121914148_LocalOptions2.Designer.cs">
+      <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.cs" />
+    <Compile Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.Designer.cs">
+      <DependentUpon>201610140911085_Added prop LocalOptionId on OptionEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141036395_Added LocalItSystemRole.cs" />
+    <Compile Include="Migrations\201610141036395_Added LocalItSystemRole.Designer.cs">
+      <DependentUpon>201610141036395_Added LocalItSystemRole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.cs" />
+    <Compile Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.Designer.cs">
+      <DependentUpon>201610141039072_Added LocalItSystemRole in KitosContext.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610141101480_Added LocalBusinessType.cs" />
+    <Compile Include="Migrations\201610141101480_Added LocalBusinessType.Designer.cs">
+      <DependentUpon>201610141101480_Added LocalBusinessType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610152053249_Added rest of the local options.cs" />
+    <Compile Include="Migrations\201610152053249_Added rest of the local options.Designer.cs">
+      <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.cs" />
+    <Compile Include="Migrations\201610240722136_AddedIsObligatory.Designer.cs">
+      <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs" />
+    <Compile Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.Designer.cs">
+      <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.cs" />
+    <Compile Include="Migrations\201610241230380_Added new contract props running, byEnding.Designer.cs">
+      <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.cs" />
+    <Compile Include="Migrations\201610251319335_Added IsActive to LocalOptions.Designer.cs">
+      <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs" />
+    <Compile Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.Designer.cs">
+      <DependentUpon>201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.cs" />
+    <Compile Include="Migrations\201610251400376_IsLocallyAvailable fix.Designer.cs">
+      <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610310911198_AddPriority.cs" />
+    <Compile Include="Migrations\201610310911198_AddPriority.Designer.cs">
+      <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201610311056238_active added to it contract.cs" />
+    <Compile Include="Migrations\201610311056238_active added to it contract.Designer.cs">
+      <DependentUpon>201610311056238_active added to it contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611041145308_externalreference added.cs" />
+    <Compile Include="Migrations\201611041145308_externalreference added.Designer.cs">
+      <DependentUpon>201611041145308_externalreference added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611071012530_createdDate added.cs" />
+    <Compile Include="Migrations\201611071012530_createdDate added.Designer.cs">
+      <DependentUpon>201611071012530_createdDate added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611081216008_objectid made optional.cs" />
+    <Compile Include="Migrations\201611081216008_objectid made optional.Designer.cs">
+      <DependentUpon>201611081216008_objectid made optional.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611090824159_DefaultUserStartPreference.cs" />
+    <Compile Include="Migrations\201611090824159_DefaultUserStartPreference.Designer.cs">
+      <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.cs" />
+    <Compile Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.Designer.cs">
+      <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611141201425_Hangfire create database.cs" />
+    <Compile Include="Migrations\201611141201425_Hangfire create database.Designer.cs">
+      <DependentUpon>201611141201425_Hangfire create database.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611161024144_reference added to Objects.cs" />
+    <Compile Include="Migrations\201611161024144_reference added to Objects.Designer.cs">
+      <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611161337177_Added HelpText.cs" />
+    <Compile Include="Migrations\201611161337177_Added HelpText.Designer.cs">
+      <DependentUpon>201611161337177_Added HelpText.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611181029318_Added Key to HelpText.cs" />
+    <Compile Include="Migrations\201611181029318_Added Key to HelpText.Designer.cs">
+      <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611231334176_Added LocalOrganizationUnitRolesController.cs" />
+    <Compile Include="Migrations\201611231334176_Added LocalOrganizationUnitRolesController.Designer.cs">
+      <DependentUpon>201611231334176_Added LocalOrganizationUnitRolesController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611281218490_Added ItProjectStatusUpdate.cs" />
+    <Compile Include="Migrations\201611281218490_Added ItProjectStatusUpdate.Designer.cs">
+      <DependentUpon>201611281218490_Added ItProjectStatusUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201611281309558_Deleted StatusProject from ItProject.cs" />
+    <Compile Include="Migrations\201611281309558_Deleted StatusProject from ItProject.Designer.cs">
+      <DependentUpon>201611281309558_Deleted StatusProject from ItProject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612010831018_Added taskrefOptOut.cs" />
+    <Compile Include="Migrations\201612010831018_Added taskrefOptOut.Designer.cs">
+      <DependentUpon>201612010831018_Added taskrefOptOut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612080839538_AddedActiveToITSystem.cs" />
+    <Compile Include="Migrations\201612080839538_AddedActiveToITSystem.Designer.cs">
+      <DependentUpon>201612080839538_AddedActiveToITSystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612081248502_Added GlobalConfig.cs" />
+    <Compile Include="Migrations\201612081248502_Added GlobalConfig.Designer.cs">
+      <DependentUpon>201612081248502_Added GlobalConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612120950234_ChangedITSystemITSystemUsage.cs" />
+    <Compile Include="Migrations\201612120950234_ChangedITSystemITSystemUsage.Designer.cs">
+      <DependentUpon>201612120950234_ChangedITSystemITSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612121307579_Added AccessType.cs" />
+    <Compile Include="Migrations\201612121307579_Added AccessType.Designer.cs">
+      <DependentUpon>201612121307579_Added AccessType.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612130917183_ITContract duration.cs" />
+    <Compile Include="Migrations\201612130917183_ITContract duration.Designer.cs">
+      <DependentUpon>201612130917183_ITContract duration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.cs" />
+    <Compile Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.Designer.cs">
+      <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612151028139_ContractSigner.cs" />
+    <Compile Include="Migrations\201612151028139_ContractSigner.Designer.cs">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.cs" />
+    <Compile Include="Migrations\201612160925221_InterfaceUses removed.Designer.cs">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612191146082_Advis.cs" />
+    <Compile Include="Migrations\201612191146082_Advis.Designer.cs">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201612201243216_Archive.cs" />
+    <Compile Include="Migrations\201612201243216_Archive.Designer.cs">
+      <DependentUpon>201612201243216_Archive.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201701240754224_Added References for IT Systems.cs" />
+    <Compile Include="Migrations\201701240754224_Added References for IT Systems.Designer.cs">
+      <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703151425005_DatabaseRelationsshipAddedInItProject.cs" />
+    <Compile Include="Migrations\201703151425005_DatabaseRelationsshipAddedInItProject.Designer.cs">
+      <DependentUpon>201703151425005_DatabaseRelationsshipAddedInItProject.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705010745599_Changed UUID.cs" />
+    <Compile Include="Migrations\201705010745599_Changed UUID.Designer.cs">
+      <DependentUpon>201705010745599_Changed UUID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.cs" />
+    <Compile Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.Designer.cs">
+      <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.cs" />
+    <Compile Include="Migrations\201708171252435_Added PreviousName to ItSystem.Designer.cs">
+      <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.cs" />
+    <Compile Include="Migrations\201710040651514_access modifier removed from itcontractremark.Designer.cs">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.cs" />
+    <Compile Include="Migrations\201710111321047_Removed itContractRemark entity.Designer.cs">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.cs" />
+    <Compile Include="Migrations\201711221241038_Override of exisiting table.Designer.cs">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.cs" />
+    <Compile Include="Migrations\201712281114451_general purpose added to itsystem.Designer.cs">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.cs" />
+    <Compile Include="Migrations\201712281227026_data level added to itsystem.Designer.cs">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.cs" />
+    <Compile Include="Migrations\201712291105417_containslegalinfo added to itsystem.Designer.cs">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.cs" />
+    <Compile Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.Designer.cs">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801041517268_new optionTypes added.cs" />
+    <Compile Include="Migrations\201801041517268_new optionTypes added.Designer.cs">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.cs" />
+    <Compile Include="Migrations\201801101135275_dataworkers added to system.Designer.cs">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.cs" />
+    <Compile Include="Migrations\201801191355102_added new fields to org and two new entities.Designer.cs">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.cs" />
+    <Compile Include="Migrations\201801191413299_1280_GDPRSystemUsage.Designer.cs">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.cs" />
+    <Compile Include="Migrations\201801191527385_general purpose added to usage.Designer.cs">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.cs" />
+    <Compile Include="Migrations\201801230816140_isBusinessCritical added to system usage.Designer.cs">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.cs" />
+    <Compile Include="Migrations\201801231023532_dataLevel added to system usage.Designer.cs">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231236182_UserCount Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.cs" />
+    <Compile Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.Designer.cs">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801241120532_register type option added.cs" />
+    <Compile Include="Migrations\201801241120532_register type option added.Designer.cs">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.cs" />
+    <Compile Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.Designer.cs">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802070853146_Merge_issue.cs" />
+    <Compile Include="Migrations\201802070853146_Merge_issue.Designer.cs">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.cs" />
+    <Compile Include="Migrations\201802090900414_databehandlere added to itsystemusage.Designer.cs">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.cs" />
+    <Compile Include="Migrations\201802091422355_objectType to make attachedoption more generic.Designer.cs">
+      <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs" />
+    <Compile Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.Designer.cs">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.cs" />
+    <Compile Include="Migrations\201802161445054_reference fields added to sysusage.Designer.cs">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.cs" />
+    <Compile Include="Migrations\201802161536558_user supervision info added to sysusage.Designer.cs">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802191216367_DPIAAdded.cs" />
+    <Compile Include="Migrations\201802191216367_DPIAAdded.Designer.cs">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.cs" />
+    <Compile Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.Designer.cs">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.cs" />
+    <Compile Include="Migrations\201802281250267_Name for url on itcontract added.Designer.cs">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803010908075_GDPRChanges.cs" />
+    <Compile Include="Migrations\201803010908075_GDPRChanges.Designer.cs">
+      <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.cs" />
+    <Compile Include="Migrations\201803021222458_cascade delete added to itprojectusage.Designer.cs">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803050825306_ArchivingNew.cs" />
+    <Compile Include="Migrations\201803050825306_ArchivingNew.Designer.cs">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804091133514_ArchiveFromSystemAdded.cs" />
+    <Compile Include="Migrations\201804091133514_ArchiveFromSystemAdded.Designer.cs">
+      <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.cs" />
+    <Compile Include="Migrations\201804110855592_approved added to archiveperiod.Designer.cs">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804111226032_OrganizationPropertyAdded.cs" />
+    <Compile Include="Migrations\201804111226032_OrganizationPropertyAdded.Designer.cs">
+      <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804161323008_ContactPersonAdded.cs" />
+    <Compile Include="Migrations\201804161323008_ContactPersonAdded.Designer.cs">
+      <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs" />
+    <Compile Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.Designer.cs">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.cs" />
+    <Compile Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.Designer.cs">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.cs" />
+    <Compile Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.Designer.cs">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
+    </Compile>
+<<<<<<< HEAD
+    <Compile Include="Migrations\202001162041388_KLEUpdateHistoryItem.cs" />
+    <Compile Include="Migrations\202001162041388_KLEUpdateHistoryItem.Designer.cs">
+      <DependentUpon>202001162041388_KLEUpdateHistoryItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.cs" />
+    <Compile Include="Migrations\202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.Designer.cs">
+      <DependentUpon>202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.cs</DependentUpon>
+=======
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.cs" />
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.Designer.cs">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
+>>>>>>> 4862ce8cc9ee179865ed1830c4a0dab3d4239b3d
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
+    <Compile Include="Services\DatabaseTransaction.cs" />
+    <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
+    <Compile Include="Services\WithinAmbienTransaction.cs" />
+    <Compile Include="Services\TransactionManager.cs" />
+    <Compile Include="TypeConfigurationExtensions.cs" />
+    <Compile Include="TypeMapping.cs" />
+    <Compile Include="UserRepository.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
+      <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201607110712126_Initial.resx">
+      <DependentUpon>201607110712126_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607110724592_FixIndexes.resx">
+      <DependentUpon>201607110724592_FixIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607141106381_AlteredOrgType.resx">
+      <DependentUpon>201607141106381_AlteredOrgType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607220834424_AlterOrganizationRole.resx">
+      <DependentUpon>201607220834424_AlterOrganizationRole.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201607271054106_AddedDefaultOrgToUser.resx">
+      <DependentUpon>201607271054106_AddedDefaultOrgToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608111143069_AddedReports.resx">
+      <DependentUpon>201608111143069_AddedReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201608180814320_AddedUserProperties_ModifiedLogin.resx">
+      <DependentUpon>201608180814320_AddedUserProperties_ModifiedLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201609301133049_Option Entity to base class.resx">
+      <DependentUpon>201609301133049_Option Entity to base class.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610100846446_Added the IT prefix to config.resx">
+      <DependentUpon>201610100846446_Added the IT prefix to config.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121636117_Added OrganizationOptions.resx">
+      <DependentUpon>201610121636117_Added OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121639127_Updated OrganizationOptions.resx">
+      <DependentUpon>201610121639127_Updated OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121650046_Added OptionType to OrganizationOptions.resx">
+      <DependentUpon>201610121650046_Added OptionType to OrganizationOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610121914148_LocalOptions2.resx">
+      <DependentUpon>201610121914148_LocalOptions2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610140911085_Added prop LocalOptionId on OptionEntity.resx">
+      <DependentUpon>201610140911085_Added prop LocalOptionId on OptionEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141036395_Added LocalItSystemRole.resx">
+      <DependentUpon>201610141036395_Added LocalItSystemRole.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141039072_Added LocalItSystemRole in KitosContext.resx">
+      <DependentUpon>201610141039072_Added LocalItSystemRole in KitosContext.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610141101480_Added LocalBusinessType.resx">
+      <DependentUpon>201610141101480_Added LocalBusinessType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610152053249_Added rest of the local options.resx">
+      <DependentUpon>201610152053249_Added rest of the local options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610240722136_AddedIsObligatory.resx">
+      <DependentUpon>201610240722136_AddedIsObligatory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.resx">
+      <DependentUpon>201610240857400_Renamed IsDisabled to IsEnabled on optionEntity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610241230380_Added new contract props running, byEnding.resx">
+      <DependentUpon>201610241230380_Added new contract props running, byEnding.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251319335_Added IsActive to LocalOptions.resx">
+      <DependentUpon>201610251319335_Added IsActive to LocalOptions.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.resx">
+      <DependentUpon>201610251347086_Renamed OptionEntity.IsActive to IsLocallyAvailable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610251400376_IsLocallyAvailable fix.resx">
+      <DependentUpon>201610251400376_IsLocallyAvailable fix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610310911198_AddPriority.resx">
+      <DependentUpon>201610310911198_AddPriority.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201610311056238_active added to it contract.resx">
+      <DependentUpon>201610311056238_active added to it contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611041145308_externalreference added.resx">
+      <DependentUpon>201611041145308_externalreference added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611071012530_createdDate added.resx">
+      <DependentUpon>201611071012530_createdDate added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611081216008_objectid made optional.resx">
+      <DependentUpon>201611081216008_objectid made optional.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611090824159_DefaultUserStartPreference.resx">
+      <DependentUpon>201611090824159_DefaultUserStartPreference.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611140951353_external references added to it-system-usages and removed from it-system.resx">
+      <DependentUpon>201611140951353_external references added to it-system-usages and removed from it-system.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611141201425_Hangfire create database.resx">
+      <DependentUpon>201611141201425_Hangfire create database.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161024144_reference added to Objects.resx">
+      <DependentUpon>201611161024144_reference added to Objects.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611161337177_Added HelpText.resx">
+      <DependentUpon>201611161337177_Added HelpText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611181029318_Added Key to HelpText.resx">
+      <DependentUpon>201611181029318_Added Key to HelpText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611231334176_Added LocalOrganizationUnitRolesController.resx">
+      <DependentUpon>201611231334176_Added LocalOrganizationUnitRolesController.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611281218490_Added ItProjectStatusUpdate.resx">
+      <DependentUpon>201611281218490_Added ItProjectStatusUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201611281309558_Deleted StatusProject from ItProject.resx">
+      <DependentUpon>201611281309558_Deleted StatusProject from ItProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612010831018_Added taskrefOptOut.resx">
+      <DependentUpon>201612010831018_Added taskrefOptOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612080839538_AddedActiveToITSystem.resx">
+      <DependentUpon>201612080839538_AddedActiveToITSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612081248502_Added GlobalConfig.resx">
+      <DependentUpon>201612081248502_Added GlobalConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612120950234_ChangedITSystemITSystemUsage.resx">
+      <DependentUpon>201612120950234_ChangedITSystemITSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612121307579_Added AccessType.resx">
+      <DependentUpon>201612121307579_Added AccessType.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612130917183_ITContract duration.resx">
+      <DependentUpon>201612130917183_ITContract duration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612140928290_Added Disable to ItSystem and ItInterface.resx">
+      <DependentUpon>201612140928290_Added Disable to ItSystem and ItInterface.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612151028139_ContractSigner.resx">
+      <DependentUpon>201612151028139_ContractSigner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612160925221_InterfaceUses removed.resx">
+      <DependentUpon>201612160925221_InterfaceUses removed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612191146082_Advis.resx">
+      <DependentUpon>201612191146082_Advis.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201612201243216_Archive.resx">
+      <DependentUpon>201612201243216_Archive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201701240754224_Added References for IT Systems.resx">
+      <DependentUpon>201701240754224_Added References for IT Systems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703151425005_DatabaseRelationsshipAddedInItProject.resx">
+      <DependentUpon>201703151425005_DatabaseRelationsshipAddedInItProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705010745599_Changed UUID.resx">
+      <DependentUpon>201705010745599_Changed UUID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705220811328_Visibility option for contract remark and economy streams.resx">
+      <DependentUpon>201705220811328_Visibility option for contract remark and economy streams.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708171252435_Added PreviousName to ItSystem.resx">
+      <DependentUpon>201708171252435_Added PreviousName to ItSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710040651514_access modifier removed from itcontractremark.resx">
+      <DependentUpon>201710040651514_access modifier removed from itcontractremark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111321047_Removed itContractRemark entity.resx">
+      <DependentUpon>201710111321047_Removed itContractRemark entity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711221241038_Override of exisiting table.resx">
+      <DependentUpon>201711221241038_Override of exisiting table.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281114451_general purpose added to itsystem.resx">
+      <DependentUpon>201712281114451_general purpose added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712281227026_data level added to itsystem.resx">
+      <DependentUpon>201712281227026_data level added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291105417_containslegalinfo added to itsystem.resx">
+      <DependentUpon>201712291105417_containslegalinfo added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712291238058_datatransfered and name of third country added to itsystem.resx">
+      <DependentUpon>201712291238058_datatransfered and name of third country added to itsystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801041517268_new optionTypes added.resx">
+      <DependentUpon>201801041517268_new optionTypes added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801101135275_dataworkers added to system.resx">
+      <DependentUpon>201801101135275_dataworkers added to system.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191355102_added new fields to org and two new entities.resx">
+      <DependentUpon>201801191355102_added new fields to org and two new entities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191413299_1280_GDPRSystemUsage.resx">
+      <DependentUpon>201801191413299_1280_GDPRSystemUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801191527385_general purpose added to usage.resx">
+      <DependentUpon>201801191527385_general purpose added to usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801230816140_isBusinessCritical added to system usage.resx">
+      <DependentUpon>201801230816140_isBusinessCritical added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231023532_dataLevel added to system usage.resx">
+      <DependentUpon>201801231023532_dataLevel added to system usage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231236182_UserCount Added to Systemusage.resx">
+      <DependentUpon>201801231236182_UserCount Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801231302073_ContainsLegalInfo Added to Systemusage.resx">
+      <DependentUpon>201801231302073_ContainsLegalInfo Added to Systemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801241120532_register type option added.resx">
+      <DependentUpon>201801241120532_register type option added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802060833158_KITOS-1267_mergeAndNameing.resx">
+      <DependentUpon>201802060833158_KITOS-1267_mergeAndNameing.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802070853146_Merge_issue.resx">
+      <DependentUpon>201802070853146_Merge_issue.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802090900414_databehandlere added to itsystemusage.resx">
+      <DependentUpon>201802090900414_databehandlere added to itsystemusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802091422355_objectType to make attachedoption more generic.resx">
+      <DependentUpon>201802091422355_objectType to make attachedoption more generic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.resx">
+      <DependentUpon>201802161234398_containsdatahandleragreement and datahandleragreementlink added to contract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161445054_reference fields added to sysusage.resx">
+      <DependentUpon>201802161445054_reference fields added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802161536558_user supervision info added to sysusage.resx">
+      <DependentUpon>201802161536558_user supervision info added to sysusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802191216367_DPIAAdded.resx">
+      <DependentUpon>201802191216367_DPIAAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281057596_Name for url in sysusage added and convictiondata removved.resx">
+      <DependentUpon>201802281057596_Name for url in sysusage added and convictiondata removved.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802281250267_Name for url on itcontract added.resx">
+      <DependentUpon>201802281250267_Name for url on itcontract added.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803010908075_GDPRChanges.resx">
+      <DependentUpon>201803010908075_GDPRChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021222458_cascade delete added to itprojectusage.resx">
+      <DependentUpon>201803021222458_cascade delete added to itprojectusage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803050825306_ArchivingNew.resx">
+      <DependentUpon>201803050825306_ArchivingNew.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804091133514_ArchiveFromSystemAdded.resx">
+      <DependentUpon>201804091133514_ArchiveFromSystemAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804110855592_approved added to archiveperiod.resx">
+      <DependentUpon>201804110855592_approved added to archiveperiod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804111226032_OrganizationPropertyAdded.resx">
+      <DependentUpon>201804111226032_OrganizationPropertyAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804161323008_ContactPersonAdded.resx">
+      <DependentUpon>201804161323008_ContactPersonAdded.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.resx">
+      <DependentUpon>201812040907424_AddedNullableToUserSupevisionDateInItSystmUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908121031346_AddedHasApiAccessBooleanToUser.resx">
+      <DependentUpon>201908121031346_AddedHasApiAccessBooleanToUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909021103202_Add-Access-Modifier-Indexes.resx">
+      <DependentUpon>201909021103202_Add-Access-Modifier-Indexes.cs</DependentUpon>
+    </EmbeddedResource>
+<<<<<<< HEAD
+    <EmbeddedResource Include="Migrations\202001162041388_KLEUpdateHistoryItem.resx">
+      <DependentUpon>202001162041388_KLEUpdateHistoryItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.resx">
+      <DependentUpon>202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.cs</DependentUpon>
+=======
+    <EmbeddedResource Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.resx">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
+>>>>>>> 4862ce8cc9ee179865ed1830c4a0dab3d4239b3d
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Migrations\SQLScripts\1.Kitos_script.sql" />
+    <Content Include="Migrations\SQLScripts\2.udfaldsrum.sql" />
+    <Content Include="Migrations\SQLScripts\3.LokaleUdfaldsrum.sql" />
+    <Content Include="Migrations\SQLScripts\4.CleanUp.sql" />
+    <Content Include="Migrations\SQLScripts\6.dbFix.sql" />
+    <Content Include="Migrations\SQLScripts\5.PriorityFix.sql" />
+    <Content Include="Migrations\SQLScripts\AdvisTest.sql" />
+    <Content Include="Migrations\SQLScripts\ExpirationDateContractFix.sql" />
+    <Content Include="Migrations\SQLScripts\ReferenceDisplayFix.sql" />
+    <Content Include="Migrations\SQLScripts\SystemReferenceFix.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

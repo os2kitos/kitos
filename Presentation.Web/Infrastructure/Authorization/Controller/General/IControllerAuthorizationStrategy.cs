@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using Core.ApplicationServices.Authorization;
+using Core.DomainModel;
 using Core.DomainServices.Authorization;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.General
@@ -12,6 +13,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.General
         bool AllowCreate<T>();
         bool AllowModify(IEntity entity);
         bool AllowDelete(IEntity entity);
-        bool AllowEntityVisibilityControl(IEntity entity);
+        bool HasPermission(Permission permission);
+        EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>();
     }
 }

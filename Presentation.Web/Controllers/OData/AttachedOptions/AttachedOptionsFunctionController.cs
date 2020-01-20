@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Core.DomainServices;
 using System;
 using System.Collections.Generic;
@@ -23,11 +22,10 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         private readonly IGenericRepository<TLocalOption> _localOptionRepository;
 
         public AttachedOptionsFunctionController(
-            IGenericRepository<AttachedOption> repository, 
-            IAuthenticationService authService,
+            IGenericRepository<AttachedOption> repository,
             IGenericRepository<TOption> optionRepository,
             IGenericRepository<TLocalOption> localOptionRepository)
-               : base(repository, authService)
+               : base(repository)
         {
             _attachedOptionRepository = repository;
             _optionRepository = optionRepository;
@@ -36,7 +34,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         public virtual IHttpActionResult GetOptionsByObjectIDAndType(int id, EntityType entitytype, OptionType optiontype)
         {
-            var orgId = AuthService.GetCurrentOrganizationId(UserId);
+            var orgId = UserContext.ActiveOrganizationId;
 
             var globalOptionData = _optionRepository.AsQueryable().Where(s => s.IsEnabled);
             var localpersonalData = _localOptionRepository.AsQueryable().Where(p => p.IsActive && p.OrganizationId == orgId).ToList();
@@ -61,8 +59,8 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
         [ODataRoute("RemoveOption(id={id}, objectId={objectId}, type={type}, entityType={entityType})")]
         public IHttpActionResult RemoveOption(int id, int objectId, OptionType type, EntityType entityType)
         {
-            var option = _attachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id 
-            && o.ObjectId == objectId 
+            var option = _attachedOptionRepository.AsQueryable().FirstOrDefault(o => o.OptionId == id
+            && o.ObjectId == objectId
             && o.OptionType == type
             && o.ObjectType == entityType);
 
@@ -71,7 +69,7 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
                 return NotFound();
             }
 
-            if (!AuthService.HasWriteAccess(UserId, option))
+            if (!AllowWrite(option))
             {
                 return Forbidden();
             }
@@ -124,21 +122,13 @@ namespace Presentation.Web.Controllers.OData.AttachedOptions
 
         protected List<AttachedOption> GetAttachedOptions(OptionType type, int id, EntityType objectType)
         {
-            var hasOrg = typeof(IHasOrganization).IsAssignableFrom(typeof(AttachedOption));
-
-            if (AuthService.HasReadAccessOutsideContext(UserId) || hasOrg == false)
-            {
-                //tolist so we can operate with open datareaders in the following foreach loop.
-                return _attachedOptionRepository.AsQueryable().Where(x => x.ObjectId == id
-                && x.OptionType == type
-                && x.ObjectType == objectType).ToList();
-            }
-
-            return _attachedOptionRepository.AsQueryable()
-                .Where(x => ((IHasOrganization)x).OrganizationId == AuthService.GetCurrentOrganizationId(UserId)
-                            && x.ObjectId == id
-                            && x.OptionType == type
-                            && x.ObjectType == objectType).ToList();
+            return _attachedOptionRepository
+                .AsQueryable()
+                .Where(x =>
+                    x.ObjectId == id
+                    && x.OptionType == type
+                    && x.ObjectType == objectType)
+                .ToList();
         }
     }
 }

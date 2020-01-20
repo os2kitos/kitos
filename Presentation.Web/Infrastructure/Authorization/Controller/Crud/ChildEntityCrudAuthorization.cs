@@ -1,14 +1,17 @@
 ﻿using System;
 using Core.DomainModel;
+using Core.DomainServices.Extensions;
+using Core.DomainServices.Model.Result;
 
 namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 {
-    public class ChildEntityCrudAuthorization<T> : IControllerCrudAuthorization
+    public class ChildEntityCrudAuthorization<T, TRoot> : IControllerCrudAuthorization
+        where TRoot : class, IEntity
     {
-        private readonly Func<T, IEntity> _getRoot;
+        private readonly Func<T, TRoot> _getRoot;
         private readonly IControllerCrudAuthorization _crudAuthorization;
 
-        public ChildEntityCrudAuthorization(Func<T, IEntity> getRoot,
+        public ChildEntityCrudAuthorization(Func<T, TRoot> getRoot,
             IControllerCrudAuthorization crudAuthorization)
         {
             _getRoot = getRoot;
@@ -22,9 +25,7 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 
         public bool AllowCreate<T1>(IEntity entity)
         {
-            return
-                typeof(T1) == typeof(T) &&
-                AllowModify(entity); //Even though it is AllowCreate, we delegate to AllowModify on the root
+            return AllowModify(entity);
         }
 
         public bool AllowModify(IEntity entity)
@@ -34,22 +35,26 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
 
         public bool AllowDelete(IEntity entity)
         {
-            //Even though it is AllowDelete, we delegate to AllowModify on the root
             return AllowModify(entity);
         }
 
-        private bool DelegateToRootEntity(IEntity entity, Predicate<IEntity> authorize)
+        private bool DelegateToRootEntity(IEntity entity, Func<IEntity, bool> authorize)
         {
-            if (entity is T inputType)
+            var root = Maybe<IEntity>.None;
+
+            switch (entity)
             {
-                var root = _getRoot(inputType);
-                if (root != null)
-                {
-                    return authorize.Invoke(root);
-                }
+                case TRoot _:
+                    root = Maybe<IEntity>.Some(entity);
+                    break;
+                case T inputType:
+                    root = _getRoot(inputType).FromNullable<IEntity>();
+                    break;
             }
 
-            return false;
+            return root
+                .Select(authorize)
+                .GetValueOrFallback(false);
         }
     }
 }

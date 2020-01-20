@@ -1,0 +1,1346 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.props" Condition="Exists('..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.props')" />
+  <Import Project="..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props" Condition="Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.Default.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Presentation.Web</RootNamespace>
+    <AssemblyName>Presentation.Web</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort>44300</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <TargetFrameworkProfile />
+    <UseGlobalApplicationHostFile>false</UseGlobalApplicationHostFile>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>12.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>0</WarningLevel>
+    <DocumentationFile>bin\Presentation.Web.xml</DocumentationFile>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PublishDatabases>false</PublishDatabases>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>OnlyFilesToRunTheApp</FilesToIncludeForPublish>
+    <DocumentationFile>bin\Presentation.Web.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="Elasticsearch.Net, Version=2.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Elasticsearch.Net.2.4.1\lib\net46\Elasticsearch.Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hangfire.Core, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Core.1.6.6\lib\net45\Hangfire.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hangfire.Ninject, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.Ninject.1.2.0\lib\net45\Hangfire.Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hangfire.SqlServer, Version=1.6.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Hangfire.SqlServer.1.6.6\lib\net45\Hangfire.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Edm, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Edm.5.8.4\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.OData.5.8.4\lib\net40\Microsoft.Data.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Services.5.8.4\lib\net40\Microsoft.Data.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Services.Client, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Data.Services.Client.5.8.4\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.1.0.0\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.0.0\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=5.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.5.2.1\lib\net451\Microsoft.IdentityModel.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.2.1\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.OData.Core, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Core.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.OData.Edm, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.OData.Edm.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.OData.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.0\lib\net451\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.0\lib\net451\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Jwt, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Jwt.3.1.0\lib\net45\Microsoft.Owin.Security.Jwt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.4.0.0\lib\net451\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Spatial, Version=7.5.0.20627, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Spatial.7.5.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.3.2.2.0\lib\net45-full\Ninject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Interception, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Interception.3.2.0.0\lib\net45-full\Ninject.Extensions.Interception.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Interception.DynamicProxy, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Interception.DynamicProxy.3.2.0.0\lib\net45-full\Ninject.Extensions.Interception.DynamicProxy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Logging.3.2.3.0\lib\net45-full\Ninject.Extensions.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Extensions.Logging.Serilog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Extensions.Logging.Serilog.3.2.3.0\lib\net45-full\Ninject.Extensions.Logging.Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Web.Common, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Web.Common.3.2.3.0\lib\net45-full\Ninject.Web.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Web.WebApi, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Web.WebApi.3.2.4.0\lib\net45-full\Ninject.Web.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Ninject.Web.WebApi.WebHost, Version=3.2.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ninject.Web.WebApi.WebHost.3.2.4.0\lib\net45-full\Ninject.Web.WebApi.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.Exceptions, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Exceptions.1.2.0\lib\net451\Serilog.Exceptions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.FullNetFx, Version=1.5.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.1.5.14\lib\net45\Serilog.FullNetFx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Serilog.Sinks.Elasticsearch, Version=3.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\packages\Serilog.Sinks.Elasticsearch.3.0.134\lib\net45\Serilog.Sinks.Elasticsearch.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SerilogWeb.Classic">
+      <HintPath>externalreferences\SerilogWeb.Classic.dll</HintPath>
+    </Reference>
+    <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.Core.5.5.2\lib\net40\Swashbuckle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Swashbuckle.OData, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a2e252c86e553959, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.OData.3.5.0\lib\net452\Swashbuckle.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=4.0.2.28, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.4.0.2.202250711\lib\net45\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Spatial, Version=5.8.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Spatial.5.8.4\lib\net40\System.Spatial.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.3\lib\net45\System.Web.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.3\lib\net45\System.Web.Http.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.OData, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.OData.6.0.0\lib\net45\System.Web.OData.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http">
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest">
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.1.0\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+<<<<<<< HEAD
+    <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Models\KLEUpdateDTO.cs" />
+=======
+    <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensitiveDataTypesController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\BaseOdataAuthorizationController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\ReportsITSystemContactsController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemRolesController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\ReportsItSystemsController.cs" />
+    <Compile Include="Controllers\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
+>>>>>>> 4862ce8cc9ee179865ed1830c4a0dab3d4239b3d
+    <Compile Include="Extensions\DTOMappingExtensions.cs" />
+    <Compile Include="Extensions\HttpMethodIntent.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageMigrationController.cs" />
+    <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
+    <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageContractMigrationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
+    <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
+    <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
+    <Compile Include="Models\KLEStatusDTO.cs" />
+    <Compile Include="Models\NamedEntityDTO.cs" />
+    <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
+    <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
+    <Compile Include="Models\ItSystem\SystemDeleteConflict.cs" />
+    <Compile Include="Models\ReportItSystemRightOutputDTO.cs" />
+    <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.ts" />
+    <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
+    <TypeScriptCompile Include="app\models\generic\NamedEntityDTO.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\associated-agreement-element-types.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-contract-it-system-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-migration.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-periode.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-test-location.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
+    <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
+    <TypeScriptCompile Include="app\services\kleService.ts" />
+    <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
+    <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-edit.controller.ts" />
+    <TypeScriptCompile Include="app\services\itSystemUsageService.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-location.ts" />
+    <Compile Include="App_Start\AuthConfig.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\LogConfig.cs" />
+    <Compile Include="App_Start\NinjectWebCommon.cs" />
+    <Compile Include="Controllers\API\ContactpersonController.cs" />
+    <Compile Include="App_Start\SwaggerConfig.cs" />
+    <Compile Include="Controllers\API\DataProtectionAdvisorController.cs" />
+    <Compile Include="Controllers\API\DataResponsibleController.cs" />
+    <Compile Include="Controllers\API\AdviceUserRelationController.cs" />
+    <Compile Include="Controllers\API\HealthCheckController.cs" />
+    <Compile Include="Controllers\API\UsageDataworkerController.cs" />
+    <Compile Include="Controllers\API\DataworkerController.cs" />
+    <Compile Include="Controllers\API\ExcelController.cs" />
+    <Compile Include="Controllers\API\ItInterfaceExhibitUsageController.cs" />
+    <Compile Include="Controllers\API\ItContractItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\ExhibitController.cs" />
+    <Compile Include="Controllers\API\ItInterfaceController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageOrgUnitUsageController.cs" />
+    <Compile Include="Controllers\API\ItProjectStatusController.cs" />
+    <Compile Include="Controllers\API\HandoverTrialController.cs" />
+    <Compile Include="Controllers\API\GenericHierarchyApiController.cs" />
+    <Compile Include="Controllers\API\OrganizationRightController.cs" />
+    <Compile Include="Controllers\API\DataRowController.cs" />
+    <Compile Include="Controllers\API\ItContractRightsController.cs" />
+    <Compile Include="Controllers\API\ItProjectRightController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageRightsController.cs" />
+    <Compile Include="Controllers\API\OrganizationUnitRightsController.cs" />
+    <Compile Include="Controllers\API\ItProjectOrgUnitUsageController.cs" />
+    <Compile Include="Controllers\API\ReferenceController.cs" />
+    <Compile Include="Controllers\API\UploadFileController.cs" />
+    <Compile Include="Controllers\OData\AccessTypesController.cs" />
+    <Compile Include="Controllers\OData\AdviceController.cs" />
+    <Compile Include="Controllers\OData\AdviceSentController.cs" />
+    <Compile Include="Controllers\OData\ArchivePeriodsController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\AttachedOptionsFunctionController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\ItsystemUsage\AttachedOptionsRegisterTypesController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsRegularPersonalDataController.cs" />
+    <Compile Include="Controllers\OData\AttachedOptions\Itsystem\AttachedOptionsSensitivePersonalDataController.cs" />
+    <Compile Include="Controllers\OData\BaseController.cs" />
+    <Compile Include="Controllers\OData\BaseEntityController.cs" />
+    <Compile Include="Controllers\OData\BaseOptionController.cs" />
+    <Compile Include="Controllers\OData\ConfigsController.cs" />
+    <Compile Include="Controllers\OData\EconomyStreamsController.cs" />
+    <Compile Include="Controllers\OData\GlobalConfigsController.cs" />
+    <Compile Include="Controllers\OData\HelpTextsController.cs" />
+    <Compile Include="Controllers\OData\ItContractRightsController.cs" />
+    <Compile Include="Controllers\OData\ItContractsController.cs" />
+    <Compile Include="Controllers\OData\ItInterfaceExhibitsController.cs" />
+    <Compile Include="Controllers\OData\ItInterfacesController.cs" />
+    <Compile Include="Controllers\OData\ItProjectRightsController.cs" />
+    <Compile Include="Controllers\OData\ItProjectsController.cs" />
+    <Compile Include="Controllers\OData\ItProjectStatusUpdatesController.cs" />
+    <Compile Include="Controllers\OData\ItSystemRightsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemsController.cs" />
+    <Compile Include="Controllers\OData\ItSystemUsagesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionBaseController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalAgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveLocationsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTestLocationsController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalArchiveTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalBusinessTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalFrequencyTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalGoalTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalHandoverTrialTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalInterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTemplateTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItContractTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItInterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItProjectTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemCategoriesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalItSystemTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalMethodTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalOptionExtendTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalOrganizationUnitRolesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentFrequencyTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalPaymentModelTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalPriceRegulationTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalProcurementStrategyTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalPurchaseFormTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegularPersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalTsaTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveLocationsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveTestLocationsController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ArchiveTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\BusinessTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\DataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\FrequencyTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\GoalTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\HandoverTrialTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\InterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItContractRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItContractTemplateTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItContractTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItInterfaceTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItProjectRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItProjectTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItSystemCategoriesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItSystemRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ItSystemTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\MethodTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\OptionExtendTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\OrganizationUnitRolesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\PaymentFrequencyTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\PaymentModelTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\PriceRegulationTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\PurchaseFormTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\RegularPersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ReportCategoriesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\TsaTypesController.cs" />
+    <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitRightsController.cs" />
+    <Compile Include="Controllers\OData\OrganizationUnitsController.cs" />
+    <Compile Include="Controllers\OData\ReportsController.cs" />
+    <Compile Include="Controllers\OData\UsersController.cs" />
+    <Compile Include="Extensions\IdentityClaimExtension.cs" />
+    <Compile Include="Extensions\OwinContextExtensions.cs" />
+    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Swagger\RemoveInternalApiOperationsFilter.cs" />
+    <Compile Include="Infrastructure\Factories\Authentication\OwinAuthenticationContextFactory.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyModificationsThroughApiMiddleware.cs" />
+    <Compile Include="Infrastructure\Middleware\DenyUsersWithoutApiAccessMiddleware.cs" />
+    <Compile Include="Infrastructure\Middleware\APIRequestsLoggingMiddleware.cs" />
+    <Compile Include="Infrastructure\Attributes\InternalApiAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
+    <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
+    <Compile Include="Infrastructure\LogInterceptor.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
+    <Compile Include="Infrastructure\Model\Authentication\SsoConfig.cs" />
+    <Compile Include="Infrastructure\Odata\CaseInsensitiveResolver.cs" />
+    <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
+    <Compile Include="Infrastructure\TokenValidator.cs" />
+    <Compile Include="Models\ArchivePeriodDTO.cs" />
+    <Compile Include="Models\ContactPersonDTO.cs" />
+    <Compile Include="Models\DataResponsibleDTO.cs" />
+    <Compile Include="Models\DataProtectionAdvisorDTO.cs" />
+    <Compile Include="Models\AdviceUserRelationDTO.cs" />
+    <Compile Include="Models\EntitiesAccessRightsDTO.cs" />
+    <Compile Include="Models\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\EntityAccessRightsDTO.cs" />
+    <Compile Include="Models\ItSystemDataWorkerRelationDTO.cs" />
+    <Compile Include="Models\ItSystemUsageDataWorkerRelationDTO.cs" />
+    <Compile Include="Models\GetTokenResponseDTO.cs" />
+    <Compile Include="Models\OrganizationSimpleDTO.cs" />
+    <Compile Include="Models\SSOConfigDTO.cs" />
+    <Compile Include="Models\UpdateDefaultOrgUnitDto.cs" />
+    <Compile Include="Controllers\Web\HomeController.cs" />
+    <Compile Include="Models\HandoverTrialDTO.cs" />
+    <Compile Include="Models\ItInterfaceDTO.cs" />
+    <Compile Include="Models\ItInterfaceExhibitDTO.cs" />
+    <Compile Include="Models\ItInterfaceExhibitUsageDTO.cs" />
+    <Compile Include="Models\ItInterfaceUseDTO.cs" />
+    <Compile Include="Models\ItProjectOverviewDTO.cs" />
+    <Compile Include="Models\ItProjectPhaseDTO.cs" />
+    <Compile Include="Models\ItProjectStatusDTO.cs" />
+    <Compile Include="Models\ExcelImportErrorDTO.cs" />
+    <Compile Include="Models\PagingModel.cs" />
+    <Compile Include="Controllers\API\PaymentMilestoneController.cs" />
+    <Compile Include="Models\ItContractSystemDTO.cs" />
+    <Compile Include="Models\ItContractOverviewDTO.cs" />
+    <Compile Include="Models\ItContractPlanDTO.cs" />
+    <Compile Include="Models\ItProjectSimpleDTO.cs" />
+    <Compile Include="Models\ItProjectCatalogDTO.cs" />
+    <Compile Include="Models\ItSystemSimpleDTO.cs" />
+    <Compile Include="Models\PaymentMilestoneDTO.cs" />
+    <Compile Include="Controllers\API\EconomyStreamController.cs" />
+    <Compile Include="Models\EconomyStreamDTO.cs" />
+    <Compile Include="Controllers\API\ItContractController.cs" />
+    <Compile Include="Models\AdviceDTO.cs" />
+    <Compile Include="App_Start\FilterConfig.cs" />
+    <Compile Include="App_Start\MappingConfig.cs" />
+    <Compile Include="Models\Exceptions\ConflictException.cs" />
+    <Compile Include="Models\ItContractDTO.cs" />
+    <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\API\AssignmentController.cs" />
+    <Compile Include="Controllers\API\AuthorizeController.cs" />
+    <Compile Include="Controllers\API\BaseApiController.cs" />
+    <Compile Include="Controllers\API\CommunicationController.cs" />
+    <Compile Include="Controllers\API\HandoverController.cs" />
+    <Compile Include="Controllers\API\EconomyYearController.cs" />
+    <Compile Include="Controllers\API\GoalController.cs" />
+    <Compile Include="Controllers\API\GoalStatusController.cs" />
+    <Compile Include="Controllers\API\GenericRightsController.cs" />
+    <Compile Include="Controllers\API\ItInterfaceUsageController.cs" />
+    <Compile Include="Controllers\API\ItProjectController.cs" />
+    <Compile Include="Controllers\API\ItSystemController.cs" />
+    <Compile Include="Controllers\API\ItSystemUsageController.cs" />
+    <Compile Include="Controllers\API\RiskController.cs" />
+    <Compile Include="Controllers\API\StakeholderController.cs" />
+    <Compile Include="Controllers\API\MilestoneController.cs" />
+    <Compile Include="Models\CommunicationDTO.cs" />
+    <Compile Include="Models\GoalDTO.cs" />
+    <Compile Include="Models\GoalStatusDTO.cs" />
+    <Compile Include="Models\HandoverDTO.cs" />
+    <Compile Include="Models\ItInterfaceExposureDTO.cs" />
+    <Compile Include="Models\RiskDTO.cs" />
+    <Compile Include="Controllers\API\WishController.cs" />
+    <Compile Include="Models\AssignmentDTO.cs" />
+    <Compile Include="Models\DataRowDTO.cs" />
+    <Compile Include="Models\DataRowUsageDTO.cs" />
+    <Compile Include="Models\EconomyYearDTO.cs" />
+    <Compile Include="Models\ItInterfaceUsageDTO.cs" />
+    <Compile Include="Models\ItProjectDTO.cs" />
+    <Compile Include="Models\ItSystemDTO.cs" />
+    <Compile Include="Controllers\API\TaskUsageController.cs" />
+    <Compile Include="Models\CreateGlobalAdminDTO.cs" />
+    <Compile Include="Models\CreateLocalAdminDTO.cs" />
+    <Compile Include="Controllers\API\GenericOptionApiController.cs" />
+    <Compile Include="Controllers\API\OrganizationUnitController.cs" />
+    <Compile Include="Controllers\API\GlobalAdminController.cs" />
+    <Compile Include="Controllers\API\OrganizationController.cs" />
+    <Compile Include="Controllers\API\PasswordResetRequestController.cs" />
+    <Compile Include="Controllers\API\TaskRefController.cs" />
+    <Compile Include="Controllers\API\UserController.cs" />
+    <Compile Include="Controllers\API\GenericApiController.cs" />
+    <Compile Include="Controllers\API\TextController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\HtmlHelpers.cs" />
+    <Compile Include="Infrastructure\CustomMembershipProvider.cs" />
+    <Compile Include="Infrastructure\CustomRoleProvider.cs" />
+    <Compile Include="Infrastructure\IUserRepositoryFactory.cs" />
+    <Compile Include="Infrastructure\NinjectDependencyResolver.cs" />
+    <Compile Include="Infrastructure\NinjectDependencyScope.cs" />
+    <Compile Include="Infrastructure\ProviderInitializationHttpModule.cs" />
+    <Compile Include="Infrastructure\UserRepositoryFactory.cs" />
+    <Compile Include="Models\ApiReturnDTO.cs" />
+    <Compile Include="Models\AuthorizeViewModels.cs" />
+    <Compile Include="Models\ConfigDTO.cs" />
+    <Compile Include="Models\ItSystemUsageDTO.cs" />
+    <Compile Include="Models\LoginDTO.cs" />
+    <Compile Include="Models\OptionDTO.cs" />
+    <Compile Include="Models\OrganizationDTO.cs" />
+    <Compile Include="Models\OrgUnitDTO.cs" />
+    <Compile Include="Models\PasswordResetRequestDTO.cs" />
+    <Compile Include="Models\ResetPasswordDTO.cs" />
+    <Compile Include="Models\OrganizationRightDTO.cs" />
+    <Compile Include="Models\RightOutputDTO.cs" />
+    <Compile Include="Models\RightInputDTO.cs" />
+    <Compile Include="Models\RoleDTO.cs" />
+    <Compile Include="Models\StakeholderDTO.cs" />
+    <Compile Include="Models\MilestoneDTO.cs" />
+    <Compile Include="Models\TaskDelegationDTO.cs" />
+    <Compile Include="Models\TaskRefSelectedDTO.cs" />
+    <Compile Include="Models\TaskRefUsageDTO.cs" />
+    <Compile Include="Models\TaskUsageDTO.cs" />
+    <Compile Include="Models\TaskRefDTO.cs" />
+    <Compile Include="Models\TaskUsageNestedDTO.cs" />
+    <Compile Include="Models\TextDTO.cs" />
+    <Compile Include="Models\UserDTO.cs" />
+    <Compile Include="Models\UserOrganizationsDTO.cs" />
+    <Compile Include="Models\UserOverviewDTO.cs" />
+    <Compile Include="Models\WishDTO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Startup.cs" />
+    <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
+    <TypeScriptCompile Include="app\utility\validation.ts" />
+    <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\CreateUserHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\KendoToolbarHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\NavigationBarHelper.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\ReferenceHelper.ts" />
+    <TypeScriptCompile Include="Tests\it-contract\RegularUser.Contract.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Organization\CreateUser.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Tabs\LocalAdmin.Reference.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Organization\CreateUserPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemReference.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
+    <TypeScriptCompile Include="Tests\It-System\RegularUser.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\CSSLocatorHelper.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\IPageObject.po.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\KendoToolbarWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\NavigationBarWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\RepeaterWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\Select2TagWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\Select2Wrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\SelectStatus2Wrapper.ts" />
+    <TypeScriptCompile Include="Tests\Object-wrappers\SubNavigationBarWrapper.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-contract\ItContractOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\It-system\ItSystemOverview.po.ts" />
+    <TypeScriptCompile Include="Tests\Utility\NavigationHelper.ts" />
+    <TypeScriptCompile Include="Tests\Utility\TestFixtureWrapper.ts" />
+    <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
+    <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
+    <Content Include="appReport\locales\da-DK.xml" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
+    <Content Include="app\components\it-contract\tabs\it-contract-gdpr-editlink-modal.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-tab-gdpr.view.html" />
+    <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
+    <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
+    <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
+    <Content Include="app\components\global-admin\global-admin-misc.view.html" />
+    <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
+    <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
+    <Content Include="app\components\global-admin\global-admin-report.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-systemusage-tab-gdpr-editlink-modal.view.html" />
+    <Content Include="app\components\org\basicInformation\org-GDPR.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.view.html" />
+    <Content Include="app\shared\globalAdvis\it-advice-global.view.html" />
+    <Content Include="app\shared\globalAdvis\it-advice-global.modal.view.html" />
+    <Content Include="app\components\it-advice\it-advice-modal-view.html" />
+    <Content Include="app\components\it-contract\it-contract-tab-advice.view.html" />
+    <Content Include="app\components\it-advice\it-advice.view.html" />
+    <Content Include="app\components\it-contract\it-contract-details\it-contract-details.view.html" />
+    <Content Include="app\components\it-contract\it-contract-modal-create.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-main.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-main.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
+    <Content Include="app\components\it-reference\it-reference-modal.view.html" />
+    <Content Include="app\components\it-reference\it-reference.view.html" />
+    <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
+    <Content Include="app\components\local-config\local-config-current-org.view.html" />
+    <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts-create.modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-help-texts.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-misc.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\It-advice.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-advice.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-advice.state.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-create-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-edit-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
+    <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\localOptionRoleList\localOptionRoleList.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\org-user-delete.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-organization-unit-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\reports\report-edit.controller.ts" />
+    <TypeScriptCompile Include="app\models\general-role-entity.ts" />
+    <TypeScriptCompile Include="app\models\help-text.ts" />
+    <TypeScriptCompile Include="app\models\IReference.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-right.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-status-update.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-unit-right.ts" />
+    <TypeScriptCompile Include="app\models\role-entity.ts" />
+    <TypeScriptCompile Include="app\models\option-entity.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
+    <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
+    <TypeScriptCompile Include="appReport\index.d.ts" />
+    <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
+    <TypeScriptCompile Include="appReport\reportApp.module.ts" />
+    <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
+    <TypeScriptCompile Include="app\services\httpServices.ts" />
+    <TypeScriptCompile Include="app\services\itContractsService.ts" />
+    <TypeScriptCompile Include="app\services\itProjectService.ts" />
+    <TypeScriptCompile Include="app\services\itSystemService.ts" />
+    <TypeScriptCompile Include="app\services\NavigationService.ts" />
+    <TypeScriptCompile Include="app\services\OrganizationService.ts" />
+    <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
+    <TypeScriptCompile Include="app\services\uploadFileService.ts" />
+    <TypeScriptCompile Include="app\services\userGetService.ts" />
+    <TypeScriptCompile Include="app\services\userServices.ts" />
+    <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
+    <TypeScriptCompile Include="app\shared\datereader.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\fileModel.directive.ts" />
+    <TypeScriptCompile Include="app\shared\confirmClick.directive.ts" />
+    <TypeScriptCompile Include="app\shared\disabledOnBusy.directive.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\globalOptionList\globalOptionList.directive.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\globalOptionRoleList\globalOptionRoleList.directive.ts" />
+    <TypeScriptCompile Include="app\shared\displayAccessModifier\displayAccessModifier.directive.ts" />
+    <TypeScriptCompile Include="app\shared\helpText\helpText.directive.ts" />
+    <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
+    <TypeScriptCompile Include="app\shared\match.directive.ts" />
+    <TypeScriptCompile Include="app\services\needsWidthFixService.ts" />
+    <TypeScriptCompile Include="app\shared\selectMultipleOption\selectMultipleOption.directive.ts" />
+    <Content Include="appReport\css\report.css" />
+    <Content Include="appReport\Index.html" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
+    <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
+    <Content Include="app\components\reports\report-edit.modal.view.html" />
+    <Content Include="app\shared\helpText\helpText.view.html" />
+    <Content Include="app\shared\helpText\helpTextModal.view.html" />
+    <Content Include="app\shared\navigation\navigation-buttons.view.html" />
+    <Content Include="app\shared\selectMultipleOption\selectMultipleOption.view.html" />
+    <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
+    <Content Include="app\components\reports\reports-overview.html" />
+    <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectOption\selectOption.directive.ts" />
+    <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
+    <Content Include="app\shared\selectOption\selectOption.view.html" />
+    <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
+    <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
+    <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
+    <TypeScriptCompile Include="app\shared\searchBox\searchBox.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccessModifier.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectOrgUnit\selectOrgUnit.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
+    <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
+    <TypeScriptCompile Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.directive.ts" />
+    <TypeScriptCompile Include="app\shared\showErrors.directive.ts" />
+    <TypeScriptCompile Include="app\shared\showStatus\showStatus.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-project\simpleComment.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-project\squareTrafficLight.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\suggestNew\suggestNew.directive.ts" />
+    <TypeScriptCompile Include="app\components\local-config\suggestNewRole\suggestNewRole.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-system\unique.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueEmail.directive.ts" />
+    <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\uniqueOrgUser.directive.ts" />
+    <TypeScriptCompile Include="app\shared\autofocus.directive.ts" />
+    <TypeScriptCompile Include="app\shared\typeahead\typeahead.directive.ts" />
+    <TypeScriptCompile Include="app\utility\lodash.mixin.ts" />
+    <Content Include="app\shared\tinyMCE_lang_da.js" />
+    <Content Include="app\shared\typeahead\typeahead.view.html" />
+    <Content Include="Content\css\app.css" />
+    <Content Include="Content\css\app.min.css" />
+    <Content Include="Content\css\fonts\tinymce-small.eot" />
+    <Content Include="Content\css\fonts\tinymce-small.svg" />
+    <Content Include="Content\css\fonts\tinymce-small.ttf" />
+    <Content Include="Content\css\fonts\tinymce-small.woff" />
+    <Content Include="Content\css\fonts\tinymce.eot" />
+    <Content Include="Content\css\fonts\tinymce.svg" />
+    <Content Include="Content\css\fonts\tinymce.ttf" />
+    <Content Include="Content\css\fonts\tinymce.woff" />
+    <Content Include="Content\css\maps\app.min.css.map" />
+    <Content Include="Content\css\select2-spinner.gif" />
+    <Content Include="Content\css\select2.png" />
+    <Content Include="Content\css\select2x2.png" />
+    <Content Include="Content\Default\loading-image.gif" />
+    <Content Include="Content\Default\loading.gif" />
+    <Content Include="Content\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\img\Accesscontrol.svg" />
+    <Content Include="Content\img\Advis.svg" />
+    <Content Include="Content\img\Aendringsoenske.svg" />
+    <Content Include="Content\img\Aftalefrister.svg" />
+    <Content Include="Content\img\Arkiv.svg" />
+    <Content Include="Content\img\Betalingsmodel.svg" />
+    <Content Include="Content\img\EksterneReferencer.svg" />
+    <Content Include="Content\img\End-to-end.svg" />
+    <Content Include="Content\img\Faser.svg" />
+    <Content Include="Content\img\folder-lock.svg" />
+    <Content Include="Content\img\GDPR-Lock.svg" />
+    <Content Include="Content\img\Gevinster.svg" />
+    <Content Include="Content\img\Hierarki.svg" />
+    <Content Include="Content\img\Interessenter.svg" />
+    <Content Include="Content\img\ITprojekter.svg" />
+    <Content Include="Content\img\ITsystemer.svg" />
+    <Content Include="Content\img\KLE.svg" />
+    <Content Include="Content\img\Kommunikation.svg" />
+    <Content Include="Content\img\Kontrakter.svg" />
+    <Content Include="Content\img\Kontraktforside.svg" />
+    <Content Include="Content\img\Kontraktroller.svg" />
+    <Content Include="Content\img\Oekonomi.svg" />
+    <Content Include="Content\img\Organisation.svg" />
+    <Content Include="Content\img\OS2_logo_kitos.png" />
+    <Content Include="Content\img\Overlevering.svg" />
+    <Content Include="Content\img\Projekforside.svg" />
+    <Content Include="Content\img\Projektbeskrivelse.svg" />
+    <Content Include="Content\img\Projektroller.svg" />
+    <Content Include="Content\img\Rediger.svg" />
+    <Content Include="Content\img\References.svg" />
+    <Content Include="Content\img\Risiko.svg" />
+    <Content Include="Content\img\Slet.svg" />
+    <Content Include="Content\img\Snitfladedetaljer.svg" />
+    <Content Include="Content\img\Snitflader.svg" />
+    <Content Include="Content\img\Stamdata.svg" />
+    <Content Include="Content\img\Status-maal.svg" />
+    <Content Include="Content\img\Status-projekt.svg" />
+    <Content Include="Content\img\Strategi-maal.svg" />
+    <Content Include="Content\img\Strategi.svg" />
+    <Content Include="Content\img\Systemforside.svg" />
+    <Content Include="Content\img\Systemforside_white.svg" />
+    <Content Include="Content\img\Systemroller.svg" />
+    <Content Include="Content\img\VisIOverblik.svg" />
+    <Content Include="Content\notify\notify.css" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.view.html" />
+    <Content Include="externalreferences\SerilogWeb.Classic.dll" />
+    <Content Include="favicon.ico" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\excel.png" />
+    <Content Include="Images\logo.png" />
+    <Content Include="app\shared\kleFilter\kleFilter.view.html" />
+    <Content Include="app\shared\orderBy\orderBy.view.html" />
+    <Content Include="app\shared\paginationButtons\paginationButtons.view.html" />
+    <Content Include="app\shared\searchBox\searchBox.view.html" />
+    <Content Include="app\shared\selectStatus2\selectStatus2.view.html" />
+    <Content Include="app\shared\selectAccessModifier\selectAccessModifier.view.html" />
+    <Content Include="app\shared\selectOrgUnit\selectOrgUnit.view.html" />
+    <Content Include="app\components\home\selectUserOrgUnit\selectUserOrgUnit.view.html" />
+    <Content Include="app\shared\selectUser\selectUser.view.html" />
+    <Content Include="app\shared\showStatus\showStatus.view.html" />
+    <Content Include="app\components\global-admin\global-admin-global-admins.view.html" />
+    <Content Include="app\components\global-admin\global-admin-local-admins.view.html" />
+    <Content Include="app\components\global-admin\global-admin-organizations.view.html" />
+    <Content Include="app\shared\optionList\optionList.view.html" />
+    <Content Include="app\components\global-admin\global-admin-system.view.html" />
+    <Content Include="app\components\global-admin\global-admin-contract.view.html" />
+    <Content Include="app\components\global-admin\global-admin-org.view.html" />
+    <Content Include="app\components\global-admin\global-admin-project.view.html" />
+    <Content Include="app\components\global-admin\global-admin-organization-modal.view.html" />
+    <Content Include="app\components\home\choose-organization.html" />
+    <Content Include="app\components\home\home-edit-user.view.html" />
+    <Content Include="app\components\home\home-reset-password.view.html" />
+    <Content Include="app\components\home\home-forgot-password.view.html" />
+    <Content Include="app\components\home\home.view.html" />
+    <Content Include="app\components\it-contract\it-contract-edit.view.html" />
+    <Content Include="app\components\it-contract\it-contract-overview.view.html" />
+    <Content Include="app\components\it-contract\it-contract-plan.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-deadlines.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-economy.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-systems.view.html" />
+    <Content Include="app\components\it-contract\tabs\it-contract-tab-roles.view.html" />
+    <Content Include="app\components\it-project\it-project-overview.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-modal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-communication.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-description.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-handover.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-hierarchy.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-phases.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-risk.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-roles.view.html" />
+    <Content Include="app\components\it-project\it-project-edit.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-org.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-economy.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-itsys.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-kle.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-stakeholders.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-goal.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-strategy.view.html" />
+    <Content Include="app\components\it-project\tabs\it-project-tab-status-project.view.html" />
+    <Content Include="app\components\it-system\it-interface\it-interface-edit.view.html" />
+    <Content Include="app\components\it-system\it-interface\it-interface-catalog.view.html" />
+    <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-details.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.view.html" />
+    <Content Include="app\components\it-system\it-system-catalog.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.view.html" />
+    <Content Include="app\components\it-system\edit\it-system-edit.view.html" />
+    <Content Include="app\components\it-system\it-system-overview.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-org.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-hierarchy.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.view.html" />
+    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.view.html" />
+    <Content Include="app\components\it-system\usage\it-system-usage.view.html" />
+    <Content Include="app\components\local-config\import\local-config-import-template.view.html" />
+    <Content Include="app\components\local-config\local-config-contract.view.html" />
+    <Content Include="app\components\local-config\import\local-config-import.view.html" />
+    <Content Include="app\components\local-config\local-config-system.view.html" />
+    <Content Include="app\components\local-config\local-config-project.view.html" />
+    <Content Include="app\components\local-config\local-config-org.view.html" />
+    <Content Include="app\components\local-config\suggestNewRole\suggestNewRole.view.html" />
+    <Content Include="app\components\local-config\suggestNew\suggestNew.view.html" />
+    <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
+    <Content Include="app\components\org\overview\org-overview.view.html" />
+    <Content Include="app\components\org\overview\org-overview-modal-comment.view.html" />
+    <Content Include="app\components\org\overview\org-overview-task-foldout-leaf.view.html" />
+    <Content Include="app\components\org\overview\org-overview-task-foldout-node.view.html" />
+    <Content Include="app\components\org\structure\org-structure-tree-unit.view.html" />
+    <Content Include="app\components\org\structure\org-structure.view.html" />
+    <Content Include="app\components\org\overview\org-overview-usage.view.html" />
+    <Content Include="app\components\org\user\org-user-create.modal.view.html" />
+    <Content Include="app\components\org\user\org-user-edit.modal.view.html" />
+    <Content Include="app\components\org\user\org-user.view.html" />
+    <Content Include="app\shared\organization-tree-item.html" />
+    <Content Include="app\components\it-system\it-interface\it-interface-modal-create.view.html" />
+    <Content Include="app\components\it-system\it-system-modal-create.view.html" />
+    <Content Include="app\shared\navigation\navigation-sub.view.html" />
+    <Content Include="app\shared\navigation\navigation-authorized.view.html" />
+    <Content Include="app\shared\navigation\navigation-top.view.html" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-global-admins.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-local-admins.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-project.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-system.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-contract.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\home\home-forgot-password.controller.ts" />
+    <TypeScriptCompile Include="app\components\home\home-reset-password.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
+    <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\index.d.ts" />
+    <TypeScriptCompile Include="app\directiveFactory.ts" />
+    <TypeScriptCompile Include="app\models\api\organization-role.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\economy-stream.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-overview-inactive.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-strategy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project.interfaces.ts" />
+    <TypeScriptCompile Include="app\kitos.ts" />
+    <TypeScriptCompile Include="app\models\access-modifier.ts" />
+    <TypeScriptCompile Include="app\models\config.ts" />
+    <TypeScriptCompile Include="app\models\entity.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\advice.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\agreement-element.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\contract-template.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\contract-type.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\handover-trial-type.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\handover-trial.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-rights.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\option-extend.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\payment-frequency.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\payment-milestone.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\payment-model.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\price-regulation.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\procurement-strategy.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\purchase-form.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\termination-deadline.ts" />
+    <TypeScriptCompile Include="app\models\it-project\communication.ts" />
+    <TypeScriptCompile Include="app\models\it-project\economy-year.ts" />
+    <TypeScriptCompile Include="app\models\it-project\goal-status.ts" />
+    <TypeScriptCompile Include="app\models\it-project\goal-type.ts" />
+    <TypeScriptCompile Include="app\models\it-project\goal.ts" />
+    <TypeScriptCompile Include="app\models\it-project\handover.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-org-unit-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-priority.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-status.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-type.ts" />
+    <TypeScriptCompile Include="app\models\it-project\risk.ts" />
+    <TypeScriptCompile Include="app\models\it-project\stakeholder.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\data-row-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\frequency.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\interface-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-interface-exhibit-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-org-unit-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
+    <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
+    <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
+    <TypeScriptCompile Include="app\models\it-system\interface-type.ts" />
+    <TypeScriptCompile Include="app\models\it-system\interface.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
+    <TypeScriptCompile Include="app\models\it-system\method.ts" />
+    <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
+    <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
+    <TypeScriptCompile Include="app\models\it-system\wish.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-type.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization-unit.ts" />
+    <TypeScriptCompile Include="app\models\it-system\business-type.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-type-option.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system-base.ts" />
+    <TypeScriptCompile Include="app\models\it-system\it-system.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract-it-system-usage.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\it-contract.ts" />
+    <TypeScriptCompile Include="app\models\it-project\it-project.ts" />
+    <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
+    <TypeScriptCompile Include="app\models\organization\organization.ts" />
+    <TypeScriptCompile Include="app\models\password-reset-request.ts" />
+    <TypeScriptCompile Include="app\models\report\report.ts" />
+    <TypeScriptCompile Include="app\models\task-ref.ts" />
+    <TypeScriptCompile Include="app\models\task-usage.ts" />
+    <TypeScriptCompile Include="app\models\traffic-light.ts" />
+    <TypeScriptCompile Include="app\models\api\api-wrapper.ts" />
+    <TypeScriptCompile Include="app\models\user.ts" />
+    <TypeScriptCompile Include="app\services\economyCalc.ts" />
+    <TypeScriptCompile Include="app\services\gridStateService.ts" />
+    <TypeScriptCompile Include="app\services\ReportService.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
+    <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
+    <TypeScriptCompile Include="Tests\HomePage\Login.e2e.spec.ts" />
+    <TypeScriptCompile Include="app\app.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-create.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-organizations.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-subnav.ts" />
+    <TypeScriptCompile Include="app\components\home\home-edit-user.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-deadlines.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-paymentmodel.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-phases.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-description.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-contracts.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-system-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-wishes.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\local-config-import-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\local-config-import-contracts.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\local-config-import-users.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\import\local-config-import.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-system.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-contract.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-project.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\local-config\local-config-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\services\taskService.ts" />
+    <TypeScriptCompile Include="app\components\home\home.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-hierarchy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\it-contract-plan.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-roles.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-systems.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-economy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-communication.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-handover.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-hierarchy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-stakeholders.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-goal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-modal.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-risk.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-roles.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-economy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-itsys.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-kle.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\it-project-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-catalog.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-details.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-kle.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\edit\it-system-edit.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-system-catalog.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\it-system-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-proj.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-kle.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-org.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-hierarchy.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-roles.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\it-system-usage.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-interfaces.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\structure\org-structure.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\org-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\overview\org-overview.controller.ts" />
+    <TypeScriptCompile Include="app\components\org\user\org-user.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-project\angularjs-dropdown-multiselect.directive.ts" />
+    <TypeScriptCompile Include="app\shared\hrefBlank.directive.ts" />
+    <TypeScriptCompile Include="app\shared\limitToDots.filter.ts" />
+    <TypeScriptCompile Include="app\utility\utility.ts" />
+    <TypeScriptCompile Include="app\services\httpBusyInterceptor.ts" />
+    <Content Include="Content\excel\OS2KITOS IT Kontrakter.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Brugere.xlsx" />
+    <Content Include="Content\excel\OS2KITOS Organisationsenheder.xlsx" />
+    <Content Include="Content\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\fonts\FontAwesome.otf" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Content\fonts\glyphicons-halflings-regular.woff2" />
+    <TypeScriptCompile Include="app\models\it-project\it-project-phase.ts" />
+    <Content Include="app\components\it-project\it-project-modal-create.view.html" />
+    <Content Include="app\components\org\user\org-user-delete.modal.view.html" />
+    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.view.html" />
+    <Content Include="app\components\it-system\it-interface\it-interface-edit-tab-main.view.html" />
+    <Content Include="Content\less\styles.less" />
+    <Content Include="Content\less\kitos.less" />
+    <Content Include="Content\less\variables.less" />
+    <Content Include="Content\notify\notify.less" />
+    <Content Include="Content\kendo.default.min.css" />
+    <Content Include="app\components\local-config\local-config-option-edit.modal.view.html" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <TypeScriptCompile Include="Tests\HomePage\Home.e2e.spec.ts" />
+    <None Include="Parameters.xml">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Scripts\angular-bundle.min.js" />
+    <Content Include="Scripts\app-bundle.min.js" />
+    <Content Include="Scripts\appReport-bundle.min.js" />
+    <Content Include="Scripts\library-bundle.min.js" />
+    <Content Include="Scripts\skins\lightgray\content.min.css" />
+    <Content Include="Scripts\skins\lightgray\skin.min.css" />
+    <EmbeddedResource Include="Scripts\SwaggerUICustom.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <None Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+      <IsTransformFile>True</IsTransformFile>
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Images\accent.png" />
+    <Content Include="Images\bullet.png" />
+    <Content Include="Images\heroAccent.png" />
+    <Content Include="Images\orderedList0.png" />
+    <Content Include="Images\orderedList1.png" />
+    <Content Include="Images\orderedList2.png" />
+    <Content Include="Images\orderedList3.png" />
+    <Content Include="Images\orderedList4.png" />
+    <Content Include="Images\orderedList5.png" />
+    <Content Include="Images\orderedList6.png" />
+    <Content Include="Images\orderedList7.png" />
+    <Content Include="Images\orderedList8.png" />
+    <Content Include="Images\orderedList9.png" />
+    <Content Include="Views\_ViewStart.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\Home\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
+      <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
+      <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
+      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
+      <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
+      <Name>Core.DomainServices</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
+      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
+      <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
+      <Project>{5AE358F5-4F11-47FE-94BE-1588F357DCDC}</Project>
+      <Name>Infrastructure.OpenXML</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Tests\Models\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptModuleKind>commonjs</TypeScriptModuleKind>
+  </PropertyGroup>
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <SaveServerSettingsInUserFile>True</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+	   Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target> -->
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuild.Microsoft.VisualStudio.Web.targets.14.0.0.3\build\MSBuild.Microsoft.VisualStudio.Web.targets.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.targets" Condition="Exists('..\packages\Microsoft.TypeScript.MSBuild.2.0.6\build\Microsoft.TypeScript.MSBuild.targets')" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\WebApplications\Microsoft.WebApplication.targets" />
+</Project>

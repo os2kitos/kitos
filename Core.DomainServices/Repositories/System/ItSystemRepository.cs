@@ -21,6 +21,16 @@ namespace Core.DomainServices.Repositories.System
             _systemRepository = systemRepository;
         }
 
+        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters)
+        {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
+            return _systemRepository
+                .AsQueryable()
+                .ByOrganizationDataQueryParameters(parameters);
+        }
+
         public IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters)
         {
             if (parameters == null)
@@ -28,10 +38,7 @@ namespace Core.DomainServices.Repositories.System
 
             var idsOfSystemsInUse = GetIdsOfSystemsInUse(parameters.ActiveOrganizationId);
 
-            return _systemRepository
-                .AsQueryable()
-                .ByOrganizationDataQueryParameters(parameters)
-                .ExceptEntitiesWithIds(idsOfSystemsInUse);
+            return GetSystems(parameters).ExceptEntitiesWithIds(idsOfSystemsInUse);
         }
 
         public IQueryable<ItSystem> GetSystemsInUse(int organizationId)

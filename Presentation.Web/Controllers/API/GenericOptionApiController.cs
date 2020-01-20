@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security;
-using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainServices;
 
@@ -11,8 +10,8 @@ namespace Presentation.Web.Controllers.API
     public abstract class GenericOptionApiController<TModel, TReference, TDto> : GenericApiController<TModel, TDto>
         where TModel : OptionEntity<TReference>
     {
-        protected GenericOptionApiController(IGenericRepository<TModel> repository, IAuthorizationContext authorizationContext = null)
-            : base(repository, authorizationContext)
+        protected GenericOptionApiController(IGenericRepository<TModel> repository)
+            : base(repository)
         {
         }
 
@@ -25,9 +24,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable().Where(t => t.IsSuggestion);
+                var items = Repository
+                    .AsQueryable()
+                    .Where(t => t.IsSuggestion)
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .Select(Map);
 
-                return Ok(Map(items));
+                return Ok(items);
             }
             catch (Exception e)
             {
@@ -39,9 +43,14 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var items = Repository.AsQueryable().Where(t => !t.IsSuggestion);
+                var items = Repository
+                    .AsQueryable()
+                    .Where(t => !t.IsSuggestion)
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .Select(Map);
 
-                return Ok(Map(items));
+                return Ok(items);
             }
             catch (Exception e)
             {
@@ -51,7 +60,7 @@ namespace Presentation.Web.Controllers.API
 
         protected override TModel PutQuery(TModel item)
         {
-            if (!item.IsSuggestion && !AllowModify(item)) 
+            if (!item.IsSuggestion && !AllowModify(item))
                 throw new SecurityException();
 
             return base.PutQuery(item);

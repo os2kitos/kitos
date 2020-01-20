@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contract\ItContractTest.cs" />
-    <Compile Include="Interfaces\ItInterfaceUsageTests.cs" />
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />

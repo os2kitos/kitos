@@ -14,8 +14,10 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IOrgUnitService _orgUnitService;
 
-        public OrganizationUnitRightController(IGenericRepository<OrganizationUnitRight> rightRepository,
-            IGenericRepository<OrganizationUnit> objectRepository, IOrgUnitService orgUnitService)
+        public OrganizationUnitRightController(
+            IGenericRepository<OrganizationUnitRight> rightRepository,
+            IGenericRepository<OrganizationUnit> objectRepository, 
+            IOrgUnitService orgUnitService)
             : base(rightRepository, objectRepository)
         {
             _orgUnitService = orgUnitService;
@@ -55,28 +57,6 @@ namespace Presentation.Web.Controllers.API
             }
         }
 
-        /// <summary>
-        /// Returns all colllecteds rights for an organization unit and all sub units for a specific user
-        /// </summary>
-        /// <param name="orgId">Id of the unit</param>
-        /// <param name="userId">Id of the user</param>
-        /// <returns>List of rights</returns>
-        public HttpResponseMessage GetRightsForUser(int orgId, int userId)
-        {
-            try
-            {
-                var theRights = GetOrganizationRights(orgId).Where(r => r.UserId == userId).ToList();
-
-                var dtos = AutoMapper.Mapper.Map<ICollection<OrganizationUnitRight>, ICollection<RightOutputDTO>>(theRights);
-
-                return Ok(dtos);
-            }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
-        }
-
         private List<OrganizationUnitRight> GetOrganizationRights(int id)
         {
             var orgUnits = _orgUnitService.GetSubTree(id);
@@ -86,7 +66,7 @@ namespace Presentation.Web.Controllers.API
             {
                 theRights.AddRange(GetRightsQuery(orgUnit.Id));
             }
-            return theRights;
+            return theRights.Where(AllowRead).ToList();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Swagger
                 Assert.Equal(HttpStatusCode.OK, result.StatusCode);
                 var doc = await result.ReadResponseBodyAsAsync<SwaggerDoc>();
                 Assert.Equal("2.0", doc.Swagger);
-                Assert.Equal(url.Host, doc.Host);
+                Assert.Equal(url.Authority, doc.Host);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.DomainModel;
+using Core.DomainModel.Constants;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;
@@ -9,22 +10,21 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    public class AssignmentController : GenericContextAwareApiController<Assignment, AssignmentDTO>
+    public class AssignmentController : GenericApiController<Assignment, AssignmentDTO>
     {
         private readonly IItProjectRepository _projectRepository;
 
         public AssignmentController(
             IGenericRepository<Assignment> repository,
-            IItProjectRepository projectRepository,
-            IAuthorizationContext authorizationContext)
-            : base(repository, authorizationContext)
+            IItProjectRepository projectRepository)
+            : base(repository)
         {
             _projectRepository = projectRepository;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<Assignment>(x => _projectRepository.GetById(x.AssociatedItProjectId.GetValueOrDefault(-1)), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<Assignment, ItProject>(x => _projectRepository.GetById(x.AssociatedItProjectId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
         }
     }
 }

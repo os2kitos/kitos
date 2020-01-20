@@ -2,6 +2,7 @@
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Model.Result;
 using Serilog;
 
 namespace Core.ApplicationServices.Interface.ExhibitUsage
@@ -22,30 +23,30 @@ namespace Core.ApplicationServices.Interface.ExhibitUsage
             _authorizationContext = authorizationContext;
         }
 
-        public OperationResult Delete(int systemUsageId, int interfaceExhibitId)
+        public Result<ItInterfaceExhibitUsage, OperationFailure> Delete(int systemUsageId, int interfaceExhibitId)
         {
             var key = ItInterfaceExhibitUsage.GetKey(systemUsageId, interfaceExhibitId);
             var interfaceExhibitUsageToBeDeleted = _itInterfaceExhibitUsageRepository.GetByKey(key);
             if (interfaceExhibitUsageToBeDeleted == null)
             {
                 _logger.Error($"Could not find interface exhibit usage with key {key}");
-                return OperationResult.NotFound;
+                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.NotFound);
             }
 
             if (!AllowDelete(interfaceExhibitUsageToBeDeleted))
             {
-                return OperationResult.Forbidden;
+                return Result<ItInterfaceExhibitUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             _itInterfaceExhibitUsageRepository.Delete(interfaceExhibitUsageToBeDeleted);
             _itInterfaceExhibitUsageRepository.Save();
-            return OperationResult.Ok;
+            return Result<ItInterfaceExhibitUsage, OperationFailure>.Success(interfaceExhibitUsageToBeDeleted);
         }
 
         private bool AllowDelete(ItInterfaceExhibitUsage interfaceExhibitUsageToBeDeleted)
         {
             //ExhibitUsage belongs to a contract, hence a deletion is a modification of the contract
-            return interfaceExhibitUsageToBeDeleted.ItContract == null || 
+            return interfaceExhibitUsageToBeDeleted.ItContract == null ||
                    _authorizationContext.AllowModify(interfaceExhibitUsageToBeDeleted.ItContract);
         }
     }

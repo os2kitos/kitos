@@ -146,7 +146,9 @@
     <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\KLEUpdateHistoryItemRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
-    <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
+    <Compile Include="ApplicationServices\Model\ResultTest.cs" />
+    <Compile Include="DomainServices\MaybeTest.cs" />
+    <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +176,10 @@
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>

@@ -4,8 +4,8 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Hosting;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainServices;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
@@ -20,10 +20,9 @@ namespace Tests.Unit.Presentation.Web.Helpers
 
         protected virtual void SetupControllerFrorTest(BaseApiController sut)
         {
-            var userRepository = new Mock<IGenericRepository<User>>();
-            sut.UserRepository = userRepository.Object;
-
             //Set request context
+            var userMock = new Mock<IOrganizationalUserContext>();
+            sut.UserContext = userMock.Object;
             var httpRequestMessage = new HttpRequestMessage();
             var httpRequestContext = new HttpRequestContext
             {
@@ -40,18 +39,13 @@ namespace Tests.Unit.Presentation.Web.Helpers
             var principal = new Mock<IPrincipal>();
             principal.Setup(x => x.Identity).Returns(identity.Object);
             sut.User = principal.Object;
+            CurrentOrganizationId = A<int>();
             KitosUser = new User
             {
                 DefaultOrganizationId = A<int>()
             };
-            userRepository.Setup(x => x.GetByKey(userId)).Returns(KitosUser);
-
-            //Set authenticated user
-            var authService = new Mock<IAuthenticationService>();
-            CurrentOrganizationId = A<int>();
-            authService.Setup(x => x.GetCurrentOrganizationId(userId)).Returns(CurrentOrganizationId);
-            sut.AuthenticationService = authService.Object;
-
+            userMock.Setup(x => x.UserEntity).Returns(KitosUser);
+            userMock.Setup(x => x.ActiveOrganizationId).Returns(CurrentOrganizationId);
         }
 
         protected T ExpectResponseOf<T>(HttpResponseMessage message)

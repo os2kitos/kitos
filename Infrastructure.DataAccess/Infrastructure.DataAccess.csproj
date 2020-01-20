@@ -515,9 +515,15 @@
     <Compile Include="Migrations\202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.Designer.cs">
       <DependentUpon>202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.cs" />
+    <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.Designer.cs">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
+    <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
+    <Compile Include="Services\WithinAmbienTransaction.cs" />
     <Compile Include="Services\TransactionManager.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="TypeMapping.cs" />
@@ -821,6 +827,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.resx">
       <DependentUpon>202001171239420_TaskRef-Char-Limit-And-Index-On-TaskKey-Index-On-Uuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.resx">
+      <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
