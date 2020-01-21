@@ -3,8 +3,9 @@
     app.factory("csrfRequestInterceptor", ["$cookies", "$injector", "$q", ($cookies: ng.cookies.ICookiesService, $injector: ng.auto.IInjectorService, $q: ng.IQService) => ({
         request(config) {
 
-            const isNonMutating = (requestConfig: any) => {
-                return requestConfig.method === "GET" || requestConfig.method === "HEAD" || requestConfig.method === "OPTIONS";
+            const isMutating = (requestConfig: any) => {
+                var method = requestConfig.method;
+                return method === "POST" || method === "PATCH" || method === "DELETE" || method === "PUT";
             };
 
             var getHiddenFieldValue = () : string => {
@@ -25,7 +26,7 @@
                 return requestConfig;
             }
 
-            if (isNonMutating(config)) {
+            if (!isMutating(config)) {
                 return config;
             }
 
