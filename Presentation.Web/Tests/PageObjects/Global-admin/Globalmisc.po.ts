@@ -35,9 +35,7 @@ class GlobalMisc implements PageObject {
     }
 
     public waitForStatusText(text: string) {
-
-        let condition = this.ec.textToBePresentInElementValue(element(this.byDataElementType(this.consts.kleStatusLabel)), text);
-
+        let condition = this.ec.textToBePresentInElement(element(this.byDataElementType(this.consts.kleStatusLabel)), text);
         return browser.wait(condition, waitUpTo.twoMinutes);
     }
 }
