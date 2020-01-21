@@ -89,26 +89,21 @@
         $scope.UpdateKLE = function () {
             toggleKleButtonsClickAbility(false, false);
             if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
-                angular.element("body").append('<div id="overlay" style="background-color:grey;position:absolute;top:0;left:0;height:100%;width:100%;z-index:99999;opacity:0.9;text-align:center;justify-content: center;flex-direction: column;display: flex;"><h1 id=loadingDots>Opdaterer KLE vent venligst</h1></div>');
-                var animation = setInterval(updateAnimationStart, 1000);
                 KLEservice.applyUpdateKLE().
                     success((data, status) => {
                         if (status !== 200) {
                             toggleKleButtonsClickAbility(true, false);
-                            clearInterval(animation);
                             angular.element(document.getElementById("overlay")).remove();
                             notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                             return;
                         }
                         notify.addSuccessMessage("KLE er opdateret");
-                        clearInterval(animation);
                         angular.element(document.getElementById("overlay")).remove();
                         getKleStatus();
                     }).
                     error(() => {
                         toggleKleButtonsClickAbility(true, false);
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
-                        clearInterval(animation);
                         angular.element(document.getElementById("overlay")).remove();
                     });
             } else {
@@ -121,21 +116,5 @@
             $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
             $scope.KleApplyUpdateButtonInteraction = updateButton;
         }
-
-        function updateAnimationStart() {
-
-            var loading = document.getElementById("loadingDots");
-
-            if (loading.innerHTML.length > 29) {
-                loading.innerHTML = "Opdaterer KLE vent venligst";
-            }
-            else {
-                loading.innerText += ".";
-            }
-
-
-        }
-
-
     }]);
 })(angular, app);
