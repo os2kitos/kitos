@@ -5,9 +5,9 @@
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        public static $inject: string[] = ["$scope", "$http", "notify", "$timeout", "_"];
+        public static $inject: string[] = ["$scope", "$http", "notify", "$timeout", "_","exportGridToExcelService"];
 
-        constructor(private $scope, private $http, private notify, private $timeout, private _) {
+        constructor(private $scope, private $http, private notify, private $timeout, private _, private exportGridToExcelService) {
             this.mainGridOptions = {
                 dataSource: {
                     type: "odata-v4",
@@ -135,72 +135,10 @@
             }
         }
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide columns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                const sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (let rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    const row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    const dataItem = e.data[rowIndex - 1];
-
-                    for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        const cell = row.cells[columnIndex];
-                        const template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loading bar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-            }
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
-        private getTemplateMethod(column) {
-            let template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = (column.template as Function);
-            } else if (typeof column.template === "string") {
-                template = kendo.template(column.template as string);
-            } else {
-                template = t => t;
-            }
-
-            return template;
-        }
     }
 
     angular

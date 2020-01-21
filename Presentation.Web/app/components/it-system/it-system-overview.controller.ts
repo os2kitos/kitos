@@ -35,7 +35,8 @@
             "user",
             "gridStateService",
             "orgUnits",
-            "needsWidthFixService"
+            "needsWidthFixService",
+            "exportGridToExcelService"
         ];
 
         constructor(
@@ -53,7 +54,8 @@
             private user,
             private gridStateService: Services.IGridStateFactory,
             private orgUnits: Array<any>,
-            private needsWidthFixService) {
+            private needsWidthFixService,
+            private exportGridToExcelService) {
             $rootScope.page.title = "IT System - Overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
@@ -946,22 +948,6 @@
             return concatRoles;
         }
 
-        private getTemplateMethod(column) {
-            var template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = <Function>column.template;
-            } else if (typeof column.template === "string") {
-                template = kendo.template(<string>column.template);
-            } else {
-                template = t => t;
-            }
-
-            return template;
-        }
-
         private isContractActive(dataItem) {
             if (!dataItem.Active) {
                 var today = moment();
@@ -1112,57 +1098,8 @@
             }
         };
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItSystemUsageOverview>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide coloumns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                var sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (var rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    var row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    var dataItem = e.data[rowIndex - 1];
-
-                    for (var columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        var cell = row.cells[columnIndex];
-
-                        var template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loadingbar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-                this.needsWidthFixService.fixWidth();
-            }
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
     }
 
