@@ -62,7 +62,7 @@ namespace Tests.Integration.Presentation.Web.Security
             using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/itsystem"), cookie, itSystem))
             {
                 //Assert
-                Assert.Equal(HttpStatusCode.BadRequest, httpResponse.StatusCode);
+                Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
             }
         }
     }
