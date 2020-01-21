@@ -47,6 +47,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="ExpectedObjects, Version=2.3.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExpectedObjects.2.3.4\lib\net40\ExpectedObjects.dll</HintPath>
+    </Reference>
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
     </Reference>
@@ -96,6 +99,8 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Interfaces\ItInterfaceUsageTests.cs" />
     <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
+    <Compile Include="KLE\TaskRefIntegrityInput.cs" />
+    <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
@@ -111,6 +116,7 @@
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
     <Compile Include="Tools\AuthorizationHelper.cs" />
+    <Compile Include="Tools\DatabaseAccess.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
@@ -136,12 +142,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
+      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
+      <Name>Core.DomainServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
       <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
