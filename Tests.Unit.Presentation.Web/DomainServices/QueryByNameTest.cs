@@ -26,8 +26,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.Equal(2, result.Count);
-            Assert.True(result.Contains(included1));
-            Assert.True(result.Contains(included2));
+            Assert.Contains(included1, result);
+            Assert.Contains(included2, result);
         }
 
         private ItSystem CreateItSystem(string name)

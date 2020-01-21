@@ -51,7 +51,7 @@ namespace Core.ApplicationServices.Interface.Usage
             if (contract == null)
             {
                 _logger.Error("Contract with id: {id} not found. Cannot create interface usage", contractId);
-                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.BadInput);
+                return Result<ItInterfaceUsage, OperationFailure>.Failure(OperationFailure.BadRequest);
             }
 
             if (!AllowCreateInterfaceUsageIn(contract))

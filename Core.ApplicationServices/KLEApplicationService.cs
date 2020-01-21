@@ -29,8 +29,7 @@ namespace Core.ApplicationServices
             {
                 return Result<KLEStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
-            var lastUpdated = _kleUpdateHistoryItemRepository.GetLastUpdated();
-            return Result<KLEStatus, OperationFailure>.Success(_kleStandardRepository.GetKLEStatus(lastUpdated));
+            return Result<KLEStatus, OperationFailure>.Success(GetKLEStatusFromLastUpdated());
         }
 
         public Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary()
@@ -48,10 +47,24 @@ namespace Core.ApplicationServices
             {
                 return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
-
+            if (GetKLEStatusFromLastUpdated().UpToDate)
+            {
+                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.BadRequest);
+            }
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);
             return Result<KLEUpdateStatus, OperationFailure>.Success(KLEUpdateStatus.Ok);
         }
+
+        #region Helpers
+
+        private KLEStatus GetKLEStatusFromLastUpdated()
+        {
+            var lastUpdated = _kleUpdateHistoryItemRepository.GetLastUpdated();
+            var status = _kleStandardRepository.GetKLEStatus(lastUpdated);
+            return status;
+        }
+
+        #endregion
     }
 }

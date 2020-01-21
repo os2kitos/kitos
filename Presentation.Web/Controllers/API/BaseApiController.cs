@@ -153,7 +153,7 @@ namespace Presentation.Web.Controllers.API
         {
             switch (failure)
             {
-                case OperationFailure.BadInput:
+                case OperationFailure.BadRequest:
                     return BadRequest();
                 case OperationFailure.NotFound:
                     return NotFound();

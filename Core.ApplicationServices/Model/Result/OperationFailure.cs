@@ -2,7 +2,7 @@
 {
     public enum OperationFailure
     {
-        BadInput,
+        BadRequest,
         NotFound,
         Forbidden,
         Conflict,

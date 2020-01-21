@@ -102,7 +102,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
             if (itSystemUsage == null)
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
+                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadRequest);
             }
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
@@ -113,7 +113,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             var toItSystem = _systemRepository.GetSystem(toSystemId);
             if (toItSystem == null)
             {
-                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadInput);
+                return Result<ItSystemUsageMigration, OperationFailure>.Failure(OperationFailure.BadRequest);
             }
             if (!_authorizationContext.AllowReads(toItSystem))
             {

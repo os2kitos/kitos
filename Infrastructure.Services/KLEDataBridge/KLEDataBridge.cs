@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Configuration;
+using System.IO;
 using System.Net;
 using System.Xml.Linq;
+using Infrastructure.Services.Properties;
 
 namespace Infrastructure.Services.KLEDataBridge
 {
@@ -9,7 +11,7 @@ namespace Infrastructure.Services.KLEDataBridge
         public XDocument GetKLEXMLData()
         {
             using (var client = new WebClient())
-            using (var stream = client.OpenRead("http://api.kle-online.dk/resources/kle/emneplan?uuid=true"))
+            using (var stream = client.OpenRead(Settings.Default.KLEOnlineUrl + "/emneplan?uuid=true"))
             using (var reader = new StreamReader(stream))
             {
                 return XDocument.Load(reader);

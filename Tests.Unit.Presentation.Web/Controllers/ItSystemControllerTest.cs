@@ -134,7 +134,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
 
         [Theory]
         [InlineData(OperationFailure.Conflict, HttpStatusCode.Conflict)]
-        [InlineData(OperationFailure.BadInput, HttpStatusCode.BadRequest)]
+        [InlineData(OperationFailure.BadRequest, HttpStatusCode.BadRequest)]
         [InlineData(OperationFailure.UnknownError, HttpStatusCode.InternalServerError)]
         public void GetUsingOrganizations_Returns_Failed_OperationResult(OperationFailure operationResult, HttpStatusCode expectedStatusCode)
         {

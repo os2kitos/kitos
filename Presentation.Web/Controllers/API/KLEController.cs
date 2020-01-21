@@ -19,6 +19,10 @@ namespace Presentation.Web.Controllers.API
     [RoutePrefix("api/v1/kle")]
     public class KLEController : BaseApiController
     {
+        private const string KLETypeColumnName = "Type";
+        private const string KLETaskKeyColumnName = "TaskKey";
+        private const string KLEDescriptionColumnName = "Description";
+        private const string KLEChangeColumnName = "Change";
         private readonly IKLEApplicationService _kleApplicationService;
 
         public KLEController(IKLEApplicationService kleApplicationService)
@@ -32,20 +36,14 @@ namespace Presentation.Web.Controllers.API
         {
             var result = _kleApplicationService.GetKLEStatus();
 
-            switch (result.Ok)
-            {
-                case false:
-                    return Forbidden();
-                case true:
-                    return Ok(
-                        new KLEStatusDTO
-                        {
-                            UpToDate = result.Value.UpToDate,
-                            Version = result.Value.Published.ToString("dd-MM-yyyy")
-                        });
-                default:
-                    return Error($"Something went wrong getting KLE status");
-            }
+            return result.Ok ?
+                Ok(
+                    new KLEStatusDTO
+                    {
+                        UpToDate = result.Value.UpToDate,
+                        Version = result.Value.Published.ToString("dd-MM-yyyy")
+                    }) :
+                FromOperationFailure(result.Error);
         }
 
         [HttpGet]
@@ -53,21 +51,13 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetKLEChanges()
         {
             var result = _kleApplicationService.GetKLEChangeSummary();
+            if (!result.Ok) return FromOperationFailure(result.Error);
+            
+            var list = new List<dynamic>();
+            CreateCsvHeader(list);
+            CreateCsvChangeDescriptions(list, result.Value);
 
-            switch (result.Ok)
-            {
-                case false:
-                    return Forbidden();
-                case true:
-                {
-                    var list = new List<dynamic>();
-                    CreateCsvHeader(list);
-                    CreateCsvChangeDescriptions(list, result.Value);
-                    return CreateCsvFormattedHttpResponse(list);
-                }
-                default:
-                    return Error($"Something went wrong getting KLE status");
-            }
+            return CreateCsvFormattedHttpResponse(list);
         }
 
         [HttpPut]
@@ -75,20 +65,14 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PutKLEChanges()
         {
             var result = _kleApplicationService.UpdateKLE();
-            switch (result.Ok)
-            {
-                case false:
-                    return Forbidden();
-                case true:
-                {
-                    return Ok(new KLEUpdateDTO
+            
+            return result.Ok ? 
+                Ok(
+                    new KLEUpdateDTO
                     {
                         Status = result.Value
-                    });
-                }
-                default:
-                    return Error($"Something went wrong updating KLE values");
-            }
+                    }) :
+                FromOperationFailure(result.Error);
         }
 
         #region Helpers
@@ -96,10 +80,10 @@ namespace Presentation.Web.Controllers.API
         private static void CreateCsvHeader(ICollection<dynamic> list)
         {
             var header = new ExpandoObject() as IDictionary<string, object>;
-            header.Add("Type", "KLE Type");
-            header.Add("TaskKey", "KLE nummer");
-            header.Add("Description", "Beskrivelse");
-            header.Add("Change", "Ændring");
+            header.Add(KLETypeColumnName, "KLE Type");
+            header.Add(KLETaskKeyColumnName, "KLE nummer");
+            header.Add(KLEDescriptionColumnName, "Beskrivelse");
+            header.Add(KLEChangeColumnName, "Ændring");
             list.Add(header);
         }
 
@@ -109,10 +93,10 @@ namespace Presentation.Web.Controllers.API
             foreach (var elem in relevantChanges)
             {
                 var obj = new ExpandoObject() as IDictionary<string, object>;
-                obj.Add("Type", elem.Type);
-                obj.Add("TaskKey", elem.TaskKey);
-                obj.Add("Description", elem.UpdatedDescription);
-                obj.Add("Change", ChangeTypeToString(elem.ChangeType));
+                obj.Add(KLETypeColumnName, elem.Type);
+                obj.Add(KLETaskKeyColumnName, elem.TaskKey);
+                obj.Add(KLEDescriptionColumnName, elem.UpdatedDescription);
+                obj.Add(KLEChangeColumnName, ChangeTypeToString(elem.ChangeType));
                 list.Add(obj);
             };
         }

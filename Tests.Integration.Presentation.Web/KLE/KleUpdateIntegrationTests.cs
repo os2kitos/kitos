@@ -452,7 +452,7 @@ namespace Tests.Integration.Presentation.Web.KLE
             VerifyTaskRefIntegrity(expectedTaskRefs);
         }
 
-        public void ClearUUID(TaskRef taskRef)
+        private void ClearUUID(TaskRef taskRef)
         {
             taskRef.Uuid = Guid.Empty;
         }

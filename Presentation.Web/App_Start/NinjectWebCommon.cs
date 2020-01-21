@@ -140,12 +140,12 @@ namespace Presentation.Web
 
         private static void RegisterKLE(IKernel kernel)
         {
-            kernel.Bind<IKLEApplicationService>().To<KLEApplicationService>();
-            kernel.Bind<IKLEStandardRepository>().To<KLEStandardRepository>();
-            kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>();
-            kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>();
-            kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>();
-            kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>();
+            kernel.Bind<IKLEApplicationService>().To<KLEApplicationService>().InRequestScope();
+            kernel.Bind<IKLEStandardRepository>().To<KLEStandardRepository>().InRequestScope();
+            kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>().InRequestScope();
+            kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InRequestScope();
+            kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InRequestScope();
+            kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InRequestScope();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

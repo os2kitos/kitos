@@ -25,10 +25,10 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.Equal(3, result.Count);
-            Assert.True(result.Contains(included1));
-            Assert.True(result.Contains(included2));
-            Assert.True(result.Contains(included3));
-        }
+            Assert.Contains(included1, result);
+            Assert.Contains(included2, result);
+            Assert.Contains(included3, result);
+        }                            
 
         private ItSystem CreateItSystem(string name)
         {

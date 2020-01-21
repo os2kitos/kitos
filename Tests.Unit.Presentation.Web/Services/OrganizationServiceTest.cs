@@ -90,7 +90,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.BadInput, result.Error);
+            Assert.Equal(OperationFailure.BadRequest, result.Error);
         }
 
         [Theory]
