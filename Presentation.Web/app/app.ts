@@ -131,7 +131,7 @@ app.run([
             userService.logout().then(() => {
                 $rootScope.changingOrganization = false;
                 $state.go("index");
-                $cookies.remove("XSRF-TOKEN");
+                $cookies.remove(Kitos.Constants.CSRF.CSRFCookie);
             });
         };
 

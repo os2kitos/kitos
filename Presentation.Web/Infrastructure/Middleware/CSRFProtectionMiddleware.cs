@@ -6,6 +6,8 @@ using Core.ApplicationServices.Authentication;
 using Microsoft.Owin;
 using Ninject;
 using Presentation.Web.Extensions;
+using Presentation.Web.Helpers;
+using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
@@ -15,12 +17,10 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
-        private const string XsrfHeader = "X-XSRF-TOKEN";
-        private const string XsrfCookie = "XSRF-TOKEN";
-
         public override async Task Invoke(IOwinContext context)
         {
             var kernel = context.GetNinjectKernel();
+            var logger = kernel.Get<ILogger>();
             var authenticationContext = kernel.Get<IAuthenticationContext>();
             if (authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
@@ -28,27 +28,26 @@ namespace Presentation.Web.Infrastructure.Middleware
                 return;
             }
 
-            if (context.Request.Method.IsGet())
+            if (!context.Request.Method.IsMutation())
             {
                 await Next.Invoke(context);
                 return;
             }
 
-
             var headers = context.Request.Headers;
-            if (!headers.TryGetValue(XsrfHeader, out var xsrfToken))
+            if (!headers.TryGetValue(Constants.CSRFValues.HeaderName, out var xsrfToken))
             {
                 context.Response.StatusCode = 400;
-                context.Response.Write("Manglende xsrf header");
+                context.Response.Write(Constants.CSRFValues.MissingXsrfHeaderError);
                 return;
             }
 
             var tokenHeaderValue = xsrfToken.First();
-            var tokenCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == XsrfCookie);
+            var tokenCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == Constants.CSRFValues.CookieName);
             if (tokenCookie.Value == null)
             {
                 context.Response.StatusCode = 400;
-                context.Response.Write("Manglende xsrf cookie");
+                context.Response.Write(Constants.CSRFValues.MissingXsrfCookieError);
                 return;
             }
 
@@ -60,7 +59,8 @@ namespace Presentation.Web.Infrastructure.Middleware
             catch (HttpAntiForgeryException e)
             {
                 context.Response.StatusCode = 400;
-                context.Response.Write(e.Message);
+                logger.Error(e.Message);
+                context.Response.Write(Constants.CSRFValues.XsrfValidationFailedError);
             }
 
 

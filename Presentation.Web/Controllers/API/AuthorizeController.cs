@@ -17,6 +17,7 @@ using System.Web;
 using System.Web.Helpers;
 using Core.ApplicationServices.Organizations;
 using Newtonsoft.Json;
+using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -266,7 +267,7 @@ namespace Presentation.Web.Controllers.API
         {
             var response = new HttpResponseMessage(HttpStatusCode.OK);
 
-            var cookie = HttpContext.Current.Request.Cookies["XSRF-TOKEN"];
+            var cookie = HttpContext.Current.Request.Cookies[Constants.CSRFValues.CookieName];
 
             AntiForgery.GetTokens(cookie == null ? "" : cookie.Value, out var cookieToken, out var formToken);
 
@@ -276,9 +277,9 @@ namespace Presentation.Web.Controllers.API
             {
                 response.Headers.AddCookies(new[]
                 {
-                    new CookieHeaderValue("XSRF-TOKEN", cookieToken)
+                    new CookieHeaderValue(Constants.CSRFValues.CookieName, cookieToken)
                     {
-                        Expires = DateTimeOffset.Now.AddMinutes(10),
+                        Expires = DateTimeOffset.Now.AddMinutes(Constants.CSRFValues.CookieExpirationMinutes),
                         Path = "/"
                     }
                 });

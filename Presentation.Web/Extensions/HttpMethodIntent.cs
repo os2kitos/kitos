@@ -20,10 +20,5 @@
             }
         }
 
-        public static bool IsGet(this string method)
-        {
-            return method.ToLowerInvariant() == "get";
-        }
-
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
+using Presentation.Web.Helpers;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -76,7 +77,6 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         private static async Task<HttpResponseMessage> SendWithCookieAsync(Cookie cookie, HttpRequestMessage requestMessage)
         {
-            //Make sure state does not bleed into stateless handler
             return await SendWithCSRFToken(requestMessage, cookie);
         }
 
@@ -84,7 +84,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Cookie authCookie = null)
         {
             var csrfToken = await GetCSRFToken(authCookie);
-            requestMessage.Headers.Add("X-XSRF-TOKEN", csrfToken.FormToken);
+            requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
 
             var cookieContainer = new CookieContainer();
             if (authCookie != null)
@@ -98,7 +98,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        private static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
+        public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/antiforgery");
             var csrfRequest = new HttpRequestMessage(HttpMethod.Get, url);
@@ -123,7 +123,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
             var cookieParts = csrfResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
-            var cookie = new Cookie("XSRF-TOKEN", cookieParts[1].Split(';')[0], "/", url.Host);
+            var cookie = new Cookie(Constants.CSRFValues.CookieName, cookieParts[1].Split(';')[0], "/", url.Host);
             return new CSRFTokenDTO
             {
                 CookieToken = cookie,
@@ -135,7 +135,6 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var requestMessage = CreatePostMessage(url, body);
             return SendWithCSRFToken(requestMessage);
-            //return StatelessHttpClient.SendAsync(requestMessage);
         }
 
         private static HttpRequestMessage CreatePostMessage(Uri url, object body)

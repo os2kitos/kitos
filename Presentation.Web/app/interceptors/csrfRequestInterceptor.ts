@@ -2,26 +2,31 @@
 ((ng, app) => {
     app.factory("csrfRequestInterceptor", ["$cookies", "$injector", "$q", ($cookies: ng.cookies.ICookiesService, $injector: ng.auto.IInjectorService, $q: ng.IQService) => ({
         request(config) {
-            if (config.method === "GET") {
-                return config;
-            }
 
-            var getHiddenFieldValue = () => {
-                return angular.element("input[id='__RequestVerificationToken']").val();
-            }
+            const isNonMutating = (requestConfig: any) => {
+                return requestConfig.method === "GET" || requestConfig.method === "HEAD" || requestConfig.method === "OPTIONS";
+            };
+
+            var getHiddenFieldValue = () : string => {
+                return angular.element(`input[id='${Kitos.Constants.CSRF.HiddenFieldName}']`).val();
+            };
 
             var setHiddenFieldValue = (updatedHiddenValue: string) => {
-                (document.getElementById("__RequestVerificationToken") as HTMLInputElement).value = updatedHiddenValue;
+                (document.getElementById(Kitos.Constants.CSRF.HiddenFieldName) as HTMLInputElement).value = updatedHiddenValue;
             }
 
-            var shouldUpdate = () => {
-                const cookie = $cookies.get("XSRF-TOKEN");
+            const shouldUpdate = () => {
+                const cookie = $cookies.get(Kitos.Constants.CSRF.CSRFCookie);
                 return cookie == null || getHiddenFieldValue() === "";
-            }
+            };
 
             var prepareConfig = (requestConfig: any) => {
-                requestConfig.headers["X-XSRF-TOKEN"] = getHiddenFieldValue();
+                requestConfig.headers[Kitos.Constants.CSRF.CSRFHeader] = getHiddenFieldValue();
                 return requestConfig;
+            }
+
+            if (isNonMutating(config)) {
+                return config;
             }
 
             if (shouldUpdate()) {
