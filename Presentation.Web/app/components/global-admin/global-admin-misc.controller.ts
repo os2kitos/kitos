@@ -16,7 +16,7 @@
         $rootScope.page.title = "Andet";
         getKleStatus();
         function getKleStatus() {
-            $scope.KLEUpdateAvailableLabel = "Tjekker efter ny version af KLE";
+            $scope.KLEUpdateAvailableLabel = "Undersøger om der er en ny version af KLE...";
             toggleKleButtonsClickAbility(false, false);
             KLEservice.getStatus().success(function (dto, status) {
                     if (status !== 200) {
@@ -87,30 +87,34 @@
         }
 
         $scope.UpdateKLE = function () {
+            toggleKleButtonsClickAbility(false, false);
             if (confirm("Sikker på at du vil opdatere KLE til nyeste version?")) {
                 KLEservice.applyUpdateKLE().
                     success((data, status) => {
                         if (status !== 200) {
-                            toggleKleButtonsClickAbility(true,false);
+                            toggleKleButtonsClickAbility(true, false);
+                            angular.element(document.getElementById("overlay")).remove();
                             notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
                             return;
                         }
                         notify.addSuccessMessage("KLE er opdateret");
+                        angular.element(document.getElementById("overlay")).remove();
                         getKleStatus();
                     }).
                     error(() => {
                         toggleKleButtonsClickAbility(true, false);
                         notify.addErrorMessage("Der skete en fejl under opdatering af KLE");
+                        angular.element(document.getElementById("overlay")).remove();
                     });
             } else {
                 notify.addInfoMessage("KLE opdatering stoppet!");
             }
+            
         }
 
         function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
             $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
             $scope.KleApplyUpdateButtonInteraction = updateButton;
         }
-
     }]);
 })(angular, app);
