@@ -5,6 +5,8 @@ import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import PageObject = require("../IPageObject.po");
 import Constants = require("../../Utility/Constants");
+import WaitTimers = require("../../Utility/WaitTimers");
+var waitUpTo = new WaitTimers();
 
 class GlobalMisc implements PageObject {
     private navigationHelper = new NavigationHelper();
@@ -30,6 +32,11 @@ class GlobalMisc implements PageObject {
 
     public waitForElementToBecomeClickAble(elementWaitingFor: string) {
         return this.ec.presenceOf(element(this.byDataElementType(elementWaitingFor)));
+    }
+
+    public waitForStatusText(text: string) {
+        let condition = this.ec.textToBePresentInElement(element(this.byDataElementType(this.consts.kleStatusLabel)), text);
+        return browser.wait(condition, waitUpTo.twoMinutes);
     }
 }
 export = GlobalMisc;
