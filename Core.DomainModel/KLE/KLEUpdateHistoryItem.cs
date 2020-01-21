@@ -6,10 +6,8 @@ namespace Core.DomainModel.KLE
     {
         public DateTime Version { get; set; }
 
-        private KLEUpdateHistoryItem()
-        {
-            //NOTE: For EF
-        }
+        // To keep EF happy
+        private KLEUpdateHistoryItem() {}
 
         public KLEUpdateHistoryItem(DateTime version, int userId)
         {

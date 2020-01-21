@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.KLE;
 
 namespace Core.ApplicationServices
@@ -23,35 +23,35 @@ namespace Core.ApplicationServices
             _kleUpdateHistoryItemRepository = kleUpdateHistoryItemRepository;
         }
 
-        public Result<OperationResult, KLEStatus> GetKLEStatus()
+        public Result<KLEStatus, OperationFailure> GetKLEStatus()
         {
             if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
             {
-                return Result<OperationResult, KLEStatus>.Fail(OperationResult.Forbidden);
+                return Result<KLEStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
             var lastUpdated = _kleUpdateHistoryItemRepository.GetLastUpdated();
-            return Result<OperationResult, KLEStatus>.Ok(_kleStandardRepository.GetKLEStatus(lastUpdated));
+            return Result<KLEStatus, OperationFailure>.Success(_kleStandardRepository.GetKLEStatus(lastUpdated));
         }
 
-        public Result<OperationResult, IEnumerable<KLEChange>> GetKLEChangeSummary()
+        public Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary()
         {
             if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
             {
-                return Result<OperationResult, IEnumerable<KLEChange>>.Fail(OperationResult.Forbidden);
+                return Result<IEnumerable<KLEChange>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
-            return Result<OperationResult, IEnumerable<KLEChange>>.Ok(_kleStandardRepository.GetKLEChangeSummary());
+            return Result<IEnumerable<KLEChange>, OperationFailure>.Success(_kleStandardRepository.GetKLEChangeSummary());
         }
 
-        public Result<OperationResult, KLEUpdateStatus> UpdateKLE()
+        public Result<KLEUpdateStatus, OperationFailure> UpdateKLE()
         {
             if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
             {
-                return Result<OperationResult, KLEUpdateStatus>.Fail(OperationResult.Forbidden);
+                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
 
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);
-            return Result<OperationResult, KLEUpdateStatus>.Ok(KLEUpdateStatus.Ok);
+            return Result<KLEUpdateStatus, OperationFailure>.Success(KLEUpdateStatus.Ok);
         }
     }
 }

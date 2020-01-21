@@ -198,6 +198,7 @@
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
                 excelExport: this.exportToExcel,
+                page: this.onPaging,
                 columns: [
                     {
                         field: "ItInterfaceId", title: "Snitflade ID", width: 120,
@@ -543,6 +544,11 @@
         // saves grid state to localStorage
         private saveGridOptions = () => {
             this.gridState.saveGridOptions(this.mainGrid);
+        }
+
+        // Resets the position of the scrollbar
+        private onPaging = () => {
+            Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
         // loads kendo grid options from localstorage

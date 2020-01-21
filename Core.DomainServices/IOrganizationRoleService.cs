@@ -6,9 +6,9 @@ namespace Core.DomainServices
 {
     public interface IOrganizationRoleService
     {
-        OrganizationRight MakeUser(User user, Organization organization, User kitosUser);
+        OrganizationRight MakeUser(User user, Organization organization);
 
-        OrganizationRight MakeLocalAdmin(User user, Organization organization, User kitosUser);
+        OrganizationRight MakeLocalAdmin(User user, Organization organization);
 
         IEnumerable<OrganizationRole> GetRolesInOrganization(User user, int organizationId);
     }

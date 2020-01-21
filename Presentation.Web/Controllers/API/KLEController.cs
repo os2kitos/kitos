@@ -9,8 +9,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -23,7 +21,7 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IKLEApplicationService _kleApplicationService;
 
-        public KLEController(IAuthorizationContext authorizationContext, IKLEApplicationService kleApplicationService) : base(authorizationContext)
+        public KLEController(IKLEApplicationService kleApplicationService)
         {
             _kleApplicationService = kleApplicationService;
         }
@@ -34,11 +32,11 @@ namespace Presentation.Web.Controllers.API
         {
             var result = _kleApplicationService.GetKLEStatus();
 
-            switch (result.Status)
+            switch (result.Ok)
             {
-                case OperationResult.Forbidden:
+                case false:
                     return Forbidden();
-                case OperationResult.Ok:
+                case true:
                     return Ok(
                         new KLEStatusDTO
                         {
@@ -55,11 +53,12 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetKLEChanges()
         {
             var result = _kleApplicationService.GetKLEChangeSummary();
-            switch (result.Status)
+
+            switch (result.Ok)
             {
-                case OperationResult.Forbidden:
+                case false:
                     return Forbidden();
-                case OperationResult.Ok:
+                case true:
                 {
                     var list = new List<dynamic>();
                     CreateCsvHeader(list);
@@ -76,11 +75,11 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage PutKLEChanges()
         {
             var result = _kleApplicationService.UpdateKLE();
-            switch (result.Status)
+            switch (result.Ok)
             {
-                case OperationResult.Forbidden:
+                case false:
                     return Forbidden();
-                case OperationResult.Ok:
+                case true:
                 {
                     return Ok(new KLEUpdateDTO
                     {

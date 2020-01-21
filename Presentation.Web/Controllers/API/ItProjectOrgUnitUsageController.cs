@@ -31,7 +31,8 @@ namespace Presentation.Web.Controllers.API
             {
                 var items = _responsibleOrgUnitRepository.Get(x => x.ItProjectId == id);
                 var orgUnits = items.Select(x => x.OrganizationUnit);
-                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits);
+
+                var dtos = Mapper.Map<IEnumerable<SimpleOrgUnitDTO>>(orgUnits.Where(AllowRead));
 
                 return Ok(dtos);
             }
@@ -51,6 +52,12 @@ namespace Presentation.Web.Controllers.API
                 if (project.ResponsibleUsage == null) return Ok(); // TODO should be NotFound but ui router resolve redirects to mainpage on 404
 
                 var organizationUnit = project.ResponsibleUsage.OrganizationUnit;
+
+                if (!AllowRead(organizationUnit))
+                {
+                    return Forbidden();
+                }
+
                 var dtos = Mapper.Map<SimpleOrgUnitDTO>(organizationUnit);
                 return Ok(dtos);
             }
@@ -64,8 +71,18 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] {projectId, orgUnitId});
+                var entity = _responsibleOrgUnitRepository.GetByKey(new object[] { projectId, orgUnitId });
                 var project = _projectRepository.GetByKey(projectId);
+
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(project))
+                {
+                    return Forbidden();
+                }
 
                 project.ResponsibleUsage = entity;
 
@@ -84,6 +101,17 @@ namespace Presentation.Web.Controllers.API
             try
             {
                 var project = _projectRepository.GetByKey(projectId);
+
+                if (project == null)
+                {
+                    return NotFound();
+                }
+
+                if (!AllowModify(project))
+                {
+                    return Forbidden();
+                }
+
                 // WARNING: force loading so setting it to null will be tracked
                 var forceLoad = project.ResponsibleUsage;
                 project.ResponsibleUsage = null;

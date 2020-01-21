@@ -7,8 +7,9 @@ using System.Security;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -23,16 +24,13 @@ namespace Presentation.Web.Controllers.API
     public abstract class BaseApiController : ApiController
     {
         [Inject]
-        public IGenericRepository<User> UserRepository { get; set; }
-
-        [Inject]
-        public IAuthenticationService AuthenticationService { get; set; }
-
-        [Inject]
-        public IFeatureChecker FeatureChecker { get; set; }
-
-        [Inject]
         public ILogger Logger { get; set; }
+
+        [Inject]
+        public IOrganizationalUserContext UserContext { get; set; }
+
+        [Inject]
+        public IAuthorizationContext AuthorizationContext { get; set; }
 
         //Lazy to make sure auth service is available when resolved
         private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
@@ -41,14 +39,11 @@ namespace Presentation.Web.Controllers.API
         protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected BaseApiController(IAuthorizationContext authorizationContext = null)
-        {
-            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() =>
+        protected int ActiveOrganizationId => UserContext.ActiveOrganizationId;
 
-                authorizationContext == null
-                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(AuthenticationService, () => UserId)
-                    : new ContextBasedAuthorizationStrategy(authorizationContext)
-            );
+        protected BaseApiController()
+        {
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
             _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
@@ -154,46 +149,26 @@ namespace Presentation.Web.Controllers.API
             return CreateResponse(HttpStatusCode.Forbidden, msg);
         }
 
-
-        protected bool IsGlobalAdmin()
+        protected new HttpResponseMessage FromOperationFailure(OperationFailure failure)
         {
-            try
+            switch (failure)
             {
-                int userId;
-                int.TryParse(User.Identity.Name, out userId);
-
-                return AuthenticationService.IsGlobalAdmin(userId);
-            }
-            catch
-            {
-                return false;
+                case OperationFailure.BadInput:
+                    return BadRequest();
+                case OperationFailure.NotFound:
+                    return NotFound();
+                case OperationFailure.Forbidden:
+                    return Forbidden();
+                case OperationFailure.Conflict:
+                    return Conflict("");
+                default:
+                    return CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
 
-        protected User KitosUser
-        {
-            get
-            {
-                try
-                {
-                    var user = UserRepository.GetByKey(UserId);
+        protected User KitosUser => UserContext.UserEntity;
 
-                    if (user == null)
-                        throw new SecurityException();
-
-                    return user;
-                }
-                catch (Exception exp)
-                {
-                    Logger?.Error("Error in property KitosUser", exp);
-                    throw new SecurityException();
-                }
-            }
-        }
-
-        protected int UserId => Convert.ToInt32(User.Identity.Name);
-
-        protected bool IsAuthenticated => User.Identity.IsAuthenticated;
+        protected int UserId => UserContext.UserId;
 
         protected virtual TDest Map<TSource, TDest>(TSource item)
         {
@@ -230,6 +205,11 @@ namespace Presentation.Web.Controllers.API
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new RootEntityCrudAuthorization(AuthorizationStrategy);
+        }
+
+        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        {
+            return AuthorizationStrategy.GetEntityTypeReadAccessLevel<T>();
         }
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
@@ -269,7 +249,7 @@ namespace Presentation.Web.Controllers.API
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return AuthorizationStrategy.AllowEntityVisibilityControl(entity);
+            return AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
         }
 
         #endregion

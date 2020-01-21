@@ -45,10 +45,12 @@
     <Compile Include="Cryptography\CryptoService.cs" />
     <Compile Include="Cryptography\ICryptoService.cs" />
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
+    <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Types\TypeHierarchyExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

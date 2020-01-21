@@ -1,13 +1,14 @@
 ﻿using System.Web.Http;
 using System.Web.OData;
 using Core.DomainServices;
-using Core.ApplicationServices;
 using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
-using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model.Result;
 using Core.DomainServices.Queries;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -16,39 +17,42 @@ namespace Presentation.Web.Controllers.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        protected IAuthenticationService AuthService { get; } //TODO: Remove once the new approach is validated
-        private readonly IControllerAuthorizationStrategy _authorizationStrategy;
+        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
         private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
         protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
 
-        protected BaseEntityController(
-            IGenericRepository<T> repository,
-            IAuthenticationService authService,
-            IAuthorizationContext authorizationContext = null)
+        protected BaseEntityController(IGenericRepository<T> repository)
             : base(repository)
         {
-            _authorizationStrategy =
-                authorizationContext == null
-                    ? (IControllerAuthorizationStrategy)new LegacyAuthorizationStrategy(authService, () => UserId)
-                    : new ContextBasedAuthorizationStrategy(authorizationContext);
-            AuthService = authService;
+            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
             _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            var organizationId = AuthService.GetCurrentOrganizationId(UserId);
+            var organizationId = ActiveOrganizationId;
 
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
 
-            var refinement = new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId);
+            var entityAccessLevel = GetEntityTypeReadAccessLevel<T>();
 
-            var result = refinement.Apply(Repository.AsQueryable());
+            var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
+                Maybe<QueryAllByRestrictionCapabilities<T>>.None :
+                Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationId));
 
-            if (refinement.RequiresPostFiltering())
+            var mainQuery = Repository.AsQueryable();
+
+            var result = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            if (refinement.Select(x => x.RequiresPostFiltering()).GetValueOrFallback(false))
             {
-                result = result.AsEnumerable().Where(AllowRead).AsQueryable();
+                result = result
+                    .AsEnumerable()
+                    .Where(AllowRead)
+                    .AsQueryable();
             }
 
             return Ok(result);
@@ -104,18 +108,13 @@ namespace Presentation.Web.Controllers.OData
             //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IHasOrganization organization && organization.OrganizationId == 0)
             {
-                organization.OrganizationId = AuthService.GetCurrentOrganizationId(UserId);
+                organization.OrganizationId = ActiveOrganizationId;
             }
 
             entity.ObjectOwnerId = UserId;
             entity.LastChangedByUserId = UserId;
 
             if (AllowCreate<T>(entity) == false)
-            {
-                return Forbidden();
-            }
-
-            if ((entity as IHasAccessModifier)?.AccessModifier == AccessModifier.Public && AllowEntityVisibilityControl(entity) == false)
             {
                 return Forbidden();
             }
@@ -211,12 +210,17 @@ namespace Presentation.Web.Controllers.OData
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
-            return _authorizationStrategy.GetCrossOrganizationReadAccess();
+            return _authorizationStrategy.Value.GetCrossOrganizationReadAccess();
+        }
+
+        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        {
+            return _authorizationStrategy.Value.GetEntityTypeReadAccessLevel<T>();
         }
 
         protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            return _authorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
+            return _authorizationStrategy.Value.GetOrganizationReadAccessLevel(organizationId);
         }
 
         protected bool AllowRead(T entity)
@@ -231,7 +235,7 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowCreate<T>()
         {
-            return _authorizationStrategy.AllowCreate<T>();
+            return _authorizationStrategy.Value.AllowCreate<T>();
         }
 
         protected bool AllowCreate<T>(IEntity entity)
@@ -246,12 +250,29 @@ namespace Presentation.Web.Controllers.OData
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return _authorizationStrategy.AllowEntityVisibilityControl(entity);
+            return _authorizationStrategy.Value.HasPermission(new VisibilityControlPermission(entity));
         }
 
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new RootEntityCrudAuthorization(_authorizationStrategy);
+            return new RootEntityCrudAuthorization(_authorizationStrategy.Value);
+        }
+
+        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        {
+            switch (failure)
+            {
+                case OperationFailure.BadInput:
+                    return BadRequest();
+                case OperationFailure.NotFound:
+                    return NotFound();
+                case OperationFailure.Forbidden:
+                    return Forbidden();
+                case OperationFailure.Conflict:
+                    return Conflict();
+                default:
+                    return StatusCode(HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

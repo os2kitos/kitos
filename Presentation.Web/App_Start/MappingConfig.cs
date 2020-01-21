@@ -10,6 +10,12 @@ using Core.DomainModel.Organization;
 using Presentation.Web;
 using Presentation.Web.Models;
 using Core.DomainModel.Advice;
+using Advice = Core.DomainModel.Advice.Advice;
+using ContactPerson = Core.DomainModel.ContactPerson;
+using DataRow = Core.DomainModel.ItSystem.DataRow;
+using ExternalReference = Core.DomainModel.ExternalReference;
+using Organization = Core.DomainModel.Organization.Organization;
+using Text = Core.DomainModel.Text;
 
 [assembly: WebActivatorEx.PreApplicationStartMethod(typeof(MappingConfig), "Start")]
 
@@ -333,16 +339,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.ItSystemReferenceId, opt => opt.MapFrom(src => src.Object.ItSystem.ReferenceId))
                .ForMember(dto => dto.ItSystemPreviousName, opt => opt.MapFrom(src => src.Object.ItSystem.PreviousName));
 
-
-
-
-
-
-
-
-
-
-
             Mapper.CreateMap<ItProjectRight, RightOutputDTO>();
             Mapper.CreateMap<RightInputDTO, ItProjectRight>();
 
@@ -453,8 +449,6 @@ namespace Presentation.Web
 
             Mapper.CreateMap<Stakeholder, StakeholderDTO>()
                   .ReverseMap();
-
-
 
             Mapper.CreateMap<ItProject, ItProjectDTO>()
                 .ForMember(dest => dest.ChildrenIds,

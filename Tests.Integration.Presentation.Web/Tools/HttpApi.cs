@@ -237,7 +237,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
         }
 
-        public static async Task<HttpResponseMessage> DeleteOdataUserAsync(int id)
+        public static async Task<HttpResponseMessage> DeleteUserAsync(int id)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
             var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);

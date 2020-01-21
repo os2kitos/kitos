@@ -1,8 +1,8 @@
 ﻿using System.Web.Http;
 using System.Web.OData;
+using Core.ApplicationServices.Authorization;
 using Core.DomainServices;
 using Ninject;
-using Ninject.Extensions.Logging;
 
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
@@ -10,17 +10,15 @@ namespace Presentation.Web.Controllers.OData.ReportsControllers
     public abstract class BaseOdataAuthorizationController<T> : ODataController where T : class
     {
         protected readonly IGenericRepository<T> Repository;
+
         [Inject]
-        public ILogger Logger { get; set; }
-        protected int UserId
-        {
-            get
-            {
-                int userId;
-                int.TryParse(User.Identity.Name, out userId);
-                return userId;
-            }
-        }
+        public IOrganizationalUserContext UserContext { get; set; }
+
+        [Inject]
+        public IAuthorizationContext AuthorizationContext { get; set; }
+
+        protected int UserId => UserContext.UserId;
+
         protected BaseOdataAuthorizationController(IGenericRepository<T> repository)
         {
             Repository = repository;

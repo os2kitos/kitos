@@ -68,8 +68,8 @@
     <Reference Include="Microsoft.Spatial, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Spatial.7.0.0\lib\portable-net45+win8+wpa81\Microsoft.Spatial.dll</HintPath>
     </Reference>
-    <Reference Include="Moq, Version=4.12.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.12.0\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Moq, Version=4.13.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.13.1\lib\net45\Moq.dll</HintPath>
     </Reference>
     <Reference Include="Neleus.LambdaCompare, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Neleus.LambdaCompare.1.0.3\lib\net461\Neleus.LambdaCompare.dll</HintPath>
@@ -146,7 +146,9 @@
     <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\KLEUpdateHistoryItemRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
-    <Compile Include="ApplicationServices\Model\ResultModelTests.cs" />
+    <Compile Include="ApplicationServices\Model\ResultTest.cs" />
+    <Compile Include="DomainServices\MaybeTest.cs" />
+    <Compile Include="Infrastructure\TypeHierarchyExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +176,10 @@
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
+      <Name>Infrastructure.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
+      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
   </ItemGroup>

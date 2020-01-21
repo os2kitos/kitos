@@ -6,9 +6,9 @@ namespace Core.DomainModel.Organization
     public enum OrganizationTypeKeys
     {
         Kommune = 1,
-        Interessefællesskab,
-        Virksomhed,
-        AndenOffentligMyndighed
+        Interessefællesskab = 2,
+        Virksomhed = 3,
+        AndenOffentligMyndighed = 4
     }
     public class OrganizationType
     {
