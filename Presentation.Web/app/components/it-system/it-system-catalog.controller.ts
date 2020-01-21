@@ -948,9 +948,6 @@
                             return orgName;
                         }
                     },
-                    sortable: {
-                        initialDirection: "desc"
-                    }
                 }
             ],
         };
