@@ -14,7 +14,7 @@ class TestFixtureWrapper {
     }
 
     public enableLongRunningTest() {
-        const minutes = 2;
+        const minutes = 5;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = minutes * 60 * 1000;
     }
 
