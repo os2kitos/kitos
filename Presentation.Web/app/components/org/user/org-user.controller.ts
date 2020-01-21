@@ -17,7 +17,7 @@
         public mainGrid: IKendoGrid<IGridModel>;
         public mainGridOptions: IKendoGridOptions<IGridModel>;
 
-        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess"];
+        public static $inject: string[] = ["$http", "$timeout", "_", "$", "$state", "$scope", "notify", "user", "hasWriteAccess","exportGridToExcelService"];
 
         constructor(
             private $http: ng.IHttpService,
@@ -28,7 +28,8 @@
             private $scope,
             private notify,
             private user,
-            private hasWriteAccess) {
+            private hasWriteAccess,
+            private exportGridToExcelService) {
             this.hasWriteAccess = hasWriteAccess;
             this.mainGridOptions = {
                 dataSource: {
@@ -115,7 +116,7 @@
                 excel: {
                     fileName: "Brugere.xlsx",
                     filterable: true,
-                    allPages: true
+                    allPages: true,
                 },
                 pageable: {
                     refresh: true,
@@ -125,7 +126,7 @@
                 sortable: {
                     mode: "single"
                 },
-                editable: false,
+                editable: false,    
                 reorderable: true,
                 resizable: true,
                 filterable: {
@@ -140,14 +141,14 @@
                     <uib-tab index="2" heading="System roller"><user-system-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-system-roles></uib-tab>
                     <uib-tab index="3" heading="Kontrakt roller"><user-contract-roles user-id="${dataItem.Id}" current-organization-id="${this.user.currentOrganizationId}"></user-contract-roles></uib-tab>
                 </uib-tabset>`,
-                excelExport: this.exportToExcel,
+
                 columns: [
                     {
                         field: "Name", title: "Navn", width: 230,
                         persistId: "fullname", // DON'T YOU DARE RENAME!
                         template: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
                         excelTemplate: (dataItem) => `${dataItem.Name} ${dataItem.LastName}`,
-                        hidden: false,
+                        hidden: false, 
                         filterable: {
                             cell: {
                                 template: customFilter,
@@ -346,72 +347,10 @@
             }
         }
 
-        private exportFlag = false;
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            var columns = e.sender.columns;
-
-            if (!this.exportFlag) {
-                e.preventDefault();
-                this._.forEach(columns, column => {
-                    if (column.hidden) {
-                        column.tempVisual = true;
-                        e.sender.showColumn(column);
-                    }
-                });
-                this.$timeout(() => {
-                    this.exportFlag = true;
-                    e.sender.saveAsExcel();
-                });
-            } else {
-                this.exportFlag = false;
-
-                // hide columns on visual grid
-                this._.forEach(columns, column => {
-                    if (column.tempVisual) {
-                        delete column.tempVisual;
-                        e.sender.hideColumn(column);
-                    }
-                });
-
-                // render templates
-                const sheet = e.workbook.sheets[0];
-
-                // skip header row
-                for (let rowIndex = 1; rowIndex < sheet.rows.length; rowIndex++) {
-                    const row = sheet.rows[rowIndex];
-
-                    // -1 as sheet has header and dataSource doesn't
-                    const dataItem = e.data[rowIndex - 1];
-
-                    for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                        if (columns[columnIndex].field === "") continue;
-                        const cell = row.cells[columnIndex];
-                        const template = this.getTemplateMethod(columns[columnIndex]);
-
-                        cell.value = template(dataItem);
-                    }
-                }
-
-                // hide loading bar when export is finished
-                kendo.ui.progress(this.mainGrid.element, false);
-            }
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
-        private getTemplateMethod(column) {
-            let template: Function;
-
-            if (column.excelTemplate) {
-                template = column.excelTemplate;
-            } else if (typeof column.template === "function") {
-                template = (column.template as Function);
-            } else if (typeof column.template === "string") {
-                template = kendo.template(column.template as string);
-            } else {
-                template = t => t;
-            }
-
-            return template;
-        }
         public curOrgCheck: boolean;
     }
 
