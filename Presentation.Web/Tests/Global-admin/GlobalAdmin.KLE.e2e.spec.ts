@@ -44,25 +44,27 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     });
      
     it("Is able to check,download and execute a KLE update", () => {
+        console.log("Timeout is " + jasmine.DEFAULT_TIMEOUT_INTERVAL);
         waitForNewUpdateAvailable().then(() => {
             console.log("Clicking the view changes button");
-            clickOnButton(consts.kleChangesButton);
+            return  clickOnButton(consts.kleChangesButton);
         }).then(() => {
             console.log("Waiting for download link to appear");
-            waitForUpdateButtonToBeClickAble(consts.KleDownloadAnchor);
+            return  waitForUpdateButtonToBeClickAble(consts.KleDownloadAnchor);
         }).then(() => {
             console.log("Checking if Update KLE button is clickable");
-            waitForUpdateButtonToBeClickAble(consts.kleUpdateButton);
+            return  waitForUpdateButtonToBeClickAble(consts.kleUpdateButton);
         }).then(() => {
             console.log("Clicking the update KLE button");
-            clickOnButton(consts.kleUpdateButton);
+            return  clickOnButton(consts.kleUpdateButton);
         }).then(() => {
             console.log("Confirming update");
-            navHelper.acceptAlertBox();
+            return  navHelper.acceptAlertBox();
         }).then(() => {
-            console.log("Checking KLE have been updated");
-            expect(element(cssHelper.byDataElementType(consts.kleStatusLabel)).getText())
-                .toStartWith("KITOS baserer sig på den seneste KLE version, udgivet");
+            console.log("Waiting for update to be completed");
+            return pageObject.waitForStatusText("KITOS baserer sig på den seneste KLE version, udgivet");
+        }).then(() => {
+            console.log("Checking Button status");
             expectButtonEnableToBe(consts.kleChangesButton,false);
             expectButtonEnableToBe(consts.kleUpdateButton, false);
         });
