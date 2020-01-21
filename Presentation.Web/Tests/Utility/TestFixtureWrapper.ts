@@ -15,12 +15,18 @@ class TestFixtureWrapper {
 
     public enableLongRunningTest() {
         const minutes = 5;
-        jasmine.DEFAULT_TIMEOUT_INTERVAL = minutes * 60 * 1000;
+        const mill = minutes * 60 * 1000;
+        jasmine.DEFAULT_TIMEOUT_INTERVAL = mill;
+        browser.manage().timeouts().setScriptTimeout(mill);
     }
 
     public disableLongRunningTest() {
+        const seconds = 11;
+        const mill = seconds * 1000;
         jasmine.DEFAULT_TIMEOUT_INTERVAL = defaultJasmineTimeout;
+        browser.manage().timeouts().setScriptTimeout(mill);
     }
+
 }
 
 export = TestFixtureWrapper;
