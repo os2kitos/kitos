@@ -4,9 +4,11 @@ import Constants = require("../Utility/Constants");
 import CSSLocatorHelper = require("../Object-wrappers/CSSLocatorHelper");
 import WaitTimers = require("../Utility/WaitTimers");
 import NaviHelp = require("../Utility/NavigationHelper");
+import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 
 describe("Global Administrator is able to see changes to KLE and update to the newest KLE version", () => {
 
+    var testFixture = new TestFixtureWrapper();
     var loginHelper = new Login();
     var consts = new Constants();
     var pageObject = new Misc();
@@ -15,12 +17,17 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     var navHelper = new NaviHelp();
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsGlobalAdmin();
     });
 
     beforeEach(() => {
         pageObject.getPage();
         browser.waitForAngular();
+    });
+
+    afterAll(() => {
+        testFixture.disableLongRunningTest();
     });
 
     it("Is able to see if there is an update for KLE", () => {
