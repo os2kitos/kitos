@@ -17,16 +17,17 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     var navHelper = new NaviHelp();
 
     beforeAll(() => {
-        testFixture.enableLongRunningTest();
+        
         loginHelper.loginAsGlobalAdmin();
     });
 
     beforeEach(() => {
+        testFixture.enableLongRunningTest();
         pageObject.getPage();
         browser.waitForAngular();
     });
 
-    afterAll(() => {
+    afterEach(() => {
         testFixture.disableLongRunningTest();
     });
 
