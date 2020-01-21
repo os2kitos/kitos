@@ -13,6 +13,7 @@ var source = "Presentation.Web",
     appReportTypeScriptOut = typescriptOutput + "/appReport",
     bowerComponents = "bower_components",
     appMaps = sourceApp + "/**/*.js.map",
+    npm = "node_modules",
 
 
     // e2e
@@ -44,5 +45,6 @@ module.exports = {
     coverage: coverage,
     frontendCoverageReport: frontendCoverageReport,
     tempFrontendCoverageReport: tempFrontendCoverageReport,
-    tempFiles: tempFiles
+    tempFiles: tempFiles,
+    npm: npm
 };
