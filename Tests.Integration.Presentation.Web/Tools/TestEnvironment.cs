@@ -90,7 +90,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 //Loading users from environment
                 Console.Out.WriteLine("Tests running towards remote target. Loading configuration from environment.");
                 DefaultUserPassword = GetEnvironmentVariable("DefaultUserPassword");
-                ConnectionString = GetEnvironmentVariable("HangfireDbConnectionStringForIIsApp");
+                ConnectionString = GetEnvironmentVariable("KitosDbConnectionStringForTeamCity");
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User)},
