@@ -33,6 +33,11 @@ namespace Infrastructure.DataAccess.Mapping
                 {
                     t.ToTable("TaskRefItSystemUsageOptOut");
                 });
-        }
+
+            this.Property(x => x.TaskKey).HasMaxLength(50);
+
+            this.Property(x => x.TaskKey).HasUniqueIndexAnnotation("UX_TaskKey", 0);
+
+       }
     }
 }

@@ -511,6 +511,10 @@
     <Compile Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.Designer.cs">
       <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.cs" />
+    <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.Designer.cs">
+      <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -816,6 +820,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001150841034_TaskRef_Remove_AccessModifier.resx">
       <DependentUpon>202001150841034_TaskRef_Remove_AccessModifier.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001201357301_Added-KLEHistoryTable.resx">
+      <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

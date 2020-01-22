@@ -7,12 +7,12 @@ namespace Tests.Integration.Presentation.Web.TestEnvironmentValidation
     public class TestEnvironmentTest
     {
         [Theory]
-        [InlineData(OrganizationRole.User)]
-        [InlineData(OrganizationRole.LocalAdmin)]
-        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User, false)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
         [InlineData(OrganizationRole.User, true)]
         [InlineData(OrganizationRole.GlobalAdmin, true)]
-        public void User_With_Role_Is_Available(OrganizationRole role, bool apiAccess = false)
+        public void User_With_Role_Is_Available(OrganizationRole role, bool apiAccess)
         {
             var user = TestEnvironment.GetCredentials(role, apiAccess);
 

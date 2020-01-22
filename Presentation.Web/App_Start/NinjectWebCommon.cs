@@ -13,8 +13,10 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.ApplicationServices.TaskRefs;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Repositories.System;
@@ -32,6 +34,7 @@ using Hangfire;
 using Infrastructure.DataAccess.Services;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.KLEDataBridge;
 using Microsoft.Owin;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
@@ -133,6 +136,17 @@ namespace Presentation.Web
             kernel.Bind<IOwinContext>().ToMethod(_ => HttpContext.Current.GetOwinContext()).InRequestScope();
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
+            RegisterKLE(kernel);
+        }
+
+        private static void RegisterKLE(IKernel kernel)
+        {
+            kernel.Bind<IKLEApplicationService>().To<KLEApplicationService>().InRequestScope();
+            kernel.Bind<IKLEStandardRepository>().To<KLEStandardRepository>().InRequestScope();
+            kernel.Bind<IKLEDataBridge>().To<KLEDataBridge>().InRequestScope();
+            kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InRequestScope();
+            kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InRequestScope();
+            kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InRequestScope();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

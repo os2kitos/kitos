@@ -51,6 +51,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             return SendWithCookieAsync(cookie, requestMessage);
         }
 
+        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url);
+
+            if (body != null)
+            {
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
+            }
+
+            return SendWithCookieAsync(cookie, requestMessage);
+        }
+
         public static Task<HttpResponseMessage> GetWithCookieAsync(Uri url, Cookie cookie)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<KLE-Emneplan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:noNamespaceSchemaLocation="http://skemaer.kle-online.dk/rest/KLE-REST-Emneplan-fuld-version-1-2.xsd">
+  <UdgivelsesDato>2019-11-01</UdgivelsesDato>
+  <Hovedgruppe>
+    <HovedgruppeNr>00</HovedgruppeNr>
+    <HovedgruppeTitel>Kommunens styrelse</HovedgruppeTitel>
+    <HovedgruppeAdministrativInfo>
+      <RettetDato>2011-05-01</RettetDato>
+    </HovedgruppeAdministrativInfo>
+    <UUID>4eba8818-da19-4e37-b3e1-b9b6be2f2f13</UUID>
+    <Gruppe>
+      <GruppeNr>00.01</GruppeNr>
+      <GruppeTitel>Kommunens styrelse</GruppeTitel>
+      <UUID>4da28ac8-fbb4-4f04-a81d-0af336eab752</UUID>
+      <Emne>
+        <EmneNr>00.01.00</EmneNr>
+        <EmneTitel>Kommunens styrelse i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>2004-02-01</OprettetDato>
+          <RettetDato>2011-05-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>15b97b4f-08c6-42fc-9a37-3ec048d8d01b</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>00.03</GruppeNr>
+      <GruppeTitel>International virksomhed og EU</GruppeTitel>
+      <UUID>d4160818-9977-4cee-bdc6-c6290effd69e</UUID>
+      <Emne>
+        <EmneNr>00.03.00</EmneNr>
+        <EmneTitel>HAS BEEN RENAMED</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>2003-08-01</OprettetDato>
+          <RettetDato>1996-01-01</RettetDato>
+        </EmneAdministrativInfo>
+        <UUID>f8d6e719-e050-48d8-89e2-977d0eaba6bb</UUID>
+      </Emne>
+    </Gruppe>
+    <Gruppe>
+      <GruppeNr>00.05</GruppeNr>
+      <GruppeTitel>Besøg, repræsentation mv.</GruppeTitel>
+      <GruppeAdministrativInfo>
+        <OprettetDato>1988-01-01</OprettetDato>
+      </GruppeAdministrativInfo>
+      <UUID>aa720548-7faa-4856-babc-9f560a663b24</UUID>
+      <Emne>
+        <EmneNr>00.05.00</EmneNr>
+        <EmneTitel>Besøg, repræsentation mv. i almindelighed</EmneTitel>
+        <EmneAdministrativInfo>
+          <OprettetDato>1988-01-01</OprettetDato>
+        </EmneAdministrativInfo>
+        <UUID>0cc253a9-163f-4563-acdf-b34a477f3ad1</UUID>
+      </Emne>
+    </Gruppe>
+  </Hovedgruppe>
+</KLE-Emneplan>

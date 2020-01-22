@@ -319,6 +319,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
@@ -342,6 +344,7 @@
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\ItSystem\UsingOrganizationDTO.cs" />
+    <Compile Include="Models\KLEStatusDTO.cs" />
     <Compile Include="Models\NamedEntityDTO.cs" />
     <Compile Include="Infrastructure\MessageHandlers\MessageLoggingHandler.cs" />
     <Compile Include="Infrastructure\Tracelistener\SerilogTraceListener.cs" />
@@ -365,6 +368,7 @@
     <TypeScriptCompile Include="app\components\org\uniqueEmail.contactPerson.directive.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-categories.ts" />
     <TypeScriptCompile Include="app\models\it-system\systemDeleteErrorMessages.ts" />
+    <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
     <TypeScriptCompile Include="app\shared\globalAdvis\globalAdvis.directive.ts" />
@@ -655,6 +659,7 @@
     <Compile Include="Startup.cs" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\validation.ts" />
+    <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Helpers\InterfaceCatalogHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SystemCatalogHelper.ts" />
@@ -669,6 +674,7 @@
     <TypeScriptCompile Include="Tests\Organization\UserOverview.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\User.Accessibility.Catalog.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\LocalAdmin.Reference.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\Global-admin\GlobalMisc.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\HomePage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\HomePage\LoginPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />

@@ -116,7 +116,7 @@ namespace Tests.Unit.Presentation.Web.Context
             var authContext = authenticationContextFactory.Create();
 
             //Assert
-            Assert.Equal(false, authContext.HasApiAccess);
+            Assert.False(authContext.HasApiAccess);
         }
 
         private static IUserRepository MakeMockUserRepository(bool apiAccess, int userId, int? defaultOrgId = null)

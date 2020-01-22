@@ -4,7 +4,6 @@
     help: protractor.ElementFinder
 }
 
-
 class subNavigationBarWrapper {
 
     public icons(): iconLinks {
@@ -20,5 +19,4 @@ class subNavigationBarWrapper {
         return element(by.id("navbar-top")).all(by.css("a")).get(index);
     }
 }
-
 export = subNavigationBarWrapper;

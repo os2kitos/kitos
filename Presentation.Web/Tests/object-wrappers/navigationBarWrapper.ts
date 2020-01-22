@@ -16,7 +16,6 @@ type userDropdown = {
     changeOrg: protractor.ElementFinder,
     logOut: protractor.ElementFinder
 }
-
 var byDataElementType = new CssLocator().byDataElementType;
 var consts = new Constants();
 
@@ -38,7 +37,5 @@ class navigationBarWrapper {
         changeOrg: element(byDataElementType(consts.navigationDropdownChangeOrg)),
         logOut: element(byDataElementType(consts.navigationDropdownLogOut))
         };
-
 }
-
 export = navigationBarWrapper;
