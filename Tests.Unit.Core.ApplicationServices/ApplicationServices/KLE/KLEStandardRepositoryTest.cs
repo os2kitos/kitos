@@ -26,6 +26,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private readonly Mock<ILogger> _mockLogger;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _mockSystemUsageRepository;
         private readonly Mock<IGenericRepository<TaskUsage>> _mockTaskUsageRepository;
+        private readonly Mock<IOperationClock> _mockClock;
         private readonly GenericRepositoryTaskRefStub _stubTaskRefRepository;
         private readonly KLEStandardRepository _sut;
 
@@ -37,7 +38,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockSystemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _mockTaskUsageRepository = new Mock<IGenericRepository<TaskUsage>>();
             _stubTaskRefRepository = new GenericRepositoryTaskRefStub();
-            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockTaskUsageRepository.Object, _mockLogger.Object);
+            _mockClock = new Mock<IOperationClock>();
+            _mockClock.Setup(c => c.Now).Returns(DateTime.Now);
+            _sut = new KLEStandardRepository(_mockKleDataBridge.Object, _mockTransactionManager.Object, _stubTaskRefRepository, _mockSystemUsageRepository.Object, _mockTaskUsageRepository.Object, _mockClock.Object, _mockLogger.Object);
         }
 
         [Theory]
@@ -112,6 +115,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
 
             Assert.Equal("HAS BEEN RENAMED", updateObjects.renamedTaskRef.Description);
             Assert.Equal(Guid.Parse("f8d6e719-e050-48d8-89e2-977d0eaba6bb"), updateObjects.renamedTaskRef.Uuid);
+            Assert.Equal(DateTime.Today, updateObjects.renamedTaskRef.LastChanged.Date);
         }
 
         [Fact]
@@ -122,6 +126,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _sut.UpdateKLE(0, 0);
 
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
+            Assert.All(updateObjects.stubTaskRefRepository.Get(), t => Assert.Equal(DateTime.Today, t.LastChanged.Date));
         }
 
         [Fact]
@@ -140,6 +145,8 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             Assert.Equal(21, updateObjects.stubTaskRefRepository.Get().Count());
             var sampleTaskRef = updateObjects.stubTaskRefRepository.Get(t => t.TaskKey == existingItemTaskKey).First();
             Assert.Equal(Guid.Parse("f0820080-181a-4ea4-9587-02b86aa13898"), sampleTaskRef.Uuid);
+            Assert.Equal(DateTime.Today, sampleTaskRef.LastChanged.Date);
+
         }
         
         [Fact]

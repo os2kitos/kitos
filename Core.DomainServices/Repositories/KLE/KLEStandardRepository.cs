@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Xml.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
@@ -23,6 +22,7 @@ namespace Core.DomainServices.Repositories.KLE
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IKLEParentHelper _kleParentHelper;
         private readonly IKLEConverterHelper _kleConverterHelper;
+        private readonly IOperationClock _clock;
         private readonly ILogger _logger;
 
         public KLEStandardRepository(
@@ -31,12 +31,14 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<TaskRef> existingTaskRefRepository,
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IGenericRepository<TaskUsage> taskUsageRepository,
+            IOperationClock clock,
             ILogger logger) : this(new KLEParentHelper(), new KLEConverterHelper(), taskUsageRepository)
         {
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
             _systemUsageRepository = systemUsageRepository;
+            _clock = clock;
             _logger = logger;
         }
 
@@ -133,7 +135,7 @@ namespace Core.DomainServices.Repositories.KLE
             _logger.Debug($"Changes: {changes.Count}");
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                var updateTime = DateTime.Now;
+                var updateTime = _clock.Now;
 
                 // Changes first run
                 UpdateRemovedTaskRefs(changes);
