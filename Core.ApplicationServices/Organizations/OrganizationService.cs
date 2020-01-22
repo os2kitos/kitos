@@ -139,7 +139,7 @@ namespace Core.ApplicationServices.Organizations
             if (newOrg.IsCvrInvalid())
             {
                 _logger.Error("Invalid cvr {cvr} provided for org with name {name}", newOrg.Cvr, newOrg.Name);
-                return Result<Organization, OperationFailure>.Failure(OperationFailure.BadRequest);
+                return Result<Organization, OperationFailure>.Failure(OperationFailure.BadInput);
             }
 
             if (!_authorizationContext.AllowCreate<Organization>(newOrg))

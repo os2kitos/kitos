@@ -49,7 +49,7 @@ namespace Core.ApplicationServices
             }
             if (GetKLEStatusFromLastUpdated().UpToDate)
             {
-                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.BadRequest);
+                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.BadInput);
             }
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);

@@ -262,7 +262,7 @@ namespace Presentation.Web.Controllers.OData
         {
             switch (failure)
             {
-                case OperationFailure.BadRequest:
+                case OperationFailure.BadInput:
                     return BadRequest();
                 case OperationFailure.NotFound:
                     return NotFound();

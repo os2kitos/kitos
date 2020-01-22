@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.SystemUsage
             var itSystem = _systemRepository.GetSystem(newSystemUsage.ItSystemId);
             if (itSystem == null)
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.BadRequest);
+                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.BadInput);
             }
 
             if (!_authorizationContext.AllowReads(itSystem))
