@@ -12,11 +12,16 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Fact]
         private void ConvertToTaskRefs_Given_Sample_Creates_Valid_TaskRefs()
         {
+            //Arrange
             var mockKLEDataBridge = new Mock<IKLEDataBridge>();
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-single-item.xml");
             mockKLEDataBridge.Setup(b => b.GetKLEXMLData()).Returns(document);
             var sut = new KLEConverterHelper();
+
+            //Act
             var result = sut.ConvertToTaskRefs(document);
+
+            //Assert
             Assert.True(result.TryGet("00", out var mainGroup));
             Assert.Equal(Guid.Parse("4eba8818-da19-4e37-b3e1-b9b6be2f2f13"), mainGroup.Uuid);
             Assert.True(result.TryGet("00.05.00", out var item));

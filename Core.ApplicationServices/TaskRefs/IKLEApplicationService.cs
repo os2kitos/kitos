@@ -4,7 +4,7 @@ using Core.DomainModel.KLE;
 using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.KLE;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.TaskRefs
 {
     public interface IKLEApplicationService
     {

@@ -8,7 +8,7 @@ namespace Core.DomainServices.Model.Result
         private readonly Maybe<TSuccess> _value;
 
 
-        private Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
+        protected Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
         {
             if (successResult.HasValue == failureResult.HasValue)
             {

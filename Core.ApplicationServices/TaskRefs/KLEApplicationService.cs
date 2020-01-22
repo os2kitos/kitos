@@ -6,7 +6,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model.Result;
 using Core.DomainServices.Repositories.KLE;
 
-namespace Core.ApplicationServices
+namespace Core.ApplicationServices.TaskRefs
 {
     public class KLEApplicationService : IKLEApplicationService
     {
@@ -25,7 +25,7 @@ namespace Core.ApplicationServices
 
         public Result<KLEStatus, OperationFailure> GetKLEStatus()
         {
-            if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
+            if (!HasAccess())
             {
                 return Result<KLEStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
@@ -34,7 +34,7 @@ namespace Core.ApplicationServices
 
         public Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary()
         {
-            if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
+            if (!HasAccess())
             {
                 return Result<IEnumerable<KLEChange>, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
@@ -43,7 +43,7 @@ namespace Core.ApplicationServices
 
         public Result<KLEUpdateStatus, OperationFailure> UpdateKLE()
         {
-            if (!_organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin))
+            if (!HasAccess())
             {
                 return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
@@ -54,6 +54,11 @@ namespace Core.ApplicationServices
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);
             return Result<KLEUpdateStatus, OperationFailure>.Success(KLEUpdateStatus.Ok);
+        }
+
+        private bool HasAccess()
+        {
+            return _organizationalUserContext.HasRole(OrganizationRole.GlobalAdmin);
         }
 
         #region Helpers

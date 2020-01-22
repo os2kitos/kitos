@@ -12,7 +12,10 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private void DeduceParentId_Given_KLE_Number_Returns_ValidParentId(string kleNumber, string expectedParentTaskKey, bool expectedResult)
         {
             var sut = new KLEParentHelper();
-            Assert.Equal(expectedResult, sut.TryDeduceParentTaskKey(kleNumber, out var result));
+
+            var actual = sut.TryDeduceParentTaskKey(kleNumber, out var result);
+
+            Assert.Equal(expectedResult, actual);
             Assert.Equal(expectedParentTaskKey, result);
         }
     }

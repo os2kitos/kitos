@@ -15,10 +15,22 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
 {
     public class KLEUpdateHistoryItemRepositoryTest
     {
+        private readonly Mock<IGenericRepository<KLEUpdateHistoryItem>> mockGenericUpdateHistoryItemRepository;
+        private readonly Mock<ITransactionManager> mockTransactionManager;
+        private readonly KLEUpdateHistoryItemRepository sut;
+
+        public KLEUpdateHistoryItemRepositoryTest()
+        {
+            mockGenericUpdateHistoryItemRepository = new Mock<IGenericRepository<KLEUpdateHistoryItem>>();
+            mockTransactionManager = new Mock<ITransactionManager>();
+            sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
+
+        }
+
         [Fact]
         private void Get_Returns_All_UpdateHistoryItems()
         {
-            var mockGenericUpdateHistoryItemRepository = new Mock<IGenericRepository<KLEUpdateHistoryItem>>();
+            //Arrange
             mockGenericUpdateHistoryItemRepository.Setup(
                 r => r.Get(
                     It.IsAny<Expression<Func<KLEUpdateHistoryItem, bool>>>(), 
@@ -28,38 +40,44 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                 new KLEUpdateHistoryItem(DateTime.Parse("01-01-2020", CultureInfo.GetCultureInfo("da-DK")), 1),
                 new KLEUpdateHistoryItem(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1)
             });
-            var mockTransactionManager = new Mock<ITransactionManager>();
-            var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
+
+            //Act
             var result = sut.Get();
+
+            //Assert
             Assert.Equal(2, result.Count());
         }
 
         [Fact]
         private void GetLastest_Returns_LastChanged_UpdateHistoryItem()
         {
-            var mockGenericUpdateHistoryItemRepository = new Mock<IGenericRepository<KLEUpdateHistoryItem>>();
+            //Arrange
             var expectedLastUpdate = DateTime.Today;
             mockGenericUpdateHistoryItemRepository.Setup(r => r.Count).Returns(1);
             mockGenericUpdateHistoryItemRepository
                 .Setup(r => r.GetMax(It.IsAny<Expression<Func<KLEUpdateHistoryItem, DateTime>>>()))
                 .Returns(expectedLastUpdate);
-            var mockTransactionManager = new Mock<ITransactionManager>();
-            var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
+
+            //Act
             var result = sut.GetLastUpdated();
+
+            //Assert
             Assert.Equal(expectedLastUpdate, result);
         }
 
         [Fact]
         private void Insert_Updates_And_Remembers()
         {
-            var mockGenericUpdateHistoryItemRepository = new Mock<IGenericRepository<KLEUpdateHistoryItem>>();
+            //Arrange
             mockGenericUpdateHistoryItemRepository.Setup(r => r.Insert(It.IsAny<KLEUpdateHistoryItem>()));
-            var mockTransactionManager = new Mock<ITransactionManager>();
             var mockDatabaseTransaction = new Mock<IDatabaseTransaction>();
             mockTransactionManager.Setup(t => t.Begin(IsolationLevel.Serializable))
                 .Returns(mockDatabaseTransaction.Object);
-            var sut = new KLEUpdateHistoryItemRepository(mockGenericUpdateHistoryItemRepository.Object, mockTransactionManager.Object);
+
+            //Act
             sut.Insert(DateTime.Parse("01-11-2019", CultureInfo.GetCultureInfo("da-DK")), 1);
+
+            //Assert
             mockGenericUpdateHistoryItemRepository.VerifyAll();
         }
     }
