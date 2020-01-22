@@ -241,6 +241,11 @@ align-text@^0.1.1, align-text@^0.1.3:
     longest "^1.0.1"
     repeat-string "^1.5.2"
 
+angular-cookies@1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.4.7.tgz#03c1ead86cc7f80c322e43ed47106a63cb94daf7"
+  integrity sha1-A8Hq2GzH+AwyLkPtRxBqY8uU2vc=
+
 "angular@>= 1.0.8", angular@^1.0.8, angular@~1:
   version "1.7.9"
   resolved "https://registry.yarnpkg.com/angular/-/angular-1.7.9.tgz#e52616e8701c17724c3c238cfe4f9446fd570bc4"

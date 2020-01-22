@@ -11,7 +11,13 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Web;
+using System.Web.Helpers;
 using Core.ApplicationServices.Organizations;
+using Newtonsoft.Json;
+using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 
@@ -252,6 +258,39 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/authorize/antiforgery")]
+        public HttpResponseMessage GetAntiForgeryToken()
+        {
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+
+            var cookie = HttpContext.Current.Request.Cookies[Constants.CSRFValues.CookieName];
+
+            AntiForgery.GetTokens(cookie == null ? "" : cookie.Value, out var cookieToken, out var formToken);
+
+            response.Content = new StringContent(JsonConvert.SerializeObject(formToken), Encoding.UTF8, "application/json");
+
+            if (CookieAlreadySet(cookieToken))
+            {
+                response.Headers.AddCookies(new[]
+                {
+                    new CookieHeaderValue(Constants.CSRFValues.CookieName, cookieToken)
+                    {
+                        Expires = DateTimeOffset.Now.AddMinutes(Constants.CSRFValues.CookieExpirationMinutes),
+                        Path = "/"
+                    }
+                });
+            }
+
+            return response;
+        }
+
+        private static bool CookieAlreadySet(string cookieToken)
+        {
+            return !string.IsNullOrEmpty(cookieToken);
         }
     }
 }

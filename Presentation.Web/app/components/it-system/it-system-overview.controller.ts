@@ -703,6 +703,12 @@
                         field: "Concluded", title: "Ibrugtagningsdato", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "concludedSystemFrom", // DON'T YOU DARE RENAME!
                         hidden: false,
+                        excelTemplate: dataItem => {
+                            if (!dataItem || !dataItem.Concluded) {
+                                return "";
+                            }
+                            return dataItem.Concluded.toLocaleDateString("da-DK");
+                        },
                         filterable: 
                         {
                             operators: {
