@@ -65,6 +65,7 @@ module.exports = {
         appReport("services/stimulsoftService.js"),
         app("services/ReportService.js"),
         app("services/userServices.js"),
+        app("interceptors/csrfRequestInterceptor.js"),
         appReport("report-viewer.controller.js")
     ],
     appReportBundle: "appReport-bundle.min.js",

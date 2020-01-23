@@ -1,6 +1,6 @@
 ﻿
 ((ng, app) => {
-    app.factory("csrfRequestInterceptor", ["$cookies", "$injector", "$q", ($cookies: ng.cookies.ICookiesService, $injector: ng.auto.IInjectorService, $q: ng.IQService) => ({
+    app.factory("csrfRequestInterceptor", ["$cookies", "$injector", ($cookies: ng.cookies.ICookiesService, $injector: ng.auto.IInjectorService) => ({
         request(config) {
 
             const isMutating = (requestConfig: any) => {
