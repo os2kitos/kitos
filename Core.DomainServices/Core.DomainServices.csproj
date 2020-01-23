@@ -84,6 +84,7 @@
     <Compile Include="Queries\IntersectionQuery.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
+    <Compile Include="Repositories\KLE\IOperationClock.cs" />
     <Compile Include="Repositories\KLE\IKLEConverterHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEParentHelper.cs" />
     <Compile Include="Repositories\KLE\IKLEStandardRepository.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Repositories\KLE\KLEStandardRepository.cs" />
     <Compile Include="Repositories\KLE\KLEStatus.cs" />
     <Compile Include="Repositories\KLE\KLEUpdateStatus.cs" />
+    <Compile Include="Repositories\KLE\OperationClock.cs" />
     <Compile Include="Repositories\Project\IItProjectRepository.cs" />
     <Compile Include="Repositories\Project\ItProjectRepository.cs" />
     <Compile Include="Repositories\Reference\IReferenceRepository.cs" />

@@ -147,6 +147,7 @@ namespace Presentation.Web
             kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InRequestScope();
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InRequestScope();
             kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InRequestScope();
+            kernel.Bind<IOperationClock>().To<OperationClock>().InRequestScope();
         }
 
         private static void RegisterDataAccess(IKernel kernel)

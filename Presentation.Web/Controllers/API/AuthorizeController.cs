@@ -279,8 +279,8 @@ namespace Presentation.Web.Controllers.API
                 {
                     new CookieHeaderValue(Constants.CSRFValues.CookieName, cookieToken)
                     {
-                        Expires = DateTimeOffset.Now.AddMinutes(Constants.CSRFValues.CookieExpirationMinutes),
-                        Path = "/"
+                        Path = "/",
+                        Secure = true,
                     }
                 });
             }
