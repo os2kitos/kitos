@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -23,6 +24,8 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItProjectRepository> _specificProjectRepo;
         private readonly ItProjectService _sut;
         private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IUserRepository> _userRepository;
+        private readonly Mock<IOrganizationalUserContext> _userContext;
 
         public ItProjectServiceTest()
         {
@@ -30,13 +33,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _specificProjectRepo = new Mock<IItProjectRepository>();
             _transactionManager = new Mock<ITransactionManager>();
+            _userRepository = new Mock<IUserRepository>();
+            _userContext = new Mock<IOrganizationalUserContext>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
                 _specificProjectRepo.Object,
                 _transactionManager.Object,
-                new Mock<IUserRepository>().Object,
-                new Mock<IOrganizationalUserContext>().Object,
+                _userRepository.Object,
+                _userContext.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
         }
 
@@ -140,7 +145,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var id = A<int>();
-            var itProject = new ItProject();
+            var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() } } };
             _itProjectRepo.Setup(x => x.GetByKey(id)).Returns(itProject);
             _authorizationContext.Setup(x => x.AllowDelete(itProject)).Returns(true);
 
@@ -149,8 +154,212 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.Ok);
-            _itProjectRepo.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
+            _itProjectRepo.Verify(x => x.DeleteWithReferencePreload(itProject), Times.Once);
             _itProjectRepo.Verify(x => x.Save(), Times.Once);
+            Assert.Empty(itProject.Handover.Participants); //Make sure participants were emptied prior to deletion
+        }
+
+        [Fact]
+        public void AddHandoverParticipant_Returns_NotFound()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            ExpectGetProjectByIdReturns(projectId, default(ItProject));
+
+            //Act
+            var result = _sut.AddHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void AddHandoverParticipant_Returns_Forbidden()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var itProject = new ItProject();
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, false);
+
+            //Act
+            var result = _sut.AddHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void AddHandoverParticipant_Returns_BadInput_If_User_Not_Found()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var itProject = new ItProject();
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, default(User));
+
+            //Act
+            var result = _sut.AddHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error);
+        }
+
+        [Fact]
+        public void AddHandoverParticipant_Returns_Conflict_If_Participant_Already_Added()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var user = new User() { Id = participantId };
+            var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { user } } };
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, user);
+
+            //Act
+            var result = _sut.AddHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Conflict, result.Error);
+        }
+
+        [Fact]
+        public void AddHandoverParticipant_Returns_Success()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var user = new User() { Id = participantId };
+            var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() { Id = A<int>() } } } };
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, user);
+
+            //Act
+            var result = _sut.AddHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.True(itProject.Handover.Participants.Contains(user));
+            _itProjectRepo.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteHandoverParticipant_Returns_NotFound()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            ExpectGetProjectByIdReturns(projectId, default(ItProject));
+
+            //Act
+            var result = _sut.DeleteHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void DeleteHandoverParticipant_Returns_Forbidden()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var itProject = new ItProject();
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, false);
+
+            //Act
+            var result = _sut.DeleteHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void DeleteHandoverParticipant_Returns_BadInput_If_User_Not_Found()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var itProject = new ItProject();
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, default(User));
+
+            //Act
+            var result = _sut.DeleteHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error);
+        }
+
+        [Fact]
+        public void DeleteHandoverParticipant_Returns_BadInput_If_Participant_Not_Found_In_Handover_Participants()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var user = new User { Id = participantId };
+            var itProject = new ItProject { Handover = new Handover { Participants = new List<User> { new User() { Id = A<int>() } } } };
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, user);
+
+            //Act
+            var result = _sut.DeleteHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadInput, result.Error);
+        }
+
+        [Fact]
+        public void DeleteHandoverParticipant_Returns_Success()
+        {
+            //Arrange
+            var projectId = A<int>();
+            var participantId = A<int>();
+            var user = new User() { Id = participantId };
+            var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() { Id = A<int>() }, user } } };
+            ExpectGetProjectByIdReturns(projectId, itProject);
+            ExpectAllowModifyProjectReturns(itProject, true);
+            ExpectGetUserReturns(participantId, user);
+
+            //Act
+            var result = _sut.DeleteHandoverParticipant(projectId, participantId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(itProject.Handover.Participants.Contains(user));
+            _itProjectRepo.Verify(x => x.Save(), Times.Once);
+        }
+
+        private void ExpectGetUserReturns(int participantId, User value)
+        {
+            _userRepository.Setup(x => x.GetById(participantId)).Returns(value);
+        }
+
+        private void ExpectAllowModifyProjectReturns(ItProject itProject, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowModify(itProject)).Returns(value);
+        }
+
+        private void ExpectGetProjectByIdReturns(int projectId, ItProject itProject)
+        {
+            _specificProjectRepo.Setup(x => x.GetById(projectId)).Returns(itProject);
         }
     }
 }

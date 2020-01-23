@@ -110,7 +110,7 @@ namespace Core.ApplicationServices.Project
             {
                 return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
-            project.Handover.Participants.Clear();
+            project.Handover?.Participants?.Clear();
             _projectRepository.DeleteWithReferencePreload(project);
             _projectRepository.Save();
 
@@ -138,25 +138,11 @@ namespace Core.ApplicationServices.Project
         public Result<Handover, OperationFailure> AddHandoverParticipant(int projectId, int participantId)
         {
             var itProject = _itProjectRepository.GetById(projectId);
-            if (itProject == null)
+            var user = _userRepository.GetById(participantId);
+            var result = CanAddParticipant(itProject, user);
+            if (result.HasValue)
             {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.NotFound);
-            }
-
-            if (!_authorizationContext.AllowModify(itProject))
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.Forbidden);
-            }
-
-            var user = _userRepository.GetByKey(participantId);
-            if (user == null)
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.BadInput);
-            }
-
-            if (itProject.Handover.Participants.Any(p => p.Id == participantId))
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.Conflict);
+                return Result<Handover, OperationFailure>.Failure(result.Value);
             }
 
             itProject.Handover.Participants.Add(user);
@@ -167,28 +153,36 @@ namespace Core.ApplicationServices.Project
             return Result<Handover, OperationFailure>.Success(itProject.Handover);
         }
 
+        private Maybe<OperationFailure> CanAddParticipant(ItProject itProject, User user)
+        {
+            if (itProject == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowModify(itProject))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+            }
+            if (user == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+            if (itProject.Handover.Participants.Any(p => p.Id == user.Id))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Conflict);
+            }
+            return Maybe<OperationFailure>.None;
+        }
+
         public Result<Handover, OperationFailure> DeleteHandoverParticipant(int projectId, int participantId)
         {
             var itProject = _itProjectRepository.GetById(projectId);
-            if (itProject == null)
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.NotFound);
-            }
+            var user = _userRepository.GetById(participantId);
+            var result = CanRemoveParticipant(itProject, user);
 
-            if (!_authorizationContext.AllowModify(itProject))
+            if (result.HasValue)
             {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.Forbidden);
-            }
-
-            var user = _userRepository.GetByKey(participantId);
-            if (user == null)
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.BadInput);
-            }
-
-            if (itProject.Handover.Participants.Any(p => p.Id == participantId) == false)
-            {
-                return Result<Handover, OperationFailure>.Failure(OperationFailure.BadInput);
+                return Result<Handover, OperationFailure>.Failure(result.Value);
             }
 
             itProject.Handover.Participants.Remove(user);
@@ -197,6 +191,30 @@ namespace Core.ApplicationServices.Project
             _projectRepository.Save();
 
             return Result<Handover, OperationFailure>.Success(itProject.Handover);
+        }
+
+        private Maybe<OperationFailure> CanRemoveParticipant(ItProject itProject, User user)
+        {
+            if (itProject == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(itProject))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+            }
+
+            if (user == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+
+            if (itProject.Handover.Participants.Any(p => p.Id == user.Id) == false)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+            return Maybe<OperationFailure>.None;
         }
 
         private static void AddEconomyYears(ItProject project)
