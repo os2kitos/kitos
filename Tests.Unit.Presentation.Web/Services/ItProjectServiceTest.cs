@@ -7,6 +7,7 @@ using Core.ApplicationServices.Project;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -29,7 +30,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _specificProjectRepo = new Mock<IItProjectRepository>();
             _transactionManager = new Mock<ITransactionManager>();
-            _sut = new ItProjectService(_itProjectRepo.Object, _authorizationContext.Object, _specificProjectRepo.Object, _transactionManager.Object);
+            _sut = new ItProjectService(
+                _itProjectRepo.Object,
+                _authorizationContext.Object,
+                _specificProjectRepo.Object,
+                _transactionManager.Object,
+                new Mock<IUserRepository>().Object,
+                new Mock<IOrganizationalUserContext>().Object,
+                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now));
         }
 
         [Fact]
