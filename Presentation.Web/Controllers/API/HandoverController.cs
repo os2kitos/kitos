@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.DomainModel;
+using Core.ApplicationServices.Project;
 using Core.DomainModel.Constants;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
@@ -15,22 +16,32 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     public class HandoverController : GenericApiController<Handover, HandoverDTO>
     {
-        private readonly IGenericRepository<User> _userRepository;
         private readonly IItProjectRepository _projectRepository;
+        private readonly IItProjectService _projectService;
 
         public HandoverController(
             IGenericRepository<Handover> repository,
-            IGenericRepository<User> userRepository,
-            IItProjectRepository projectRepository)
+            IItProjectRepository projectRepository,
+            IItProjectService projectService)
             : base(repository)
         {
-            _userRepository = userRepository;
             _projectRepository = projectRepository;
+            _projectService = projectService;
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<Handover, ItProject>(goalStatus => _projectRepository.GetById(goalStatus.ItProject?.Id ?? EntityConstants.InvalidId), base.GetCrudAuthorization());
+        }
+
+        public override HttpResponseMessage Delete(int id, int organizationId)
+        {
+            return CreateResponse(HttpStatusCode.MethodNotAllowed);
+        }
+
+        public override HttpResponseMessage Post(HandoverDTO dto)
+        {
+            return CreateResponse(HttpStatusCode.MethodNotAllowed);
         }
 
         public virtual HttpResponseMessage PostParticipant(int id, [FromUri] int participantId)
@@ -39,18 +50,13 @@ namespace Presentation.Web.Controllers.API
             {
                 var handover = Repository.GetByKey(id);
 
-                if (!AllowModify(handover))
-                {
-                    return Forbidden();
-                }
+                if (handover == null) return NotFound();
 
-                var user = _userRepository.GetByKey(participantId);
-                handover.Participants.Add(user);
-                handover.LastChanged = DateTime.UtcNow;
-                handover.LastChangedByUser = KitosUser;
-                Repository.Save();
+                var result = _projectService.AddHandoverParticipant(handover.ItProject?.Id ?? EntityConstants.InvalidId, participantId);
 
-                return Ok();
+                return result.Ok ? 
+                    Ok() : 
+                    FromOperationFailure(result.Error);
             }
             catch (Exception e)
             {
@@ -64,17 +70,15 @@ namespace Presentation.Web.Controllers.API
             {
                 var handover = Repository.GetByKey(id);
 
-                if (!AllowModify(handover))
-                {
-                    return Forbidden();
-                }
+                if (handover == null) return NotFound();
 
-                var user = _userRepository.GetByKey(participantId);
-                handover.Participants.Remove(user);
-                Repository.Save();
+                var result = _projectService.DeleteHandoverParticipant(handover.ItProject?.Id ?? EntityConstants.InvalidId, participantId);
 
-                return Ok();
+                return result.Ok ?
+                    Ok() :
+                    FromOperationFailure(result.Error);
             }
+
             catch (Exception e)
             {
                 return LogError(e);
