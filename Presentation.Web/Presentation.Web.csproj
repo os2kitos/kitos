@@ -320,6 +320,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KLEController.cs" />
+    <Compile Include="Infrastructure\Attributes\IgnoreCSRFProtectionAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\RequireValidatedCSRFAttributed.cs" />
     <Compile Include="Models\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\OData\ItContractItSystemUsagesController.cs" />
@@ -339,7 +341,6 @@
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
-    <Compile Include="Infrastructure\Middleware\CSRFProtectionMiddleware.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageContractMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
