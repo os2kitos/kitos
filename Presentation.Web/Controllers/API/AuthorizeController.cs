@@ -121,6 +121,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<GetTokenResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [IgnoreCSRFProtection]
         public HttpResponseMessage GetToken(LoginDTO loginDto)
         {
             if (loginDto == null)

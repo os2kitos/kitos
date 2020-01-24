@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
@@ -184,13 +185,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
+        public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
+        {
+            var requestMessage = CreatePostMessage(url, loginDto);
+            using (var client = new HttpClient())
+            {
+                return await client.SendAsync(requestMessage);
+            }
+        }
+
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
             var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var httpResponseMessage = await PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
             {
                 return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
@@ -200,7 +210,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
 
-            using (var httpResponseMessage = await PostAsync(url, loginDto))
+            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
             {
                 return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
             }
