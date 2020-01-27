@@ -98,7 +98,7 @@ namespace Core.ApplicationServices.Authorization
         {
             if (IsReadOnly())
             {
-                return false;
+                return IsGlobalAdmin(); //Global admin negates readonly
             }
 
             if (MatchType<T, ItSystem>())
