@@ -14,7 +14,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization, IEntityWithExternalReferences
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, IContextAware, ISystemModule, IHasOrganization, IEntityWithExternalReferences, IAggregateRoot
     {
         public ItSystemUsage()
         {
@@ -416,5 +416,9 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public bool? ArchiveFromSystem { get; set; }
+        /// <summary>
+        /// Defines how this system uses other systems.
+        /// </summary>
+        public ICollection<SystemRelation> UsageRelations { get; set; }
     }
 }

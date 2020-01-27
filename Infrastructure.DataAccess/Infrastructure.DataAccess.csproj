@@ -111,6 +111,7 @@
     <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
+    <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\TsaTypeMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
@@ -515,6 +516,10 @@
     <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.Designer.cs">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001271353037_Added_SystemRelation.cs" />
+    <Compile Include="Migrations\202001271353037_Added_SystemRelation.Designer.cs">
+      <DependentUpon>202001271353037_Added_SystemRelation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -823,6 +828,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001201357301_Added-KLEHistoryTable.resx">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001271353037_Added_SystemRelation.resx">
+      <DependentUpon>202001271353037_Added_SystemRelation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
