@@ -67,9 +67,13 @@ namespace Core.DomainServices.Repositories.KLE
             return publishedDate;
         }
 
-        public IReadOnlyList<KLEChange> GetKLEChangeSummary()
+        public IOrderedEnumerable<KLEChange> GetKLEChangeSummary()
         {
-            return GetKLEChangeSummary(_kleDataBridge.GetKLEXMLData());
+            var kleXmlData = _kleDataBridge.GetKLEXMLData();
+
+            var kleChangeSummary = GetKLEChangeSummary(kleXmlData);
+
+            return kleChangeSummary.OrderBy(c => c.TaskKey);
         }
 
         private IReadOnlyList<KLEChange> GetKLEChangeSummary(XDocument kleXmlData)
@@ -88,7 +92,8 @@ namespace Core.DomainServices.Repositories.KLE
                             Type = mostRecentTaskRef.Type,
                             ChangeType = KLEChangeType.Renamed,
                             TaskKey = existingTaskRef.TaskKey,
-                            UpdatedDescription = mostRecentTaskRef.Description
+                            UpdatedDescription = mostRecentTaskRef.Description,
+                            ChangeDetails = $"Navneskift fra '{existingTaskRef.Description}' til '{mostRecentTaskRef.Description}'"
                         });
                     }
                     else if (existingTaskRef.Uuid == Guid.Empty)
@@ -98,6 +103,7 @@ namespace Core.DomainServices.Repositories.KLE
                             Uuid = mostRecentTaskRef.Uuid,
                             ChangeType = KLEChangeType.UuidPatched,
                             TaskKey = existingTaskRef.TaskKey,
+                            ChangeDetails = "Opdatering af null uuid"
                         });
                     }
                     mostRecentTaskRefs.Remove(mostRecentTaskRef.TaskKey);
@@ -120,7 +126,8 @@ namespace Core.DomainServices.Repositories.KLE
                     Type = mostRecentTaskRef.Type,
                     ChangeType = KLEChangeType.Added,
                     TaskKey = mostRecentTaskRef.TaskKey,
-                    UpdatedDescription = mostRecentTaskRef.Description
+                    UpdatedDescription = mostRecentTaskRef.Description,
+                    ChangeDetails = "Nyt KLE element"
                 }));
 
             return result;

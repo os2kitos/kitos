@@ -61,7 +61,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockKleStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
                 new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
-            });
+            }.OrderBy(c => c.TaskKey));
             _mockOrganizationalUserContext.Setup(r => r.HasRole(role)).Returns(true);
             
             // Act
@@ -97,7 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockKleStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
                 new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
-            });
+            }.OrderBy(c => c.TaskKey));
             
             // Act
             var result = _sut.UpdateKLE();

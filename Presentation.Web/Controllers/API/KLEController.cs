@@ -24,6 +24,8 @@ namespace Presentation.Web.Controllers.API
         private const string KLETaskKeyColumnName = "TaskKey";
         private const string KLEDescriptionColumnName = "Description";
         private const string KLEChangeColumnName = "Change";
+        private const string KLEChangeDetailsColumnName = "ChangeDescription";
+
         private readonly IKLEApplicationService _kleApplicationService;
 
         public KLEController(IKLEApplicationService kleApplicationService)
@@ -83,8 +85,9 @@ namespace Presentation.Web.Controllers.API
             var header = new ExpandoObject() as IDictionary<string, object>;
             header.Add(KLETypeColumnName, "KLE Type");
             header.Add(KLETaskKeyColumnName, "KLE nummer");
-            header.Add(KLEDescriptionColumnName, "Beskrivelse");
+            header.Add(KLEDescriptionColumnName, "KLE beskrivelse");
             header.Add(KLEChangeColumnName, "Ændring");
+            header.Add(KLEChangeDetailsColumnName, "Ændringsbeskrivelse");
             list.Add(header);
         }
 
@@ -98,6 +101,7 @@ namespace Presentation.Web.Controllers.API
                 obj.Add(KLETaskKeyColumnName, elem.TaskKey);
                 obj.Add(KLEDescriptionColumnName, elem.UpdatedDescription);
                 obj.Add(KLEChangeColumnName, ChangeTypeToString(elem.ChangeType));
+                obj.Add(KLEChangeDetailsColumnName, elem.ChangeDetails);
                 list.Add(obj);
             };
         }
