@@ -409,7 +409,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         [InlineData(true, false, true)]
-        [InlineData(true, true, false)]
+        [InlineData(true, true, true)] //Global admin cannot be readonly
         [InlineData(false, false, false)]
         public void Allow_Create_ItSystem_Returns(bool isGlobalAdmin, bool isReadOnly, bool expectedResult)
         {
