@@ -12,9 +12,8 @@
             controller: ['$rootScope', '$http', '$state', '$uibModal', 'notify', 'user', '$scope', function ($rootScope, $http, $state, $modal, notify, user, $scope) {
                 $rootScope.page.title = 'IT Kontrakt';
                 $rootScope.page.subnav = [
-                    { state: 'it-contract.overview', text: "IT kontrakter: økonomi" },
-                    { state: 'it-contract.plan', text: "IT kontrakter: tid" },
-                    { state: 'it-contract.edit', text: 'IT Kontrakt', showWhen: 'it-contract.edit' },
+                    { state: 'it-contract.overview', text: "Kontraktoverblik - Økonomi" },
+                    { state: 'it-contract.plan', text: "Kontraktoverblik - Tid" }
                 ];
                 $rootScope.page.subnav.buttons = [
                     { func: remove, text: 'Slet IT Kontrakt', style: 'btn-danger', icon: 'glyphicon-minus', showWhen: 'it-contract.edit' }
