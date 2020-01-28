@@ -43,12 +43,6 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual InterfaceType Interface { get; set; }
 
-        public int? InterfaceTypeId { get; set; }
-
-        public int? TsaId { get; set; }
-
-        public int? MethodId { get; set; }
-
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }
 

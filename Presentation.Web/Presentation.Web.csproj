@@ -1074,15 +1074,12 @@
     <TypeScriptCompile Include="app\models\it-system\archive-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-row.ts" />
     <TypeScriptCompile Include="app\models\it-system\data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\interface-type.ts" />
     <TypeScriptCompile Include="app\models\it-system\interface.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit-usage.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-exhibit.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface-use.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-interface.ts" />
-    <TypeScriptCompile Include="app\models\it-system\method.ts" />
     <TypeScriptCompile Include="app\models\it-system\sensitive-data-type.ts" />
-    <TypeScriptCompile Include="app\models\it-system\tsa.ts" />
     <TypeScriptCompile Include="app\models\it-system\wish.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-right.ts" />
     <TypeScriptCompile Include="app\models\organization\organization-role.ts" />
