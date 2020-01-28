@@ -31,6 +31,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
+        public static async Task<HttpResponseMessage> SendDeleteProjectAsync(int id, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var defaultOrganizationId = TestEnvironment.DefaultOrganizationId; //NOTE: Not even used in the endpoint
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/itproject/{id}?organizationId={defaultOrganizationId}"), cookie);
+        }
+
         public static async Task<ItSystemUsageDTO> AddSystemBinding(int projectId, int usageId, int organizationId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -217,6 +225,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<HandoverDTO> AddHandoverResponsibleAsync(int handoverId, int responsibleUserId, Cookie optionalLogin = null)
+        {
+            using (var response = await SendAddHandoverResponsibleRequestAsync(handoverId, responsibleUserId, optionalLogin))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<HandoverDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAddHandoverResponsibleRequestAsync(int handoverId, int responsibleUserId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"api/handover/{handoverId}?participantId={responsibleUserId}");
+
+            return await HttpApi.PostWithCookieAsync(url, cookie, new object());
         }
     }
 }

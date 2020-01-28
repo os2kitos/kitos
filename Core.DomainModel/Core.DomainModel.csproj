@@ -54,6 +54,7 @@
     <Compile Include="AttachedOption.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="ExternalLink.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
@@ -61,7 +62,9 @@
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasName.cs" />
     <Compile Include="ItProject\PhaseNames.cs" />
+    <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
+    <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />
@@ -72,6 +75,7 @@
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
+    <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
@@ -93,7 +97,6 @@
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
     <Compile Include="LocalOptions\LocalDataType.cs" />
-    <Compile Include="LocalOptions\LocalFrequencyType.cs" />
     <Compile Include="LocalOptions\LocalInterfaceType.cs" />
     <Compile Include="LocalOptions\LocalItSystemCategories.cs" />
     <Compile Include="LocalOptions\LocalItSystemType.cs" />
@@ -150,9 +153,7 @@
     <Compile Include="ItSystem\ItInterfaceExhibit.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
-    <Compile Include="ItSystemUsage\DataRowUsage.cs" />
     <Compile Include="ItSystem\DataType.cs" />
-    <Compile Include="ItSystem\FrequencyType.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceExhibitUsage.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceUsage.cs" />
     <Compile Include="ItSystem\ItInterface.cs" />
@@ -209,6 +210,9 @@
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
+    <Compile Include="Result\Maybe.cs" />
+    <Compile Include="Result\OperationFailure.cs" />
+    <Compile Include="Result\Result.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="TrafficLight.cs" />
     <Compile Include="User.cs" />

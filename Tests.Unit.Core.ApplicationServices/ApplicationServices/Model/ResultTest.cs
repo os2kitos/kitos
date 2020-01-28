@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.DomainServices.Model.Result;
+using Core.DomainModel.Result;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Model

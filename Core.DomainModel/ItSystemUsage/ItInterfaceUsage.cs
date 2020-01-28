@@ -21,7 +21,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ItInterfaceUsage()
         {
-            this.DataRowUsages = new List<DataRowUsage>();
         }
 
         public int ItSystemUsageId { get; set; }
@@ -35,11 +34,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The contract for this interface usage.
         /// </summary>
         public virtual ItContract.ItContract ItContract { get; set; }
-
-        /// <summary>
-        /// Local details regarding the usage of the exposed data of the interface
-        /// </summary>
-        public virtual ICollection<DataRowUsage> DataRowUsages { get; set; }
 
         public int? InfrastructureId { get; set; }
         /// <summary>

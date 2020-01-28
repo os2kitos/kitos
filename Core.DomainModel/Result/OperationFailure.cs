@@ -1,4 +1,4 @@
-﻿namespace Core.ApplicationServices.Model.Result
+﻿namespace Core.DomainModel.Result
 {
     public enum OperationFailure
     {

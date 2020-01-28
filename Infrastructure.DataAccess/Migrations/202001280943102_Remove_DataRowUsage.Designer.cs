@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Archived : IMigrationMetadata
+    public sealed partial class Remove_DataRowUsage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Archived));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Remove_DataRowUsage));
         
         string IMigrationMetadata.Id
         {
-            get { return "201612131514276_Archived"; }
+            get { return "202001280943102_Remove_DataRowUsage"; }
         }
         
         string IMigrationMetadata.Source

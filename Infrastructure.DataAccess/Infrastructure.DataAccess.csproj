@@ -64,6 +64,8 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />
     <Compile Include="Mapping\DataProtectionAdvisorMap.cs" />
+    <Compile Include="Mapping\ExternalLinkMap.cs" />
+    <Compile Include="Mapping\RelationFrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItSystemUsageDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\ItSystemDataWorkerRelationMap.cs" />
     <Compile Include="Mapping\SensitivePersonalDataTypeMap.cs" />
@@ -105,12 +107,11 @@
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
-    <Compile Include="Mapping\DataRowUsageMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\FrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
+    <Compile Include="Mapping\SystemRelationMap.cs" />
     <Compile Include="Mapping\TsaTypeMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
@@ -515,6 +516,14 @@
     <Compile Include="Migrations\202001201357301_Added-KLEHistoryTable.Designer.cs">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.cs" />
+    <Compile Include="Migrations\202001280931470_Add_SystemRelation.Designer.cs">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.cs" />
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -823,6 +832,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001201357301_Added-KLEHistoryTable.resx">
       <DependentUpon>202001201357301_Added-KLEHistoryTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280931470_Add_SystemRelation.resx">
+      <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

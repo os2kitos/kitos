@@ -23,8 +23,6 @@
                         notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                         return;
                     }
-                    console.log(dto.response);
-                    console.log(dto.response.upToDate);
                     if (!dto.response.upToDate) {
                         $scope.KLEUpdateAvailableLabel = "Der er en ny version af KLE, udgivet " + dto.response.version;
                         toggleKleButtonsClickAbility(true, false);

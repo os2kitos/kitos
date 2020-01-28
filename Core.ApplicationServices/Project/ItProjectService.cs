@@ -4,13 +4,13 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Result;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
-using Core.DomainServices.Model.Result;
+using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
 
@@ -22,17 +22,26 @@ namespace Core.ApplicationServices.Project
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItProjectRepository _itProjectRepository;
         private readonly ITransactionManager _transactionManager;
+        private readonly IUserRepository _userRepository;
+        private readonly IOrganizationalUserContext _userContext;
+        private readonly IOperationClock _operationClock;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
             IAuthorizationContext authorizationContext,
             IItProjectRepository itProjectRepository,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IUserRepository userRepository,
+            IOrganizationalUserContext userContext,
+            IOperationClock operationClock)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
             _itProjectRepository = itProjectRepository;
             _transactionManager = transactionManager;
+            _userRepository = userRepository;
+            _userContext = userContext;
+            _operationClock = operationClock;
         }
 
         public Result<ItProject, OperationFailure> AddProject(ItProject project)
@@ -81,11 +90,11 @@ namespace Core.ApplicationServices.Project
 
             //Setup all project phases and select initial "current".
             project.CurrentPhase = 1;
-            project.Phase1 = new ItProjectPhase {Name = PhaseNames.Phase1};
-            project.Phase2 = new ItProjectPhase {Name = PhaseNames.Phase2};
-            project.Phase3 = new ItProjectPhase {Name = PhaseNames.Phase3};
-            project.Phase4 = new ItProjectPhase {Name = PhaseNames.Phase4};
-            project.Phase5 = new ItProjectPhase {Name = PhaseNames.Phase5};
+            project.Phase1 = new ItProjectPhase { Name = PhaseNames.Phase1 };
+            project.Phase2 = new ItProjectPhase { Name = PhaseNames.Phase2 };
+            project.Phase3 = new ItProjectPhase { Name = PhaseNames.Phase3 };
+            project.Phase4 = new ItProjectPhase { Name = PhaseNames.Phase4 };
+            project.Phase5 = new ItProjectPhase { Name = PhaseNames.Phase5 };
         }
 
         public Result<ItProject, OperationFailure> DeleteProject(int id)
@@ -100,7 +109,8 @@ namespace Core.ApplicationServices.Project
             {
                 return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
             }
-            _projectRepository.DeleteByKeyWithReferencePreload(id);
+            project.Handover?.Participants?.Clear();
+            _projectRepository.DeleteWithReferencePreload(project);
             _projectRepository.Save();
 
             return Result<ItProject, OperationFailure>.Success(project);
@@ -122,6 +132,88 @@ namespace Core.ApplicationServices.Project
             }
 
             return projects;
+        }
+
+        public Result<Handover, OperationFailure> AddHandoverParticipant(int projectId, int participantId)
+        {
+            var itProject = _itProjectRepository.GetById(projectId);
+            var user = _userRepository.GetById(participantId);
+            var result = CanAddParticipant(itProject, user);
+            if (result.HasValue)
+            {
+                return Result<Handover, OperationFailure>.Failure(result.Value);
+            }
+
+            itProject.Handover.Participants.Add(user);
+            itProject.Handover.LastChanged = _operationClock.Now;
+            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
+            _projectRepository.Save();
+
+            return Result<Handover, OperationFailure>.Success(itProject.Handover);
+        }
+
+        private Maybe<OperationFailure> CanAddParticipant(ItProject itProject, User user)
+        {
+            if (itProject == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+            }
+            if (!_authorizationContext.AllowModify(itProject))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+            }
+            if (user == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+            if (itProject.Handover.Participants.Any(p => p.Id == user.Id))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Conflict);
+            }
+            return Maybe<OperationFailure>.None;
+        }
+
+        public Result<Handover, OperationFailure> DeleteHandoverParticipant(int projectId, int participantId)
+        {
+            var itProject = _itProjectRepository.GetById(projectId);
+            var user = _userRepository.GetById(participantId);
+            var result = CanRemoveParticipant(itProject, user);
+
+            if (result.HasValue)
+            {
+                return Result<Handover, OperationFailure>.Failure(result.Value);
+            }
+
+            itProject.Handover.Participants.Remove(user);
+            itProject.Handover.LastChanged = _operationClock.Now;
+            itProject.Handover.LastChangedByUser = _userContext.UserEntity;
+            _projectRepository.Save();
+
+            return Result<Handover, OperationFailure>.Success(itProject.Handover);
+        }
+
+        private Maybe<OperationFailure> CanRemoveParticipant(ItProject itProject, User user)
+        {
+            if (itProject == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.NotFound);
+            }
+
+            if (!_authorizationContext.AllowModify(itProject))
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.Forbidden);
+            }
+
+            if (user == null)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+
+            if (itProject.Handover.Participants.Any(p => p.Id == user.Id) == false)
+            {
+                return Maybe<OperationFailure>.Some(OperationFailure.BadInput);
+            }
+            return Maybe<OperationFailure>.None;
         }
 
         private static void AddEconomyYears(ItProject project)
