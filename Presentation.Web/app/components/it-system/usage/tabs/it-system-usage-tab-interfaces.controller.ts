@@ -5,30 +5,9 @@
             templateUrl: "app/components/it-system/usage/tabs/it-system-usage-tab-interfaces.view.html",
             controller: "system.EditInterfaces",
             resolve: {
-                tsas: [
-                    "$http", function ($http) {
-                        return $http.get("odata/LocalTsaTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                            return result.data.value;
-                        });
-                    }
-                ],
                 interfaces: [
                     "$http", function ($http) {
                         return $http.get("odata/LocalInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                            return result.data.value;
-                        });
-                    }
-                ],
-                interfaceTypes: [
-                    "$http", function ($http) {
-                        return $http.get("odata/LocalItInterfaceTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
-                            return result.data.value;
-                        });
-                    }
-                ],
-                methods: [
-                    "$http", function ($http) {
-                        return $http.get("odata/LocalMethodTypes?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc").then(function (result) {
                             return result.data.value;
                         });
                     }
@@ -69,8 +48,8 @@
         });
     }]);
 
-    app.controller("system.EditInterfaces", ["$rootScope", "$scope", "$http", "notify", "tsas", "interfaces", "interfaceTypes", "methods", "dataTypes", "frequencies", "itSystemUsage", "exhibits",
-        function ($rootScope, $scope, $http, notify, tsas, interfaces, interfaceTypes, methods, dataTypes, frequencies, itSystemUsage, exhibits) {
+    app.controller("system.EditInterfaces", ["$rootScope", "$scope", "$http", "notify","interfaces", "dataTypes", "frequencies", "itSystemUsage", "exhibits",
+        function ($rootScope, $scope, $http, notify, interfaces, dataTypes, frequencies, itSystemUsage, exhibits) {
 
             $scope.frequencies = frequencies;
 
@@ -80,10 +59,7 @@
 
             // resolving complex types from ids
             function resolveTypes(theInterface) {
-                theInterface.interfaceType = _.find(interfaceTypes, { Id: theInterface.interfaceTypeId });
                 theInterface.interface = _.find(interfaces, { Id: theInterface.interfaceId });
-                theInterface.method = _.find(methods, { Id: theInterface.methodId });
-                theInterface.tsa = _.find(tsas, { Id: theInterface.tsaId });
 
                 _.each(theInterface.dataRows, function (dataRow: { dataTypeId; dataType; }) {
                     dataRow.dataType = _.find(dataTypes, { Id: dataRow.dataTypeId });

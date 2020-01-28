@@ -45,20 +45,9 @@ namespace Core.DomainModel.ItSystem
 
         public int? InterfaceTypeId { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the type of the interface.
-        ///     Provides details about an it system of type interface.
-        /// </summary>
-        /// <value>
-        ///     The type of the interface.
-        /// </value>
-        public virtual ItInterfaceType InterfaceType { get; set; }
-
         public int? TsaId { get; set; }
-        public virtual TsaType Tsa { get; set; }
 
         public int? MethodId { get; set; }
-        public virtual MethodType Method { get; set; }
 
         public virtual ICollection<DataRow> DataRows { get; set; }
         public string Note { get; set; }

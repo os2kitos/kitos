@@ -56,7 +56,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
-        public DbSet<ItInterfaceType> ItInterfaceTypes { get; set; }
         public DbSet<ItContract> ItContracts { get; set; }
         public DbSet<ItContractItSystemUsage> ItContractItSystemUsages { get; set; }
         public DbSet<ItContractRight> ItContractRights { get; set; }
@@ -74,7 +73,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemRight> ItSystemRights { get; set; }
         public DbSet<ItSystemRole> ItSystemRoles { get; set; }
         public DbSet<ItSystemType> ItSystemTypes { get; set; }
-        public DbSet<MethodType> MethodTypes { get; set; }
         public DbSet<OptionExtendType> OptionExtendTypes { get; set; }
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<OrganizationType> OrganizationTypes { get; set; }
@@ -98,7 +96,6 @@ namespace Infrastructure.DataAccess
         public DbSet<AccessType> AccessTypes { get; set; }
         public DbSet<TaskUsage> TaskUsages { get; set; }
         public DbSet<Text> Texts { get; set; }
-        public DbSet<TsaType> TsaTypes { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Wish> Wishes { get; set; }
         public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
@@ -115,13 +112,11 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalItContractRole> LocalItContractRoles { get; set; }
         public DbSet<LocalItContractTemplateType> LocalItContractTemplateTypes { get; set; }
         public DbSet<LocalItContractType> LocalItContractTypes { get; set; }
-        public DbSet<LocalItInterfaceType> LocalItInterfaceTypes { get; set; }
         public DbSet<LocalItProjectRole> LocalItProjectRoles { get; set; }
         public DbSet<LocalItProjectType> LocalItProjectTypes { get; set; }
         public DbSet<LocalItSystemRole> LocalItSystemRoles { get; set; }
         public DbSet<LocalItSystemType> LocalItSystemTypes { get; set; }
         public DbSet<LocalItSystemCategories> LocalItSystemCategories { get; set; }
-        public DbSet<LocalMethodType> LocalMethodTypes { get; set; }
         public DbSet<LocalOptionExtendType> LocalOptionExtendTypes { get; set; }
         public DbSet<LocalPaymentFreqencyType> LocalPaymentFreqencyTypes { get; set; }
         public DbSet<LocalPaymentModelType> LocalPaymentModelTypes { get; set; }
@@ -133,7 +128,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
         public DbSet<LocalRegularPersonalDataType> LocalRegularPersonalDataTypes { get; set; }
-        public DbSet<LocalTsaType> LocalTsaTypes { get; set; }
         public DbSet<ExternalReference> ExternalReferences { get; set; }
         public DbSet<HelpText> HelpTexts { get; set; }
         public DbSet<LocalOrganizationUnitRole> LocalOrganizationUnitRoles { get; set; }
@@ -187,7 +181,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
-            modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItContractMap());
     
             modelBuilder.Configurations.Add(new ItContractRightMap());
@@ -203,7 +196,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemRightMap());
             modelBuilder.Configurations.Add(new ItSystemRoleMap());
             modelBuilder.Configurations.Add(new ItSystemTypeMap());
-            modelBuilder.Configurations.Add(new MethodTypeMap());
             modelBuilder.Configurations.Add(new OrganizationMap());
             modelBuilder.Configurations.Add(new OrganizationRightMap());
             modelBuilder.Configurations.Add(new OrganizationTypeMap());
@@ -221,7 +213,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TaskUsageMap());
             modelBuilder.Configurations.Add(new TextMap());
-            modelBuilder.Configurations.Add(new TsaTypeMap());
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new WishMap());

@@ -112,7 +112,6 @@
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
     <Compile Include="Mapping\SystemRelationMap.cs" />
-    <Compile Include="Mapping\TsaTypeMap.cs" />
     <Compile Include="Mapping\TaskUsageMap.cs" />
     <Compile Include="Mapping\OrganizationUnitMap.cs" />
     <Compile Include="Mapping\OrganizationUnitRightMap.cs" />
@@ -121,7 +120,6 @@
     <Compile Include="Mapping\GoalStatusMap.cs" />
     <Compile Include="Mapping\HandoverMap.cs" />
     <Compile Include="Mapping\InterfaceTypeMap.cs" />
-    <Compile Include="Mapping\ItInterfaceTypeMap.cs" />
     <Compile Include="Mapping\ItContractMap.cs" />
     <Compile Include="Mapping\ItContractRightMap.cs" />
     <Compile Include="Mapping\ItContractRoleMap.cs" />
@@ -132,7 +130,6 @@
     <Compile Include="Mapping\ItSystemRightMap.cs" />
     <Compile Include="Mapping\ItSystemRoleMap.cs" />
     <Compile Include="Mapping\TaskRefMap.cs" />
-    <Compile Include="Mapping\MethodTypeMap.cs" />
     <Compile Include="Mapping\OrganizationMap.cs" />
     <Compile Include="Mapping\PasswordResetRequestMap.cs" />
     <Compile Include="Mapping\ItProjectTypeMap.cs" />
@@ -524,6 +521,10 @@
     <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001281210025_Removed-ItInterfaceType-Method-Tsa.cs" />
+    <Compile Include="Migrations\202001281210025_Removed-ItInterfaceType-Method-Tsa.Designer.cs">
+      <DependentUpon>202001281210025_Removed-ItInterfaceType-Method-Tsa.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -838,6 +839,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
       <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001281210025_Removed-ItInterfaceType-Method-Tsa.resx">
+      <DependentUpon>202001281210025_Removed-ItInterfaceType-Method-Tsa.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
