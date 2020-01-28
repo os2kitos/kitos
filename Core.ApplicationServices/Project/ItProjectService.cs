@@ -53,7 +53,7 @@ namespace Core.ApplicationServices.Project
 
             if (!_authorizationContext.AllowCreate<ItProject>(project))
             {
-                return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             PrepareNewObject(project);
@@ -81,7 +81,7 @@ namespace Core.ApplicationServices.Project
                 transaction.Commit();
             }
 
-            return Result<ItProject, OperationFailure>.Success(project);
+            return project;
         }
 
         private static void PrepareNewObject(ItProject project)
@@ -102,18 +102,18 @@ namespace Core.ApplicationServices.Project
             var project = _projectRepository.GetByKey(id);
             if (project == null)
             {
-                return Result<ItProject, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
 
             if (!_authorizationContext.AllowDelete(project))
             {
-                return Result<ItProject, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
             project.Handover?.Participants?.Clear();
             _projectRepository.DeleteWithReferencePreload(project);
             _projectRepository.Save();
 
-            return Result<ItProject, OperationFailure>.Success(project);
+            return project;
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
@@ -138,10 +138,10 @@ namespace Core.ApplicationServices.Project
         {
             var itProject = _itProjectRepository.GetById(projectId);
             var user = _userRepository.GetById(participantId);
-            var result = CanAddParticipant(itProject, user);
-            if (result.HasValue)
+            var error = CanAddParticipant(itProject, user);
+            if (error.HasValue)
             {
-                return Result<Handover, OperationFailure>.Failure(result.Value);
+                return error.Value;
             }
 
             itProject.Handover.Participants.Add(user);
@@ -149,7 +149,7 @@ namespace Core.ApplicationServices.Project
             itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
-            return Result<Handover, OperationFailure>.Success(itProject.Handover);
+            return itProject.Handover;
         }
 
         private Maybe<OperationFailure> CanAddParticipant(ItProject itProject, User user)
@@ -177,11 +177,11 @@ namespace Core.ApplicationServices.Project
         {
             var itProject = _itProjectRepository.GetById(projectId);
             var user = _userRepository.GetById(participantId);
-            var result = CanRemoveParticipant(itProject, user);
+            var error = CanRemoveParticipant(itProject, user);
 
-            if (result.HasValue)
+            if (error.HasValue)
             {
-                return Result<Handover, OperationFailure>.Failure(result.Value);
+                return error.Value;
             }
 
             itProject.Handover.Participants.Remove(user);
@@ -189,7 +189,7 @@ namespace Core.ApplicationServices.Project
             itProject.Handover.LastChangedByUser = _userContext.UserEntity;
             _projectRepository.Save();
 
-            return Result<Handover, OperationFailure>.Success(itProject.Handover);
+            return itProject.Handover;
         }
 
         private Maybe<OperationFailure> CanRemoveParticipant(ItProject itProject, User user)

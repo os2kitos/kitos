@@ -39,17 +39,17 @@ namespace Core.ApplicationServices.Interface
 
                 if (itInterface == null)
                 {
-                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.NotFound);
+                    return OperationFailure.NotFound;
                 }
 
                 if (!_authorizationContext.AllowDelete(itInterface))
                 {
-                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Forbidden);
+                    return OperationFailure.Forbidden;
                 }
 
                 if (itInterface.ExhibitedBy != null)
                 {
-                    return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Conflict);
+                    return OperationFailure.Conflict;
                 }
 
                 var dataRows = _dataRowRepository.Get(x => x.ItInterfaceId == id);
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.Interface
                 _repository.Save();
 
                 transaction.Commit();
-                return Result<ItInterface, OperationFailure>.Success(itInterface);
+                return itInterface;
             }
         }
 
@@ -78,7 +78,7 @@ namespace Core.ApplicationServices.Interface
             if (!IsItInterfaceIdAndNameUnique(newInterface.ItInterfaceId, newInterface.Name,
                 newInterface.OrganizationId))
             {
-                return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Conflict);
+                return OperationFailure.Conflict;
             }
 
             var user = _userContext.UserEntity;
@@ -96,13 +96,13 @@ namespace Core.ApplicationServices.Interface
 
             if (!_authorizationContext.AllowCreate<ItInterface>(newInterface))
             {
-                return Result<ItInterface, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var createdInterface = _repository.Insert(newInterface);
             _repository.Save();
 
-            return Result<ItInterface, OperationFailure>.Success(createdInterface);
+            return createdInterface;
         }
 
         private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)

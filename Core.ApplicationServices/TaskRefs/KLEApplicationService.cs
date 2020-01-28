@@ -26,16 +26,16 @@ namespace Core.ApplicationServices.TaskRefs
         {
             if (!HasAccess())
             {
-                return Result<KLEStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
-            return Result<KLEStatus, OperationFailure>.Success(GetKLEStatusFromLastUpdated());
+            return GetKLEStatusFromLastUpdated();
         }
 
         public Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary()
         {
             if (!HasAccess())
             {
-                return Result<IEnumerable<KLEChange>, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
             return Result<IEnumerable<KLEChange>, OperationFailure>.Success(_kleStandardRepository.GetKLEChangeSummary());
         }
@@ -44,15 +44,15 @@ namespace Core.ApplicationServices.TaskRefs
         {
             if (!HasAccess())
             {
-                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
             if (GetKLEStatusFromLastUpdated().UpToDate)
             {
-                return Result<KLEUpdateStatus, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
             var publishedDate = _kleStandardRepository.UpdateKLE(_organizationalUserContext.UserId, _organizationalUserContext.ActiveOrganizationId);
             _kleUpdateHistoryItemRepository.Insert(publishedDate, _organizationalUserContext.UserId);
-            return Result<KLEUpdateStatus, OperationFailure>.Success(KLEUpdateStatus.Ok);
+            return KLEUpdateStatus.Ok;
         }
 
         private bool HasAccess()
