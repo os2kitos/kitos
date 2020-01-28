@@ -8,7 +8,7 @@ namespace Presentation.Web.Controllers.API
 {
 
     [InternalApi]
-    [System.Web.Mvc.RoutePrefix("api/v1/systemrelations")]
+    [RoutePrefix("api/v1/systemrelations")]
     public class SystemRelationController : BaseApiController
     {
         private readonly IItSystemUsageService _usageService;
@@ -18,8 +18,8 @@ namespace Presentation.Web.Controllers.API
             _usageService = usageService;
         }
 
-        [System.Web.Mvc.HttpPost]
-        [System.Web.Mvc.Route("")]
+        [HttpPost]
+        [Route("")]
         public HttpResponseMessage PostRelation([FromBody] CreateSystemRelationDTO relation)
         {
             if (relation == null)

@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using System;
+
+namespace Core.DomainModel
 {
     /// <summary>
     /// Defines interface for objects that have a 1:M option choice in another object.

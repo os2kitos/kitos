@@ -29,7 +29,13 @@ namespace Tests.Unit.Presentation.Web.Services
             _usageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
-            _sut = new ItSystemUsageService(_usageRepository.Object, _authorizationContext.Object, _systemRepository.Object,new Mock<IItContractRepository>().Object, new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>().Object);
+            _sut = new ItSystemUsageService(
+                _usageRepository.Object,
+                _authorizationContext.Object,
+                _systemRepository.Object,
+                new Mock<IItContractRepository>().Object,
+                new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>().Object,
+                new Mock<IOrganizationalUserContext>().Object);
         }
 
         [Fact]
@@ -68,7 +74,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Returns_BadInput_If_ItSystemNotFound()
         {
             //Arrange
-            var itSystemUsage = new ItSystemUsage {ItSystemId = A<int>()};
+            var itSystemUsage = new ItSystemUsage { ItSystemId = A<int>() };
             SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
             _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage)).Returns(true);
             _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(default(ItSystem));

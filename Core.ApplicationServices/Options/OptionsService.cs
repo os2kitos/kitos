@@ -30,9 +30,18 @@ namespace Core.ApplicationServices.Options
                 .Select(x => x.Id)
                 .ToList();
 
-            return _optionRepository
+            var allLocallyEnabled = _optionRepository
                 .AsQueryable()
-                .ByIds(activeOptions)
+                .ByIds(activeOptions);
+
+            var allObligatory = _optionRepository
+                .AsQueryable()
+                .ExceptEntitiesWithIds(activeOptions)
+                .Where(x => x.IsObligatory && x.IsEnabled); //Add enabled global options which are obligatory as well
+
+            return allObligatory
+                .Concat(allLocallyEnabled)
+                .OrderBy(option => option.Name)
                 .ToList();
         }
     }

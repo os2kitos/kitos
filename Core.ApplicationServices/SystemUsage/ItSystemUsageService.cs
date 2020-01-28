@@ -20,19 +20,22 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IItSystemRepository _systemRepository;
         private readonly IItContractRepository _contractRepository;
         private readonly IOptionsService<SystemRelation, RelationFrequencyType> _frequencyService;
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
             IAuthorizationContext authorizationContext,
             IItSystemRepository systemRepository,
             IItContractRepository contractRepository,
-            IOptionsService<SystemRelation, RelationFrequencyType> frequencyService)
+            IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
+            IOrganizationalUserContext userContext)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
             _systemRepository = systemRepository;
             _contractRepository = contractRepository;
             _frequencyService = frequencyService;
+            _userContext = userContext;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
@@ -41,29 +44,29 @@ namespace Core.ApplicationServices.SystemUsage
             var existing = GetByOrganizationAndSystemId(newSystemUsage.OrganizationId, newSystemUsage.ItSystemId);
             if (existing != null)
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Conflict);
+                return OperationFailure.Conflict;
             }
 
             if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage))
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var itSystem = _systemRepository.GetSystem(newSystemUsage.ItSystemId);
             if (itSystem == null)
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.BadInput);
+                return OperationFailure.BadInput;
             }
 
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             //Cannot create system usage in an org where the logical it system is unavailable to the users.
             if (!AllowUsageInTargetOrganization(newSystemUsage, itSystem))
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             var usage = _usageRepository.Create();
@@ -78,7 +81,7 @@ namespace Core.ApplicationServices.SystemUsage
             _usageRepository.Insert(usage);
             _usageRepository.Save(); // abuse this as UoW
 
-            return Result<ItSystemUsage, OperationFailure>.Success(usage);
+            return usage;
         }
 
         private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
@@ -93,17 +96,17 @@ namespace Core.ApplicationServices.SystemUsage
             var itSystemUsage = GetById(id);
             if (itSystemUsage == null)
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.NotFound);
+                return OperationFailure.NotFound;
             }
             if (!_authorizationContext.AllowDelete(itSystemUsage))
             {
-                return Result<ItSystemUsage, OperationFailure>.Failure(OperationFailure.Forbidden);
+                return OperationFailure.Forbidden;
             }
 
             // delete it system usage
             _usageRepository.DeleteByKeyWithReferencePreload(id);
             _usageRepository.Save();
-            return Result<ItSystemUsage, OperationFailure>.Success(itSystemUsage);
+            return itSystemUsage;
         }
 
         public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)
@@ -135,10 +138,10 @@ namespace Core.ApplicationServices.SystemUsage
             var targetFrequency = Maybe<RelationFrequencyType>.None;
 
             if (source == null)
-                return Result<SystemRelation, OperationError>.Failure(new OperationError("Source not found", OperationFailure.NotFound));
+                return new OperationError("Source not found", OperationFailure.NotFound);
 
             if (destination == null)
-                return Result<SystemRelation, OperationError>.Failure(new OperationError("Destination id does not point to a valid system usage", OperationFailure.BadInput));
+                return new OperationError("Destination id does not point to a valid system usage", OperationFailure.BadInput);
 
             if (!_authorizationContext.AllowModify(source))
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
@@ -151,17 +154,17 @@ namespace Core.ApplicationServices.SystemUsage
                     .FromNullable();
 
                 if (!targetFrequency.HasValue)
-                    return Result<SystemRelation, OperationError>.Failure(new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput));
+                    return new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput);
             }
 
             if (contractId.HasValue)
             {
                 targetContract = _contractRepository.GetById(contractId.Value).FromNullable();
                 if (!targetContract.HasValue)
-                    return Result<SystemRelation, OperationError>.Failure(new OperationError("Contract id doew not point to a valid contract", OperationFailure.BadInput));
+                    return new OperationError("Contract id doew not point to a valid contract", OperationFailure.BadInput);
             }
 
-            var result = source.AddUsageRelationTo(destination, interfaceId, description, linkName, linkUrl, targetFrequency, targetContract);
+            var result = source.AddUsageRelationTo(_userContext.UserEntity, destination, interfaceId, description, linkName, linkUrl, targetFrequency, targetContract);
             if (result.Ok)
             {
                 _usageRepository.Save();

@@ -431,6 +431,7 @@ namespace Core.DomainModel.ItSystemUsage
         public ICollection<SystemRelation> UsedByRelations { get; set; }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
+            User activeUser,
             ItSystemUsage destination,
             int? interfaceId,
             string description,
@@ -439,22 +440,25 @@ namespace Core.DomainModel.ItSystemUsage
             Maybe<RelationFrequencyType> targetFrequency,
             Maybe<ItContract.ItContract> targetContract)
         {
+            if(activeUser == null)
+                throw new ArgumentNullException(nameof(activeUser));
+
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
 
             if (Id == destination.Id)
-                return Result<SystemRelation, OperationError>.Failure(new OperationError("Cannot create relation to self", OperationFailure.BadInput));
+                return new OperationError("Cannot create relation to self", OperationFailure.BadInput);
 
-            if (this.IsInSameOrganizationAs(destination))
-                return Result<SystemRelation, OperationError>.Failure(new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput));
+            if (!this.IsInSameOrganizationAs(destination))
+                return new OperationError("Attempt to create relation to it-system in a different organization", OperationFailure.BadInput);
 
-            var targetContractIsInSameOrganization =
+            var allowContractBinding =
                 targetContract
                     .Select(this.IsInSameOrganizationAs)
                     .GetValueOrFallback(true);
 
-            if (!targetContractIsInSameOrganization)
-                return Result<SystemRelation, OperationError>.Failure(new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput));
+            if (!allowContractBinding)
+                return new OperationError("Attempt to create relation to it-contract in a different organization", OperationFailure.BadInput);
 
             var exposedInterface = Maybe<ItInterface>.None;
             if (interfaceId.HasValue)
@@ -462,7 +466,7 @@ namespace Core.DomainModel.ItSystemUsage
 
                 exposedInterface = destination.GetExposedInterface(interfaceId.Value);
                 if (!exposedInterface.HasValue)
-                    return Result<SystemRelation, OperationError>.Failure(new OperationError("Interface is not exposed by the target system", OperationFailure.BadInput));
+                    return new OperationError("Interface is not exposed by the target system", OperationFailure.BadInput);
             }
 
             var newRelation = new SystemRelation(this, destination)
@@ -474,13 +478,22 @@ namespace Core.DomainModel.ItSystemUsage
                 Reference =
                 {
                     Name = linkName,
-                    Url = linkUrl
-                }
+                    Url = linkUrl,
+                    ObjectOwner = ObjectOwner,
+                    LastChangedByUser = activeUser,
+                    LastChanged = DateTime.Now
+                },
+                ObjectOwner = ObjectOwner,
+                LastChangedByUser = activeUser,
+                LastChanged = DateTime.Now
             };
 
             UsageRelations.Add(newRelation);
 
-            return Result<SystemRelation, OperationError>.Success(newRelation);
+            LastChangedByUser = activeUser;
+            LastChanged = DateTime.Now;
+
+            return newRelation;
         }
 
         private Maybe<ItInterface> GetExposedInterface(int interfaceId)
