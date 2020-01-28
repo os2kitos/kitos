@@ -8,12 +8,16 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.ExhibitUsage;
 using Core.ApplicationServices.Interface.Usage;
+using Core.ApplicationServices.Options;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.TaskRefs;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.KLE;
@@ -137,6 +141,13 @@ namespace Presentation.Web
             RegisterAuthenticationContext(kernel);
             RegisterAccessContext(kernel);
             RegisterKLE(kernel);
+            RegisterOptions(kernel);
+        }
+
+        private static void RegisterOptions(IKernel kernel)
+        {
+            kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
+                .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InRequestScope();
         }
 
         private static void RegisterKLE(IKernel kernel)

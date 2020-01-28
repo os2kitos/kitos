@@ -1,6 +1,4 @@
-﻿using Core.DomainModel.Result;
-
-namespace Core.DomainServices.Extensions
+﻿namespace Core.DomainModel.Result
 {
     public static class ObjectExtensions
     {

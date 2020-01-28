@@ -1,11 +1,14 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Options;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 
 namespace Core.ApplicationServices.SystemUsage
@@ -15,15 +18,21 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsage> _usageRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemRepository _systemRepository;
+        private readonly IItContractRepository _contractRepository;
+        private readonly IOptionsService<SystemRelation, RelationFrequencyType> _frequencyService;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
             IAuthorizationContext authorizationContext,
-            IItSystemRepository systemRepository)
+            IItSystemRepository systemRepository,
+            IItContractRepository contractRepository,
+            IOptionsService<SystemRelation, RelationFrequencyType> frequencyService)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
             _systemRepository = systemRepository;
+            _contractRepository = contractRepository;
+            _frequencyService = frequencyService;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage, User objectOwner)
@@ -74,7 +83,7 @@ namespace Core.ApplicationServices.SystemUsage
 
         private static bool AllowUsageInTargetOrganization(ItSystemUsage newSystemUsage, ItSystem itSystem)
         {
-            return 
+            return
                     newSystemUsage.OrganizationId == itSystem.OrganizationId || //It system is defined in same org as usage
                     itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
@@ -109,5 +118,56 @@ namespace Core.ApplicationServices.SystemUsage
         {
             return _usageRepository.GetByKey(usageId);
         }
+
+        public Result<SystemRelation, OperationError> AddRelation(
+            int sourceId,
+            int destinationId,
+            int? interfaceId,
+            string description,
+            string linkName,
+            string linkUrl,
+            int? frequencyId,
+            int? contractId)
+        {
+            var source = _usageRepository.GetByKey(sourceId);
+            var destination = _usageRepository.GetByKey(destinationId);
+            var targetContract = Maybe<ItContract>.None;
+            var targetFrequency = Maybe<RelationFrequencyType>.None;
+
+            if (source == null)
+                return Result<SystemRelation, OperationError>.Failure(new OperationError("Source not found", OperationFailure.NotFound));
+
+            if (destination == null)
+                return Result<SystemRelation, OperationError>.Failure(new OperationError("Destination id does not point to a valid system usage", OperationFailure.BadInput));
+
+            if (!_authorizationContext.AllowModify(source))
+                return Result<SystemRelation, OperationError>.Failure(OperationFailure.Forbidden);
+
+            if (frequencyId.HasValue)
+            {
+                targetFrequency = _frequencyService
+                    .GetAvailableOptions(source.OrganizationId)
+                    .FirstOrDefault(x => x.Id == frequencyId.Value)
+                    .FromNullable();
+
+                if (!targetFrequency.HasValue)
+                    return Result<SystemRelation, OperationError>.Failure(new OperationError("Frequency type is not available in the organization", OperationFailure.BadInput));
+            }
+
+            if (contractId.HasValue)
+            {
+                targetContract = _contractRepository.GetById(contractId.Value).FromNullable();
+                if (!targetContract.HasValue)
+                    return Result<SystemRelation, OperationError>.Failure(new OperationError("Contract id doew not point to a valid contract", OperationFailure.BadInput));
+            }
+
+            var result = source.AddUsageRelationTo(destination, interfaceId, description, linkName, linkUrl, targetFrequency, targetContract);
+            if (result.Ok)
+            {
+                _usageRepository.Save();
+            }
+            return result;
+        }
+
     }
 }

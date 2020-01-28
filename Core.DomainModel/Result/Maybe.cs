@@ -48,14 +48,21 @@ namespace Core.DomainModel.Result
                 Maybe<TResult>.None;
         }
 
-        public T GetValueOrFallback(T defaultValue)
+        public T GetValueOrFallback(T fallback)
         {
-            if (defaultValue == null)
-                throw new ArgumentNullException(nameof(defaultValue));
+            if (fallback == null)
+                throw new ArgumentNullException(nameof(fallback));
 
             return HasValue ?
                 Value :
-                defaultValue;
+                fallback;
+        }
+
+        public T GetValueOrDefault()
+        {
+            return HasValue ?
+                Value :
+                default(T);
         }
 
         public override bool Equals(object obj)

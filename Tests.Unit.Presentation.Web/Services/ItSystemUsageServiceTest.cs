@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Options;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -8,6 +9,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Moq;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -27,7 +29,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _usageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
-            _sut = new ItSystemUsageService(_usageRepository.Object, _authorizationContext.Object, _systemRepository.Object);
+            _sut = new ItSystemUsageService(_usageRepository.Object, _authorizationContext.Object, _systemRepository.Object,new Mock<IItContractRepository>().Object, new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>().Object);
         }
 
         [Fact]
@@ -274,5 +276,7 @@ namespace Tests.Unit.Presentation.Web.Services
             response = response ?? new ItSystemUsage[0];
             _usageRepository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
+
+        //TODO: Add coverage of new types
     }
 }
