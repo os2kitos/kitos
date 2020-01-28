@@ -14,6 +14,10 @@ type HeaderButtons = {
     createReference: protractor.ElementFinder
 };
 
+type FilterInputs = {
+    catalogNameFilter: protractor.ElementFinder
+}
+
 type InputFields =
 {
         referenceDocTitle: protractor.ElementFinder,
@@ -44,10 +48,12 @@ type ColumnObjects = {
     usedByName: protractor.ElementArrayFinder,
     catalogUsage: protractor.ElementArrayFinder,
     userApi: protractor.ElementArrayFinder,
-    UserEmail: protractor.ElementArrayFinder
+    UserEmail: protractor.ElementArrayFinder,
+    activationToggle: protractor.ElementArrayFinder
 };
 
 var byDataElementType = new CSSLocator().byDataElementType;
+var byDataField = new CSSLocator().byDataField;
 var consts = new Constants();
 
 class kendoToolbarWrapper {
@@ -68,6 +74,13 @@ class kendoToolbarWrapper {
 
         };
         return buttons;
+    }
+
+    public filterInputs(): FilterInputs {
+        var filters: FilterInputs = {
+            catalogNameFilter: element(byDataField(consts.kendoCatalogNameFilter)).element(by.tagName("input"))
+    }
+        return filters;
     }
 
     public inputFields(): InputFields {
@@ -111,8 +124,9 @@ class kendoToolbarWrapper {
             UserEmail: kendo.getColumnItemLinks(consts.kendoUserEmailObject),
             referenceName: kendo.getColumnItemLinks(consts.kendoReferenceNameObjects),
             referenceId: kendo.getColumnItemLinks(consts.kendoReferenceHeaderIdObjects),
-            usedByName: kendo.getColumnItemLinks(consts.kendoUsedByObject)
-        };
+            usedByName: kendo.getColumnItemLinks(consts.kendoUsedByObject),
+            activationToggle: kendo.getButtons(consts.kendoCatalogUsageObjects)
+    };
         return columns;
     }
 
@@ -125,6 +139,10 @@ class kendoToolbarWrapper {
             });
         });
         return test;
+    }
+
+    public applyFilter(filter: protractor.ElementFinder, textValue: string) {
+        filter.sendKeys(textValue+"\n");
     }
 }
 
@@ -140,6 +158,10 @@ class kendoHelper {
 
     public getColumnItemLinks(itemHook: string) {
         return element.all(byDataElementType(itemHook)).all(by.tagName("a"));
+    }
+
+    public getButtons(itemHook: string) {
+        return element.all(byDataElementType(itemHook)).all(by.tagName("button"));
     }
 }
 

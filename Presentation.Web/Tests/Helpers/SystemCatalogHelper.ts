@@ -4,6 +4,7 @@ import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
+import SystemUsageHelper = require("./SystemUsageHelper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -50,8 +51,30 @@ class SystemCatalogHelper {
             .then(() => Select2.waitForDataAndSelect());
     }
 
+    public static createLocalSystem(name: string) {
+        console.log(`Creating local system for system: ${name}`);
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.applyCatalogNameKendoFilter(name))
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().activationToggle.first().click());
+    }
+
+    public static openSystem(name: string) {
+        console.log(`open details for local system: ${name}`);
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click());
+    }
+
     public static findCatalogColumnsFor(name: string) {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+    }
+
+    public static applyCatalogNameKendoFilter(name: string) {
+        return SystemCatalogHelper.pageObject.kendoToolbarWrapper.applyFilter(
+            SystemCatalogHelper.pageObject.kendoToolbarWrapper.filterInputs().catalogNameFilter,
+            name);
     }
 
     public static waitForKendoGrid() {
