@@ -43,10 +43,8 @@ namespace Infrastructure.DataAccess
         public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }
         public DbSet<DataRow> DataRows { get; set; }
-        public DbSet<DataRowUsage> DataRowUsages { get; set; }
         public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
-        public DbSet<FrequencyType> FrequencyTypes { get; set; }
         public DbSet<RelationFrequencyType> RelationFrequencyTypes { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
@@ -55,8 +53,6 @@ namespace Infrastructure.DataAccess
         public DbSet<HandoverTrial> HandoverTrials { get; set; }
         public DbSet<HandoverTrialType> HandoverTrialTypes { get; set; }
         public DbSet<InterfaceType> InterfaceTypes { get; set; }
-        // Udkommenteret ifm. OS2KITOS-663
-        //public DbSet<ItInterfaceUse> ItInterfaceUses { get; set; }
         public DbSet<ItInterfaceUsage> ItInterfaceUsages { get; set; }
         public DbSet<ItInterfaceExhibit> ItInterfaceExhibits { get; set; }
         public DbSet<ItInterfaceExhibitUsage> ItInterfaceExhibtUsages { get; set; }
@@ -112,7 +108,7 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalArchiveTestLocation> LocalArchiveTestLocation { get; set; }
         public DbSet<LocalBusinessType> LocalBusinessTypes { get; set; }
         public DbSet<LocalDataType> LocalDataTypes { get; set; }
-        public DbSet<LocalFrequencyType> LocalFrequencyTypes { get; set; }
+        public DbSet<LocalRelationFrequencyType> LocalRelationFrequencyTypes { get; set; }
         public DbSet<LocalGoalType> LocalGoalTypes { get; set; }
         public DbSet<LocalHandoverTrialType> LocalHandoverTrialTypes { get; set; }
         public DbSet<LocalInterfaceType> LocalInterfaceTypes { get; set; }
@@ -177,10 +173,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItContractTypeMap());
             modelBuilder.Configurations.Add(new DataTypeMap());
             modelBuilder.Configurations.Add(new DataRowMap());
-            modelBuilder.Configurations.Add(new DataRowUsageMap());
             modelBuilder.Configurations.Add(new EconomyStreamMap());
             modelBuilder.Configurations.Add(new EconomyYearMap());
-            modelBuilder.Configurations.Add(new FrequencyTypeMap());
             modelBuilder.Configurations.Add(new RelationFrequencyTypeMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());

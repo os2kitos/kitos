@@ -101,9 +101,6 @@ namespace Presentation.Web
 
             BindEntitySet<ItContractType, ItContractTypesController>(builder);
 
-            var dataRowUsage = builder.EntitySet<DataRowUsage>("DataRowUsages");
-            dataRowUsage.EntityType.HasKey(x => new { x.DataRowId, x.ItSystemUsageId, x.ItSystemId, x.ItInterfaceId });
-
             var economyStream = builder.EntitySet<EconomyStream>(entitySetEconomyStreams);
             economyStream.EntityType.HasKey(x => x.Id);
 
@@ -111,7 +108,7 @@ namespace Presentation.Web
             economyFunc.Parameter<int>("Organization");
             economyFunc.ReturnsCollectionFromEntitySet<EconomyStream>(entitySetEconomyStreams);
 
-            BindEntitySet<FrequencyType, FrequencyTypesController>(builder);
+            BindEntitySet<RelationFrequencyType, FrequencyTypesController>(builder);
 
             BindEntitySet<GoalType, GoalTypesController>(builder);
 
@@ -339,7 +336,7 @@ namespace Presentation.Web
             var localDataType = BindEntitySet<LocalDataType, LocalDataTypesController>(builder);
             localDataType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localFrequencyType = BindEntitySet<LocalFrequencyType, LocalFrequencyTypesController>(builder);
+            var localFrequencyType = BindEntitySet<LocalRelationFrequencyType, LocalFrequencyTypesController>(builder);
             localFrequencyType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localGoalType = BindEntitySet<LocalGoalType, LocalGoalTypesController>(builder);

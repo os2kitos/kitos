@@ -76,6 +76,7 @@
     <Compile Include="KLE\KLEUpdateHistoryItem.cs" />
     <Compile Include="LocalOptions\LocalArchiveTestLocation.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
+    <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />
@@ -97,7 +98,6 @@
     <Compile Include="LocalOptions\LocalArchiveLocation.cs" />
     <Compile Include="LocalOptions\LocalArchiveType.cs" />
     <Compile Include="LocalOptions\LocalDataType.cs" />
-    <Compile Include="LocalOptions\LocalFrequencyType.cs" />
     <Compile Include="LocalOptions\LocalInterfaceType.cs" />
     <Compile Include="LocalOptions\LocalItSystemCategories.cs" />
     <Compile Include="LocalOptions\LocalItSystemType.cs" />
@@ -154,9 +154,7 @@
     <Compile Include="ItSystem\ItInterfaceExhibit.cs" />
     <Compile Include="ItSystem\DataRow.cs" />
     <Compile Include="ItSystem\ArchiveType.cs" />
-    <Compile Include="ItSystemUsage\DataRowUsage.cs" />
     <Compile Include="ItSystem\DataType.cs" />
-    <Compile Include="ItSystem\FrequencyType.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceExhibitUsage.cs" />
     <Compile Include="ItSystemUsage\ItInterfaceUsage.cs" />
     <Compile Include="ItSystem\ItInterface.cs" />

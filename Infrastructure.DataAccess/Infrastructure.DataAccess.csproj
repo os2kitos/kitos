@@ -107,9 +107,7 @@
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
-    <Compile Include="Mapping\DataRowUsageMap.cs" />
     <Compile Include="Mapping\DataRowMap.cs" />
-    <Compile Include="Mapping\FrequencyTypeMap.cs" />
     <Compile Include="Mapping\ItInterfaceUsageMap.cs" />
     <Compile Include="Mapping\ItSystemUsageMap.cs" />
     <Compile Include="Mapping\SensitiveDataTypeMap.cs" />
@@ -522,6 +520,10 @@
     <Compile Include="Migrations\202001280931470_Add_SystemRelation.Designer.cs">
       <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.cs" />
+    <Compile Include="Migrations\202001280943102_Remove_DataRowUsage.Designer.cs">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -833,6 +835,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001280931470_Add_SystemRelation.resx">
       <DependentUpon>202001280931470_Add_SystemRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001280943102_Remove_DataRowUsage.resx">
+      <DependentUpon>202001280943102_Remove_DataRowUsage.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
