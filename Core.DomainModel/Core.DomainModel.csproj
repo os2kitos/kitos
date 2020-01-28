@@ -54,6 +54,7 @@
     <Compile Include="AttachedOption.cs" />
     <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
+    <Compile Include="ExternalLink.cs" />
     <Compile Include="ExternalReference.cs" />
     <Compile Include="GlobalConfig.cs" />
     <Compile Include="HelpText.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="ItProject\PhaseNames.cs" />
     <Compile Include="ItSystemUsage\SystemRelation.cs" />
     <Compile Include="ItSystem\ArchiveTestLocation.cs" />
+    <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ItSystemUsageDataWorkerRelation.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystem\ItSystemDataWorkerRelation.cs" />

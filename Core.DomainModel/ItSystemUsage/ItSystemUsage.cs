@@ -420,5 +420,9 @@ namespace Core.DomainModel.ItSystemUsage
         /// Defines how this system uses other systems.
         /// </summary>
         public ICollection<SystemRelation> UsageRelations { get; set; }
+        /// <summary>
+        /// Defines how this system is used by other systems
+        /// </summary>
+        public ICollection<SystemRelation> UsedByRelations { get; set; }
     }
 }

@@ -47,6 +47,7 @@ namespace Infrastructure.DataAccess
         public DbSet<EconomyYear> EconomyYears { get; set; }
         public DbSet<EconomyStream> EconomyStrams { get; set; }
         public DbSet<FrequencyType> FrequencyTypes { get; set; }
+        public DbSet<RelationFrequencyType> RelationFrequencyTypes { get; set; }
         public DbSet<Goal> Goals { get; set; }
         public DbSet<GoalStatus> GoalStatus { get; set; }
         public DbSet<GoalType> GoalTypes { get; set; }
@@ -151,6 +152,8 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalRegisterType> LocalRegisterTypes { get; set; }
         public DbSet<ContactPerson> ContactPersons { get; set; }
         public DbSet<KLEUpdateHistoryItem> KLEUpdateHistoryItems { get; set; }
+        public DbSet<SystemRelation> SystemRelations { get; set; }
+        public DbSet<ExternalLink> ExternalLinks { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -178,6 +181,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new EconomyStreamMap());
             modelBuilder.Configurations.Add(new EconomyYearMap());
             modelBuilder.Configurations.Add(new FrequencyTypeMap());
+            modelBuilder.Configurations.Add(new RelationFrequencyTypeMap());
             modelBuilder.Configurations.Add(new GoalMap());
             modelBuilder.Configurations.Add(new GoalStatusMap());
             modelBuilder.Configurations.Add(new GoalTypeMap());
@@ -187,8 +191,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new InterfaceTypeMap());
             modelBuilder.Configurations.Add(new ItInterfaceUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceMap());
-            // Udkommenteret ifm. OS2KITOS-663
-            //modelBuilder.Configurations.Add(new ItInterfaceUseMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitUsageMap());
             modelBuilder.Configurations.Add(new ItInterfaceTypeMap());
@@ -241,6 +243,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageDataWorkerRelationMap());
             modelBuilder.Configurations.Add(new DataResponsibleMap());
             modelBuilder.Configurations.Add(new DataProtectionAdvisorMap());
+            modelBuilder.Configurations.Add(new ExternalLinkMap());
+            modelBuilder.Configurations.Add(new SystemRelationMap());
         }
     }
 }

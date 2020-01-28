@@ -10,30 +10,48 @@ namespace Core.DomainModel.ItSystemUsage
         /// </summary>
         private SystemRelation() { }
 
-        public SystemRelation(ItSystemUsage relationTarget)
+        public SystemRelation(ItSystemUsage relationSource, ItSystemUsage relationTarget)
         {
+            RelationSource = relationSource ?? throw new ArgumentNullException(nameof(relationSource));
             RelationTarget = relationTarget ?? throw new ArgumentNullException(nameof(relationTarget));
+            Reference = new ExternalLink();
         }
 
         /// <summary>
         /// Mandatory relation target
         /// </summary>
-        public ItSystemUsage RelationTarget { get; set; }
+        public virtual int RelationSourceId { get; set; }
+        /// <summary>
+        /// Mandatory relation target
+        /// </summary>
+        public virtual ItSystemUsage RelationSource { get; set; }
+        /// <summary>
+        /// Mandatory relation target
+        /// </summary>
+        public virtual int RelationTargetId { get; set; }
+        /// <summary>
+        /// Mandatory relation target
+        /// </summary>
+        public virtual ItSystemUsage RelationTarget { get; set; }
         /// <summary>
         /// Defines the optional interface to the <see cref="RelationTarget"/>
         /// </summary>
-        public ItInterface RelationInterface { get; set; }
+        public virtual ItInterface RelationInterface { get; set; }
         /// <summary>
         /// Optional description for the relation
         /// </summary>
         public string Description { get; set; }
         /// <summary>
+        /// Link to information about the relation
+        /// </summary>
+        public ExternalLink Reference { get; set; }
+        /// <summary>
         /// Optional usage frequency
         /// </summary>
-        public FrequencyType UsageFrequency { get; set; }
+        public virtual RelationFrequencyType UsageFrequency { get; set; }
         /// <summary>
         /// Optional contract relation
         /// </summary>
-        public ItContract.ItContract AssociatedContract { get; set; }
+        public virtual ItContract.ItContract AssociatedContract { get; set; }
     }
 }
